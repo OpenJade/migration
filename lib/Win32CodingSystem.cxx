@@ -189,9 +189,12 @@ void Win32Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
     bufLen_ = n*2;
     buf_ = new char[bufLen_];
   }
+  String<wchar_t> ws(n);
+  for (size_t i = 0; i < n; i++)
+    ws[i] = wchar_t(s[i]); 
   int nBytes = WideCharToMultiByte(codePage_,
 				   0,
-				   s,
+				   ws.data(),
 				   n,
 				   buf_,
 				   bufLen_,

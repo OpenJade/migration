@@ -1,4 +1,4 @@
-Changes in OpenSP 1.5pre4
+Changes in OpenSP 1.5pre5
 
 * Fix 32-bit assumptions so we build on 64-bit platforms such
   as Alpha.

@@ -1,4 +1,4 @@
-libosp1 and libosp-dev: OpenSP development support for Debian
+libosp2 and libosp-dev: OpenSP development support for Debian
 --------------------------------------------------------------
 
 Include files from libosp-dev are available in /usr/include/osp .

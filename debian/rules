@@ -11,7 +11,8 @@
 
 pkg		:= opensp
 pkg-osp		:= $(pkg)
-pkg-libosp	:= libosp1
+libosp-maj-ver	:= 2
+pkg-libosp	:= libosp2
 pkg-libosp-dev	:= libosp-dev
 
 # default SGML pathing
@@ -49,7 +50,7 @@ compress	:= gzip -9f
 am_inst_flags	:= INSTALL='install -o root -g root -p' INSTALL_PROGRAM='$(install_program)' INSTALL_SCRIPT='$(install_script)' INSTALL_DATA='$(install_file)'
 
 # first version of package providing the right shlibs
-SHLIBS_PKGVER	:= 1.5pre4-1
+SHLIBS_PKGVER	:= 1.5pre4-3
 
 # extra docs we don't want
 DOCS_TOO_MUCH	:= ABOUT-NLS COPYING ChangeLog
@@ -128,7 +129,7 @@ debian/substvars:
 debian/$(pkg-libosp).shlibs:
 #	 std shlibs file, with the first version that supplied the version
 #	  that applications should build with
-	echo "libosp      1 $(pkg-libosp) (>= $(SHLIBS_PKGVER))" > $@
+	echo "libosp      $(libosp-maj-ver) $(pkg-libosp) (>= $(SHLIBS_PKGVER))" > $@
 
 debian/README.Debian:	debian/README.Debian.in
 #	 substitute the catalog paths

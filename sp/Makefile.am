@@ -10,6 +10,11 @@ SUBDIRS = pubtext doc \
 
 pkginclude_HEADERS = config.h
 
+docdir = $(prefix)/doc
+pkgdocdir = $(docdir)/@PACKAGE@
+
+pkgdoc_DATA = NEWS COPYING AUTHORS ChangeLog
+
 BUILT_SOURCES = config.h msggen.pl
 
 ## Note that we include the windows-only aux files.

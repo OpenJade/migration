@@ -2287,6 +2287,11 @@ void Interpreter::addCharProperty(const Identifier *prop, Owner<Expression> &def
 {
   // FIXME: what about variable default values ?
   defval->optimize(*this, Environment(), defval);
+  if(!defval->constantValue()) {
+    setNextLocation(defval->location());
+    message(InterpreterMessages::varCharPropertyExprUnsupported);
+    return;
+  }
   // FIXME: this is a kind of memory leak
   makePermanent(defval->constantValue());
   ELObjPart val(defval->constantValue(), partIndex_);
@@ -2314,6 +2319,13 @@ void Interpreter::addCharProperty(const Identifier *prop, Owner<Expression> &def
 void Interpreter::setCharProperty(const Identifier *prop, Char c, Owner<Expression> &val)
 {
   // FIXME: what about variable default values ?
+  val->optimize(*this, Environment(), val);
+  if(!val->constantValue()) {
+    setNextLocation(val->location());
+    message(InterpreterMessages::varCharPropertyExprUnsupported);
+    return;
+  }
+  makePermanent(val->constantValue());
   const CharProp *cp = charProperties_.lookup(prop->name());
   if (!cp) {
     CharProp ncp;
@@ -2323,8 +2335,6 @@ void Interpreter::setCharProperty(const Identifier *prop, Char c, Owner<Expressi
     charProperties_.insert(prop->name(), ncp);
     cp = charProperties_.lookup(prop->name());
   }
-  val->optimize(*this, Environment(), val);
-  makePermanent(val->constantValue());
   ELObjPart obj = ELObjPart(val->constantValue(), partIndex_);
   
   ELObjPart def = (*cp->map)[c];

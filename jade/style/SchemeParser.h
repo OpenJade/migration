@@ -101,6 +101,7 @@ private:
   bool doToupper();
   bool doTolower();
   bool skipForm();
+  bool parseSpecialQuery(Owner<Expression> &expr, const char *query);
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);
   bool parseBegin(Owner<Expression> &expr);

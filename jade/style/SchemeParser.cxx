@@ -789,6 +789,14 @@ bool SchemeParser::parseExpression(unsigned allowed,
 	  return parseLetStar(expr);
 	case Identifier::keyLetrec:
 	  return parseLetrec(expr);
+        case Identifier::keyThereExists:
+          return parseSpecialQuery(expr, "node-list-some?");
+        case Identifier::keyForAll:
+          return parseSpecialQuery(expr, "node-list-every?");
+        case Identifier::keySelectEach:
+          return parseSpecialQuery(expr, "node-list-filter");
+        case Identifier::keyUnionForEach:
+          return parseSpecialQuery(expr, "node-list-union-map");
 	case Identifier::keyMake:
 	  return parseMake(expr);
 	case Identifier::keyStyle:
@@ -2334,6 +2342,34 @@ bool SchemeParser::doTolower()
   }
   return 1;
 }
+
+bool SchemeParser::parseSpecialQuery(Owner<Expression> &rexp, const char *query)
+{
+  Location loc(in_->currentLocation());
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Vector<const Identifier *> vars;
+  vars.push_back(lookup(currentToken_));
+  Identifier::SyntacticKey key;
+  if (vars.back()->syntacticKey(key) && key <= int(Identifier::lastSyntacticKey))
+    message(InterpreterMessages::syntacticKeywordAsVariable,
+            StringMessageArg(currentToken_));
+
+  Owner<Expression> op(new ConstantExpression(
+    interp_->lookup(interp_->makeStringC(query))->computeBuiltinValue(1, *interp_),
+    loc));
+  NCVector<Owner<Expression> > inits, args(2);
+  Owner<Expression> expr;
+  if (!parseExpression(0, args[1], key, tok)
+      || !parseExpression(0, expr, key, tok)
+      || !getToken(allowCloseParen, tok))
+    return 0;
+  args[0] = new LambdaExpression(vars, inits, 0, 0, 0, expr, loc);
+  rexp = new CallExpression(op, args, loc);
+  return 1;
+}
+
 
 #ifdef DSSSL_NAMESPACE
 }

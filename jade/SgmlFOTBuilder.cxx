@@ -11,7 +11,7 @@
 
 #include "config.h"
 #include "SgmlFOTBuilder.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "dsssl_ns.h"
 #include <stdio.h>
 #include <string.h>

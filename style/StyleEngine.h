@@ -4,10 +4,10 @@
 #ifndef StyleEngine_INCLUDED
 #define StyleEngine_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Message.h"
-#include "SgmlParser.h"
+#include <OpenSP/Message.h>
+#include <OpenSP/SgmlParser.h>
 #include "FOTBuilder.h"
 #include "GroveManager.h"
 #include "dsssl_ns.h"

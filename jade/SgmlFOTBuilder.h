@@ -5,7 +5,7 @@
 #define SgmlFOTBuilder_INCLUDED 1
 
 #include "FOTBuilder.h"
-#include "OutputCharStream.h"
+#include <OpenSP/OutputCharStream.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

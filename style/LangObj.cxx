@@ -3,9 +3,9 @@
 
 #include "stylelib.h"
 #include "LangObj.h"
-#include "HashTable.h"
-#include "CharMap.h"
-#include "constant.h"
+#include <OpenSP/HashTable.h>
+#include <OpenSP/CharMap.h>
+#include <OpenSP/constant.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -9,7 +9,7 @@
 #include "ELObjMessageArg.h"
 #include "Expression.h"
 #include "Style.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

@@ -5,9 +5,9 @@
 #ifndef TeXFOTBuilder_INCLUDED
 #define TeXFOTBuilder_INCLUDED 1
 
-#include "OutputByteStream.h"
+#include <OpenSP/OutputByteStream.h>
 #include "FOTBuilder.h"
-#include "Message.h"
+#include <OpenSP/Message.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

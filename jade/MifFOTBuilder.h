@@ -7,10 +7,10 @@
 #define MifFOTBuilder_INCLUDED 1
 
 #include "FOTBuilder.h"
-#include "Ptr.h"
-#include "ExtendEntityManager.h"
-#include "CharsetInfo.h"
-#include "CmdLineApp.h"
+#include <OpenSP/Ptr.h>
+#include <OpenSP/ExtendEntityManager.h>
+#include <OpenSP/CharsetInfo.h>
+#include <OpenSP/CmdLineApp.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

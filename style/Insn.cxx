@@ -8,7 +8,7 @@
 #include "InterpreterMessages.h"
 #include "ELObjMessageArg.h"
 #include "Expression.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "Insn2.h"
 #include "SosofoObj.h"
 #include "Node.h"

@@ -6,7 +6,7 @@
 
 #include "Interpreter.h"
 #include "Expression.h"
-#include "Owner.h"
+#include <OpenSP/Owner.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

@@ -4,10 +4,10 @@
 #ifndef SdNode_INCLUDED
 #define SdNode_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Sd.h"
-#include "Syntax.h"
+#include <OpenSP/Sd.h>
+#include <OpenSP/Syntax.h>
 #include "GroveBuilder.h"
 
 #ifdef SP_NAMESPACE

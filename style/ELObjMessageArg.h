@@ -5,7 +5,7 @@
 #define ELObjMessageArg_INCLUDED 1
 
 #include "ELObj.h"
-#include "MessageArg.h"
+#include <OpenSP/MessageArg.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

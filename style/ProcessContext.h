@@ -4,11 +4,11 @@
 #ifndef ProcessContext_INCLUDED
 #define ProcessContext_INCLUDED 1
 
-#include "Resource.h"
-#include "Ptr.h"
-#include "Vector.h"
-#include "NCVector.h"
-#include "Owner.h"
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/Owner.h>
 #include "Collector.h"
 #include "Style.h"
 #include "FOTBuilder.h"
@@ -16,9 +16,9 @@
 #include "SosofoObj.h"
 #include "VM.h"
 #include "ProcessingMode.h"
-#include "Link.h"
-#include "IList.h"
-#include "IQueue.h"
+#include <OpenSP/Link.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IQueue.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

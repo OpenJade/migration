@@ -5,8 +5,8 @@
 #define HtmlFOTBuilder_INCLUDED 1
 
 #include "FOTBuilder.h"
-#include "CmdLineApp.h"
-#include "Message.h"
+#include <OpenSP/CmdLineApp.h>
+#include <OpenSP/Message.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

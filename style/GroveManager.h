@@ -4,12 +4,12 @@
 #ifndef GroveManager_INCLUDED
 #define GroveManager_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "StringC.h"
-#include "Vector.h"
+#include <OpenSP/StringC.h>
+#include <OpenSP/Vector.h>
 #include "FOTBuilder.h"
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "dsssl_ns.h"
 
 #ifdef DSSSL_NAMESPACE

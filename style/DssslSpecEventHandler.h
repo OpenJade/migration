@@ -4,18 +4,18 @@
 #ifndef DssslSpecEventHandler_INCLUDED
 #define DssslSpecEventHandler_INCLUDED 1
 
-#include "ErrorCountEventHandler.h"
-#include "ArcEngine.h"
-#include "Message.h"
-#include "Text.h"
-#include "Owner.h"
-#include "Boolean.h"
-#include "InputSource.h"
-#include "Vector.h"
-#include "NCVector.h"
-#include "IList.h"
-#include "IListIter.h"
-#include "StringC.h"
+#include <OpenSP/ErrorCountEventHandler.h>
+#include <OpenSP/ArcEngine.h>
+#include <OpenSP/Message.h>
+#include <OpenSP/Text.h>
+#include <OpenSP/Owner.h>
+#include <OpenSP/Boolean.h>
+#include <OpenSP/InputSource.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IListIter.h>
+#include <OpenSP/StringC.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

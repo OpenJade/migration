@@ -10,7 +10,7 @@
 #include "config.h"
 #include "TeXFOTBuilder.h"
 #include "TeXMessages.h"
-#include "MessageArg.h"
+#include <OpenSP/MessageArg.h>
 #include "TmpOutputByteStream.h"
 #include "dsssl_ns.h"
 #include <stdio.h>

@@ -4,11 +4,11 @@
 #ifndef ELObj_INCLUDED
 #define ELObj_INCLUDED 1
 
-#include "types.h"
+#include <OpenSP/types.h>
 #include "Collector.h"
-#include "OutputCharStream.h"
-#include "Boolean.h"
-#include "Location.h"
+#include <OpenSP/OutputCharStream.h>
+#include <OpenSP/Boolean.h>
+#include <OpenSP/Location.h>
 #include "Node.h"
 #include "FOTBuilder.h"
 #include <string.h>

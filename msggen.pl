@@ -110,7 +110,7 @@ print <<END if $gen_c;
 END
 
 print <<END;
-#include "Message.h"
+#include <OpenSP/Message.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {

@@ -6,25 +6,25 @@
 
 #include "ELObj.h"
 #include "Expression.h"
-#include "Message.h"
-#include "PointerTable.h"
-#include "NamedTable.h"
+#include <OpenSP/Message.h>
+#include <OpenSP/PointerTable.h>
+#include <OpenSP/NamedTable.h>
 #include "Collector.h"
-#include "InputSource.h"
-#include "XcharMap.h"
-#include "Owner.h"
+#include <OpenSP/InputSource.h>
+#include <OpenSP/XcharMap.h>
+#include <OpenSP/Owner.h>
 #include "Style.h"
 #include "SosofoObj.h"
 #include "ProcessingMode.h"
 #include "NumberCache.h"
-#include "HashTable.h"
+#include <OpenSP/HashTable.h>
 #include "FOTBuilder.h"
-#include "Owner.h"
-#include "Boolean.h"
+#include <OpenSP/Owner.h>
+#include <OpenSP/Boolean.h>
 #include "Node.h"
 #include "GroveManager.h"
 #include "Pattern.h"
-#include "CharMap.h"
+#include <OpenSP/CharMap.h>
 #include "TransformationMode.h"
 
 #ifdef DSSSL_NAMESPACE

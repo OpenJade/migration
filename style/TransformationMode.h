@@ -4,12 +4,12 @@
 #ifndef TransformationMode_INCLUDED
 #define TransformationMode_INCLUDED 1
 
-#include "Resource.h"
-#include "Ptr.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
 #include "Insn.h"
-#include "Owner.h"
+#include <OpenSP/Owner.h>
 #include "ELObj.h"
 
 #ifdef DSSSL_NAMESPACE

@@ -1,11 +1,11 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "IList.h"
-#include "IQueue.h"
-#include "Vector.h"
-#include "Hash.h"
-#include "PointerTable.h"
+#include <OpenSP/IList.h>
+#include <OpenSP/IQueue.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/Hash.h>
+#include <OpenSP/PointerTable.h>
 #undef SP_DEFINE_TEMPLATES
 
 #ifdef DSSSL_NAMESPACE

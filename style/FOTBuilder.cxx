@@ -3,9 +3,9 @@
 
 #include "stylelib.h"
 #include "FOTBuilder.h"
-#include "Owner.h"
-#include "macros.h"
-#include "IListIter.h"
+#include <OpenSP/Owner.h>
+#include <OpenSP/macros.h>
+#include <OpenSP/IListIter.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

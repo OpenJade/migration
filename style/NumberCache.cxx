@@ -3,7 +3,7 @@
 
 #include "stylelib.h"
 #include "NumberCache.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

@@ -6,7 +6,7 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "IList.h"
+#include <OpenSP/IList.h>
 #undef SP_DEFINE_TEMPLATES
 
 #ifdef DSSSL_NAMESPACE

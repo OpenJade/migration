@@ -4,20 +4,20 @@
 #ifndef Style_INCLUDED
 #define Style_INCLUDED 1
 
-#include "types.h"
-#include "StringC.h"
-#include "Named.h"
+#include <OpenSP/types.h>
+#include <OpenSP/StringC.h>
+#include <OpenSP/Named.h>
 #include <stddef.h>
 #include "ELObj.h"
-#include "Vector.h"
-#include "Ptr.h"
-#include "Resource.h"
-#include "Owner.h"
+#include <OpenSP/Vector.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Resource.h>
+#include <OpenSP/Owner.h>
 #include "Insn.h"
 #include "FOTBuilder.h"
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Location.h"
+#include <OpenSP/Location.h>
 #include "ProcessingMode.h"
 
 #ifdef DSSSL_NAMESPACE

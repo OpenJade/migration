@@ -7,20 +7,20 @@
 
 #include "HtmlFOTBuilder.h"
 #include "FOTBuilder.h"
-#include "Link.h"
-#include "IList.h"
-#include "IListIter.h"
-#include "OutputCharStream.h"
-#include "Ptr.h"
-#include "Resource.h"
-#include "macros.h"
+#include <OpenSP/Link.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IListIter.h>
+#include <OpenSP/OutputCharStream.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Resource.h>
+#include <OpenSP/macros.h>
 #include "HtmlMessages.h"
-#include "MessageArg.h"
-#include "ErrnoMessageArg.h"
-#include "StringResource.h"
-#include "OwnerTable.h"
-#include "Hash.h"
-#include "OutputByteStream.h"
+#include <OpenSP/MessageArg.h>
+#include <OpenSP/ErrnoMessageArg.h>
+#include <OpenSP/StringResource.h>
+#include <OpenSP/OwnerTable.h>
+#include <OpenSP/Hash.h>
+#include <OpenSP/OutputByteStream.h>
 #include "dsssl_ns.h"
 
 #include <stdio.h>

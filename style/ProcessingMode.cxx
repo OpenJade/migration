@@ -4,14 +4,14 @@
 #include "stylelib.h"
 #include "ProcessingMode.h"
 #include "Interpreter.h"
-#include "MessageArg.h"
+#include <OpenSP/MessageArg.h>
 #include "InterpreterMessages.h"
 #include "Expression.h"
 #include "Insn.h"
 #include "Insn2.h"
-#include "IListIter.h"
+#include <OpenSP/IListIter.h>
 #include "LocNode.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include <stdlib.h>
 
 #ifdef DSSSL_NAMESPACE

@@ -8,7 +8,7 @@
 #include "SosofoObj.h"
 #include "Style.h"
 #include "Insn.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "ELObjMessageArg.h"
 #include "LocNode.h"
 #include "VM.h"

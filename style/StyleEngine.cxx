@@ -8,12 +8,12 @@
 #include "SchemeParser.h"
 #include "FOTBuilder.h"
 #include "DssslSpecEventHandler.h"
-#include "ArcEngine.h"
+#include <OpenSP/ArcEngine.h>
 #include "ProcessContext.h"
-#include "macros.h"
-#include "InternalInputSource.h"
-#include "OutputCharStream.h"
-#include "OutputByteStream.h"
+#include <OpenSP/macros.h>
+#include <OpenSP/InternalInputSource.h>
+#include <OpenSP/OutputCharStream.h>
+#include <OpenSP/OutputByteStream.h>
 #include "DocumentGenerator.h"
 
 #ifdef DSSSL_NAMESPACE

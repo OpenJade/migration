@@ -6,24 +6,24 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "Vector.h"
-#include "NCVector.h"
-#include "Ptr.h"
-#include "Owner.h"
-#include "PointerTable.h"
-#include "OwnerTable.h"
-#include "NamedTable.h"
-#include "IList.h"
-#include "IListIter.h"
-#include "IQueue.h"
-#include "HashTable.h"
-#include "CharMap.h"
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Owner.h>
+#include <OpenSP/PointerTable.h>
+#include <OpenSP/OwnerTable.h>
+#include <OpenSP/NamedTable.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IListIter.h>
+#include <OpenSP/IQueue.h>
+#include <OpenSP/HashTable.h>
+#include <OpenSP/CharMap.h>
 #ifdef SP_SIZEOF_BOOL_1
-#include "XcharMap.h"
+#include <OpenSP/XcharMap.h>
 #endif
 #undef SP_DEFINE_TEMPLATES
 
-#include "Insn.h"
+#include <OpenSP/Insn.h>
 #include "Expression.h"
 #include "Interpreter.h"
 #include "ELObj.h"
@@ -33,7 +33,7 @@
 #include "ProcessContext.h"
 #include "SosofoObj.h"
 #include "DssslSpecEventHandler.h"
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
 #include "DssslApp.h"
 #include "Pattern.h"

@@ -4,9 +4,9 @@
 #include "stylelib.h"
 #include "DssslSpecEventHandler.h"
 #include "InterpreterMessages.h"
-#include "InternalInputSource.h"
+#include <OpenSP/InternalInputSource.h>
 #include "FOTBuilder.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "Node.h"
 
 #ifdef DSSSL_NAMESPACE

@@ -6,7 +6,7 @@
 
 #include "Collector.h"
 #include "EvalContext.h"
-#include "Location.h"
+#include <OpenSP/Location.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

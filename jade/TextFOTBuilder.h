@@ -3,9 +3,9 @@
 #ifndef TextFOTBuilder__H_INCLUDED
 #define TextFOTBuilder__H_INCLUDED
 
-#include "OutputByteStream.h"
+#include <OpenSP/OutputByteStream.h>
 #include "FOTBuilder.h"
-#include "Message.h"
+#include <OpenSP/Message.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

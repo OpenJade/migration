@@ -6,12 +6,12 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "Ptr.h"
-#include "IList.h"
-#include "IListIter.h"
-#include "Vector.h"
-#include "OwnerTable.h"
-#include "PointerTable.h"
+#include <OpenSP/Ptr.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IListIter.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/OwnerTable.h>
+#include <OpenSP/PointerTable.h>
 #undef SP_DEFINE_TEMPLATES
 
 #ifdef DSSSL_NAMESPACE

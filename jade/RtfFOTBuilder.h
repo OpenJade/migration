@@ -4,12 +4,12 @@
 #ifndef RtfFOTBuilder_INCLUDED
 #define RtfFOTBuilder_INCLUDED 1
 
-#include "OutputByteStream.h"
+#include <OpenSP/OutputByteStream.h>
 #include "FOTBuilder.h"
-#include "Ptr.h"
-#include "ExtendEntityManager.h"
-#include "CharsetInfo.h"
-#include "Message.h"
+#include <OpenSP/Ptr.h>
+#include <OpenSP/ExtendEntityManager.h>
+#include <OpenSP/CharsetInfo.h>
+#include <OpenSP/Message.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

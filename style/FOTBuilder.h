@@ -4,16 +4,16 @@
 #ifndef FOTBuilder_INCLUDED
 #define FOTBuilder_INCLUDED 1
 
-#include "types.h"
-#include "StringC.h"
-#include "Boolean.h"
+#include <OpenSP/types.h>
+#include <OpenSP/StringC.h>
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Link.h"
-#include "IList.h"
-#include "Vector.h"
-#include "Resource.h"
-#include "Ptr.h"
-#include "Owner.h"
+#include <OpenSP/Link.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Owner.h>
 #include <stddef.h>
 #include <string.h>
 #include "dsssl_ns.h"
@@ -23,7 +23,7 @@
 // subsequent declaration of the class PublicId, but it's happy
 // if it sees the class first.
 #ifdef __SUNPRO_CC
-#include "ExternalId.h"
+#include <OpenSP/ExternalId.h>
 #endif
 
 #ifdef SP_USE_DLL

@@ -2,9 +2,10 @@
 
 lib_LTLIBRARIES = libostyle.la
 
-libostyle_la_LDFLAGS = --version-info 0:0:0 -lm \
-	-L$(top_builddir)/grove -logrove \
-	-L$(top_builddir)/spgrove -lospgrove -losp
+libostyle_la_LDFLAGS = --version-info 0:0:0
+#libostyle_la_LDFLAGS = --version-info 0:0:0 -lm \
+#	-L$(top_builddir)/grove -logrove \
+#	-L$(top_builddir)/spgrove -lospgrove -losp
 
 libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	DssslApp.h DssslAppMessages.h DssslSpecEventHandler.cxx \
@@ -28,7 +29,7 @@ INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove
 EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
 	InterpreterMessages.msg InterpreterMessages.rc \
 	DssslAppMessages.msg DssslAppMessages.rc \
- 	style.dsp 
+	style.dsp 
 
 BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 	InterpreterMessages.h DssslAppMessages.h 

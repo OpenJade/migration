@@ -13,6 +13,7 @@ dnl
 dnl Initialization.
 AC_INIT(pubtext)
 AM_INIT_AUTOMAKE(OpenSP, 1.5pre6, no-define)
+AC_PREREQ(2.52)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
@@ -65,7 +66,7 @@ fi
 AC_CHECK_SIZEOF(size_t)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned short)
-OJ_CHECK_SIZEOF(wchar_t, wchar.h)
+AC_CHECK_SIZEOF(wchar_t,,stdio.h wchar.h)
 AC_CXX_BOOL
 if test "$ac_cv_cxx_bool" = yes; then
   AC_CHECK_SIZEOF(bool)

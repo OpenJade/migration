@@ -8,6 +8,8 @@
 #include <OpenSP/macros.h>
 #include "dsssl_ns.h"
 
+#ifdef JADE_TEXT
+
 #undef   DBG_TEXT_BACKEND
 #ifndef  DBG_TEXT_BACKEND
 #   define DBG(x) void(0)
@@ -949,3 +951,4 @@ FOTBuilder *makeTextFOTBuilder(OutputByteStream* os, Messenger *,
 }
 #endif
 
+#endif /* JADE_TEXT */

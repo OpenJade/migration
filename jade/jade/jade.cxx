@@ -13,7 +13,9 @@
 #ifdef JADE_MIF
 #include "MifFOTBuilder.h"
 #endif
+#ifdef JADE_TEXT
 #include "TextFOTBuilder.h"
+#endif
 #include <OpenSP/OutputCharStream.h>
 #include <OpenSP/macros.h>
 #include <OpenSP/sptchar.h>
@@ -35,7 +37,8 @@ public:
   void processOption(AppChar opt, const AppChar *arg);
   FOTBuilder *makeFOTBuilder(const FOTBuilder::Description *&);
 private:
-  enum OutputType { fotType, rtfType,
+  enum OutputType { fotType, 
+                    rtfType,
 #ifdef JADE_HTML
                     htmlType,
 #endif
@@ -43,7 +46,12 @@ private:
 #ifdef JADE_MIF
                     mifType,
 #endif
-                    sgmlType, xmlType, txtType };
+                    sgmlType, 
+                    xmlType, 
+#ifdef JADE_TEXT
+                    txtType 
+#endif 
+                   };
   static const AppChar *const outputTypeNames[];
   OutputType outputType_;
   String<AppChar> outputFilename_;
@@ -63,7 +71,9 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
 #endif
   SP_T("sgml"),
   SP_T("xml"),
+#ifdef JADE_TEXT
   SP_T("txt"),
+#endif
 };
 
 JadeApp::JadeApp()
@@ -177,8 +187,10 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Description *&descr)
   case sgmlType:
   case xmlType:
     return makeTransformFOTBuilder(this, outputType_ == xmlType, outputOptions_, descr);
+#ifdef JADE_TEXT
   case txtType:
     return makeTextFOTBuilder(&outputFile_, this, descr);
+#endif /* JADE_TEXT */
   default:
     break;
   }

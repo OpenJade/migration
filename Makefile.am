@@ -25,7 +25,7 @@ MAINTAINERCLEANFILES = install-sh mkinstalldirs missing \
 ## We include msggen.pl, since it won't be generated on Windows.
 EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak .cvsignore all \
-	@PACKAGE@-@VERSION@.spec
+	@PACKAGE@-@VERSION@.spec config.rpath
 
 dist-hook:
 	mv $(distdir)/include/config.h.old $(distdir)/config.h

@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -7,6 +7,7 @@
 #include "splib.h"
 #include "MessageArg.h"
 #include "MessageBuilder.h"
+#include "ParserMessages.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -75,6 +76,25 @@ OtherMessageArg::OtherMessageArg()
 void OtherMessageArg::append(MessageBuilder &builder) const
 {
   builder.appendOther(this);
+}
+
+StringVectorMessageArg::StringVectorMessageArg(const Vector<StringC> &v)
+: v_(v)
+{
+}
+
+MessageArg *StringVectorMessageArg::copy() const
+{
+  return new StringVectorMessageArg(*this);
+}
+
+void StringVectorMessageArg::append(MessageBuilder &builder) const
+{
+  for (size_t i = 0; i < v_.size(); i++) {
+    if (i > 0)
+      builder.appendFragment(ParserMessages::listSep);
+    builder.appendChars(v_[i].data(), v_[i].size());
+  }
 }
 
 #ifdef SP_NAMESPACE

@@ -60,7 +60,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "spcat"=.\spcat\spcat.dsp - Package Owner=<4>
+Project: "spent"=.\spent\spent.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -72,7 +72,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "spent"=.\spent\spent.dsp - Package Owner=<4>
+Project: "sx"=.\sx\sx.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -87,7 +87,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "sx"=.\sx\sx.dsp - Package Owner=<4>
+Project: "spcat"=.\spcat\spcat.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

@@ -68,6 +68,7 @@ public:
                const MessageType1 *&urnerror);
   const StringC &string() const;
   const Text &text() const;
+  const Type type() const { return type_; }
 private:
   Boolean initFpi(const StringC &, const CharsetInfo &, Char, 
                const MessageType1 *&);

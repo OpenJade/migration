@@ -741,12 +741,18 @@ void ParserState::activateLinkType(const StringC &name)
 Boolean ParserState::shouldActivateLink(const StringC &name) const
 {
   if (!activeLinkTypesSubsted_) {
-    // FIXME use mutable
-    ParserState *state = (ParserState *)this;
     for (size_t i = 0; i < activeLinkTypes_.size(); i++)
       for (size_t j = 0; j < activeLinkTypes_[i].size(); j++)
-	syntax().generalSubstTable()->subst(state->activeLinkTypes_[i][j]);
-    state->activeLinkTypesSubsted_ = 1;
+	syntax().generalSubstTable()->subst(
+#ifndef HAVE_MUTABLE
+	  ((ParserState *)this)-> 
+#endif
+	    activeLinkTypes_[i][j]
+	  );
+#ifndef HAVE_MUTABLE
+	  ((ParserState *)this)-> 
+#endif
+	    activeLinkTypesSubsted_ = 1;
   }
   for (size_t i = 0; i < activeLinkTypes_.size(); i++)
     if (name == activeLinkTypes_[i])

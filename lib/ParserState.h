@@ -243,8 +243,8 @@ private:
   Ptr<Lpd> defLpd_;
   Vector<ConstPtr<Lpd> > allLpd_;
   Vector<ConstPtr<Lpd> > lpd_; // active LPDs
-  Vector<StringC> activeLinkTypes_;
-  Boolean activeLinkTypesSubsted_;
+  mutable Vector<StringC> activeLinkTypes_;
+  mutable Boolean activeLinkTypesSubsted_;
   Boolean hadLpd_;
   Boolean resultAttributeSpecMode_;
   Boolean pass2_;

@@ -2,7 +2,7 @@
 
 lib_LTLIBRARIES= libosp.la
 
-libosp_la_LDFLAGS = --version-info 0:0:0
+libosp_la_LDFLAGS = -version-info 1:0:0
 
 ## We list the generated sources here. This has the side-effect
 ## of putting them in the distribution, but that is actually nice
@@ -42,8 +42,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	SGMLApplication.cxx SJISCodingSystem.cxx SOEntityCatalog.cxx Sd.cxx \
 	SdFormalError.h SdText.cxx SearchResultMessageArg.cxx SgmlParser.cxx \
 	ShortReferenceMap.cxx SrInfo.h StdioStorage.cxx StdioStorageMessages.h \
-	StorageManager.cxx StorageObjectPosition.h \
-	StringVectorMessageArg.cxx StringVectorMessageArg.h Syntax.cxx \
+	StorageManager.cxx StorageObjectPosition.h Syntax.cxx \
 	Text.cxx TokenMessageArg.cxx TokenMessageArg.h \
 	TranslateCodingSystem.cxx Trie.h TrieBuilder.cxx TrieBuilder.h \
 	TypeId.cxx URLStorage.cxx URLStorageMessages.h \
@@ -52,6 +51,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	assert.cxx big5.h events.h gb2312.h iso646-jis.h iso8859-2.h \
 	iso8859-3.h iso8859-4.h iso8859-5.h iso8859-6.h iso8859-7.h \
 	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
+	koi8-r.h \
 	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
 	splibpch.h token.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
@@ -103,4 +103,4 @@ SUFFIXES = .msg .m4 .rc
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_builddir)/msggen.pl $(MSGGENFLAGS) $<
+	[ ! -f $(top_srcdir)/msggen.pl ] || $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

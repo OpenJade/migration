@@ -7,6 +7,7 @@ use POSIX;
 # Package and version.
 $package = '@PACKAGE@';
 $version = '@VERSION@';
+$package = $package; $version = $version; # be quiet, -w
 
 $prog = $0;
 $prog =~ s@.*/@@;
@@ -173,7 +174,7 @@ if ($gen_c) {
 #pragma implementation
 #endif
 
-#include "config.h"
+#include "splib.h"
 #include "$class.h"
 
 #ifdef SP_NAMESPACE

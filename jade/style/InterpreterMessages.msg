@@ -85,11 +85,13 @@ E0+sosofoContext++this context requires a sosofo
 E0+styleContext++this context requires a style object
 E0+notInCharacteristicValue++procedure can only be used in evaluation of characteristic value
 E1+expressionNotImplemented++sorry, %1 expression not implemented
-E0+RGBColorArgCount++Device RGB color requires three arguments
-E0+RGBColorArgType++arguments for Device RGB color must be numbers
-E0+RGBColorArgRange++arguments for Device RGB color must be in the range 0 to 1
+E1+colorArgCount++%1 color requires three arguments
+E1+colorArgType++arguments for %1 color must be numbers
+E1+colorArgRange++arguments for %1 color must be in the range 0 to 1
+E1+colorProcResType++result of procedure in %1 color must be a number
 E1+unknownColorSpaceFamily++unknown color-space family %1
-E0+deviceRGBColorSpaceNoArgs++Device RGB Color Space Family does not take any arguments
+E1+colorSpaceNoArgs++%1 color-space family does not take any arguments
+E1+colorSpaceArgError++invalid parameters for %1 color-space family
 E1+notABuiltinInheritedC++%1 is not a pre-defined inherited characteristic
 E1+invalidNumberFormat++invalid number format %1
 E1+invalidPublicIdChar++invalid character %1 in public identifier

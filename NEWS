@@ -1,3 +1,20 @@
+Changes in OpenJade 1.3.1 (January 2002)
+
+* Support for newer GNU source configuration tools (autoconf, libtool, automake)
+
+* Support for newer GNU and Microsoft compilers
+
+* Support for more/up to date platforms (Mac OS X, Darwin, BSD, Cygwin etc.)
+
+* Numerous bug fixes to TeX backend for improved table support and two
+  sided output. Two new external procedures two control double sided
+  output (required by jadetex 3.4 or greater).
+
+  "UNREGISTERED::OpenJade//Characteristic::page-two-side?"
+  "UNREGISTERED::OpenJade//Characteristic::two-side-start-on-right?"
+
+* Support for XML Byte Order Marks
+
 Changes in OpenJade 1.3
 
 * The SGML backend will no emit linebreaks when used as -t sgml-raw.

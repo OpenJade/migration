@@ -75,7 +75,7 @@
    more than one system identifier is specified, then the corresponding
    entities will be concatenated to form the document entity. Thus the
    document entity may be spread among several files; for example, the
-   SGML declaration, prologue and document instance set could each be in a
+   SGML declaration, prolog and document instance set could each be in a
    separate file. If no system identifiers are specified, then onsgmls
    will read the document entity from the standard input. A command line
    system identifier of - can be used to refer to the standard input.
@@ -242,7 +242,7 @@
     <varlistentry>
       <term><option>-p</option></term>
       <listitem>
-          <para>Parse only the prologue. <command>onsgmls</command> will exit after parsing the
+          <para>Parse only the prolog. <command>onsgmls</command> will exit after parsing the
           document type declaration. Implies <option>-s</option>.</para>
       </listitem>
     </varlistentry>

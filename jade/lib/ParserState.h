@@ -142,6 +142,7 @@ public:
   void pushInput(InputSource *);
   Boolean referenceDsEntity(const Location &);
   void setDsEntity(const ConstPtr<Entity> &);
+  const ConstPtr<Entity> &dsEntity() const;
   Boolean eventQueueEmpty() const;
   Event *eventQueueGet();
   EventHandler &eventHandler();
@@ -837,6 +838,13 @@ Boolean ParserState::hadAfdrDecl() const
 {
   return hadAfdrDecl_;
 }
+
+inline
+const ConstPtr<Entity> &ParserState::dsEntity() const
+{
+  return dsEntity_;
+}
+
 
 #ifdef SP_NAMESPACE
 }

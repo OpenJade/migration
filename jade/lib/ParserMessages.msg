@@ -437,6 +437,13 @@ E1+urnMissingPrefix++invalid universal resource name %1: missing urn: prefix
 E1+urnInvalidNid++invalid universal resource name %1: invalid namespace identifier  
 E1+urnInvalidNss++invalid universal resource name %1: invalid namespace specific string 
 E1+urnExtraField++invalid universal resource name %1: extra field
+E0+omittedProlog++prolog can't be omitted unless CONCUR NO and LINK EXPLICIT NO and either IMPLYDEF ELEMENT YES or IMPLYDEF DOCTYPE YES
+E0+impliedDocumentElement++can't determine name of #IMPLIED document element
+E0+impliedDoctypeConcurLink++can't use #IMPLICIT doctype unless CONCUR NO and LINK EXPLICIT NO
+E0+sorryImpliedDoctype++Sorry, #IMPLICIT doctypes not implemented
+W0+dtdDataEntityReference++reference to DTD data entity ignored
+E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefined
+E1+dsEntityNotationUndefined++notation %1 for external subset undefined
 =1000
 +delimStart++delimiter 
 +delimEnd++

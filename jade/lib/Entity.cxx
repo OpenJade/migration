@@ -179,10 +179,11 @@ Entity *ExternalTextEntity::copy() const
 }
 
 ExternalNonTextEntity::ExternalNonTextEntity(const StringC &name,
+					     DeclType declType,
 					     DataType dataType,
 					     const Location &defLocation,
 					     const ExternalId &id)
-: ExternalEntity(name, generalEntity, dataType, defLocation, id)
+: ExternalEntity(name, declType, dataType, defLocation, id)
 {
 }
 
@@ -191,9 +192,9 @@ ExternalDataEntity::ExternalDataEntity(const StringC &name,
 				       const Location &defLocation,
 				       const ExternalId &id,
 				       const ConstPtr<Notation> &nt,
-				       
-				       AttributeList &attributes)
-: ExternalNonTextEntity(name, dataType, defLocation, id),
+				       AttributeList &attributes,
+				       DeclType declType)
+: ExternalNonTextEntity(name, declType, dataType, defLocation, id),
   notation_(nt)
 {
   attributes.swap(attributes_);
@@ -214,7 +215,7 @@ Entity *ExternalDataEntity::copy() const
 SubdocEntity::SubdocEntity(const StringC &name,
 			   const Location &defLocation,
 			   const ExternalId &id)
-: ExternalNonTextEntity(name, subdoc, defLocation, id)
+: ExternalNonTextEntity(name, generalEntity, subdoc, defLocation, id)
 {
 }
 
@@ -494,6 +495,12 @@ Boolean ExternalNonTextEntity::isCharacterData() const
   return 1;
 }
 
+
+void ExternalNonTextEntity::dsReference(ParserState &parser,
+					const Ptr<EntityOrigin> &) const
+{
+  parser.message(ParserMessages::dtdDataEntityReference);
+}
 
 void ExternalNonTextEntity::normalReference(ParserState &parser,
 					    const Ptr<EntityOrigin> &,

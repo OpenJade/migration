@@ -1071,6 +1071,11 @@ int main(int argc, char **argv)
 }
 </pre>
 <p>
+This example will only work for the non-multibyte version of SP;
+for the multibyte version you will need to use the standard C++ library's
+facilities for wide character output, or roll your own equivalents
+(like the OutputCharStream used by SP applications).
+<p>
 There's a bigger example in the <code>sgmlnorm</code> directory in the SP
 distribution.
 This uses the <code>SGMLApplication</code> interface, but it doesn't

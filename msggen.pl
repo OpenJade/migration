@@ -46,6 +46,11 @@ while (<DEF>) {
     next if /^[ 	]*$/;
     @field = split('\+', $_, 5);
     &error("too few fields") if $#field < 3;
+    if ($#field == 4 && $field[4] =~ /^%J/) {
+	$field[3] .= '+';
+	$field[3] .= substr($field[4], 2);
+	$#field = 3;
+    }
     if ($field[0] eq "") {
 	$type[$num] = "";
 	$argc = 0;

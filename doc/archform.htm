@@ -10,10 +10,8 @@ The Hytime standard (ISO/IEC 10744) introduced the concept of
 architectural forms.  This document assumes you are already familiar
 with this concept. HyTime 2nd Edition generalizes this, and makes it
 possible to have an <I>architecture engine</I> which can perform
-architectural form processing for arbitrary architectures.  SP now
-includes such an architecture engine.  The implementation is based on
-a draft of HyTime 2nd Edition, and has some <A
-HREF="#hi2diff">differences</A> from the final version.
+architectural form processing for arbitrary architectures.  SP
+includes such an architecture engine.
 <P>
 Non-markup sensitive applications built using SP now support
 architectural form processing using the <SAMP>-A
@@ -22,9 +20,6 @@ document will be validated against all declared base architectures,
 and the output will be for the architectural document for that
 architecture: the element types, notations and attributes will be
 those defined in the meta-DTD.
-<P>
-This option is experimental and has not been subject to much testing.
-Please be sure to report any bugs or problems you encounter.
 <P>
 Although spam does not support the <SAMP>-A</SAMP> option because it
 works with the markup of your document, sgmlnorm does.
@@ -43,7 +38,7 @@ this is called the <I>architecture notation declaration</I>.
 <P>
 An architecture base declaration is a processing instruction of the form:
 <PRE>
-&lt;?ArcBase <VAR>archname</VAR>&gt;
+&lt;?IS10744 ArcBase <VAR>archname</VAR>&gt;
 </PRE>
 <P>
 The processing instruction is recognized either in the DTD or in an
@@ -265,7 +260,7 @@ in the meta-DTD
 Before any of these extensions can be used, the meta-DTD must include a
 declaration
 <PRE>
-&lt;!AFDR "ISO/IEC 10744:1992"&gt;
+&lt;!AFDR "ISO/IEC 10744:1997"&gt;
 </PRE>
 <P>
 This declaration should only be included if the extensions are used.
@@ -340,34 +335,6 @@ type declaration subset, it is clearly the intent of the standard that
 they be allowed.  You can use a <SAMP>-wlpd-notation</SAMP> option to
 disallow them.
 
-<H2>Notation set architecture</H2>
-<P>
-An architecture for which <VAR>archname</VAR> is declared
-as a notation with a public identifier of
-<PRE>
-"ISO/IEC 10744//NOTATION AFDR ARCBASE
-Notation Set Architecture Definition Document//EN"
-</PRE>
-<P>
-is special.  The element types in the meta-DTD for this architecture
-are the notations of the document DTD and the attributes defined for
-the element types in the meta-DTD are the data attributes defined for
-the notations in the document DTD.  For each element, the attribute
-with a declared value of NOTATION performs the function that the
-ArcFormA attribute performs for normal architectures.  Only the
-<SAMP>ArcNamrA</SAMP> and <SAMP>ArcSuprA</SAMP> architectural support
-attributes can be used with this architecture.
-<P>
-The notation set architecture can also be declared using
-an architecture base declaration of the form:
-<PRE>
-&lt;?ArcBase #NOTATION&gt;
-</PRE>
-<P>
-In this case, no architecture support attributes can be declared;
-<SAMP>ArcNamrA</SAMP> will be defaulted to <SAMP>notnames</SAMP>,
-and <SAMP>ArcSuprA</SAMP> to <SAMP>notsupr</SAMP>.
-
 <H2>Derived architectures</H2>
 <P>
 A meta-DTD can have one or more base architectures in the same way as
@@ -388,24 +355,13 @@ document to produce an architectural document conforming to the
 A document that is validated against a meta-DTD will automatically
 be validated against any base architectures of that meta-DTD.
 
-<H2><A NAME=hi2diff>Differences from HyTime 2nd Edition</A></H2>
+<H2><A NAME=hi2diff>Unimplemented features</A></H2>
 <P>
-This implementation differs from the AFDR specification in HyTime 2nd
-edition in the following ways:
+The following features from the AFDR specification in HyTime 2nd
+edition are not yet implemented:
 <UL>
 <LI>
-The date in the public identifier in the AFDR declaration is 1992
-rather than 1997.
-<LI>
-The <CODE>#MAPTOKEN</CODE> feature is not implemented.
-<LI>
-The notation set architecture is provided.
-<LI>
-The architecture base declaration processing instruction starts with
-<CODE>ArcBase</CODE> rather than <CODE>IS10744 ArcBase</CODE>.
-<LI>
-Changing <CODE>ArcBase</CODE> using APPINFO in the SGML declaration is
-not supported.
+use of <CODE>#MAPTOKEN</CODE> in the architectural attribute renamer.
 </UL>
 <P>
 <ADDRESS>

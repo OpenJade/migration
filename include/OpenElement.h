@@ -48,6 +48,8 @@ public:
   const LeafContentToken *currentPosition() const;
   Boolean declaredEmpty() const;
   void setConref();
+  unsigned long index() const;
+  void setIndex(unsigned long);
 private:
   OpenElement(const OpenElement &); // undefined
   void operator=(const OpenElement &); // undefined
@@ -58,6 +60,7 @@ private:
   ElementDefinition::DeclaredContent declaredContent_;
   const ShortReferenceMap *map_;
   Location startLocation_;
+  unsigned long index_;
 };
 
 inline
@@ -185,6 +188,18 @@ inline
 void OpenElement::setConref()
 {
   declaredContent_ = ElementDefinition::empty;
+}
+
+inline
+unsigned long OpenElement::index() const
+{
+  return index_;
+}
+
+inline
+void OpenElement::setIndex(unsigned long index)
+{
+  index_ = index;
 }
 
 #ifdef SP_NAMESPACE

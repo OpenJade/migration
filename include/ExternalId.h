@@ -31,6 +31,7 @@ public:
     LPD,
     NONSGML,
     NOTATION,
+    SD,
     SHORTREF,
     SUBDOC,
     SYNTAX,

@@ -34,6 +34,8 @@ DEBUG=
 XDEFINES=
 DEFINES=-DSP_HAVE_BOOL -DSP_ANSI_CLASS_INST -DSP_MULTI_BYTE $(XDEFINES)
 CXXFLAGS=-ansi $(DEBUG) $(WARN)
+# Flag to pass to CXX to make it output list of dependencies as a Makefile.
+CXXDEPGENFLAGS=-MM
 LDFLAGS=
 CC=gcc
 CFLAGS=-O $(DEBUG)
@@ -64,7 +66,7 @@ EXE=
 #EXE=.exe
 
 LIBDIRS=lib $(XLIBDIRS)
-PROGDIRS=nsgmls spam sgmlnorm spent $(XPROGDIRS)
+PROGDIRS=nsgmls spam sgmlnorm spent sx $(XPROGDIRS)
 dodirs=$(LIBDIRS) $(PROGDIRS)
 PURIFYFLAGS=
 PURIFY=purify $(PURIFYFLAGS) -g++=yes -collector=`dirname \`gcc -print-libgcc-file-name\``/ld
@@ -75,7 +77,7 @@ MDEFINES='CXX=$(CXX)' 'CC=$(CC)' 'LIBOBJS=$(LIBOBJS)' 'CXXFLAGS=$(CXXFLAGS)' \
  'M4=$(M4)' 'PERL=$(PERL)' 'LIBS=$(LIBS)' 'PURIFY=$(PURIFY)' \
  'PIC_FLAG=$(PIC_FLAG)' 'XPROGDIRS=$(XPROGDIRS)' 'XLIBDIRS=$(XLIBDIRS)' \
  'libMakefile=$(libMakefile)' 'EXE=$(EXE)' 'bindir=$(bindir)' \
- 'INSTALL=$(INSTALL)'
+ 'INSTALL=$(INSTALL)' CXXDEPGENFLAGS='$(CXXDEPGENFLAGS)'
 
 # Automatic template instantiation can cause compilers to generate
 # various extra files; the clean target won't delete these.

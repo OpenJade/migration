@@ -8,6 +8,7 @@
 #endif
 
 #include <stddef.h>
+#include "IList.h"
 
 #ifdef SP_USE_DLL
 #ifdef BUILD_LIBGROVE
@@ -26,7 +27,7 @@
 #endif
 
 // Supports the following modules:
-// baseabs prlgabs0 instabs basesds0 instsds0 subdcabs
+// baseabs prlgabs0 prlgabs1 instabs basesds0 instsds0 subdcabs
 
 #ifdef GROVE_NAMESPACE
 namespace GROVE_NAMESPACE {
@@ -49,6 +50,8 @@ class NamedNodeListPtr;
 class GroveString;
 class NodeVisitor;
 class SdataMapper;
+class GroveStringList;
+class GroveStringListPtr;
 
 enum AccessResult {
   accessOK,			// success
@@ -61,55 +64,100 @@ struct GROVE_API ComponentName {
   enum Id {
     noId = -1,
     idAllPropertyNames,
+    idAnd,
+    idAny,
     idApplicationInfo,
     idAttributeAssignment,
+    idAttributeDef,
+    idAttributeDefs,
     idAttributes,
     idAttributeValueToken,
     idCdata,
     idChar,
     idChildrenPropertyName,
     idClassName,
+    idConnector,
+    idConref,
     idContent,
+    idContentTokens,
+    idContentType,
+    idCurrent,
+    idCurrentAttributeIndex,
+    idCurrentGroup,
     idDataChar,
     idDataPropertyName,
     idDataSepPropertyName,
+    idDeclValueType,
     idDefaulted,
     idDefaultedEntities,
+    idDefaultEntity,
+    idDefaultValue,
+    idDefaultValueType,
+    idDoctypesAndLinktypes,
     idDocumentElement,
     idDocumentType,
-    idDoctypesAndLinktypes,
     idElement,
     idElements,
+    idElementToken,
+    idElementType,
+    idElementTypes,
+    idEmpty,
     idEntities,
     idEntity,
     idEntityName,
     idEntityType,
     idEpilog,
+    idExclusions,
     idExternalData,
     idExternalId,
+    idFixed,
     idGeneralEntities,
     idGeneratedSystemId,
     idGi,
-    idGoverningDoctype,
     idGoverning,
+    idGoverningDoctype,
     idGroveRoot,
     idId,
+    idIdref,
+    idIdrefs,
     idImplied,
     idIncluded,
+    idInclusions,
+    idModelGroup,
     idMustOmitEndTag,
     idName,
+    idNames,
     idNdata,
+    idNmtkgrp,
+    idNmtoken,
+    idNmtokens,
     idNotation,
     idNotationName,
     idNotations,
+    idNumber,
+    idNumbers,
+    idNutoken,
+    idNutokens,
+    idOccurenceIndicator,
+    idOmitEndTag,
+    idOmitStartTag,
+    idOpt,
+    idOr,
     idOrigin,
     idOriginToSubnodeRelPropertyName,
+    idParameterEntities,
     idParent,
+    idPcdataToken,
     idPi,
+    idPlus,
     idProlog,
     idPublicId,
+    idRcdata,
     idReferent,
+    idRep,
+    idRequired,
     idSdata,
+    idSeq,
     idSgmlConstants,
     idSgmlDocument,
     idSubdocument,
@@ -118,6 +166,7 @@ struct GROVE_API ComponentName {
     idSystemId,
     idText,
     idToken,
+    idTokens,
     idTokenSep,
     idTreeRoot,
     idValue
@@ -140,6 +189,7 @@ struct GROVE_API ClassDef {
   static const ClassDef dataChar;
   static const ClassDef element;
   static const ClassDef attributeAssignment;
+  static const ClassDef attributeDef;
   static const ClassDef attributeValueToken;
   static const ClassDef pi;
   static const ClassDef sdata;
@@ -151,6 +201,11 @@ struct GROVE_API ClassDef {
   static const ClassDef subdocument;
   static const ClassDef nonSgml;
   static const ClassDef message;
+  static const ClassDef elementType;
+  static const ClassDef modelGroup;
+  static const ClassDef elementToken;
+  static const ClassDef pcdataToken;
+  static const ClassDef defaultEntity;
 };
 
 class PropertyValue;
@@ -254,27 +309,66 @@ public:
   virtual AccessResult getEntityName(GroveString &) const;
   virtual AccessResult getExternalId(NodePtr &) const;
   virtual AccessResult getNotation(NodePtr &) const;
-  // Properties only on entity
+  virtual AccessResult getGi(GroveString &) const;
+  struct OccurIndicator {
+    enum Enum { opt, plus, rep };
+  };
+  virtual AccessResult getOccurIndicator(OccurIndicator::Enum &) const;
+  virtual AccessResult getAttributeDefs(NamedNodeListPtr &) const;
   virtual AccessResult getText(GroveString &) const;
   virtual AccessResult getNotationName(GroveString &) const;
-  enum EntityType { text, cdata, sdata, ndata, subdocument, pi };
-  virtual AccessResult getEntityType(EntityType &) const;
+  struct EntityType {
+    enum Enum { text, cdata, sdata, ndata, subdocument, pi };
+  };
+  virtual AccessResult getEntityType(EntityType::Enum &) const;
+  // Properties only on entity
   virtual AccessResult getDefaulted(bool &) const;
   // Properties only on externalId
   virtual AccessResult getPublicId(GroveString &) const;
   virtual AccessResult getSystemId(GroveString &) const;
   virtual AccessResult getGeneratedSystemId(GroveString &) const;
-  // Properties only on attributeAssignment.
+  // Properties only on attributeAssignment
   virtual AccessResult getValue(NodeListPtr &) const;
   virtual AccessResult getTokenSep(GroveChar &) const;
   virtual AccessResult getImplied(bool &) const;
+  virtual AccessResult getAttributeDef(NodePtr &) const;
+  // Properties only on attributeDef
+  virtual AccessResult getCurrentAttributeIndex(long &) const;
+  virtual AccessResult getCurrentGroup(NodeListPtr &) const;
+  struct DeclValueType {
+    enum Enum { cdata, entity, entities, id, idref, idrefs, name, names, nmtoken,
+                nmtokens, number, numbers, nutoken, nutokens, notation, nmtkgrp };
+  };
+  virtual AccessResult getDeclValueType(DeclValueType::Enum &) const;
+  struct DefaultValueType {
+    enum Enum { value, fixed, required, current, conref, implied };
+  };
+  virtual AccessResult getDefaultValueType(DefaultValueType::Enum &) const;
+  virtual AccessResult getDefaultValue(NodeListPtr &) const;
+  virtual AccessResult getTokens(GroveStringListPtr &) const;
   // Properties only on element.
-  virtual AccessResult getGi(GroveString &) const;
   virtual bool hasGi(GroveString) const;
   virtual AccessResult getId(GroveString &) const;
   virtual AccessResult getContent(NodeListPtr &) const;
   virtual AccessResult getIncluded(bool &) const;
   virtual AccessResult getMustOmitEndTag(bool &) const;
+  virtual AccessResult getElementType(NodePtr &) const;
+  // Properties only on elementType.
+  struct ContentType {
+    enum Enum { cdata, rcdata, empty, any, modelgrp };
+  };
+  virtual AccessResult getContentType(ContentType::Enum &) const;
+  virtual AccessResult getExclusions(GroveStringListPtr &) const;
+  virtual AccessResult getInclusions(GroveStringListPtr &) const;
+  virtual AccessResult getModelGroup(NodePtr &) const;
+  virtual AccessResult getOmitEndTag(bool &) const;
+  virtual AccessResult getOmitStartTag(bool &) const;
+  // Properties only on modelGroup.
+  struct Connector {
+    enum Enum { and_, or_, seq }; // "and", "or" can be keywords
+  };
+  virtual AccessResult getConnector(Connector::Enum &) const;
+  virtual AccessResult getContentTokens(NodeListPtr &) const;
   // Properties only on attributeValueToken.
   virtual AccessResult getToken(GroveString &) const;
   virtual AccessResult getReferent(NodePtr &) const;
@@ -282,6 +376,9 @@ public:
   virtual AccessResult getGoverning(bool &) const;
   virtual AccessResult getGeneralEntities(NamedNodeListPtr &) const;
   virtual AccessResult getNotations(NamedNodeListPtr &) const;
+  virtual AccessResult getElementTypes(NamedNodeListPtr &) const;
+  virtual AccessResult getDefaultEntity(NodePtr &) const;
+  virtual AccessResult getParameterEntities(NamedNodeListPtr &) const;
   // Properties only on sgmlDocument.
   virtual AccessResult getSgmlConstants(NodePtr &) const;
   virtual AccessResult getApplicationInfo(GroveString &) const;
@@ -335,7 +432,9 @@ public:
     attributes,
     entities,
     notations,
-    doctypesAndLinktypes
+    doctypesAndLinktypes,
+    elementTypes,
+    attributeDefs
   };
   virtual Type type() const = 0;
   // If the node is of a class that occurs in the list,
@@ -471,6 +570,78 @@ private:
   size_t size_;
 };
 
+class GROVE_API GroveStringLink {
+public:
+  GroveStringLink( const GroveString &gs )
+   : data_(gs), next_(0) { }
+  friend class GroveStringList;
+  friend class ConstGroveStringListIter;
+private:
+  GroveString data_;
+  GroveStringLink *next_;
+};
+
+class GroveStringList;
+
+class GROVE_API ConstGroveStringListIter {
+public:
+  friend class GroveStringList;
+  ConstGroveStringListIter() : link_(0) { }
+  ConstGroveStringListIter(const GroveStringList &list);
+  int done() const { return link_ == 0; }
+  const GroveString &cur() const { return link_->data_; }
+  void next() { link_ = link_->next_; }
+protected:
+  void attach(const GroveStringLink *link) { link_ = link; }
+  const GroveStringLink *link_;
+};
+
+class GROVE_API GroveStringList {
+public:
+  friend class ConstGroveStringListIter;
+  GroveStringList() : head_(0), refCount_(0) { }
+  ~GroveStringList();
+  void append(const GroveString &gs);
+  void release();
+  void addRef();
+  bool canReuse(GroveStringListPtr &ptr) const;
+  AccessResult first(GroveString &) const;
+  AccessResult rest(GroveStringListPtr &) const;
+  const ConstGroveStringListIter &iter() { return iter_; }
+private:
+  unsigned refCount_;
+  GroveStringLink *head_;
+  ConstGroveStringListIter iter_;
+};
+
+class GROVE_API GroveStringListPtr {
+public:
+  GroveStringListPtr() : list_(0) { }
+  GroveStringListPtr(GroveStringList *list) : list_(list) { addRef(); }
+  ~GroveStringListPtr() { release(); }
+  GroveStringListPtr(const GroveStringListPtr &ptr) : list_(ptr.list_) { addRef(); }
+  GroveStringListPtr &operator=(const GroveStringListPtr &ptr) {
+    ptr.addRef();
+    release();
+    list_ = ptr.list_;
+    return *this;
+  }
+  GroveStringList *operator->() const { return list_; }
+  GroveStringList &operator*() const { return *list_; }
+  void assign(GroveStringList *list) {
+    if (list)
+      list->addRef();
+    release();
+    list_ = list;
+  }
+  void clear() { release(); list_ = 0; }
+  operator bool() const { return list_ != 0; }
+private:
+  void addRef() const { if (list_) list_->addRef(); }
+  void release() const { if (list_) list_->release(); }
+  GroveStringList *list_;
+};
+
 class GROVE_API SdataMapper {
 public:
   virtual ~SdataMapper();
@@ -487,6 +658,7 @@ public:
   virtual void dataChar(Node &);
   virtual void element(Node &);
   virtual void attributeAssignment(Node &);
+  virtual void attributeDef(Node &);
   virtual void attributeValueToken(Node &);
   virtual void pi(Node &);
   virtual void sdata(Node &);
@@ -498,6 +670,11 @@ public:
   virtual void subdocument(Node &);
   virtual void nonSgml(Node &);
   virtual void message(Node &);
+  virtual void elementType(Node &);
+  virtual void modelGroup(Node &);
+  virtual void elementToken(Node &);
+  virtual void pcdataToken(Node &);
+  virtual void defaultEntity(Node &);
 };
 
 class GROVE_API PropertyValue {
@@ -510,7 +687,9 @@ public:
   virtual void set(GroveChar) = 0;
   virtual void set(GroveString) = 0;
   virtual void set(ComponentName::Id) = 0;
+  virtual void set(const GroveStringListPtr &) = 0;
   virtual void set(const ComponentName::Id *) = 0;
+  virtual void set(long) = 0;
 };
 
 inline

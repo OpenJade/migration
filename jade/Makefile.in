@@ -9,14 +9,21 @@
 # Original SP Makefile.in Copyright (C) 1996 Henry S. Thompson
 # Original SP Makefile Copyright (c) 1994, 1995, 1996 James Clark
 
+top_builddir=@TOP@
 TOP=@TOP@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
+datadir=@datadir@
+libdir=@libdir@
+
+DESTDIR=
 
 LIBTOOL=@LIBTOOL@
+LIBTOOL_DEPS=@LIBTOOL_DEPS@
 
+SP_LIBDIRS=lib $(XLIBDIRS)
 LIBDIRS=lib grove spgrove style
 PROGDIRS=nsgmls spam sgmlnorm spent jade sx
 dodirs=$(LIBDIRS) $(PROGDIRS)
@@ -28,8 +35,11 @@ do=all
 
 $(TARGETS): FORCE
 	@$(MAKE) -f Makefile do=$@ $(dodirs)
-	if test $@ = 'install'; then $(LIBTOOL) --finish $(libdir); fi
-
+	@if test $@ = 'install'; then \
+	  $(LIBTOOL) --finish $(DESTDIR)$(libdir); \
+	  mkdir -p $(DESTDIR)$(datadir); \
+	  cp -f dsssl/builtins.dsl $(DESTDIR)$(datadir); \
+	fi;
 
 $(LIBDIRS): FORCE
 	@if test $(srcdir) = .; \
@@ -67,7 +77,13 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/Makefile.lt -f $$srcdir/../Makefile.prog \
 		-f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): lib
+$(PROGDIRS): $(SP_LIBDIRS)
+
+jade: grove spgrove style lib
+
+spgrove: grove lib
+
+style: grove spgrove lib
 
 # GNU tar
 TAR=tar
@@ -101,3 +117,7 @@ mrproper:
 	-test -f Makefile.lib.dist && mv Makefile.lib.dist Makefile.lib
 
 FORCE:
+
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
+

@@ -6,23 +6,24 @@
 #  Copyright (C) 1998 Cees de Groot <cg@sgmltools.org>
 #
 
+top_builddir=@TOP@
 TOP=@TOP@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
 libdir=@libdir@
+datadir=@datadir@
 
 CXX=@CXX@
 CC=@CC@
-M4=@M4@
 PERL=@PERL@
 LIBTOOL=@LIBTOOL@
 INSTALL=@INSTALL@
 
 LIBOBJS=@LIBOBJS@
 LIBS=@LIBS@
-DEFS=@DEFS@
+DEFS=@DEFS@ -DDEFAULT_SCHEME_BUILTINS=\"${datadir}/builtins.dsl\"
 INCS=-I$(srcdir) -I$(srcdir)/../include $(INCLUDE)
 CXXFLAGS=@CXXFLAGS@ $(INCS) $(DEBUG) $(DEFS)
 CFLAGS=@CFLAGS@ $(DEBUG) $(DEFS)
@@ -46,8 +47,11 @@ CXXDEPGENFLAGS=-MM
 
 .m4.cxx:
 	rm -f $@
-	$(M4) $(srcdir)/../lib/instmac.m4 $< >$@
+	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
 	chmod -w $@
+
+%.h %.cxx %.rc: %.msg
+	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
 
 .msg.h:
 	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
@@ -57,7 +61,10 @@ depend_src: depend.temp
 
 depend.temp: FORCE
 	$(CXX) -MM $(CXXFLAGS) $(CXXDEPGENFLAGS) $(OBJS:.o=.cxx) \
-	  | sed -e 's; \([^/ ][^/ ]*\)/; $$(srcdir)/\1/;g' >depend.temp
+	  | sed -e 's; \([^/ ][^/ ]*\)/; $$(srcdir)/\1/;g' >depend.temp1
+	cat depend.temp1 > depend.temp
+	cat depend.temp1 | sed -e 's/\.o:/.lo:/g' >> depend.temp
+	rm depend.temp1
 
 clean: FORCE
 	-rm -f $(CLEANFILES)

@@ -168,6 +168,115 @@ public:
   ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
 };
 
+class DeviceGrayColorSpaceObj : public ColorSpaceObj {
+public:
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+};
+
+class DeviceCMYKColorSpaceObj : public ColorSpaceObj {
+public:
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+};
+
+class DeviceKXColorSpaceObj : public ColorSpaceObj {
+public:
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+};
+
+class CIEXYZColorSpaceObj : public ColorSpaceObj {
+public:
+  CIEXYZColorSpaceObj(const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ~CIEXYZColorSpaceObj();
+  ELObj *makeColor(const double *, Interpreter &);
+protected:
+struct XYZData {
+  double white_[3];
+  double white_u;
+  double white_v;
+  double M_[9];
+};
+ XYZData *xyzData_; 
+};
+
+class CIELUVColorSpaceObj : public CIEXYZColorSpaceObj {
+public:
+  CIELUVColorSpaceObj(const double *, const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ~CIELUVColorSpaceObj();
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+private:
+struct LUVData {
+  double range_[6]; 
+};
+  LUVData *luvData_;
+};
+
+class CIELABColorSpaceObj : public CIEXYZColorSpaceObj {
+public:
+  CIELABColorSpaceObj(const double *, const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ~CIELABColorSpaceObj();
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+private:
+struct LABData {
+  double range_[6]; 
+};
+  LABData *labData_; 
+};
+
+class CIEABCColorSpaceObj : public CIEXYZColorSpaceObj {
+public:
+  CIEABCColorSpaceObj(const double *, const double *, const double *,
+                      FunctionObj **, const double *, const double *,
+                      FunctionObj **, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ~CIEABCColorSpaceObj();
+  void traceSubObjects(Collector &) const;
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+private:
+struct ABCData {
+  double rangeAbc_[6]; 
+  FunctionObj *decodeAbc_[3]; 
+  double matrixAbc_[9]; 
+  double rangeLmn_[6]; 
+  FunctionObj *decodeLmn_[3]; 
+  double matrixLmn_[9];
+};
+ ABCData *abcData_; 
+};
+
+class CIEAColorSpaceObj : public CIEXYZColorSpaceObj {
+public:
+  CIEAColorSpaceObj(const double *, const double *, const double *,
+                    FunctionObj *, const double *, const double *,
+                    FunctionObj **, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ~CIEAColorSpaceObj();
+  void traceSubObjects(Collector &) const;
+  ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
+private:
+struct AData {
+  double rangeA_[2]; 
+  FunctionObj *decodeA_; 
+  double matrixA_[3]; 
+  double rangeLmn_[6]; 
+  FunctionObj *decodeLmn_[3]; 
+  double matrixLmn_[9]; 
+};
+  AData *aData_;
+};
+
 struct InheritedCInfo : public Resource {
   InheritedCInfo(const ConstPtr<InheritedC> &, const VarStyleObj *,
 		 unsigned valLevel, unsigned specLevel, const ProcessingMode::Rule *,

@@ -21,7 +21,7 @@ dsssl\dsssl.dtd
 dsssl\demo.sgm
 dsssl\demo.dsl
 dsssl\catalog
-bin\sp115u.dll
+bin\sp120u.dll
 bin\style.dll
 bin\spgrove.dll
 bin\grove.dll

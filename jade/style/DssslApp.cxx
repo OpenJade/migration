@@ -10,7 +10,6 @@
 #include "macros.h"
 #include "LocNode.h"
 #include "SdNode.h"
-#include "NotationStorage.h"
 #include "InputSource.h"
 #include "jade_version.h"
 
@@ -34,11 +33,6 @@ DssslApp::DssslApp(int unitsPerInch)
   registerOption('V', SP_T("variable"));
 }
 
-void DssslApp::registerAdditionalStorageManagers()
-{
-  entityManager()->registerStorageManager(new NotationStorageManager("CLSID"));
-}
-
 int DssslApp::init(int argc, AppChar **argv)
 {
   int ret = GroveApp::init(argc, argv);
@@ -51,7 +45,6 @@ int DssslApp::init(int argc, AppChar **argv)
 
 int DssslApp::processSysid(const StringC &sysid)
 {
-  registerAdditionalStorageManagers();
   rootSystemId_ = sysid;
   ParsedSystemId v;
   if (!entityManager()->parseSystemId(sysid, systemCharset(), 0, 0,
@@ -135,7 +128,6 @@ int DssslApp::generateEvents(ErrorCountEventHandler *eceh)
   // The parser thread is started in GroveApp::generateEvents
   // which hasn't happened yet.
   clearEntityManager();
-  registerAdditionalStorageManagers();
   return GroveApp::generateEvents(eceh);
 }
 

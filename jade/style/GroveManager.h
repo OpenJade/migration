@@ -8,6 +8,7 @@
 #include "StringC.h"
 #include "Vector.h"
 #include "FOTBuilder.h"
+#include "Boolean.h"
 #include "dsssl_ns.h"
 
 #ifdef DSSSL_NAMESPACE

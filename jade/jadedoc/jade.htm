@@ -33,8 +33,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 0.9.
-This should be considered a beta test version.
+The current version is 1.0.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -116,10 +115,10 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew0_9.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew1_0.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade0_9.zip">Jade</A>.
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_0.zip">Jade</A>.
 This package includes the sources for a compatible version of SP
 (which may be different from the latest released version of SP).
 <p>
@@ -134,7 +133,7 @@ using a <SAMP>-U</SAMP> option with some versions of unzip.
 
 <h3><A NAME=building-win32>Win32</A></h3>
 <p>
-Only Microsoft Visual C++ 4.2 is supported.  It worked with 4.1 last
+Only Microsoft Visual C++ 4.2b is supported.  It worked with 4.1 last
 time I tried, but it's only been tested with 4.2.
 <p>
 Open SP.mak as a makefile and build at least the
@@ -744,7 +743,8 @@ about it.
 <p>
 Please report bugs by email to me, <A
 href="mailto:jjc@jclark.com"><CODE>jjc@jclark.com</CODE></A>.  Do not
-post them to comp.text.sgml nor to the sp-prog list.
+post them to comp.text.sgml nor to the sp-prog mailing list nor to the DSSSList
+mailing list.
 <p>
 I do not want to get bug reports about documented limitations, so
 please read the list of limitations carefully.  However, feel free to
@@ -763,12 +763,13 @@ you have a clean, simple and portable workaround for your compiler's
 bug.
 </UL>
 <P>
-Before reporting a bug, please check that your snapshot is current.
+Before reporting a bug, please check that your version is current.
 <P>
 <strong>The most important thing in reporting a bug is to include a
 complete set of files on which I can run jade and reproduce the
-problem</strong>.  Also tell me what command line I should use, and
-what is incorrect about the behaviour of jade.  If the files are large
+problem</strong>.  Include all DTDs that you use, whether or not they
+are standard.  Also tell me what command line I should use, and what
+is incorrect about the behaviour of jade.  If the files are large
 package them up as a tar or zip file and upload them to
 ftp://ftp.jclark.com/incoming.
 <P>

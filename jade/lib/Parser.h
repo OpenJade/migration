@@ -304,6 +304,7 @@ private:
 			 Boolean isDocument,
 			 CharsetDecl &, UnivCharsetDesc &);
   Boolean sdParseExternalCharset(Sd &, UnivCharsetDesc &desc);
+  UnivChar charNameToUniv(Sd &sd, const StringC &name);
   Boolean translateSyntax(CharSwitcher &switcher,
 			  const CharsetInfo &syntaxCharset,
 			  const CharsetInfo &docCharset,

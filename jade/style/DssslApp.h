@@ -29,7 +29,6 @@ protected:
 private:
   void processGrove();
   int generateEvents(ErrorCountEventHandler *eceh);
-  void registerAdditionalStorageManagers();
   Boolean getDssslSpecFromGrove();
   Boolean getDssslSpecFromPi(const Char *s, size_t n,
 			     const Location &loc);

@@ -90,6 +90,7 @@ private:
   void operator=(const HttpSocketStorageObject &); // undefined
   Boolean readHeader(Messenger &);
   Boolean readLine(Messenger &mgr, String<char> &line, String<char> &leftOver);
+  static Boolean parseStatus(const char *&ptr, int &val);
   StringC hostStr_;
   String<char> path_;
   Boolean eof_;
@@ -483,26 +484,13 @@ Boolean HttpSocketStorageObject::readHeader(Messenger &mgr)
   if (!readLine(mgr, buf, leftOver))
     return 0;
   buf += '\0';
-  static const char ver[] = "HTTP/1.0";
-  int i;
-  for (i = 0; ver[i]; i++)
-    if (ver[i] != buf[i])
-      break;
-  if (ver[i]) {
+  const char *ptr = &buf[0];
+  int val;
+  if (!parseStatus(ptr, val)) {
     if (buf.size() > 0)
       unread(buf.data(), buf.size() - 1);
     return 1;
   }
-  const char *ptr = &buf[i];
-  while (isspace((unsigned char)*ptr))
-    ptr++;
-  int val = 0;
-  while (isdigit((unsigned char)*ptr)) {
-    val = val*10 + *ptr - '0';
-    ptr++;
-  }
-  while (isspace((unsigned char)*ptr))
-    ptr++;
   if (val < 200 || val >= 300) {
     StringC reason;
     while (*ptr && *ptr != '\n' && *ptr != '\r') {
@@ -527,6 +515,42 @@ Boolean HttpSocketStorageObject::readHeader(Messenger &mgr)
   }
   if (leftOver.size())
     unread(leftOver.data(), leftOver.size());
+  return 1;
+}
+
+// Status line must start with: "HTTP/" 1*DIGIT "." 1*DIGIT SP 3DIGIT SP
+
+Boolean HttpSocketStorageObject::parseStatus(const char *&ptr, int &val)
+{
+  static const char ver[] = "HTTP/";
+  for (const char *v = ver; *v; v++, ptr++)
+    if (*v != *ptr)
+      return 0;
+  if (!isdigit((unsigned char)*ptr))
+    return 0;
+  do {
+    ++ptr;
+  } while (isdigit((unsigned char)*ptr));
+  if (*ptr != '.')
+    return 0;
+  ptr++;
+  if (!isdigit((unsigned char)*ptr))
+    return 0;
+  do {
+    ++ptr;
+  } while (isdigit((unsigned char)*ptr));
+  if (*ptr != ' ')
+    return 0;
+  ptr++;
+  val = 0;
+  for (int i = 0; i < 3; i++, ptr++) {
+    if (!isdigit((unsigned char)*ptr))
+      return 0;
+    val = val*10 + *ptr - '0';
+  }
+  if (*ptr != ' ')
+    return 0;
+  ptr++;
   return 1;
 }
 

@@ -1,4 +1,4 @@
-LIB=sp
+LIB=osp
 INCLUDE=-I$(srcdir)/../generic
 DEPLIBS=-lm
 MSGGENFLAGS=-l

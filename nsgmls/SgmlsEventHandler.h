@@ -106,7 +106,7 @@ private:
   void outputLocation1(const Location &loc);
   void outputString(const StringC &str);
   void outputString(const Char *, size_t);
-  static void escape(OutputCharStream &, Char);
+  static void escaper(OutputCharStream &, Char);
 
   OutputCharStream &os();
 

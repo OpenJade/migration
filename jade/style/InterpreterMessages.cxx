@@ -1506,6 +1506,18 @@ MessageFragment::appModule,
 ,"first definition was here"
 #endif
 );
+const MessageType1 InterpreterMessages::undefinedMode(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+131
+#ifndef SP_NO_MESSAGE_TEXT
+,"mode %1 not defined"
+#endif
+);
 #ifdef SP_NAMESPACE
 }
 #endif

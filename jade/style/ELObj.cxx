@@ -149,7 +149,12 @@ BoxObj *ELObj::asBox()
   return 0;
 }
 
-void ELObj::print(Interpreter &, OutputCharStream &out)
+void ELObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  print(interp, out, 10);
+}
+
+void ELObj::print(Interpreter &, OutputCharStream &out, unsigned)
 {
   out << "#<unknown object " << (unsigned long)this << ">";
 }
@@ -577,12 +582,40 @@ bool IntegerObj::isEqual(ELObj &obj)
   return obj.exactIntegerValue(n) && n == n_;
 }
 
-void IntegerObj::print(Interpreter &, OutputCharStream &out)
+void IntegerObj::print(Interpreter &, OutputCharStream &out, unsigned radix)
 {
-  if (n_ < 0)
-    out << '-' << (unsigned long)-n_;
+  if (radix == 10) {
+    if (n_ < 0)
+      out << '-' << (unsigned long)-n_;
+    else
+      out << (unsigned long)n_;
+    return;
+  }
+
+  if (n_ == 0) {
+    out << '0';
+    return;
+  }
+  
+  unsigned long n;
+
+  if (n_ < 0) {
+    out << '-';
+    n = -n_;
+  }
   else
-    out << (unsigned long)n_;
+    n = n_;
+  
+  char buf[64];
+  int i = 0;
+
+  while (n != 0) {
+    buf[i++] = "0123456789abcdef"[n % radix];
+    n /= radix;
+  }
+
+  while (i > 0)
+    out << buf[--i];
 }
 
 bool IntegerObj::exactIntegerValue(long &n)

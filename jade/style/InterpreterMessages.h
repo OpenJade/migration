@@ -260,6 +260,8 @@ struct InterpreterMessages {
   static const MessageType1L duplicateCharacteristic;
   // 129
   static const MessageType1L duplicateFlowObjectClass;
+  // 131
+  static const MessageType1 undefinedMode;
 };
 
 #ifdef SP_NAMESPACE

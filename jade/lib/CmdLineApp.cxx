@@ -44,6 +44,10 @@
 #include <io.h>
 #endif
 
+#ifdef _MSC_VER
+#include <crtdbg.h>
+#endif
+
 #ifndef SP_DEFAULT_ENCODING
 #ifdef WIN32
 #define SP_DEFAULT_ENCODING SP_T("WINDOWS")
@@ -188,6 +192,9 @@ int CmdLineApp::init(int, AppChar **argv)
 
 int CmdLineApp::run(int argc, AppChar **argv)
 {
+#ifdef _MSC_VER
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF|_CRTDBG_LEAK_CHECK_DF);
+#endif
 #ifdef SP_ANSI_LIB
   try {
 #endif

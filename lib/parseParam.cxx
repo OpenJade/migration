@@ -604,7 +604,7 @@ Boolean Parser::parseEntityReferenceNameGroup(Boolean &ignore)
       }
     }
   }
-  ignore = 1;x
+  ignore = 1;
   return 1;
 }
 

@@ -198,9 +198,7 @@ void ParserState::startDtd(const StringC &name)
   defLpd_.clear();
   for (size_t i = 0; i < options().includes.size(); i++) {
     StringC name = options().includes[i];
-    const SubstTable *subst = syntax().entitySubstTable();
-    for (size_t j = 0; j < name.size(); j++)
-      subst->subst(name[j]);
+    syntax().entitySubstTable()->subst(name);
     Text text;
     text.addChars(syntax().reservedName(Syntax::rINCLUDE), Location());
     Entity *entity
@@ -742,17 +740,16 @@ Boolean ParserState::shouldActivateLink(const StringC &name) const
 {
   if (!activeLinkTypesSubsted_) {
     for (size_t i = 0; i < activeLinkTypes_.size(); i++)
-      for (size_t j = 0; j < activeLinkTypes_[i].size(); j++)
-	syntax().generalSubstTable()->subst(
+      syntax().generalSubstTable()->subst(
 #ifndef HAVE_MUTABLE
-	  ((ParserState *)this)-> 
+	((ParserState *)this)-> 
 #endif
-	    activeLinkTypes_[i][j]
-	  );
+	activeLinkTypes_[i]
+	);
 #ifndef HAVE_MUTABLE
-	  ((ParserState *)this)-> 
+    ((ParserState *)this)-> 
 #endif
-	    activeLinkTypesSubsted_ = 1;
+      activeLinkTypesSubsted_ = 1;
   }
   for (size_t i = 0; i < activeLinkTypes_.size(); i++)
     if (name == activeLinkTypes_[i])

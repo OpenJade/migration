@@ -1976,9 +1976,7 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
     if (parm.paramLiteralText.size() == 0)
 	message(ParserMessages::sdEmptyDelimiter);
     else if (translateSyntax(sdBuilder, parm.paramLiteralText, str)) {
-      const SubstTable *table = sdBuilder.syntax->generalSubstTable();
-      for (size_t i = 0; i < str.size(); i++)
-	table->subst(str[i]);
+      sdBuilder.syntax->generalSubstTable()->subst(str);
       if (checkGeneralDelim(*sdBuilder.syntax, str)
 	  && !delimGeneralSpecified[delimGeneral])
 	sdBuilder.syntax->setDelimGeneral(delimGeneral, str);
@@ -2062,9 +2060,7 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
       if (lastLiteral.size() == 0)
 	message(ParserMessages::sdEmptyDelimiter);
       else if (translateSyntax(sdBuilder, lastLiteral, str)) {
-	const SubstTable *table = sdBuilder.syntax->generalSubstTable();
-	for (size_t i = 0; i < str.size(); i++)
-	  table->subst(str[i]);
+	sdBuilder.syntax->generalSubstTable()->subst(str);
 	if (str.size() == 1
 	    || checkShortrefDelim(*sdBuilder.syntax,
 				  sdBuilder.sd->internalCharset(),
@@ -2135,9 +2131,8 @@ Boolean Parser::sdParseNames(SdBuilder &sdBuilder, SdParam &parm)
 		    StringMessageArg(transName));
 	    transName.resize(0);
 	    break;
-	  }
-	for (i = 0; i < transName.size(); i++)
-	  sdBuilder.syntax->generalSubstTable()->subst(transName[i]);
+	  }	
+	sdBuilder.syntax->generalSubstTable()->subst(transName);
 	if (sdBuilder.syntax->reservedName(reservedName).size() > 0)
 	  message(ParserMessages::duplicateReservedName,
 		  StringMessageArg(syntax().reservedName(reservedName)));

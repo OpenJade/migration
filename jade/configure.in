@@ -41,6 +41,7 @@ AC_DEFINE_DIR(OPENJADE_LOCALE_DIR, datadir/locale, [location of message catalogs
 OPENJADE_MESSAGE_DOMAIN=jade
 AC_DEFINE_UNQUOTED(OPENJADE_MESSAGE_DOMAIN, "$OPENJADE_MESSAGE_DOMAIN", [message domain])
 AC_SUBST(OPENJADE_MESSAGE_DOMAIN)
+AC_CHECK_LIB(w,wcscoll)
 
 dnl Checks for header files.
 AC_HEADER_STDC

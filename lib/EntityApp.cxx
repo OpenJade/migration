@@ -36,11 +36,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-#ifdef SP_MSDOS_FILENAMES
-const Char FILE_SEP = ';';
-#else
-const Char FILE_SEP = ':';
-#endif
+const Char FILE_SEP = PATH_SEPARATOR;
 
 EntityApp::EntityApp(const char *requiredInternalCode)
 : CmdLineApp(requiredInternalCode),

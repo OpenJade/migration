@@ -25,9 +25,6 @@
 /* define this if  set_new_handler() has to be declared extern "C" */
 #undef SP_SET_NEW_HANDLER_EXTERN_C 
 
-/* ??? */
-#undef SP_ANSI_LIB       
-
 /* define this to build a multi-byte version */
 #undef SP_MULTI_BYTE
 
@@ -40,10 +37,10 @@
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
 
-/*** I think everything below this line can safely be ignored ***/
-
-/* set this to the path separator, this is only here to pacify autoheader */
+/* set this to the path separator */
 #undef PATH_SEPARATOR
+
+/*** I think everything below this line can safely be ignored ***/
 
 /* if this is not set it defaults to 200 */
 #undef DEFAULT_ERROR_LIMIT
@@ -232,3 +229,7 @@
 #ifndef HAVE_NAMESPACE_STD
 #define SP_NO_STD_NAMESPACE 
 #endif /* HAVE_NAMESPACE_STD */
+
+#if defined(HAVE_NEW) && defined(HAVE_CASSERT)
+#define SP_ANSI_LIB
+#endif /* HAVE_NEW && HAVE_CASSERT */

@@ -362,7 +362,7 @@ bool SchemeParser::doQuery()
   Pattern::Element *elem = new Pattern::Element(StringC(), 0);
   list.insert(elem);
   elem->addQualifier(new Pattern::NodeQualifier(query, priority, 
-                                                defMode_, interp_));
+                                                defMode_, interp_, loc));
   Pattern pattern(list);
   NCVector<Pattern> patterns(1);
   patterns[0].swap(pattern);

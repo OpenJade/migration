@@ -59,7 +59,7 @@ public:
   void append(MessageBuilder &) const;
 };
 
-SP_API class StringVectorMessageArg : public MessageArg {
+class SP_API StringVectorMessageArg : public MessageArg {
 public:
   StringVectorMessageArg(const Vector<StringC> &);
   MessageArg *copy() const;

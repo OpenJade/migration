@@ -11,9 +11,9 @@
 #include "NsgmlsMessages.h"
 #include "MessageArg.h"
 #include "ErrnoMessageArg.h"
-#include "ParserApp.h"
 #include "sptchar.h"
 #include "macros.h"
+#include "nsgmls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -24,27 +24,32 @@
 using namespace SP_NAMESPACE;
 #endif
 
-class NsgmlsApp : public ParserApp {
-public:
-  NsgmlsApp();
-  int processArguments(int argc, AppChar **argv);
-  ErrorCountEventHandler *makeEventHandler();
-  void processOption(AppChar opt, const AppChar *arg);
-  void allLinkTypesActivated();
-private:
-  Boolean suppressOutput_;
-  Boolean prologOnly_;
-  unsigned outputFlags_;
-  String<AppChar> rastFile_;
-  const AppChar *rastOption_;
-  Boolean batchMode_;
-};
-
 SP_DEFINE_APP(NsgmlsApp)
+
+const NsgmlsApp::OptionFlags NsgmlsApp::outputOptions[] = {
+    { SP_T("all"), SgmlsEventHandler::outputAll },
+    { SP_T("line"), SgmlsEventHandler::outputLine },
+    { SP_T("entity"), SgmlsEventHandler::outputEntity },
+    { SP_T("id"), SgmlsEventHandler::outputId },
+    { SP_T("included"), SgmlsEventHandler::outputIncluded },
+    { SP_T("notation-sysid"), SgmlsEventHandler::outputNotationSysid },
+    { SP_T("nonsgml"), SgmlsEventHandler::outputNonSgml },
+    { SP_T("empty"), SgmlsEventHandler::outputEmpty },
+    { SP_T("data-attribute"), SgmlsEventHandler::outputDataAtt },
+    { SP_T("comment"), SgmlsEventHandler::outputComment },
+    { SP_T("omitted"), (SgmlsEventHandler::outputTagOmission |
+                        SgmlsEventHandler::outputAttributeOmission ) },
+    { SP_T("tagomit"), SgmlsEventHandler::outputTagOmission },
+    { SP_T("attromit"), SgmlsEventHandler::outputAttributeOmission },
+    { SP_T("version"), SgmlsEventHandler::outputParserInformation },
+    { SP_T("all"), 0 },
+  };
+
+
 
 class PrologMessageEventHandler : public MessageEventHandler {
 public:
-  PrologMessageEventHandler(Messenger *messenger);
+  PrologMessageEventHandler(class Messenger *messenger);
   void endProlog(EndPrologEvent *);
 };
 
@@ -55,13 +60,13 @@ public:
 		    const StringC &filenameStr,
 		    const OutputCodingSystem *,
 		    CmdLineApp *,
-		    Messenger *messenger);
+		    class ::Messenger *messenger);
   ~XRastEventHandler();
   void message(MessageEvent *);
   void truncateOutput();
   void allLinkTypesActivated();
 private:
-  Messenger *messenger_;
+  class ::Messenger *messenger_;
   // file_ must come before os_ so it gets inited first
   FileOutputByteStream file_;
   EncodeOutputCharStream os_;
@@ -87,7 +92,8 @@ NsgmlsApp::NsgmlsApp()
   // FIXME treat these as aliases
   registerOption('d', 0, NsgmlsMessages::dHelp);
   registerOption('l', 0, NsgmlsMessages::lHelp);
-  registerOption('m', 0, NsgmlsMessages::mHelp);
+  // registerOption('m', SP_T("catalog"), NsgmlsMessages::sysid, NsgmlsMessages::mHelp);
+  registerOption('m', 0, NsgmlsMessages::sysid, NsgmlsMessages::mHelp);
   registerOption('r', 0, NsgmlsMessages::rHelp);
   registerOption('u', 0, NsgmlsMessages::uHelp);
   registerInfo(NsgmlsMessages::info1);
@@ -119,22 +125,9 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'o':
     {
-      static struct {
-	// Qualifier works around CodeWarrior bug
-	const CmdLineApp::AppChar *name;
-	unsigned flag;
-      } outputOptions[] = {
-	{ SP_T("line"), SgmlsEventHandler::outputLine },
-	{ SP_T("entity"), SgmlsEventHandler::outputEntity },
-	{ SP_T("id"), SgmlsEventHandler::outputId },
-	{ SP_T("included"), SgmlsEventHandler::outputIncluded },
-	{ SP_T("notation-sysid"), SgmlsEventHandler::outputNotationSysid },
-	{ SP_T("nonsgml"), SgmlsEventHandler::outputNonSgml },
-	{ SP_T("empty"), SgmlsEventHandler::outputEmpty },
-	{ SP_T("data-attribute"), SgmlsEventHandler::outputDataAtt },
-      };
       Boolean found = 0;
-      for (size_t i = 0; i < SIZEOF(outputOptions); i++)
+                       //was i < SIZEOF(outputOptions)
+      for (size_t i = 0; outputOptions[i].flag != 0; i++)
 	if (tcscmp(arg, outputOptions[i].name) == 0) {
 	  outputFlags_ |= outputOptions[i].flag;
 	  found = 1;
@@ -166,6 +159,12 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
     ParserApp::processOption(opt, arg);
     break;
   }
+  if (outputFlags_ & SgmlsEventHandler::outputComment) {
+    options_.eventsWanted.addCommentDecls();
+    options_.eventsWanted.addPrologMarkup();
+  }
+  if (outputFlags_ & SgmlsEventHandler::outputTagOmission)
+    options_.eventsWanted.addInstanceMarkup();
 }
 
 int NsgmlsApp::processArguments(int argc, AppChar **argv)
@@ -212,7 +211,7 @@ ErrorCountEventHandler *NsgmlsApp::makeEventHandler()
 				 outputFlags_);
 }
 
-PrologMessageEventHandler::PrologMessageEventHandler(Messenger *messenger)
+PrologMessageEventHandler::PrologMessageEventHandler(class Messenger *messenger)
 : MessageEventHandler(messenger)
 {
 }
@@ -228,7 +227,7 @@ XRastEventHandler::XRastEventHandler(SgmlParser *parser,
 				     const StringC &filenameStr,
 				     const OutputCodingSystem *codingSystem,
 				     CmdLineApp *app,
-				     Messenger *messenger)
+				     ::Messenger *messenger)
 : RastEventHandler(parser, messenger),
   messenger_(messenger),
   filename_(filename),

@@ -59,7 +59,14 @@ is separated by colons under Unix and by semi-colons under MSDOS.
 <DD>
 The storage object identifier is an integer specifying a file
 descriptor. Thus a system identifier of <SAMP>&lt;osfd>0</SAMP> will
-refer to the standard input.
+refer to the standard input (<CODE>STDIN</code>), 1 to standard output
+(<code>STDOUT</code>), and 2 to standard error
+(<code>STDERR</code>). Arbitrary file descriptors may be used so you
+could say <samp>&lt;osfd&gt;3</samp> to get an extra input or output
+stream independant of the usual three. This is useful, e.g., for
+generating catalog entries or SGML declarations on the fly. You can
+use an osfd storage object anywhere you can use a sysid, including on
+the command line.
 <DT>
 <SAMP>url</SAMP>
 <DD>

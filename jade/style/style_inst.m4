@@ -17,6 +17,7 @@
 #include "IListIter.h"
 #include "IQueue.h"
 #include "HashTable.h"
+#include "CharMap.h"
 #ifdef SP_SIZEOF_BOOL_1
 #include "XcharMap.h"
 #endif
@@ -161,11 +162,52 @@ __instantiate(IListIter<Pattern::Element>)
 __instantiate(IList<Pattern::Qualifier>)
 __instantiate(IListIter<Pattern::Qualifier>)
 __instantiate(Ptr<MacroFlowObj::Definition>)
+__instantiate(`HashTable<StringC,CharPart>')
+__instantiate(`HashTableItem<StringC,CharPart>')
+__instantiate(`HashTable<StringC,StringC>')
+__instantiate(`HashTableItem<StringC,StringC>')
 #ifdef SP_SIZEOF_BOOL_1
 __instantiate(XcharMap<char>)
 __instantiate(SharedXcharMap<char>)
 __instantiate(Ptr<SharedXcharMap<char> >)
 __instantiate(ConstPtr<SharedXcharMap<char> >)
+#endif
+__instantiate(CharMap<ELObjPart>)
+__instantiate(CharMapPage<ELObjPart>)
+__instantiate(CharMapColumn<ELObjPart>)
+__instantiate(CharMapResource<ELObjPart>)
+__instantiate(Ptr<CharMapResource<ELObjPart> >)
+__instantiate(ConstPtr<CharMapResource<ELObjPart> >)
+__instantiate(`HashTable<StringC,CharProp>')
+__instantiate(`HashTableItem<StringC,CharProp>')
+#ifndef _MSC_VER
+__instantiate(`OneRefArgCall<FOTBuilder::Address>')
+__instantiate(`OneArgCall<char const *>')
+__instantiate(`OneRefArgCall<FOTBuilder::TableCellNIC>')
+__instantiate(`OneArgCall<FOTBuilder::Symbol>')
+__instantiate(`OneArgCall<unsigned int>')
+__instantiate(`OneArgCall<unsigned short>')
+__instantiate(`OneRefArgCall<FOTBuilder::CharacterNIC>')
+__instantiate(`OneRefArgCall<NodePtr>')
+__instantiate(`OneRefArgCall<FOTBuilder::LeaderNIC>')
+__instantiate(`OneArgCall<long>')
+__instantiate(`OneRefArgCall<FOTBuilder::GridNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::TableColumnNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::RuleNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::DisplayGroupNIC>')
+__instantiate(`OneRefArgCall<String<unsigned short> >')
+__instantiate(`OneRefArgCall<FOTBuilder::LengthSpec>')
+__instantiate(`OneRefArgCall<FOTBuilder::InlineNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::DisplayNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::TableNIC>')
+__instantiate(`OneRefArgCall<Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > >')
+__instantiate(`OneRefArgCall<FOTBuilder::BoxNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::GridCellNIC>')
+__instantiate(`OneRefArgCall<FOTBuilder::DeviceRGBColor>')
+__instantiate(`OneRefArgCall<FOTBuilder::OptLengthSpec>')
+__instantiate(`OneArgCall<bool>')
+__instantiate(`OneRefArgCall<FOTBuilder::InlineSpace>')
+__instantiate(`OneRefArgCall<FOTBuilder::ExternalGraphicNIC>') 
 #endif
 
 #ifdef SP_NAMESPACE

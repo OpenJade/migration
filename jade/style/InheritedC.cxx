@@ -120,7 +120,7 @@ ELObj *PublicIdInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) 
 {
   Interpreter &interp = *vm.interp;
   if (pubid_)
-    return interp.makeSymbol(interp.makeStringC(pubid_));
+    return new (interp) StringObj(interp.makeStringC(pubid_));
   else
     return interp.makeFalse();
 }
@@ -748,6 +748,74 @@ GenericLengthSpecInheritedC::make(ELObj *obj, const Location &loc,
   return copy;
 }
 
+class GenericOptInlineSpaceInheritedC : public InheritedC {
+public:
+  typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptInlineSpace &);
+  GenericOptInlineSpaceInheritedC(const Identifier *, unsigned index, Setter);
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&value, Vector<size_t> &dependencies) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+private:
+  FOTBuilder::OptInlineSpace value_;
+  Setter setter_;
+};
+
+GenericOptInlineSpaceInheritedC
+::GenericOptInlineSpaceInheritedC(const Identifier *ident, unsigned index,
+                                  Setter setter)
+: InheritedC(ident, index), setter_(setter)
+{
+}
+
+ELObj *GenericOptInlineSpaceInheritedC::value(VM &vm, const VarStyleObj *,
+                                              Vector<size_t> &) const
+{
+  if (!value_.hasSpace)
+    return vm.interp->makeFalse();
+  else
+    return new (*vm.interp) InlineSpaceObj(value_.space);
+}
+
+
+void GenericOptInlineSpaceInheritedC::set(VM &, const VarStyleObj *,
+                                          FOTBuilder &fotb,
+                                          ELObj *&,
+                                          Vector<size_t> &) const
+{
+  (fotb.*setter_)(value_);
+}
+
+ConstPtr<InheritedC>
+GenericOptInlineSpaceInheritedC::make(ELObj *obj, const Location &loc,
+                                      Interpreter &interp) const
+{
+  GenericOptInlineSpaceInheritedC *copy
+    = new GenericOptInlineSpaceInheritedC(identifier(), index(), setter_);
+  InlineSpaceObj *iso = obj->asInlineSpace();
+  if (iso) {
+    copy->value_.space = iso->inlineSpace();
+    copy->value_.hasSpace = 1;
+  }
+  else {
+    FOTBuilder::OptLengthSpec res;
+    if (interp.convertOptLengthSpecC(obj, identifier(), loc, res))  {
+      if (res.hasLength) {
+        copy->value_.space.nominal = res.length;
+        copy->value_.space.min     = res.length; 
+        copy->value_.space.max     = res.length; 
+        copy->value_.hasSpace = 1;
+      } else 
+        copy->value_.hasSpace = 0;
+    } else {
+      delete copy;
+      copy = 0;
+    }
+  } 
+  return copy;
+}
+
+
 class GenericOptLengthSpecInheritedC : public OptLengthSpecInheritedC {
 public:
   typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptLengthSpec &);
@@ -1162,6 +1230,8 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
     return interp.makeError();
   }
   ELObj *obj = ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  const Char *s;
+  size_t n;
   interp.makeReadOnly(obj);
   return obj;
 }
@@ -1303,6 +1373,12 @@ void Interpreter::installInheritedCs()
   INHERITED_C2("numbered-lines?", GenericBoolInheritedC, &FOTBuilder::setNumberedLines, 1);
   INHERITED_C2("hanging-punct?", GenericBoolInheritedC, &FOTBuilder::setHangingPunct, 0);
   INHERITED_C2("box-open-end?", GenericBoolInheritedC, &FOTBuilder::setBoxOpenEnd, 0);
+  INHERITED_C2("side-by-side-overlap-control", GenericSymbolInheritedC, &FOTBuilder::setSideBySideOverlapControl,
+	       FOTBuilder::symbolIndent);
+  INHERITED_C2("side-by-side-pre-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePreAlign,
+	       FOTBuilder::symbolInitial);
+  INHERITED_C2("side-by-side-post-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePostAlign,
+	       FOTBuilder::symbolInitial);
   INHERITED_C2("truncate-leader?", GenericBoolInheritedC, &FOTBuilder::setTruncateLeader, 0);
   INHERITED_C2("align-leader?", GenericBoolInheritedC, &FOTBuilder::setAlignLeader, 1);
   INHERITED_C2("table-part-omit-middle-header?", GenericBoolInheritedC,
@@ -1416,7 +1492,7 @@ void Interpreter::installInheritedCs()
   INHERITED_C("glyph-subst-table", GlyphSubstTableC, 0);
 
   // #f or inline-space
-  IGNORED_C("inline-space-space", makeFalse());
+  INHERITED_C("inline-space-space", GenericOptInlineSpaceInheritedC, &FOTBuilder::setInlineSpaceSpace);
   // integers
   // float
   IGNORED_C("line-miter-limit", makeInteger(10));

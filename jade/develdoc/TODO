@@ -50,8 +50,26 @@ Simple things
   SchemeParserMessages (and more...). 
 
 * Set up framework for I18N: generating .po from .msg, po/OpenXYZ.pot from ../*.po,
-  generate and install .mo files. See GNU gettext Makefile.in.in.
+  generate and install .mo files. This has been done for OpenSP,
+  still to do for OpenJade. 
+  
+  If you add a new .msg file, you now have to remember to add it 
+  to po/POTFILES.in.
 
+  Adding support for a new language is done by:
+  1) cp po/OpenSP.pot <lang>.po	
+  2) Add translations in po/<lang>.po
+  3) cvs add po/<lang>.po 
+  4) Add <lang> to ALL_LINGUAS in configure.in
+  5) cvs commit configure.in po/<lang>.po
+  Here <lang> stands for the proper 2-letter language code 
+  (is that ISO 639 ?)
+
+  Still to do: figure out how to create translated .rc files from
+  the translations in <lang>.po. This will need some perl magic
+  to read in <lang>.po, then go over the .rc file and for each string,
+  look up the translation. Then write out a translated .rc file 
+  containing the proper language identification (ask Didier about this). 
 
 
 Things which have to be added to the jade internals documentation

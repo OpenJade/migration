@@ -191,7 +191,7 @@ MessageFragment::appModule,
 ,"reference to undefined variable %1"
 #endif
 );
-const MessageType0 InterpreterMessages::badCharName(
+const MessageType1 InterpreterMessages::badCharName(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -200,7 +200,7 @@ MessageFragment::appModule,
 #endif
 15
 #ifndef SP_NO_MESSAGE_TEXT
-,"no character with that name"
+,"no character with name %1"
 #endif
 );
 const MessageType1 InterpreterMessages::keywordNotAllowedCall(
@@ -1518,7 +1518,7 @@ MessageFragment::appModule,
 ,"mode %1 not defined"
 #endif
 );
-const MessageType3 InterpreterMessages::notAnInteger(
+const MessageType1 InterpreterMessages::badCharNumber(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1527,10 +1527,10 @@ MessageFragment::appModule,
 #endif
 132
 #ifndef SP_NO_MESSAGE_TEXT
-,"%2 argument for primitive %1 of wrong type: %3 not an integer"
+,"bad character number %1"
 #endif
 );
-const MessageType3 InterpreterMessages::notAKeyword(
+const MessageType1 InterpreterMessages::duplicateCharName(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1539,10 +1539,10 @@ MessageFragment::appModule,
 #endif
 133
 #ifndef SP_NO_MESSAGE_TEXT
-,"%2 argument for primitive %1 of wrong type: %3 not a keyword"
+,"duplicate character name %1"
 #endif
 );
-const MessageType3 InterpreterMessages::notAnAlist(
+const MessageType1 InterpreterMessages::duplicateSdataEntityName(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1551,10 +1551,10 @@ MessageFragment::appModule,
 #endif
 134
 #ifndef SP_NO_MESSAGE_TEXT
-,"%2 argument for primitive %1 of wrong type: %3 not an alist"
+,"duplicate SDATA entity name %1"
 #endif
 );
-const MessageType3 InterpreterMessages::notACharList(
+const MessageType1 InterpreterMessages::duplicateSdataEntityText(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1563,11 +1563,11 @@ MessageFragment::appModule,
 #endif
 135
 #ifndef SP_NO_MESSAGE_TEXT
-,"%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+,"duplicate SDATA entity text %1"
 #endif
 );
-const MessageType3 InterpreterMessages::lengthError(
-MessageType::error,
+const MessageType0 InterpreterMessages::unsupportedDeclaration(
+MessageType::warning,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
 #else
@@ -1575,7 +1575,31 @@ MessageFragment::appModule,
 #endif
 136
 #ifndef SP_NO_MESSAGE_TEXT
-,"%2 argument for primitive %1 has wrong length"
+,"unsupported declaration will be ignored"
+#endif
+);
+const MessageType1 InterpreterMessages::unsupportedCharRepertoire(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+137
+#ifndef SP_NO_MESSAGE_TEXT
+,"unsupported character repertoire %1 will be ignored"
+#endif
+);
+const MessageType0 InterpreterMessages::badDeclaration(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+138
+#ifndef SP_NO_MESSAGE_TEXT
+,"error in declaration element"
 #endif
 );
 #ifdef SP_NAMESPACE

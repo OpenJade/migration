@@ -43,7 +43,7 @@ struct InterpreterMessages {
   // 14
   static const MessageType1 undefinedVariableReference;
   // 15
-  static const MessageType0 badCharName;
+  static const MessageType1 badCharName;
   // 16
   static const MessageType1 keywordNotAllowedCall;
   // 17
@@ -263,15 +263,19 @@ struct InterpreterMessages {
   // 131
   static const MessageType1 undefinedMode;
   // 132
-  static const MessageType3 notAnInteger;
+  static const MessageType1 badCharNumber;
   // 133
-  static const MessageType3 notAKeyword;
+  static const MessageType1 duplicateCharName;
   // 134
-  static const MessageType3 notAnAlist;
+  static const MessageType1 duplicateSdataEntityName;
   // 135
-  static const MessageType3 notACharList;
+  static const MessageType1 duplicateSdataEntityText;
   // 136
-  static const MessageType3 lengthError;
+  static const MessageType0 unsupportedDeclaration;
+  // 137
+  static const MessageType1 unsupportedCharRepertoire;
+  // 138
+  static const MessageType0 badDeclaration;
 };
 
 #ifdef SP_NAMESPACE

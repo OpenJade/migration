@@ -14,7 +14,7 @@ E0+oddKeyArgs++odd number of keyword/value arguments
 E0+missingArg++missing argument for function call
 E1+syntacticKeywordAsVariable++syntactic keyword %1 used as variable
 E1+undefinedVariableReference++reference to undefined variable %1
-E0+badCharName++no character with that name
+E1+badCharName++no character with name %1
 E1+keywordNotAllowedCall++syntactic keyword %1 not valid in call position
 E1+symbolRequired++symbol required (got %1)
 E1+unknownTopLevelForm++unknown top level form %1
@@ -124,9 +124,10 @@ E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here
 E1+undefinedMode++mode %1 not defined
-E3+notAnInteger++%2 argument for primitive %1 of wrong type: %3 not an integer
-E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
-E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
-E3+notACharList++%2 argument for primitive %1 of wrong type: %3 not a list of characters
-E3+lengthError++%2 argument for primitive %1 has wrong length
-
+E1+badCharNumber++bad character number %1
+E1+duplicateCharName++duplicate character name %1
+E1+duplicateSdataEntityName++duplicate SDATA entity name %1
+E1+duplicateSdataEntityText++duplicate SDATA entity text %1
+W0+unsupportedDeclaration++unsupported declaration will be ignored
+W1+unsupportedCharRepertoire++unsupported character repertoire %1 will be ignored
+E0+badDeclaration++error in declaration element

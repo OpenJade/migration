@@ -54,7 +54,9 @@ void TokenMessageArg::append(MessageBuilder &builder) const
 	  const StringC &delim = syntax_->delimGeneral(info.delim1);
 	  builder.appendFragment(ParserMessages::delimStart);
 	  builder.appendChars(delim.data(), delim.size());
+#if 0
 	  fragment = &ParserMessages::delimEnd;
+#endif
 	}
 	break;
       case TokenInfo::setType:

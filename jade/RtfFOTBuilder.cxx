@@ -3,12 +3,16 @@
 
 #include "config.h"
 #include "RtfFOTBuilder.h"
+#include "RtfMessages.h"
+#include "MessageArg.h"
 #include "Vector.h"
 #include "HashTable.h"
 #include "InputSource.h"
 #include "StorageManager.h"
 #include "Location.h"
 #include "macros.h"
+#include "CharMap.h"
+#include "CharsetRegistry.h"
 #ifdef SP_SHORT_HEADERS
 #include <strstrea.h>
 #else
@@ -79,7 +83,8 @@ private:
 
 class RtfFOTBuilder : public SerialFOTBuilder {
 public:
-  RtfFOTBuilder(streambuf *, const Ptr<ExtendEntityManager> &, const CharsetInfo &, Messenger *);
+  RtfFOTBuilder(streambuf *, const Vector<StringC> &, 
+		const Ptr<ExtendEntityManager> &, const CharsetInfo &, Messenger *);
   ~RtfFOTBuilder();
   void characters(const Char *, size_t);
   void paragraphBreak(const ParagraphNIC &);
@@ -178,6 +183,7 @@ public:
   void setCellBeforeColumnMargin(Length);
   void setCellAfterColumnMargin(Length);
   void setCellBackground(bool);
+  void setCellRowAlignment(Symbol);
   void startNode(const NodePtr &, const StringC &, RuleType);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
@@ -186,7 +192,7 @@ public:
     const char *fontSuffix;
     Char mapping[128];
   };
-  enum { nWinCharsets = 6 };
+  enum { jisCharset = 5, nWinCharsets = 7 };
   static const WinCharset winCharsets[nWinCharsets];
   struct SymbolFont {
     const char *name;
@@ -230,6 +236,7 @@ private:
   void endDisplay();
   void newPar(bool allowSpaceBefore = 1);
   bool systemIdFilename(const StringC &systemId, String<char> &filename);
+  int systemIdFilename1(const StringC &systemId, String<char> &filename);
   int makeColor(const DeviceRGBColor &);
   void outputBookmarkName(const Char *, size_t);
   void outputBookmarkName(unsigned long);
@@ -244,17 +251,19 @@ private:
   void outputHeaderFooter(const char *suffix, unsigned flags);
   long computeLengthSpec(const LengthSpec &);
   void displaySizeChanged();
+  void symbolChar(int ff, unsigned code);
+  void initJIS();
 
   enum InlineState {
     inlineFirst,		// never had an inline FO
     inlineStart,		// must emit \par before next inline FO
-    inlineContinue,		// like Start, but will be a continuation line
     inlineField,		// in a line field
     inlineFieldEnd,             // in a line field with align=end
     inlineMiddle,		// had some inline FOs
     inlineTable			// just after \row
   };
   InlineState inlineState_;
+  bool continuePar_;
   enum UnderlineType {
      noUnderline,
      underlineSingle,
@@ -323,6 +332,7 @@ private:
     long cellBottomMargin;
     long cellLeftMargin;
     long cellRightMargin;
+    char cellVerticalAlignment;
     // These are needed for handling LengthSpecs
     LengthSpec positionPointShiftSpec;
     LengthSpec leftIndentSpec;
@@ -394,10 +404,11 @@ private:
   Border tableBorder_[4];
   unsigned cellIndex_;
   struct Cell {
-    Cell() : present(0), hasBackground(0), span(1), vspan(1) { }
+    Cell() : present(0), hasBackground(0), span(1), vspan(1), valign('t') { }
     bool present;
     bool hasBackground;
     unsigned short backgroundColor;
+    char valign;
     String<char> content;
     unsigned span;
     unsigned vspan;
@@ -412,7 +423,7 @@ private:
   bool inTableHeader_;
   unsigned nHeaderRows_;
   Vector<Column> columns_;
-  bool inTable_;
+  unsigned tableLevel_;
   ostrstream fieldos_;
   int fieldTabPos_;
   long displaySize_;
@@ -437,11 +448,16 @@ private:
   unsigned leaderDepth_;
   ostrstream nullos_;
   ostream *preLeaderOsp_;
-  enum { charTableSize = 0x3000 };
-  enum { symbolFontFlag = 0x8000 };
-  unsigned short charTable_[charTableSize];
+  enum { CHAR_TABLE_CHAR_BITS = 16 };
+  enum { CHAR_TABLE_SYMBOL_FLAG = 1U << 31, CHAR_TABLE_DB_FLAG = 1U << 30 };
+  CharMap<Unsigned32> charTable_;
   String<char> hfPart_[nHF];
   ostrstream hfos_;
+  enum RTFVersion {
+    word95,
+    word97
+  };
+  RTFVersion rtfVersion_;
   friend struct OutputFormat;
   friend struct Format;
   friend struct CommonFormat;
@@ -544,6 +560,7 @@ ostream &operator<<(ostream &os, const String<char> &s)
 }
 
 FOTBuilder *makeRtfFOTBuilder(streambuf *sbuf,
+			      const Vector<StringC> &options,
 			      const Ptr<ExtendEntityManager> &entityManager,
 			      const CharsetInfo &systemCharset,
 			      Messenger *mgr,
@@ -586,20 +603,23 @@ FOTBuilder *makeRtfFOTBuilder(streambuf *sbuf,
     { 0, 0, 0}
   };
   ext = extensions;
-  return new RtfFOTBuilder(sbuf, entityManager, systemCharset, mgr);
+  return new RtfFOTBuilder(sbuf, options, entityManager, systemCharset, mgr);
 }
 
 RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
+			     const Vector<StringC> &options,
 			     const Ptr<ExtendEntityManager> &entityManager,
 			     const CharsetInfo &systemCharset, Messenger *mgr)
-: finalos_(sbuf), entityManager_(entityManager),
+: finalos_(sbuf),
+  entityManager_(entityManager),
   systemCharset_(&systemCharset), mgr_(mgr),
   inlineState_(inlineFirst),
+  continuePar_(0),
   tempos_(&tempbuf_), osp_(&tempos_),
   accumSpace_(0),
   keepWithNext_(0), hadSection_(0),
   linkDepth_(0),
-  inTable_(0),
+  tableLevel_(0),
   nodeLevel_(0),
   nPendingElementsNonEmpty_(0),
   followWhitespaceChar_(0),
@@ -619,7 +639,9 @@ RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
   maxConsecHyphens_(0),
   doBreak_(breakNone),
   keep_(0),
-  hadParInKeep_(0)
+  hadParInKeep_(0),
+  charTable_(0),
+  rtfVersion_(word95)
 {
   specFormat_.fontSize = 20; // 10 points
   specFormatStack_.push_back(specFormat_);
@@ -629,29 +651,78 @@ RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
     times += *s;
   fontFamilyNameTable_.insert(times, 0);
   fontFamilyCharsetsTable_[0].rtfFontNumber[0] = 0;
-  for (int i = 0; i < charTableSize; i++)
-    charTable_[i] = 0;
   for (int i = 0; i < nWinCharsets; i++) {
     for (int j = 0; j < 128; j++) {
       Char c = winCharsets[i].mapping[j];
       if (c) {
 	if (!charTable_[c])
-	  charTable_[c] = (j | 0x80 | (1 << (8 + i)));
-	else if ((charTable_[i] & 0x7f) == j)
-	  charTable_[c] |= (1 << (8 + i));
+	  charTable_.setChar(c, (j + 0x80) | (1 << (i + CHAR_TABLE_CHAR_BITS)));
+	else if ((charTable_[i] & ((1 << CHAR_TABLE_CHAR_BITS) - 1)) == (j + 0x80))
+	  charTable_.setChar(c, charTable_[c] | (1 << (i + CHAR_TABLE_CHAR_BITS)));
       }
     }
   }
+  initJIS();
   for (int i = 0; i < nSymbolFonts; i++) {
     for (int j = 0; j < 256; j++) {
       Char c = symbolFonts[i].mapping[j];
       if (c && !charTable_[c])
-	charTable_[c] = (j | (i << 8) | symbolFontFlag );
+	charTable_.setChar(c, j | (1 << (CHAR_TABLE_CHAR_BITS + i)) | CHAR_TABLE_SYMBOL_FLAG);
     }
     StringC tem;
     for (const char *s = symbolFonts[i].name; *s; s++)
       tem += *s;
     fontFamilyNameTable_.insert(tem, i + 1);
+  }
+  for (size_t i = 0; i < options.size(); i++) {
+    if (options[i] == systemCharset.execToDesc("97"))
+      rtfVersion_ = word97;
+  }
+}
+
+void RtfFOTBuilder::initJIS()
+{
+  WideChar min, max;
+  UnivChar univ;
+  Owner<CharsetRegistry::Iter> jis(CharsetRegistry::makeIter(CharsetRegistry::JIS0208));
+  while (jis->next(min, max, univ)) {
+    do {
+      if (!charTable_[univ]) {
+	unsigned char c1 = min >> 8;
+	unsigned char c2 = min & 0x7f;
+	unsigned char out1;
+	if (c1 < 33)
+	  out1 = 0;
+	else if (c1 < 95)
+	  out1 = ((c1 + 1) >> 1) + 112;
+	else if (c1 < 127)
+	  out1 = ((c1 + 1) >> 1) + 176;
+	else
+	  out1 = 0;
+	if (out1) {
+	  unsigned char out2;
+	  if (c1 & 1) {
+	    if (c2 < 33)
+	      out2 = 0;
+	    else if (c2 <= 95)
+	      out2 = c2 + 31;
+	    else if (c2 <= 126)
+	      out2 = c2 + 32;
+	    else
+	      out2 = 0;
+	  }
+	  else {
+	    if (33 <= c2 && c2 <= 126)
+	      out2 = c2 + 126;
+	    else
+	      out2 = 0;
+	  }
+	  if (out2)
+	    charTable_.setChar(univ, (out1 << 8) | out2 | (1 << (jisCharset + CHAR_TABLE_CHAR_BITS)) | CHAR_TABLE_DB_FLAG);
+	}
+      }
+      univ++;
+    } while (min++ != max);
   }
 }
 
@@ -692,7 +763,7 @@ RtfFOTBuilder::~RtfFOTBuilder()
 	 << "\\blue" << (n & 0xff)
 	 << ';';
   }
-  os() << "}\n";
+  os() << "}{\\stylesheet}\n";
   if (maxConsecHyphens_ > 0)
     os() << "\\hyphconsec" << maxConsecHyphens_;
   os() << "\\deflang" << DEFAULT_LANG << "\\notabind\\facingp\\hyphauto1\\widowctrl\n";
@@ -862,10 +933,22 @@ void hexChar(ostream &os, unsigned code)
   os << "\\'" << hex[(code >> 4) & 0xf] << hex[code & 0xf];
 }
 
+void RtfFOTBuilder::symbolChar(int ff, unsigned code)
+{
+  int &n = fontFamilyCharsetsTable_[ff].rtfFontNumber[nWinCharsets - 1];
+  if (n < 0)
+    n = nextRtfFontNumber_++;
+  os() << "{\\f" << n;
+  hexChar(os(), code);
+  os() << "}";
+}
+
 void RtfFOTBuilder::characters(const Char *s, size_t n)
 {
   // Ignore record ends at the start of continuation paragraphs.
-  if (inlineState_ == inlineContinue && paraFormat_.lines == symbolWrap) {
+  if (continuePar_
+      && (inlineState_ == inlineStart || inlineState_ == inlineFirst)
+      && paraFormat_.lines == symbolWrap) {
     for (; n > 0 && *s == '\r'; s++, n--)
       ;
     if (n == 0)
@@ -962,40 +1045,54 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
       break;
     case '\0':
       break;
+    case '\\':
+      if (outputFormat_.charset == jisCharset)
+	setCharset(0);
+      // fall through
     case '{':
     case '}':
-    case '\\':
       os() << '\\' << char(*s);
       break;
+    case '|':
+    case '~':
+      if (outputFormat_.charset == jisCharset)
+	setCharset(0);
       // fall through
     default:
       if (*s < 0x80)
 	os() << char(*s);
-      else if (*s < charTableSize) {
-	unsigned short code = charTable_[*s];
-	if (code & symbolFontFlag) {
-	  outputFormat_.fontFamily = ((code >> 8) & 0x7f) + 1;
-	  setCharset(nWinCharsets - 1);
-	  hexChar(os(), code & 0xff);
-	}
-        else {
-	  if (!(code & (1 << (outputFormat_.charset + 8)))) {
-	    if (!code)
-	      break;
+      else {
+	unsigned long code = charTable_[*s];
+	if (code & CHAR_TABLE_SYMBOL_FLAG)
+	  symbolChar(((code & ~CHAR_TABLE_SYMBOL_FLAG) >> CHAR_TABLE_CHAR_BITS) + 1,
+		     code & 0xff);
+        else if (code) {
+	  if (!(code & (1 << (outputFormat_.charset + CHAR_TABLE_CHAR_BITS)))) {
 	    // If possible, choose a charset compatible with the language
-	    if (code & (outputFormat_.langCharsets << 8))
-	      code &= ((outputFormat_.langCharsets << 8) | 0xff);
+	    if (code & (outputFormat_.langCharsets << CHAR_TABLE_CHAR_BITS))
+	      code &= ((outputFormat_.langCharsets << CHAR_TABLE_CHAR_BITS) | ((1 << CHAR_TABLE_CHAR_BITS) - 1));
 	    int i = 0;
-	    for (unsigned mask = 0x100; !(code & mask); mask <<= 1, i++)
+	    for (unsigned mask = 1 << CHAR_TABLE_CHAR_BITS; !(code & mask); mask <<= 1, i++)
 	      ;
 	    setCharset(i);
 	  }
-	  hexChar(os(), code & 0xff);
+	  if (code & CHAR_TABLE_DB_FLAG) {
+	    os() << "{\\dbch";
+	    hexChar(os(), (code >> 8) & 0xff);
+	    hexChar(os(), code & 0xff);
+	    os() << "}";
+	  }
+	  else 
+	    hexChar(os(), code & 0xff);
 	}
-      }
-      else if (*s >= SYMBOL_FONT_PAGE + 0x20 && *s <= SYMBOL_FONT_PAGE + 0xff) {
-	setCharset(nWinCharsets - 1);
-	hexChar(os(), *s & 0xff);
+	else {
+	  if (*s >= SYMBOL_FONT_PAGE + 0x20 && *s <= SYMBOL_FONT_PAGE + 0xff)
+	    symbolChar(outputFormat_.fontFamily, *s & 0xff);
+	  else {
+	    os() << "\\u" << int(short(*s));
+	    hexChar(os(), '?');
+	  }
+	}
       }
       break;
     }
@@ -1191,7 +1288,7 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
       accumSpace_ = 0;
     }
     if (keep_) {
-      if (hadParInKeep_ || inlineState_ == inlineContinue)
+      if (hadParInKeep_ || continuePar_)
 	keepWithNext_ = 1;
       hadParInKeep_ = 1;
     }
@@ -1213,7 +1310,7 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
     break;
   }
   os() << "\\pard";
-  if (inTable_)
+  if (tableLevel_)
     os() << "\\intbl";
   flushPendingElements();
   if (accumSpace_) {
@@ -1263,12 +1360,13 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
 void RtfFOTBuilder::inlinePrepare()
 {
   followWhitespaceChar_ = 0;
-  if (inlineState_ == inlineMiddle || inlineState_ == inlineField
+  if (inlineState_ == inlineMiddle
+      || inlineState_ == inlineField
       || inlineState_ == inlineFieldEnd)
     return;
   newPar();
   os() << "\\sl" << (paraFormat_.lineSpacingAtLeast ? paraFormat_.lineSpacing : - paraFormat_.lineSpacing);
-  int fli = inlineState_ == inlineContinue ? 0 : paraFormat_.firstLineIndent;
+  int fli = continuePar_ ? 0 : paraFormat_.firstLineIndent;
   if (fli)
     os() << "\\fi" << fli;
   if (paraFormat_.quadding != 'l')
@@ -1494,6 +1592,7 @@ void RtfFOTBuilder::startDisplay(const DisplayNIC &nic)
     keepWithNext_ = 1;
   if (inlineState_ != inlineFirst && inlineState_ != inlineTable)
     inlineState_ = inlineStart;
+  continuePar_ = 0;
   switch (nic.breakBefore) {
   case symbolPage:
   case symbolPageRegion:
@@ -1550,8 +1649,11 @@ void RtfFOTBuilder::endDisplay()
 {
   doBreak_ = displayStack_.back().breakAfter;
   keep_ = displayStack_.back().saveKeep;
-  if (inlineState_ != inlineTable)
-    inlineState_ = inlineContinue;
+  if (inlineState_ != inlineTable) {
+    if (inlineState_ != inlineFirst)
+      inlineState_ = inlineStart;
+    continuePar_ = 1;
+  }
   if (displayStack_.back().spaceAfter > accumSpace_)
     accumSpace_ = displayStack_.back().spaceAfter;
   if (displayStack_.back().keepWithNext)
@@ -1562,9 +1664,9 @@ void RtfFOTBuilder::endDisplay()
 void RtfFOTBuilder::startLineField(const LineFieldNIC &)
 {
   start();
-  if (inlineState_ == inlineStart || inlineState_ == inlineContinue) {
+  if (inlineState_ == inlineStart || inlineState_ == inlineFirst) {
     fieldTabPos_ = specFormat_.fieldWidth + paraFormat_.leftIndent;
-    if (inlineState_ == inlineStart)
+    if (!continuePar_)
       fieldTabPos_ += paraFormat_.firstLineIndent;
     inlinePrepare();
     inlineState_ = inlineField;
@@ -1752,6 +1854,12 @@ void RtfFOTBuilder::startSimplePageSequence()
     pageFormat_.headerMargin = hfPreSpace;
   if (pageFormat_.footerMargin < hfPostSpace)
     pageFormat_.footerMargin = hfPostSpace;
+  // Word 97 seems to get very confused by top or bottom margins less than this.
+  static const int minVMargin = 12*20;
+  if (pageFormat_.topMargin < minVMargin)
+    pageFormat_.topMargin = minVMargin;
+  if (pageFormat_.bottomMargin < minVMargin)
+    pageFormat_.bottomMargin = minVMargin;
   os() << "\\sectd\\plain";
   if (pageFormat_.pageWidth > pageFormat_.pageHeight)
     os() << "\\lndscpsxn";
@@ -1784,9 +1892,11 @@ void RtfFOTBuilder::endSimplePageSequence()
   if (inlineState_ != inlineFirst)
     os() << "\\par";
   inlineState_ = inlineFirst;
+  continuePar_ = 0;
   end();
   --inSimplePageSequence_;
-  pageFormat_ = pageFormatStack_.back();
+  if (!inSimplePageSequence_)
+    pageFormat_ = pageFormatStack_.back();
   doBreak_ = breakNone;
 }
 
@@ -1827,6 +1937,7 @@ void RtfFOTBuilder::endAllSimplePageSequenceHeaderFooter()
   for (size_t i = 0; i < nHF; i++)
     hfPart_[i].resize(0);
   inlineState_ = inlineFirst;
+  continuePar_ = 0;
 }
 
 void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)
@@ -1894,8 +2005,10 @@ void RtfFOTBuilder::idrefButton(const Char *s, size_t n)
 {
   os() << "{\\field";
   os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
-  os() << "GOTOBUTTON ";
+  os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
   outputBookmarkName(s, n);
+  if (rtfVersion_ >= word97)
+    os() << "}{\\fldrslt ";
   os() << ' ';
 }
 
@@ -1914,9 +2027,11 @@ void RtfFOTBuilder::startLink(const Address &addr)
 	  if (addr.node->elementIndex(n) == accessOK) {
 	    os() << "{\\field";
 	    os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
-	    os() << "GOTOBUTTON ";
+	    os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
 	    outputBookmarkName(n);
 	    os() << ' ';
+	    if (rtfVersion_ >= word97)
+	      os() << "}{\\fldrslt ";
 	    elementsRefed_.add(n);
 	  }
 	  else
@@ -1948,7 +2063,7 @@ void RtfFOTBuilder::startLink(const Address &addr)
 void RtfFOTBuilder::endLink()
 {
   if (--linkDepth_ == 0) {
-    os() << "}{\\fldrslt }}";
+    os() << (rtfVersion_ >= word97 ? "}}" : "}{\\fldrslt }}");
     outputFormat_ = saveOutputFormat_;
   }
   end();
@@ -2057,29 +2172,51 @@ void RtfFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
 
 bool RtfFOTBuilder::systemIdFilename(const StringC &systemId, String<char> &filename)
 {
-  if (systemId.size() == 0)
+  int res = systemIdFilename1(systemId, filename);
+  if (res < 0) {
+    mgr_->message(RtfMessages::systemIdNotFilename, StringMessageArg(systemId));
     return 0;
+  }
+  return res;
+}
+
+// Return -1 if an error should be generated
+
+int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &filename)
+{
+  if (systemId.size() == 0)
+    return -1;
+  ParsedSystemId parsedBuf;
   Owner<InputSource> in
     = entityManager_->open(systemId, *systemCharset_, new InputSourceOrigin, 0, *mgr_);
   if (!in)
     return 0;
   Xchar c = in->get(*mgr_);
-  if (c == InputSource::eE)
-    return 0;
-  const Location &loc = in->currentLocation();
-  if (loc.origin().isNull())
-    return 0;
-  const InputSourceOrigin *tem = loc.origin()->asInputSourceOrigin();
-  if (!tem)
-    return 0;
-  const ParsedSystemId *parsed
-    = ExtendEntityManager::externalInfoParsedSystemId(tem->externalInfo());
-  if (!parsed)
-    return 0;
+  const ParsedSystemId *parsed;
+  if (c == InputSource::eE && in->accessError()) {
+    if (!entityManager_->parseSystemId(systemId, *systemCharset_, 0, 0, *mgr_, parsedBuf))
+      return 0;
+    if (parsedBuf.size() != 1 || parsedBuf[0].baseId.size())
+      return 0;
+    parsedBuf[0].id = parsedBuf[0].specId;
+    parsed = &parsedBuf;
+  }
+  else {
+    const Location &loc = in->currentLocation();
+    if (loc.origin().isNull())
+      return -1;
+    const InputSourceOrigin *tem = loc.origin()->asInputSourceOrigin();
+    if (!tem)
+      return -1;
+    parsed
+      = ExtendEntityManager::externalInfoParsedSystemId(tem->externalInfo());
+    if (!parsed)
+      return -1;
+  }
   if (parsed->size() != 1)
-    return 0;
+    return -1;
   if (strcmp((*parsed)[0].storageManager->type(), "OSFILE") != 0)
-    return 0;
+    return -1;
   const StringC &id = (*parsed)[0].id;
   String<char> buf;
   // FIXME use WideCharToMultibyte
@@ -2104,6 +2241,10 @@ void RtfFOTBuilder::startTable(const TableNIC &nic)
 {
   startDisplay(nic);
   start();
+  if (tableLevel_++) {
+    mgr_->message(RtfMessages::nestedTable);
+    return;
+  }
   if (nic.widthType == TableNIC::widthExplicit)
     tableWidth_ = computeLengthSpec(nic.width);
   else
@@ -2130,34 +2271,35 @@ void RtfFOTBuilder::startTable(const TableNIC &nic)
   default:
     break;
   }
-  inTable_ = 1;
 }
 
 void RtfFOTBuilder::endTable()
 {
-  if (cells_.size())
-    outputTable();
-  if (inlineState_ == inlineTable) {
-    outputFormat_ = OutputFormat();
-    os() << "\\pard\\plain\\sl-1";
-    inlineState_ = inlineStart;
+  if (--tableLevel_ == 0) {
+    if (cells_.size())
+      outputTable();
+    if (inlineState_ == inlineTable) {
+      outputFormat_ = OutputFormat();
+      os() << "\\pard\\plain\\sl-1";
+      inlineState_ = inlineStart;
+    }
+    displaySize_ = tableDisplaySize_;
   }
   end();
   endDisplay();
-  displaySize_ = tableDisplaySize_;
-  inTable_ = 0;
 }
 
 void RtfFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
 {
-  nHeaderRows_ = 0;
+  if (tableLevel_ == 1)
+    nHeaderRows_ = 0;
   startDisplay(nic);
   start();
 }
 
 void RtfFOTBuilder::endTablePartSerial()
 {
-  if (cells_.size())
+  if (tableLevel_ == 1 && cells_.size())
     outputTable();
   end();
   endDisplay();
@@ -2165,12 +2307,14 @@ void RtfFOTBuilder::endTablePartSerial()
 
 void RtfFOTBuilder::startTablePartHeader()
 {
-  inTableHeader_ = 1;
+  if (tableLevel_ == 1)
+    inTableHeader_ = 1;
 }
 
 void RtfFOTBuilder::endTablePartHeader()
 {
-  inTableHeader_ = 0;
+  if (tableLevel_ == 1)
+    inTableHeader_ = 0;
 }
 
 void RtfFOTBuilder::startTablePartFooter()
@@ -2183,7 +2327,7 @@ void RtfFOTBuilder::endTablePartFooter()
 
 void RtfFOTBuilder::tableColumn(const TableColumnNIC &nic)
 {
-  if (nic.nColumnsSpanned == 1) {
+  if (tableLevel_ == 1 && nic.nColumnsSpanned == 1) {
     if (nic.columnIndex >= columns_.size())
       columns_.resize(columns_.size() + 1);
     columns_[nic.columnIndex].hasWidth = nic.hasWidth;
@@ -2226,12 +2370,15 @@ void RtfFOTBuilder::outputTable()
 	if (i + cells_[i][j].vspan > cells_.size())
 	  cells_[i][j].vspan = cells_.size() - i;
 	for (size_t k = 1; k < cells_[i][j].vspan; k++) {
-	  if (!cells_[i + k][j].present) {
-	    cells_[i + k][j].present = 1;
-	    cells_[i + k][j].span = cells_[i][j].span;
-	    cells_[i + k][j].border[leftBorder] = cells_[i][j].border[leftBorder];
-	    cells_[i + k][j].border[rightBorder] = cells_[i][j].border[rightBorder];
+	  if (cells_[i + k][j].present) {
+	    cells_[i][j].vspan = k;
+	    break;
 	  }
+	  cells_[i + k][j].vspan = 0;
+	  cells_[i + k][j].present = 1;
+	  cells_[i + k][j].span = cells_[i][j].span;
+	  cells_[i + k][j].border[leftBorder] = cells_[i][j].border[leftBorder];
+	  cells_[i + k][j].border[rightBorder] = cells_[i][j].border[rightBorder];
 	}
 	cells_[i + cells_[i][j].vspan - 1][j].border[bottomBorder]
 	    = cells_[i][j].border[bottomBorder];
@@ -2319,6 +2466,13 @@ void RtfFOTBuilder::outputTable()
     os() << ' ';
     long pos = tableLeftIndent_;
     for (unsigned j = 0; j < cells_[i].size(); j += cells_[i][j].span) {
+      if (cells_[i][j].vspan == 0)
+	os() << "\\clvmrg";
+      else {
+	if (cells_[i][j].vspan > 1)
+	  os() << "\\clvmgf";
+	os() << "\\clvertal" << cells_[i][j].valign;
+      }
       for (int k = 0; k < 4; k++) {
 	const Border &brdr = cells_[i][j].border[k];
 	if (brdr.flags & RtfFOTBuilder::Border::isPresent) {
@@ -2359,6 +2513,10 @@ void RtfFOTBuilder::outputTableBorder(const Border &brdr)
 
 void RtfFOTBuilder::startTableRow()
 {
+  if (tableLevel_ != 1) {
+    start();
+    return;
+  }
   if (inlineState_ == inlineStart) {
     if (accumSpace_)
       os() << "\\sa" << accumSpace_;
@@ -2375,6 +2533,10 @@ void RtfFOTBuilder::startTableRow()
 
 void RtfFOTBuilder::endTableRow()
 {
+  if (tableLevel_ != 1) {
+    end();
+    return;
+  }
   if (inTableHeader_) {
     Vector<Cell> headerRow;
     cells_.back().swap(headerRow);
@@ -2388,6 +2550,10 @@ void RtfFOTBuilder::endTableRow()
 
 void RtfFOTBuilder::startTableCell(const TableCellNIC &nic)
 {
+  if (tableLevel_ != 1) {
+    start();
+    return;
+  }
   if (nic.columnIndex >= cells_.back().size())
     cells_.back().resize(nic.columnIndex + 1);
   cellIndex_ = nic.columnIndex;
@@ -2397,6 +2563,7 @@ void RtfFOTBuilder::startTableCell(const TableCellNIC &nic)
   cells_.back()[cellIndex_].hasBackground = specFormat_.cellBackground;
   if (specFormat_.cellBackground)
     cells_.back()[cellIndex_].backgroundColor = specFormat_.backgroundColor;
+  cells_.back()[cellIndex_].valign = specFormat_.cellVerticalAlignment;
   // Make a guess at the display-size.
   bool hasWidth = 1;
   long newDisplaySize = 0;
@@ -2414,6 +2581,7 @@ void RtfFOTBuilder::startTableCell(const TableCellNIC &nic)
         /(columns_.size() ? columns_.size() : 2);
   osp_ = &cellos_;
   inlineState_ = inlineFirst;
+  continuePar_ = 0;
   addLeftIndent_  = specFormat_.cellLeftMargin;
   addRightIndent_ = specFormat_.cellRightMargin;
   accumSpace_ = specFormat_.cellTopMargin;
@@ -2426,6 +2594,10 @@ void RtfFOTBuilder::startTableCell(const TableCellNIC &nic)
 
 void RtfFOTBuilder::endTableCell()
 {
+  if (tableLevel_ != 1) {
+    end();
+    return;
+  }
   accumSpace_ += specFormat_.cellBottomMargin;
   if (accumSpace_ > 0) {
     if (inlineState_ == inlineFirst)
@@ -2448,42 +2620,50 @@ void RtfFOTBuilder::endTableCell()
 
 void RtfFOTBuilder::tableBeforeRowBorder()
 {
-  storeBorder(tableBorder_[topBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(tableBorder_[topBorder]);
 }
 
 void RtfFOTBuilder::tableAfterRowBorder()
 {
-  storeBorder(tableBorder_[bottomBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(tableBorder_[bottomBorder]);
 }
 
 void RtfFOTBuilder::tableBeforeColumnBorder()
 {
-  storeBorder(tableBorder_[leftBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(tableBorder_[leftBorder]);
 }
 
 void RtfFOTBuilder::tableAfterColumnBorder()
 {
-  storeBorder(tableBorder_[rightBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(tableBorder_[rightBorder]);
 }
 
 void RtfFOTBuilder::tableCellBeforeRowBorder()
 {
-  storeBorder(cells_.back()[cellIndex_].border[topBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(cells_.back()[cellIndex_].border[topBorder]);
 }
 
 void RtfFOTBuilder::tableCellAfterRowBorder()
 {
-  storeBorder(cells_.back()[cellIndex_].border[bottomBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(cells_.back()[cellIndex_].border[bottomBorder]);
 }
 
 void RtfFOTBuilder::tableCellBeforeColumnBorder()
 {
-  storeBorder(cells_.back()[cellIndex_].border[leftBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(cells_.back()[cellIndex_].border[leftBorder]);
 }
 
 void RtfFOTBuilder::tableCellAfterColumnBorder()
 {
-  storeBorder(cells_.back()[cellIndex_].border[rightBorder]);
+  if (tableLevel_ == 1)
+    storeBorder(cells_.back()[cellIndex_].border[rightBorder]);
 }
 
 void RtfFOTBuilder::storeBorder(Border &b)
@@ -2548,6 +2728,23 @@ void RtfFOTBuilder::setCellAfterColumnMargin(Length n)
 void RtfFOTBuilder::setCellBackground(bool b)
 {
   specFormat_.cellBackground = b;
+}
+
+void RtfFOTBuilder::setCellRowAlignment(Symbol align)
+{
+  switch (align) {
+  case symbolStart:
+    specFormat_.cellVerticalAlignment = 't';
+    break;
+  case symbolCenter:
+    specFormat_.cellVerticalAlignment = 'c';
+    break;
+  case symbolEnd:
+    specFormat_.cellVerticalAlignment = 'b';
+    break;
+  default:
+    break;
+  }
 }
 
 void RtfFOTBuilder::outputBookmarkName(const Char *s, size_t n)
@@ -2695,6 +2892,7 @@ RtfFOTBuilder::Format::Format()
   boxHasBorder(1), boxHasBackground(0),
   borderPresent(1), borderPriority(0), borderOmitAtBreak(0),
   cellLeftMargin(0), cellRightMargin(0), cellTopMargin(0), cellBottomMargin(0),
+  cellVerticalAlignment('t'),
   lineSpacingSpec(240), cellBackground(0), scoreSpaces(1), hyphenate(0)
 {
 }
@@ -2974,6 +3172,9 @@ unsigned RtfFOTBuilder::convertLanguage(unsigned language, unsigned country,
   case SP_LETTER2('F', 'O'):
     langCharsets = 0x13;
     return 0x438;
+  case SP_LETTER2('J', 'A'):
+    langCharsets = (1 << jisCharset);
+    return 0x411;
   }
   langCharsets = 0x1f;
   return DEFAULT_LANG;
@@ -3075,6 +3276,21 @@ RtfFOTBuilder::winCharsets[RtfFOTBuilder::nWinCharsets] = {
     0x00e8, 0x00e9, 0x00ea, 0x00eb, 0x00ec, 0x00ed, 0x00ee, 0x00ef,
     0x011f, 0x00f1, 0x00f2, 0x00f3, 0x00f4, 0x00f5, 0x00f6, 0x00f7,
     0x00f8, 0x00f9, 0x00fa, 0x00fb, 0x00fc, 0x0131, 0x015f, 0x00ff }
+  },
+  // Shift JIS Katakana
+  { 128, "", {
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+    0x0000, 0xff61, 0xff62, 0xff63, 0xff64, 0xff65, 0xff66, 0xff67,
+    0xff68, 0xff69, 0xff6a, 0xff6b, 0xff6c, 0xff6d, 0xff6e, 0xff6f,
+    0xff70, 0xff71, 0xff72, 0xff73, 0xff74, 0xff75, 0xff76, 0xff77,
+    0xff78, 0xff79, 0xff7a, 0xff7b, 0xff7c, 0xff7d, 0xff7e, 0xff7f,
+    0xff80, 0xff81, 0xff82, 0xff83, 0xff84, 0xff85, 0xff86, 0xff87,
+    0xff88, 0xff89, 0xff8a, 0xff8b, 0xff8c, 0xff8d, 0xff8e, 0xff8f,
+    0xff90, 0xff91, 0xff92, 0xff93, 0xff94, 0xff95, 0xff96, 0xff97,
+    0xff98, 0xff99, 0xff9a, 0xff9b, 0xff9c, 0xff9d, 0xff9e, 0xff9f }
   },
   // This is the Symbol charset which is treated specially.
   // It must be last in this table.

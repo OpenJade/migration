@@ -62,6 +62,7 @@ public:
   StyleObj *tableColumnStyle(unsigned columnIndex, unsigned span);
   StyleObj *tableRowStyle();
   void startTableRow(StyleObj *);
+  bool inTable() const;
   bool inTableRow();
   void endTableRow();
   void clearPageType();
@@ -172,6 +173,12 @@ bool ProcessContext::getPageType(unsigned &n) const
     return 0;
   n = pageType_;
   return 1;
+}
+
+inline
+bool ProcessContext::inTable() const
+{
+  return !tableStack_.empty();
 }
 
 #ifdef DSSSL_NAMESPACE

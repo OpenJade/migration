@@ -16,13 +16,14 @@ namespace SP_NAMESPACE {
 
 class SPGROVE_API GroveApp : public ParserApp {
 public:
+  GroveApp(const char *requiredCodingSystem = 0);
   ErrorCountEventHandler *makeEventHandler();
   int generateEvents(ErrorCountEventHandler *eceh);
   virtual void processGrove() = 0;
 
   class GenerateEventArgs {
   public:
-    int operator()() { return app_->inheritedGenerateEvents(eceh_); }
+    int run() { return app_->inheritedGenerateEvents(eceh_); }
   private:
     GenerateEventArgs(ErrorCountEventHandler *eceh, GroveApp *app)
       : app_(app), eceh_(eceh) { }

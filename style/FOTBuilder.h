@@ -452,6 +452,22 @@ public:
   virtual void startSimplePageSequenceHeaderFooter(unsigned);
   virtual void endSimplePageSequenceHeaderFooter(unsigned);
   virtual void endAllSimplePageSequenceHeaderFooter();
+  // SGML Transformations
+  struct DocumentTypeNIC {
+    DocumentTypeNIC();
+    StringC name;
+    StringC publicId;
+    StringC systemId;
+  };
+  virtual void documentType(const DocumentTypeNIC &);
+  struct ElementNIC {
+    StringC gi;
+    Vector<StringC> attributes;
+  };
+  virtual void startElement(const ElementNIC &);
+  virtual void endElement();
+  virtual void emptyElement(const ElementNIC &);
+  virtual void processingInstruction(const StringC &);
   // page-number sosofo
   virtual void pageNumber();
   // Inherited characteristics
@@ -676,6 +692,11 @@ public:
   void tableCellAfterRowBorder();
   void tableCellBeforeColumnBorder();
   void tableCellAfterColumnBorder();
+  void startElement(const ElementNIC &);
+  void endElement();
+  void emptyElement(const ElementNIC &);
+  void documentType(const DocumentTypeNIC &);
+  void processingInstruction(const StringC &);
   // Inherited characteristics
   void setFontSize(Length);
   void setFontFamilyName(const StringC &);
@@ -1008,6 +1029,21 @@ private:
     SetGlyphSubstTableCall(const Vector<ConstPtr<GlyphSubstTable> > &tables) : arg(tables) { }
     void emit(FOTBuilder &);
     Vector<ConstPtr<GlyphSubstTable> > arg;
+  };
+  struct StartElementCall : Call {
+    StartElementCall(const ElementNIC &nic) : arg(nic) { }
+    void emit(FOTBuilder &);
+    ElementNIC arg;
+  };
+  struct EmptyElementCall : Call {
+    EmptyElementCall(const ElementNIC &nic) : arg(nic) { }
+    void emit(FOTBuilder &);
+    ElementNIC arg;
+  };
+  struct DocumentTypeCall : Call {
+    DocumentTypeCall(const DocumentTypeNIC &nic) : arg(nic) { }
+    void emit(FOTBuilder &);
+    DocumentTypeNIC arg;
   };
   Call *calls_;
   Call **tail_;

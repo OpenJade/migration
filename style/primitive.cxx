@@ -3626,6 +3626,35 @@ DEFPRIMITIVE(NamedNode, argc, argv, context, interp, loc)
   return new (interp) NodePtrNodeListObj(nnl->namedNode(s, n));
 }
 
+DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
+{
+  NamedNodeListObj *nnl = argv[0]->asNamedNodeList();
+  if (!nnl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANamedNodeList, 0, argv[0]);
+  NodeListObj *nl = nnl;
+  PairObj *tail = interp.makePair(0, 0);
+  PairObj *head = tail;
+  ELObjDynamicRoot protect(interp, head);
+  for (;;) {
+    ELObjDynamicRoot protect(interp, nl);
+    NodePtr nd = nl->nodeListFirst(interp);
+    if (!nd)
+      break;
+    GroveString str;
+    if (nnl->nodeName(nd, str)) {
+      // protect the StringObj by putting in the head's car
+      head->setCar(new (interp) StringObj(str.data(), str.size()));
+      PairObj *newTail = new (interp) PairObj(head->car(), 0);
+      tail->setCdr(newTail);
+      tail = newTail;
+    }
+    nl = nl->nodeListRest(interp);
+  }
+  tail->setCdr(interp.makeNil());
+  return head->cdr();
+}
+
 DEFPRIMITIVE(Children, argc, argv, context, interp, loc)
 {
   NodePtr node;

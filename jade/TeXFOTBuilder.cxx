@@ -35,6 +35,7 @@ public:
   void externalGraphic(const ExternalGraphicNIC &);
   void rule(const RuleNIC &);
   void alignmentPoint();
+  void formattingInstruction(const StringC &);
 
   //////////////////////////////////////////////////////////////////////
   // Non-atomic flow objects
@@ -330,7 +331,7 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       case '_':
       case '~':
       case '%':
-	os() << "\\char`" << *s << "{}";
+	os() << "\\char" << int(*s) << "{}";
 	break;
       case '\r':
 	os() << '\n';
@@ -421,6 +422,11 @@ void TeXFOTBuilder::alignmentPoint()
   insertAtomic("AlignmentPoint");
 }
 
+void TeXFOTBuilder::formattingInstruction (const StringC &instr)
+{
+  os() << instr;
+}
+  
 
 //////////////////////////////////////////////////////////////////////
 // Non-atomic flow objects

@@ -14,10 +14,14 @@
 namespace SP_NAMESPACE {
 #endif
 
-static
-Thread::ReturnType THREAD_CALLING_CONVENTION generateEventsThread(void *args)
+GroveApp::GroveApp(const char *requiredCodingSystem)
+: ParserApp(requiredCodingSystem)
 {
-  return (*(GroveApp::GenerateEventArgs *)args)();
+}
+
+static int generateEventsThread(void *args)
+{
+  return ((GroveApp::GenerateEventArgs *)args)->run();
 }
 
 int GroveApp::generateEvents(ErrorCountEventHandler *eceh)

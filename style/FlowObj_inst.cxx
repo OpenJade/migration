@@ -192,6 +192,32 @@ typedef Owner<FOTBuilder::ExternalGraphicNIC> Dummy_12;
 #endif
 #endif
 #ifdef __DECCXX
+#pragma define_template Owner<FOTBuilder::DocumentTypeNIC>
+#else
+#ifdef __xlC__
+#pragma define(Owner<FOTBuilder::DocumentTypeNIC>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Owner<FOTBuilder::DocumentTypeNIC>;
+#else
+typedef Owner<FOTBuilder::DocumentTypeNIC> Dummy_13;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Owner<FOTBuilder::ElementNIC>
+#else
+#ifdef __xlC__
+#pragma define(Owner<FOTBuilder::ElementNIC>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Owner<FOTBuilder::ElementNIC>;
+#else
+typedef Owner<FOTBuilder::ElementNIC> Dummy_14;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
 #pragma define_template Owner<MultiModeFlowObj::NIC>
 #else
 #ifdef __xlC__
@@ -200,7 +226,7 @@ typedef Owner<FOTBuilder::ExternalGraphicNIC> Dummy_12;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<MultiModeFlowObj::NIC>;
 #else
-typedef Owner<MultiModeFlowObj::NIC> Dummy_13;
+typedef Owner<MultiModeFlowObj::NIC> Dummy_15;
 #endif
 #endif
 #endif

@@ -80,6 +80,8 @@
 /* define this to enable precompiled header support */
 #undef SP_PCH
 
+/* the location we install our messages */
+#undef SP_LOCALE_DIR
 
 @TOP@
 
@@ -208,9 +210,9 @@
 #define SP_HAVE_LOCALE
 #endif /* HAVE_SETLOCALE */
 
-#ifdef HAVE_GETTEXT
+#if defined(HAVE_GETTEXT) && defined(ENABLE_NLS)
 #define SP_HAVE_GETTEXT 
-#endif /* HAVE_GETTEXT */
+#endif /* HAVE_GETTEXT && ENABLE_NLS */
 
 #ifdef WORDS_BIGENDIAN
 #define SP_BIG_ENDIAN

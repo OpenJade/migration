@@ -49,6 +49,9 @@ CXXDEPGENFLAGS=-MM
 	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
 	chmod -w $@
 
+%.h %.cxx %.rc: %.msg
+	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
+
 .msg.h:
 	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
 

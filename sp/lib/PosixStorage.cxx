@@ -405,7 +405,7 @@ PosixStorageManager::makeStorageObject(const StringC &spec,
 #ifdef SP_WIDE_SYSTEM
     String<FChar> cfilename;
     for (size_t j = 0; j < filename.size(); j++)
-      cfilename += FChar(filename[i]);
+      cfilename += FChar(filename[j]);
     cfilename += FChar(0);
 #else
     String<FChar> cfilename = filenameCodingSystem_->convertOut(filename);

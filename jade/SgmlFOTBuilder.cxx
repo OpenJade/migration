@@ -1975,7 +1975,7 @@ void SgmlFOTBuilder::startColumnSetSequenceSerial(const DisplayNIC &nic)
   os() << "<column-set-sequence";
   displayNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endColumnSetSequenceSerial()
@@ -1989,7 +1989,7 @@ void SgmlFOTBuilder::startEmbeddedText(const EmbeddedTextNIC &nic)
   os() << "<embedded-text";
   embeddedTextNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endEmbeddedText()
@@ -2003,7 +2003,7 @@ void SgmlFOTBuilder::startIncludedContainerArea(const IncludedContainerAreaNIC &
   os() << "<included-container-area";
   includedContainerAreaNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endIncludedContainerArea()
@@ -2017,7 +2017,7 @@ void SgmlFOTBuilder::startAlignedColumn(const DisplayNIC &nic)
   os() << "<aligned-column";
   displayNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endAlignedColumn()
@@ -2031,7 +2031,7 @@ void SgmlFOTBuilder::startMultiLineInlineNoteSerial(const MultiLineInlineNoteNIC
   os() << "<multi-line-inline-note";
   multiLineInlineNoteNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
   suppressAnchors_ = 1;
   curOs_ = &hfs_;
 }
@@ -2078,7 +2078,7 @@ void SgmlFOTBuilder::startSideBySide(const DisplayNIC &nic)
   os() << "<side-by-side";
   displayNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endSideBySide()
@@ -2091,7 +2091,7 @@ void SgmlFOTBuilder::startSideBySideItem()
 {
   os() << "<side-by-side-item";
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endSideBySideItem()
@@ -2114,7 +2114,7 @@ void SgmlFOTBuilder::startPageSequenceSerial()
 {
   os() << "<page-sequence";
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endPageSequenceSerial()
@@ -2128,7 +2128,7 @@ void SgmlFOTBuilder::startGlyphAnnotation(const GlyphAnnotationNIC &nic)
   os() << "<glyph-annotation";
   glyphAnnotationNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
 }
 
 void SgmlFOTBuilder::endGlyphAnnotation()
@@ -2142,7 +2142,7 @@ void SgmlFOTBuilder::startEmphasizingMarkSerial(const EmphasizingMarkNIC &nic)
   os() << "<emphasizing-mark";
   emphasizingMarkNIC(nic);
   outputIcs();
-  os() << "/>" << RE;
+  os() << ">" << RE;
   suppressAnchors_ = 1;
   curOs_ = &hfs_;
 }

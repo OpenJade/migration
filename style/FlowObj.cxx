@@ -3011,9 +3011,7 @@ void Interpreter::installFlowObjs()
   //aligned-column
   FLOW_OBJ(AlignedColumnFlowObj, "aligned-column");
   //multi-line-inline-note
-/*
   FLOW_OBJ(MultiLineInlineNoteFlowObj, "multi-line-inline-note");
-*/
   //emphasizing-mark
   FLOW_OBJ(EmphasizingMarkFlowObj, "emphasizing-mark");
   // tables

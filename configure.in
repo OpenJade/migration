@@ -66,17 +66,13 @@ dnl the following tests require c++, not c; note that if you switch this
 dnl earlier, AC_C_CONST will fail, at least
 dnl
 AC_LANG_CPLUSPLUS
-
-AC_CACHE_CHECK(support for bool,
-    ac_cv_typedef_bool,
-    AC_TRY_LINK(,bool x; x=(false | true);,
-       	ac_cv_typedef_bool=yes,
-	ac_cv_typedef_bool=no))
-if test "$ac_cv_typedef_bool" = "yes"
-then
-    AC_DEFINE(SP_HAVE_BOOL)
-    AC_CHECK_SIZEOF(bool)
-fi
+AC_CXX_BOOL
+AC_CHECK_SIZEOF(bool)
+AC_CXX_NEW_FOR_SCOPING
+AC_CXX_DYNAMIC_CAST
+AC_CXX_NAMESPACES
+AC_CXX_EXPLICIT_INSTANTIATIONS
+ACX_CHECK_PATHNAME_STYLE_DOS
 
 dnl
 dnl  Checks for library functions.
@@ -92,26 +88,6 @@ dnl Check for thread support.
 dnl
 AC_CHECK_LIB(threads,cthread_fork,LIB_THREADS="-lthreads",LIB_THREADS="")
 AC_SUBST(LIB_THREADS)
-
-dnl 
-dnl  ANSI templates
-dnl
-AC_CACHE_CHECK(for ANSI template instantiation,
-               ac_cv_c_template_ansi,
-               AC_TRY_LINK([
-class foo {
-};
-
-template<class T> class test {
-public:
- T *data();};
-template class test<foo>;
-],,ac_cv_c_template_ansi=yes,
-   ac_cv_c_template_ansi=no))
-if test "$ac_cv_c_template_ansi" = "yes"
- then
-  AC_DEFINE(SP_ANSI_CLASS_INST)
-fi
 
 dnl
 dnl  HTTP support
@@ -143,15 +119,12 @@ AC_DEFINE(SP_MULTI_BYTE)
 dnl
 dnl FIXME: these need checks !!!
 dnl
-AC_DEFINE(SP_POSIX_FILENAMES)
 AC_DEFINE(SP_SET_NEW_HANDLER_EXTERN_C)
-AC_DEFINE(SP_ANSI_FOR_SCOPE)
 AC_DEFINE(SP_ANSI_LIB)
 AC_DEFINE(SP_NO_STD_NAMESPACE)
 AC_DEFINE(SP_DEFINE_TEMPLATES)
 AC_DEFINE(SP_MUTEX_PTHREADS)
 dnl AC_DEFINE(SP_NEW_H_MISSING)
-dnl AC_DEFINE(SP_NO_STD_NAMESPACE)
 dnl AC_DEFINE(SP_NO_MESSAGE_TEXT)
 dnl AC_DEFINE(SP_WIDE_SYSTEM)
 dnl AC_DEFINE(SP_LINE_TERM1)
@@ -164,11 +137,9 @@ dnl AC_DEFINE(SP_PCH)
 dnl AC_DEFINE(SP_MUTEX_WIN32)
 dnl AC_DEFINE(SP_MUTEX_MACH)
 dnl AC_DEFINE(SP_QUAL_TEMPLATE_DTOR_BROKEN)
-dnl AC_DEFINE(SP_HAVE_RTTI)
 dnl AC_DEFINE(SP_DECLARE_PLACEMENT_OPERATOR_NEW)
 dnl AC_DEFINE(SP_HAVE_PLACEMENT_OPERATOR_DELETE)
 dnl AC_DEFINE(SP_FANCY_NEW_HANDLER)
-dnl AC_DEFINE(SP_HAVE_TYPENAME)
 dnl AC_DEFINE(SP_HAVE_SETMODE)
 
 AC_MSG_CHECKING(for default catalog)

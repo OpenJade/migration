@@ -13,25 +13,13 @@
 /* define this appropriately if the type sig_atomic_t is not available */
 #undef sig_atomic_t
 
-/* define this if you use POSIX filenames */
-#undef SP_POSIX_FILENAMES  
-
-/* define this if you use MSDOS filenames */
-#undef SP_MSDOS_FILENAMES 
-
 /* define this if your system misses new.h */
 #undef SP_NEW_H_MISSING 
 
 /* define this if  set_new_handler() has to be declared extern "C" */
 #undef SP_SET_NEW_HANDLER_EXTERN_C 
 
-/* define this if  ANSI "for" scope rules are supported */
-#undef SP_ANSI_FOR_SCOPE 
-
 #undef SP_ANSI_LIB       
-
-/* define this if ANSI template instantiation is supported */
-#undef SP_ANSI_CLASS_INST 
 
 /* define this if  std:: namespace is not supported */
 #undef SP_NO_STD_NAMESPACE 
@@ -63,9 +51,6 @@
 /* define this to compile explicit template instantiations */
 #undef SP_MANUAL_INST
 
-/* define this if the bool type is supported */
-#undef SP_HAVE_BOOL
-
 /* define the following to build a dll (windows only) */
 #undef SP_USE_DLL
 #undef SP_DLLEXPORT
@@ -86,9 +71,6 @@
 /* define this if qualified templated destructors like T::~T are broken */
 #undef SP_QUAL_TEMPLATE_DTOR_BROKEN
 
-/* define this if dynamic_cast is supported */
-#undef SP_HAVE_RTTI
-
 /* define this if new.h doesn't declare void *operator new(size_t, void *p) */
 #undef SP_DECLARE_PLACEMENT_OPERATOR_NEW
 
@@ -98,13 +80,13 @@
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
 
-/* define this if typename is supported */
-#undef SP_HAVE_TYPENAME
-
 /* define this if _setmode is supported */
 #undef SP_HAVE_SETMODE
 #define _O_BINARY O_BINARY
 #define S_IFMT (S_IFDIR|S_IFCHR|S_IFREG)
+
+/* set this to the path separator */
+#undef PATH_SEPARATOR
 
 @TOP@
 
@@ -141,7 +123,11 @@
 #define SP_STAT_BLKSIZE 
 #endif
 
-#if SP_HAVE_BOOL && (SIZEOF_BOOL == 1)
+#ifdef HAVE_BOOL 
+#define SP_HAVE_BOOL
+#endif /* HAVE_BOOL */
+
+#if (SIZEOF_BOOL == 1)
 #define SP_SIZEOF_BOOL_1
 #endif
 
@@ -160,10 +146,10 @@
 #define SP_LINE_TERM1 '\n'
 #endif
 
-#ifndef SP_ANSI_FOR_SCOPE
+#ifndef HAVE_NEW_FOR_SCOPING
 // This simulates the new ANSI "for" scope rules
 #define for if (0); else for
-#endif
+#endif /* HAVE_NEW_FOR_SCOPING */
 
 #ifndef SP_HAVE_TYPENAME
 #define typename /* as nothing */
@@ -197,10 +183,31 @@
 #endif
 #endif
 
+#ifdef HAVE_NAMESPACES
+#define SP_NAMESPACE OpenSP
+#endif /* HAVE_NAMESPACES */
+
 #ifdef SP_NAMESPACE
 #define SP_NAMESPACE_SCOPE SP_NAMESPACE::
 #else
 #define SP_NAMESPACE_SCOPE
-#endif
+#endif /* SP_NAMESPACE */
 
+#ifdef HAVE_DYNAMIC_CAST
+#define SP_HAVE_RTTI
+#endif /* HAVE_DYNAMIC_CAST */
+
+#ifdef HAVE_TYPENAME
+#define SP_HAVE_TYPENAME
+#endif /* HAVE_TYPENAME */
+
+#ifdef HAVE_PATHNAME_STYLE_DOS
+#define SP_MSDOS_FILENAMES 
+#else 
+#define SP_POSIX_FILENAMES  
+#endif /* HAVE_PATHNAME_STYLE_DOS */
+
+#ifdef HAVE_INSTANTIATIONS
+#define SP_ANSI_CLASS_INST
+#endif /* HAVE_INSTANTIATIONS */ 
 

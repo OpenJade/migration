@@ -75,6 +75,7 @@ private:
   XmlOutputEventHandler(const XmlOutputEventHandler &); // undefined
   void operator=(const XmlOutputEventHandler &); // undefined
   OutputCharStream &os();
+  void outputData(const Char *s, size_t n, Boolean inLit, Boolean inSuperLit);
   void outputData(const Char *s, size_t n, Boolean inLit);
   void outputCdata(const Char *s, size_t n);
   void outputExternalId(const EntityDecl &decl);
@@ -90,6 +91,7 @@ private:
   char *convertSuffix(char *name);
   int maybeCreateDirectories(char *path);
   Boolean checkFirstSeen(const StringC &name);
+  char getQuoteMark(const StringC *contents);
 
   CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;
@@ -101,7 +103,6 @@ private:
   OutputCharStream *os_;
   OutputCharStream *extEnts_;
   OutputCharStream *intEnts_;
-  OutputCharStream *nullOut_;
   FileOutputByteStream *extEntFile_;
   FileOutputByteStream *intEntFile_;
   const char *outputDir_;

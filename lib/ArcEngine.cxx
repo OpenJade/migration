@@ -88,6 +88,7 @@ public:
 		const SgmlParser *parser,
 		ArcDirector &director,
 		const volatile sig_atomic_t *cancelPtr,
+		const StringC *arcPublicId,
 		const Notation *,
 		const Vector<StringC> &name,
 		const SubstTable *table);
@@ -149,12 +150,13 @@ void ArcEngine::parseAll(SgmlParser &parser,
 			 const volatile sig_atomic_t *cancelPtr)
 {
   ArcEngineImpl wrap(mgr, &parser, director, cancelPtr,
-		     0, Vector<StringC>(), 0);
+		     0, 0, Vector<StringC>(), 0);
   parser.parseAll(wrap, cancelPtr);
 }
 
 EventHandler *
-SelectOneArcDirector::arcEventHandler(const Notation *,
+SelectOneArcDirector::arcEventHandler(const StringC *,
+				      const Notation *,
 				      const Vector<StringC> &name,
 				      const SubstTable *table)
 {
@@ -183,6 +185,7 @@ ArcEngineImpl::ArcEngineImpl(Messenger &mgr,
 			     const SgmlParser *parser,
 			     ArcDirector &director,
 			     const volatile sig_atomic_t *cancelPtr,
+			     const StringC *arcPublicId,
 			     const Notation *notation,
 			     const Vector<StringC> &docName,
 			     const SubstTable *table)
@@ -193,7 +196,7 @@ ArcEngineImpl::ArcEngineImpl(Messenger &mgr,
   alloc_(maxSize(sizes, SIZEOF(sizes)), 50),
   nullHandler_(mgr), docName_(docName)
 {
-  eventHandler_ = director.arcEventHandler(notation, docName, table);
+  eventHandler_ = director.arcEventHandler(arcPublicId, notation, docName, table);
   if (!eventHandler_)
     eventHandler_ = &nullHandler_;
   delegateTo_ = eventHandler_;
@@ -833,13 +836,18 @@ void ArcProcessor::init(const EndPrologEvent &event,
     }
     return;
   }
-  if (!piDecl()) {
+  const StringC *arcPublicId = 0;
+  if (piDecl()) {
+    if (supportAttsText_[rArcPubid])
+      arcPublicId = &supportAtts_[rArcPubid];
+  } else {
     notation = docDtd_->lookupNotation(name_);
     if (!notation.isNull()) {
       ConstPtr<AttributeDefinitionList> notAttDef = notation->attributeDef();
       attributeList_.init(notAttDef);
       attributeList_.finish(*this);
       supportAttributes(attributeList_, 0);
+      arcPublicId = notation->publicIdPointer();
     }
     else {
       setNextLocation(declLoc_);
@@ -850,7 +858,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
   docName.push_back(name_);
   ArcEngineImpl *engine
     = new ArcEngineImpl(*mgr, parentParser, director, cancelPtr,
-			notation.pointer(),
+			arcPublicId, notation.pointer(),
 			docName,
 			docSyntax_->generalSubstTable());
   docHandler_ = engine;

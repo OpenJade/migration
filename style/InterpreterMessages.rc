@@ -132,4 +132,9 @@ BEGIN
   129, "flow object class %1 already defined in same part"
   130, "first definition was here"
   131, "mode %1 not defined"
+  132, "%2 argument for primitive %1 of wrong type: %3 not an integer"
+  133, "%2 argument for primitive %1 of wrong type: %3 not a keyword"
+  134, "%2 argument for primitive %1 of wrong type: %3 not an alist"
+  135, "%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+  136, "%2 argument for primitive %1 has wrong length"
 END

@@ -124,4 +124,9 @@ E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here
 E1+undefinedMode++mode %1 not defined
+E3+notAnInteger++%2 argument for primitive %1 of wrong type: %3 not an integer
+E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
+E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
+E3+notACharList++%2 argument for primitive %1 of wrong type: %3 not a list of characters
+E3+lengthError++%2 argument for primitive %1 has wrong length
 

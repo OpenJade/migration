@@ -57,6 +57,7 @@ public:
     keyStyle,
     keyWithMode,
     keyDefineUnit,
+    keyQuery,
     keyElement,
     keyDefault,
     keyRoot,
@@ -164,6 +165,18 @@ public:
     keyOrder,
     keyForward,
     keyBackward,
+    keyWhitePoint,
+    keyBlackPoint,
+    keyRange,
+    keyRangeAbc,
+    keyRangeLmn,
+    keyRangeA,
+    keyDecodeAbc,
+    keyDecodeLmn,
+    keyDecodeA, 
+    keyMatrixAbc,
+    keyMatrixLmn,
+    keyMatrixA,
     keyArchitecture
   };
   enum { lastSyntacticKey = keyWithMode };

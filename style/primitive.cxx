@@ -2402,6 +2402,39 @@ DEFPRIMITIVE(IsColorSpace, argc, argv, context, interp, loc)
     return interp.makeFalse();
 }
 
+static
+bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
+		   int nKeys, Interpreter &interp, const Location &loc, int *pos); 
+
+// return 1 if obj is a list of numbers of length len.
+static 
+bool decodeNumVector(double *res, int len, ELObj *obj)
+{
+  ELObj *e = obj;
+  PairObj *p; 
+  for (int i = 0; i < len; i++) { 
+    p = e->asPair(); 
+    if (!p || !p->car()->realValue(res[i]))
+      return 0;
+    e = p->cdr();
+  }
+  return 1;
+}
+
+static 
+bool decodeFuncVector(FunctionObj **res, int len, ELObj *obj)
+{
+  ELObj *e = obj;
+  PairObj *p; 
+  for (int i = 0; i < len; i++) { 
+    p = e->asPair(); 
+    if (!p || !(res[i] = p->car()->asFunction())) 
+      return 0;
+    e = p->cdr();
+  }
+  return 1;
+}
+
 DEFPRIMITIVE(ColorSpace, argc, argv, context, interp, loc)
 {
   const Char *s;
@@ -2409,18 +2442,130 @@ DEFPRIMITIVE(ColorSpace, argc, argv, context, interp, loc)
   if (!argv[0]->stringData(s, n))
      return argError(interp, loc,
 		    InterpreterMessages::notAString, 0, argv[0]);
-  if (StringC(s, n)
-      != interp.makeStringC("ISO/IEC 10179:1996//Color-Space Family::Device RGB")) {
-    interp.setNextLocation(loc);
-    interp.message(InterpreterMessages::unknownColorSpaceFamily,
-                   StringMessageArg(StringC(s, n)));
-    return interp.makeError();
+  StringC str(s, (n < 43) ? n : 43);
+  if (str == interp.makeStringC("ISO/IEC 10179:1996//Color-Space Family::Dev")) { 
+    str.assign(s + 40, n - 40);
+    ELObj *res;
+    if (str == interp.makeStringC("Device RGB")) 
+      res = new (interp) DeviceRGBColorSpaceObj;
+    else if (str == interp.makeStringC("Device Gray")) 
+      res = new (interp) DeviceGrayColorSpaceObj;
+    else if (str == interp.makeStringC("Device CMYK")) 
+      res = new (interp) DeviceCMYKColorSpaceObj;
+    else if (str == interp.makeStringC("Device KX")) 
+      res = new (interp) DeviceKXColorSpaceObj;
+    else {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::unknownColorSpaceFamily,
+                     StringMessageArg(StringC(s, n)));
+      return interp.makeError();
+    }
+    if (argc > 1) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorSpaceNoArgs,
+                     StringMessageArg(str));
+    }
+    return res;
   }
-  if (argc > 1) {
-    interp.setNextLocation(loc);
-    interp.message(InterpreterMessages::deviceRGBColorSpaceNoArgs);
-  }
-  return new (interp) DeviceRGBColorSpaceObj;
+  else if (str == interp.makeStringC("ISO/IEC 10179:1996//Color-Space Family::CIE")) { 
+    str.assign(s + 40, n - 40);
+    if (   str == interp.makeStringC("CIE LUV") 
+        || str == interp.makeStringC("CIE LAB")
+        || str == interp.makeStringC("CIE Based ABC")
+        || str == interp.makeStringC("CIE Based A")) { 
+      static const Identifier::SyntacticKey keys[12] = {
+        Identifier::keyWhitePoint, 
+        Identifier::keyBlackPoint, 
+        Identifier::keyRange,
+        Identifier::keyRangeAbc,
+        Identifier::keyRangeLmn,
+        Identifier::keyRangeA,
+        Identifier::keyMatrixAbc,
+        Identifier::keyMatrixLmn,
+        Identifier::keyMatrixA,
+        Identifier::keyDecodeAbc,
+        Identifier::keyDecodeLmn,
+        Identifier::keyDecodeA
+      };
+      int pos[12];
+      // FIXME messages
+      double wp[3], bp[3], range[6];
+      double rangeAbc[6], rangeLmn[6], rangeA[2];
+      double matrixAbc[9], matrixLmn[9], matrixA[3];
+      FunctionObj *decodeAbc[3], *decodeLmn[3], *decodeA;
+      if (!decodeKeyArgs(argc - 1, argv + 1, keys, 12, interp, loc, pos)
+          || (pos[0] < 0)  
+          || (pos[0] >= 0 && !decodeNumVector(wp, 3, argv[pos[0] + 1])) 
+          || (pos[1] >= 0 && !decodeNumVector(bp, 3, argv[pos[1] + 1]))
+          || (pos[2] >= 0 && !decodeNumVector(range, 6, argv[pos[2] + 1])) 
+          || (pos[3] >= 0 && !decodeNumVector(rangeAbc, 6, argv[pos[3] + 1]))
+          || (pos[4] >= 0 && !decodeNumVector(rangeLmn, 6, argv[pos[4] + 1]))
+          || (pos[5] >= 0 && !decodeNumVector(rangeA, 2, argv[pos[5] + 1]))
+          || (pos[6] >= 0 && !decodeNumVector(matrixAbc, 9, argv[pos[6] + 1]))
+          || (pos[7] >= 0 && !decodeNumVector(matrixLmn, 9, argv[pos[7] + 1]))
+          || (pos[8] >= 0 && !decodeNumVector(matrixA, 3, argv[pos[8] + 1]))
+          || (pos[9] >= 0 && !decodeFuncVector(decodeAbc, 3, argv[pos[9] + 1]))
+          || (pos[10] >= 0 && !decodeFuncVector(decodeLmn, 3, argv[pos[10] + 1]))
+          || (pos[11] >= 0 && !(decodeA = argv[pos[11] + 1]->asFunction()))) {
+        interp.setNextLocation(loc);
+        interp.message(InterpreterMessages::colorSpaceArgError,
+                       StringMessageArg(str));
+        return interp.makeError();
+      }
+      if (   str == interp.makeStringC("CIE LUV")
+          || str == interp.makeStringC("CIE LAB")) {
+        for (int i = 3; i < 12; i++)
+          if (pos[i] >= 0) {
+            interp.setNextLocation(loc);
+            interp.message(InterpreterMessages::colorSpaceArgError,
+                           StringMessageArg(str));
+            return interp.makeError();
+          }
+        if (str == interp.makeStringC("CIE LUV"))
+          return new (interp) CIELUVColorSpaceObj(wp, (pos[1] >= 0) ? bp : 0, 
+                                                  (pos[2] >= 0) ? range : 0);
+        else 
+          return new (interp) CIELABColorSpaceObj(wp, (pos[1] >= 0) ? bp : 0, 
+                                                  (pos[2] >= 0) ? range : 0);
+      } 
+      else if (str == interp.makeStringC("CIE Based ABC")) {
+        if (pos[2] >= 0 || pos[5] >= 0 || pos[8] >= 0 || pos[11] >= 0) {
+          interp.setNextLocation(loc);
+          interp.message(InterpreterMessages::colorSpaceArgError,
+                         StringMessageArg(str));
+          return interp.makeError();
+        }
+        return new (interp) CIEABCColorSpaceObj(wp, 
+            (pos[1] >= 0) ? bp : 0, 
+            (pos[3] >= 0) ? rangeAbc : 0,
+            (pos[9] >= 0) ? decodeAbc : 0,
+            (pos[6] >= 0) ? matrixAbc : 0,
+            (pos[4] >= 0) ? rangeLmn : 0,
+            (pos[10] >= 0) ? decodeLmn : 0,
+            (pos[7] >= 0) ? matrixLmn : 0);
+      }
+      else { // CIE Based A
+        if (pos[2] >= 0 || pos[3] >= 0 || pos[6] >= 0 || pos[9] >= 0) {
+          interp.setNextLocation(loc);
+          interp.message(InterpreterMessages::colorSpaceArgError,
+                         StringMessageArg(str));
+          return interp.makeError();
+        }
+        return new (interp) CIEAColorSpaceObj(wp, 
+            (pos[1] >= 0) ? bp : 0, 
+            (pos[5] >= 0) ? rangeA : 0,
+            (pos[11] >= 0) ? decodeA : 0,
+            (pos[8] >= 0) ? matrixA : 0,
+            (pos[4] >= 0) ? rangeLmn : 0,
+            (pos[10] >= 0) ? decodeLmn : 0,
+            (pos[7] >= 0) ? matrixLmn : 0);
+      }
+    }
+  } 
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::unknownColorSpaceFamily,
+                 StringMessageArg(StringC(s, n)));
+  return interp.makeError();
 }
 
 DEFPRIMITIVE(Color, argc, argv, context, interp, loc)

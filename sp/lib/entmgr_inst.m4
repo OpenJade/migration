@@ -79,6 +79,7 @@ __instantiate(Vector<PackedBoolean>)
 #endif
 __instantiate(CharMap<Unsigned32>)
 #ifdef SP_MULTI_BYTE
+__instantiate(CharMapPlane<Unsigned32>)
 __instantiate(CharMapPage<Unsigned32>)
 __instantiate(CharMapColumn<Unsigned32>)
 #endif

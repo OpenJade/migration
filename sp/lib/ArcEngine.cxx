@@ -1699,6 +1699,7 @@ void ArcProcessor::buildAttributeMapRest(MetaMap &map,
 	  if (atts.id(j)) {
 	    map.attMapFrom.push_back(j);
 	    map.attMapTo.push_back(i);
+            map.attTokenMapBase.push_back(map.tokenMapFrom.size());
 	    break;
 	  }
       }
@@ -1706,10 +1707,12 @@ void ArcProcessor::buildAttributeMapRest(MetaMap &map,
 						    fromIndex)) {
 	map.attMapFrom.push_back(fromIndex + atts.size());
 	map.attMapTo.push_back(i);
+        map.attTokenMapBase.push_back(map.tokenMapFrom.size());
       }
       else if (atts.attributeIndex(metaAttDef->def(i)->name(), fromIndex)) {
 	map.attMapFrom.push_back(fromIndex);
 	map.attMapTo.push_back(i);
+        map.attTokenMapBase.push_back(map.tokenMapFrom.size());
       }
     }
 }

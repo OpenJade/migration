@@ -14,6 +14,8 @@
 #include <OpenSP/ArcEngine.h>
 #include <OpenSP/Entity.h>
 #include <OpenSP/MessageTable.h>
+#include <OpenSP/ErrorCountEventHandler.h>
+#include <OpenSP/Event.h>
 
 #include <ctype.h>
 #include <string.h>
@@ -77,7 +79,7 @@ int DssslApp::init(int argc, AppChar **argv)
   setlocale(LC_NUMERIC, "C");
 #endif
   MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
-                                                  "jade",
+                                                  OPENJADE_PACKAGE,
 						  OPENJADE_LOCALE_DIR);
   return ret;
 }
@@ -206,28 +208,45 @@ int DssslApp::generateEvents(ErrorCountEventHandler *eceh)
   return GroveApp::generateEvents(eceh);
 }
 
-Boolean DssslApp::getDssslSpecFromGrove()
+class PrologPiEventHandler : public ErrorCountEventHandler {
+ public:
+  PrologPiEventHandler(DssslApp &app);
+  void pi(PiEvent *);
+  void endProlog(EndPrologEvent *);
+  Boolean gotSpec() { return gotSpec_; }
+ private:
+  DssslApp *app_;
+  Boolean gotSpec_;
+};
+
+PrologPiEventHandler::PrologPiEventHandler(DssslApp &app)
+: app_(&app), gotSpec_(0)
 {
-  NodeListPtr nl;
-  if (rootNode_->getProlog(nl) != accessOK)
-    return 0;
-  for (;;) {
-    NodePtr nd;
-    if (nl->first(nd) != accessOK)
-      break;
-    GroveString pi;
-    if (nd->getSystemData(pi) == accessOK) {
-      Location loc;
-      const LocNode *lnd = LocNode::convert(nd);
-      if (lnd)
-	lnd->getLocation(loc);
-      if (getDssslSpecFromPi(pi.data(), pi.size(), loc))
-	return 1;
-    }
-    if (nl.assignRest() != accessOK)
-      break;
+}
+
+void PrologPiEventHandler::pi(PiEvent *event)
+{
+  if (app_->getDssslSpecFromPi(event->data(), 
+                               event->dataLength(), 
+                               event->location())) {
+    gotSpec_ = 1;
+    cancel();
   }
-  return 0;
+  delete event; 
+}
+
+void PrologPiEventHandler::endProlog(EndPrologEvent *event)
+{
+  cancel();
+  delete event;
+}
+
+Boolean DssslApp::getDssslSpecFromProlog()
+{
+  initParser(rootSystemId_);
+  PrologPiEventHandler eh(*this);
+  parser_.parseAll(eh, eh.cancelPtr());
+  return eh.gotSpec();
 }
 
 Boolean DssslApp::getDssslSpecFromPi(const Char *s, size_t n,
@@ -267,41 +286,39 @@ Boolean DssslApp::handleSimplePi(const Char *s, size_t n,
 				         dssslSpecSysid_);
 }
 
+void DssslApp::handleAttribute(const StringC &name, StringC &value)
+{
+  if (matchCi(name, "type")) {
+    static const char *types[] = {
+      "text/dsssl",
+      "text/x-dsssl",
+      "application/dsssl",
+      "application/x-dsssl"
+    };
+    for (size_t i = 0; i < SIZEOF(types); i++)
+      if (matchCi(value, types[i])) {
+	piIsDsssl_ = 1;
+	break;
+      }
+  }
+  else if (matchCi(name, "href")) 
+    value.swap(piHref_);
+}
+
 Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
 				  const Location &loc)
 {
   // FIXME maybe give warnings if syntax is wrong
-  Boolean hadHref = 0;
-  StringC href;
-  Boolean isDsssl = 0;
   StringC name;
   StringC value;
-  while (getAttribute(s, n, name, value)) {
-    if (matchCi(name, "type")) {
-      static const char *types[] = {
-	"text/dsssl",
-	"text/x-dsssl",
-	"application/dsssl",
-	"application/x-dsssl"
-      };
-      for (size_t i = 0; i < SIZEOF(types); i++)
-	if (matchCi(value, types[i])) {
-	  isDsssl = 1;
-	  break;
-	}
-      if (!isDsssl)
-	return 0;
-    }
-    else if (matchCi(name, "href")) {
-      hadHref = 1;
-      value.swap(href);
-    }
-  }
-  if (!isDsssl || !hadHref)
+  piIsDsssl_ = 0;
+  while (getAttribute(s, n, name, value)) 
+    handleAttribute(name, value);
+  if (!piIsDsssl_ || piHref_.size() == 0)
     return 0;
-  splitOffId(href, dssslSpecId_);
+  splitOffId(piHref_, dssslSpecId_);
   // FIXME should use location of attribute value rather than location of PI
-  return entityManager()->expandSystemId(href, loc, 0, systemCharset(), 0, *this,
+  return entityManager()->expandSystemId(piHref_, loc, 0, systemCharset(), 0, *this,
 				         dssslSpecSysid_);
 }
 
@@ -379,7 +396,7 @@ Boolean DssslApp::getAttribute(const Char *&s, size_t &n,
 
 Boolean DssslApp::initSpecParser()
 {
-  if (!dssslSpecOption_ && !getDssslSpecFromGrove() && dssslSpecSysid_.size() == 0) {
+  if (!dssslSpecOption_ && !getDssslSpecFromProlog() && dssslSpecSysid_.size() == 0) {
     message(DssslAppMessages::noSpec);
     return 0;
   }

@@ -232,7 +232,7 @@
 			      (result (empty-node-list)))
 		     (if (node-list-empty? cur)
 			 result
-			 (loop (parent snl)
+			 (loop (parent cur)
 			       (node-list cur result)))))
 		 nl))
 

@@ -1131,14 +1131,30 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
     return getToken(allowCloseParen, tok);
   }
   NCVector<Owner<Expression> > valExprs;
-  for (;;) {
-    Owner<Expression> tem;
-    if (!parseExpression(allowCloseParen, tem, key, tok))
+  bool arrow = 0;
+  if (!parseExpression(allowCloseParen|allowKeyArrow, tem, key, tok))
+    return 0;
+  if (key == Identifier::keyArrow) {
+    arrow = 1;
+    if (!parseExpression(0, tem, key, tok))
       return 0;
-    if (!tem)
-      break;
+  }
+  if (tem) {
     valExprs.resize(valExprs.size() + 1);
     tem.swap(valExprs.back());
+    if (arrow || !dsssl2()) {
+      if (!getToken(allowCloseParen, tok))
+        return 0;
+    }
+    else
+      for (;;) {
+        if (!parseExpression(allowCloseParen, tem, key, tok))
+          return 0;
+        if (!tem)
+          break;
+        valExprs.resize(valExprs.size() + 1);
+        tem.swap(valExprs.back());
+      }
   }
   Owner<Expression> valExpr;
   if (valExprs.size() == 1)
@@ -1148,7 +1164,20 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
   Owner<Expression> elseExpr;
   if (!parseCond(elseExpr, 1))
     return 0;
-  if (valExpr)
+  if (arrow) {
+    const Identifier *ident = interp_->lookup(interp_->makeStringC("cond"));
+    Vector<const Identifier *> vars;
+    NCVector<Owner<Expression> > inits(1), args(1);
+    Owner<Expression> thenExpr, body;
+    vars.push_back(ident);
+    testExpr.swap(inits.back());
+    testExpr = new VariableExpression(ident, loc);
+    args.back() = new VariableExpression(ident, loc);
+    thenExpr = new CallExpression(valExpr, args, loc);
+    body = new IfExpression(testExpr, thenExpr, elseExpr, loc);
+    expr = new LetExpression(vars, inits, body, loc);
+  }
+  else if (valExpr)
     expr = new IfExpression(testExpr, valExpr, elseExpr, loc);
   else
     expr = new OrExpression(testExpr, elseExpr, loc);

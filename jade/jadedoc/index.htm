@@ -288,23 +288,31 @@ openjade demo.sgm
         all options are case-sensitive, ie <code>-g</code> and <code>-G</code>
         are different options):</font></p>
         <dl>
-            <dt><font face="Arial"><code>-d</code> <i>dsssl_spec</i></font>
+            <dt><font face="Arial"><code>-h</code>, <code>--help</code></font></dt>
+            <dd><font face="Arial">Display a help message and exit.</font></dd>
+            <dt><font face="Arial"><code>-v</code>, <code>--version</code></font></dt>
+            <dd><font face="Arial">Show the version number.</font></dd>
+            <dt><font face="Arial"><code>-d</code> <i>sysid</i>, 
+                <code>--specification=</code><i>sysid</i></font>
             </dt>
-            <dd><font face="Arial">This specifies that <i>dsssl_spec</i>
+            <dd><font face="Arial">This specifies that <i>sysid</i>
                 is the system identifier of the DSSSL
                 specification to be used.</font> </dd>
-            <dt><font face="Arial"><code>-G</code></font></dt>
+            <dt><font face="Arial"><code>-G</code>, <code>--debug</code></font></dt>
             <dd><font face="Arial">Debug mode. When an error
                 occurs in the evaluation of an expression,
                 OpenJade will display a stack trace. Note that
                 this disables tail-call optimization.</font></dd>
-            <dt><font face="Arial"><code>-c</code> <i>filename</i></font></dt>
-            <dd><font face="Arial">The <i>filename</i> arguments
-                specify catalog files rather than the document
+            <dt><font face="Arial"><code>-c</code> <i>sysid</i>, 
+                <code>--catalog=</code><i>sysid</i></font></dt>
+            <dd><font face="Arial">Use catalog <i>sysid</i>.</font></dd>
+            <dt><font face="Arial"><code>-C</code>, <code>--catalogs</code></font></dt>
+            <dd><font face="Arial">The arguments specify catalog 
+                files rather than the document
                 entity. The document entity is specified by the
                 first <samp>DOCUMENT</samp> entry in the catalog
                 files.</font></dd>
-            <dt><font face="Arial"><code>-s</code></font></dt>
+            <dt><font face="Arial"><code>-s</code>, <code>--strict</code></font></dt>
             <dd><font face="Arial">Strict compliance mode.
                 Currently the only effect is that jade doesn't
                 use any predefined character names, sdata-entity
@@ -312,8 +320,9 @@ openjade demo.sgm
                 checking that your stylesheet is portable to
                 other DSSSL implementations and that it is
                 strictly compliant to the DSSSL specifications.</font></dd>
-            <dt><font face="Arial"><code>-t</code> <i>output_type</i></font></dt>
-            <dd><font face="Arial"><i>output_type</i> specifies
+            <dt><font face="Arial"><code>-t</code> <i>type</i>,
+                <code>--output-type=</code><i>type</i></font></dt>
+            <dd><font face="Arial"><i>type</i> specifies
                 the type of output as follows:</font> <dl compact>
                     <dt><font face="Arial"><code>fot</code></font></dt>
                     <dd><font face="Arial">An XML representation
@@ -348,35 +357,42 @@ openjade demo.sgm
                         to MIF transformations)</font></dd>
                 </dl>
             </dd>
-            <dt><font face="Arial"><code>-o</code> <i>output_file</i>
+            <dt><font face="Arial"><code>-o</code> <i>file</i>,
+                <code>--output-file=</code><i>file</i>
                 </font></dt>
-            <dd><font face="Arial">Write output to <i>output_file</i>
+            <dd><font face="Arial">Write output to <i>file</i>
                 instead of the default. The default filename is
                 the name of the last input file with its
                 extension replaced by the name of the type of
                 output. If there is no input filename, then the
                 extension is added onto <i>jade-out</i>. </font></dd>
-            <dt><font face="Arial"><code>-V</code> <i>variable</i>
+            <dt><font face="Arial"><code>-V</code> <i>variable</i>,
+                <code>--define=</code><i>variable</i>
                 </font></dt>
             <dd><font face="Arial">This is equivalent to doing <code>(define
                 variable #t)</code> except that this definition
                 will take priority over any definition of
                 variable in a style-sheet. </font></dd>
-            <dt><font face="Arial"><code>-V</code> <i>variable=value</i>
+            <dt><font face="Arial"><code>-V</code> <i>variable=value</i>,
+                <code>--define=</code><i>variable=value</i>
                 </font></dt>
             <dd><font face="Arial">This is equivalent to doing <code>(define
                 variable &quot;value&quot;)</code> except that
                 this definition will take priority over any
                 definition of variable in a style-sheet. </font></dd>
             <dt><font face="Arial"><code>-V</code> <i>(define
-                variable value)</i></font></dt>
+                variable value)</i>,
+                <code>--define=</code><i>(define variable value)</i></font></dt>
             <dd><font face="Arial">This is equivalent to doing <code>(define
                 variable value)</code> except that this
                 definition will take priority over any definition
                 of variable in a style-sheet. Note that you will probably
                 have to use some escaping mechanism for the spaces to get 
                 the entire scheme expression parsed as one cmdline argument.</font></dd>
-            <dt><a name="optw"><font face="Arial"><code>-wtype</code></font></a><font
+            <dt><font face="Arial"><code>-2</code></font></dt>
+            <dd><font face="Arial">Enable experimental DSSSL extensions.</font></dd>
+            <dt><a name="optw"><font face="Arial"><code>-w</code> <i>type</i>,
+                <code>--warning=</code><i>type</i></font></a><font
                 face="Arial"> (examples: wxml, wmixed, wsgmldecl,
                 etc.) </font></dt>
             <dd><font face="Arial">Control warnings and errors.

@@ -49,6 +49,45 @@ public:
   class SpecPart;
   class Doc;
   class Part;
+  class MapSdataEntityElement;
+
+  class DeclarationElement : public Link {
+  public:
+    enum Type {
+      features,
+      basesetEncoding,
+      literalDescribedChar,
+      addNameChars,
+      addSeparatorChars,
+      standardChars,
+      otherChars,
+      combineChar,
+      mapSdataEntity,
+      charRepertoire,
+      sgmlGrovePlan,
+    };
+
+    DeclarationElement(Type);
+    void makeInputSource(DssslSpecEventHandler&, Owner<InputSource>&);
+    Type type() const;
+    void setContent(Text &);
+    void setName(const StringC &s) { name_ = s; };
+    const StringC &name() { return name_; };
+    void setText(const StringC &s) { text_ = s; };
+    const StringC &text() { return text_; };
+    void setModadd(const StringC &s) { modadd_ = s; };
+    const StringC &modadd() { return modadd_; };
+    void setDesc(const StringC &s) { desc_ = s; };
+    const StringC &desc() { return desc_; };
+
+  private:
+    Type type_;
+    Text content_;
+    StringC name_;
+    StringC text_;
+    StringC modadd_;
+    StringC desc_;
+  };
 
   class PartHeader : public Link {
   public:
@@ -91,17 +130,27 @@ public:
   class Part : public SpecPart {
   public:
     typedef IListIter<BodyElement> Iter;
-    Part();
+    typedef IListIter<DeclarationElement> DIter;
+    Part(Doc *, bool partial, bool style);
     Iter iter();
+    DIter diter();
+    Doc *doc();
     const Vector<PartHeader *> &use() const;
     void addUse(PartHeader *);
     void append(BodyElement *);
+    void append(DeclarationElement *);
     bool setMark(bool = 1);
+    bool style();
+    bool partial();
   private:
     Part *resolve(DssslSpecEventHandler &);
+    IList<DeclarationElement> declarations_;
     IList<BodyElement> bodyElements_;
     Vector<PartHeader *> use_;
     bool mark_;
+    Doc *doc_;
+    bool style_;
+    bool partial_;
   };
 
   class Doc : public Link {
@@ -112,13 +161,17 @@ public:
     PartHeader *refPart(const StringC &);
     PartHeader *refPart(const StringC &, const Location &refLoc);
     Part *resolveFirstPart(DssslSpecEventHandler &);
+    Part::DIter diter();
     void load(DssslSpecEventHandler &);
+    void append(DeclarationElement *); 
     const StringC &sysid() const;
   private:
     bool loaded_;
     StringC sysid_;
+    IList<DeclarationElement> declarations_;
     IList<PartHeader> headers_;
     Location loc_;
+    friend class Part;
   };
   DssslSpecEventHandler(Messenger &);
   void load(SgmlParser &specParser, const CharsetInfo &, const StringC &id,
@@ -126,13 +179,17 @@ public:
   void externalSpecificationStart(const StartElementEvent &);
   void externalSpecificationEnd(const EndElementEvent &);
   void styleSpecificationStart(const StartElementEvent &);
-  void styleSpecificationEnd(const EndElementEvent &);
-  void styleSpecificationBodyStart(const StartElementEvent &);
-  void styleSpecificationBodyEnd(const EndElementEvent &);
+  void transformSpecificationStart(const StartElementEvent &);
+  void specificationEnd(const EndElementEvent &);
+  void specificationBodyStart(const StartElementEvent &);
+  void specificationBodyEnd(const EndElementEvent &);
+  void declarationStart(const StartElementEvent &);
+  void declarationEnd(const EndElementEvent &);
 private:
   Vector<Part *> &parts();
   void startElement(StartElementEvent *);
   void endElement(EndElementEvent *);
+  void specificationStart(const StartElementEvent &, bool);
   void data(DataEvent *);
   void message(MessageEvent *);
   void endProlog(EndPrologEvent *);
@@ -155,6 +212,7 @@ private:
   IList<Doc> docs_;
   SgmlParser *parser_;
   const CharsetInfo *charset_;
+  DeclarationElement *currentDecl_;
   friend class Doc;
   friend class EntityBodyElement;
   friend class PartHeader;
@@ -195,6 +253,18 @@ inline
 DssslSpecEventHandler::Part::Iter DssslSpecEventHandler::Part::iter()
 {
   return Iter(bodyElements_);
+}
+
+inline
+DssslSpecEventHandler::Part::DIter DssslSpecEventHandler::Part::diter()
+{
+  return DIter(declarations_);
+}
+
+inline
+DssslSpecEventHandler::Part::DIter DssslSpecEventHandler::Doc::diter()
+{
+  return Part::DIter(declarations_);
 }
 
 inline

@@ -37,7 +37,7 @@
 #define SP_STAT_BLKSIZE
 #endif
 
-#ifdef __MACH__
+#if (defined __MACH__) && (! defined __GNU__)
 #define SP_MUTEX_MACH
 #endif
 
@@ -292,6 +292,10 @@
 #define SP_NAMESPACE_SCOPE SP_NAMESPACE::
 #else
 #define SP_NAMESPACE_SCOPE
+#endif
+
+#ifndef DEFAULT_SCHEME_BUILTINS
+#define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
 #endif
 
 #endif /* not config_INCLUDED */

@@ -10,18 +10,45 @@
 #include "MacroFlowObj.h"
 #include "ELObjMessageArg.h"
 #include "VM.h"
+#include "Owner.h" 
+#include "SchemeParser.h"
 #include "macros.h"
+#include "InternalInputSource.h"
 #include <stdlib.h>
+#include "LangObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
+
+class ELObjCharPropValues : public CharPropValues {
+public:
+  ELObjCharPropValues()
+    : def_(0), map_(0) {}
+private:
+  ELObjCharPropValues(const ELObjCharPropValues &); // Undefined.
+  ELObjCharPropValues &operator=(const ELObjCharPropValues &); // Undefined.
+  // 0 means no value.
+  ELObj *def_;
+  CharMap<ELObj *> map_;
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
 
 const Char defaultChar = 0xfffd;
 
 static
 size_t maxObjSize()
 {
+  // FlowObj classes are declared in FlowObj.cxx.
+  class Dummy : public CompoundFlowObj {
+  private:
+    Owner<Location> locp_;
+  };
   static size_t sz[] = {
     sizeof(UnresolvedQuantityObj),
     sizeof(VarStyleObj),
@@ -35,10 +62,17 @@ size_t maxObjSize()
     sizeof(NamedNodeListPtrNodeListObj),
     sizeof(ProcessNodeSosofoObj),
     sizeof(AppendSosofoObj),
+    sizeof(LiteralSosofoObj),
     sizeof(SetNonInheritedCsSosofoObj),
     sizeof(LabelSosofoObj),
     sizeof(MacroFlowObj),
-    sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
+    sizeof(Dummy),
+    sizeof(LangObj),
+#ifdef SP_HAVE_LOCALE
+    sizeof(RefLangObj),
+#endif
+    sizeof(SubgroveSpecObj),
+    sizeof(CreateSpecObj),
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -52,12 +86,16 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
-			 const FOTBuilder::Extension *extensionTable)
+			 bool style,
+                         bool strictMode,
+			 const FOTBuilder::Description &fotbDescr)
+
 : groveManager_(groveManager),
   messenger_(messenger),
-  extensionTable_(extensionTable),
+  fotbDescr_(fotbDescr),
   Collector(maxObjSize()),
-  partIndex_(1),  // 0 is for command-line definitions
+  partIndex_(0),  // 0 is for command-line definitions
+  dPartIndex_(1),
   lexCategory_(lexOther),
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -66,7 +104,12 @@ Interpreter::Interpreter(GroveManager *groveManager,
   initialStyle_(0),
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
-  dsssl2_(dsssl2)
+  dsssl2_(dsssl2),
+  mathClassCPV_(FOTBuilder::symbolOrdinary),
+  style_(style),
+  strictMode_(strictMode),
+  explicitFeatures_(0),
+  explicitModules_(0)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -77,30 +120,48 @@ Interpreter::Interpreter(GroveManager *groveManager,
                 = new (*this) AddressObj(FOTBuilder::Address::none));
   makePermanent(emptyNodeListObj_
 		= new (*this) NodePtrNodeListObj);
+  defaultLanguage_ = theFalseObj_;
   installSyntacticKeys();
   installCValueSymbols();
   installPortNames();
   installPrimitives();
   installUnits();
+  installFeatures(fotbDescr_.features);
+  installModules();
   installCharNames();
+  installSdata();
   installFlowObjs();
   installInheritedCs();
-  installSdata();
   installNodeProperties();
 
   static const char *lexCategories[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "!$%&*/<=>?~_^:",
+    "",
     "0123456789",
     "-+.",
+    "",
     "();\"",
     " \t\r\n\f",
+    "",
   };
-      //
+  lexCategory_.setEe(lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
+
+  // #',@[\\]`{|} are ASCII chars not mentioned above,
+  // but I guess we don't want to allow any of these
+  // in names (as most of them have special meaning in
+  // scheme/dsssl).
+  if (!strictMode_)
+    for (Char i = 127; i < charMax; i++)
+      lexCategory_.setChar(i, lexAddNameStart);
+
   initialProcessingMode_.setDefined();
+  // can't be done before initializing lexCategory_
+  installBuiltins();
+  installCharProperties();
 }
 
 void Interpreter::compile()
@@ -115,6 +176,9 @@ void Interpreter::compile()
       break;
     mode->compile(*this);
   }
+  compileCharProperties();
+  compileDefaultLanguage();
+  checkGrovePlan();
 }
 
 void Interpreter::compileInitialValues()
@@ -159,11 +223,6 @@ void Interpreter::installInitialValue(Identifier *ident, Owner<Expression> &expr
   initialValueValues_.resize(initialValueValues_.size() + 1);
   expr.swap(initialValueValues_.back());
   initialValueNames_.push_back(ident);
-}
-
-void Interpreter::defineVariable(const StringC &str)
-{
-  lookup(str)->setValue(makeTrue(), 0);
 }
 
 void Interpreter::installUnits()
@@ -215,12 +274,37 @@ void Interpreter::installSyntacticKeys()
     { "define", Identifier::keyDefine },
     { "else", Identifier::keyElse },
     { "=>", Identifier::keyArrow },
+    { "there-exists?", Identifier::keyThereExists },
+    { "for-all?", Identifier::keyForAll },
+    { "select-each", Identifier::keySelectEach },
+    { "union-for-each", Identifier::keyUnionForEach },
+    { "define-unit", Identifier::keyDefineUnit },
+    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
+    { "declare-char-property", Identifier::keyDeclareCharProperty },
+    { "define-language", Identifier::keyDefineLanguage },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
+    { "add-char-properties", Identifier::keyAddCharProperties },
+    { "architecture", Identifier::keyArchitecture },
+    { "default", Identifier::keyDefault },
+    { "null", Identifier::keyNull },
+    { "rcs?", Identifier::keyIsRcs },
+    { "parent", Identifier::keyParent },
+    { "active", Identifier::keyActive },
+    { "label", Identifier::keyLabel },
+    { "children", Identifier::keyChildren },
+    { "class", Identifier::keyClass },
+   }, styleKeys[] = {
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
-    { "define-unit", Identifier::keyDefineUnit },
+    { "query", Identifier::keyQuery },
     { "element", Identifier::keyElement },
-    { "default", Identifier::keyDefault },
     { "root", Identifier::keyRoot },
     { "id", Identifier::keyId },
     { "mode", Identifier::keyMode },
@@ -229,14 +313,9 @@ void Interpreter::installSyntacticKeys()
     { "declare-flow-object-class", Identifier::keyDeclareFlowObjectClass },
     { "declare-char-characteristic+property", Identifier::keyDeclareCharCharacteristicAndProperty },
     { "declare-reference-value-type", Identifier::keyDeclareReferenceValueType },
-    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
-    { "declare-char-property", Identifier::keyDeclareCharProperty },
     { "define-page-model", Identifier::keyDefinePageModel },
     { "define-column-set-model", Identifier::keyDefineColumnSetModel },
-    { "define-language", Identifier::keyDefineLanguage },
-    { "add-char-properties", Identifier::keyAddCharProperties },
     { "use", Identifier::keyUse },
-    { "label", Identifier::keyLabel },
     { "content-map", Identifier::keyContentMap },
     { "keep-with-previous?", Identifier::keyIsKeepWithPrevious },
     { "keep-with-next?", Identifier::keyIsKeepWithNext },
@@ -303,19 +382,36 @@ void Interpreter::installSyntacticKeys()
     { "grid-n-rows", Identifier::keyGridNRows },
     { "grid-n-columns", Identifier::keyGridNColumns },
     { "radical", Identifier::keyRadical },
-    { "null", Identifier::keyNull },
-    { "rcs?", Identifier::keyIsRcs },
-    { "parent", Identifier::keyParent },
-    { "active", Identifier::keyActive },
     { "attributes", Identifier::keyAttributes },
-    { "children", Identifier::keyChildren },
     { "repeat", Identifier::keyRepeat },
     { "position", Identifier::keyPosition },
     { "only", Identifier::keyOnly },
-    { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
-    { "architecture", Identifier::keyArchitecture },
+    { "white-point", Identifier::keyWhitePoint },
+    { "black-point", Identifier::keyBlackPoint },
+    { "range", Identifier::keyRange },
+    { "range-abc", Identifier::keyRangeAbc },
+    { "range-lmn", Identifier::keyRangeLmn },
+    { "range-a", Identifier::keyRangeA },
+    { "decode-abc", Identifier::keyDecodeAbc },
+    { "decode-lmn", Identifier::keyDecodeLmn },
+    { "decode-a", Identifier::keyDecodeA },
+    { "matrix-abc", Identifier::keyMatrixAbc },
+    { "matrix-lmn", Identifier::keyMatrixLmn },
+    { "matrix-a", Identifier::keyMatrixA },
+  }, transformKeys[] = {
+    { "define-transliteration-map", Identifier::keyDefineTransliterationMap },
+    { "node", Identifier::keyNode },
+    { "subgrove", Identifier::keySubgrove },
+    { "add", Identifier::keyAdd },
+    { "remove", Identifier::keyRemove },
+    { "sub", Identifier::keySub },
+    { "sort-children", Identifier::keySortChildren },
+    { "optional", Identifier::keyOptional },
+    { "unique", Identifier::keyUnique },
+    { "result-path", Identifier::keyResultPath },
+    { "property", Identifier::keyProperty },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -332,6 +428,20 @@ void Interpreter::installSyntacticKeys()
       lookup(tem)->setSyntacticKey(keys[i].key);
     }
   }
+  if (style()) 
+    for (size_t i = 0; i < SIZEOF(styleKeys); i++) {
+      StringC tem(makeStringC(styleKeys[i].name));
+      lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      if (dsssl2() && tem[tem.size() - 1] == '?') {
+        tem.resize(tem.size() - 1);
+        lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      }
+    }
+  else 
+    for (size_t i = 0; i < SIZEOF(transformKeys); i++) {
+      StringC tem(makeStringC(transformKeys[i].name));
+      lookup(tem)->setSyntacticKey(transformKeys[i].key);
+    }
   if (dsssl2()) {
     for (size_t i = 0; i < SIZEOF(keys2); i++)
       lookup(makeStringC(keys2[i].name))->setSyntacticKey(keys2[i].key);
@@ -379,29 +489,41 @@ void Interpreter::installPortNames()
 
 void Interpreter::installCharNames()
 {
-  static struct {
-    Char c;
-    const char *name;
-  } chars[] = {
+  if (!strictMode()) {
+    static struct {
+      Char c;
+      const char *name;
+    } chars[] = {
 #include "charNames.h"
-  };
-  for (size_t i = 0; i < SIZEOF(chars); i++)
-    namedCharTable_.insert(makeStringC(chars[i].name), chars[i].c);
+    };
+    for (size_t i = 0; i < SIZEOF(chars); i++) {
+      CharPart ch;
+      ch.c = chars[i].c;
+      ch.defPart = unsigned(-1);
+      namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+    }
+  }
 }
 
 void Interpreter::installSdata()
 {
-  // This comes from uni2sgml.txt on ftp://unicode.org.
-  // It is marked there as obsolete, so it probably ought to be checked.
-  // The definitions of apos and quot have been fixed for consistency with XML.
-  static struct {
-    Char c;
-    const char *name;
-  } entities[] = {
+  if (!strictMode()) {
+    // This comes from uni2sgml.txt on ftp://unicode.org.
+    // It is marked there as obsolete, so it probably ought to be checked.
+    // The definitions of apos and quot have been fixed for consistency with XML.
+    static struct {
+      Char c;
+      const char *name;
+    } entities[] = {
 #include "sdata.h"
-  };
-  for (size_t i = 0; i < SIZEOF(entities); i++)
-    sdataEntityNameTable_.insert(makeStringC(entities[i].name), entities[i].c);
+    };
+    for (size_t i = 0; i < SIZEOF(entities); i++) { 
+      CharPart ch;
+      ch.c = entities[i].c;
+      ch.defPart = unsigned(-1);
+      sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+    }
+  }
 }
 
 void Interpreter::installNodeProperties()
@@ -413,17 +535,134 @@ void Interpreter::installNodeProperties()
   }
 }
 
-bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
+void Interpreter::setCharRepertoire(const StringC &pubid)
+{
+  if (pubid == "UNREGISTERED::OpenJade//Character Repertoire::OpenJade") {
+    if (strictMode_) {
+      installCharNames();
+      installSdata();
+      // This assumes that we process char-repertoire
+      // declaration before any declarations which change
+      // lexical categories.
+      for (Char i = 127; i < charMax; i++)
+        lexCategory_.setChar(i, lexAddNameStart);
+      strictMode_ = 0;
+    }
+   } else 
+     message(InterpreterMessages::unsupportedCharRepertoire,
+                StringMessageArg(pubid));
+}
+ 
+void Interpreter::addStandardChar(const StringC &name, const StringC &num)
+{
+  int n;
+  size_t i = 0;
+  if (!scanSignDigits(num, i, n)) {
+    message(InterpreterMessages::invalidCharNumber, StringMessageArg(num));
+    return;
+  }
+  
+  const CharPart *def = namedCharTable_.lookup(name);
+  CharPart ch;
+  ch.c = n;
+  ch.defPart = dPartIndex_;
+  if (def) {
+    if (dPartIndex_ < def->defPart)
+      namedCharTable_.insert(name, ch, 1);
+    else if (def->defPart == dPartIndex_ && def->c != ch.c) 
+      message(InterpreterMessages::duplicateCharName, 
+    	      StringMessageArg(name));
+  }
+  else 
+    namedCharTable_.insert(name, ch, 1);
+}
+
+void Interpreter::addNameChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddNameStart);
+}
+
+void Interpreter::addSeparatorChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp)
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddWhiteSpace);
+}
+
+void Interpreter::addSdataEntity(const StringC &ename, const StringC &etext, const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) { 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+    return; 
+  }
+
+  CharPart ch;
+  ch.c = cp->c;
+  ch.defPart = dPartIndex_;
+
+  if (ename.size() > 0) {
+    const CharPart *def = sdataEntityNameTable_.lookup(ename);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityNameTable_.insert(ename, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityName, 
+		StringMessageArg(ename));
+    }
+    else
+      sdataEntityNameTable_.insert(ename, ch);
+  }
+
+  if (etext.size() > 0) {
+    const CharPart *def = sdataEntityTextTable_.lookup(etext);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityTextTable_.insert(etext, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityText, 
+		StringMessageArg(etext));
+    }
+    else
+      sdataEntityTextTable_.insert(etext, ch);
+  }
+}
+
+bool Interpreter::sdataMap(GroveString name, GroveString text, GroveChar &c) const
 {
   StringC tem(name.data(), name.size());
-  const Char *cp = sdataEntityNameTable_.lookup(tem);
+  StringC tem2(text.data(), text.size());
+
+  const CharPart *cp = sdataEntityNameTable_.lookup(tem);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
+  
+  cp = sdataEntityTextTable_.lookup(tem2);
+  if (cp) {
+    c = cp->c;
+    return 1;
+  }
+  
   if (convertUnicodeCharName(tem, c))
     return 1;
-  // I think this is the most thing to do.
+  // I think this is the best thing to do.
   // At least it makes preserve-sdata work with unknown SDATA entities.
   c = defaultChar;
   return 1;
@@ -450,9 +689,9 @@ ELObj *Interpreter::convertGlyphId(const Char *str, size_t len, const Location &
 
 bool Interpreter::convertCharName(const StringC &str, Char &c) const
 {
-  const Char *cp = namedCharTable_.lookup(str);
+  const CharPart *cp = namedCharTable_.lookup(str);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
   return convertUnicodeCharName(str, c);
@@ -544,6 +783,16 @@ Unit *Interpreter::lookupUnit(const StringC &str)
   return unit;
 }
 
+CharProp *Interpreter::lookupCharProperty(const StringC &n)
+{
+  CharProp *p = charPropTable_.lookup(n);
+  if (!p) {
+    p = new CharProp(n);
+    charPropTable_.insert(p);
+  }
+  return p;
+}
+
 ProcessingMode *Interpreter::lookupProcessingMode(const StringC &str)
 {
   ProcessingMode *mode = processingModeTable_.lookup(str);
@@ -567,6 +816,11 @@ void Interpreter::endPart()
 {
   currentPartFirstInitialValue_ = initialValueNames_.size();
   partIndex_++;
+}
+
+void Interpreter::dEndPart()
+{
+  dPartIndex_++;
 }
 
 void Interpreter::normalizeGeneralName(const NodePtr &nd, StringC &str)
@@ -1150,7 +1404,7 @@ ELObj *Interpreter::convertNumberFloat(const StringC &str)
   if (endPtr == buf.data())
     return 0;
   int unitExp;
-  Unit *unit = scanUnit(str, endPtr - buf.data(), unitExp);
+  Unit *unit = scanUnit(str, endPtr - buf.data() + i0, unitExp);
   if (!unit)
     return 0;
   return new (*this) UnresolvedQuantityObj(val, unit, unitExp);
@@ -1542,23 +1796,50 @@ unsigned long Interpreter::StringSet::hash(const String<char> &str)
   return h;
 }
 
+bool Identifier::preferBuiltin_ = 0;
+
 Identifier::Identifier(const StringC &name)
-: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), flowObj_(0)
+: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
+  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0), 
+  feature_(Interpreter::noFeature)
 {
 }
 
+void Identifier::maybeSaveBuiltin()
+{
+  if (defPart_ == unsigned(-1) && !builtin_) {
+    builtin_ = new Identifier(name());
+    if (value_)
+      builtin_->setValue(value_, defPart_);
+    else
+      builtin_->setDefinition(def_, defPart_, defLoc_);
+  }
+}
+ 
 void Identifier::setDefinition(Owner<Expression> &expr,
 			       unsigned part,
 			       const Location &loc)
 {
+  maybeSaveBuiltin();
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
   value_ = 0;
 }
 
+void Identifier::setBuiltinDefinition(Owner<Expression> &expr,
+				     unsigned part,
+				     const Location &loc)
+{
+  if (!builtin_) { 
+    builtin_ = new Identifier(name());
+    builtin_->setDefinition(expr, part, loc);
+  }
+}
+
 void Identifier::setValue(ELObj *value, unsigned partIndex)
 {
+  maybeSaveBuiltin();
   value_ = value;
   // Built in functions have lowest priority.
   defPart_ = partIndex;
@@ -1566,7 +1847,9 @@ void Identifier::setValue(ELObj *value, unsigned partIndex)
 
 bool Identifier::defined(unsigned &part, Location &loc) const
 {
-  if (!def_ && !value_)
+  if (builtin_ && preferBuiltin_)
+    return builtin_->defined(part, loc);
+  if (!def_ && !value_) 
     return 0;
   part = defPart_;
   loc = defLoc_;
@@ -1575,8 +1858,15 @@ bool Identifier::defined(unsigned &part, Location &loc) const
 
 ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
 {
+  if (builtin_ && preferBuiltin_)
+    return builtin_->computeValue(force, interp);
   if (value_)
     return value_;
+  bool preferred = 0;
+  if (defPart_ == unsigned(-1) && !preferBuiltin_) {
+    preferBuiltin_ = 1;
+    preferred = 1;
+  }
   ASSERT(def_);
   if (beingComputed_) {
     if (force) {
@@ -1600,7 +1890,17 @@ ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
     }
     ((Identifier *)this)->beingComputed_ = 0;
   }
+  if (preferred)
+    preferBuiltin_ = 0;
   return value_;
+}
+
+ELObj *Identifier::computeBuiltinValue(bool force, Interpreter &interp) const
+{
+  preferBuiltin_ = 1;
+  ELObj *res = computeValue(force, interp);
+  preferBuiltin_ = 0;
+  return res;
 }
 
 Unit::Unit(const StringC &name)
@@ -1778,6 +2078,940 @@ bool operator==(const StringC &s, const char *p)
     if (p[i] == '\0' || (unsigned char)p[i] != s[i])
       return 0;
   return p[s.size()] == '\0';
+}
+
+void Interpreter::installBuiltins()
+{
+  partIndex_ = unsigned(-1);
+  StringC sysid(makeStringC(DEFAULT_SCHEME_BUILTINS));
+  StringC src;
+  groveManager_->mapSysid(sysid);
+  if (groveManager_->readEntity(sysid, src)) {
+    Owner<InputSource> in(new InternalInputSource(src,
+                              InputSourceOrigin::make()));
+    SchemeParser scm(*this, in);
+    scm.parse();
+  }
+  endPart();
+  partIndex_ = 0;
+}
+
+void Interpreter::setDefaultLanguage(Owner<Expression> &expr,
+				     unsigned part,
+				     const Location &loc)
+{
+  defaultLanguageDef_.swap(expr);
+  defaultLanguageDefPart_ = part;
+  defaultLanguageDefLoc_ = loc;
+}
+
+ELObj *Interpreter::defaultLanguage() const
+{
+  return defaultLanguage_;
+}
+
+bool Interpreter::defaultLanguageSet(unsigned &part,Location &loc) const
+{
+  if(defaultLanguageDef_) {
+    part = defaultLanguageDefPart_;
+    loc = defaultLanguageDefLoc_;
+    return true;
+  }
+  return false;
+}
+
+void Interpreter::compileDefaultLanguage()
+{
+  if(defaultLanguageDef_) {
+    InsnPtr insn = Expression::optimizeCompile(defaultLanguageDef_, *this,
+					       Environment(), 0, InsnPtr());
+    VM vm(*this);
+    ELObj *obj = vm.eval(insn.pointer());
+    if(!obj->asLanguage()) {
+      if(!isError(obj)) {
+	setNextLocation(defaultLanguageDefLoc_);
+	message(InterpreterMessages::defLangDeclRequiresLanguage,
+		ELObjMessageArg(obj, *this));
+      }
+      return;
+    }
+    makePermanent(obj);
+    defaultLanguage_ = obj;
+  }
+}
+
+void Interpreter::installCharProperties()
+{
+  //FIXME convert this to tables
+
+  // NOte that default values are set in the constructors.
+
+  lookupCharProperty(makeStringC("numeric-equiv"))->
+    declarePredefined(&numericEquivCPV_);
+  if (!strictMode_) {
+    for (int i = 0; i < 10; i++) 
+      numericEquivCPV_.setValue(i+'0', i);
+  }
+  
+  if (style()) {
+    lookupCharProperty(makeStringC("space?"))->
+      declarePredefined(&isSpaceCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define SPACE 
+#include "charProps.h"
+#undef SPACE
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isSpaceCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
+    }
+
+    lookupCharProperty(makeStringC("record-end?"))->
+      declarePredefined(&isRecordEndCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define RECORD_END
+#include "charProps.h"
+#undef RECORD_END
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isRecordEndCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
+    }
+
+    lookupCharProperty(makeStringC("blank?"))->
+      declarePredefined(&isBlankCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define BLANK
+#include "charProps.h"
+#undef BLANK
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isBlankCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
+    }
+
+    lookupCharProperty(makeStringC("input-tab?"))->
+      declarePredefined(&isInputTabCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define INPUT_TAB
+#include "charProps.h"
+#undef INPUT_TAB
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isInputTabCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
+    }
+
+    lookupCharProperty(makeStringC("input-whitespace?"))->
+      declarePredefined(&isInputWhitespaceCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define INPUT_WHITESPACE
+#include "charProps.h"
+#undef INPUT_WHITESPACE
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isInputWhitespaceCPV_.setRange(chars[i].c,
+				       chars[i].c+chars[i].num-1, true);
+    }
+
+    lookupCharProperty(makeStringC("punct?"))->
+      declarePredefined(&isPunctCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+      } chars[] = {
+#define PUNCT
+#include "charProps.h"
+#undef PUNCT
+      };
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+	isPunctCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
+    }
+    
+    lookupCharProperty(makeStringC("script"))->
+      declarePredefined(&scriptCPV_);
+    if (!strictMode_) {
+      static struct {
+	Char c1, c2;
+	char *suffix;
+      } chars[] = {
+#define SCRIPT
+#include "charProps.h"
+#undef SCRIPT
+      };
+      StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
+      for (size_t i = 0; i < SIZEOF(chars); i++) { 
+	StringC tem(prefix);
+	tem += makeStringC(chars[i].suffix);
+	scriptCPV_.setRange(chars[i].c1, chars[i].c2,
+			    storePublicId(tem.data(), tem.size(), Location()));
+      }
+    }
+
+    lookupCharProperty(makeStringC("glyph-id"))->
+      declarePredefined(&glyphIdCPV_);
+    // FIXME. Default values?
+
+    lookupCharProperty(makeStringC("drop-after-line-break?"))->
+      declarePredefined(&isDropAfterLineBreakCPV_);
+    // FIXME: Values.
+
+    lookupCharProperty(makeStringC("drop-unless-before-line-break?"))->
+      declarePredefined(&isDropUnlessBeforeLineBreakCPV_);
+    // FIXME: Values.
+
+    lookupCharProperty(makeStringC("break-before-priority"))->
+      declarePredefined(&breakBeforePriorityCPV_);
+    lookupCharProperty(makeStringC("break-after-priority"))->
+      declarePredefined(&breakAfterPriorityCPV_);
+    if(!strictMode_) {
+      static struct {
+	Char c;
+	unsigned short num;
+	unsigned short bbp;
+	unsigned short bap;
+      } chars[] = {
+#define BREAK_PRIORITIES
+#include "charProps.h"
+#undef BREAK_PRIORITIES
+      };
+      for (size_t i = 0; i < SIZEOF(chars); ++i) {
+	breakBeforePriorityCPV_.setRange(chars[i].c, chars[i].c + chars[i].num-1,
+					 chars[i].bbp);
+	breakAfterPriorityCPV_.setRange(chars[i].c, chars[i].c + chars[i].num-1,
+					chars[i].bap);
+      }
+    }
+
+    lookupCharProperty(makeStringC("math-class"))->
+      declarePredefined(&mathClassCPV_);
+    // FIXME: Values.
+
+    lookupCharProperty(makeStringC("math-font-posture"))->
+      declarePredefined(&mathFontPostureCPV_);
+    // FIXME: Values.
+  }
+}
+
+void
+Interpreter::compileCharProperties()
+{
+  NamedTableIter<CharProp> iter(charPropTable_);
+  CharProp *val;
+  while ((val = iter.next())) 
+    val->compile(*this);
+}
+
+CharPropValues *Interpreter::installExtensionCharNIC(Identifier *ident,
+					  const StringC &pubid,
+					  const Location &loc)
+{
+  ident->setCharNIC(currentPartIndex(), loc);
+  // FIXME! Shouldn't even get into CVS!
+  return new ELObjCharPropValues;
+}
+
+ELObj *CharProp::value(Char ch, ELObj *def,
+		       const Location &loc, Interpreter &interp)
+{
+  addedProp_ *p=(addedProp_ *)added_(ch);
+  if (p != 0 && p->computed_ != computedOK) {
+    compileAdded_(*p,interp);
+    if(p->computed_ == computedError) {
+      if (!values_) {
+	interp.setNextLocation (loc);
+	interp.message (InterpreterMessages::unknownCharProperty,
+			StringMessageArg (name()));
+      }
+      return interp.makeError();
+    }
+    ASSERT(p->computed_ == computedOK);
+  }
+  ASSERT(values_);
+  ELObj *tem = values_->value(ch, interp);
+  if(tem)
+    return tem;
+  else if (def)
+    return def;
+  if (defComputed_ != computedOK) {
+    compileDef_ (interp);
+    if (defComputed_ == computedError)
+      return interp.makeError();
+    ASSERT(defComputed_ == computedOK);
+  }
+  tem = values_->defaultValue(interp);
+  ASSERT(tem);
+  return tem;
+}
+
+void CharProp::setValue(StringC &chars, Owner<Expression> &expr,
+			unsigned part, const Location &loc)
+{
+  ASSERT(chars.size()>0);
+  addedPropsVec_.resize (addedPropsVec_.size() + 1);
+  addedProp_ &p = addedPropsVec_.back();
+  p.chars_.swap(chars);
+  p.part_ = part;
+  p.loc_ = loc;
+  p.expr_.swap(expr);
+  p.computed_ = notComputed;
+
+  if(!addedProps_)
+    addedProps_ = new CharMap<NCVector<addedProp_>::size_type> (noAddedVal_);
+  for(size_t i = 0; i < p.chars_.size(); ++i) {
+    ASSERT((*addedProps_)[p.chars_[i]] == noAddedVal_);
+    addedProps_->setChar(p.chars_[i],addedPropsVec_.size() - 1);
+  }
+}
+
+void CharProp::declare(Owner<Expression> &expr,
+		       unsigned part,
+		       const Location &loc,
+		       CharPropValues *values)
+{
+  ASSERT(!defExpr_);
+  ASSERT(expr);
+  defExpr_.swap(expr);
+  defPart_ = part;
+  defLoc_ = loc;
+  if (values)
+    values_ = values;
+  else if (!values_) {
+    // FIXME! Shall not get into CVS!
+    values_ = new ELObjCharPropValues ();
+  }
+}
+
+void CharProp::declarePredefined(CharPropValues *values)
+{
+  values_ = values;
+}
+
+bool CharProp::hasAddedValue(Char ch,unsigned &part,Location &loc) const
+{
+  const addedProp_ *p = added_(ch);
+  if(p) {
+    part = p->part_;
+    loc = p->loc_;
+    return true;
+  }
+  return false;
+}
+
+bool CharProp::declared(unsigned &part, Location &loc) const
+{
+  if(defExpr_) {
+    part = defPart_;
+    loc = defLoc_;
+    return true;
+  }
+  return false;
+}
+
+void CharProp::compile(Interpreter &interp)
+{
+  compileDef_(interp);
+  for(NCVector<addedProp_>::size_type i = 0; i < addedPropsVec_.size(); ++i)
+    compileAdded_(addedPropsVec_[i],interp);
+  if (!hadError_) {
+    addedProps_.clear();
+    addedPropsVec_.clear();
+  }
+}
+    
+void CharProp::compileDef_(Interpreter &interp)
+{
+  switch(defComputed_) {
+  case notComputed:
+    if (defExpr_) {
+      defComputed_ = beingComputed;
+      InsnPtr insn = Expression::optimizeCompile (defExpr_, interp,
+						  Environment(), 0, InsnPtr());
+      VM vm (interp);
+      ELObj *p = vm.eval (insn.pointer());
+      if (!interp.isError(p)
+	  && values_->setDefault(name(), defLoc_, p, interp))
+	defComputed_ = computedOK;
+      else
+	defComputed_ = computedError;
+    }
+    else if (values_) {
+      defComputed_ = computedOK;
+    } else
+      defComputed_ = computedError;
+    break;
+  case beingComputed:
+    interp.setNextLocation(defLoc_);
+    interp.message(InterpreterMessages::charPropertyLoop,
+		    StringMessageArg(name()));
+    defComputed_ = computedError;
+    break;
+  default:
+    ;
+  }
+}
+
+void CharProp::compileAdded_(addedProp_ &added, Interpreter &interp)
+{
+  switch(added.computed_) {
+  case notComputed: { // Own block since InsnPtr and VM have destructors.
+    // Check that property is declared.
+    if (!values_) {
+      interp.setNextLocation (added.loc_);
+      interp.message (InterpreterMessages::unknownCharProperty,
+		      StringMessageArg (name()));
+      added.computed_ = computedError;
+      hadError_ = true;
+      return;
+    }
+    ASSERT(added.expr_);
+    added.computed_ = beingComputed;
+    InsnPtr insn = Expression::optimizeCompile (added.expr_, interp,
+						Environment(), 0, InsnPtr());
+    VM vm (interp);
+    ELObj *p = vm.eval (insn.pointer());
+    if (!interp.isError(p) &&
+	values_->setValue(name(), added.chars_, added.loc_, p, interp))
+      added.computed_ = computedOK;
+    else {
+      added.computed_ = computedError;
+      hadError_ = true;
+    }
+    break;
+  }
+  case beingComputed:
+    interp.setNextLocation(added.loc_);
+    interp.message(InterpreterMessages::charPropertyLoop,
+		    StringMessageArg(name()));
+    added.computed_ = computedError;
+    break;
+  default:
+    ;
+  }
+}
+
+const CharProp::addedProp_ *CharProp::added_(Char ch) const
+{
+  if (!addedProps_)
+    return 0;
+  NCVector<addedProp_>::size_type n((*addedProps_)[ch]);
+  if (n == noAddedVal_)
+    return 0;
+  return &addedPropsVec_[n];
+}
+
+bool IntegerCharPropValues::setDefault(const StringC &name,
+				       const Location &loc,
+				       ELObj *obj, Interpreter &interp)
+{
+  if (!obj->exactIntegerValue(def_)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotInteger,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return false;
+  }
+  return true;
+}
+
+bool IntegerCharPropValues::setValue(const StringC &name, const StringC &chars,
+				     const Location &loc,
+				     ELObj *obj, Interpreter &interp)
+{
+  ValT_ v;
+  if (!obj->exactIntegerValue(v.l_)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotInteger,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return false;
+  }
+  v.hasValue_ = true;
+  for(size_t i=0; i<chars.size(); ++i)
+    map_.setChar(chars[i],v);
+  return true;
+}
+  
+ELObj *IntegerCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v=map_[ch];
+  if(v.hasValue_)
+    return interp.makeInteger(v.l_);
+  return 0;
+}
+
+ELObj *IntegerCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return interp.makeInteger(def_);
+}
+
+bool MaybeIntegerCharPropValues::setDefault(const StringC &name,
+					    const Location &loc,
+					    ELObj *obj, Interpreter &interp)
+{
+  if (obj->exactIntegerValue(def_) || (defFalse_ = (!obj->isTrue())))
+    return true;
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotIntegerOrFalse,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
+}
+
+bool MaybeIntegerCharPropValues::setValue(const StringC &name,
+					  const StringC &chars,
+					  const Location &loc,
+					  ELObj *obj,
+					  Interpreter &interp)
+{
+  ValT_ v;
+  if (obj->exactIntegerValue(v.l_) || (v.isFalse_ = (!obj->isTrue()))) {
+    v.hasValue_ = true;
+    for (size_t i = 0; i < chars.size(); ++i)
+      map_.setChar(chars[i], v);
+    return true;
+  }
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotIntegerOrFalse,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
+  return false;
+}
+
+ELObj *MaybeIntegerCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_) {
+    if (v.isFalse_)
+      return interp.makeFalse();
+    else
+      return interp.makeInteger(v.l_);
+  }
+  return 0;
+}
+    
+ELObj *MaybeIntegerCharPropValues::defaultValue(Interpreter &interp) const
+{
+  if (defFalse_)
+    return interp.makeFalse();
+  return interp.makeInteger(def_);
+}
+
+bool BooleanCharPropValues::setDefault(const StringC &, const Location &,
+				       ELObj *obj, Interpreter &)
+{
+  def_ = obj->isTrue();
+  return 1;
+}
+
+bool BooleanCharPropValues::setValue(const StringC &, const StringC &chars,
+				     const Location &, ELObj *obj,
+				     Interpreter &)
+{
+  ValT_ v;
+  v.hasValue_ = true;
+  v.b_ = obj->isTrue();
+  for (size_t i = 0; i < chars.size(); ++i)
+    map_.setChar (chars[i], v);
+  return true;
+}
+
+ELObj *BooleanCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.b_ ? interp.makeTrue() : interp.makeFalse();
+  return 0;
+}
+
+ELObj *BooleanCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return def_ ? interp.makeTrue() : interp.makeFalse();
+}
+
+bool PublicIdCharPropValues::setDefault(const StringC &name,
+					const Location &loc,
+					ELObj *obj, Interpreter &interp)
+{
+  const Char *c;
+  size_t n;
+  if (obj->stringData (c, n)) {
+    def_ = interp.storePublicId(c, n, loc);
+    return 1;
+  }
+  if (obj == interp.makeFalse()) {
+    def_ = 0;
+    return 1;
+  }
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotPublicId,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
+  return 0;
+}
+
+bool PublicIdCharPropValues::setValue(const StringC &name,
+				      const StringC &chars,
+				      const Location &loc,
+				      ELObj *obj, Interpreter &interp)
+{
+  const Char *c;
+  size_t n;
+  FOTBuilder::PublicId pubid;
+  if (obj->stringData(c, n))
+    pubid = interp.storePublicId(c, n, loc);
+  else if (obj == interp.makeFalse())
+    pubid = 0;
+  else {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotPublicId,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return 0;
+  }
+  for (size_t i = 0; i < chars.size(); ++i)
+    map_[chars[i]] = pubid;
+  return 1;
+}
+
+ELObj *PublicIdCharPropValues::value(Char, Interpreter &) const
+{
+}
+
+ELObj *PublicIdCharPropValues::defaultValue(Interpreter &) const
+{
+}
+
+bool SymbolCharPropValues::setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &)
+{
+}
+
+bool SymbolCharPropValues::setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &)
+{
+}
+
+ELObj *SymbolCharPropValues::value(Char, Interpreter &) const
+{
+}
+
+ELObj *SymbolCharPropValues::defaultValue(Interpreter &) const
+{
+}
+
+bool ELObjCharPropValues::setDefault(const StringC &, const Location &,
+				     ELObj *obj, Interpreter &interp)
+{
+  ASSERT(obj);
+  interp.makePermanent (obj);
+  def_ = obj;
+}
+
+bool ELObjCharPropValues::setValue(const StringC &, const StringC &chars,
+				   const Location &,
+				   ELObj *obj, Interpreter &interp)
+{
+  ASSERT(obj);
+  interp.makePermanent (obj);
+  for(size_t i = 0; i < chars.size(); ++i)
+    map_.setChar(chars[i], obj);
+}
+
+ELObj *ELObjCharPropValues::value(Char ch, Interpreter &) const
+{
+  return map_[ch];
+}
+
+ELObj *ELObjCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return def_;
+}
+
+void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)
+{
+  feature_[combineChar].rcsname =          makeStringC("combine-char");
+  feature_[keyword].rcsname =              makeStringC("keyword");
+  feature_[multiSource].rcsname =          makeStringC("multi-source");
+  feature_[multiResult].rcsname =          makeStringC("multi-result");
+  feature_[regexp].rcsname =               makeStringC("regexp");
+  feature_[word].rcsname =                 makeStringC("word");
+  feature_[hytime].rcsname =               makeStringC("hytime");
+  feature_[charset].rcsname =              makeStringC("charset");
+  feature_[expression].rcsname =           makeStringC("expression");
+  feature_[multiProcess].rcsname =         makeStringC("multi-process");
+  feature_[query].rcsname =                makeStringC("query");
+  feature_[sideBySide].rcsname =           makeStringC("side-by-side");
+  feature_[sideline].rcsname =             makeStringC("sideline");
+  feature_[alignedColumn].rcsname =        makeStringC("aligned-column");
+  feature_[bidi].rcsname =                 makeStringC("bidi");
+  feature_[vertical].rcsname =             makeStringC("vertical");
+  feature_[math].rcsname =                 makeStringC("math");
+  feature_[table].rcsname =                makeStringC("table");
+  feature_[tableAutoWidth].rcsname =       makeStringC("table-auto-width");
+  feature_[simplePage].rcsname =           makeStringC("simple-page");
+  feature_[page].rcsname =                 makeStringC("page");
+  feature_[multiColumn].rcsname =          makeStringC("multi-column");
+  feature_[nestedColumnSet].rcsname =      makeStringC("nested-column-set");
+  feature_[generalIndirect].rcsname =      makeStringC("general-indirect");
+  feature_[inlineNote].rcsname =           makeStringC("inline-note");
+  feature_[glyphAnnotation].rcsname =      makeStringC("glyph-annotation");
+  feature_[emphasizingMark].rcsname =      makeStringC("emphasizing-mark");
+  feature_[includedContainer].rcsname =    makeStringC("included-container");
+  feature_[actualCharacteristic].rcsname = makeStringC("actual-characteristic");
+  feature_[online].rcsname =               makeStringC("online");
+  feature_[fontInfo].rcsname =             makeStringC("font-info");
+  feature_[crossReference].rcsname =       makeStringC("cross-reference");
+
+  for (int i = 0; i < nFeatures; i++) 
+    feature_[i].supported = notSupported;
+  feature_[charset].supported = partiallySupported;
+  feature_[expression].supported = supported;
+  feature_[multiProcess].supported = supported;
+  feature_[query].supported = partiallySupported;
+  feature_[actualCharacteristic].supported = supported;
+  feature_[crossReference].supported = supported;
+  if (backendFeatures) 
+    for (const FOTBuilder::Feature *b = backendFeatures; b->name; b++) {
+      StringC name = makeStringC(b->name);
+      for (int i = 0; i < nFeatures; i++) 
+	if (name == feature_[i].rcsname) {
+	  feature_[i].supported = b->partial ? partiallySupported : supported;
+	  break;
+	}
+    }
+
+  feature_[noFeature].declared = 1;
+  for (int i = 1; i < nFeatures; i++) 
+    feature_[i].declared = 0;
+  if (!strictMode_) 
+    for (int i = 0; i < nFeatures; i++) 
+      if (feature_[i].supported != notSupported)
+	feature_[i].declared = 1;
+  if (!style()) {
+    feature_[query].declared = 1; 
+    feature_[expression].declared = 1;
+  }
+}
+
+bool Interpreter::requireFeature(const Interpreter::Feature &f,
+                                 const Location &loc)
+{
+   //FIXME: Hack to avoid warnings about features used in builtins.dsl
+   if (!feature_[f].declared 
+       && !Identifier::preferBuiltin_  
+       && (partIndex_ != unsigned(-1))) {
+     setNextLocation(loc);
+     message(InterpreterMessages::missingFeature,
+             StringMessageArg(feature_[f].rcsname));
+   }
+   return feature_[f].declared;
+}
+
+bool Interpreter::convertFeature(const StringC &name, Interpreter::Feature &f)
+{
+  for (int i = 1; i < nFeatures; i++) 
+    if (feature_[i].rcsname == name) {
+      f = Feature(i);
+      return 1;
+    }
+  return 0;
+}
+
+void Interpreter::explicitFeatures()
+{
+  if (!explicitFeatures_) {
+    explicitFeatures_ = 1;
+    for (int i = 1; i < nFeatures; i++) 
+      feature_[i].declared = 0;
+    if (!style()) {
+      feature_[query].declared = 1; 
+      feature_[expression].declared = 1;
+    }
+  }
+}
+
+void Interpreter::declareFeature(const StringC &name)
+{  
+  Feature feature;
+  if (!convertFeature(name, feature)) {
+    message(InterpreterMessages::unknownFeature,
+	     StringMessageArg(name));
+    return;
+  }
+  declareFeature(feature);
+}
+
+void Interpreter::declareFeature(const Feature &feature)
+{
+  Status &f = feature_[feature];
+  f.declared = 1;
+  if (f.supported == notSupported) 
+    message(InterpreterMessages::unsupportedFeature,
+	    StringMessageArg(f.rcsname));
+  else if (f.supported == partiallySupported) 
+    message(InterpreterMessages::partiallySupportedFeature,
+	    StringMessageArg(f.rcsname));
+  // Handle implied features
+  switch (feature) {
+  case query:
+    declareFeature(multiProcess);
+    break;
+  case tableAutoWidth:
+    declareFeature(table);
+    break;
+  case nestedColumnSet:
+    declareFeature(multiColumn);
+    break;
+  case multiColumn:
+    declareFeature(page);
+    break;
+  default:; // do nothing
+  }
+}
+
+
+bool Identifier::requireFeature(Interpreter &interp, const Location &loc, bool fo) const
+{
+  if ((fo ? flowObjPart_ : defPart_) == unsigned(-1))
+    return interp.requireFeature(Interpreter::Feature(feature_), loc);
+  else
+    return 1;
+}
+
+void Identifier::setFeature(int f)
+{
+  feature_ = f;
+}
+
+void Interpreter::installModules()
+{
+  module_[baseabs].rcsname = makeStringC("BASEABS"); 
+  module_[prlgabs0].rcsname = makeStringC("PRLGABS0"); 
+  module_[prlgabs1].rcsname = makeStringC("PRLGABS1"); 
+  module_[instabs].rcsname = makeStringC("INSTABS"); 
+  module_[basesds0].rcsname = makeStringC("BASESDS0"); 
+  module_[basesds1].rcsname = makeStringC("BASESDS1"); 
+  module_[instsds0].rcsname = makeStringC("INSTSDS0"); 
+  module_[subdcabs].rcsname = makeStringC("SUBDCABS"); 
+  module_[sdclabs].rcsname = makeStringC("SDCLABS"); 
+  module_[sdclsds].rcsname = makeStringC("SDCLSDS"); 
+  module_[prlgsds].rcsname = makeStringC("PRLGSDS"); 
+  module_[instsds1].rcsname = makeStringC("INSTSDS1"); 
+  module_[dtgabs].rcsname = makeStringC("DTGABS"); 
+  module_[rankabs].rcsname = makeStringC("RANKABS"); 
+  module_[srabs].rcsname = makeStringC("SRABS"); 
+  module_[srsds].rcsname = makeStringC("SRSDS"); 
+  module_[linkabs].rcsname = makeStringC("LINKABS"); 
+  module_[linksds].rcsname = makeStringC("LINKSDS"); 
+  module_[subdcsds].rcsname = makeStringC("SUBDCSDS"); 
+  module_[fpiabs].rcsname = makeStringC("FPIABS"); 
+
+  module_[baseabs].appname = makeStringC("base abstract"); 
+  module_[prlgabs0].appname = makeStringC("prolog abstract level 0"); 
+  module_[prlgabs1].appname = makeStringC("prolog abstract level 1"); 
+  module_[instabs].appname = makeStringC("instance abstract"); 
+  module_[basesds0].appname = makeStringC("base SGML document string level 0"); 
+  module_[basesds1].appname = makeStringC("base SGML document string level 1"); 
+  module_[instsds0].appname = makeStringC("instance SGML document string"); 
+  module_[subdcabs].appname = makeStringC("subdoc abstract"); 
+  module_[sdclabs].appname = makeStringC("SGML declaration abstract"); 
+  module_[sdclsds].appname = makeStringC("SGML declaration SGML document string"); 
+  module_[prlgsds].appname = makeStringC("prolog SGML document string"); 
+  module_[instsds1].appname = makeStringC("instance SGML document string level 1"); 
+  module_[dtgabs].appname = makeStringC("datatag abstract"); 
+  module_[rankabs].appname = makeStringC("rank abstract"); 
+  module_[srabs].appname = makeStringC("shortref abstract"); 
+  module_[srsds].appname = makeStringC("shortref SGML document string"); 
+  module_[linkabs].appname = makeStringC("link abstract"); 
+  module_[linksds].appname = makeStringC("link SGML document string"); 
+  module_[subdcsds].appname = makeStringC("subdoc SGML document string"); 
+  module_[fpiabs].appname = makeStringC("formal public identifier abstract"); 
+
+  for (int i = 0; i < nModules; i++) 
+    module_[i].supported = notSupported;
+  module_[baseabs].supported = supported; 
+  module_[prlgabs0].supported = supported; 
+  module_[instabs].supported = supported; 
+  module_[prlgabs1].supported = supported; 
+  module_[basesds0].supported = supported;
+  module_[instsds0].supported = supported;
+  module_[subdcabs].supported = supported;
+
+  for (int i = 0; i < nModules; i++) 
+    module_[i].declared = 0;
+  module_[baseabs].declared = 1;
+  module_[prlgabs0].declared = 1;
+  module_[instabs].declared = 1;
+  if (!style()) 
+    module_[prlgabs1].declared = 1; 
+  if (!strictMode()) {
+    module_[basesds0].declared = 1;
+    module_[instsds0].declared = 1;
+    module_[subdcabs].declared = 1;
+    module_[prlgabs1].declared = 1;
+  }
+}
+
+void Interpreter::explicitModules()
+{
+  if (!explicitModules_) {
+    explicitModules_ = 1;
+    for (int i = 0; i < nModules; i++)
+      module_[i].declared = 0;
+
+    module_[baseabs].declared = 1; 
+    module_[prlgabs0].declared = 1; 
+    module_[instabs].declared = 1; 
+    if (!style()) 
+      module_[prlgabs1].declared = 1; 
+  }
+}
+
+void Interpreter::addModule(const StringC &name)
+{
+  for (int i = 0; i < nModules; i++)
+    if (module_[i].rcsname == name) {
+      module_[i].declared = 1;
+      return;
+    }   
+  message(InterpreterMessages::unknownModule, StringMessageArg(name));
+}
+
+void Interpreter::checkGrovePlan()
+{
+  for (int i = 0; i < nModules; i++) 
+    if (module_[i].supported != notSupported) {
+      if (!module_[i].declared) 
+        message(InterpreterMessages::cantOmitModule, 
+                StringMessageArg(module_[i].appname));
+    }
+    else {
+      if (module_[i].declared) 
+        message(InterpreterMessages::cantAddModule, 
+                StringMessageArg(module_[i].appname));
+    }
+}
+
+TransformationMode *Interpreter::transformationMode()
+{
+  return &transformationMode_;
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -29,24 +29,55 @@ class Expression;
 class ProcessContext : public Collector::DynamicRoot {
 public:
   ProcessContext(Interpreter &, FOTBuilder &);
+  ~ProcessContext();
   FOTBuilder &currentFOTBuilder();
   StyleStack &currentStyleStack();
   void process(const NodePtr &);
-  void processNode(const NodePtr &, const ProcessingMode *, bool chunk = 1);
-  void processNodeSafe(const NodePtr &, const ProcessingMode *, bool chunk = 1);
-  void nextMatch(StyleObj *);
-  void processChildren(const ProcessingMode *);
-  void processChildrenTrim(const ProcessingMode *);
+  void processNode(const NodePtr &, const ProcessingMode *,
+		   const Location &, bool chunk = 1);
+  void processNodeSafe(const NodePtr &, const ProcessingMode *,
+		       const Location &, bool chunk = 1);
+  void nextMatch(StyleObj *, const Location &loc);
+  void processChildren(const ProcessingMode *, const Location &);
+  void processChildrenTrim(const ProcessingMode *, const Location &);
+  void characters(const Char *, size_t, const Location &);
+  void charactersFromNode(const NodePtr &, const Char *, size_t,
+			  const Location &);
   void trace(Collector &) const;
   void startFlowObj();
   void endFlowObj();
   // Uses of label: do this
   void startConnection(SymbolObj *, const Location &);
   void endConnection();
-  // happens only for objcet with a non-principal port
+
+  // Contains information about which flow object classes a port shall accept
+  // and can validate flow objects according to this information.
+  class Validator : public Resource {
+  public:
+    // If the flow object specified by the argument is valid in the current
+    // position in this stream, this function returns true and updates
+    // state information as if the flow object was added to the stream.
+    // If the FO isn't valid, this method reports it with a message.
+    // Default implementation returns true.
+    virtual bool isValid(const FlowObj &, ProcessContext &);
+    virtual bool charsValid(size_t, const Location &, ProcessContext &);
+  };
+
+  void validate(const FlowObj &);
+  void endValidate();
+  // happens only for object with a non-principal port
   void pushPorts(bool hasPrincipalPort,
-		 const Vector<SymbolObj *> &ports, const Vector<FOTBuilder *> &fotbs);
+		 const Vector<SymbolObj *> &ports,
+		 const Vector<FOTBuilder *> &fotbs,
+		 const Vector<Validator *> validators,
+		 Validator *principalPortValidator = 0);
   void popPorts();
+  void pushPrincipalPort(Validator *);
+  void popPrincipalPort();
+  // Used by SpS headers and footers.
+  void pushPseudoPort(FOTBuilder *principalPort,
+			 Validator *);
+  void popPseudoPort();
   // happens inside pushPorts() (if any)
   void startMapContent(ELObj *, const Location &);
   void endMapContent();
@@ -69,9 +100,12 @@ public:
   void clearPageType();
   void setPageType(unsigned);
   bool getPageType(unsigned &) const;
+  void startParagraph();
+  void endParagraph();
+  bool paragraphAncestor() const;
 
   VM &vm();
-private:
+ private:
   ProcessContext(const ProcessContext &); // undefined
   void operator=(const ProcessContext &); // undefined
   void badContentMap(bool &, const Location &);
@@ -80,8 +114,9 @@ private:
   struct Port {
     Port();
     FOTBuilder *fotb;
-    IQueue<SaveFOTBuilder> saveQueue;
+    IQueue<NodeSaveFOTBuilder> saveQueue;
     Vector<SymbolObj *> labels;
+    Ptr<Validator> validator;
     unsigned connected;
   };
   // A flow object with a port that can be connected to.
@@ -93,13 +128,14 @@ private:
     StyleStack styleStack;
     unsigned flowObjLevel;
     Vector<SymbolObj *> principalPortLabels;
+    Ptr<Validator> principalPortValidator;
   };
-  // An connection between a flow object and its flow parent
+  // A connection between a flow object and its flow parent
   // made with label:.
   struct Connection;
   friend struct Connection;
   struct Connection : public Link {
-    Connection(FOTBuilder *);
+    Connection(FOTBuilder *, const StyleStack & = StyleStack());
     Connection(const StyleStack &, Port *, unsigned connectableLevel);
     FOTBuilder *fotb;
     StyleStack styleStack;
@@ -131,13 +167,16 @@ private:
   IList<Connectable> connectableStack_;
   unsigned connectableStackLevel_;
   IList<Table> tableStack_;
-  NCVector<IQueue<SaveFOTBuilder> > principalPortSaveQueues_;
+  NCVector<IQueue<NodeSaveFOTBuilder> > principalPortSaveQueues_;
   VM vm_;
   ProcessingMode::Specificity matchSpecificity_;
   unsigned flowObjLevel_;
   bool havePageType_;
   unsigned pageType_;
+  unsigned paragraphLevel_;
   Vector<NodeStackEntry> nodeStack_;
+  Vector<unsigned> invalidLevels_;
+  Vector<Ptr<Validator> > validatorStack_;
   friend class CurrentNodeSetter;
   friend struct Table;
 };
@@ -192,6 +231,24 @@ inline
 bool ProcessContext::inTable() const
 {
   return !tableStack_.empty();
+}
+
+inline
+void ProcessContext::startParagraph()
+{
+  paragraphLevel_++;
+}
+
+inline
+void ProcessContext::endParagraph()
+{
+  paragraphLevel_--;
+}
+
+inline
+bool ProcessContext::paragraphAncestor() const
+{
+  return paragraphLevel_ > 0;
 }
 
 #ifdef DSSSL_NAMESPACE

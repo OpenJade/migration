@@ -10,6 +10,11 @@ An SGML System Conforming to
 International Standard ISO 8879 --<BR>
 Standard Generalized Markup Language
 </H4>
+<H4>
+An SGML Extended Facilities system conforming to
+Annex A of International Standard ISO/IEC 10744 --
+Hypermedia/Time-based Structuring Language
+</H4>
 <H2>
 SYNOPSIS
 </H2>
@@ -301,6 +306,7 @@ enable warnings:
 <DD>
 Warn about constructs that are not allowed by <A
 HREF="http://www.w3.org/TR/1998/REC-xml-19980210">XML</A>.
+The warnings can be enabled <A HREF="xmlwarn.htm">individually.</A>
 <DT>
 <SAMP>mixed</SAMP>
 <DD>
@@ -425,6 +431,12 @@ If neither <SAMP>-wvalid</SAMP> nor <SAMP>-wno-valid</SAMP> are
 specified,
 then the <SAMP>VALIDITY</SAMP> and <SAMP>IMPLYDEF</SAMP> specified
 in the SGML declaration will be used.
+<DT>
+<SAMP>no-afdr</SAMP>
+<DD>
+Do not give errors when AFDR meta-DTD notation features are used
+in the DTD. These errors are normally produced when parsing the DTD, 
+but suppressed when parsing meta-DTDs.
 </DL>
 </DL>
 <P>

@@ -405,6 +405,7 @@ private:
   void addCommonAttributes(Dtd &dtd);
   Boolean parseAfdrDecl();
   void setSdOverrides(Sd &sd);
+  StringC sysid_;
 };
 
 #ifdef SP_NAMESPACE

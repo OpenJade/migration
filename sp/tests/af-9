@@ -1,8 +1,8 @@
 #!/bin/sh
 # Architectural Form: test ArcNamrA:
 #    Deriving attribute values from content; data from element "v" goes
-#    attribute "n" of "verse"
-#    make onsgmls segfault; nsgmls.jc accepts this input:
+#    to attribute "n" of "verse", but also keep it as element content
+#    makes onsgmls segfault; nsgmls.jc accepts this input:
 #        ONSGMLS=nsgmls.jc OSGMLNORM=sgmlnorm.jc ./af-9
 # test onsgmls and osgmlnorm
 

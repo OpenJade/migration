@@ -709,10 +709,13 @@ public:
 class STYLE_API SaveFOTBuilder : public Link, public FOTBuilder {
 public:
   SaveFOTBuilder();
+  SaveFOTBuilder(const SaveFOTBuilder&);
   SaveFOTBuilder(const NodePtr &, const StringC &processingMode);
  ~SaveFOTBuilder();
+  SaveFOTBuilder& operator = ( const SaveFOTBuilder& );
+  void clear();
   SaveFOTBuilder *asSaveFOTBuilder();
-  void emit(FOTBuilder &);
+  void emit(FOTBuilder &) const;
   void characters(const Char *, size_t);
   void charactersFromNode(const NodePtr &, const Char *, size_t);
   void character(const CharacterNIC &);
@@ -950,237 +953,74 @@ public:
 
   struct Call {
     virtual ~Call();
-    virtual void emit(FOTBuilder &) = 0;
+    virtual Call* clone() const = 0;
+    virtual void emit(FOTBuilder &) const = 0;
     Call *next;
   };
 private:
-  SaveFOTBuilder(const SaveFOTBuilder &); // undefined
-  void operator=(const SaveFOTBuilder &); // undefined
   struct NoArgCall : Call {
+    virtual Call* clone() const { return new NoArgCall(*this); }
     typedef void (FOTBuilder::*FuncPtr)();
     NoArgCall(FuncPtr f) : func(f) { }
-    void emit(FOTBuilder &);
+    void emit(FOTBuilder &) const;
     FuncPtr func;
   };
-  struct LongArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(long);
-    LongArgCall(FuncPtr f, long n) : func(f), arg(n) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    long arg;
+  template <class Arg1> class OneArgCall : public Call {
+  public:
+    typedef void (FOTBuilder::*FuncPtr)(Arg1);
+    OneArgCall(FuncPtr f, Arg1 arg1) : func_(f), arg1_(arg1) {}
+    virtual Call* clone() const { return new OneArgCall(*this); }
+    virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
+  private:
+    FuncPtr func_;
+    Arg1 arg1_;
   };
-  struct ExtensionLongArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(long);
-    ExtensionLongArgCall(FuncPtr f, long n) : func(f), arg(n) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    long arg;
-  };
-  struct LengthSpecArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const LengthSpec &);
-    LengthSpecArgCall(FuncPtr f, const LengthSpec &ls) : func(f), arg(ls) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    LengthSpec arg;
-  };
-  struct OptLengthSpecArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const OptLengthSpec &);
-    OptLengthSpecArgCall(FuncPtr f, const OptLengthSpec &ols) : func(f), arg(ols) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    OptLengthSpec arg;
-  };
-  struct NodePtrArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const NodePtr &);
-    NodePtrArgCall(FuncPtr f, const NodePtr &nd) : func(f), arg(nd) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    NodePtr arg;
-  };
-  struct StringArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const StringC &);
-    StringArgCall(FuncPtr f, const StringC &s) : func(f), arg(s) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    StringC arg;
-  };
-  struct ExtensionStringArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const StringC &);
-    ExtensionStringArgCall(FuncPtr f, const StringC &s) : func(f), arg(s) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    StringC arg;
-  };
-   struct CharArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(Char);
-    CharArgCall(FuncPtr f, Char c) : func(f), arg(c) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    Char arg;
-  };
-  struct BoolArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(bool);
-    BoolArgCall(FuncPtr f, bool b) : func(f), arg(b) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    bool arg;
-  };
-  struct ExtensionBoolArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(bool);
-    ExtensionBoolArgCall(FuncPtr f, bool b) : func(f), arg(b) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    bool arg;
-  };
-  struct SymbolArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(Symbol);
-    SymbolArgCall(FuncPtr f, Symbol sym) : func(f), arg(sym) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    Symbol arg;
-  };
-  struct PublicIdArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(PublicId);
-    PublicIdArgCall(FuncPtr f, PublicId pubid) : func(f), arg(pubid) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    PublicId arg;
-  };
-  struct UnsignedArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(unsigned);
-    UnsignedArgCall(FuncPtr f, unsigned n) : func(f), arg(n) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    unsigned arg;
-  };
-  struct DeviceRGBColorArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const DeviceRGBColor &);
-    DeviceRGBColorArgCall(FuncPtr f, const DeviceRGBColor &color) : func(f), arg(color) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    DeviceRGBColor arg;
-  };
-  struct InlineSpaceArgCall : Call {
-    typedef void (FOTBuilder::*FuncPtr)(const InlineSpace &);
-    InlineSpaceArgCall(FuncPtr f, InlineSpace is) : func(f), arg(is) { }
-    void emit(FOTBuilder &);
-    FuncPtr func;
-    InlineSpace arg;
+  template <class Arg1> class OneRefArgCall : public Call {
+  public:
+    typedef void (FOTBuilder::*FuncPtr)(const Arg1&);
+    OneRefArgCall(FuncPtr f, const Arg1& arg1) : func_(f), arg1_(arg1) {}
+    virtual Call* clone() const { return new OneRefArgCall(*this); }
+    virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
+  private:
+    FuncPtr func_;
+    Arg1 arg1_;
   };
   struct CharactersFromNodeCall : Call {
     CharactersFromNodeCall(const NodePtr &, const Char *, size_t);
-    void emit(FOTBuilder &);
+    virtual Call* clone() const { return new CharactersFromNodeCall(*this); }
+    void emit(FOTBuilder &) const;
     const Char *data;
     size_t size;
     NodePtr node;
   };
   struct CharactersCall : Call {
     CharactersCall(const Char *, size_t);
-    void emit(FOTBuilder &);
+    virtual Call* clone() const { return new CharactersCall(*this); }
+    void emit(FOTBuilder &) const;
     StringC str;
-  };
-  struct CharacterCall : Call {
-    CharacterCall(const CharacterNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    CharacterNIC arg;
   };
   struct StartNodeCall : Call {
     StartNodeCall(const NodePtr &, const StringC &);
-    void emit(FOTBuilder &);
+    virtual Call* clone() const { return new StartNodeCall(*this); }
+    void emit(FOTBuilder &) const;
     NodePtr node;
     StringC mode;
-  };
-  struct StartParagraphCall : Call {
-    StartParagraphCall(const ParagraphNIC &nic);
-    void emit(FOTBuilder &);
-    ParagraphNIC arg;
-  };
-  struct ParagraphBreakCall : Call {
-    ParagraphBreakCall(const ParagraphNIC &nic);
-    void emit(FOTBuilder &);
-    ParagraphNIC arg;
-  };
-  struct StartDisplayGroupCall : Call {
-    StartDisplayGroupCall(const DisplayGroupNIC &nic);
-    void emit(FOTBuilder &);
-    DisplayGroupNIC arg;
-  };
-  struct StartBoxCall : Call {
-    StartBoxCall(const BoxNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    BoxNIC arg;
-  };
-  struct StartLineFieldCall : Call {
-    StartLineFieldCall(const LineFieldNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    LineFieldNIC arg;
-  };
-  struct ExternalGraphicCall : Call {
-    ExternalGraphicCall(const ExternalGraphicNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    ExternalGraphicNIC arg;
-  };
-  struct RuleCall : Call {
-    RuleCall(const RuleNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    RuleNIC arg;
-  };
-  struct StartLeaderCall : Call {
-    StartLeaderCall(const LeaderNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    LeaderNIC arg;
-  };
-  struct StartTableCall : Call {
-    StartTableCall(const TableNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    TableNIC arg;
-  };
-  struct TableColumnCall : Call {
-    TableColumnCall(const TableColumnNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    TableColumnNIC arg;
-  };
-  struct StartTableCellCall : Call {
-    StartTableCellCall(const TableCellNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    TableCellNIC arg;
-  };
-  struct StartLinkCall : Call {
-    StartLinkCall(const Address &addr) : arg(addr) { }
-    void emit(FOTBuilder &);
-    Address arg;
-  };
-  struct SetGlyphSubstTableCall : Call {
-    SetGlyphSubstTableCall(const Vector<ConstPtr<GlyphSubstTable> > &tables) : arg(tables) { }
-    void emit(FOTBuilder &);
-    Vector<ConstPtr<GlyphSubstTable> > arg;
-  };
-  struct StartGridCall : Call {
-    StartGridCall(const GridNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    GridNIC arg;
-  };
-  struct StartGridCellCall : Call {
-    StartGridCellCall(const GridCellNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    GridCellNIC arg;
-  };
-  struct RadicalRadicalCall : Call {
-    RadicalRadicalCall(const CharacterNIC &nic) : arg(nic) { }
-    void emit(FOTBuilder &);
-    CharacterNIC arg;
   };
   struct ExtensionCall : Call {
     ExtensionCall(const ExtensionFlowObj &fo, const NodePtr &nd)
       : arg(fo.copy()), node(nd) { }
-    void emit(FOTBuilder &);
+    ExtensionCall(const ExtensionCall& other);
+    virtual Call* clone() const { return new ExtensionCall(*this); }
+    void emit(FOTBuilder &) const;
     Owner<ExtensionFlowObj> arg;
     NodePtr node;
   };
   struct EndExtensionCall : Call {
     EndExtensionCall(const CompoundExtensionFlowObj &fo)
       : arg(fo.copy()->asCompoundExtensionFlowObj()) { }
-    void emit(FOTBuilder &);
+    EndExtensionCall(const EndExtensionCall& other);
+    virtual Call* clone() const { return new EndExtensionCall(*this); }
+    void emit(FOTBuilder &) const;
     Owner<CompoundExtensionFlowObj> arg;
   };
   Call *calls_;
@@ -1194,13 +1034,15 @@ private:
 
 struct StartSimplePageSequenceCall : SaveFOTBuilder::Call {
   StartSimplePageSequenceCall(FOTBuilder* headerFooter[FOTBuilder::nHF]);
-  void emit(FOTBuilder&);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartSimplePageSequenceCall(*this); }
+  void emit(FOTBuilder&) const;
   SaveFOTBuilder headerFooter[FOTBuilder::nHF];
 };
 
 struct StartFractionCall : SaveFOTBuilder::Call {
   StartFractionCall(FOTBuilder *&numerator, FOTBuilder *&denominator);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartFractionCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder numerator;
   SaveFOTBuilder denominator;
 };
@@ -1212,7 +1054,8 @@ struct StartScriptCall : SaveFOTBuilder::Call {
                   FOTBuilder *&postSub,
                   FOTBuilder *&midSup,
                   FOTBuilder *&midSub);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartScriptCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder preSup;
   SaveFOTBuilder preSub;
   SaveFOTBuilder postSup;
@@ -1223,21 +1066,24 @@ struct StartScriptCall : SaveFOTBuilder::Call {
 
 struct StartMarkCall : public SaveFOTBuilder::Call {
   StartMarkCall(FOTBuilder *&overMark, FOTBuilder *&underMark);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartMarkCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder overMark;
   SaveFOTBuilder underMark;
 };
 
 struct StartFenceCall : public SaveFOTBuilder::Call {
   StartFenceCall(FOTBuilder *&open, FOTBuilder *&close);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartFenceCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder open;
   SaveFOTBuilder close;
 };
 
 struct StartRadicalCall : public SaveFOTBuilder::Call {
   StartRadicalCall(FOTBuilder *&degree);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartRadicalCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder degree;
 };
 
@@ -1245,7 +1091,8 @@ struct StartMathOperatorCall : public SaveFOTBuilder::Call {
   StartMathOperatorCall(FOTBuilder *&oper,
                         FOTBuilder *&lowerLimit,
                         FOTBuilder *&upperLimit);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartMathOperatorCall(*this); }
+  void emit(FOTBuilder &) const;
   SaveFOTBuilder oper;
   SaveFOTBuilder lowerLimit;
   SaveFOTBuilder upperLimit;
@@ -1253,7 +1100,8 @@ struct StartMathOperatorCall : public SaveFOTBuilder::Call {
 
 struct StartTablePartCall : SaveFOTBuilder::Call {
   StartTablePartCall(const FOTBuilder::TablePartNIC &nic, FOTBuilder *&header, FOTBuilder *&footer);
-  void emit(FOTBuilder &);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartTablePartCall(*this); }
+  void emit(FOTBuilder &) const;
   FOTBuilder::TablePartNIC arg;
   SaveFOTBuilder header;
   SaveFOTBuilder footer;
@@ -1263,7 +1111,9 @@ struct StartMultiModeCall : SaveFOTBuilder::Call {
   StartMultiModeCall(const FOTBuilder::MultiMode *principalMode,
 	             const Vector<FOTBuilder::MultiMode> &namedModes,
 	             Vector<FOTBuilder *> &ports);
-  void emit(FOTBuilder &);
+  StartMultiModeCall(const StartMultiModeCall& other);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartMultiModeCall(*this); }
+  void emit(FOTBuilder &) const;
   FOTBuilder::MultiMode principalMode;
   bool hasPrincipalMode;
   Vector<FOTBuilder::MultiMode> namedModes;
@@ -1274,7 +1124,9 @@ struct StartExtensionCall : SaveFOTBuilder::Call {
   StartExtensionCall(const FOTBuilder::CompoundExtensionFlowObj &,
 		     const NodePtr &,
 		     Vector<FOTBuilder *> &);
-  void emit(FOTBuilder &);
+  StartExtensionCall(const StartExtensionCall& other);
+  virtual SaveFOTBuilder::Call* clone() const { return new StartExtensionCall(*this); }
+  void emit(FOTBuilder &) const;
   IList<SaveFOTBuilder> ports;
   NodePtr node;
   Owner<FOTBuilder::CompoundExtensionFlowObj> flowObj;

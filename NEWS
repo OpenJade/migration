@@ -1,3 +1,18 @@
+Changes in OpenSP 1.5.1
+
+* Enable run time selection of message format with SP_MESSAGE_FORMAT
+  environment variable. Value is one of XML, NONE, TRADITIONAL (Nick Kew)
+
+* Add support for restricted files option to generic API (Nick Kew)
+
+* Add support for http redirection (Nick Kew)
+
+* Add support for specifying the user agent at run time with the 
+  SP_HTTP_USER_AGENT environment variable (Nick Kew)
+
+* Add support for specifying Accept: headers with the
+  SP_HTTP_ACCEPT environent variable (Nick Kew)
+
 Changes in OpenSP 1.5
 
 * Fix crash when "-m" option specified.

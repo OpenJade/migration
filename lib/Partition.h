@@ -23,7 +23,7 @@ public:
   Partition(const ISet<Char> &chars,
 	    const ISet<Char> **sets,
 	    int nSets,
-	    const SubstTable<Char> &subst);
+	    const SubstTable &subst);
   EquivCode maxCode() const;
   EquivCode charCode(Char c) const;
   EquivCode eECode() const;

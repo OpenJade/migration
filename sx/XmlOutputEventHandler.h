@@ -84,7 +84,7 @@ private:
   int nCdataEndMatched_;
   Options options_;
   Boolean namecaseGeneral_;
-  SubstTable<Char> lowerSubst_;
+  SubstTable lowerSubst_;
   StringC nameBuf_;
 };
 

@@ -21,7 +21,7 @@ class SP_API ArcDirector {
 public:
   virtual EventHandler *arcEventHandler(const Notation *,
 					const Vector<StringC> &,
-					const SubstTable<Char> *) = 0;
+					const SubstTable *) = 0;
 };
 
 class SP_API SelectOneArcDirector : public ArcDirector, public Messenger {
@@ -30,7 +30,7 @@ public:
     : select_(select), eh_(&eh) { }
   EventHandler *arcEventHandler(const Notation *,
 				const Vector<StringC> &,
-				const SubstTable<Char> *);
+				const SubstTable *);
   void dispatchMessage(const Message &);
   void dispatchMessage(Message &);
 private:

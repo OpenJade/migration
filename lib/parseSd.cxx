@@ -1976,7 +1976,7 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
     if (parm.paramLiteralText.size() == 0)
 	message(ParserMessages::sdEmptyDelimiter);
     else if (translateSyntax(sdBuilder, parm.paramLiteralText, str)) {
-      const SubstTable<Char> *table = sdBuilder.syntax->generalSubstTable();
+      const SubstTable *table = sdBuilder.syntax->generalSubstTable();
       for (size_t i = 0; i < str.size(); i++)
 	table->subst(str[i]);
       if (checkGeneralDelim(*sdBuilder.syntax, str)
@@ -2062,7 +2062,7 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
       if (lastLiteral.size() == 0)
 	message(ParserMessages::sdEmptyDelimiter);
       else if (translateSyntax(sdBuilder, lastLiteral, str)) {
-	const SubstTable<Char> *table = sdBuilder.syntax->generalSubstTable();
+	const SubstTable *table = sdBuilder.syntax->generalSubstTable();
 	for (size_t i = 0; i < str.size(); i++)
 	  table->subst(str[i]);
 	if (str.size() == 1

@@ -157,7 +157,7 @@ void Text::ignoreLastChar()
 
 // All characters other than spaces are substed.
 
-void Text::subst(const SubstTable<Char> &table, Char space)
+void Text::subst(const SubstTable &table, Char space)
 {
   for (size_t i = 0; i < items_.size(); i++)
     if (items_[i].type == TextItem::data) {

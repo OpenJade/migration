@@ -130,7 +130,7 @@ public:
   Token getToken(Mode mode);
   StringC currentToken() const;
   void getCurrentToken(StringC &) const;
-  void getCurrentToken(const SubstTable<Char> *, StringC &) const;
+  void getCurrentToken(const SubstTable *, StringC &) const;
   unsigned inputLevel() const;
   unsigned specialParseInputLevel() const;
   unsigned markedSectionLevel() const;

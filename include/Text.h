@@ -67,7 +67,7 @@ public:
   void addSdata(const StringC &, const ConstPtr<Origin> &);
   void addStartDelim(const Location &loc);
   void addEndDelim(const Location &loc, Boolean lita);
-  void subst(const SubstTable<Char> &, Char space);
+  void subst(const SubstTable &, Char space);
   void addCharsTokenize(const Char *, size_t, const Location &loc, Char space);
   void addCharsTokenize(const StringC &, const Location &loc, Char space);
   void tokenize(Char space, Text &text) const;

@@ -16,7 +16,6 @@
 #include "ISet.h"
 #include "ISetIter.h"
 #include "XcharMap.h"
-#include "SubstTable.h"
 #include "StringResource.h"
 #include "CharMap.h"
 #undef SP_DEFINE_TEMPLATES
@@ -68,7 +67,6 @@ __instantiate(ISet<WideChar>)
 __instantiate(ISetIter<Char>)
 __instantiate(ISetIter<WideChar>)
 __instantiate(Vector<ISetRange<WideChar> >)
-__instantiate(SubstTable<Char>)
 __instantiate(SharedXcharMap<PackedBoolean>)
 __instantiate(SharedXcharMap<EquivCode>)
 __instantiate(String<SyntaxChar>)

@@ -1,32 +1,27 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
-
-#ifndef SubstTable_DEF_INCLUDED
-#define SubstTable_DEF_INCLUDED 1
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
-template<class T>
-SubstTable<T>::SubstTable()
+SubstTable::SubstTable()
 : pairsValid_(1)
 {
 }
 
-template<class T>
-void SubstTable<T>::addSubst(T from, T to)
+void SubstTable::addSubst(Char from, Char to)
 {
   if (table_.size() == 0) {
-    table_.resize(T(-1) + 1);
+    table_.resize(Char(-1) + 1);
 #if _MSC_VER == 1100
     // Workaround for Visual C++ 5.0 bug.
-    T n = 0;
+    Char n = 0;
     int i = 0;
-    while (i < T(-1) + 1)
+    while (i < Char(-1) + 1)
       table_[i++] = n++;
 #else
-    for (int i = 0; i < T(-1) + 1; i++)
+    for (int i = 0; i < Char(-1) + 1; i++)
       table_[i] = i;
 #endif
   }
@@ -35,30 +30,32 @@ void SubstTable<T>::addSubst(T from, T to)
   table_[from] = to;
 }
 
-template<class T>
-String<T> SubstTable<T>::inverse(T ch) const
+StringC SubstTable::inverse(Char ch) const
 {
   if (!pairsValid_) {
-    const T *p = table_.data();
+    const Char *p = table_.data();
     size_t length = table_.size();
     for (size_t i = 0; i < length; i++)
       if (p[i] != i) {
 	// FIXME use mutable if available
 #ifndef HAVE_MUTABLE
-	((SubstTable<T> *)this)->
+	((SubstTable *)this)->
 #endif
-	  pairs_ += T(i);
+	  pairs_ += Char(i);
 #ifndef HAVE_MUTABLE
-	((SubstTable<T> *)this)->
+	((SubstTable *)this)->
 #endif
 	  pairs_ += p[i];
       }
-    ((SubstTable<T> *)this)->pairsValid_ = 1;
+#ifndef HAVE_MUTABLE
+    ((SubstTable *)this)->
+#endif
+      pairsValid_ = 1;
   }
-  const T *p = pairs_.data();
+  const Char *p = pairs_.data();
   if (!p)
-    return String<T>(&ch, 1);
-  String<T> result;
+    return StringC(&ch, 1);
+  StringC result;
   if (table_[ch] == ch)
     result += ch;
   for (size_t n = pairs_.size(); n > 0; n -= 2, p += 2)
@@ -67,8 +64,7 @@ String<T> SubstTable<T>::inverse(T ch) const
   return result;
 }
 
-template<class T>
-void SubstTable<T>::inverseTable(SubstTable<T> &inv) const
+void SubstTable::inverseTable(SubstTable &inv) const
 {
   if (table_.size() == 0) {
     inv.table_.resize(0);
@@ -77,20 +73,19 @@ void SubstTable<T>::inverseTable(SubstTable<T> &inv) const
   }
   else {
     if (inv.table_.size() == 0)
-      inv.table_.resize(T(-1) + 1);
+      inv.table_.resize(Char(-1) + 1);
     int i;
-    for (i = 0; i < T(-1) + 1; i++)
+    for (i = 0; i < Char(-1) + 1; i++)
       inv.table_[i] = i;
     inv.pairs_.resize(0);
     inv.pairsValid_ = 0;
-    for (i = 0; i < T(-1) + 1; i++)
+    for (i = 0; i < Char(-1) + 1; i++)
       if (table_[i] != i)
 	inv.table_[table_[i]] = i;
   }
 }
 
-template<class T>
-void SubstTable<T>::subst(String<T> &str) const
+void SubstTable::subst(StringC &str) const
 {
   for (size_t i = 0; i < str.size(); i++)
     subst(str[i]);
@@ -100,4 +95,3 @@ void SubstTable<T>::subst(String<T> &str) const
 }
 #endif
 
-#endif /* not SubstTable_DEF_INCLUDED */

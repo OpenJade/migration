@@ -1915,7 +1915,7 @@ Boolean Parser::parseShortrefDecl()
   Vector<StringC> vec;
   do {
     StringC delim(parm.literalText.string());
-    const SubstTable<Char> *table = instanceSyntax().generalSubstTable();
+    const SubstTable *table = instanceSyntax().generalSubstTable();
     for (size_t i = 0; i < delim.size(); i++)
       table->subst(delim[i]);
     size_t srIndex;

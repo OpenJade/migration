@@ -9,7 +9,8 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	MifFOTBuilder.h TextFOTBuilder.h TextFOTBuilder.cxx \
 	JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
 	HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx TeXFOTBuilder_inst.cxx \
-	TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx
+	TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx \
+	TmpOutputByteStream.h
 
 openjade_LDADD = $(top_builddir)/style/libostyle.la \
 	$(top_builddir)/spgrove/libospgrove.la \
@@ -50,3 +51,5 @@ SUFFIXES = .msg .m4
 
 %.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
+
+

@@ -87,12 +87,15 @@ private:
   void inputClosed(InputSource *in);
   const StringC &generalName(const StringC &name, StringC &buf);
   char *convertSuffix(char *name);
+  int maybeCreateDirectories(char *path);
   Boolean checkFirstSeen(const StringC &name);
 
   CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;
   IList<OutputCharStream> outputStack_;
   IList<OutputByteStream> outputFileStack_;
+  Vector<StringC> filesCreated_;
+  Vector<StringC> originalFilePaths_;
   const CharsetInfo *systemCharset_;
   OutputCharStream *os_;
   OutputCharStream *extEnts_;

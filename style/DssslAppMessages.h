@@ -1,4 +1,4 @@
-// This file was automatically generated from .\DssslAppMessages.msg by ..\msggen.pl.
+// This file was automatically generated from DssslAppMessages.msg by msggen.pl.
 #include "Message.h"
 
 #ifdef SP_NAMESPACE
@@ -20,7 +20,7 @@ MessageFragment::appModule,
 #endif
 2000
 #ifndef SP_NO_MESSAGE_TEXT
-,"Jade version %1"
+,"OpenJade version %1"
 #endif
 );
 const MessageType0 DssslAppMessages::noSpec(

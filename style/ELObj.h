@@ -431,6 +431,7 @@ public:
   virtual long nodeListLength(EvalContext &, Interpreter &);
   virtual bool suppressError();
   virtual bool contains(EvalContext &, Interpreter &, const NodePtr &);
+  void print(Interpreter &, OutputCharStream &);
 };
 
 class NamedNodeListObj : public NodeListObj {

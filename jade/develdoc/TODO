@@ -70,3 +70,10 @@ Reorganization
 
 * change all includes of OpenSP headers to read
   #include <OpenSP/...> (or should that be "OpenSP/..." ?)
+
+* clean up the mess of SP_ defines:
+ 
+  replace many SP_ defines by their more `standard' automake
+  names (see the bottom of acconfig.h)
+
+  replace SP_ANSI_LIB by HAVE_NEW / HAVE_CASSERT

@@ -25,3 +25,5 @@ psgml-dsssl.el - creates a skeleton DSSSL style sheet for an SGML document.
 customize.dtd - a dtd derived from the DSSSL architecture which includes
     information about user-settable variables and characteristics. This
     allows menu-driven customization.
+
+jadetex - the jadetex macros needed to process the output of the TeX backend.

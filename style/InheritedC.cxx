@@ -643,6 +643,10 @@ void GenericPageModelInheritedC::set(VM &, const VarStyleObj *,
                                   ELObj *&,
                                   Vector<size_t> &) const
 {
+   //si no esta repetido envia el define-page-model al FOTBuilder y lo mete en
+   //el array , sino no lo introduce y no lo envia
+   if (!fotb.t_ids.insertTID(value_.id_)) fotb.pageModelObj(value_);
+
   (fotb.*setter_)(value_);
 }
 
@@ -654,9 +658,9 @@ GenericPageModelInheritedC::make(ELObj *obj, const Location &loc,
 {
 //da igual el valor stpm,cogera el que tenga obj (ELObj)
 //estructura para crear el nuevo GenericPageModel, aqui se guardaran los valores de la hoja de estilo
-  FOTBuilder::StModel stpm(0,0);
+  FOTBuilder::StModel stpm;
   //guardas los valores en stpm
-  if (interp.convertPageModelC(obj, identifier(), loc, stpm)){
+  if (interp.convertPageModelC(obj, identifier(), loc, stpm,0)){
     //creas el nuevo GenericPageModel con la stpm obtenida, que es la que se pedira para FOTBuilder
     return new GenericPageModelInheritedC(identifier(), index(), setter_, stpm);
   }
@@ -667,15 +671,18 @@ GenericPageModelInheritedC::make(ELObj *obj, const Location &loc,
 class ExtensionPageModelInheritedC : public InheritedC{
 public:
   typedef void (FOTBuilder::*Setter)(const FOTBuilder::StModel &);
-//  ExtensionPageModelInheritedC(const Identifier *, unsigned index, Setter);
-  ExtensionPageModelInheritedC(const Identifier *, unsigned index, Setter, const FOTBuilder::StModel &);
+//ExtensionPageModelInheritedC(const Identifier *, unsigned index, Setter);
+  ExtensionPageModelInheritedC(const Identifier *, unsigned index, /*Setter,*/ const FOTBuilder::StModel[20], int);
   void set(VM &, const VarStyleObj *, FOTBuilder &,
            ELObj *&value, Vector<size_t> &dependencies) const;
   ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  Setter setter_;
-  FOTBuilder::StModel lista_;
+  //Setter setter_;
+  //FALTA, limitado a 20 estructuras por caracteristica
+  FOTBuilder::StModel lista_[20];
+  //numero de estructuras && tipo initial o repeat
+  int numero, init_rep;
 };
 
 /*ExtensionPageModelInheritedC
@@ -688,18 +695,34 @@ protected:
 
 ExtensionPageModelInheritedC
 ::ExtensionPageModelInheritedC(const Identifier *ident, unsigned index,
-                          Setter setter, const FOTBuilder::StModel& vstpm)
-: InheritedC(ident, index), setter_(setter), lista_(vstpm) 
+                          /*Setter setter,*/ const FOTBuilder::StModel vstpm[20], int n)
+: InheritedC(ident, index), /*setter_(setter),*/ init_rep(n) 
 {
+ //numero de StModel, al menos habra uno! FALTA
+ int i = 0;
+ while (vstpm[i].id_[0] != '\0'){
+  lista_[i] = vstpm[i];
+  i++;
+ }
+ numero = i;
 }
 
 //envia el valor de StModel al FOTBuilder
 void ExtensionPageModelInheritedC::set(VM &, const VarStyleObj *,
                                   FOTBuilder &fotb,
                                   ELObj *&,
-                                  Vector<size_t> &) const
+                                  Vector<size_t> &) const 
 {
-   (fotb.*setter_)(lista_);
+  //FALTA si repetida (global), envia define, con mem dinamica
+  for (int i = 0; i < numero; i++){  
+    //si no esta repetido envia el define-page-model al FOTBuilder y lo mete en
+    //el array , sino no lo introduce y no lo envia
+    if (!fotb.t_ids.insertTID(lista_[i].id_)) fotb.pageModelObj(lista_[i]);
+  }
+
+  if (init_rep == 0) fotb.setInitialPageModel(lista_);
+   else fotb.setRepeatPageModels(lista_);
+//  (fotb.*setter_)(lista_);
 }
 
 //recoge la informacion de la hoja de estilo y lo va añadiendo a la lista
@@ -708,15 +731,20 @@ ConstPtr<InheritedC>
 ExtensionPageModelInheritedC::make(ELObj *obj, const Location &loc,
                               Interpreter &interp) const
 {
-  FOTBuilder::StModel stpm(0,0);
+  FOTBuilder::StModel stpm;
   bool invalid = false;
   ConstPtr<InheritedC> tem;
-  FOTBuilder::StModel *tmpvector;
-  
+  FOTBuilder::StModel tmpvector[20];
+
   //crea el ExtensionPageModel encargado de pasar la info al FOTBuilder!
+  //da tantas vueltas como el numero de elementos de la lista del .dsl
+  int i = 0;
   for (;;) {
       if (obj->isNil()){
-        return  new ExtensionPageModelInheritedC(identifier(), index(), setter_, *tmpvector);
+	FOTBuilder::StModel tmpstpm;
+	tmpstpm.id_[0] = '\0'; //fin
+	tmpvector[i] = tmpstpm; //fin
+        return  new ExtensionPageModelInheritedC(identifier(), index(), /*setter_,*/ tmpvector, init_rep);
       }
       PairObj *pair = obj->asPair();
       if (!pair)
@@ -726,12 +754,26 @@ ExtensionPageModelInheritedC::make(ELObj *obj, const Location &loc,
       //(actual) obtienes un ELObj de tipo PageModelObj
       ELObj *pmobj = pair->car();
       //obtienes la structura StModel del PageModelObj que guarda la info
-      if (!interp.convertPageModelC(pmobj, identifier(), loc, stpm)){
-        invalid = "true";
+      //mydefine te da este objeto page model
+      if (!interp.convertPageModelC(pmobj, identifier(), loc, stpm,init_rep)){
+	invalid = "true";
 	break;
       }
       //va añadiendo las estructuras a la lista FALTA!
-      tmpvector = &stpm;
+      tmpvector[i] = stpm;
+      i++;
+	switch(init_rep){
+	  case 0:
+                  //FALTA comprobar si actual <= a quant
+		  interp.contID.RaizID[interp.contID.actualRaizID].init_rep[0].actual++;
+		  break;
+	  case 1:
+		  interp.contID.RaizID[interp.contID.actualRaizID].init_rep[1].actual++;
+		  break;
+	  default:
+		  //FALTA
+		  break;
+	}
   }
   if (!invalid) invalidValue(loc, interp);
   return ConstPtr<InheritedC>();
@@ -740,7 +782,7 @@ ExtensionPageModelInheritedC::make(ELObj *obj, const Location &loc,
 //prepara la lista de nodos de StModels y se lo pasa al FOTBuilder???
 ELObj *ExtensionPageModelInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) const
 {
-  return vm.interp->makePageModel(lista_);
+  return vm.interp->makePageModel(lista_[0]);
 }
 
 
@@ -1392,6 +1434,9 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
 //init2 es puntero a la instancia PageModelObj
 #define INHERITED_CPM2(name, C, init1, init2) \
     installInheritedC(name, new C(0, nInheritedC_++, init1, init2))
+#define INHERITED_CPML(name, C, init1, init2, tipo) \
+    installInheritedC(name, new C(0, nInheritedC_++, init2, tipo))
+
 #define INHERITED_CPM3(name, C, init1, init2) \
     installInheritedC(name, new C(0, nInheritedC_++, init2))
 
@@ -1653,10 +1698,11 @@ void Interpreter::installInheritedCs()
   INHERITED_C2("justify-spread?", GenericBoolInheritedC, &FOTBuilder::setJustifySpread, 0);
   INHERITED_C("binding-edge", GenericSymbolInheritedC, &FOTBuilder::setBindingEdge);
   //estructura por defecto para GenericPageModelInhertiedC
-//  Vector<ConstPtr<FOTBuilder::StModel> > vstmodel_(0);
-  FOTBuilder::StModel stmodel_(0,0);  
-  INHERITED_CPM2("initial-page-model", ExtensionPageModelInheritedC, &FOTBuilder::setInitialPageModel, stmodel_);
-  INHERITED_CPM2("repeat-page-models", ExtensionPageModelInheritedC, &FOTBuilder::setRepeatPageModels, stmodel_);
+  //Vector<ConstPtr<FOTBuilder::StModel> > vstmodel_(0);
+  FOTBuilder::StModel stmodel_;  
+  FOTBuilder::StModel vstmodel_[20];
+  INHERITED_CPML("initial-page-model", ExtensionPageModelInheritedC, &FOTBuilder::setInitialPageModel, vstmodel_, 0);
+  INHERITED_CPML("repeat-page-models", ExtensionPageModelInheritedC, &FOTBuilder::setRepeatPageModels, vstmodel_, 1);
   INHERITED_CPM2("blank-back-page-model", GenericPageModelInheritedC, &FOTBuilder::setBlankBackPageModel, stmodel_);
   INHERITED_CPM2("blank-front-page-model", GenericPageModelInheritedC, &FOTBuilder::setBlankFrontPageModel, stmodel_);
 

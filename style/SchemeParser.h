@@ -24,7 +24,12 @@ public:
   void parseNameChars();
   void parseSeparatorChars();
   bool parseExpression(Owner<Expression> &);
+  
 private:
+  void tratarSymbolID(StringC &, bool);
+  void CharactPM(char *);
+  bool iguales(char *, char *);
+  void sendID(char *);
   SchemeParser(const SchemeParser &); // undefined
   void operator=(const SchemeParser &); // undefined
 
@@ -87,6 +92,23 @@ private:
   bool doDefinePageModel();
   bool doWidth();
   bool doHeight();
+  bool doFillingDirection();
+  bool doRegion();
+  bool doHeader();
+  bool doFooter();
+  bool doRegionXOrigin();
+  bool doRegionYOrigin();
+  bool doRegionWidth();
+  bool doRegionHeight();
+  bool doRegionHeaderHeight();
+  bool doRegionHeaderWidth();
+  bool doRegionHeaderFillingdirection();
+  bool doRegionHeaderContentsalignment();
+  bool doRegionFooterHeight();
+  bool doRegionFooterWidth();
+  bool doRegionFooterFillingdirection();
+  bool doRegionFooterContentsalignment();
+  bool doRegionFillingdirection();
 
   bool doElement();
   bool doOrElement();

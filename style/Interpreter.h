@@ -190,7 +190,14 @@ public:
     keyOpen,
     keyClose,
     keyMark,
-    keyDirection
+    keyDirection,
+    keyFillingDirection,
+    keyRegion,
+    keyXOrigin,
+    keyYOrigin,
+    keyHeader,
+    keyContentsalignment,
+    keyFooter
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
@@ -352,7 +359,36 @@ public:
   //para PageModel
   PageModelObj *makePageModelNone();
   void sendPageModel(PageModelObj *);
-  PageModelObj* getSendPageModel();
+  PageModelObj* getSendPageModel(int);
+
+  //utiliza el SchemeParser vs InheritedC
+  //FALTA, de momento solo puede tener cada caract PM una lista de 20
+  struct st_listIDs{
+   st_listIDs() : quant(0), actual(0) { }
+   void insertarStr(char *);
+   char* getActual();
+   int quant, actual;
+   char id[20][30];
+  };
+
+  struct st_raizID{
+    void insert_charact(int);
+    void insert_ID(char *);
+    //si es initial o si es repeat, initial-page-model sera el 0
+    st_listIDs init_rep[2];
+    //quant: cuantos bloques hay, actual: por que bloque va, 
+    //ultim: es initial o repeat la ultima caract introd. 0 -> initial
+    int ultim;
+  }; 
+  
+  //FALTA maximo 50 initial o repeat diferentes en la hoja de estilo
+  struct st_contID{
+     st_contID() : nRaizID(0), actualRaizID(0) { }
+     int nRaizID, actualRaizID;
+     st_raizID RaizID[50];
+  }contID;
+  bool sonIguales(char *, char *); 
+
   
   NodeListObj *makeEmptyNodeList();
   void dispatchMessage(Message &);
@@ -397,7 +433,7 @@ public:
   bool convertEnumC(ELObj *, const Identifier *, const Location &, FOTBuilder::Symbol &);
 
   //para PageModel -> Generic IC
-  bool convertPageModelC(ELObj *, const Identifier *, const Location &, FOTBuilder::StModel &);
+  bool convertPageModelC(ELObj *, const Identifier *, const Location &, FOTBuilder::StModel &, int);
 
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
@@ -538,6 +574,7 @@ private:
   //Para PageModel
   PageModelObj *pageModelNoneObj_;
   PairObj *pageModelsSends_; 
+  PairObj *actualpair_; 
 
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;

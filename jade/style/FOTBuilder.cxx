@@ -123,6 +123,9 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "explicit",
     "row-major",
     "column-major",
+    "uppercase",
+    "lowercase",
+    "capitalize",
   };
   ASSERT(SIZEOF(names) == nSymbols - 2);
   return names[sym - 2];
@@ -159,8 +162,12 @@ void FOTBuilder::characters(const Vector<CharacterNIC> &v)
 {
   // This is really slow. A FOTBuilder should either override this or
   // set Description::wantCharPropertyNICs=false.
+  Char s[v.size()];
+  size_t j(0);
   for (size_t i = 0; i< v.size(); ++i)
-    character(v[i]);
+    if (v[i].specifiedC & (1 << CharacterNIC::cChar))
+      s[j++] = v[i].ch;
+  characters(s, j);
 }
 
 void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
@@ -1145,6 +1152,10 @@ void FOTBuilder::setInlineSpaceSpace(const OptInlineSpace &)
 {
 }
 
+void FOTBuilder::setCharMap(Symbol)
+{
+}
+
 void FOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
 }
@@ -1576,6 +1587,8 @@ STRING_ARG_CALL(formattingInstruction)
 
 INLINE_SPACE_ARG_CALL(setEscapementSpaceBefore)
 INLINE_SPACE_ARG_CALL(setEscapementSpaceAfter)
+ONEREFARG_CALL(setInlineSpaceSpace, OptInlineSpace);
+SYMBOL_ARG_CALL(setCharMap);
 
 SaveFOTBuilder::Call::~Call()
 {

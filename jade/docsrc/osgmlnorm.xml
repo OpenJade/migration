@@ -65,9 +65,9 @@
    with system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg>.</para>
    
    <para>When the normalized instance is prefixed with the original SGML
-   declaration and prolog, it will have the same ESIS as the original
+   declaration and prologue, it will have the same ESIS as the original
    SGML document, with the following exceptions:</para>
-<para>* The output of sgmlnorm does not protect against the recognition of
+<para>* The output of osgmlnorm does not protect against the recognition of
        short reference delimiters, so any USEMAP declarations must be
        removed from the DTD.</para>
      <para>* The normalized instance will use the reference delimiters, even if
@@ -86,7 +86,7 @@
      <para>* If the declared value of an attribute was a name token group, and
        a value was specified that was the same as the name of the
        attribute, then the attribute name and value indicator will be
-       omitted. For example, with HTML sgmlnorm would output &lt;DL COMPACT&gt;
+       omitted. For example, with HTML osgmlnorm would output &lt;DL COMPACT&gt;
        rather than &lt;DL COMPACT="COMPACT"&gt;</para>
        
    <para>The following options are available:</para>
@@ -184,6 +184,11 @@
        </listitem>
      </varlistentry>
      </variablelist>
+   </refsect1>
+
+   <refsect1>
+     <title>See Also</title>
+     <para><command>onsgmls(1)</command></para>
    </refsect1>
  </refentry>
 </section>

@@ -62,12 +62,12 @@
       <refsect1>
         <title>Description</title>
 
-   <para><command>ospam</command> (Openjade SP Add Markup) is an SGML markup stream editor implemented using
+   <para><command>ospam</command> (OpenJade SP Add Markup) is an SGML markup stream editor implemented using
    the OpenSP parser. <command>ospam</command> parses the SGML document contained in <replaceable>sysid</replaceable> and
    copies to the standard output the portion of the document entity
    containing the document instance, adding or changing markup as
    specified by the <option>-m</option> options. The <option>-p</option> option can be used to include the
-   SGML declaration and prolog in the output. The <option>-o</option> option can be used
+   SGML declaration and prologue in the output. The <option>-o</option> option can be used
    to output other entities. The <option>-x</option> option can be used to expand entity
    references.</para>
    
@@ -210,9 +210,9 @@
        <listitem>
           <para>Output the part of the document entity containing the SGML
           declaration (if it was explicitly present in the document
-          entity) and the prolog before anything else. If this option is
+          entity) and the prologue before anything else. If this option is
           specified two or more times, then all entity references
-          occurring between declarations in the prolog will be expanded;
+          occurring between declarations in the prologue will be expanded;
           this includes the implicit reference to the entity containing
           the external subset of the DTD, if there is one. Note that the
           SGML declaration will not be included if it was specified by an
@@ -274,6 +274,10 @@
    may not be equivalent to the original document. <command>ospam</command> will give a
    warning when the first two conditions are met.</para>
 
+   </refsect1>
+   <refsect1>
+     <title>See Also</title>
+     <para><command>onsgmls(1)</command></para>
    </refsect1>
  </refentry>
  </section>

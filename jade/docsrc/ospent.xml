@@ -1,48 +1,122 @@
+<?xml version='1.0'?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+<article>
+  <articleinfo>
+    <title>ospent</title>
+    <author>
+      <firstname>James</firstname>
+      <surname>Clark</surname>
+    </author>
+    <author>
+      <firstname>Ian</firstname>
+      <surname>Castle</surname>
+      <affiliation><email>ian.castle@looksystems.co.uk</email></affiliation>
+    </author>
+  
+    <copyright>
+      <year>2002</year>
+      <holder>OpenJade Project</holder>
+    </copyright>
+  </articleinfo>
 
-                                     SPENT
                                        
-SYNOPSIS
+  <section>
+    <title>Reference</title>
 
+    <refentry>
+      <refentryinfo>
+        <title>ospent</title>
+        <date>January 2002</date>
+        <productname>OpenJade</productname>
+      </refentryinfo>
+
+      <refmeta>
+        <refentrytitle>ospent</refentrytitle>
+        <manvolnum>1</manvolnum>
+      </refmeta>
+
+      <refnamediv>
+        <refname>ospent</refname>
+        <refpurpose>Concatenate entities</refpurpose>
+      </refnamediv>
+    
+      <refsynopsisdiv>
+        <cmdsynopsis>
+          <command>ospent</command>
+          <arg choice="opt"><option>-Cnrv</option></arg>
+          <arg choice="opt"><option>-b<replaceable>bctf</replaceable></option></arg>
+          <arg choice="opt"><option>-D<replaceable>directory</replaceable></option></arg>
+          <arg rep="repeat"><replaceable>sysid</replaceable></arg>
+        </cmdsynopsis>
+      </refsynopsisdiv>
+<!--
    spent [ -Cnrv ] [ -bbctf ] [ -Ddirectory ] sysid...
+-->
    
-DESCRIPTION
+      <refsect1>
+        <title>Description</title>
 
-   Spent (SGML print entity) prints the concatenation of the entities
-   with [1]system identifiers sysid... on the standard output.
+   <para><command>ospent</command> (OpenJade SGML print entity) prints the concatenation of the entities
+   with system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg> on the standard output.</para>
    
-   The following options are available:
-   
-   -bbctf
-          Use the [2]BCTF with name bctf for output.
-          
-   -C
-          This has the same effect as in [3]nsgmls.
-          
-   -Ddirectory
-          Search directory for files specified in system identifiers.
-          This has the same effect as in [4]nsgmls.
-          
-   -n
-          The entity is a non-SGML data entity. This option forces the
+   <para>The following options are available:</para>
+
+   <variablelist>
+     <varlistentry>
+     <term><option>-b<replaceable>bctf</replaceable></option></term>
+     <listitem>
+          <para>Use the BCTF with name <replaceable>bctf</replaceable> for output.</para>
+     </listitem>
+     </varlistentry>
+     <varlistentry>
+       <term><option>-C</option></term>
+       <listitem>
+          <para>This has the same effect as in <command>onsgmls(1)</command>.</para>
+       </listitem>
+     </varlistentry>
+     <varlistentry>
+       <term><option>-D<replaceable>directory</replaceable></option></term>
+       <listitem>
+          <para>Search directory for files specified in system identifiers.
+          This has the same effect as in <command>onsgmls(1)</command>.</para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>-n</option></term>
+       <listitem>
+         <para>The entity is a non-SGML data entity. This option forces the
           octets in the storage objects comprising the entity to be
           copied exactly without any of the conversions that are done for
-          text entities. Implies -r.
-          
-   -r
-          Raw output. Don't perform any conversion on RSs and REs when
+          text entities. Implies <option>-r</option>.</para>
+       </listitem>
+     </varlistentry>
+
+     <varlistentry>
+       <term><option>-r</option></term>
+       <listitem>
+          <para>Raw output. Don't perform any conversion on RSs and REs when
           printing the entity. The entity would typically have the
-          storage manager attribute records=asis.
-          
-   -v
-          Print the version number.
-          
-   
-    James Clark
-    jjc@jclark.com
+          storage manager attribute records=asis.</para>
+       </listitem>
+     </varlistentry>
 
-References
+     <varlistentry>
+       <term><option>-v</option></term>
+       <listitem>
+          <para>Print the version number.</para>
+       </listitem>
+     </varlistentry>
+   </variablelist>
 
-   1. file://localhost/home/ian/OPENJADE/cvs/jade/doc/sysid
-   2. file://localhost/home/ian/OPENJADE/cvs/jade/doc/sysid.htm#bctf
-   3. file://localhost/home/ian/OPENJADE/cvs/jade/doc/nsgmls#optC
-   4. file://localhost/home/ian/OPENJADE/cvs/jade/doc/nsgmls.htm#optD
+   </refsect1>
+
+   <refsect1>
+     <title>See Also</title>
+     <para><command>onsgmls(1)</command>, <command>openjade(1)</command></para>
+   </refsect1>
+
+   </refentry>
+   </section>
+</article>

@@ -900,8 +900,7 @@ msgid "%1 is already a function name"
 msgstr "%1 ist bereits ein Funktionsname"
 
 msgid "characters with the following numbers in ISO 646 are significant in the concrete syntax but are not in the document character set: %1"
-msgstr "Die Zeichen mit den folgenden Nummern in ISO 646 sind in der konkreten
-Syntax signifikant, aber nicht im Dokumentzeichensatz: %1"
+msgstr "Die Zeichen mit den folgenden Nummern in ISO 646 sind in der konkreten Syntax signifikant, aber nicht im Dokumentzeichensatz: %1"
 
 msgid "general delimiter %1 consists solely of function characters"
 msgstr "Allgemeiner Begrenzer %1 besteht nur aus Funktionszeichen"

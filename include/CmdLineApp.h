@@ -16,6 +16,7 @@
 #include "OutputByteStream.h"
 #include "OutputCharStream.h"
 #include "CodingSystemKit.h"
+#include "Options.h"
 
 #ifdef SP_WIDE_SYSTEM
 // for wchar_t
@@ -50,6 +51,7 @@ public:
   OutputCharStream *makeStdErr();
 protected:
   virtual void registerOption(AppChar c, const AppChar *argName = 0);
+  virtual void registerLongOption(const AppChar *option, AppChar c, const AppChar *argName = 0);
   virtual int init(int argc, AppChar **argv);
   void resetCodingSystemKit();
   static Boolean stringMatches(const AppChar *s, const char *key);
@@ -57,6 +59,8 @@ protected:
   const CodingSystem *outputCodingSystem_;
   String<AppChar> optstr_;
   Vector<const AppChar *> optArgNames_;
+  Vector<LongOption<AppChar> > longOpts_;
+  Vector<const AppChar *> longOptArgNames_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;
 private:

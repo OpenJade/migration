@@ -6,6 +6,8 @@
 =4000
 E1+invalidOptionError++invalid option %1
 E1+missingOptionArgError++missing argument for option %1
+E1+ambiguousOptionError++option %1 is ambiguous
+E1+erroneousOptionArgError++option %1 doesn't allow an argument
 I1+usage++usage is %1
 I2+versionInfo++%1 version %2
 E1+unknownBctf++unknown BCTF %1

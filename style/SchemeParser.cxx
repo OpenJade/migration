@@ -346,7 +346,7 @@ bool SchemeParser::doMode()
 bool SchemeParser::doQuery()
 {
   Location loc(in_->currentLocation());
-  Owner<Expression> query, construct;
+  Owner<Expression> query, construct, priority;
   Token tok;
   Identifier::SyntacticKey key;
   if (!parseExpression(0, query, key, tok))
@@ -355,18 +355,8 @@ bool SchemeParser::doQuery()
   if (!parseExpression(0, construct, key, tok))
     return 0;
 
-  Owner<Expression> expr;
-  long priority = 0;
-  if (!parseExpression(allowCloseParen, expr, key, tok))
+  if (!parseExpression(allowCloseParen, priority, key, tok))
     return 0;
-  if (tok != tokenCloseParen) {
-    expr->optimize(*interp_, Environment(), expr);
-    ELObj *val = expr->constantValue();
-    if (!val || !val->exactIntegerValue(priority)) {
-      // error: priority not a number
-      return 0;
-    }
-  }
 
   IList<Pattern::Element> list;
   Pattern::Element *elem = new Pattern::Element(StringC(), 0);

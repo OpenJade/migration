@@ -60,7 +60,6 @@ bool Options<T>::searchLong(const T *arg)
 template<class T>
 bool Options<T>::get(T &c)
 {
-  const T *cp;
   if (sp_ == 1) {
     if (ind_ >= argc_)
       return false;

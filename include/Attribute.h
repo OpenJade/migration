@@ -523,7 +523,7 @@ private:
   AttributeList attributes_;
 };
 
-class DataAttributeValue : public CdataAttributeValue {
+class SP_API DataAttributeValue : public CdataAttributeValue {
 public:
   DataAttributeValue(Text &, const ConstPtr<Notation> &, const AttributeList &);
   const AttributeList &attributes() const;

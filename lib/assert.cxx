@@ -1,9 +1,10 @@
 // Copyright (c) 1994 James Clark
 // See the file COPYING for copying permission.
 
+#include "splib.h"
+// config.h included by splib.h
 #ifdef SP_USE_OWN_ASSERT
 
-#include "splib.h"
 #include <stdlib.h>
 #include "macros.h"
 

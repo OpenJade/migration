@@ -84,9 +84,10 @@ config.status:	ChangeLog
 	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
 	   ./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
-	   --enable-http --enable-static --enable-shared		\
+	   --enable-http --enable-shared				\
 	   --enable-default-catalog=$(default-catalogs)			\
-	   --enable-default-search-path=$(default-sgml-path)
+	   --enable-default-search-path=$(default-sgml-path)		\
+	   --enable-static
 
 
 build:	config.status

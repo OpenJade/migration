@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0//EN">
 <html>
 
 <head>
@@ -10,9 +11,9 @@
 
 <h2>OpenJade Releases</h2>
 
-<p>OpenJade releases are tagged <font face="Times New Roman"><code>jade_x_y</code></font>
-or <font face="Times New Roman"><code>jade_x_y_z</code></font>;
-for example OpenJade 1.2.1 is tagged <font face="Times New Roman"><code>jade_1_2_1</code></font>.</p>
+<p>OpenJade releases are tagged <code>jade_x_y</code>
+or <code>jade_x_y_z</code>;
+for example OpenJade 1.2.1 is tagged <code>jade_1_2_1</code>.</p>
 
 <h2>The Bleeding Edge</h2>
 
@@ -23,14 +24,14 @@ stable branch contains mostly bugfixes and simple additions,
 while the experimental branch contains new, untested features.</p>
 
 <p>Checking out OpenJade will give you the experimental branch.
-To get the stable branch checkout (or update to) <font
-face="Times New Roman"><code>jade_1_3_branch</code></font>. For
+To get the stable branch checkout (or update to)
+<code>jade_1_3_branch</code>. For
 example,</p>
 
-<p><pre>
-cvs -z9 checkout jade   # get experimental branch
-cvs -z9 update -r jade_1_3_branch jade  # switch to stable branch
-</pre></p>
+<pre>
+cvs -z3 checkout jade   # get experimental branch
+cvs -z3 update -r jade_1_3_branch jade  # switch to stable branch
+</pre>
 
 <p>Logs of development activity are kept in the <a
 href="ChangeLog.jade">ChangeLog</a> and the <a href="NEWS.jade">NEWS</a>
@@ -44,27 +45,22 @@ and is more user-level.</p>
 repository. Thus to use the OpenJade out of CVS, you will have to
 check out, build and install OpenSP as well:</p>
 
-<p><pre>cvs -z9 checkout sp</pre></p>
+<pre>cvs -z3 checkout sp</pre>
 
 <p>We have also converted the Unix build process to automake, thus
 you'll need the developer tools automake, autoconf and libtool
-to work from CVS. The sequence of commands to run after an initial 
-checkout of OpenSP is:</p>
-
-<p><pre>
-autoheader
-automake --add-missing
-aclocal
-autoconf
-</pre></p>
+to work from CVS. You can use the <code>autoinit.sh</code> tool
+(currently found in the sp module, but it works as well for
+OpenJade) to automatically run the commands required to generate the
+configuration script etc.</p>
 
 <p>After this, you can do the normal</p>
 
-<p><pre>
+<pre>
 ./configure
 make
 make install
-</pre></p>
+</pre>
 
 <h2>OpenJade Internals Documentation</h2>
 
@@ -78,7 +74,7 @@ Clasen, one of the OpenJade maintainers.</p>
 <p>Preferrably, start with a clean OpenJade release  
 and apply your changes to it. Then generate a patch with the command</p>
 
-<p><pre>cvs -z9 diff -r jade_1_2_1 &gt; patch</pre></p>
+<pre>cvs -z3 diff -u -r jade_1_2_1 &gt; patch</pre>
 
 <p>Pack the patch using the tools appropriate for your platform
 (Zip for windows or tar -z for *ix) and send it to one of the

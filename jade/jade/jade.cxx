@@ -11,7 +11,6 @@
 #include "OutputCharStream.h"
 #include "macros.h"
 #include "sptchar.h"
-#include "jade_version.h"
 #include "JadeMessages.h"
 #include "ErrnoMessageArg.h"
 #include "OutputByteStream.h"
@@ -95,10 +94,6 @@ void JadeApp::processOption(AppChar opt, const AppChar *arg)
     else
       outputFilename_.assign(arg, tcslen(arg));
     break;
-  case 'v':
-    message(JadeMessages::versionInfo,
-	    StringMessageArg(convertInput(JADE_VERSION)));
-    // fall through
   default:
     DssslApp::processOption(opt, arg);
     break;

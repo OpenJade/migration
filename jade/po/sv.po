@@ -1,17 +1,14 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+# Swedish translations for OpenJade 1.4.
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Project-Id-Version: OpenJade 1.4\n"
+"PO-Revision-Date: 1999-12-08 23:03+01:00\n"
+"Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
+"Language-Team: Swedish <sv@li.org>\n"
+"MIME-Version:: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Created-Date: 1999-12-08 21:56+0000\n"
 
 # HtmlMessages
 msgid "cannot open output file %1 (%2)"
@@ -23,6 +20,19 @@ msgstr "okänd utdatatyp %1"
 
 msgid "empty output filename"
 msgstr "tomt filnamn för utdatafilen"
+
+msgid "Use the backend %1."
+msgstr ""
+
+# JadeMessages
+msgid "Send output to %1."
+msgstr "Skicka utdata till %1."
+
+msgid "FILE"
+msgstr ""
+
+msgid "TYPE"
+msgstr ""
 
 # MifMessages
 msgid "MIF: cannot open output file %1 (%2)"
@@ -80,6 +90,53 @@ msgstr "%1 version %2"
 
 msgid "no DSSSL specification: use -d to specify"
 msgstr "ingen DSSSL-specifikation: använd -d för att ange en"
+
+msgid ""
+"Options with a \"doc-\"/\"spec-\" prefix apply only to the "
+"document/specification."
+msgstr ""
+
+msgid "Enable experimental DSSSL extensions."
+msgstr ""
+
+msgid "Debug mode."
+msgstr ""
+
+msgid "Use DSSSL specification %1."
+msgstr "Använd DSSSL-specifikation %1."
+
+msgid "Pretend that %1 appeared in the specification."
+msgstr ""
+
+msgid "Strict DSSSL compliance mode."
+msgstr ""
+
+msgid "Show open entities in error messages."
+msgstr ""
+
+msgid "Show open elements in error messages."
+msgstr ""
+
+msgid "Show error numbers in error messages."
+msgstr ""
+
+msgid "Show references in error messages."
+msgstr ""
+
+msgid "Define parameter entity %1 as \"INCLUDE\"."
+msgstr ""
+
+msgid "Enable warning %1."
+msgstr ""
+
+msgid "SYSID"
+msgstr ""
+
+msgid "DEFINITION"
+msgstr ""
+
+msgid "NAME"
+msgstr ""
 
 # InterpreterMessages
 msgid "unexpected end of file"
@@ -188,12 +245,6 @@ msgstr "%2 argumentet till primitiven %1 är av fel typ: %3 är ingen sträng"
 msgid "%2 argument for primitive %1 of wrong type: %3 not a string or symbol"
 msgstr ""
 "%2 argumentet till primitiven %1 är av fel typ: är ingen sträng eller symbol"
-
-msgid ""
-"%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol"
-msgstr ""
-"%2 argumentet till primitiven %1 är av fel typ: %3 är varken en sträng eller "
-"symbol"
 
 msgid "%2 argument for primitive %1 of wrong type: %3 not a char"
 msgstr "%2 argumentet till primitiven %1 är av fel typ: %3 är inget tecken"
@@ -337,9 +388,6 @@ msgstr ""
 msgid "argument not a keyword"
 msgstr ""
 
-msgid "support for more than one style-specification-body not yet implemented"
-msgstr ""
-
 msgid ""
 "specification document does not have the DSSSL architecture as a base "
 "architecture"
@@ -368,9 +416,6 @@ msgid "this context requires a style object"
 msgstr ""
 
 msgid "procedure can only be used in evaluation of characteristic value"
-msgstr ""
-
-msgid "sorry, %1 expression not implemented"
 msgstr ""
 
 msgid "%1 color requires three arguments"
@@ -533,8 +578,9 @@ msgstr ""
 msgid "%2 argument for primitive %1 of wrong type: %3 not a language"
 msgstr ""
 
-msgid "%2 argument for primitive %1 of wrong type: %3 not a po"
+msgid "%2 argument for primitive %1 of wrong type: %3 not a positive integer"
 msgstr ""
+"%2 argumentet till primitiven %1 är av fel typ: %3 är inget positivt heltal"
 
 msgid "%2 argument for primitive %1 of wrong type: %3 not an integer"
 msgstr ""
@@ -607,7 +653,7 @@ msgstr ""
 msgid "feature %1 not supported"
 msgstr ""
 
-msgid "feature %1 only partially supported "
+msgid "feature %1 only partially supported"
 msgstr ""
 
 msgid "only allowed in style language"
@@ -622,10 +668,10 @@ msgstr ""
 msgid "specification is marked as partial"
 msgstr ""
 
-msgid "grove plan excluding module %1 not supported "
+msgid "grove plan excluding module %1 not supported"
 msgstr ""
 
-msgid "grove plan including module %1 not supported "
+msgid "grove plan including module %1 not supported"
 msgstr ""
 
 msgid "%1 not an SGML property set module"
@@ -641,7 +687,7 @@ msgid ""
 "the value \"#f\""
 msgstr ""
 
-msgid "variable %1 occurs more than once in bindings======="
+msgid "variable %1 occurs more than once in bindings"
 msgstr ""
 
 msgid "exactly one of node:, subgrove: and class: needed"
@@ -733,3 +779,8 @@ msgstr ""
 msgid "flow object not accepted by port; only table-cell flow objects accepted"
 msgstr ""
 
+#~ msgid ""
+#~ "%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol"
+#~ msgstr ""
+#~ "%2 argumentet till primitiven %1 är av fel typ: %3 är varken en sträng eller "
+#~ "symbol"

@@ -25,3 +25,4 @@ I1+hHelp++Show this help text.
 +name++NAME
 +file++FILE
 +noArg++NOTHING
+I0+tryHelpOptionForInfo++Try the "--help" option for more information.

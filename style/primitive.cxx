@@ -63,6 +63,7 @@ public:
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
   void traceSubObjects(Collector &) const;
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *nodeList_;
   ComponentName::Id cls_;
@@ -1867,7 +1868,7 @@ DEFPRIMITIVE(NodeListContains, argc, argv, context, interp, loc)
   if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
     return argError(interp, loc,
 		    InterpreterMessages::notASingletonNode, 1, argv[1]);
-  if (nl->contains(node)) 
+  if (nl->contains(context, interp, node)) 
     return interp.makeTrue();
   return interp.makeFalse();
 }
@@ -5648,6 +5649,13 @@ NodeListObj *SelectByClassNodeListObj::nodeListChunkRest(EvalContext &context, I
 void SelectByClassNodeListObj::traceSubObjects(Collector &c) const
 {
   c.trace(nodeList_);
+}
+
+bool SelectByClassNodeListObj::contains(EvalContext &context, Interpreter &interp,
+					const NodePtr &n)
+{
+  return (n->classDef().className == cls_
+	  && nodeList_->contains(context, interp, n));
 }
 
 MapNodeListObj::MapNodeListObj(FunctionObj *func, NodeListObj *nl,

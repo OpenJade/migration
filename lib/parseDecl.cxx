@@ -1054,7 +1054,7 @@ Boolean Parser::parseAttlistDecl()
 	  curAdl = adlCopy.pointer();
 	}
 	for (size_t j = 0; j < adl->size(); j++) {
-	  size_t index;
+	  unsigned index;
 	  if (!curAdl->attributeIndex(adl->def(j)->name(), index)) {
             index = curAdl->idIndex();
             if (index != -1 && adl->def(j)->isId())
@@ -2657,7 +2657,7 @@ void Parser::addCommonAttributes(Dtd &dtd)
 	    done2Adl[adl->index()] = 1;
           if (!skip)
 	    for (size_t j = 0; j < commonAdl[i]->size(); j++) {
-	      size_t index;
+	      unsigned index;
 	      if (!adl->attributeIndex(commonAdl[i]->def(j)->name(),
 	  			       index))
 	        adl->append(commonAdl[i]->def(j)->copy());

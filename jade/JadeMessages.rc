@@ -1,0 +1,7 @@
+STRINGTABLE
+BEGIN
+  1000, "Jade version %1"
+  1001, "unknown output type %1"
+  1002, "empty output filename"
+  1003, "cannot open output file %1 (%2)"
+END

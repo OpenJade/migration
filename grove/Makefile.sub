@@ -1,0 +1,2 @@
+LIB=grove
+OBJS=Node.o

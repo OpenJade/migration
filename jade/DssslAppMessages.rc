@@ -1,0 +1,4 @@
+STRINGTABLE
+BEGIN
+  2000, "no DSSSL specification: use -d to specify"
+END

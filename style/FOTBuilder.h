@@ -154,9 +154,12 @@ public:
     symbolTrailEdge,
     symbolExplicit,
     symbolRowMajor,
-    symbolColumnMajor
+    symbolColumnMajor,
+    symbolUppercase,
+    symbolLowercase,
+    symbolCapitalize
   };
-  enum { nSymbols = symbolColumnMajor + 1 };
+  enum { nSymbols = symbolCapitalize + 1 };
   typedef const char *PublicId;
   struct STYLE_API GlyphId {
     GlyphId() : publicId(0), suffix(0) { }
@@ -650,6 +653,9 @@ public:
   virtual void setEscapementSpaceBefore(const InlineSpace &);
   virtual void setEscapementSpaceAfter(const InlineSpace &);
   virtual void setInlineSpaceSpace(const OptInlineSpace &);
+  // If a symbol or #f. (Set to #f if a procedure, since this case is handled
+  // by the engine.)
+  virtual void setCharMap(Symbol);
   // For simple page sequence
   virtual void setPageWidth(Length);
   virtual void setPageHeight(Length);
@@ -973,6 +979,8 @@ public:
   void setCountry(Letter2);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
+  void setInlineSpaceSpace(const OptInlineSpace &);
+  void setCharMap(Symbol);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
   void startNode(const NodePtr &, const StringC &processingMode);
   void endNode();

@@ -14,10 +14,6 @@ pkg-openjade		:= $(pkg)
 pkg-libostyle		:= libostyle0
 pkg-libostyle-dev	:= libostyle-dev
 
-# default SGML pathing
-default-catalogs	:= /usr/local/share/sgml/catalog:/usr/local/lib/sgml/catalog:/usr/lib/sgml/catalog
-default-sgml-path	:= /usr/local/share/sgml:/usr/local/lib/sgml:/usr/lib/sgml
-
 # directory abstraction
 prefix-openjade		:= debian/tmp
 bindir-openjade		:= $(prefix-openjade)/usr/bin
@@ -85,8 +81,6 @@ config.status:	ChangeLog
 	   ./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
 	   --enable-http --enable-shared				\
-	   --enable-default-catalog=$(default-catalogs)			\
-	   --enable-default-search-path=$(default-sgml-path)		\
 	   --enable-static
 
 

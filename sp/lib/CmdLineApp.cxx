@@ -161,6 +161,16 @@ void CmdLineApp::registerInfo(const MessageType0 &i, bool pre)
     infos_.push_back(i);
 }
 
+// Backward compability. Will not display argName.
+void CmdLineApp::registerOption(AppChar c, const AppChar *argName)
+{
+  if (argName)
+    registerOption(c, 0, CmdLineAppMessages::someArg,
+		   CmdLineAppMessages::undocOption);
+  else
+    registerOption(c, 0, CmdLineAppMessages::undocOption);
+}
+
 void CmdLineApp::usage()
 {
   const OutputCharStream::Newline nl = OutputCharStream::newline;

@@ -1,6 +1,10 @@
 <!doctype style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN">
 <!-- Copyright (C) 1999 Avi Kivity -->
                  
+<style-sheet>
+<style-specification>
+<style-specification-body>
+
 <![cdata[                
                  
 (root
@@ -117,3 +121,7 @@
   (external-procedure "UNREGISTERED::OpenJade//Procedure::language"))
 
 ]]>
+
+</style-specification-body>
+</style-specification>
+</style-sheet>

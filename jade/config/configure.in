@@ -48,8 +48,9 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_CXX
+AC_PROG_CXXCPP
 AC_PATH_PROGS(PERL, perl, perl)
-test "$INSTALL" = "./config/install.sh -c" && INSTALL=`pwd`"/config/install.sh -c"
+AC_PROG_INSTALL
 
 dnl
 dnl  Stuff special to GNU C++
@@ -141,7 +142,7 @@ fi
 dnl
 dnl  HTTP support
 dnl
-AC_MSG_CHECKING(wether to include support for http)
+AC_MSG_CHECKING(whether to include support for http)
 AC_ARG_ENABLE(http,
 [  --enable-http 	  include support for http],
     if test $enableval = yes

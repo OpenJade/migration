@@ -23,13 +23,6 @@ if test "$CXXFLAGS" = ""; then
   CXXFLAGS="-O2"
 fi
 
-changequote(,)dnl
-SPLTVERSION=`cat VERSION | grep SP | sed 's/[a-zA-Z ]*//g' | cut -d'.' -f1,2 | sed 's/\./:/g'`
-JADELTVERSION=`cat VERSION | grep Jade | sed 's/[a-zA-Z ]*//g' | cut -d'.' -f1,2 | sed 's/\./:/g'`
-changequote([,])dnl
-
-AC_SUBST(SPLTVERSION)
-AC_SUBST(JADELTVERSION)
 
 dnl
 dnl  Backup original Makefiles, people may want to revert to it if

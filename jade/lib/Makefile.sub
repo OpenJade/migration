@@ -1,3 +1,4 @@
+LTVERSION=0:0:0
 LIB=osp
 INCLUDE=-I$(srcdir)/../generic
 DEPLIBS=-lm

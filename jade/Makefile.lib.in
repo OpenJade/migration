@@ -6,12 +6,6 @@
 #  Copyright (C) 1998 Cees A. de Groot
 #
 
-ifeq ($(LIB),sp)
-LTVERSION=@SPLTVERSION@
-else
-LTVERSION=@JADELTVERSION@
-endif
-
 CLEANFILES=-r lib$(LIB).la $(OBJS) $(COBJS) $(LT_OBJS) core .libs Makefile.lt
 
 LIB_THREADS=@LIB_THREADS@

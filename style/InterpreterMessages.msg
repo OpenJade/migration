@@ -154,5 +154,4 @@ E0+badAddCharProperty++error in character property declaration
 E1+duplicateCharPropertyDecl++duplicate definition for character property %1+first definition was here
 E2+duplicateAddCharProperty++duplicate character property declaration %1 for character %2
 E0+returnNotSosofo++value returned by procedure was not a sosofo
-
-
+E0+varCharPropertyExprUnsupported++variable expressions for character property values currently not supported

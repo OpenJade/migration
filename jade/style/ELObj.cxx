@@ -124,6 +124,11 @@ GlyphSubstTableObj *ELObj::asGlyphSubstTable()
   return 0;
 }
 
+LanguageObj *ELObj::asLanguage()
+{
+  return 0;
+}
+
 bool ELObj::optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &)
 {
   return 0;

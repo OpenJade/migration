@@ -202,6 +202,11 @@ public:
     LengthSpec min;
     LengthSpec max;
   };
+  struct OptInlineSpace {
+    OptInlineSpace() : hasSpace(0) { }
+    bool hasSpace;
+    InlineSpace space;
+  };
   // non-inherited characteristics for all displayed flow objects
   struct DisplayNIC {
     DisplayNIC();
@@ -633,6 +638,7 @@ public:
   virtual void setCountry(Letter2);
   virtual void setEscapementSpaceBefore(const InlineSpace &);
   virtual void setEscapementSpaceAfter(const InlineSpace &);
+  virtual void setInlineSpaceSpace(const OptInlineSpace &);
   // For simple page sequence
   virtual void setPageWidth(Length);
   virtual void setPageHeight(Length);

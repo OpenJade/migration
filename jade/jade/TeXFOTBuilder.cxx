@@ -14,9 +14,14 @@
 #include "TmpOutputByteStream.h"
 #include <stdio.h>
 #include <stdlib.h>
-
 #undef TEXDEBUG
 #undef NDEBUG
+
+#define OUTLINES
+#undef DEBUG_OUTLINES
+#ifdef DEBUG_OUTLINES
+#include <iostream.h>
+#endif
 #include <assert.h>
 
 #ifdef DSSSL_NAMESPACE
@@ -47,8 +52,8 @@ void TeXTmpOutputByteStream::commit( OutputByteStream &os ) const {
     os.sputn( s, n );
   }
 }
-
 // --------- TeXFOTBuilder ----------------------------------------------------
+
 
 class TeXFOTBuilder : public SerialFOTBuilder {
 public:
@@ -104,6 +109,7 @@ public:
 
   TeXFOTBuilder(OutputByteStream *, Messenger *mgr);
   ~TeXFOTBuilder();
+  //// Needed for heading levels
 
   //////////////////////////////////////////////////////////////////////
   // Atomic flow objects
@@ -403,13 +409,194 @@ public:
   void setGridEquidistantColumns(bool);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
+  void setInlineSpaceSpace(const OptInlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
 
   void startDisplay( const DisplayNIC & );
   void endDisplay();
 
   enum FotObjectClassType { oc_Unknown, oc_Cell };
+ 
+  
+  struct Format {
 
+    Format() : FotCurDisplaySize( 0 ),
+               FotLineThickness( 1000 ),
+               FotLineCap( symbolButt ),
+               FotBorderPriority( 0 ),
+               FotBorderPresent( true ),
+               FotLineRepeat( 1 ),
+               FotLineSep( 1000 ),
+               FotDisplayAlignment( symbolStart ),
+               FotStartIndentSpec( 0 ),
+               FotEndIndentSpec( 0 ),
+               FotLeftMargin( 1 ),
+               FotRightMargin( 1 ),
+               FotPageWidth( 72000*8 ),
+               FotPageNColumns( 1 ),
+               FotPageColumnSep( 72000/2 ),
+               FotSpan( 1 ),
+               FotCellBeforeColumnMargin( 0 ),
+               FotCellAfterColumnMargin( 0 ),
+               FotObjectClass( oc_Unknown ) {}
+
+    long                 FotCurDisplaySize;
+    Length               FotLineThickness;
+    Symbol               FotLineCap;
+    long                 FotBorderPriority;
+    bool                 FotBorderPresent;
+    long                 FotLineRepeat;
+    Length               FotLineSep;
+    Symbol               FotDisplayAlignment;
+    LengthSpec           FotStartIndentSpec;
+    LengthSpec           FotEndIndentSpec;
+    Length               FotLeftMargin;
+    Length               FotRightMargin;
+    Length               FotPageWidth;
+    long                 FotPageNColumns;
+    Length               FotPageColumnSep;
+    long                 FotSpan;
+    Length               FotCellBeforeColumnMargin;
+    Length               FotCellAfterColumnMargin;
+    FotObjectClassType   FotObjectClass;
+
+    static const Length INITIAL_PAGE_SIZE() { return 72000*8; }
+  };
+
+  struct CompoundFotElement;
+  struct FotElement {
+
+    FotElement(  CompoundFotElement *parent = NULL )
+     : Parent( parent ), SiblingSeqIdx( -1 ) {}
+    String<char> Characteristics;
+
+    virtual void out( OutputByteStream &stream ) const
+     { outProlog( stream ); outContent( stream ); outEpilog( stream ); }
+    virtual void open( TeXFOTBuilder &builder );
+    virtual void close( TeXFOTBuilder &builder );
+    virtual bool isAtomic() const = 0;
+    virtual const char *name() const = 0;
+    CompoundFotElement *parent() const { return Parent; }
+    String<char> &nodeInfoEpilog() { return NodeInfoEpilog; }
+    void setParent( CompoundFotElement *parent ) { Parent = parent; }
+    virtual FotElement *lastClosed_() = 0;
+    virtual FotElement *currentlyOpen_() = 0;
+    void setSiblingSeqIdx( int idx ) { SiblingSeqIdx = idx; }
+    int siblingSeqIdx() const { assert( SiblingSeqIdx > -1 ); return SiblingSeqIdx; }
+
+   protected:
+    int SiblingSeqIdx;
+    CompoundFotElement* Parent;
+    String<char> NodeInfoProlog;
+    String<char> NodeInfoEpilog;
+
+    virtual void outContent( OutputByteStream & ) const {};
+    virtual void outProlog( OutputByteStream &stream ) const = 0;
+    virtual void outEpilog( OutputByteStream &stream ) const = 0;
+  };
+
+  struct FotElementState {
+    FotElementState() : EnforcingStructure( true ), IsOpen( false ) {}
+    bool enforcingStructure() { return IsOpen && EnforcingStructure; }
+
+    bool EnforcingStructure;
+    bool IsOpen;
+    String<char> CurNodeInfoProlog;
+  };
+  
+  struct AtomicFotElement : public FotElement {
+
+    AtomicFotElement( CompoundFotElement *parent = NULL ) : FotElement( parent ) {}
+    virtual bool isAtomic() const { return true; }
+    virtual FotElement *lastClosed_() { return NULL; };
+    virtual FotElement *currentlyOpen_() { return this; }
+   
+   protected:
+    virtual void outProlog( OutputByteStream &stream ) const
+     { stream << NodeInfoProlog << "\\insert" << name() << "%\n{" << Characteristics << '}'; }
+    virtual void outEpilog( OutputByteStream &stream ) const
+     { stream << '}' << NodeInfoEpilog; }
+  };
+
+  struct CompoundFotElement : public FotElement {
+
+    CompoundFotElement( CompoundFotElement *parent = NULL )
+     : FotElement( parent ), CurrentlyOpenChildIdx( -1 ), LastClosedChildIdx( -1 ) {}
+    virtual bool isAtomic() const { return false; }
+    virtual void open( TeXFOTBuilder &builder )
+      { FotElement::open( builder ); builder.setCurOs( &PreContent ); };
+    virtual void childJustClosed( FotElement &child )
+     { CurrentlyOpenChildIdx = -1; LastClosedChildIdx = child.siblingSeqIdx(); };
+    virtual void childJustOpened( FotElement &child )
+     { CurrentlyOpenChildIdx = child.siblingSeqIdx(); };
+    virtual FotElement &child( size_t idx ) = 0;
+    static FotElement *lastClosed( CompoundFotElement &treeRoot )
+     { return treeRoot.currentlyOpen( treeRoot )
+        ? treeRoot.currentlyOpen( treeRoot )->lastClosed_() : (FotElement*)NULL; }
+    static FotElement *currentlyOpen( CompoundFotElement &treeRoot ) {
+      return treeRoot.currentlyOpen_();
+    }
+    virtual FotElement *currentlyOpen_()
+     { return CurrentlyOpenChildIdx > -1
+        ? child( (size_t)CurrentlyOpenChildIdx ).currentlyOpen_() : this; }
+    virtual FotElement *lastClosed_() 
+     { return LastClosedChildIdx > -1
+        ? &child( (size_t)LastClosedChildIdx )
+        : ( parent() ? parent()->lastClosed_() : (FotElement*)NULL ); }
+    
+   protected:
+    virtual void outProlog( OutputByteStream &stream ) const {
+      #ifdef TEXDEBUG
+       stream <<  "\nELEMENT\n" << "\nPRO\n" << NodeInfoProlog << "\nEND_PRO\n" << "\\" << name() << "%\n{" << Characteristics << '}';
+      #else
+       stream <<  NodeInfoProlog << "\\" << name() << "%\n{" << Characteristics << '}';
+      #endif
+       PreContent.commit( stream );
+     }
+    virtual void outEpilog( OutputByteStream &stream ) const {
+      #ifdef TEXDEBUG
+        stream << "\\end" << name() << "{}" << "\nEPI\n" << NodeInfoEpilog << "\nEND_EPI\nEND_ELEMENT\n" ;
+      #else
+        stream << "\\end" << name() << "{}" << NodeInfoEpilog << "%\n" ;
+      #endif
+    }
+  void setPageNumberRestart(bool);
+  void setPageNumberFormat(const StringC &);
+  void setPageNColumns(long);
+  void setPageColumnSep(Length);
+  void setPageBalanceColumns(bool);
+  void setGridRowSep(Length);
+  void setGridColumnSep(Length);
+  void setSubscriptDepth(Length);
+  void setSuperscriptHeight(Length);
+  void setUnderMarkDepth(Length);
+  void setOverMarkHeight(Length);
+  void setHeadingLevel(long);
+
+  void setMinPreLineSpacing(const OptLengthSpec &);
+  void setMinPostLineSpacing(const OptLengthSpec &);
+  void setMinLeading(const OptLengthSpec &);
+  void setScriptPreAlign(Symbol);
+  void setScriptPostAlign(Symbol);
+  void setScriptMidSupAlign(Symbol);
+  void setScriptMidSubAlign(Symbol);
+  void setNumeratorAlign(Symbol);
+  void setDenominatorAlign(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowAlignment(Symbol);
+  void setGridEquidistantRows(bool);
+  void setGridEquidistantColumns(bool);
+  void setEscapementSpaceBefore(const InlineSpace &);
+  void setEscapementSpaceAfter(const InlineSpace &);
+  void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
+
+  void startDisplay( const DisplayNIC & );
+  void endDisplay();
+
+  enum FotObjectClassType { oc_Unknown, oc_Cell };
+ 
+  
   struct Format {
 
     Format() : FotCurDisplaySize( 0 ),
@@ -785,8 +972,34 @@ private:
   Messenger *mgr_;
   bool preserveSdata_;
 
+#ifdef OUTLINES
+  int needToCollect() {return inHeading_;}
+
+  void addHeadedText(const Char * s, size_t n);
+  void addHeadedText(const StringC p);
+
+  struct ParHead {
+    ParHead() : isHeaded_(false),level_(0),previous_(0){}
+    ParHead(bool h): isHeaded_(h),level_(0),previous_(0){}
+    ParHead(bool h,long l) : isHeaded_(h),level_(l),previous_(0){}
+
+    bool isHeaded_;
+    long level_;
+    StringC  headingText_;
+    size_t previous_;
+  };
+
+  StringC protectedChar_; //for special tex Chars
+  
+  bool headingSet_;
+  bool inHeading_;
+  StringC return_;
+  Vector<ParHead> parStack_;
+  size_t  lastHeaded_;
+#endif
   Vector<size_t> DisplayBoxLevels;
   Vector<Format> FormatStack;
+ 
   Format NextFormat; 
   Table CurTable;
   FotElementState CurFotElementState;
@@ -825,6 +1038,7 @@ private:
 
   void set(const char *,const OptLengthSpec &);
   void set(const char *,const InlineSpace &);
+  void set(const char *,const OptInlineSpace &);
 
   // Structures for non-inherited characteristics,
   // in the order specified in style/FOTBuilder.h.
@@ -849,7 +1063,59 @@ private:
   void dumpInherited();
 
   void message(const MessageType0 &);
+  static ParHead& top(Vector<ParHead>& s);
+  static ParHead* ptrTop(Vector<ParHead>& s);
+  static void pop(Vector<ParHead>& s);
+  static void push(Vector<ParHead>& s, ParHead p);
 };
+
+#ifdef OUTLINES
+// Stack Utilities
+
+TeXFOTBuilder::ParHead& 
+TeXFOTBuilder::top (Vector<TeXFOTBuilder::ParHead> &s) {
+  //cerr << "top" <<s.back().level_<<'\n';
+  return s.back();
+}
+
+TeXFOTBuilder::ParHead* 
+TeXFOTBuilder::ptrTop (Vector<TeXFOTBuilder::ParHead> &s) {
+  //cerr << "top" <<s.back().level_<<'\n';
+  return &(s.back());
+}
+
+void 
+TeXFOTBuilder::pop(Vector<TeXFOTBuilder::ParHead> &s){
+  //cerr << "popping" <<'\n';
+  s.resize(s.size() - 1);
+}
+    
+void 
+TeXFOTBuilder::push(Vector<TeXFOTBuilder::ParHead> &s,TeXFOTBuilder::ParHead p ){
+  //cerr << "pushing" <<p.level_<<'\n';
+  s.push_back(p);
+}
+
+void TeXFOTBuilder::addHeadedText(const Char * s, size_t n){
+  if (top(parStack_).isHeaded_){
+    top(parStack_).headingText_.append(s,n);
+  }
+  else{
+    assert(((top(parStack_).previous_)) >= 0);
+    parStack_[top(parStack_).previous_].headingText_.append(s,n);
+  }
+}
+
+void TeXFOTBuilder::addHeadedText(const  StringC p){
+  if (top(parStack_).isHeaded_){
+    top(parStack_).headingText_ += p;
+  }
+  else{
+    assert(((top(parStack_).previous_)) >= 0);
+    parStack_[top(parStack_).previous_].headingText_ += p;
+  }
+}
+#endif
 
 #ifdef TEXDEBUG
   TeXFOTBuilder *TeXFOTBuilder::CurInstance = NULL;
@@ -1712,6 +1978,9 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
 
 TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
 : fileout_(o), mgr_(mgr), CurOs( NULL ), preserveSdata_(1)
+#ifdef OUTLINES
+,inHeading_(0),headingSet_(0),lastHeaded_(0)
+#endif
 {
   #ifdef TEXDEBUG
     CurInstance = this;
@@ -1719,6 +1988,10 @@ TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
   NextFormat.FotCurDisplaySize = Format::INITIAL_PAGE_SIZE();
   FormatStack.push_back( NextFormat );
   os() << "\\FOT{2}";
+#ifdef OUTLINES
+  return_ += Char('\n');
+  protectedChar_ += Char('\\');
+#endif
 }
 
 TeXFOTBuilder::~TeXFOTBuilder()
@@ -1729,7 +2002,9 @@ TeXFOTBuilder::~TeXFOTBuilder()
 //////////////////////////////////////////////////////////////////////
 // Atomic flow objects
 //////////////////////////////////////////////////////////////////////
-
+#ifdef OUTLINES
+//FIXME Que faire avec les characteres > 256
+#endif
 void TeXFOTBuilder::characters(const Char *s, size_t n)
 {
   for (; n > 0; n--, s++) {
@@ -1748,12 +2023,24 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       switch(*s) {
       default:
 	os() << char(*s);
+#ifdef OUTLINES
+	if (needToCollect()){
+	  addHeadedText(s,1);
+	  //top(parStack_).headingText_.append(s,1);
+	}
+#endif
 	break;
       case '\\':
       case '^':
       case '_':
       case '~':
 	os() << "\\char" << int(*s) << "{}";
+#ifdef OUTLINES
+	if (needToCollect()){
+	  addHeadedText(s,1);
+	  //top(parStack_).headingText_.append(s,1);
+	}
+#endif
 	break;
       case '{':
       case '}':
@@ -1762,9 +2049,22 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       case '#':
       case '%':
 	os() << "\\" << char(*s);
+#ifdef OUTLINES
+	if (needToCollect()){
+	  protectedChar_[1]=*s;
+	  addHeadedText(protectedChar_);
+	  //top(parStack_).headingText_ += protectedChar_;
+	}
+#endif
 	break;
       case '\r':
 	os() << '\n';
+#ifdef OUTLINES
+	if (needToCollect()){
+	  addHeadedText(return_);
+	  //top(parStack_).headingText_ += return_;
+	}
+#endif
 	break;
       case '\n':
 	break;
@@ -1944,16 +2244,55 @@ void TeXFOTBuilder::startParagraph(const ParagraphNIC &nic)
     curTable().curCell().paragraphChildrenNum++;
   start();
   setParagraphNIC(nic);
+#ifdef OUTLINES
+  if (headingSet_){
+    startGroup("HeadPar");
+    headingSet_=0;
+    inHeading_=1;
+    top(parStack_).previous_=lastHeaded_;
+    lastHeaded_=parStack_.size() - 1 ;
+    //assert(lastHeaded_!=0);
+  }
+  else{
+    ParHead par(0);
+    startGroup("Par");
+    push(parStack_,par);
+    top(parStack_).previous_=lastHeaded_;
+  }
+#else
   startGroup("Par");
+#endif
 }
 
 void TeXFOTBuilder::endParagraph()
 {
-  endGroup("Par");
+  //FIXME : when (headed (level n) (headed level (+ n 1)))
+  // text for level N+1 is emitted before text for level n
+  // and outliens are out of sync.
+#ifdef OUTLINES
+  if (top(parStack_).isHeaded_){
+    //cerr << "Writing\n";
+    //cerr << "length : "<<top(parStack_).headingText_.size();
+    os() << "\\def\\HeadingText{%\n"
+	 << top(parStack_).headingText_
+	 <<"}%\n";
+    endGroup("HeadPar");
+    //    headingText_.resize(0);
+    inHeading_=0;
+    
+  }
+  else{
+    //cerr << "Non Writing\n";
+    endGroup("Par");
+  }
+  lastHeaded_=top(parStack_).previous_;
+  pop(parStack_);
+#else
+  endDisplay();
+#endif
   end();
   endDisplay();
 }
-
 void TeXFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
 {
   startDisplay( nic );
@@ -3411,6 +3750,12 @@ void TeXFOTBuilder::setEscapementSpaceAfter(const InlineSpace &space)
 }
 
 
+void TeXFOTBuilder::setInlineSpaceSpace(const OptInlineSpace &space)
+{
+  set("InlineSpaceSpace",space);
+}
+
+
 void TeXFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
   // FIX ME!
@@ -4053,6 +4398,13 @@ void TeXFOTBuilder::set(const char *name,const OptLengthSpec &spec)
   }
 }
 
+void TeXFOTBuilder::set(const char *name,const OptInlineSpace &spec)
+{
+  if (spec.hasSpace) {
+    set(name,spec.space);
+  }
+}
+
 // This one is also a problem because it duplicates functionality.
 void TeXFOTBuilder::set(const char *name,const InlineSpace &space)
 {
@@ -4322,7 +4674,16 @@ void TeXFOTBuilder::setGridColumnSep(Length w)
 
 void TeXFOTBuilder::setHeadingLevel(long n)
 {
- set("HeadingLevel",n);
+#ifdef OUTLINES
+  if ((n >=1) && (n <=9)){
+    ParHead par(1,n);
+    headingSet_=1;
+    push(parStack_,par);
+    set("HeadingLevel",n);
+  }
+#else
+  set("HeadingLevel",n);
+#endif
 }
 
 void TeXFOTBuilder::setPageNumberRestart(bool flag)

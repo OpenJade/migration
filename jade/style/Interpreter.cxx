@@ -10,8 +10,12 @@
 #include "MacroFlowObj.h"
 #include "ELObjMessageArg.h"
 #include "VM.h"
+#include "Owner.h" 
+#include "SchemeParser.h"
 #include "macros.h"
+#include "InternalInputSource.h"
 #include <stdlib.h>
+#include "LangObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -39,6 +43,8 @@ size_t maxObjSize()
     sizeof(LabelSosofoObj),
     sizeof(MacroFlowObj),
     sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
+    sizeof(LangObj),
+    sizeof(RefLangObj),
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -52,12 +58,14 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+                         bool strictMode,
 			 const FOTBuilder::Extension *extensionTable)
 : groveManager_(groveManager),
   messenger_(messenger),
   extensionTable_(extensionTable),
   Collector(maxObjSize()),
   partIndex_(1),  // 0 is for command-line definitions
+  dPartIndex_(1),
   lexCategory_(lexOther),
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -66,7 +74,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
   initialStyle_(0),
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
-  dsssl2_(dsssl2)
+  dsssl2_(dsssl2),
+  strictMode_(strictMode)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -77,30 +86,47 @@ Interpreter::Interpreter(GroveManager *groveManager,
                 = new (*this) AddressObj(FOTBuilder::Address::none));
   makePermanent(emptyNodeListObj_
 		= new (*this) NodePtrNodeListObj);
+  defaultLanguage_ = theFalseObj_;
   installSyntacticKeys();
   installCValueSymbols();
   installPortNames();
   installPrimitives();
   installUnits();
-  installCharNames();
+  if (!strictMode_) {
+    installCharNames();
+    installSdata();
+  }
   installFlowObjs();
   installInheritedCs();
-  installSdata();
   installNodeProperties();
 
   static const char *lexCategories[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "!$%&*/<=>?~_^:",
+    "",
     "0123456789",
     "-+.",
+    "",
     "();\"",
     " \t\r\n\f",
+    "",
   };
-      //
+  lexCategory_.setEe(lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
+
+  // #',@[\\]`{|} are ASCII chars not mentioned above,
+  // but I guess we don't want to allow any of these
+  // in names (as most of them have special meaning in
+  // scheme/dsssl).
+  if (!strictMode_)
+    for (Char i = 127; i < charMax; i++)
+      lexCategory_.setChar(i, lexAddNameStart);
+
   initialProcessingMode_.setDefined();
+  // can't be done before initializing lexCategory_
+  installBuiltins();
 }
 
 void Interpreter::compile()
@@ -219,6 +245,7 @@ void Interpreter::installSyntacticKeys()
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
     { "define-unit", Identifier::keyDefineUnit },
+    { "query", Identifier::keyQuery },
     { "element", Identifier::keyElement },
     { "default", Identifier::keyDefault },
     { "root", Identifier::keyRoot },
@@ -315,6 +342,25 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
+    { "white-point", Identifier::keyWhitePoint },
+    { "black-point", Identifier::keyBlackPoint },
+    { "range", Identifier::keyRange },
+    { "range-abc", Identifier::keyRangeAbc },
+    { "range-lmn", Identifier::keyRangeLmn },
+    { "range-a", Identifier::keyRangeA },
+    { "decode-abc", Identifier::keyDecodeAbc },
+    { "decode-lmn", Identifier::keyDecodeLmn },
+    { "decode-a", Identifier::keyDecodeA },
+    { "matrix-abc", Identifier::keyMatrixAbc },
+    { "matrix-lmn", Identifier::keyMatrixLmn },
+    { "matrix-a", Identifier::keyMatrixA },
     { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
@@ -385,8 +431,12 @@ void Interpreter::installCharNames()
   } chars[] = {
 #include "charNames.h"
   };
-  for (size_t i = 0; i < SIZEOF(chars); i++)
-    namedCharTable_.insert(makeStringC(chars[i].name), chars[i].c);
+  for (size_t i = 0; i < SIZEOF(chars); i++) {
+    CharPart ch;
+    ch.c = chars[i].c;
+    ch.defPart = unsigned(-1);
+    namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installSdata()
@@ -400,8 +450,12 @@ void Interpreter::installSdata()
   } entities[] = {
 #include "sdata.h"
   };
-  for (size_t i = 0; i < SIZEOF(entities); i++)
-    sdataEntityNameTable_.insert(makeStringC(entities[i].name), entities[i].c);
+  for (size_t i = 0; i < SIZEOF(entities); i++) { 
+    CharPart ch;
+    ch.c = entities[i].c;
+    ch.defPart = unsigned(-1);
+    sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installNodeProperties()
@@ -413,17 +467,134 @@ void Interpreter::installNodeProperties()
   }
 }
 
-bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
+void Interpreter::setCharRepertoire(const StringC &pubid)
+{
+  if (pubid == "UNREGISTERED::OpenJade//Character Repertoire::OpenJade") {
+    if (strictMode_) {
+      installCharNames();
+      installSdata();
+      // This assumes that we process char-repertoire
+      // declaration before any declarations which change
+      // lexical categories.
+      for (Char i = 127; i < charMax; i++)
+        lexCategory_.setChar(i, lexAddNameStart);
+      strictMode_ = 0;
+    }
+   } else 
+     message(InterpreterMessages::unsupportedCharRepertoire,
+                StringMessageArg(pubid));
+}
+ 
+void Interpreter::addStandardChar(const StringC &name, const StringC &num)
+{
+  int n;
+  size_t i = 0;
+  if (!scanSignDigits(num, i, n)) {
+    message(InterpreterMessages::badCharNumber, StringMessageArg(num));
+    return;
+  }
+
+  const CharPart *def = namedCharTable_.lookup(name);
+  CharPart ch;
+  ch.c = n;
+  ch.defPart = dPartIndex_;
+  if (def) {
+    if (dPartIndex_ < def->defPart)
+      namedCharTable_.insert(name, ch, 1);
+    else if (def->defPart == dPartIndex_ && def->c != ch.c) 
+      message(InterpreterMessages::duplicateCharName, 
+    	      StringMessageArg(name));
+  }
+  else 
+    namedCharTable_.insert(name, ch, 1);
+}
+
+void Interpreter::addNameChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddNameStart);
+}
+
+void Interpreter::addSeparatorChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp)
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddWhiteSpace);
+}
+
+void Interpreter::addSdataEntity(const StringC &ename, const StringC &etext, const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) { 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+    return; 
+  }
+
+  CharPart ch;
+  ch.c = cp->c;
+  ch.defPart = dPartIndex_;
+
+  if (ename.size() > 0) {
+    const CharPart *def = sdataEntityNameTable_.lookup(ename);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityNameTable_.insert(ename, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityName, 
+		StringMessageArg(ename));
+    }
+    else
+      sdataEntityNameTable_.insert(ename, ch);
+  }
+
+  if (etext.size() > 0) {
+    const CharPart *def = sdataEntityTextTable_.lookup(etext);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityTextTable_.insert(etext, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityText, 
+		StringMessageArg(etext));
+    }
+    else
+      sdataEntityTextTable_.insert(etext, ch);
+  }
+}
+
+bool Interpreter::sdataMap(GroveString name, GroveString text, GroveChar &c) const
 {
   StringC tem(name.data(), name.size());
-  const Char *cp = sdataEntityNameTable_.lookup(tem);
+  StringC tem2(text.data(), text.size());
+
+  const CharPart *cp = sdataEntityNameTable_.lookup(tem);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
+  
+  cp = sdataEntityTextTable_.lookup(tem2);
+  if (cp) {
+    c = cp->c;
+    return 1;
+  }
+  
   if (convertUnicodeCharName(tem, c))
     return 1;
-  // I think this is the most thing to do.
+  // I think this is the best thing to do.
   // At least it makes preserve-sdata work with unknown SDATA entities.
   c = defaultChar;
   return 1;
@@ -450,9 +621,9 @@ ELObj *Interpreter::convertGlyphId(const Char *str, size_t len, const Location &
 
 bool Interpreter::convertCharName(const StringC &str, Char &c) const
 {
-  const Char *cp = namedCharTable_.lookup(str);
+  const CharPart *cp = namedCharTable_.lookup(str);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
   return convertUnicodeCharName(str, c);
@@ -567,6 +738,11 @@ void Interpreter::endPart()
 {
   currentPartFirstInitialValue_ = initialValueNames_.size();
   partIndex_++;
+}
+
+void Interpreter::dEndPart()
+{
+  dPartIndex_++;
 }
 
 void Interpreter::normalizeGeneralName(const NodePtr &nd, StringC &str)
@@ -1542,15 +1718,30 @@ unsigned long Interpreter::StringSet::hash(const String<char> &str)
   return h;
 }
 
+bool Identifier::preferBuiltin_ = 0;
+
 Identifier::Identifier(const StringC &name)
-: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), flowObj_(0)
+: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
+  flowObj_(0), builtin_(0), defPart_(0)
 {
 }
 
+void Identifier::maybeSaveBuiltin()
+{
+  if (defPart_ == unsigned(-1) && !builtin_) {
+    builtin_ = new Identifier(name());
+    if (value_)
+      builtin_->setValue(value_, defPart_);
+    else
+      builtin_->setDefinition(def_, defPart_, defLoc_);
+  }
+}
+ 
 void Identifier::setDefinition(Owner<Expression> &expr,
 			       unsigned part,
 			       const Location &loc)
 {
+  maybeSaveBuiltin();
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
@@ -1559,6 +1750,7 @@ void Identifier::setDefinition(Owner<Expression> &expr,
 
 void Identifier::setValue(ELObj *value, unsigned partIndex)
 {
+  maybeSaveBuiltin();
   value_ = value;
   // Built in functions have lowest priority.
   defPart_ = partIndex;
@@ -1575,8 +1767,15 @@ bool Identifier::defined(unsigned &part, Location &loc) const
 
 ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
 {
+  if (builtin_ && preferBuiltin_)
+    return builtin_->computeValue(force, interp);
   if (value_)
     return value_;
+  bool preferred = 0;
+  if (defPart_ == unsigned(-1) && !preferBuiltin_) {
+    preferBuiltin_ = 1;
+    preferred = 1;
+  }
   ASSERT(def_);
   if (beingComputed_) {
     if (force) {
@@ -1600,6 +1799,8 @@ ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
     }
     ((Identifier *)this)->beingComputed_ = 0;
   }
+  if (preferred)
+    preferBuiltin_ = 0;
   return value_;
 }
 
@@ -1778,6 +1979,32 @@ bool operator==(const StringC &s, const char *p)
     if (p[i] == '\0' || (unsigned char)p[i] != s[i])
       return 0;
   return p[s.size()] == '\0';
+}
+
+void Interpreter::installBuiltins()
+{
+  partIndex_ = unsigned(-1);
+  StringC sysid(makeStringC(DEFAULT_SCHEME_BUILTINS));
+  StringC src;
+  groveManager_->mapSysid(sysid);
+  if (groveManager_->readEntity(sysid, src)) {
+    Owner<InputSource> in(new InternalInputSource(src,
+                              InputSourceOrigin::make()));
+    SchemeParser scm(*this, in);
+    scm.parse();
+  }
+  endPart();
+  partIndex_ = 1;
+}
+
+void Interpreter::setDefaultLanguage(ELObj *lang)
+{
+  defaultLanguage_ = (lang->asLanguage()) ? lang : theFalseObj_;
+}
+
+ELObj *Interpreter::defaultLanguage() const
+{
+  return defaultLanguage_;
 }
 
 #ifdef DSSSL_NAMESPACE

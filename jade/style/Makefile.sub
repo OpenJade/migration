@@ -1,5 +1,8 @@
 LIB=style
-OBJS=Collector.o \
+DEPLIBS=-lm -L$(TOP)/grove/.libs -lgrove -L$(TOP)/lib/.libs -lsp 	\
+  -L$(TOP)/spgrove/.libs -lspgrove
+OBJS=LangObj.o \
+  Collector.o \
   DssslApp.o \
   DssslSpecEventHandler.o \
   ELObj.o \
@@ -30,3 +33,6 @@ GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 FlowObj.o: FlowObj_inst.cxx
 primitive.o: primitive_inst.cxx
 DssslApp.o: DssslAppMessages.h
+FlowObj.lo: FlowObj_inst.cxx
+primitive.lo: primitive_inst.cxx
+DssslApp.lo: DssslAppMessages.h

@@ -329,6 +329,401 @@ ColorSpaceObj *ColorSpaceObj::asColorSpace()
   return this;
 }
 
+// invert a 3x3 matrix A. result is returned in B
+// both must be arrays of length 9.
+static void
+invert(double *A, double *B)
+{
+  B[0] =   (A[4]*A[8] - A[5]*A[7]); 
+  B[3] = - (A[3]*A[8] - A[5]*A[6]);
+  B[6] =   (A[3]*A[7] - A[4]*A[6]);
+  B[1] = - (A[1]*A[8] - A[2]*A[7]);
+  B[4] =   (A[0]*A[8] - A[2]*A[6]);
+  B[7] = - (A[0]*A[7] - A[1]*A[6]);
+  B[2] =   (A[1]*A[5] - A[2]*A[4]);
+  B[5] = - (A[0]*A[5] - A[2]*A[3]);
+  B[8] =   (A[0]*A[4] - A[1]*A[3]);
+  double det = A[0]*B[0] + A[1]*B[3] + A[2]*B[6]; 
+  if (det < 0.0001) {
+    //FIXME message
+  }
+  B[0] /= det; B[1] /= det; B[2] /= det;           
+  B[3] /= det; B[4] /= det; B[5] /= det;          
+  B[6] /= det; B[7] /= det; B[8] /= det;         
+}
+
+/*
+ FIXME make color handling more flexible:
+  * pass different color types to backends
+  * move the conversion code to a separate
+    class ColorConverter, which could then
+    be used by backends to do the needed
+    conversions. 
+  * make phosphors settable 
+  * make highlight color for KX settable 
+  * whitepoint correction, making the device 
+    whitepoint/blackpoint settable
+
+ for the formulas used here, see:
+  * Computer Graphics, Principles and Practice, Second Edition,
+    Foley, van Damme, Hughes,
+    Addison-Wesley, 1987
+  * Principles of Color Technology, Second Edition, 
+    Fred W. Billmeyer, Jr. and Max Saltzman, 
+    John Wiley & Sons, Inc., 1981
+  * The color faq
+*/
+CIEXYZColorSpaceObj::CIEXYZColorSpaceObj(const double *wp, const double *bp)
+{
+  xyzData_ = new XYZData;
+  for (int i = 0; i < 3; i++) 
+    xyzData_->white_[i] = wp[i];
+  double tmp = wp[0] + 15*wp[1] + 3*wp[2]; 
+  xyzData_->white_u = 4*wp[0]/tmp;
+  xyzData_->white_v = 9*wp[1]/tmp;
+
+  // from the color faq
+  double xr = .64; double yr = .33; 
+  double xg = .30; double yg = .60;
+  double xb = .15; double yb = .06;
+  double U[9];
+  U[0] = xr; U[1] = xg; U[2] = xb; 
+  U[3] = yr; U[4] = yg; U[5] = yb; 
+  U[6] = 1.0 - xr - yr; U[7] = 1.0 - xg - yg; U[8] = 1.0 - xb - yb; 
+  double Uinv[9];
+  invert(U, Uinv);  
+  double C[3];
+  for (int i = 0; i < 3; i++) 
+    C[i] = Uinv[3*i]*wp[0] + Uinv[3*i+1]*wp[1] + Uinv[3*i+2]*wp[2];
+  double Minv[9];
+  Minv[0] = U[0]*C[0]; Minv[1] = U[1]*C[1]; Minv[2] = U[2]*C[2];
+  Minv[3] = U[3]*C[0]; Minv[4] = U[4]*C[1]; Minv[5] = U[5]*C[2];
+  Minv[6] = U[6]*C[0]; Minv[7] = U[7]*C[1]; Minv[8] = U[8]*C[2];
+  invert(Minv, xyzData_->M_);
+}
+
+CIEXYZColorSpaceObj::~CIEXYZColorSpaceObj()
+{
+  delete xyzData_;
+}
+
+ELObj *CIEXYZColorSpaceObj::makeColor (const double *h, Interpreter &interp)
+{
+ unsigned char c[3];
+ for (int i = 0; i < 3; i++) 
+   c[i] = (unsigned char) ((xyzData_->M_[3*i]*h[0] 
+                          + xyzData_->M_[3*i+1]*h[1] 
+                          + xyzData_->M_[3*i+2]*h[2])*255.0 + .5);
+
+  return new (interp) DeviceRGBColorObj(c[0], c[1], c[2]);
+}
+
+CIELUVColorSpaceObj::CIELUVColorSpaceObj(const double *wp, const double *bp, const double *r) 
+: CIEXYZColorSpaceObj(wp, bp)
+{
+  luvData_ = new LUVData;
+  for (int i = 0; i < 6; i++) 
+    luvData_->range_[i] = r ? r[i] : ((i % 2) ? 1.0 : .0);
+}
+                                         
+CIELUVColorSpaceObj::~CIELUVColorSpaceObj()
+{
+  delete luvData_;
+}
+
+ELObj *CIELUVColorSpaceObj::makeColor(int argc, ELObj **argv,
+				 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 3) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("CIE LUV")));
+    return interp.makeError();
+  }
+  double d[3];
+  for (int i = 0; i < 3; i++) {
+    if (!argv[i]->realValue(d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("CIE LUV")));
+      return interp.makeError();
+    }
+    if (d[i] < luvData_->range_[2*i] || d[i] > luvData_->range_[2*i+1]) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("CIE LUV")));
+      return interp.makeError();
+    }
+  }
+
+  double h[3];
+  if (d[0] == 0.0) {
+    h[0] = h[1] = h[2] = 0.0;
+  } else {                                   
+    if (d[0] <= 7.996968)
+      h[1] = d[0] / 903.0;
+    else { 
+      h[1] = (d[0] + 16.0) / 116.0;
+      h[1] = h[1] * h[1] * h[1];
+    }                                        
+    double uu = d[1] / (13.0 * d[0]) + xyzData_->white_u;
+    double vv = d[2] / (13.0 * d[0]) + xyzData_->white_v;    
+    double tmp = 9.0 * h[1] / vv;                 
+    h[0] = uu * tmp / 4.0;                  
+    h[2] = (tmp - 15.0 * h[1] - h[0]) / 3.0;     
+  }              
+
+  return CIEXYZColorSpaceObj::makeColor(h, interp);
+}
+
+CIELABColorSpaceObj::CIELABColorSpaceObj(const double *wp, const double *bp, const double *r) 
+: CIEXYZColorSpaceObj(wp, bp)
+{
+  labData_ = new LABData;
+  if (r)
+    for (int i = 0; i < 6; i++) 
+      labData_->range_[i] = r[i];
+  else { 
+    labData_->range_[0] = .0;
+    labData_->range_[1] = 100.0;
+    labData_->range_[2] = .0;
+    labData_->range_[3] = 1.0;
+    labData_->range_[4] = .0;
+    labData_->range_[5] = 1.0;
+  }  
+}
+                                         
+CIELABColorSpaceObj::~CIELABColorSpaceObj()
+{
+  delete labData_;
+}
+
+ELObj *CIELABColorSpaceObj::makeColor(int argc, ELObj **argv,
+				 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 3) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("CIE LAB")));
+    return interp.makeError();
+  }
+  double d[3];
+  for (int i = 0; i < 3; i++) {
+    if (!argv[i]->realValue(d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("CIE LAB")));
+      return interp.makeError();
+    }
+    if (d[i] < labData_->range_[2*i] || d[i] > labData_->range_[2*i+1]) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("CIE LAB")));
+      return interp.makeError();
+    }
+  }
+  d[0] /= 100.0;
+  
+  double h[3];
+  double tmp = (d[0] + 16.0) / 116.0;
+  h[1] = tmp * tmp * tmp;
+  if (h[1] < 0.008856) {
+    tmp = d[0] / 9.03292;
+    h[0] = xyzData_->white_[0] * ((d[1] / 3893.5) + tmp);
+    h[1] = tmp;
+    h[2] = xyzData_->white_[2] * (tmp - (d[2] / 1557.4));
+  } else {
+    double tmp2 = tmp + (d[1] / 5.0);
+    h[0] = xyzData_->white_[0] * tmp2 * tmp2 * tmp2;
+    tmp2 = tmp - (d[2] / 2.0);
+    h[2] = xyzData_->white_[2] * tmp2 * tmp2 * tmp2;
+  }
+
+  return CIEXYZColorSpaceObj::makeColor(h, interp);
+}
+
+CIEABCColorSpaceObj::CIEABCColorSpaceObj(const double *wp, const double *bp, 
+      const double *rabc, FunctionObj **dabc, const double *mabc, 
+      const double *rlmn, FunctionObj **dlmn, const double *mlmn) 
+: CIEXYZColorSpaceObj(wp, bp)
+{
+  abcData_ = new ABCData;
+  int i;
+  for (i = 0; i < 6; i++) 
+    abcData_->rangeAbc_[i] = rabc ? rabc[i] : ((i % 2) ? 1.0 : 0.0); 
+  for (i = 0; i < 3; i++)
+    abcData_->decodeAbc_[i] = dabc ? dabc[i] : 0;
+  for (i = 0; i < 9; i++)
+    abcData_->matrixAbc_[i] = mabc ? mabc[i] : ((i % 4) ? 0.0 : 1.0);
+  for (i = 0; i < 6; i++) 
+    abcData_->rangeLmn_[i] = rlmn ? rlmn[i] : ((i % 2) ? 1.0 : 0.0); 
+  for (i = 0; i < 3; i++)
+    abcData_->decodeLmn_[i] = dlmn ? dlmn[i] : 0;
+  for (i = 0; i < 9; i++)
+    abcData_->matrixLmn_[i] = mlmn ? mlmn[i] : ((i % 4) ? 0.0 : 1.0);
+}
+
+CIEABCColorSpaceObj::~CIEABCColorSpaceObj()
+{
+  delete abcData_;
+}
+
+static 
+bool applyFunc(Interpreter &interp, FunctionObj *f, double &d)
+{
+  InsnPtr insns[2];
+  insns[1] = f->makeCallInsn(1, interp, Location(), InsnPtr());
+  insns[0] = InsnPtr(new ConstantInsn(new (interp) RealObj(d),insns[1]));
+  VM vm(interp);
+  ELObj *res = vm.eval(insns[0].pointer());
+  if (!res || !res->realValue(d)) 
+    return 0;
+  return 1;
+}
+
+ELObj *CIEABCColorSpaceObj::makeColor(int argc, ELObj **argv,
+				 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 3) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("CIE Based ABC")));
+    return interp.makeError();
+  }
+  double d[3];
+  for (int i = 0; i < 3; i++) {
+    if (!argv[i]->realValue(d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("CIE Based ABC")));
+      return interp.makeError();
+    }
+    if (d[i] < abcData_->rangeAbc_[2*i] || d[i] > abcData_->rangeAbc_[2*i+1]) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("CIE Based ABC")));
+      return interp.makeError();
+    }
+    if (abcData_->decodeAbc_[i] && !applyFunc(interp, abcData_->decodeAbc_[i], d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorProcResType,
+                     StringMessageArg(interp.makeStringC("CIE Based ABC")));
+      return interp.makeError();
+    }
+  }
+  double l[3];
+  for (int i = 0; i < 3; i++) { 
+    l[i] = abcData_->matrixAbc_[i]*d[0] 
+         + abcData_->matrixAbc_[3+i]*d[1] 
+         + abcData_->matrixAbc_[6+i]*d[2];
+    if (l[i] < abcData_->rangeLmn_[2*i] || l[i] > abcData_->rangeLmn_[2*i+1]) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("CIE Based ABC")));
+      return interp.makeError();
+    }
+    if (abcData_->decodeLmn_[i] && !applyFunc(interp, abcData_->decodeLmn_[i], l[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorProcResType,
+                     StringMessageArg(interp.makeStringC("CIE Based ABC")));
+      return interp.makeError();
+    }
+  }
+  double h[3];
+  for (int i = 0; i < 3; i++)  
+    h[i] = abcData_->matrixLmn_[i]*l[0] 
+         + abcData_->matrixLmn_[3+i]*l[1] 
+         + abcData_->matrixLmn_[6+i]*l[2];
+
+  return CIEXYZColorSpaceObj::makeColor(h, interp);
+}
+
+CIEAColorSpaceObj::CIEAColorSpaceObj(const double *wp, const double *bp, 
+      const double *ra, FunctionObj *da, const double *ma, 
+      const double *rlmn, FunctionObj **dlmn, const double *mlmn) 
+: CIEXYZColorSpaceObj(wp, bp)
+{
+  aData_ = new AData;
+  int i;
+  for (i = 0; i < 2; i++) 
+    aData_->rangeA_[i] = ra ? ra[i] : ((i % 2) ? 1.0 : 0.0); 
+  aData_->decodeA_ = da ? da : 0;
+  for (i = 0; i < 3; i++)
+    aData_->matrixA_[i] = ma ? ma[i] : 1.0;
+  for (i = 0; i < 6; i++) 
+    aData_->rangeLmn_[i] = rlmn ? rlmn[i] : ((i % 2) ? 1.0 : 0.0); 
+  for (i = 0; i < 3; i++)
+    aData_->decodeLmn_[i] = dlmn ? dlmn[i] : 0;
+  for (i = 0; i < 9; i++)
+    aData_->matrixLmn_[i] = mlmn ? mlmn[i] : ((i % 4) ? 0.0 : 1.0);
+}
+
+CIEAColorSpaceObj::~CIEAColorSpaceObj()
+{
+  delete aData_;
+}
+
+ELObj *CIEAColorSpaceObj::makeColor(int argc, ELObj **argv,
+				 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("CIE Based A")));
+    return interp.makeError();
+  }
+  double d;
+  if (!argv[0]->realValue(d)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgType,
+                   StringMessageArg(interp.makeStringC("CIE Based A")));
+    return interp.makeError();
+  }
+  if (d < aData_->rangeA_[0] || d > aData_->rangeA_[1]) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgRange,
+                   StringMessageArg(interp.makeStringC("CIE Based A")));
+    return interp.makeError();
+  }
+  if (aData_->decodeA_ && !applyFunc(interp, aData_->decodeA_, d)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorProcResType,
+                   StringMessageArg(interp.makeStringC("CIE Based A")));
+    return interp.makeError();
+  }
+  double l[3];
+  for (int i = 0; i < 3; i++) { 
+    l[i] = aData_->matrixA_[i]*d;  
+    if (l[i] < aData_->rangeLmn_[2*i] || l[i] > aData_->rangeLmn_[2*i+1]) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("CIE Based A")));
+      return interp.makeError();
+    }
+    if (aData_->decodeLmn_[i] && !applyFunc(interp, aData_->decodeLmn_[i], l[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorProcResType,
+                     StringMessageArg(interp.makeStringC("CIE Based A")));
+      return interp.makeError();
+    }
+  }
+  double h[3];
+  for (int i = 0; i < 3; i++) { 
+    h[i] = aData_->matrixLmn_[i]*l[0] 
+         + aData_->matrixLmn_[3+i]*l[1] 
+         + aData_->matrixLmn_[6+i]*l[2];
+  }
+  return CIEXYZColorSpaceObj::makeColor(h, interp);
+}
+
 ELObj *DeviceRGBColorSpaceObj::makeColor(int argc, ELObj **argv,
 					 Interpreter &interp, const Location &loc)
 {
@@ -336,7 +731,8 @@ ELObj *DeviceRGBColorSpaceObj::makeColor(int argc, ELObj **argv,
     return new (interp) DeviceRGBColorObj(0, 0, 0);
   if (argc != 3) {
     interp.setNextLocation(loc);
-    interp.message(InterpreterMessages::RGBColorArgCount);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("Device RGB")));
     return interp.makeError();
   }
   unsigned char c[3];
@@ -344,17 +740,113 @@ ELObj *DeviceRGBColorSpaceObj::makeColor(int argc, ELObj **argv,
     double d;
     if (!argv[i]->realValue(d)) {
       interp.setNextLocation(loc);
-      interp.message(InterpreterMessages::RGBColorArgType);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("Device RGB")));
       return interp.makeError();
     }
     if (d < 0.0 || d > 1.0) {
       interp.setNextLocation(loc);
-      interp.message(InterpreterMessages::RGBColorArgRange);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("Device RGB")));
       return interp.makeError();
     }
     c[i] = (unsigned char)(d*255.0 + .5);
   }
   return new (interp) DeviceRGBColorObj(c[0], c[1], c[2]);
+}
+
+ELObj *DeviceGrayColorSpaceObj::makeColor(int argc, ELObj **argv,
+					 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("Device Gray")));
+    return interp.makeError();
+  }
+  unsigned char c;
+  double d;
+  if (!argv[0]->realValue(d)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgType,
+                   StringMessageArg(interp.makeStringC("Device Gray")));
+    return interp.makeError();
+  }
+  if (d < 0.0 || d > 1.0) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgRange,
+                   StringMessageArg(interp.makeStringC("Device Gray")));
+    return interp.makeError();
+  }
+  c = (unsigned char)(d*255.0 + .5);
+  return new (interp) DeviceRGBColorObj(c, c, c);
+}
+
+#define MIN(x,y) (((x) < (y)) ? (x) : (y)) 
+
+ELObj *DeviceCMYKColorSpaceObj::makeColor(int argc, ELObj **argv,
+					 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 4) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("Device CMYK")));
+    return interp.makeError();
+  }
+  double d[4];
+  for (int i = 0; i < 4; i++) {
+    if (!argv[i]->realValue(d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("Device CMYK")));
+      return interp.makeError();
+    }
+    if (d[i] < 0.0 || d[i] > 1.0) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("Device CMYK")));
+      return interp.makeError();
+    }
+  }
+  unsigned char c[3];
+  for (int i = 0; i < 3; i++) 
+    c[i] = (unsigned char)((1 - MIN(1, d[i] + d[3]))*255.0 + .5);
+  return new (interp) DeviceRGBColorObj(c[0], c[1], c[2]);
+}
+
+ELObj *DeviceKXColorSpaceObj::makeColor(int argc, ELObj **argv,
+					 Interpreter &interp, const Location &loc)
+{
+  if (argc == 0)
+    return new (interp) DeviceRGBColorObj(0, 0, 0);
+  if (argc != 2) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::colorArgCount,
+                   StringMessageArg(interp.makeStringC("Device KX")));
+    return interp.makeError();
+  }
+  double d[2];
+  for (int i = 0; i < 2; i++) {
+    if (!argv[i]->realValue(d[i])) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgType,
+                     StringMessageArg(interp.makeStringC("Device KX")));
+      return interp.makeError();
+    }
+    if (d[i] < 0.0 || d[i] > 1.0) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::colorArgRange,
+                     StringMessageArg(interp.makeStringC("Device KX")));
+      return interp.makeError();
+    }
+  }
+  unsigned char c;
+  c = (unsigned char)((1 - MIN(1, d[0] + d[1]))*255.0 + .5);
+  return new (interp) DeviceRGBColorObj(c, c, c);
 }
 
 VarInheritedC::VarInheritedC(const ConstPtr<InheritedC> &ic,

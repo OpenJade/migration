@@ -58,7 +58,7 @@ E1+rankStemGenericIdentifier+11.2.1p2+%1 used both a rank stem and generic ident
 E0+missingTagMinimization+11.2p3+omitted tag minimization parameter can be omitted only if "OMITTAG NO" is specified on the SGML declaration
 E1+duplicateElementDefinition+11.2p2+element type %1 already defined
 E0+entityApplicableDtd++entity reference with no applicable DTD
-E1+commentDeclInvalidToken+10.3p1+invalid comment declaration: found %1 outside comment but inside comment declaration+commment declaration started here
+E1+commentDeclInvalidToken+10.3p1+invalid comment declaration: found %1 outside comment but inside comment declaration+comment declaration started here
 E1+instanceDeclaration++%1 declaration not allowed in instance
 E0+contentNonSgml++non-SGML character not allowed in content
 E1+noCurrentRank++no current rank for rank stem %1
@@ -418,7 +418,8 @@ W0+internalSubsetLiteralParamEntityRef++reference to parameter entity in paramet
 E0+cannotGenerateSystemIdSgml++cannot generate system identifier for SGML declaration reference
 E1+sdTextClass++public text class of formal public identifier of SGML declaration must be SD
 E0+sgmlDeclRefRequiresWww++SGML declaration reference was used but minimum literal was not "ISO 8879:1986 (WWW)"
-
+W0+pcdataGroupMemberOccurrenceIndicator++member of model group containing #PCDATA has occurrence indicator
+W0+pcdataGroupMemberModelGroup++member of model group containing #PCDATA is a model group
 # message fragments
 =1000
 +delimStart++delimiter 

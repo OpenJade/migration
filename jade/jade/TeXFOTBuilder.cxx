@@ -593,7 +593,7 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
 ////////////////////////////////////////////////////////////////////////
 
 TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
-: fileout_(o), mgr_(mgr)
+: fileout_(o), mgr_(mgr), preserveSdata_(1)
 {
   os() << "\\FOT{}";
 }
@@ -639,6 +639,8 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
 	break;
       case '\r':
 	os() << '\n';
+	break;
+      case '\n':
 	break;
       }
     }
@@ -2699,35 +2701,35 @@ void TeXFOTBuilder::setParagraphNIC(const ParagraphNIC &nic)
 
 void TeXFOTBuilder::setCharacterNIC(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & nic.cChar)
+  if (nic.specifiedC & (1 << CharacterNIC::cChar))
     set("Ch",(unsigned long)nic.ch);
-  if (nic.specifiedC & nic.cGlyphId)
+  if (nic.specifiedC & (1 << CharacterNIC::cGlyphId))
     set("GlyphId",nic.glyphId);
-  if (nic.specifiedC & nic.cBreakBeforePriority)
+  if (nic.specifiedC & (1 << CharacterNIC::cBreakBeforePriority))
     set("BreakBeforePriority",nic.breakBeforePriority);
-  if (nic.specifiedC & nic.cBreakAfterPriority)
+  if (nic.specifiedC & (1 << CharacterNIC::cBreakAfterPriority))
     set("BreakAfterPriority",nic.breakAfterPriority);
-  if (nic.specifiedC & nic.cMathClass)
+  if (nic.specifiedC & (1 << CharacterNIC::cMathClass))
     set("MathClass",nic.mathClass);
-  if (nic.specifiedC & nic.cMathFontPosture)
+  if (nic.specifiedC & (1 << CharacterNIC::cMathFontPosture))
     set("MathFontPosture",nic.mathFontPosture);
-  if (nic.specifiedC & nic.cScript)
+  if (nic.specifiedC & (1 << CharacterNIC::cScript))
     set("Script",(long unsigned int)nic.script);
-  if (nic.specifiedC & nic.cIsDropAfterLineBreak)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsDropAfterLineBreak))
     set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
-  if (nic.specifiedC & nic.cIsDropUnlessBeforeLineBreak)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsDropUnlessBeforeLineBreak))
     set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
-  if (nic.specifiedC & nic.cIsPunct)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsPunct))
     set("IsPunct",nic.isPunct);
-  if (nic.specifiedC & nic.cIsInputWhitespace)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsInputWhitespace))
     set("IsInputWhiteSpace",nic.isInputWhitespace);
-  if (nic.specifiedC & nic.cIsInputTab)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsInputTab))
     set("IsInputTab",nic.isInputTab);
-  if (nic.specifiedC & nic.cIsRecordEnd)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsRecordEnd))
     set("IsRecordEnd",nic.isRecordEnd);
-  if (nic.specifiedC & nic.cIsSpace)
+  if (nic.specifiedC & (1 << CharacterNIC::cIsSpace))
     set("IsSpace",nic.isSpace);
-  MAYBESET("StretchFactor",nic.stretchFactor,0L);
+  MAYBESET("StretchFactor",nic.stretchFactor,1.0);
 }
 
 void TeXFOTBuilder::setLineFieldNIC(const LineFieldNIC &nic)

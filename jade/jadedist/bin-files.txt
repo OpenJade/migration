@@ -54,6 +54,7 @@ pubtext\HTML4.dcl
 pubtext\HTML4-s.dtd
 pubtext\HTML4.dtd
 pubtext\HTML4-f.dtd
+pubtext\HTML4.soc
 pubtext\HTMLlat1.ent
 pubtext\HTMLspec.ent
 pubtext\HTMLsym.ent

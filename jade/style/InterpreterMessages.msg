@@ -123,3 +123,5 @@ E1+uninitializedVariableReference++reference to uninitialized variable %1
 E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here
+E1+undefinedMode++mode %1 not defined
+

@@ -1082,6 +1082,10 @@ WithModeExpression::WithModeExpression(const ProcessingMode *mode, Owner<Express
 InsnPtr WithModeExpression::compile(Interpreter &interp, const Environment &env, int stackPos,
 				    const InsnPtr &next)
 {
+  if (!mode_->defined()) {
+    interp.setNextLocation(location());
+    interp.message(InterpreterMessages::undefinedMode, StringMessageArg(mode_->name()));
+  }
   return new PushModeInsn(mode_,
 			  optimizeCompile(expr_, interp, env, stackPos,
 					  new PopModeInsn(next)));
@@ -1255,9 +1259,9 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     if (flowObj->hasPseudoNonInheritedC(keys_[i])
         && !exprs_[i]->constantValue()) {
       rest = exprs_[i]->compile(interp, env, stackPos + 1,
-			        new SetNonInheritedCInsn(keys_[i],
-						         exprs_[i]->location(),
-						         rest));
+			        new SetPseudoNonInheritedCInsn(keys_[i],
+						               exprs_[i]->location(),
+						               rest));
     }
   }
   // FIXME optimize case where there are no non-inherited styles.

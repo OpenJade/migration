@@ -99,6 +99,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
+  initialProcessingMode_.setDefined();
 }
 
 void Interpreter::compile()

@@ -22,7 +22,7 @@ public:
     };
   static inline Type blank(int n) {
     // `Priority::' works round gcc 2.5.5 bug
-    return Priority::Type(n + 1);
+    return Priority::Type(n + function);
   }
   static inline Boolean isBlank(Type t) {
     return function < t && t < delim;

@@ -37,6 +37,17 @@
 |table-column
 |character
 |simple-page-sequence
+|page-sequence
+|column-set-sequence
+|embedded-text
+|anchor
+|included-container-area
+|glyph-annotation
+|aligned-column
+|multi-line-inline-note
+|emphasizing-mark
+|side-by-side
+|side-by-side-item
 |fraction
 |script
 |mark
@@ -65,6 +76,16 @@
 <!ELEMENT link %flow;>
 <!ELEMENT scroll %flow;>
 <!ELEMENT marginalia %flow;>
+<!ELEMENT page-sequence %flow;>
+<!ELEMENT column-set-sequence %flow;>
+<!ELEMENT embedded-text %flow;>
+<!ELEMENT included-container-area %flow;>
+<!ELEMENT glyph-annotation %flow;>
+<!ELEMENT aligned-column %flow;>
+<!ELEMENT multi-line-inline-note %flow;>
+<!ELEMENT emphasizing-mark %flow;>
+<!ELEMENT side-by-side %flow;>
+<!ELEMENT side-by-side-item %flow;>
 <!ELEMENT leader %flow;>
 <!ELEMENT sideline %flow;>
 <!ELEMENT box %flow;>
@@ -78,6 +99,7 @@
 <!ELEMENT grid-cell %flow;>
 <!ELEMENT paragraph-break EMPTY>
 <!ELEMENT external-graphic EMPTY>
+<!ELEMENT anchor EMPTY>
 <!ELEMENT rule EMPTY>
 <!ELEMENT alignment-point EMPTY>
 <!ELEMENT table-column EMPTY>
@@ -114,6 +136,34 @@
 <!ELEMENT simple-page-sequence.right-footer %flow;>
 <!ELEMENT simple-page-sequence.center-footer %flow;>
 
+<!ATTLIST column-set-sequence 
+ %display-nic;
+>
+<!ATTLIST aligned-column 
+ %display-nic;
+>
+<!ATTLIST side-by-side 
+ %display-nic;
+>
+<!ATTLIST embedded-text 
+ %embeddedtext-nic;
+>
+<!ATTLIST anchor 
+ %anchor-nic;
+>
+<!ATTLIST included-container-area 
+ %includedcontainerarea-nic;
+>
+<!ATTLIST glyph-annotation 
+ %glyphannotation-nic;
+>
+<!ATTLIST multi-line-inline-note 
+ %multilineinlinenote-nic;
+>
+<!ATTLIST emphasizing-mark 
+ %emphasizingmark-nic;
+>
+
 <!ENTITY % hf "
   front %boolean; #IMPLIED
   first %boolean; #IMPLIED
@@ -124,6 +174,12 @@
 <!ATTLIST simple-page-sequence.left-footer %hf;>
 <!ATTLIST simple-page-sequence.right-footer %hf;>
 <!ATTLIST simple-page-sequence.center-footer %hf;>
+
+<!ATTLIST page-sequence.right-header %hf;>
+<!ATTLIST page-sequence.center-header %hf;>
+<!ATTLIST page-sequence.left-footer %hf;>
+<!ATTLIST page-sequence.right-footer %hf;>
+<!ATTLIST page-sequence.center-footer %hf;>
 
 <!ELEMENT table
 (table.before-row-border, table.after-row-border,
@@ -244,6 +300,8 @@ float-out-marginalia %boolean; #IMPLIED
 float-out-sidelines %boolean; #IMPLIED
 float-out-line-numbers %boolean; #IMPLIED
 cell-background %boolean; #IMPLIED
+justify-spread %boolean; #IMPLIED
+binding-edge %enum; #IMPLIED
 span-weak %boolean; #IMPLIED
 ignore-record-end %boolean; #IMPLIED
 numbered-lines %boolean; #IMPLIED
@@ -281,6 +339,23 @@ sideline-side %enum; #IMPLIED
 hyphenation-keep %enum-or-boolean; #IMPLIED
 font-structure %enum-or-boolean; #IMPLIED
 font-proportionate-width %enum-or-boolean; #IMPLIED
+force-last-page %enum-or-boolean; #IMPLIED
+force-first-page %enum-or-boolean; #IMPLIED
+first-page-type %enum; #IMPLIED
+binding-edge %enum; #IMPLIED
+justify-spread %boolean; #IMPLIED
+anchor-keep-with-previous %boolean; #IMPLIED
+contents-alignment %enum; #IMPLIED
+overflow-action %enum; #IMPLIED
+annotation-glyph-placement %enum; #IMPLIED
+annotation-glyph-style CDATA #IMPLIED
+inline-note-style CDATA #IMPLIED
+inline-note-line-count NMTOKEN #IMPLIED
+mark-distribution CDATA #IMPLIED
+mark-style %boolean; #IMPLIED
+side-by-side-overlap-control %enum; #IMPLIED
+side-by-side-pre-align %enum; #IMPLIED
+side-by-side-post-align %enum; #IMPLIED
 cell-crossed %enum-or-boolean; #IMPLIED
 position-point-shift %length-spec; #IMPLIED
 start-margin %length-spec; #IMPLIED
@@ -346,14 +421,73 @@ glyph-subst-table NMTOKENS #IMPLIED
   space-after-priority NMTOKEN #IMPLIED
 ">
 
+<!ENTITY % embeddedtext-nic "
+  direction %enum; #IMPLIED 
+">
+
+<!ENTITY % anchor-nic "
+  display %boolean; #IMPLIED 
+">
+
+<!ENTITY % includedcontainerarea-nic "
+  scale %enum; #IMPLIED
+  scale-x NMTOKEN #IMPLIED
+  scale-y NMTOKEN #IMPLIED
+  display %boolean; #IMPLIED 
+  escapement-direction %enum; #IMPLIED 
+  widthType %enum; #IMPLIED 
+  heightType %enum; #IMPLIED 
+  height %length-spec; #IMPLIED
+  width %length-spec; #IMPLIED
+  position-point-x %length-spec; #IMPLIED
+  position-point-y %length-spec; #IMPLIED
+  contents-rotation NMTOKEN #IMPLIED
+  break-before-priority NMTOKEN #IMPLIED
+  break-after-priority NMTOKEN #IMPLIED
+  position-preference %enum-or-boolean; #IMPLIED
+  keep-with-next %boolean; 'false'
+  keep-with-previous %boolean; 'false'
+  may-violate-keep-before %boolean; 'false'
+  may-violate-keep-after %boolean; 'false'
+  keep %enum-or-boolean; #IMPLIED
+  break-before %enum-or-boolean; #IMPLIED
+  break-after %enum-or-boolean; #IMPLIED
+  space-before CDATA #IMPLIED
+  space-before-conditional %boolean; #IMPLIED
+  space-before-priority NMTOKEN #IMPLIED
+  space-after CDATA #IMPLIED
+  space-after-conditional %boolean; #IMPLIED
+  space-after-priority NMTOKEN #IMPLIED
+">
+
 <!ENTITY % inline-nic "
   break-before-priority NMTOKEN #IMPLIED
   break-after-priority NMTOKEN #IMPLIED
 ">
 
+<!ENTITY % multilineinlinenote-nic "
+  break-before-priority NMTOKEN #IMPLIED
+  break-after-priority NMTOKEN #IMPLIED
+">
+
+<!ENTITY % empahsizingmark-nic "
+  position-preference %enum; #IMPLIED 
+">
+
 <!ATTLIST sequence %inherited-characteristics;>
 <!ATTLIST line-field %inherited-characteristics;>
+<!ATTLIST page-sequence %inherited-characteristics;>
 <!ATTLIST simple-page-sequence %inherited-characteristics;>
+<!ATTLIST column-set-sequence %inherited-characteristics;>
+<!ATTLIST embedded-text %inherited-characteristics;>
+<!ATTLIST anchor %inherited-characteristics;>
+<!ATTLIST included-container-area %inherited-characteristics;>
+<!ATTLIST glyph-annotation %inherited-characteristics;>
+<!ATTLIST aligned-column %inherited-characteristics;>
+<!ATTLIST multi-line-inline-note %inherited-characteristics;>
+<!ATTLIST emphasizing-mark %inherited-characteristics;>
+<!ATTLIST side-by-side %inherited-characteristics;>
+<!ATTLIST side-by-side-item %inherited-characteristics;>
 <!ATTLIST fraction %inherited-characteristics;>
 <!ATTLIST fraction.fraction-bar %inherited-characteristics;>
 <!ATTLIST math-sequence %inherited-characteristics;>

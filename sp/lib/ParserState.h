@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef ParserState_INCLUDED
@@ -62,6 +62,9 @@ public:
   void setHandler(EventHandler *, const volatile sig_atomic_t *cancelPtr);
   void unsetHandler();
   Boolean inInstance() const;
+  Boolean inTag(Boolean &start) const;
+  void enterTag(Boolean start);
+  void leaveTag();
   Boolean hadDtd() const;
   void allDone();
   void startDtd(const StringC &);
@@ -239,6 +242,8 @@ private:
   Phase phase_;
   Phase finalPhase_;
   Boolean inInstance_;
+  Boolean inStartTag_;
+  Boolean inEndTag_;
   Ptr<Dtd> defDtd_;
   Ptr<Lpd> defLpd_;
   Vector<ConstPtr<Lpd> > allLpd_;

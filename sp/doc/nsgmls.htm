@@ -213,6 +213,36 @@ Output the notation name and attributes for DATA attributes. Otherwise,
 DATA attributes are treated like CDATA attributes. For more details, see clause
 4.4.3 of <A HREF="http://www.ornl.gov/sgml/sc34/document/0029.htm">Annex K 
 of ISO 8879</A>.</dd>
+
+<dt>
+<tt>comment</tt></dt>
+
+<dd>
+Output an <tt>_</tt> command with the contents of a comment. Multiple comments
+in a single comment declaration will result in multiple distinct <tt>_</tt>
+commands, just as if the comments were each in a separate comment
+declaration.</dd>
+
+<dt>
+<tt>omitted</tt></dt>
+
+<dd>
+
+Output an <tt>o</tt> command before a command which was implied by the input
+document, but omitted from the actual markup. This currently affects
+<tt>(</tt>, <tt>)</tt>, and <tt>A</tt> commands.</dd>
+
+<dt>
+<tt>tagomit</tt></dt>
+
+<dd>
+As <tt>omitted</tt>, but only for <tt>(</tt> and <tt>)</tt> commands.</dd>
+
+<dt>
+<tt>attromit</tt></dt>
+
+<dd>
+As <tt>omitted</tt>, but only for <tt>A</tt> commands.</dd>
 </dl>
 Multiple
 <tt>-o</tt> options are allowed.</dd>

@@ -1,9 +1,48 @@
-Changes in OpenSP 1.4
+Changes in OpenSP 1.5pre6
 
+* RPM spec file updates and corrections from Terje Bless
+
+* Adapt SP patch from Liam Quinn that adds a HTTP/1.0 Host header to HTTP
+  requests. Necessary to fetch DTDs specified in SYSTEM identifiers
+  when the DTD resides on a name-based "Virtual Host".
+  Thanks to 'tbe'.
+
+* Some GCC >= 2.96 fixes and other build improvements
+
+* A few minor documentation improvements, thanks to Terje Bless
+
+Changes in OpenSP 1.5pre5
+
+* Fix 32-bit assumptions so we build on 64-bit platforms such
+  as Alpha.
+
+* Enable internationalized builds on Win32
+
+* Other Win32 fixes
+
+* Re-instate the '-widref' option which was accidentally removed.
+
+* New -output options: comment, omitted, tagomit and attromit; this
+  shows comments and implied elements and/or attributes.  
+  Patch from Robert Braddock.
+
+* German translation updates
+
+* Build hygene
+
+* Autoconf fix affecting at least some gcc 2.7.x installations
+
+Changes in OpenSP 1.5pre4
+
+* More of Annex K supported: Common data attributes can now be
+  specified in external entity declarations.
+  
 * The architecture engine supports #MAPTOKEN.
 
 * The multibyte version of OpenSP now uses 32bit chars and supports
   the full UTF-16 range 0x0000-0x10ffff.
+
+Changes in OpenSP 1.4
 
 * Support for the koi8-r (RFC 1489) encoding.
  

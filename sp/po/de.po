@@ -2,13 +2,12 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1999-12-21 21:04+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2000-03-16 20:43+0000\n"
+"PO-Revision-Date: 2000-03-15 17:19+01:00\n"
+"Last-Translator: Matthias Clasen <clasen@mathematik.uni-freiburg.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
@@ -88,9 +87,6 @@ msgstr "Die Meta-DTD erlaubt keine Daten an dieser Stelle"
 msgid "invalid value %1 for ArcIgnD attribute"
 msgstr "Ungültiger Wert %1 für ArcIgnD Attribut"
 
-msgid "invalid value %1 for ArcIndr architectural support attribute"
-msgstr "Ungültiger Wert %1 für ArcIndr Architekturunterstützungsattribut"
-
 msgid "unrecognized quantity name %1"
 msgstr "Unbekannter Quantitätsname %1"
 
@@ -105,6 +101,18 @@ msgstr "Ungültige Ziffer %1"
 
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "Nur der Wert nArcIndr für das ArcIndr Attribut wird unterstützt"
+
+msgid "#ARCCONT attribute already specified"
+msgstr "#ARCCONT Attribut bereits spezifiziert"
+
+msgid "invalid value %1 for #ARCCONT"
+msgstr "Ungültiger Wert %1 für #ARCCONT"
+
+msgid "%1 already used as a substitute name"
+msgstr "%1 ist schon Ersetzungsname"
+
+msgid "substitute name #CONTENT already specified"
+msgstr "Ersetzungsname #CONTENT bereits spezifiziert"
 
 msgid "name expected"
 msgstr "Name erwartet"
@@ -2216,8 +2224,8 @@ msgstr ""
 "#IMPLICIT kann als Dokumenttyp nur bei CONCUR NO und LINK EXPLICIT NO "
 "verwendet werden"
 
-msgid "Sorry, #IMPLICIT doctypes not implemented"
-msgstr "Sorry, #IMPLICIT als Dokumenttyp nicht implementiert"
+msgid "Sorry, #IMPLIED doctypes not implemented"
+msgstr "Sorry, #IMPLIED als Dokumenttyp nicht implementiert"
 
 msgid "reference to DTD data entity ignored"
 msgstr "Referenz auf DTD-Datenentität ignoriert"
@@ -2227,6 +2235,33 @@ msgstr "Notation %1 für Parameterentität %2 undefiniert"
 
 msgid "notation %1 for external subset undefined"
 msgstr "Notation %1 für externe Teilmenge undefiniert"
+
+msgid "attribute %1 can't be redeclared"
+msgstr "Attribut %1 kann nicht redeklariert werden"
+
+msgid "#IMPLICIT attributes have already been specified for notation %1"
+msgstr "#IMPLICIT Attribut für Notationo %1 bereits spezifiziert"
+
+msgid ""
+"a name group is not allowed in a parameter entity reference in a start tag"
+msgstr ""
+"Eine Namensgruppe ist in einer Referenz auf eine Parameterentität in einem "
+"Starttag nicht erlaubt"
+
+msgid ""
+"name group in a parameter entity reference in an end tag (SGML forbids them "
+"in start tags)"
+msgstr ""
+"Namensgruppe ist in einer Referenz auf eine Parameterentität in einem Endtag "
+"(SGML verbietet diese in Starttags)"
+
+msgid "if the declared value is NOTATION a default value of CONREF is useless"
+msgstr ""
+"Wenn der deklarierte Wert NOTATION ist, ist ein Defaultwert von CONREF "
+"sinnlos"
+
+msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
+msgstr "Sorry, #ALL und #IMPLICIT Inhaltstoken nicht implementiert"
 
 msgid "delimiter "
 msgstr "Begrenzer "
@@ -2695,6 +2730,3 @@ msgstr "%1 gibt die Verkettung der Entitäten mit den Systembezeichnern"
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... auf der Standardausgabe aus."
-
-#~ msgid "NAME "
-#~ msgstr "NAME"

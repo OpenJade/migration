@@ -18,6 +18,7 @@
 #define SP_HAVE_SOCKET
 #else
 #ifdef SP_HAVE_SOCKET
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -78,7 +79,10 @@ class HttpSocketStorageObject : public RewindStorageObject {
 public:
   HttpSocketStorageObject(SOCKET fd, Boolean mayRewind, const StringC &hostStr);
   ~HttpSocketStorageObject();
-  Boolean open(const String<char> &path, Messenger &);
+  Boolean open(const String<char> &host,
+               unsigned short port,
+               const String<char> &path,
+               Messenger &);
   Boolean read(char *buf, size_t bufSize, Messenger &mgr, size_t &nread);
   Boolean seekToStart(Messenger &);
   static SOCKET openHttp(const String<char> &host,
@@ -268,13 +272,12 @@ StorageObject *URLStorageManager::makeStorageObject(const StringC &specId,
   StringC hostStr;
   for (i = 0; i < host.size(); i++)
     hostStr += host[i];
-  host += '\0';
   SOCKET fd = HttpSocketStorageObject::openHttp(host, port, hostStr, mgr);
   if (fd == INVALID_SOCKET)
     return 0;
   HttpSocketStorageObject *p
     = new HttpSocketStorageObject(fd, mayRewind, hostStr);
-  if (!p->open(path, mgr)) {
+  if (!p->open(host, port, path, mgr)) {
     delete p;
     return 0;
   }
@@ -360,11 +363,14 @@ Boolean URLStorageManager::transformNeutral(StringC &str, Boolean fold,
 
 #ifdef SP_HAVE_SOCKET
 
-SOCKET HttpSocketStorageObject::openHttp(const String<char> &host,
+SOCKET HttpSocketStorageObject::openHttp(const String<char> &theHost,
 					unsigned short port,
 					const StringC &hostStr,
 					Messenger &mgr)
 {
+  String<char> host = theHost;
+  host += '\0';
+
 #ifdef WINSOCK
   if (!winsockIniter.init(mgr))
     return INVALID_SOCKET;
@@ -450,7 +456,10 @@ HttpSocketStorageObject::~HttpSocketStorageObject()
     (void)closesocket(fd_);
 }
 
-Boolean HttpSocketStorageObject::open(const String<char> &path, Messenger &mgr)
+Boolean HttpSocketStorageObject::open(const String<char> &host,
+				     unsigned short port,
+	 	 		     const String<char> &path,
+				     Messenger &mgr)
 {
   path_ = path;
   String<char> request;
@@ -458,8 +467,20 @@ Boolean HttpSocketStorageObject::open(const String<char> &path, Messenger &mgr)
   request += path_;
   request += ' ';
   request.append("HTTP/1.0\r\n", 10);
+  request.append("Host: ", 6);
+  if (!isdigit((unsigned char)host[0])) {
+    request += host;
+    if (port != 80) {
+      char portstr[sizeof(unsigned short)*3 + 1];
+      sprintf(portstr, "%u", port);
+      request.append(":", 1);
+      request.append(portstr, strlen(portstr));
+    } 
+  }
+  request.append("\r\n", 2);
   request.append("Accept: */*\r\n", 13);
   request.append("\r\n", 2);
+
   // FIXME check length of write
   if (writesocket(fd_, request.data(), request.size()) == SOCKET_ERROR) {
     ParentLocationMessenger(mgr).message(URLStorageMessages::writeError,

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -46,8 +46,8 @@ size_t maxSize(const size_t *v, size_t n)
   return max;
 }
 
-const unsigned invalidAtt = unsigned(-1);
-const unsigned contentPseudoAtt = unsigned(-2);
+const unsigned contentPseudoAtt = unsigned(-1);
+const unsigned invalidAtt = unsigned(-2);
 
 class DelegateEventHandler : public EventHandler {
 public:
@@ -677,6 +677,8 @@ void ArcProcessor::init(const EndPrologEvent &event,
   rniDefault_ += docSyntax_->reservedName(Syntax::rDEFAULT);
   rniArcCont_ = metaSyntax_->delimGeneral(Syntax::dRNI);
   rniArcCont_ += sd->execToInternal("ARCCONT");
+  rniMaptoken_ = metaSyntax_->delimGeneral(Syntax::dRNI);
+  rniMaptoken_ += sd->execToInternal("MAPTOKEN");
   ConstPtr<Entity> dtdent = makeDtdEntity(notation.pointer());
   if (dtdent.isNull())
     return;
@@ -1322,19 +1324,24 @@ ArcProcessor::buildMetaMap(const ElementType *docElementType,
   // Build the attribute map.
   if (metaAttributed) {
     Vector<PackedBoolean> renamed;
+    Vector<PackedBoolean> substituted;
     ConstPtr<AttributeDefinitionList> metaAttDef
       = metaAttributed->attributeDef();
-    if (!metaAttDef.isNull())
-      renamed.assign(metaAttDef->size(), PackedBoolean(0));
+    if (!metaAttDef.isNull()) {
+      renamed.assign(metaAttDef->size() + 1, PackedBoolean(0));
+      substituted.assign(atts.def()->size() 
+			 + (linkAtts ? linkAtts->def()->size() : 0)
+			 + 1, PackedBoolean(0));
+    }
     if (linkAtts) {
       Boolean specified;
       unsigned index;
       const Text *linkNamerText = considerNamer(*linkAtts, specified, index);
       if (linkNamerText)
-	buildAttributeMapRename(*mapP, *linkNamerText, atts, linkAtts, renamed);
+	buildAttributeMapRename(*mapP, *linkNamerText, atts, linkAtts, renamed, substituted);
     }
     if (namerText)
-      buildAttributeMapRename(*mapP, *namerText, atts, 0, renamed);
+      buildAttributeMapRename(*mapP, *namerText, atts, 0, renamed, substituted);
     buildAttributeMapRest(*mapP, atts, linkAtts, renamed);
   }
   return *mapP;
@@ -1560,7 +1567,8 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 					   const Text &rename,
 					   const AttributeList &atts,
 					   const AttributeList *linkAtts,
-					   Vector<PackedBoolean> &attRenamed)
+					   Vector<PackedBoolean> &attRenamed,
+					   Vector<PackedBoolean> &attSubstituted)
 {
   Vector<StringC> tokens;
   Vector<size_t> tokensPos;
@@ -1573,15 +1581,21 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
     unsigned fromIndex = invalidAtt;
     unsigned toIndex = invalidAtt;
     metaSyntax_->generalSubstTable()->subst(tokens[i]);
-    if (tokens[i] == rniArcCont_)
-      toIndex = contentPseudoAtt;
+    if (tokens[i] == rniArcCont_) {    
+      if (attRenamed[contentPseudoAtt + 1]) {
+	setNextLocation(rename.charLocation(tokensPos[i]));
+	Messenger::message(ArcEngineMessages::arcContDuplicate);
+      } 
+      else
+	toIndex = contentPseudoAtt;
+    }
     else if (metaAttDef.isNull()
 	     || !metaAttDef->attributeIndex(tokens[i], toIndex)) {
       setNextLocation(rename.charLocation(tokensPos[i]));
       Messenger::message(ArcEngineMessages::renameToInvalid,
 			 StringMessageArg(tokens[i]));
     }
-    else if (attRenamed[toIndex]) {
+    else if (attRenamed[toIndex + 1]) {
       toIndex = invalidAtt;
       setNextLocation(rename.charLocation(tokensPos[i]));
       Messenger::message(ArcEngineMessages::renameToDuplicate,
@@ -1594,31 +1608,71 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
     else {
       docSyntax_->generalSubstTable()->subst(tokens[i + 1]);
       if (tokens[i + 1] == rniContent_) {
-	fromIndex = contentPseudoAtt;
+	if (toIndex == contentPseudoAtt) {
+	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
+	  Messenger::message(ArcEngineMessages::arcContInvalid,
+			     StringMessageArg(tokens[i + 1]));
+	}
+	else if (attSubstituted[contentPseudoAtt + 1]) {
+	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
+	  Messenger::message(ArcEngineMessages::contentDuplicate);
+	} 
+	else
+	  fromIndex = contentPseudoAtt;
       }
       else if (tokens[i + 1] == rniDefault_) {
-	if (toIndex != contentPseudoAtt)
-	  attRenamed[toIndex] = 1;
+	if (toIndex == contentPseudoAtt) {
+	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
+	  Messenger::message(ArcEngineMessages::arcContInvalid,
+			     StringMessageArg(tokens[i + 1]));
+	}
+	else
+	  attRenamed[toIndex + 1] = 1;
       }
       else if (linkAtts
-	       && linkAtts->attributeIndex(tokens[i + 1], fromIndex))
+	       && linkAtts->attributeIndex(tokens[i + 1], fromIndex)) {
 	fromIndex += atts.size();
+	if (attSubstituted[fromIndex + 1]) {
+	  fromIndex = invalidAtt;
+	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
+	  Messenger::message(ArcEngineMessages::renameFromDuplicate,
+			     StringMessageArg(tokens[i + 1]));
+	}
+      }
       else if (!atts.attributeIndex(tokens[i + 1], fromIndex)) {
-	setNextLocation(rename.charLocation(tokensPos[i + 1]));
+ 	setNextLocation(rename.charLocation(tokensPos[i + 1]));
 	Messenger::message(ArcEngineMessages::renameFromInvalid,
+			   StringMessageArg(tokens[i + 1]));
+      } 
+      else if (attSubstituted[fromIndex + 1]) {
+	fromIndex = invalidAtt;
+	setNextLocation(rename.charLocation(tokensPos[i + 1]));
+	Messenger::message(ArcEngineMessages::renameFromDuplicate,
 			   StringMessageArg(tokens[i + 1]));
       }
     }
     if (fromIndex != invalidAtt && toIndex != invalidAtt) {
       map.attMapFrom.push_back(fromIndex);
       map.attMapTo.push_back(toIndex);
+      attRenamed[toIndex + 1] = 1;
+      attSubstituted[fromIndex + 1] = 1;
       if (toIndex != contentPseudoAtt) {
-	attRenamed[toIndex] = 1;
 	if (metaAttDef->def(toIndex)->isId()
 	    && (fromIndex >= atts.size() || !atts.id(fromIndex)))
 	  Messenger::message(ArcEngineMessages::idMismatch,
 			     StringMessageArg(metaAttDef->def(toIndex)
 					      ->name()));
+	Vector<StringC> fromTokens;
+	Vector<StringC> toTokens;
+	for (;i + 4 < tokens.size(); i += 3) {
+	  docSyntax_->generalSubstTable()->subst(tokens[i + 2]);
+ 	  if (tokens[i + 2] != rniMaptoken_) 
+	    break;
+	  fromTokens.push_back(tokens[i + 3]);
+	  toTokens.push_back(tokens[i + 4]);
+	}
+	if (fromTokens.size() > 0) 
+	  Messenger::message(ArcEngineMessages::sorryMaptoken);
       }
     }
   }
@@ -1634,7 +1688,7 @@ void ArcProcessor::buildAttributeMapRest(MetaMap &map,
   if (metaAttDef.isNull())
     return;
   for (unsigned i = 0; i < metaAttDef->size(); i++)
-    if (!attRenamed[i]) {
+    if (!attRenamed[i + 1]) {
       unsigned fromIndex;
       if (metaAttDef->def(i)->isId()) {
 	for (unsigned j = 0; j < atts.size(); j++)

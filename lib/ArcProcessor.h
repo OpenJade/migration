@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef ArcProcessor_INCLUDED
@@ -124,7 +124,8 @@ private:
 			       const Text &rename,
 			       const AttributeList &atts,
 			       const AttributeList *linkAtts,
-			       Vector<PackedBoolean> &attRenamed);
+			       Vector<PackedBoolean> &attRenamed,
+			       Vector<PackedBoolean> &attSubstituted);
   void buildAttributeMapRest(MetaMap &map,
 			     const AttributeList &atts,
 			     const AttributeList *linkAtts,
@@ -180,6 +181,7 @@ private:
   StringC rniContent_;
   StringC rniArcCont_;
   StringC rniDefault_;
+  StringC rniMaptoken_;
   enum {
     isArc = 01,
     suppressForm = 02,

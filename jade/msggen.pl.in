@@ -80,7 +80,7 @@ while (<DEF>) {
     &error("duplicate tag $field[1]") 
       if (!defined($opt_p) && defined($tag_used{$field[1]}));
     $tag_used{$field[1]} = 1;
-    $field[2] =~ /^((ISO(\/IEC)? [0-9]+:[0-9]+ )?[A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?( (ISO(\/IEC)? [0-9]+:[0-9]+ )?[A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)*)?$/
+    $field[2] =~ /^((ISO(\/IEC)? [0-9]+:[0-9]+ )?(([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)|(\[[0-9]+(\.[0-9]*)?\]))( (ISO(\/IEC)? [0-9]+:[0-9]+ )?(([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)|(\[[0-9]+(\.[0-9]*)?\])))*)?$/
 	|| &error("invalid clauses field");
     # push @clauses, $field[2];
     $clauses[$num] = $field[2];

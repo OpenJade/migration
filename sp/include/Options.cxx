@@ -12,8 +12,8 @@ namespace SP_NAMESPACE {
 #endif
 
 template<class T>
-Options<T>::Options(int argc, T *const *argv, const T *opts)
-: argc_(argc), argv_(argv), opts_(opts), ind_(1), sp_(1)
+Options<T>::Options(int argc, T *const *argv, const T *opts, const Vector<LongOption<T> > &l)
+: argc_(argc), argv_(argv), opts_(opts), ind_(1), sp_(1), longOpts_(l), longInd_(-1)
 {
 }
 
@@ -27,61 +27,71 @@ const T *Options<T>::search(T c) const
 }
 
 template<class T>
+bool Options<T>::searchLong()
+{
+  /* return true if a unique match is found 
+     set sp_ to the char ending the option name ('\0' or '=')
+     set longInd_ to the index of the first match 
+   */
+  longInd_ = -1;
+  for (size_t i = 0; i < longOpts_.size(); i++) {
+    const T *t;
+    for (sp_ = 2, t = longOpts_[i].name; ; sp_++, t++) {
+      if ((argv_[ind_][sp_] == T('\0')) || (argv_[ind_][sp_] == T('='))) {
+        if (longInd_ >= 0)
+          return 0; // ambiguous
+        else {
+          longInd_ = i;
+          if (*t == T('\0'))
+            return 1; // exact match
+          else 
+            break; // match, continue with next option
+        }
+      }
+      else if (argv_[ind_][sp_] != *t)
+        break;  // no match, continue with next option
+    }
+  }
+  return (longInd_ >= 0);
+}
+
+template<class T>
 bool Options<T>::get(T &c)
 {
   const T *cp;
   if (sp_ == 1) {
     if (ind_ >= argc_)
       return false;
-    if ((
-#ifdef OTHER_OPTION_CHAR
-	 argv_[ind_][0] != OTHER_OPTION_CHAR &&
-#endif
-	 argv_[ind_][0] != OPTION_CHAR) || argv_[ind_][1] == 0) {
-#ifdef REORDER_ARGS
-      int i;
-      for (i = ind_; i < argc_; i++)
-	if ((
-#ifdef OTHER_OPTION_CHAR
-	     argv_[i][0] == OTHER_OPTION_CHAR ||
-#endif
-	     argv_[i][0] == OPTION_CHAR) && argv_[i][1] != 0)
-	  break;
-      if (i < argc_) {
-	c = argv_[i][1];
-	if (c != T(':') && c != OPTION_CHAR
-	    && (cp = search(c)) != 0
-	    && cp[1] == T(':') && argv_[i][2] == 0 && i < argc_ - 1) {
-	  int j;
-	  T *temp1 = argv_[i];
-	  T *temp2 = argv_[i + 1];
-	  for (j = i - 1; j >= ind_; j--)
-	    argv_[j+2] = argv_[j];
-	  argv_[ind_] = temp1;
-	  argv_[ind_ + 1] = temp2;
-	}
-	else {
-	  int j;
-	  T *temp = argv_[i];
-	  for (j = i - 1; j >= ind_; j--)
-	    argv_[j+1] = argv_[j];
-	  argv_[ind_] = temp;
-	}
-      }
-      else
-#endif
-	return false;
-    }
-    if ((argv_[ind_][0] == OPTION_CHAR && argv_[ind_][1] == OPTION_CHAR
-	 && argv_[ind_][2] == 0)
-#ifdef OTHER_OPTION_CHAR
-	|| (argv_[ind_][0] == OTHER_OPTION_CHAR
-	    && argv_[ind_][1] == OTHER_OPTION_CHAR
-	    && argv_[ind_][2] == 0)
-#endif
-	) {
-      ind_++;
+    if ((argv_[ind_][0] != OPTION_CHAR) || argv_[ind_][1] == 0) 
       return false;
+    if (argv_[ind_][0] == OPTION_CHAR && argv_[ind_][1] == OPTION_CHAR) {
+      if (argv_[ind_][2] == 0) {
+        ind_++;
+        return false;
+      }
+      else {
+        opt_ = 0; // this marks a long option
+        if (searchLong()) {
+          c = longOpts_[longInd_].val;
+          if (longOpts_[longInd_].arg) {
+            if (argv_[ind_][sp_] == T('='))
+              arg_ = &argv_[ind_][sp_ + 1];
+            else if (ind_ + 1 < argc_)
+              arg_ = argv_[++ind_];
+            else
+              c = (*opts_ == T(':') ? T(':') : T('?')); // missing argument
+          }
+          else if (argv_[ind_][sp_] == T('='))
+            c = T('='); // erroneous argument
+        }
+        else if (longInd_ >= 0)
+          c = T('-'); // ambiguous option
+        else
+          c = T('?'); // unknown option
+        ind_++;
+        sp_ = 1;
+        return true;
+      }
     }
   }
   opt_ = c = argv_[ind_][sp_];

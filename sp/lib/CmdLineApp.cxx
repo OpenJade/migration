@@ -79,6 +79,10 @@ CmdLineApp::CmdLineApp(const char *requiredInternalCode)
   registerOption('b', internalCharsetIsDocCharset_ ? SP_T("bctf") : SP_T("encoding"));
   registerOption('f', SP_T("error_file"));
   registerOption('v');
+  registerLongOption(internalCharsetIsDocCharset_ ? SP_T("bctf") 
+                     : SP_T("encoding"), 'b', SP_T("name"));
+  registerLongOption(SP_T("error-file"), 'f', SP_T("error_file"));
+  registerLongOption(SP_T("version"), 'v');
 }
 
 void CmdLineApp::resetCodingSystemKit()
@@ -93,6 +97,19 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *argName)
     optstr_ += SP_T(':');
     optArgNames_.push_back(argName);
   }
+}
+
+void CmdLineApp::registerLongOption(const AppChar *option, AppChar c, const AppChar *argName)
+{
+  LongOption<AppChar> o;
+  o.name = option;
+  o.val = c;
+  o.arg = 0;
+  if (argName) {
+    o.arg = 1;
+    longOptArgNames_.push_back(argName);
+  }
+  longOpts_.push_back(o);
 }
 
 StringC CmdLineApp::usageString()
@@ -228,24 +245,32 @@ catch (
 
 int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
 {
-  AppChar ostr[2];
+  AppChar ostrbuf[2];
+  const AppChar *ostr;
   optstr_ += SP_T('\0');
-  Options<AppChar> options(argc, argv, optstr_.data());
+  Options<AppChar> options(argc, argv, optstr_.data(), longOpts_);
   AppChar opt;
   while (options.get(opt)) {
     switch (opt) {
+    case '-':
+    case '=':
     case ':':
-      ostr[0] = options.opt();
-      ostr[1] = SP_T('\0');
-      message(CmdLineAppMessages::missingOptionArgError,
-	      StringMessageArg(convertInput(ostr)));
-      message(CmdLineAppMessages::usage,
-	      StringMessageArg(usageString()));
-      return 1;
     case '?':
-      ostr[0] = options.opt();
-      ostr[1] = SP_T('\0');
-      message(CmdLineAppMessages::invalidOptionError,
+      if (options.opt() == 0) {
+        if (opt == '-' || opt == '?') 
+          ostr = &argv[options.ind() - 1][2];
+        else 
+          ostr = longOpts_[options.longIndex()].name;
+      } 
+      else {
+        ostr = ostrbuf;
+        ostrbuf[0] = options.opt();
+        ostrbuf[1] = SP_T('\0');
+      }
+      message((opt == '-') ? CmdLineAppMessages::ambiguousOptionError
+               : ((opt == '=') ? CmdLineAppMessages::erroneousOptionArgError
+               : ((opt == ':') ? CmdLineAppMessages::missingOptionArgError
+               : CmdLineAppMessages::invalidOptionError)),
 	      StringMessageArg(convertInput(ostr)));
       message(CmdLineAppMessages::usage,
 	      StringMessageArg(usageString()));

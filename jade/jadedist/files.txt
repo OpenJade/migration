@@ -120,6 +120,7 @@ dsssl/demo.sgm
 dsssl/style-sheet.dtd
 dsssl/spec.dtd
 dsssl/dsssl.dtd
+dsssl/builtins.dsl
 dsssl/extensions.dsl
 dsssl/fot.dtd
 dsssl/catalog

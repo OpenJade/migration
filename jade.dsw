@@ -32,6 +32,9 @@ Package=<4>
     Begin Project Dependency
     Project_Dep_Name sx
     End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name spcat
+    End Project Dependency
 }}}
 
 ###############################################################################
@@ -73,10 +76,6 @@ Project: "jade"=.\jade\jade.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
-    begin source code control
-    c:\home\work\sp\jade.pj
-    .
-    end source code control
 }}}
 
 Package=<4>
@@ -155,6 +154,21 @@ Package=<4>
 ###############################################################################
 
 Project: "spam"=.\spam\spam.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name lib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "spcat"=.\spcat\spcat.dsp - Package Owner=<4>
 
 Package=<5>
 {{{

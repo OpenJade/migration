@@ -41,8 +41,8 @@ RSC=rc.exe
 # PROP Intermediate_Dir ".\Release"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
-# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\style" /I "..\grove" /I "..\spgrove" /D "_CONSOLE" /D "NDEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /YX /FD /c
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "JADE_HTML" /D "JADE_MIF" /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\style" /I "..\grove" /I "..\spgrove" /D "_CONSOLE" /D "NDEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /D "JADE_HTML" /D "JADE_MIF" /YX /FD /c
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
 # ADD RSC /l 0x809 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\jade.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\openjade.exe"
 # SUBTRACT LINK32 /profile /map
 
 !ELSEIF  "$(CFG)" == "jade - Win32 Debug"
@@ -66,8 +66,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir ".\Debug"
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
-# ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MDd /W3 /GX /ZI /Od /I "..\include" /I "..\style" /I "..\grove" /I "..\spgrove" /D "_CONSOLE" /D "_DEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /YX /FD /c
+# ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "JADE_HTML" /D "JADE_MIF" /YX /c
+# ADD CPP /nologo /MDd /W3 /GX /ZI /Od /I "..\include" /I "..\style" /I "..\grove" /I "..\spgrove" /D "_CONSOLE" /D "_DEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /D "JADE_HTML" /D "JADE_MIF" /YX /FD /c
 # ADD BASE RSC /l 0x809 /d "_DEBUG"
 # ADD RSC /l 0x809 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -75,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\dbgbin\jade.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\dbgbin\openjade.exe"
 # SUBTRACT LINK32 /incremental:no
 
 !ENDIF 
@@ -108,7 +108,7 @@ InputName=HtmlFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -122,7 +122,7 @@ InputName=HtmlFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -164,7 +164,6 @@ InputName=HtmlMessages
 # Begin Source File
 
 SOURCE=.\jade.cxx
-# ADD CPP /D "JADE_MIF"
 # End Source File
 # Begin Source File
 
@@ -200,7 +199,6 @@ InputName=JadeMessages
 # Begin Source File
 
 SOURCE=.\MifFOTBuilder.cxx
-# ADD CPP /D "JADE_MIF"
 # End Source File
 # Begin Source File
 
@@ -215,7 +213,7 @@ InputName=MifFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -229,7 +227,7 @@ InputName=MifFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -285,7 +283,7 @@ InputName=RtfFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -299,7 +297,7 @@ InputName=RtfFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -363,7 +361,7 @@ InputName=TeXFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -377,7 +375,7 @@ InputName=TeXFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -418,6 +416,10 @@ InputName=TeXMessages
 # End Source File
 # Begin Source File
 
+SOURCE=.\TextFOTBuilder.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\TransformFOTBuilder.cxx
 # End Source File
 # Begin Source File
@@ -433,7 +435,7 @@ InputName=TransformFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -447,7 +449,7 @@ InputName=TransformFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

@@ -11,6 +11,8 @@
 #include "macros.h"
 #include "Insn2.h"
 #include "SosofoObj.h"
+#include "Node.h"
+#include "ELObjPropVal.h"
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -1271,7 +1273,7 @@ const Insn *SetNonInheritedCsSosofoInsn::execute(VM &vm) const
   // to the garbage collector.
   FlowObj *flowObj = (FlowObj *)*--tem;
   ASSERT((*tem)->asSosofo() != 0);
-  *tem++ = new (*vm.interp) SetNonInheritedCsSosofoObj(flowObj, code_, display);
+  *tem++ = new (*vm.interp) SetNonInheritedCsSosofoObj(flowObj, code_, display, vm.currentNode);
   vm.sp = tem;
   return next_.pointer();
 }
@@ -1306,6 +1308,25 @@ const Insn *SetNonInheritedCInsn::execute(VM &vm) const
 SetContentInsn::SetContentInsn(const CompoundFlowObj *flowObj, InsnPtr next)
 : flowObj_(flowObj), next_(next)
 {
+}
+
+SetImplicitCharInsn::SetImplicitCharInsn(const Location &loc, InsnPtr next)
+: loc_(loc), next_(next)
+{
+}
+
+const Insn *SetImplicitCharInsn::execute(VM &vm) const
+{
+  ASSERT(vm.sp[-1]->asSosofo() != 0);
+
+  Char *cp(0);
+  if (vm.currentNode) {
+    Char ch;
+    AccessResult ret = vm.currentNode->getChar(*vm.interp, ch);
+    if (ret == accessOK)
+      ((FlowObj *)vm.sp[-1])->setImplicitChar(ch);
+  }
+  return next_.pointer();
 }
 
 const Insn *SetContentInsn::execute(VM &vm) const

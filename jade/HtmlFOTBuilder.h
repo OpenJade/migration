@@ -14,7 +14,7 @@ namespace DSSSL_NAMESPACE {
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &basename,
 			       CmdLineApp *app,
-			       const FOTBuilder::Extension *&);
+			       const FOTBuilder::Description *&);
 
 #ifdef DSSSL_NAMESPACE
 }

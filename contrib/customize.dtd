@@ -1,0 +1,150 @@
+<!-- A DTD for customizable DSSSL Style Sheets. Second version 97/07/11 -->
+
+<!-- An customization application should create a style sheet containing
+     a style-specification using the customizable style-specification as an 
+     external-specification. The generated style-specification should contain
+     a line 
+
+     (define identifier expression) 
+
+     with the customized value expression for each <variable name=identifier> 
+     element and a line  
+   
+     (declare-initial-value identifier expression) 
+
+     for each <characteristic name=identifier> element in the customizable 
+     style-specification.  -->
+
+<!element customizable-style-sheet o o (style-specification,
+			   (external-specification|style-specification)*)>
+<!element style-specification o o (customize?,style-specification-body)>
+<!attlist style-specification
+  id id #implied
+  use idrefs #implied
+>
+<!element style-specification-body o o (#pcdata)>
+<!attlist style-specification-body
+  content entity #conref
+>
+<!element external-specification - o empty>
+<!attlist external-specification
+  id id #required
+  document entity #required
+  specid name #implied
+>
+
+<!element customize - - ((section|variable|characteristic)*) 
+  -- The description of the customizable part of a style-specification. 
+     It can be hierarchically structured to make menu-based customization 
+     dialogs possible. -->
+ 
+<!attlist customize
+  languages cdata #implied -- A list of languages for which descriptions 
+	                      are given. A customization tool should give the 
+                              user a possibility to choose the preferred
+                              language among thses. This language should be
+                              used for selecting appropriate <description>s. 
+                              If a particular <section>, <variable> or <value>
+                              doesn't have a <description> in the preferred 
+                              language, the tool should display a description
+                              without an explicit language, if there is one.
+                              Otherwise the tool might choose to use another
+                              language or provide a default description. It is
+                              not acceptible to simply omit the <section>,
+                              <variable> or <value> in question. -->
+
+<!element section - - (description*,(section|variable|characteristic)*) >
+
+<!element characteristic - - (description*,value*) 
+  -- Infomation about a single inherited characteristic. -->
+  
+<!attlist characteristic
+  name cdata #required   -- The name of the characteristic. --
+  ignored (ignored) #conref  -- Style sheet authors can mark characteristics
+                                as ignored. If a characteristic is marked as 
+                                ignored, the customization application shall 
+                                not offer it for customization. 
+                                Typical reasons for ignoring characteristics
+                                are that the style sheet does not use flow
+                                object classes which have this characteristic
+                                or that the style sheet relies on a the
+                                characteristic to have a fixed value or
+                                that the characteristic is overridden by 
+                                an expression. Eg, paper-height and paper-width
+                                could be ignored, if there is a variable for
+                                selecting the paper format. 
+
+                                The customization application is free to 
+                                offer customization for any characteristics 
+                                which have not been explicitly mentioned in
+                                the customize info in the style sheet. It 
+                                could base the decision about which
+                                characteristics to offer on knowledge about
+                                supported flow object classes in the DSSSL 
+                                engine. --
+  initial cdata #implied -- The initial value of the characteristic. This 
+                            shall be an allowed value. -->
+
+<!element variable - - (description*,value*) 
+  -- Infomation about a single variable. -->
+ 
+<!attlist variable
+  name cdata #required   -- The name of the variable. --
+  default cdata #implied -- The default value of the variable, if any. This 
+                            shall be an allowed value. -->
+
+<!element value - o (description*,(content|type)) 
+  -- This element describes the allowed values for a variable. The
+     values can be explicitly specified using the <content> element or 
+     a whole type of elements can be included using the <type> element.
+     The set of all allowed values is the union of the sets of allowed
+     values of all <content> and <type> subelements. Typical constellations 
+     are: 1) only <content> subelements
+          2) a single <type> element -->
+ 
+<!element type - o empty >
+
+<!attlist type class (boolean|char|string|number|length|area|expression) #required 
+ -- All values of the type specified in this attribute are acceptable values. -->
+ 
+<!element content - - (#pcdata) -- A single possible value. end tag ommission
+                                   is not allowed, since a closing newline is
+                                   almost never wanted in a value, but would
+                                   creep in inevitably. -->
+
+<!element description - o (short,long?) -- A description can be part of a 
+   <section>, a <variable> or a <value>. It always has a <short> part, which
+   should contain a short descriptive string, suitable as a menu entry. The
+   optional long part can contain a longer description, suitable a a help text
+   explaining the <section>, <variable> or <value> in question. -->
+  
+<!attlist description
+   language cdata #implied -- Identifies the language used in the
+                              description. If no language is specified, the
+                              description is used whenever there is no
+                              description in the users preferred language. -->
+
+<!element short o o (#pcdata) -- A short description suitable as a menu entry. -->
+  
+<!element long - o (#pcdata) -- A longer description, suitable as 
+                                an explanatory help text. -->
+
+<?ArcBase DSSSL>
+<!NOTATION DSSSL   PUBLIC "ISO/IEC 10179:1996//NOTATION
+                   DSSSL Architecture Definition Document//EN"
+                -- A document architecture conforming to the
+                   Architectural Form Definition Requirements of
+                   ISO/IEC 10744.     --
+>
+
+<!ATTLIST #NOTATION DSSSL
+                            -- Support attributes for all architectures --
+  ArcQuant CDATA #FIXED "NAMELEN 64"
+  ArcDTD CDATA #FIXED "%DSSSLDTD"
+  ArcDocF NAME #FIXED dsssl-specification
+  ArcDataF NAME #FIXED dsssl-specification
+>
+
+<!ENTITY % DSSSLDTD PUBLIC
+ "ISO/IEC 10179:1996//DTD DSSSL Architecture//EN"
+>

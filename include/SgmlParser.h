@@ -70,7 +70,6 @@ public:
   // Only to be called after the parse has ended.
   Ptr<Dtd> baseDtd();
   void activateLinkType(const StringC &);
-  void activateDocType(const StringC &);
   void allLinkTypesActivated();
   void swap(SgmlParser &);
   friend class Parser;

@@ -65,7 +65,6 @@ public:
   ParserState::sdPointer;
   ParserState::instanceSyntaxPointer;
   ParserState::prologSyntaxPointer;
-  ParserState::activateDocType;
   ParserState::activateLinkType;
   ParserState::allLinkTypesActivated;
   ParserState::entityManager;

@@ -88,7 +88,6 @@ public:
   Ptr<Dtd> baseDtd();
   void activateLinkType(const StringC &);
   void allLinkTypesActivated();
-  void activateDocType(const StringC &);
   void setResultAttributeSpecMode();
   void clearResultAttributeSpecMode();
   Boolean haveApplicableDtd() const;
@@ -244,7 +243,6 @@ private:
   Vector<ConstPtr<Lpd> > allLpd_;
   Vector<ConstPtr<Lpd> > lpd_; // active LPDs
   Vector<StringC> activeLinkTypes_;
-  Vector<StringC> activeDocTypes_;
   Boolean activeLinkTypesSubsted_;
   Boolean hadLpd_;
   Boolean resultAttributeSpecMode_;

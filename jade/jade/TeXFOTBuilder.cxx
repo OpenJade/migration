@@ -1675,8 +1675,8 @@ static OutputByteStream &operator<<(OutputByteStream &os, double d)
 }
 
 FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
-			      const FOTBuilder::Extension *&ext,
-			      const FOTBuilder::Feature *&f)
+			      const FOTBuilder::Description *&descr)
+
 {  
   static const TeXFOTBuilder::PageFloatFlowObj pageFloat;
   static const TeXFOTBuilder::PageFootnoteFlowObj pageFootnote;
@@ -1790,7 +1790,6 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
 
     { 0, 0, 0}
   };
-  ext = extensions;
 
   static const FOTBuilder::Feature features[] = {
     { "sideline", 0},
@@ -1799,7 +1798,14 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
     { "simple-page", 0},
     { 0, 0}
   };
-  f = features;
+
+  static FOTBuilder::Description description=
+  {
+    extensions,
+    features,
+    false
+  };
+  descr = &description;
 
   return new TeXFOTBuilder(os, mgr);
 }
@@ -4350,52 +4356,36 @@ void TeXFOTBuilder::setParagraphNIC(const ParagraphNIC &nic)
 
 void TeXFOTBuilder::setCharacterNIC(const CharacterNIC &nic)
 {
-#if 1
-  if (nic.valid) {
-    set("Ch",(unsigned long)nic.ch);
-    set("GlyphId",nic.glyphId);
-    set("BreakBeforePriority",nic.breakBeforePriority);
-    set("MathClass",nic.mathClass);
-    set("MathFontPosture",nic.mathFontPosture);
-    stringout_ << "\\def\\Script%\n{" << nic.script+29 << '}';
-    set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
-    set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
-    set("IsPunct",nic.isPunct);
-    set("IsInputWhiteSpace",nic.isInputWhitespace);
-    set("IsInputTab",nic.isInputTab);
-    set("IsRecordEnd",nic.isRecordEnd);
-    set("IsSpace",nic.isSpace);
-  }
-#else
   if (nic.specifiedC & (1 << CharacterNIC::cChar))
     set("Ch",(unsigned long)nic.ch);
-  if (nic.specifiedC & (1 << CharacterNIC::cGlyphId))
-    set("GlyphId",nic.glyphId);
+  if (nic.specifiedC & (1 << CharacterNIC::cGlyphId)) {
+    if(nic.glyphId.publicId)
+      set("GlyphId",nic.glyphId);
+  }
   if (nic.specifiedC & (1 << CharacterNIC::cBreakBeforePriority))
-    set("BreakBeforePriority",nic.breakBeforePriority);
+    MAYBESET("BreakBeforePriority",nic.breakBeforePriority,0);
   if (nic.specifiedC & (1 << CharacterNIC::cBreakAfterPriority))
-    set("BreakAfterPriority",nic.breakAfterPriority);
+    MAYBESET("BreakAfterPriority",nic.breakAfterPriority,0);
   if (nic.specifiedC & (1 << CharacterNIC::cMathClass))
-    set("MathClass",nic.mathClass);
+    MAYBESET("MathClass",nic.mathClass,symbolOrdinary);
   if (nic.specifiedC & (1 << CharacterNIC::cMathFontPosture))
-    set("MathFontPosture",nic.mathFontPosture);
+    MAYBESET("MathFontPosture",nic.mathFontPosture,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cScript))
-    set("Script",(long unsigned int)nic.script);
+    MAYBESET("Script",(long unsigned int)nic.script,0);
   if (nic.specifiedC & (1 << CharacterNIC::cIsDropAfterLineBreak))
-    set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
+    MAYBESET("IsDropAfterLineBreak",nic.isDropAfterLineBreak,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsDropUnlessBeforeLineBreak))
-    set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
+    MAYBESET("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsPunct))
-    set("IsPunct",nic.isPunct);
+    MAYBESET("IsPunct",nic.isPunct,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsInputWhitespace))
-    set("IsInputWhiteSpace",nic.isInputWhitespace);
+    MAYBESET("IsInputWhiteSpace",nic.isInputWhitespace,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsInputTab))
-    set("IsInputTab",nic.isInputTab);
+    MAYBESET("IsInputTab",nic.isInputTab,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsRecordEnd))
-    set("IsRecordEnd",nic.isRecordEnd);
+    MAYBESET("IsRecordEnd",nic.isRecordEnd,symbolFalse);
   if (nic.specifiedC & (1 << CharacterNIC::cIsSpace))
-    set("IsSpace",nic.isSpace);
-#endif
+    MAYBESET("IsSpace",nic.isSpace,symbolFalse);
   MAYBESET("StretchFactor",nic.stretchFactor,1.0);
 }
 

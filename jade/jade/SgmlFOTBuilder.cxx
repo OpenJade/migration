@@ -514,7 +514,7 @@ OutputCharStream &operator<<(OutputCharStream &os,
 }
 
 FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os, 
-	                       const FOTBuilder::Feature *&f)
+	                       const FOTBuilder::Description *&descr)
 {
   static const FOTBuilder::Feature features[] = {
     { "sideline", 0},
@@ -524,7 +524,12 @@ FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os,
     { "simple-page", 0},
     { 0, 0}
   };
-  f = features;
+  static FOTBuilder::Description description = {
+    0,  // Extension
+    features,
+    false
+  };
+  descr = &description;
 
   return new SgmlFOTBuilder(os);
 }

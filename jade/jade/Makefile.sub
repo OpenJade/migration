@@ -15,3 +15,4 @@ TeXFOTBuilder.o: TeXFOTBuilder_inst.cxx TeXMessages.h
 MifFOTBuilder.o: MifFOTBuilder_inst.cxx MifMessages.h
 TransformFOTBuilder.o: TransformFOTBuilder_inst.cxx
 jade.o: JadeMessages.h
+

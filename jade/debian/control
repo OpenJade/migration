@@ -6,7 +6,7 @@ Standards-Version: 3.1.1
 
 Package: openjade
 Architecture: any
-Depends: ${shlibs-openjade:Depends}, ${libostyle1:ShlibVersion}, sgml-base
+Depends: ${shlibs-openjade:Depends}, ${libostyle:ShlibVersion}, sgml-base
 Suggests: doc-base, sgml-data
 Description: Implementation of the DSSSL language
  OpenJade is an implementation of the ISO/IEC 10179:1996 standard
@@ -22,9 +22,9 @@ Description: Implementation of the DSSSL language
  Author:   The OpenJade Team <jade-devel@infomansol.com>
  Homepage: http://openjade.sourceforge.net/
 
-Package: libostyle1
+Package: libostyle0
 Architecture: any
-Depends: ${shlibs-libostyle1:Depends}, ${libosp:ShlibVersion}
+Depends: ${shlibs-libostyle:Depends}
 Description: Runtime libraries for OpenJade
  OpenJade's shared libraries, runtime support.  Includes libogrove,
  providing an abstract interface to groves; libospgrove, an interface
@@ -35,7 +35,7 @@ Description: Runtime libraries for OpenJade
 
 Package: libostyle-dev
 Architecture: any
-Depends: ${libostyle1:Version}, libc6-dev, libstdc++-dev
+Depends: ${libostyle:Version}, libc6-dev, libstdc++-dev
 Recommends: c++-compiler
 Description: OpenJade libraries, developer support
  Contains include files and the static library for libogrove,

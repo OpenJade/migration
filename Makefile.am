@@ -7,7 +7,5 @@ SUBDIRS = pubtext doc all \
           lib nsgmls spent spam sgmlnorm sx spcat 
 
 ## Note that we include the windows-only aux files.
-EXTRA_DIST = config/config.sub config/ltconfig config/missing \
-             config/config.guess config/install-sh config/ltmain.sh \
-             config/mkinstalldirs instmac.pl msggen.pl \
-             sunfix.sh SP.dsw SP.mak build-win32.bat sp-generate.mak
+EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
+	build-win32.bat sp-generate.mak

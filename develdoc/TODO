@@ -69,5 +69,10 @@ Reorganization
 * Remove config/
 
 * change all includes of OpenSP headers to read
+  #include <OpenSP/...> (or should that be "OpenSP/..." ?)
 
-#include <OpenSP/...> (or should that be "OpenSP/..." ?)
+* add the .dsp, .rc, .mak, .bat files and the all/ directory
+  to EXTRA_DIST (and BUILT_SOURCES, if appropriate) so that
+  we can easily generate a .zip file suitable for building on windows
+  from the .tar.gz. Better still, add AUTOMAKE_OPTIONS(dist-zip)
+  to the toplevel Makefile.am and simply use make dist-zip.

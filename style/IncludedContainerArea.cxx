@@ -1,6 +1,10 @@
 
 #include "IncludedContainerArea.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 void IncludedContainerAreaFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -131,4 +135,6 @@ void IncludedContainerAreaFlowObj::setNonInheritedC(const Identifier *ident,
  }
 }
 
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

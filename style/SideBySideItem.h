@@ -11,8 +11,12 @@
 
 /**
  *@class SideBySideItemFlowObj
- *@brief clase que implementa el objeto de flujo side-by-side-item
+ *@brief Class which implements the "side-by-side-item" flow object
  */
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class SideBySideItemFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -21,3 +25,7 @@ public:
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
 };
+
+#ifdef DSSSL_NAMESPACE
+}
+#endif

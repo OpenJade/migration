@@ -12,8 +12,12 @@
 //multi-line-inline-note
 /**
  *@class MultiLineInlineNoteFlowObj
- *@brief clase que implementa el objeto de flujo multi-line-inline-note
+ *@brief Class which implements the "multi-line-inline-note" flow object
  */
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class MultiLineInlineNoteFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -41,3 +45,6 @@ private:
   Owner<NIC> openclose_; 
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

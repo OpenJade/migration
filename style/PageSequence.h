@@ -11,8 +11,12 @@
 //page-sequence
 /**
  *@class PageSequenceFlowObj
- *@brief Clase que crea el objeto de flujo page-sequence
+ *@brief Class which creates the "page-sequence" flow object
  */
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class PageSequenceFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -25,3 +29,6 @@ public:
   void traceSubObjects(Collector &) const;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

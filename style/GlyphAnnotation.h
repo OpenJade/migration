@@ -11,8 +11,13 @@
 //glyph-annotation
 /**
  *@class GlyphAnnotationFlowObj
- *@brief clase que crea el objeto de flujo glyph-annotation
+ *@brief Class which creates the "glyph-annotation" flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class GlyphAnnotationFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -32,5 +37,6 @@ private:
   Owner<FOTBuilder::GlyphAnnotationNIC> nic_;
 };
 
-
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

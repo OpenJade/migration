@@ -12,8 +12,12 @@
 //included-container-area
 /**
  *@class IncludedContainerAreaFlowObj
- *@brief clase que crea el objeto de flujo included-container-area
+ *@brief Class which creates the "included-container-area" flow object
  */
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class IncludedContainerAreaFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -32,3 +36,6 @@ private:
   Owner<FOTBuilder::IncludedContainerAreaNIC> nic_;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

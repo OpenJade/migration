@@ -3,6 +3,10 @@
 
 #include "ColumnSetSequence.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 void ColumnSetSequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -37,3 +41,6 @@ void ColumnSetSequenceFlowObj::setNonInheritedC(const Identifier *ident,
  }
 }
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

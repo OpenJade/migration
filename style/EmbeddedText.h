@@ -12,8 +12,13 @@
 //embedded-text
 /**
  *@class EmbeddedTextFlowObj
- *@brief clase que crea el objeto de flujo embedded-text
+ *@brief Class which creates the "embedded-text" flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class EmbeddedTextFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -32,3 +37,6 @@ private:
   Owner<FOTBuilder::EmbeddedTextNIC> nic_;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

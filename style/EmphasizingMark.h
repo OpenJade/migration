@@ -11,8 +11,13 @@
 //emphasizing-mark
 /**
  *@class EmphasizingMarkFlowObj
- *@brief clase que implementa el objeto de flujo emphasizing-mark
+ *@brief Class which implements the "emphasizing-mark" flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class EmphasizingMarkFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -34,5 +39,8 @@ private:
   SosofoObj* emphmark_;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif
 
 

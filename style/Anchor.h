@@ -11,8 +11,13 @@
 //anchor flow object
 /**
  *@class AnchorFlowObj
- *@brief clase que crea el objeto de flujo Anchor
+ *@brief Class which creates the "Anchor" flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class AnchorFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -31,3 +36,6 @@ private:
   Owner<FOTBuilder::AnchorNIC> nic_;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

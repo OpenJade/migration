@@ -3,6 +3,9 @@
 
 #include "GlyphAnnotation.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
 
 void GlyphAnnotationFlowObj::processInner(ProcessContext &context)
 {
@@ -53,3 +56,6 @@ void GlyphAnnotationFlowObj::setNonInheritedC(const Identifier *ident,
  CANNOT_HAPPEN();
 }
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

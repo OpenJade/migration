@@ -60,7 +60,7 @@ CATOBJS = cat-compat.o ../po/cat-id-tbl.o
 GETTOBJS = intl-compat.o
 DISTFILES.common = Makefile.in linux-msg.sed po2tbl.sed.in \
 xopen-msg.sed $(HEADERS) $(SOURCES)
-DISTFILES = $(DISTFILES.common)
+DISTFILES = VERSION $(DISTFILES.common)
 DISTFILES.gettext = $(DISTFILES.common) libintl.glibc libintl.inst
 
 .SUFFIXES:

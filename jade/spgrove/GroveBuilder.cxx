@@ -22,6 +22,8 @@
 #include "SdNode.h"
 #include "threads.h"
 #include <OpenSP/macros.h>
+#include <assert.h>
+#include <stdio.h>
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4250 ) // inherits via dominance
@@ -60,12 +62,10 @@ class AttributeDefNode;
 class EntityNode;
 class NotationNode;
 class ExternalIdNode;
-class FormalPublicIdNode;
 class DocumentTypeNode;
 class SgmlConstantsNode;
 class MessageNode;
 class ElementTypeNode;
-class RankStemNode;
 class ModelGroupNode;
 class ElementTokenNode;
 class PcdataTokenNode;
@@ -185,6 +185,9 @@ public:
   }
   // Be careful not to change ref counts while accessing DTD.
   const Dtd *governingDtd() const { return dtd_.pointer(); }
+  const Dtd *lookupDtd(const StringC &) const;
+  const Dtd *firstDtd() const { return allDtds_.size() == 0 ? 0 : allDtds_.begin()->pointer(); }
+  const Dtd *lastDtd() const { return allDtds_.size() == 0 ? 0 : allDtds_.back().pointer(); }
   // must not be called till grove is complete
   Dtd::ConstEntityIter defaultedEntityIter() const;
   const Entity *lookupDefaultedEntity(const StringC &) const;
@@ -223,7 +226,8 @@ public:
   void push(ElementChunk *, Boolean hasId);
   void pop();
   void setAppinfo(const StringC &);
-  void setDtd(const ConstPtr<Dtd> &dtd);
+  void setGoverningDtd(const ConstPtr<Dtd> &dtd);
+  void addDtd(const ConstPtr<Dtd> &dtd);
   void setSd(const ConstPtr<Sd> &, const ConstPtr<Syntax> &, const ConstPtr<Syntax> &);
   void storeAttributeValue(const ConstPtr<AttributeValue> &value) {
     values_.push_back(value);
@@ -257,6 +261,7 @@ private:
   DataChunk *pendingData_;
   Chunk **tailPtr_;
   ConstPtr<Dtd> dtd_;
+  Vector<ConstPtr<Dtd> > allDtds_;
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> prologSyntax_;
   ConstPtr<Syntax> instanceSyntax_;
@@ -347,6 +352,7 @@ public:
   void subdocEntity(SubdocEntityEvent *);
   void pi(PiEvent *);
   void endProlog(EndPrologEvent *);
+  void endDtd(EndDtdEvent *);
   void entityDefaulted(EntityDefaultedEvent *);
 };
 
@@ -397,12 +403,10 @@ public:
   virtual bool same2(const EntityNode *) const;
   virtual bool same2(const NotationNode *) const;
   virtual bool same2(const ExternalIdNode *) const;
-  virtual bool same2(const FormalPublicIdNode *) const;
   virtual bool same2(const DocumentTypeNode *) const;
   virtual bool same2(const SgmlConstantsNode *) const;
   virtual bool same2(const MessageNode *) const;
   virtual bool same2(const ElementTypeNode *) const;
-  virtual bool same2(const RankStemNode *) const;
   virtual bool same2(const ModelGroupNode *) const;
   virtual bool same2(const ElementTokenNode *) const;
   virtual bool same2(const PcdataTokenNode *) const;
@@ -1200,40 +1204,11 @@ private:
   const Notation *notation_;
 };
 
-class FormalPublicIdNode : public BaseNode {
-public:
-  FormalPublicIdNode(const GroveImpl *, const PublicId *);
-  AccessResult getOwnerType(OwnerType::Enum &) const;
-  AccessResult getOwnerId(GroveString &) const;
-  AccessResult getTextClass(TextClass::Enum &) const;
-  AccessResult getUnavailable(bool &) const;
-  AccessResult getTextDescription(GroveString &) const;
-  AccessResult getTextLanguage(GroveString &) const;
-  AccessResult getTextDesignatingSequence(GroveString &) const;
-  AccessResult getTextDisplayVersion(GroveString &) const;
-  void accept(NodeVisitor &);
-  const ClassDef &classDef() const { return ClassDef::formalPublicId; }
-  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
-    name = ComponentName::idFormalPublicId;
-    return accessOK;
-  }
-  bool same(const BaseNode &) const;
-  bool same2(const FormalPublicIdNode *) const;
-private:
-  const PublicId *pubid_;
-  mutable StringC owner_;
-  mutable StringC desc_;
-  mutable StringC lang_;
-  mutable StringC dseq_;
-  mutable StringC dver_;
-};
-
 class ExternalIdNode : public BaseNode {
 public:
   ExternalIdNode(const GroveImpl *grove);
   virtual const ExternalId &externalId() const = 0;
   AccessResult getPublicId(GroveString &) const;
-  AccessResult getFormalPublicId(NodePtr &) const;
   AccessResult getSystemId(GroveString &) const;
   AccessResult getGeneratedSystemId(GroveString &) const;
   void accept(NodeVisitor &);
@@ -1328,34 +1303,11 @@ private:
   const MessageItem *item_;
 };
 
-// CLASS DEF: RankStemNode
-class RankStemNode : public BaseNode {
-public:
-  RankStemNode(const GroveImpl *grove, const RankStem &rankStem, const Dtd::ConstElementTypeIter &iter) 
-   : BaseNode(grove), rankStem_(rankStem), iter_(iter) {};
-  AccessResult getOrigin(NodePtr &) const;
-  const ClassDef &classDef() const { return ClassDef::rankStem; }
-  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
-    name = ComponentName::idElementTypes;
-    return accessOK;
-}
-  AccessResult getStem(GroveString &) const;
-  AccessResult getElementTypes(NodeListPtr &) const;
-  bool same(const BaseNode &) const;
-  bool same2(const RankStemNode *) const;
-  void accept(NodeVisitor &);
-  unsigned long hash() const;
-  const RankStem &rankStem() const { return rankStem_; }
-protected:
-  const RankStem &rankStem_;
-  Dtd::ConstElementTypeIter iter_;
-};
-
 // CLASS DEF: ElementTypeNode
 class ElementTypeNode : public BaseNode {
 public:
-  ElementTypeNode(const GroveImpl *grove, const ElementType &elementType)
-    : BaseNode(grove), elementType_(elementType) {};
+  ElementTypeNode(const GroveImpl *grove, const Dtd *dtd, const ElementType &elementType)
+    : BaseNode(grove), dtd_(dtd), elementType_(elementType) {};
   AccessResult getOrigin(NodePtr &) const;
   const ClassDef &classDef() const { return ClassDef::elementType; }
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
@@ -1370,9 +1322,6 @@ public:
   AccessResult getModelGroup(NodePtr &) const;
   AccessResult getOmitEndTag(bool &) const;
   AccessResult getOmitStartTag(bool &) const;
-  AccessResult getRankGroup(GroveStringListPtr &) const;
-  AccessResult getRankStem(GroveString &) const;
-  AccessResult getRankSuffix(GroveString &) const;
   AccessResult getLocation(Location &) const;
   bool same(const BaseNode &) const;
   bool same2(const ElementTypeNode *) const;
@@ -1381,6 +1330,7 @@ public:
   const ElementType &elementType() const { return elementType_; }
 protected:
   const ElementType &elementType_;
+  const Dtd *dtd_; 
 };
 
 // CLASS DEF: ContentTokenNodeBase
@@ -1388,6 +1338,7 @@ class ModelGroupNode;
 class ContentTokenNodeBase : public BaseNode {
 public:
   ContentTokenNodeBase(const GroveImpl *grove,
+		       const Dtd *dtd,
                        const ElementType &elementType,
                        ModelGroupNode *parentModelGroupNode = 0);
   ~ContentTokenNodeBase();
@@ -1399,6 +1350,7 @@ public:
   AccessResult getLocation(Location &) const;
   const ElementType &elementType() const { return elementType_; }
 protected:
+  const Dtd *dtd_;
   ModelGroupNode *parentModelGroupNode_;
   const ElementType &elementType_;
 };
@@ -1407,10 +1359,11 @@ protected:
 class ElementTokenNode : public ContentTokenNodeBase {
 public:
   ElementTokenNode(const GroveImpl *grove,
+		   const Dtd *dtd,
                    const ElementType &elementType,
                    const ElementToken &elementToken,
                    ModelGroupNode *parentModelGroupNode)
-   : ContentTokenNodeBase(grove, elementType, parentModelGroupNode),
+   : ContentTokenNodeBase(grove, dtd, elementType, parentModelGroupNode),
      elementToken_(elementToken) {}
   const ClassDef &classDef() const { return ClassDef::elementToken; }
   AccessResult getGi(GroveString &str) const;
@@ -1428,10 +1381,11 @@ protected:
 class PcdataTokenNode : public ContentTokenNodeBase {
 public:
   PcdataTokenNode(const GroveImpl *grove,
+		  const Dtd *dtd,
                   const ElementType &elementType,
                   const PcdataToken &pcdataToken,
                   ModelGroupNode *parentModelGroupNode)
-   : ContentTokenNodeBase(grove, elementType, parentModelGroupNode),
+   : ContentTokenNodeBase(grove, dtd, elementType, parentModelGroupNode),
      pcdataToken_(pcdataToken) {}
   const ClassDef &classDef() const { return ClassDef::pcdataToken; }
   bool same(const BaseNode &) const;
@@ -1447,10 +1401,11 @@ protected:
 class ModelGroupNode : public ContentTokenNodeBase {
 public:
   ModelGroupNode(const GroveImpl *grove,
+		 const Dtd *dtd,
                  const ElementType &elementType,
                  const ModelGroup &modelGroup,
                  ModelGroupNode *parentModelGroupNode = 0)
-   : ContentTokenNodeBase(grove, elementType, parentModelGroupNode),
+   : ContentTokenNodeBase(grove, dtd, elementType, parentModelGroupNode),
      modelGroup_(modelGroup) {}
   const ClassDef &classDef() const { return ClassDef::modelGroup; }
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const;
@@ -1473,7 +1428,6 @@ public:
   AttributeDefNode(const GroveImpl *grove, size_t attIndex)
    : BaseNode(grove), AttributeDefOrigin(attIndex) {}
   const ClassDef &classDef() const { return ClassDef::attributeDef; }
-  AccessResult getOrigin(NodePtr &ptr) const;
   AccessResult getName(GroveString &) const;
   AccessResult getDeclValueType(Node::DeclValueType::Enum &) const;
   AccessResult getDefaultValueType(Node::DefaultValueType::Enum &) const;
@@ -1496,6 +1450,7 @@ public:
    : AttributeDefNode(grove, attributeDefIdx),
      ElementTypeAttributeDefOrigin(&elementType),
      AttributeDefOrigin(attributeDefIdx) {}
+  AccessResult getOrigin(NodePtr &ptr) const;
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
     name = ComponentName::idAttributeDefs;
     return accessOK;
@@ -1515,6 +1470,7 @@ public:
    : AttributeDefNode(grove, attributeDefIdx),
      NotationAttributeDefOrigin(&notation),
      AttributeDefOrigin(attributeDefIdx)  {};
+  AccessResult getOrigin(NodePtr &ptr) const;
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
     name = ComponentName::idAttributeDefs;
     return accessOK;
@@ -1772,34 +1728,18 @@ public:
   Dtd::ConstNotationIter iter_;
 };
 
-// -- CLASS DEF: RankStemElementTypesNodeList
-class RankStemElementTypesNodeList : public BaseNodeList {
-public:
-  RankStemElementTypesNodeList(const GroveImpl *, 
-                               const RankStem &,
-                               const Dtd::ConstElementTypeIter &);
-  AccessResult first(NodePtr &) const;
-  AccessResult chunkRest(NodeListPtr &) const;
-protected:
-  GroveImplPtr grove_;
-  const RankStem &rankStem_;
-  Dtd::ConstElementTypeIter iter_;
-};
-
 // -- CLASS DEF: ElementTypesNodeList
 class ElementTypesNodeList : public BaseNodeList {
 public:
-  ElementTypesNodeList( const GroveImpl *, 
-                        const Dtd *,
-                        const Dtd::ConstElementTypeIter &,
-                        const Dtd::ConstRankStemIter &);
+  ElementTypesNodeList( const GroveImpl *grove,
+			const Dtd *dtd,
+                        const Dtd::ConstElementTypeIter &iter);
   AccessResult first(NodePtr &) const;
   AccessResult chunkRest(NodeListPtr &) const;
-protected:
+public:
   GroveImplPtr grove_;
   const Dtd *dtd_;
-  Dtd::ConstElementTypeIter elementTypeIter_;
-  Dtd::ConstRankStemIter rankStemIter_;
+  Dtd::ConstElementTypeIter iter_;
 };
 
 // -- CLASS DEF: ElementTypesNamedNodeList
@@ -1827,6 +1767,20 @@ protected:
   GroveImplPtr grove_;
   ModelGroupNode &modelGroupNode_;
   unsigned firstTokenIdx_;
+};
+
+// -- CLASS DEF: ModelGroupNodeList
+class ModelGroupNodeList : public BaseNodeList {
+public:
+  ModelGroupNodeList(const GroveImpl *grove,
+                     const ModelGroup &modelGroupNode,
+                     size_t firstTokenIdx);
+  AccessResult first(NodePtr &) const;
+  AccessResult chunkRest(NodeListPtr &) const;
+protected:
+  GroveImplPtr grove_;
+  ModelGroup &modelGroup_;
+  size_t firstTokenIdx_;
 };
 
 // -- CLASS DEF: AttributeDefsNodeList
@@ -2060,12 +2014,18 @@ Boolean GroveImpl::haveRootOrigin()
 }
 
 inline
-void GroveImpl::setDtd(const ConstPtr<Dtd> &dtd)
+void GroveImpl::setGoverningDtd(const ConstPtr<Dtd> &dtd)
 {
   dtd_ = dtd;
   hasDefaultEntity_ = !dtd_->defaultEntity().isNull();
   finishProlog();
   pulse();
+}
+
+inline
+void GroveImpl::addDtd(const ConstPtr<Dtd> &dtd)
+{
+  allDtds_.push_back(dtd);
 }
 
 inline
@@ -2120,6 +2080,14 @@ void GroveImpl::appendMessage(MessageItem *item)
   *messageListTailP_ = item;
   messageListTailP_ = item->nextP();
   pulse();
+}
+
+const Dtd *GroveImpl::lookupDtd(const StringC &name) const
+{
+  for (size_t i = 0; i < allDtds_.size(); i++)
+    if (allDtds_[i]->name() == name)
+      return allDtds_[i].pointer();
+  return 0;
 }
 
 inline
@@ -2270,7 +2238,13 @@ void GroveBuilderEventHandler::appinfo(AppinfoEvent *event)
 
 void GroveBuilderEventHandler::endProlog(EndPrologEvent *event)
 {
-  grove_->setDtd(event->dtdPointer());
+  grove_->setGoverningDtd(event->dtdPointer());
+  delete event;
+}
+
+void GroveBuilderEventHandler::endDtd(EndDtdEvent *event)
+{
+  grove_->addDtd(event->dtdPointer());
   delete event;
 }
 
@@ -2804,9 +2778,12 @@ DocumentTypeNode::DocumentTypeNode(const GroveImpl *grove, const Dtd *dtd)
 {
 }
 
-AccessResult DocumentTypeNode::nextChunkSibling(NodePtr &) const
+AccessResult DocumentTypeNode::nextChunkSibling(NodePtr &ptr) const
 {
-  return accessNull;
+  if (dtd_ == grove()->lastDtd())
+    return accessNull;
+  ptr.assign(new DocumentTypeNode(grove(), dtd_ + 1));
+  return accessOK; 
 }
 
 AccessResult DocumentTypeNode::getName(GroveString &str) const
@@ -3090,7 +3067,11 @@ AccessResult ElementNode::getElementType(NodePtr &ptr) const
 {
   if (chunk()->elementType() == 0)
     return accessNull;  
-  ptr.assign(new ElementTypeNode(grove(), *(chunk()->elementType())));
+  // since we are in an element in the document, the element
+  // type has to come from the governing dtd. 
+  ptr.assign(new ElementTypeNode(grove(), 
+                                 grove()->governingDtd(), 
+                                 *(chunk()->elementType())));
   return accessOK;
 }
 
@@ -4344,13 +4325,15 @@ AccessResult EntityNode::getOrigin(NodePtr &ptr) const
   if (entity_->defaulted() && grove()->lookupDefaultedEntity(entity_->name()))
     ptr.assign(new SgmlDocumentNode(grove(), grove()->root()));
   else
-    ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
+    ptr.assign(new DocumentTypeNode(grove(), 
+                 grove()->lookupDtd(*(entity_->declInDtdNamePointer()))));
   return accessOK;
 }
 
 AccessResult DefaultEntityNode::getOrigin(NodePtr &ptr) const
 {
-  ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
+  ptr.assign(new DocumentTypeNode(grove(),
+                 grove()->lookupDtd(*(entity_->declInDtdNamePointer()))));
   return accessOK;
 }
 
@@ -4589,7 +4572,7 @@ DoctypesAndLinktypesNamedNodeList
 
 NodeListPtr DoctypesAndLinktypesNamedNodeList::nodeList() const
 {
-  NodePtr tem(new DocumentTypeNode(grove(), grove()->governingDtd()));
+  NodePtr tem(new DocumentTypeNode(grove(), grove()->firstDtd()));
   return new SiblingNodeList(tem);
 }
 
@@ -4597,9 +4580,10 @@ AccessResult
 DoctypesAndLinktypesNamedNodeList
 ::namedNodeU(const StringC &str, NodePtr &ptr) const
 {
-  if (grove()->governingDtd()->name() != str)
+  const Dtd *dtd = grove()->lookupDtd(str);
+  if (!dtd)
     return accessNull;
-  ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
+  ptr.assign(new DocumentTypeNode(grove(), dtd));
   return accessOK;
 }
 
@@ -4898,7 +4882,8 @@ NotationNode::NotationNode(const GroveImpl *grove,
 
 AccessResult NotationNode::getOrigin(NodePtr &ptr) const
 {
-  ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
+  ptr.assign(new DocumentTypeNode(grove(), 
+                 grove()->lookupDtd(*(notation_->declInDtdNamePointer()))));
   return accessOK;
 }
 
@@ -4945,163 +4930,6 @@ unsigned long NotationNode::hash() const
   return (unsigned long)notation_;
 }
 
-FormalPublicIdNode::FormalPublicIdNode(const GroveImpl *grove, const PublicId *pubid) 
-: BaseNode(grove), pubid_(pubid)
-{
-}
-
-AccessResult FormalPublicIdNode::getOwnerType(OwnerType::Enum &type) const
-{
-  PublicId::OwnerType otp;
-  if (!pubid_->getOwnerType(otp))
-    return accessNull;
-  switch (otp) {
-  case PublicId::ISO:
-    type = OwnerType::iso;
-    break;
-  case PublicId::registered:
-    type = OwnerType::registered;
-    break;
-  case PublicId::unregistered:
-    type = OwnerType::unregistered;
-    break;
-  }
-  return accessOK;
-}
- 
-AccessResult FormalPublicIdNode::getOwnerId(GroveString &str) const
-{
-  if (!pubid_->getOwner(
-#ifndef HAVE_MUTABLE
-   ((FormalPublicIdNode *)this)->
-#endif
-     owner_))
-    return accessNull;
-  setString(str, owner_);
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getTextClass(TextClass::Enum &tc) const
-{
-  PublicId::TextClass text;
-  if (!pubid_->getTextClass(text))
-    return accessNull;
-  switch (text) {
-  case PublicId::CAPACITY:
-    tc = TextClass::capacity;
-    break;
-  case PublicId::CHARSET:
-    tc = TextClass::charset;
-    break;
-  case PublicId::DOCUMENT:
-    tc = TextClass::document;
-    break;
-  case PublicId::DTD:
-    tc = TextClass::dtd;
-    break;
-  case PublicId::ELEMENTS:
-    tc = TextClass::elements;
-    break;
-  case PublicId::ENTITIES:
-    tc = TextClass::entities;
-    break;
-  case PublicId::LPD:
-    tc = TextClass::lpd;
-    break;
-  case PublicId::NONSGML:
-    tc = TextClass::nonsgml;
-    break;
-  case PublicId::NOTATION:
-    tc = TextClass::notation;
-    break;
-  case PublicId::SHORTREF:
-    tc = TextClass::shortref;
-    break;
-  case PublicId::SUBDOC:
-    tc = TextClass::subdoc;
-    break;
-  case PublicId::SYNTAX:
-    tc = TextClass::syntax;
-    break;
-  case PublicId::TEXT:
-    tc = TextClass::text;
-    break;
-  default:
-    return accessNull;
-  }
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getUnavailable(bool &u) const
-{
-  if (!pubid_->getUnavailable(u))
-    return accessNull;
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getTextDescription(GroveString &str) const
-{
-  if (!pubid_->getDescription(
-#ifndef HAVE_MUTABLE
-      ((FormalPublicIdNode *)this)->
-#endif
-       desc_))
-    return accessNull;
-  setString(str, desc_);
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getTextLanguage(GroveString &str) const
-{
-  if (!pubid_->getLanguage(
-#ifndef HAVE_MUTABLE
-       ((FormalPublicIdNode *)this)->
-#endif
-      lang_))
-    return accessNull;
-  setString(str, lang_);
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getTextDesignatingSequence(GroveString &str) const
-{
-  if (!pubid_->getDesignatingSequence(
-#ifndef HAVE_MUTABLE
-   ((FormalPublicIdNode *)this)->
-#endif
-       dseq_))
-    return accessNull;
-  setString(str, dseq_);
-  return accessOK;
-}
-
-AccessResult FormalPublicIdNode::getTextDisplayVersion(GroveString &str) const
-{
-  if (!pubid_->getDisplayVersion(
-#ifndef HAVE_MUTABLE
-   ((FormalPublicIdNode *)this)->
-#endif
-      dver_))
-    return accessNull;
-  setString(str, dver_);
-  return accessOK;
-}
-
-void FormalPublicIdNode::accept(NodeVisitor &visitor)
-{
-  visitor.formalPublicId(*this);
-}
-
-bool FormalPublicIdNode::same(const BaseNode &node) const
-{
-  return node.same2(this);
-}
-
-bool FormalPublicIdNode::same2(const FormalPublicIdNode *node) const
-{
-  return pubid_ == node->pubid_;
-}
-
 ExternalIdNode::ExternalIdNode(const GroveImpl *grove)
 : BaseNode(grove)
 {
@@ -5114,15 +4942,6 @@ AccessResult ExternalIdNode::getPublicId(GroveString &str) const
     return accessNull;
   setString(str, *s);
   return accessOK;
-}
-
-AccessResult ExternalIdNode::getFormalPublicId(NodePtr &ptr) const
-{
-  const PublicId *pubid = externalId().publicId();
-  if (!pubid || pubid->type() != PublicId::fpi) 
-    return accessNull;
-  ptr.assign(new FormalPublicIdNode(grove(), pubid));
-  return accessOK;  
 }
 
 AccessResult ExternalIdNode::getSystemId(GroveString &str) const
@@ -5350,11 +5169,6 @@ bool BaseNode::same2(const ExternalIdNode *) const
   return 0;
 }
 
-bool BaseNode::same2(const FormalPublicIdNode *) const
-{
-  return 0;
-}
-
 bool BaseNode::same2(const DocumentTypeNode *) const
 {
   return 0;
@@ -5371,11 +5185,6 @@ bool BaseNode::same2(const MessageNode *) const
 }
 
 bool BaseNode::same2(const ElementTypeNode *) const
-{
-  return 0;
-}
-
-bool BaseNode::same2(const RankStemNode *) const
 {
   return 0;
 }
@@ -5576,46 +5385,6 @@ Boolean Chunk::getLocOrigin(const Origin *&) const
 
 // ------------------------------ dev --------------------------------
 
-// -- CLASS IMP: RankStemNode
-
-AccessResult RankStemNode::getOrigin(NodePtr &ptr) const
-{
-  ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
-  return accessOK;
-}
-
-AccessResult RankStemNode::getStem(GroveString &str) const
-{
-  setString(str, rankStem_.name());
-  return accessOK;
-}
-
-AccessResult RankStemNode::getElementTypes(NodeListPtr &ptr) const
-{
-  ptr.assign(new RankStemElementTypesNodeList(grove(), rankStem_, iter_));
-  return accessOK;
-}
-
-bool RankStemNode::same(const BaseNode &node) const
-{
-  return node.same2(this);
-}
-
-bool RankStemNode::same2(const RankStemNode *node) const
-{
-  return &rankStem_ == &(node->rankStem());
-}
-
-void RankStemNode::accept(NodeVisitor &visitor)
-{
-  visitor.rankStem(*this);
-}
-
-unsigned long RankStemNode::hash() const
-{
-  return (unsigned long)&rankStem_;
-}
-
 // -- CLASS IMP: ElementTypeNode
 
 AccessResult ElementTypeNode::getOrigin(NodePtr &ptr) const
@@ -5644,6 +5413,7 @@ AccessResult ElementTypeNode::getModelGroup(NodePtr &ptr) const
   if (def == 0 || def->declaredContent() != ElementDefinition::modelGroup)
     return accessNull;
   ptr.assign(new ModelGroupNode(grove(),
+				dtd_,
                                 elementType_, 
                                 *(def->compiledModelGroup()->modelGroup())));  
   return accessOK;
@@ -5726,40 +5496,6 @@ AccessResult ElementTypeNode::getOmitStartTag(bool &f) const
   return accessOK;
 }
 
-AccessResult ElementTypeNode::getRankGroup(GroveStringListPtr &stems) const
-{
-  // FIXME: What about rank groups with exactly one member ?
-  const ElementDefinition *def = elementType_.definition();
-  if (def == 0  || !def->nRankStems() <= 1)
-    return accessNull;
-  stems.assign(new GroveStringList);
-  GroveString str;
-  for (size_t i = 0; i < def->nRankStems(); i++)
-  {
-    setString(str, def->rankStem(i)->name());
-    stems->append(str);
-  }
-  return accessOK;
-}
-
-AccessResult ElementTypeNode::getRankStem(GroveString &str) const
-{
-  const ElementDefinition *def = elementType_.definition();
-  if (def == 0  || !def->nRankStems() != 1)
-    return accessNull;
-  setString(str, def->rankStem(0)->name());
-  return accessOK;
-}
-
-AccessResult ElementTypeNode::getRankSuffix(GroveString &str) const
-{
-  const ElementDefinition *def = elementType_.definition();
-  if (def == 0  || def->rankSuffix().size() == 0)
-    return accessNull;
-  setString(str, def->rankSuffix());
-  return accessOK;
-}
-
 AccessResult ElementTypeNode::getAttributeDefs(NamedNodeListPtr &ptr) const
 {
   ptr.assign(new ElementTypeAttributeDefsNamedNodeList(grove(), elementType_));
@@ -5786,92 +5522,37 @@ unsigned long ElementTypeNode::hash() const
   return (unsigned long)&elementType_;
 }
 
-// -- CLASS IMP: RankStemElementTypesNodeList
-
-RankStemElementTypesNodeList::RankStemElementTypesNodeList(const GroveImpl *grove,
-                                           const RankStem &rankStem,
-                                           const Dtd::ConstElementTypeIter &iter)
-
- : grove_(grove), rankStem_(rankStem), iter_(iter) 
-{
-}
-
-AccessResult RankStemElementTypesNodeList::first(NodePtr &ptr) const
-{
-  RankStemElementTypesNodeList *list = (RankStemElementTypesNodeList *)this;
-  for (;;) {
-    Dtd::ConstElementTypeIter tem(iter_);
-    const ElementType *elementType = tem.next();
-    if (elementType == 0)
-      return accessNull;
-    if (elementType->isRankedElement()
-        && elementType->rankedElementRankStem() == &rankStem_) {
-      ptr.assign(new ElementTypeNode(grove_, *elementType));
-      return accessOK;
-    }
-    list->iter_.next();
-  }
-}
-
-AccessResult RankStemElementTypesNodeList::chunkRest(NodeListPtr &ptr) const
-{
-  NodePtr tem;
-  if (first(tem) == accessNull) 
-    return accessNull;
-  if (canReuse(ptr)) {
-    ((RankStemElementTypesNodeList *)this)->iter_.next();
-    return first(tem);
-  }
-  Dtd::ConstElementTypeIter iter(iter_);
-  iter.next();
-  ptr.assign(new RankStemElementTypesNodeList(grove_, rankStem_, iter));
-  return ptr->first(tem);
-}
-
 // -- CLASS IMP: ElementTypesNodeList
 
-ElementTypesNodeList::ElementTypesNodeList(const GroveImpl *grove,
-                                           const Dtd *dtd,
-                                           const Dtd::ConstElementTypeIter &elementTypeIter,
-                                           const Dtd::ConstRankStemIter &rankStemIter)
-
- : grove_(grove), dtd_(dtd), elementTypeIter_(elementTypeIter), 
-rankStemIter_(rankStemIter)
+ElementTypesNodeList::ElementTypesNodeList( const GroveImpl *grove,
+					    const Dtd *dtd,
+				            const Dtd::ConstElementTypeIter &iter )
+ : grove_(grove), dtd_(dtd), iter_(iter)
 {
 }
 
 AccessResult ElementTypesNodeList::first(NodePtr &ptr) const
 {
-  Dtd::ConstElementTypeIter elementTypeIter(elementTypeIter_);
-  const ElementType *elementType = elementTypeIter.next();
-  if (elementType) {
-    ptr.assign(new ElementTypeNode(grove_, *elementType));
-    return accessOK;
-  }
-  Dtd::ConstRankStemIter rankStemIter(rankStemIter_);
-  const RankStem *rankStem = rankStemIter.next();
-  if (rankStem) { 
-    ptr.assign(new RankStemNode(grove_, *rankStem, dtd_->elementTypeIter()));
-    return accessOK;
-  }
-  return accessNull; 
+  Dtd::ConstElementTypeIter tem(iter_);
+  const ElementType *elementType = tem.next();
+  if (!elementType)
+    return accessNull;
+  ptr.assign(new ElementTypeNode(grove_, dtd_, *elementType));
+  return accessOK;
 }
 
 AccessResult ElementTypesNodeList::chunkRest(NodeListPtr &ptr) const
 {
   if (canReuse(ptr)) {
     ElementTypesNodeList *list = (ElementTypesNodeList *)this;
-    if (list->elementTypeIter_.next() == 0) 
-      if (list->rankStemIter_.next() == 0)
-        return accessNull;
+    if (list->iter_.next() == 0)
+      return accessNull;
     return accessOK;
   }
-  Dtd::ConstElementTypeIter elementTypeIter(elementTypeIter_);
-  Dtd::ConstRankStemIter rankStemIter(rankStemIter_);
-  if (elementTypeIter.next() == 0) 
-    if (rankStemIter.next() == 0)
-      return accessNull;
-  ptr.assign(new ElementTypesNodeList(grove_, dtd_, elementTypeIter, rankStemIter));
+  Dtd::ConstElementTypeIter tem(iter_);
+  if (tem.next() == 0)
+    return accessNull;
+  ptr.assign(new ElementTypesNodeList(grove_, dtd_, tem));
   return accessOK;
 }
 
@@ -5884,30 +5565,25 @@ ElementTypesNamedNodeList::ElementTypesNamedNodeList(const GroveImpl *grove, con
 
 NodeListPtr ElementTypesNamedNodeList::nodeList() const
 {
-  return new ElementTypesNodeList(grove(), dtd_, dtd_->elementTypeIter(), dtd_->rankStemIter());
+  return new ElementTypesNodeList(grove(), dtd_, dtd_->elementTypeIter());
 }
 
 AccessResult ElementTypesNamedNodeList::namedNodeU(const StringC &str, NodePtr &ptr) const
 {
   const ElementType *elementType = dtd_->lookupElementType(str); // ? Temp
-  if (elementType) {
-    ptr.assign(new ElementTypeNode(grove(), *elementType));
-    return accessOK;
-  }
-  const RankStem *rankStem = dtd_->lookupRankStem(str);
-  if (rankStem) {
-    ptr.assign(new RankStemNode(grove(), *rankStem, dtd_->elementTypeIter()));
-    return accessOK;
-  }
-  return accessNull;
+  if (!elementType)
+    return accessNull;
+  ptr.assign(new ElementTypeNode(grove(), dtd_, *elementType));
+  return accessOK;
 }
 
 // -- CLASS IMP: ContentTokenNodeBase
 
 ContentTokenNodeBase::ContentTokenNodeBase(const GroveImpl *grove,
+					   const Dtd *dtd,
                                            const ElementType &elementType,
                                            ModelGroupNode *parentModelGroupNode)
- : BaseNode(grove), elementType_(elementType), parentModelGroupNode_(parentModelGroupNode)
+ : BaseNode(grove), dtd_(dtd), elementType_(elementType), parentModelGroupNode_(parentModelGroupNode)
 {
   if (parentModelGroupNode_ != 0)
     parentModelGroupNode_->addRef();
@@ -5924,7 +5600,7 @@ AccessResult ContentTokenNodeBase::getOrigin(NodePtr &ptr) const
   if (parentModelGroupNode_ != 0)
     ptr.assign(parentModelGroupNode_);
   else
-    ptr.assign(new ElementTypeNode(grove(), elementType_));
+    ptr.assign(new ElementTypeNode(grove(), dtd_, elementType_));
   return accessOK;
 }
 
@@ -5940,7 +5616,7 @@ AccessResult ContentTokenNodeBase::getLocation(Location &loc) const
 
 AccessResult ElementTokenNode::getGi(GroveString &str) const
 {
-  ASSERT(elementToken_.elementType() != 0);
+  assert(elementToken_.elementType() != 0);
   setString(str, elementToken_.elementType()->name());
   return accessOK;
 }
@@ -6065,11 +5741,12 @@ AccessResult ModelGroupNode::getContentTokens(NodeListPtr &ptr) const
 
 void ModelGroupNode::makeNode(NodePtr &ptr, unsigned contentTokenIdx)
 {
-  ASSERT( contentTokenIdx < modelGroup_.nMembers());
+  assert( contentTokenIdx < modelGroup_.nMembers());
   const ContentToken &contentToken = modelGroup_.member(contentTokenIdx);
   const ModelGroup *asModelGroup = contentToken.asModelGroup();
   if (asModelGroup != 0)
     ptr.assign(new ModelGroupNode(grove(),
+                                  dtd_,
                                   elementType_,
                                   *asModelGroup,
                                   this));
@@ -6079,11 +5756,13 @@ void ModelGroupNode::makeNode(NodePtr &ptr, unsigned contentTokenIdx)
     if (asLeafContentToken != 0)
       if (asLeafContentToken->elementType() != 0)
         ptr.assign(new ElementTokenNode(grove(),
+                                        dtd_,
                                         elementType_,
                                         *(const ElementToken*)asLeafContentToken,
                                         this));
       else if (asLeafContentToken->occurrenceIndicator() == ContentToken::rep)
         ptr.assign(new PcdataTokenNode(grove(),
+                                       dtd_,
                                        elementType_,
                                        *(const PcdataToken*)asLeafContentToken,
                                        this));
@@ -6340,12 +6019,6 @@ const void *NotationAttributeDefOrigin::attributeOriginId() const
 
 // class IMP: AttributeDefNode
 
-AccessResult AttributeDefNode::getOrigin(NodePtr &ptr) const
-{
-  ptr.assign(makeOriginNode(grove(), attIndex_));
-  return accessOK;
-}
-
 AccessResult AttributeDefNode::getName(GroveString &str) const
 {
   setString(str, attDefList()->def(attIndex_)->name());
@@ -6493,6 +6166,12 @@ unsigned long AttributeDefNode::hash() const
 
 // class IMP: ElementTypeAttributeDefNode
 
+AccessResult ElementTypeAttributeDefNode::getOrigin(NodePtr &ptr) const
+{
+  ptr.assign(new ElementTypeNode(grove(), *elementType_));
+  return accessOK;
+}
+
 AccessResult ElementTypeAttributeDefNode::getCurrentGroup(NodeListPtr &ptr) const 
 {
   AttributeDefinitionDesc desc;
@@ -6523,6 +6202,12 @@ AccessResult ElementTypeAttributeDefNode::getDefaultValue(NodeListPtr &ptr) cons
 }
 
 // class IMP: NotationAttributeDefNode
+
+AccessResult NotationAttributeDefNode::getOrigin(NodePtr &ptr) const
+{
+  ptr.assign(new NotationNode(grove(), notation_));
+  return accessOK;
+}
 
 AccessResult NotationAttributeDefNode::getCurrentGroup(NodeListPtr &ptr) const 
 {

@@ -1,4 +1,7 @@
+#include "config.h"
 #include <stdio.h>
+
+#ifndef HAVE_STRERROR
 
 #define INT_DIGITS 19		/* enough for 64 bit integer */
 
@@ -16,3 +19,5 @@ char *strerror(n)
     return buf;
   }
 }
+
+#endif

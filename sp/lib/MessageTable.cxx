@@ -7,15 +7,22 @@
 
 #include "splib.h"
 #include "MessageTable.h"
+#include "MessageModule.h"
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
+
+MessageModule libModule;
+MessageModule appModule;
+
+#ifdef SP_NAMESPACE
+}
+#endif
 
 #ifdef SP_NO_MESSAGE_TEXT
 
 // Windows only
-
-#define WIN32_LEAN_AND_MEAN
-#define STRICT
-#include "windows.h"
-static HINSTANCE dllInstanceHandle = NULL;
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -34,17 +41,13 @@ Boolean WinMessageTable::getText(const MessageFragment &frag,
   static const int bufSize = 4096;
   SP_TCHAR buf[bufSize];
 #ifdef SP_WIDE_SYSTEM
-  int len = LoadStringW(frag.module() == MessageFragment::libModule
-		       ? dllInstanceHandle
-		       : 0,
+  int len = LoadStringW(frag.module()->dllInstanceHandle,
 		       frag.number(),
 		       buf,
 		       bufSize);
   if (len == 0 && GetLastError() != 0) {
     char bufmb[bufSize*2];
-    len = LoadStringA(frag.module() == MessageFragment::libModule
-		      ? dllInstanceHandle
-		      : 0,
+    len = LoadStringA(frag.module()->dllInstanceHandle,
 		      frag.number(),
 		      bufmb,
 		      bufSize*2);
@@ -57,9 +60,7 @@ Boolean WinMessageTable::getText(const MessageFragment &frag,
       return 0;
   }
 #else /* not SP_WIDE_SYSTEM */
-  int len = LoadStringA(frag.module() == MessageFragment::libModule
-		        ? dllInstanceHandle
-		        : 0,
+  int len = LoadStringA(frag.module()->dllInstanceHandle,
 		        frag.number(),
 		        buf,
 		        bufSize);
@@ -85,7 +86,7 @@ extern "C"
 BOOL WINAPI DllMain(HINSTANCE inst, ULONG reason, LPVOID)
 {
   if (reason == DLL_PROCESS_ATTACH)
-    dllInstanceHandle = inst;
+    SP_NAMESPACE_SCOPE::libModule->dllInstanceHandle = inst;
   return TRUE;
 }
 #endif
@@ -108,30 +109,16 @@ namespace SP_NAMESPACE {
 
 class GettextMessageTable : public MessageTable {
 public:
-  GettextMessageTable();
   Boolean getText(const MessageFragment &, String<SP_TCHAR> &) const;
-  void registerMessageDomain(unsigned char module, char *domain, char *dir) const;
-private:
-  mutable char *messageDomain[MessageFragment::nModules]; 
+  void registerMessageDomain(MessageModule &module, char *domain, char *dir) const;
 };
 
-void GettextMessageTable::registerMessageDomain(unsigned char module, 
+void GettextMessageTable::registerMessageDomain(MessageModule &module, 
                                                 char *domain, char *dir) const  
 {
-  if (module < MessageFragment::nModules) {
-#ifndef HAVE_MUTABLE
-    ((GettextMessageTable *)this)->
-#endif 
-      messageDomain[module] = domain; 
-    if (dir) 
-      bindtextdomain(domain, dir);
-  }
-}
-
-GettextMessageTable::GettextMessageTable()
-{
-  for (unsigned char module = 0; module < MessageFragment::nModules; module++)
-    messageDomain[module] = 0;
+  module.domain = domain; 
+  if (dir) 
+    bindtextdomain(domain, dir);
 }
 
 Boolean GettextMessageTable::getText(const MessageFragment &frag,
@@ -140,7 +127,7 @@ Boolean GettextMessageTable::getText(const MessageFragment &frag,
   const char *s = frag.text();
   if (!s)
     return 0;
-  s = dgettext(messageDomain[frag.module()], s);
+  s = dgettext(frag.module()->domain, s);
   if (!s)
     return 0;
   str.assign(s, strlen(s));

@@ -14,6 +14,7 @@
 #include "Boolean.h"
 #include "CharsetInfo.h"
 #include "ExtendEntityManager.h"
+#include "IList.h"
 #include "Ptr.h"
 #include "SubstTable.h"
 
@@ -37,13 +38,22 @@ public:
     PackedBoolean piEscape;
     PackedBoolean empty;
     PackedBoolean attlist;
+    PackedBoolean reportEnts;
+    PackedBoolean reportIS;
+    PackedBoolean expExt;
+    PackedBoolean expInt;
+    PackedBoolean intDecl;
+    PackedBoolean extDecl;
+    PackedBoolean sdataAsPi;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,
 			const StringC &encodingName,
+			const char *outputDir,
+			const char *dtdLoc,
 		        const Ptr<ExtendEntityManager> &,
 	  		const CharsetInfo &,
-			Messenger *);
+			CmdLineApp *);
   ~XmlOutputEventHandler();
   void data(DataEvent *);
   void startElement(StartElementEvent *);
@@ -72,12 +82,26 @@ private:
   int filenameToUrl(const StringC &filename, const Location &loc, StringC &url);
   void maybeStartDoctype(Boolean &doctypeStarted, const Dtd &dtd);
   void closeCdataSection();
+  void entityDefaulted(EntityDefaultedEvent *event);
+  void inputOpened(InputSource *in);
+  void inputClosed(InputSource *in);
   const StringC &generalName(const StringC &name, StringC &buf);
+  char *convertSuffix(char *name);
+  Boolean checkFirstSeen(const StringC &name);
 
-  Messenger *mgr_;
+  CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;
+  IList<OutputCharStream> outputStack_;
+  IList<OutputByteStream> outputFileStack_;
   const CharsetInfo *systemCharset_;
   OutputCharStream *os_;
+  OutputCharStream *extEnts_;
+  OutputCharStream *intEnts_;
+  OutputCharStream *nullOut_;
+  FileOutputByteStream *extEntFile_;
+  FileOutputByteStream *intEntFile_;
+  const char *outputDir_;
+  const char *dtdLoc_;
   Boolean inDtd_;
   Boolean useCdata_;
   Boolean inCdata_;
@@ -86,6 +110,7 @@ private:
   Boolean namecaseGeneral_;
   SubstTable lowerSubst_;
   StringC nameBuf_;
+  NamedTable<Named> entTable_;
 };
 
 inline
@@ -93,6 +118,27 @@ OutputCharStream &XmlOutputEventHandler::os()
 {
   return *os_;
 }
+
+class SP_API NullOutputByteStream : public OutputByteStream {
+public:
+  NullOutputByteStream();
+  virtual ~NullOutputByteStream();
+  void flush();
+  void sputc(char c);
+  void sputn(const char *, size_t);
+  OutputByteStream &operator<<(char);
+  OutputByteStream &operator<<(unsigned char);
+  OutputByteStream &operator<<(const char *);
+  OutputByteStream &operator<<(int);
+  OutputByteStream &operator<<(unsigned);
+  OutputByteStream &operator<<(long);
+  OutputByteStream &operator<<(unsigned long);
+  OutputByteStream &operator<<(const String<char> &);
+  char *getBufferPtr() const;
+  size_t getBufferSize() const;
+  void usedBuffer(size_t);
+  void flushBuf(char);
+};
 
 #ifdef SP_NAMESPACE
 }

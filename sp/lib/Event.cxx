@@ -536,6 +536,11 @@ EventHandler::~EventHandler()
 {
 }
 
+// By default, do nothing when an input opens or closes.
+void EventHandler::inputClosed(InputSource *in) {}
+
+void EventHandler::inputOpened(InputSource *in) {}
+
 EventQueue::EventQueue()
 {
 }

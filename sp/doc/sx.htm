@@ -49,6 +49,11 @@ This has the same effect as in <A HREF="nsgmls.htm#optc">onsgmls</A>.
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#optC">onsgmls</A>.
 <DT>
+<CODE>-d<VAR>directory</VAR></CODE>
+<DD>
+Place output files in
+<CODE><VAR>directory</VAR></CODE>.
+<DT>
 <CODE>-D<VAR>directory</VAR></CODE>,
 <CODE>--directory=<VAR>directory</VAR></CODE>
 <DD>
@@ -74,6 +79,11 @@ of stderr.
 <CODE>--include=<VAR>name</VAR></CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
+<DT>
+<CODE>-l<VAR>dtd_file</VAR></CODE>
+<DD>
+Specify that the resulting XML file should conform to the DTD in
+<CODE><VAR>dtd_file</VAR></CODE>.
 <DT>
 <CODE>-v</CODE>,
 <CODE>--version</CODE>
@@ -149,6 +159,40 @@ Use the <CODE>&lt;<VAR>e</VAR>/&gt;</CODE> syntax for element types
 <DD>
 Output a ATTLIST declaration for every element specifying the type of
 all attributes.  The default will always be <CODE>#IMPLIED</CODE>.
+<DT>
+<CODE>report-input-sources</CODE>
+<DD>
+Output a processing instruction to report when an input source other
+than the main file is opened or closed in the instance. Do not report
+any input source changes in the DTD.
+<DT>
+<CODE>report-entities</CODE>
+<DD>
+Output a processing instruction to report when an external entity
+reference has been resolved in the instance. Do not report any entity
+resolutions in the DTD.
+<DT>
+<CODE>no-expand-external</CODE>
+<DD>
+Preserve external entities, write a declaration driver file named "extEntities.dtf", and include that file in the instance's internal subset.
+<DT>
+<CODE>no-expand-internal</CODE>
+<DD>
+Preserve internal entities, write a declaration driver file named "intEntities.dtf", and include that file in the instance's internal subset.
+<DT>
+<CODE>no-external-decl
+<DD>
+Do not include the external entities declaration driver file in the instance's internal subset.
+<DT>
+<CODE>no-internal-decl
+<DD>
+Do not include the internal entities declaration driver file in the instance's internal subset.
+<DT>
+<CODE>sdata-as-pis
+<DD>
+When translating SDATA entities (whether expanding them or providing a
+definition for them in the output's internal subset), express them as
+processing instructions instead of as general internal entities.
 </DL>
 <P>
 Multiple

@@ -198,6 +198,10 @@ Do not include the internal entities declaration driver file in the instance's i
 When translating SDATA entities (whether expanding them or providing a
 definition for them in the output's internal subset), express them as
 processing instructions instead of as general internal entities.
+<DT>
+<CODE>no-output-outside-outdir
+<DD>
+When preserving external entities, do not write output files outside the specified output directory ("." by default). In other words, if an external entity's system identifier includes enough instances of ".." to cause osx to write a file outside (above) the output directory, exit. (By default, osx will issue a warning but will write the file and continue.)
 </DL>
 <P>
 Multiple

@@ -185,8 +185,8 @@ public:
   void endTableRow();
   void startTableCell(const TableCellNIC &);
   void endTableCell();
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   // Headers and footers are treated like a separate port.
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
@@ -2428,7 +2428,7 @@ void TeXFOTBuilder::endTableCell()
   #endif
 }
 
-void TeXFOTBuilder::startSimplePageSequence()
+void TeXFOTBuilder::startSimplePageSequenceSerial()
 {
   NextFormat.FotCurDisplaySize
    = ( NextFormat.FotPageWidth - NextFormat.FotLeftMargin - NextFormat.FotRightMargin
@@ -2439,7 +2439,7 @@ void TeXFOTBuilder::startSimplePageSequence()
   startGroup("SpS");
 }
 
-void TeXFOTBuilder::endSimplePageSequence()
+void TeXFOTBuilder::endSimplePageSequenceSerial()
 {
   endGroup("SpS");
   end();

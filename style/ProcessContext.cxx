@@ -394,6 +394,16 @@ void ProcessContext::popPorts()
   delete connectableStack_.get();
 }
 
+void ProcessContext::pushPrincipalPort(FOTBuilder* principalPort)
+{
+  connectionStack_.insert(new Connection(principalPort));
+}
+
+void ProcessContext::popPrincipalPort()
+{
+  delete connectionStack_.get();
+}
+
 void ProcessContext::startDiscardLabeled(SymbolObj *label)
 {
   startFlowObj();

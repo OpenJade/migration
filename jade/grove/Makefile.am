@@ -6,4 +6,7 @@ libogrove_la_LDFLAGS = --version-info 0:0:0 -lm
 
 libogrove_la_SOURCES = Node.h Node.cxx LocNode.h LocNode.cxx
 
+# This is needed by ../style/FOTBuilder.h
+pkginclude_HEADERS = Node.h
+
 EXTRA_DIST = grove.dsp

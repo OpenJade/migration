@@ -24,6 +24,10 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	stylelib.h TransformationMode.h TransformationMode.cxx \
 	DocumentGenerator.h DocumentGenerator.cxx
 
+# We install the headers needed to create a new application based on
+# the DssslApp class.
+pkginclude_HEADERS = FOTBuilder.h dsssl_ns.h DssslApp.h GroveManager.h
+
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove
 
 EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \

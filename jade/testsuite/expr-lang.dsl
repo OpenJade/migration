@@ -1,4 +1,5 @@
 <!doctype style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN">
+<!-- Copyright (C) 1999 Avi Kivity -->
                  
 <![cdata[                
                  

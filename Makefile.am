@@ -9,7 +9,7 @@ SUBDIRS = pubtext unicode doc \
 
 pkginclude_HEADERS = config.h
 
-docdir = $(prefix)/doc
+docdir = $(datadir)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
 
 pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog

@@ -21,11 +21,22 @@ namespace SP_NAMESPACE {
 #endif
 
 class MessageModule;
+
+#ifdef _MSC_VER
+extern SP_API MessageModule libModule;
+extern SP_API MessageModule appModule;
+#else
 extern MessageModule libModule;
 extern MessageModule appModule;
+#endif
 
 class SP_API MessageFragment {
 public:
+
+#ifdef _MSC_VER
+  MessageFragment() {};
+#endif
+
   MessageFragment(const MessageModule *module, unsigned number, const char *text = 0);
   const MessageModule *module() const;
   unsigned number() const;

@@ -38,8 +38,11 @@ public:
   void addOption(Option);
   void setProgramName(const StringC &);
 protected:
+
+#ifndef _MSC_VER
   MessageReporter(const MessageReporter &); // undefined
   void operator=(const MessageReporter &);  // undefined
+#endif
   
   virtual const ExternalInfo *locationHeader(const Location &, Offset &off);
   virtual const ExternalInfo *locationHeader(const Origin *, Index, Offset &off);

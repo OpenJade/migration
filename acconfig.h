@@ -31,14 +31,8 @@
 /* define this to compile explicit template instantiations */
 #undef SP_MANUAL_INST
 
-/* define this if qualified templated destructors like T::~T are broken */
-#undef SP_QUAL_TEMPLATE_DTOR_BROKEN
-
 /* define this if new.h doesn't declare void *operator new(size_t, void *p) */
 #undef SP_DECLARE_PLACEMENT_OPERATOR_NEW
-
-/* define this if void T::operator delete(void *p, Allocator &) is supported */
-#undef SP_HAVE_PLACEMENT_OPERATOR_DELETE
 
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
@@ -160,3 +154,8 @@
 #ifdef HAVE_LIBPTHREAD
 #define SP_MUTEX_PTHREADS
 #endif /* HAVE_LIBPTHREAD */
+
+#ifdef HAVE_PLACEMENT_OPERATOR_DELETE
+#define SP_HAVE_PLACEMENT_OPERATOR_DELETE
+#endif /* HAVE_PLACEMENT_OPERATOR_DELETE */
+

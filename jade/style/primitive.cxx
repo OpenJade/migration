@@ -4175,8 +4175,18 @@ DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
   int pos[3];
   if (!decodeKeyArgs(argc - 2, argv + 2, keys, 3, interp, loc, pos))
     return interp.makeError();
-  ComponentName::Id id;
-  if (interp.lookupNodeProperty(*str, id)) {
+  //FIXME: this is just a hack to fix the single duplicate rcsname 'tokens';
+  //       should really be handled in Interpreter.
+  StringC propname;
+  ComponentName::Id cls;
+  ComponentName::Id id = ComponentName::noId;
+ if (*str == "tokens" 
+      && node->getClassName(cls) == accessOK 
+     && cls == ComponentName::idModelGroup) 
+   id = ComponentName::idContentTokens;
+  else
+    interp.lookupNodeProperty(*str, id);
+ if (id != ComponentName::noId) {
     ELObjPropertyValue value(interp,
 			     pos[2] >= 0
 			     && argv[pos[2] + 2] != interp.makeFalse());

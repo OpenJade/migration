@@ -5,7 +5,12 @@
 namespace SP_NAMESPACE {
 #endif
 
+#ifdef SP_MULTI_BYTE
+// restrict Char to the UTF-16 range for now
+const Char charMax = 0x10ffff;
+#else
 const Char charMax = Char(-1);
+#endif
 const WideChar wideCharMax = WideChar(-1);
 const UnivChar univCharMax = UnivChar(-1);
 const SyntaxChar syntaxCharMax = SyntaxChar(-1);

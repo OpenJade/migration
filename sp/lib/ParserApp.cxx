@@ -232,6 +232,7 @@ Boolean ParserApp::enableWarning(const AppChar *s)
     { SP_T("entity-ref"), &ParserOptions::entityRef, 0 },
     { SP_T("external-entity-ref"), &ParserOptions::externalEntityRef, 0 },
     { SP_T("integral"), &ParserOptions::integral, 0 },
+    { SP_T("idref"), &ParserOptions::errorIdref, 0 },
     { SP_T("significant"), &ParserOptions::errorSignificant, 0 },
     { SP_T("afdr"), &ParserOptions::errorAfdr, 0 },
   };

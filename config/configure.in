@@ -1,7 +1,7 @@
 dnl
 dnl  configure.in
 dnl
-AC_REVISION($Id$)
+AC_REVISION([$Id$])
 dnl
 dnl  Process this file with autoconf to produce a configure script.
 dnl

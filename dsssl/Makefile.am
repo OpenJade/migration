@@ -8,6 +8,5 @@ pkgdocdir = $(docdir)/@PACKAGE@
 
 pkgdoc_DATA = demo.dsl demo.sgm 
 
-EXTRA_DIST = Makefile.jadetex builtins.dsl catalog demo.dsl demo.sgm \
- dsssl.dtd extensions.dsl fot.dtd jadetex.dtx jadetex.ini jadetex.ins \
- pdfjadetex.ini spec.dtd style-sheet.dtd unicode.sty
+EXTRA_DIST = builtins.dsl catalog demo.dsl demo.sgm dsssl.dtd \
+	extensions.dsl fot.dtd spec.dtd style-sheet.dtd unicode.sty

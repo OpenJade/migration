@@ -8,11 +8,12 @@
 #include "FOTBuilder.h"
 #include "GroveManager.h"
 #include "dsssl_ns.h"
-#include "StyleEngine.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
+
+class StyleEngine;
 
 class STYLE_API DssslApp : public GroveApp, public GroveManager {
 public:

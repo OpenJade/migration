@@ -242,7 +242,7 @@ dnl Output.
 AC_SUBST(LIBOBJS)
 AC_OUTPUT([Makefile msggen.pl lib/Makefile nsgmls/Makefile spent/Makefile 
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
-	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile
-	intl/Makefile po/Makefile.in],
+	include/Makefile include/config.h.old generic/Makefile doc/Makefile
+	pubtext/Makefile intl/Makefile po/Makefile.in],
 	[echo creating po/Makefile
          sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

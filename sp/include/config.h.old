@@ -303,6 +303,7 @@
 #define mutable
 #endif
 
+// NOTE: This is processed as a Makefile, not as a header by autoconf.
 #define SP_PACKAGE "OpenSP"
 #define SP_VERSION "1.4-pre2"
 #define SP_LOCALE_DIR ""

@@ -12,7 +12,7 @@ dnl
 
 dnl Initialization.
 AC_INIT(pubtext)
-AM_INIT_AUTOMAKE(OpenSP, 1.4-pre1, no-define)
+AM_INIT_AUTOMAKE(OpenSP, 1.4-pre2, no-define)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
@@ -36,11 +36,11 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
+AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale)
-dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
-dnl rely on PACKAGE and VERSION substitutions.
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
+SP_MESSAGE_DOMAIN=sp
+AC_DEFINE_UNQUOTED(SP_MESSAGE_DOMAIN, "$SP_MESSAGE_DOMAIN", [Message domain])
+AC_SUBST(SP_MESSAGE_DOMAIN) 
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -74,6 +74,8 @@ if test "$ac_cv_cxx_bool" = yes; then
   AC_CHECK_SIZEOF(bool)
   AC_LANG_C
 fi
+AC_CXX_MUTABLE
+AC_CXX_TYPENAME
 AC_CXX_NEW_FOR_SCOPING
 AC_CXX_PLACEMENT_OPERATOR_DELETE
 AC_CXX_DYNAMIC_CAST
@@ -242,7 +244,7 @@ dnl Output.
 AC_SUBST(LIBOBJS)
 AC_OUTPUT([Makefile msggen.pl lib/Makefile nsgmls/Makefile spent/Makefile 
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
-	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile
-	intl/Makefile po/Makefile.in],
+	include/Makefile include/config.h.old generic/Makefile doc/Makefile
+	pubtext/Makefile intl/Makefile po/Makefile.in],
 	[echo creating po/Makefile
          sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

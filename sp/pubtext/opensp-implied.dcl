@@ -1,6 +1,6 @@
 <!SGML "ISO 8879:1986"
 --
-	Implied SGML Declaration for SP
+	Implied SGML Declaration for OpenSP
 	Included for reference purposes
 --
                             CHARSET

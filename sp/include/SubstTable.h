@@ -24,8 +24,8 @@ public:
   void inverseTable(SubstTable<T> &) const;
 private:
   String<T> table_;
-  String<T> pairs_;		// mutable
-  Boolean pairsValid_;		// mutable
+  mutable String<T> pairs_;
+  mutable Boolean pairsValid_;
 };
 
 #ifdef SP_NAMESPACE

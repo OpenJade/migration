@@ -39,6 +39,10 @@ Simple things
 * Perhaps split InterpreterMessages into InterpreterMessages and 
   SchemeParserMessages (and more...). 
 
+* Set up framework for I18N: generating .po from .msg, po/OpenXYZ.pot from ../*.po,
+  generate and install .mo files. See GNU gettext Makefile.in.in.
+
+
 
 Things which have to be added to the jade internals documentation
 =================================================================
@@ -62,10 +66,6 @@ Things which have to be added to the jade internals documentation
 
 Reorganization
 ==============
-
-* Move jadetex from dsssl/ to contrib/
-
-* Move japan.sgmldecl to pubtext/japan.sd
 
 * move the generated config.h files to toplevel.
 

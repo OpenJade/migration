@@ -48,12 +48,12 @@ compress	:= gzip -9f
 # flags to get automake to use the above
 am_inst_flags	:= INSTALL='install -o root -g root -p' INSTALL_PROGRAM='$(install_program)' INSTALL_SCRIPT='$(install_script)' INSTALL_DATA='$(install_file)'
 
-
 # first version of package providing the right shlibs
 SHLIBS_PKGVER	:= 1.4-0.pre2
 
 # determine our version numbers
 SRC_VERSION	:= $(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | sed 's/^Version: *//')
+UPSTREAM_VERSION:= $(shell echo $(SRC_VERSION) | sed -e 's/^\(.*\)-[^-]*$$/\1/')
 
 # determine our top level
 SRCDIR		:= $(shell pwd)
@@ -61,14 +61,14 @@ SRCDIR		:= $(shell pwd)
 # stuff for snapshot/cvs building
 root_cmd		:= sudo
 deb_build		:= dpkg-buildpackage -ppgp -r$(root_cmd)
-cvs_build_dir		:= /usr/local/src/Packages/$(pkg-jade)
-cvs_ver_build_dir	:= $(cvs_build_dir)/$(pkg-jade)-$(UPSTREAM_VERSION)
+cvs_build_dir		:= $(HOME)/debian/$(pkg)
+cvs_ver_build_dir	:= $(cvs_build_dir)/$(pkg)-$(UPSTREAM_VERSION)
 cvs_pure_src_dir	:= ..
-cvs_pure_src		:= $(pkg-jade)-upstream
+cvs_pure_src		:= $(pkg)
 
 
 config.status:
-#	autoheader
+	autoheader
 #	automake --add-missing
 	aclocal
 #	libtoolize --force --copy
@@ -89,7 +89,7 @@ build:	config.status
 
 clean:
 	$(checkdir)
-	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) maintainer-clean
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libosp).shlibs					\
 	    debian/README.Debian debian/$(pkg-libosp).README.Debian
@@ -251,12 +251,14 @@ binary-arch:	$(install-common) install-opensp install-libosp		\
 cvs-build:
 	[ -d $(cvs_pure_src_dir)/$(cvs_pure_src)/CVS ] || exit 1
 	$(root_cmd) rm -rf $(cvs_ver_build_dir)
-	rm -f $(cvs_build_dir)/$(pkg-jade)_$(UPSTREAM_VERSION).orig.tar.gz
+#	rm -f $(cvs_build_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz
 #	 don't do cvs up or make the changelog
 	install -d -m 755 $(cvs_ver_build_dir)
-	GZIP=-9 tar czf $(cvs_build_dir)/$(pkg-jade)_$(UPSTREAM_VERSION).orig.tar.gz \
-		-C $(cvs_pure_src_dir) --exclude CVS $(cvs_pure_src)
+#	GZIP=-9 tar czf $(cvs_build_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz \
+#		-C $(cvs_pure_src_dir) --exclude CVS $(cvs_pure_src)
 	tar cf - --exclude CVS . | tar xf - -C $(cvs_ver_build_dir)
+	[ -f ChangeLog ] || cvs2cl -r -t -b
+	cp ChangeLog $(cvs_ver_build_dir)/
 	cd $(cvs_ver_build_dir) && $(deb_build)
 
 define checkdir

@@ -1,7 +1,7 @@
-libsp1 and libsp1-dev: SP development support for Debian
+libosp2 and libosp-dev: SP development support for Debian
 --------------------------------------------------------
 
-Include files, from libosp1-dev, are available in /usr/include/OpenSP .
+Include files, from libosp-dev, are available in /usr/include/OpenSP .
 You might have to add this to the compiler switches.
 
 Documentation on this library is available in the 'opensp' package,

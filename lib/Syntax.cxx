@@ -296,6 +296,11 @@ Boolean Syntax::lookupFunctionChar(const StringC &name, Char *result) const
 typedef HashTableIter<StringC,Char> Dummy_HashTableIter_StringC_Char;
 #endif
 
+HashTableIter<StringC,Char> Syntax::functionIter() const
+{
+  return HashTableIter<StringC,Char>(functionTable_);
+}
+
 Boolean Syntax::charFunctionName(Char c, const StringC *&name) const
 {
   HashTableIter<StringC,Char> iter(functionTable_);

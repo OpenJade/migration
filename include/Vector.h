@@ -23,7 +23,7 @@ public:
   typedef const T *const_iterator;
   Vector() : ptr_(0), size_(0), alloc_(0) { }
   Vector(size_t n) : ptr_(0), size_(0), alloc_(0) { append(n); }
-  ~Vector();
+  virtual ~Vector();
   void resize(size_t n) {
     if (n < size_)
       erase(ptr_ + n, ptr_ + size_);

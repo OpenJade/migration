@@ -36,6 +36,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
+AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale)
 SP_MESSAGE_DOMAIN=sp
 AC_DEFINE_UNQUOTED(SP_MESSAGE_DOMAIN, "$SP_MESSAGE_DOMAIN", [Message domain])

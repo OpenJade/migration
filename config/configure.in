@@ -20,6 +20,8 @@ AC_SUBST(TOP)
 
 dnl AC_ARG_PROGRAM
 
+AC_CANONICAL_HOST
+
 if test "$CXXFLAGS" = ""; then 
   CXXFLAGS="-O2"
 fi
@@ -47,10 +49,18 @@ test "$INSTALL" = "./config/install-sh -c" && INSTALL=`pwd`"/config/install-sh -
 dnl
 dnl  Stuff special to GNU C++
 dnl
-if test "$GXX"
-then
-  CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
-fi
+
+case "${host}" in
+  *-*-darwin*)
+    LINKFLAGS="-no-undefined"
+    ;;
+  *)
+    if test "$GXX"
+    then
+      CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
+    fi
+    ;;
+esac
 
 dnl
 dnl  Checks for header files.
@@ -199,6 +209,11 @@ AC_SUBST(LIBOBJS)
 
 AC_PROG_LIBTOOL
 AC_SUBST(LIBTOOL_DEPS)
+
+dnl
+dnl Darwin/Mac OS X requires some extra flags for libtool
+dnl
+AC_SUBST(LINKFLAGS)
 
 AC_OUTPUT(Makefile Makefile.lib Makefile.prog Makefile.comm)
 

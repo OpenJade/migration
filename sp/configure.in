@@ -14,6 +14,7 @@ dnl Initialization.
 AC_INIT
 AC_CONFIG_SRCDIR([pubtext])
 AM_INIT_AUTOMAKE(OpenSP, 1.5.1, no-define)
+AM_MAINTAINER_MODE
 AC_PREREQ(2.53)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
@@ -60,11 +61,11 @@ AH_BOTTOM([
 #endif
 
 #ifdef HAVE_IO_H
-#undef SP_INCLUDE_IO_H     
+#undef SP_INCLUDE_IO_H
 #endif
 
 #ifdef HAVE_OSFCN_H
-#undef SP_INCLUDE_OSFCN_H     
+#undef SP_INCLUDE_OSFCN_H
 #endif
 
 #ifndef SP_MSDOS_FILENAMES
@@ -72,10 +73,10 @@ AH_BOTTOM([
 #endif
 
 #ifdef HAVE_ST_BLKSIZE
-#define SP_STAT_BLKSIZE 
+#define SP_STAT_BLKSIZE
 #endif
 
-#ifdef HAVE_BOOL 
+#ifdef HAVE_BOOL
 #ifndef SP_HAVE_BOOL
 #define SP_HAVE_BOOL
 #endif
@@ -156,9 +157,9 @@ AH_BOTTOM([
 #endif /* HAVE_DYNAMIC_CAST */
 
 #ifdef HAVE_PATHNAME_STYLE_DOS
-#define SP_MSDOS_FILENAMES 
-#else 
-#define SP_POSIX_FILENAMES  
+#define SP_MSDOS_FILENAMES
+#else
+#define SP_POSIX_FILENAMES
 #endif /* HAVE_PATHNAME_STYLE_DOS */
 
 #ifdef HAVE_INSTANTIATIONS
@@ -175,7 +176,7 @@ AH_BOTTOM([
 
 #if defined(HAVE_GETTEXT) && defined(ENABLE_NLS)
 #ifndef SP_HAVE_GETTEXT
-#define SP_HAVE_GETTEXT 
+#define SP_HAVE_GETTEXT
 #endif
 #endif /* HAVE_GETTEXT && ENABLE_NLS */
 
@@ -200,7 +201,7 @@ AH_BOTTOM([
 #endif /* HAVE_PLACEMENT_OPERATOR_NEW */
 
 #ifndef HAVE_NAMESPACE_STD
-#define SP_NO_STD_NAMESPACE 
+#define SP_NO_STD_NAMESPACE
 #endif /* HAVE_NAMESPACE_STD */
 
 #if defined(HAVE_NEW) && defined(HAVE_CASSERT)
@@ -208,7 +209,7 @@ AH_BOTTOM([
 #endif /* HAVE_NEW && HAVE_CASSERT */
 
 #ifndef HAVE_MUTABLE
-#define mutable 
+#define mutable
 #endif /* HAVE_MUTABLE */
 ])
 
@@ -216,6 +217,13 @@ dnl Since config.h gets included by user programs, we use special names
 dnl for PACKAGE and VERSION.
 AC_DEFINE_UNQUOTED(SP_PACKAGE, "$PACKAGE", [Package name])
 AC_DEFINE_UNQUOTED(SP_VERSION, "$VERSION", [Package version])
+
+dnl libosp current:revision:age
+SP_LIBOSP_CUR=3
+dnl AC_DEFINE_UNQUOTED(SP_LIBOSP_CUR, "$SP_LIBOSP_CUR", [libosp current])
+AC_SUBST(SP_LIBOSP_CUR)
+AC_SUBST(SP_LIBOSP_REV, 1)
+AC_SUBST(SP_LIBOSP_AGE, 0)
 
 dnl Check for programs.
 AC_PROG_CC
@@ -231,12 +239,13 @@ AM_PROG_LIBTOOL
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 
+ALL_LINGUAS="de fr ja sv"
 AM_GNU_GETTEXT
 AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale, [location of message catalogs])
-SP_MESSAGE_DOMAIN=sp
+SP_MESSAGE_DOMAIN="sp$SP_LIBOSP_CUR"
 AC_DEFINE_UNQUOTED(SP_MESSAGE_DOMAIN, "$SP_MESSAGE_DOMAIN", [message domain])
-AC_SUBST(SP_MESSAGE_DOMAIN) 
+AC_SUBST(SP_MESSAGE_DOMAIN)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -297,7 +306,7 @@ ac_cv_cxx_placement_operator_new,
 #include <new>
 #else
 #include <new.h>
-#endif 
+#endif
 class A {
 public:
   A() {};
@@ -346,7 +355,7 @@ dnl FIXME these need tests for non-GNU compilers
   if test "$ac_cv_c_gnu_automatic_templates" = yes; then
     AC_DEFINE(SP_DEFINE_TEMPLATES,1,
               [define this to include template definitions in the headers])
-  else 
+  else
     AC_DEFINE(SP_MANUAL_INST,1,
               [define this to compile explicit template instantiations])
     CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
@@ -460,7 +469,8 @@ AC_ARG_ENABLE(xml-messages,
       AC_MSG_RESULT(no))
 
 dnl Output.
-AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl lib/Makefile nsgmls/Makefile spent/Makefile 
+AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl
+	lib/Makefile nsgmls/Makefile spent/Makefile
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
 	include/Makefile include/config.h.old generic/Makefile doc/Makefile
 	pubtext/Makefile unicode/Makefile intl/Makefile po/Makefile.in])

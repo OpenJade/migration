@@ -431,6 +431,7 @@ Q1+concurrentInstances+7.2.1+number of concurrent document instances exceeds qua
 E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document type
 E0+emptyStartTagBaseDtd+7.4.1.1+element not in the base document type can't have an empty start-tag
 E0+emptyEndTagBaseDtd+7.5.1.1+element not in base document type can't have an empty end-tag
+W0+immediateRecursion++immediately recursive element
 =1000
 +delimStart++delimiter 
 +delimEnd++

@@ -182,7 +182,18 @@ public:
     keyMatrixAbc,
     keyMatrixLmn,
     keyMatrixA,
-    keyArchitecture
+    keyArchitecture,
+    keyDefineTransliterationMap,
+    keyNode,
+    keySubgrove,
+    keyAdd,
+    keyRemove,
+    keySub,
+    keySortChildren,
+    keyOptional,
+    keyUnique,
+    keyProperty,
+    keyResultPath,
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);

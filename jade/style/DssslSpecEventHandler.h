@@ -131,7 +131,7 @@ public:
   public:
     typedef IListIter<BodyElement> Iter;
     typedef IListIter<DeclarationElement> DIter;
-    Part(Doc *);
+    Part(Doc *, bool partial, bool style);
     Iter iter();
     DIter diter();
     Doc *doc();
@@ -140,6 +140,8 @@ public:
     void append(BodyElement *);
     void append(DeclarationElement *);
     bool setMark(bool = 1);
+    bool style();
+    bool partial();
   private:
     Part *resolve(DssslSpecEventHandler &);
     IList<DeclarationElement> declarations_;
@@ -147,6 +149,8 @@ public:
     Vector<PartHeader *> use_;
     bool mark_;
     Doc *doc_;
+    bool style_;
+    bool partial_;
   };
 
   class Doc : public Link {
@@ -175,15 +179,17 @@ public:
   void externalSpecificationStart(const StartElementEvent &);
   void externalSpecificationEnd(const EndElementEvent &);
   void styleSpecificationStart(const StartElementEvent &);
-  void styleSpecificationEnd(const EndElementEvent &);
-  void styleSpecificationBodyStart(const StartElementEvent &);
-  void styleSpecificationBodyEnd(const EndElementEvent &);
+  void transformSpecificationStart(const StartElementEvent &);
+  void specificationEnd(const EndElementEvent &);
+  void specificationBodyStart(const StartElementEvent &);
+  void specificationBodyEnd(const EndElementEvent &);
   void declarationStart(const StartElementEvent &);
   void declarationEnd(const EndElementEvent &);
 private:
   Vector<Part *> &parts();
   void startElement(StartElementEvent *);
   void endElement(EndElementEvent *);
+  void specificationStart(const StartElementEvent &, bool);
   void data(DataEvent *);
   void message(MessageEvent *);
   void endProlog(EndPrologEvent *);

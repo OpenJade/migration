@@ -23,19 +23,26 @@ public:
   StyleEngine(Messenger &, GroveManager &,
 	      int unitsPerInch, bool debugMode, bool dsssl2,
 	      bool strictMode, const FOTBuilder::Description &);
-  void defineVariable(const StringC &);
   void parseSpec(SgmlParser &specParser,
 		 const CharsetInfo &charset,
 		 const StringC &id,
-		 Messenger &mgr);
+		 Messenger &mgr,
+                 const Vector<StringC> &defVars);
   void process(const NodePtr &, FOTBuilder &);
   ~StyleEngine();
 private:
+  void defineVariable(const StringC &, StringC &);
   StyleEngine(const StyleEngine &);  // undefined
   void operator=(const StyleEngine &); // undefined
 
   Interpreter *interpreter_;
-  StringC cmdline;
+  Messenger *mgr_;
+  GroveManager *groveManager_;
+  int unitsPerInch_;
+  bool debugMode_;
+  bool dsssl2_;
+  bool strictMode_;
+  const FOTBuilder::Description *fotbDescr_;
 };
 
 #ifdef DSSSL_NAMESPACE

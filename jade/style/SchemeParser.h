@@ -105,6 +105,7 @@ private:
   bool doTolower();
   bool doDeclareCharProperty();
   bool doAddCharProperties();
+  bool doAssociation();
   bool skipForm();
   bool parseDefine(Identifier *&, Owner<Expression> &);
   bool parseSpecialQuery(Owner<Expression> &expr, const char *query);

@@ -12,6 +12,7 @@
 #include "VM.h"
 #include "ELObjMessageArg.h"
 #include "DssslSpecEventHandler.h"
+#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -227,8 +228,12 @@ void SchemeParser::parse()
 	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDefinePageModel:
 	  case Identifier::keyDefineColumnSetModel:
+          case Identifier::keyDefineTransliterationMap:
 	    recovering = !skipForm();
 	    break;
+          case Identifier::keyArrow:
+	    recovering = !doAssociation();
+            break;
 	  default:
 	    if (!recovering)
 	      message(InterpreterMessages::unknownTopLevelForm,
@@ -868,6 +873,30 @@ bool SchemeParser::doDefineUnit()
   }
   else
     unit->setDefinition(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doAssociation()
+{
+  Location loc(in_->currentLocation());
+  if (interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::transformationLanguage);
+    return 0;
+  }
+  Owner<Expression> qexpr, texpr, pexpr;
+  Identifier::SyntacticKey key;
+  Token tok;
+  if (!parseExpression(0, qexpr, key, tok)
+      || !parseExpression(0, texpr, key, tok)
+      || !parseExpression(allowCloseParen, pexpr, key, tok)) 
+    return 0;
+  if (!pexpr)
+    pexpr = new ConstantExpression(interp_->makeInteger(0), in_->currentLocation());
+  else if (!getToken(allowCloseParen, tok)) 
+    return 0;
+  interp_->transformationMode()->addAssociation(qexpr, texpr, pexpr,
+						loc, *interp_);
   return 1;
 }
 

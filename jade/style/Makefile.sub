@@ -2,7 +2,8 @@ LTVERSION=0:0:0
 LIB=ostyle
 DEPLIBS=-lm -L$(TOP)/grove/.libs -logrove -L$(TOP)/lib/.libs -losp 	\
   -L$(TOP)/spgrove/.libs -lospgrove
-OBJS=LangObj.o \
+OBJS=TransformationMode.o\
+  LangObj.o \
   Collector.o \
   DssslApp.o \
   InterpreterMessages.o \

@@ -164,9 +164,16 @@ E1+missingFeature++undeclared use of feature %1
 W1+unsupportedFeature++feature %1 not supported
 W1+partiallySupportedFeature++feature %1 only partially supported 
 E0+styleLanguage++only allowed in style language
+E0+transformationLanguage++only allowed in transformation language
+E0+mixedLanguages++style and transformation language parts mixed
+W0+partialSpec++specification is marked as partial
 W1+cantOmitModule++grove plan excluding module %1 not supported 
 W1+cantAddModule++grove plan including module %1 not supported 
 E1+unknownModule++%1 not an SGML property set module
 E2+notACharInCharMap++Function for char-map characteristic returned non-char object %2 for character %1
 E2+charPropertyNotPublicId++value for character property %1 of wrong type: %2 not a public identifier or the value "#f"
-E1+duplicateVariableBinding++variable %1 occurs more than once in bindings
+E1+duplicateVariableBinding++variable %1 occurs more than once in bindings=======
+E0+subgroveArgs++exactly one of node:, subgrove: and class: needed
+W0+subgroveSubgroveArgs++add:, null:, remove:, children:, sub: make no sense with subgrove:
+W0+subgroveClassArgs++remove: makes no sense with class:
+E3+notASubgroveSpec++%2 argument for primitive %1 of wrong type: %3 not a subgrove-spec

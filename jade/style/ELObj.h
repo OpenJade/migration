@@ -41,6 +41,8 @@ class InlineSpaceObj;
 class GlyphSubstTableObj;
 class VectorObj;
 class LanguageObj;
+class SubgroveSpecObj;
+class CreateSpecObj;
 
 class ELObj : public Collector::Object {
 public:
@@ -77,6 +79,8 @@ public:
   virtual BoxObj *asBox();
   virtual VectorObj *asVector();
   virtual LanguageObj *asLanguage();
+  virtual SubgroveSpecObj *asSubgroveSpec();
+  virtual CreateSpecObj *asCreateSpec();
   virtual bool charValue(Char &);
   virtual bool stringData(const Char *&, size_t &);
   virtual void print(Interpreter &, OutputCharStream &);
@@ -495,6 +499,65 @@ public:
 private:
   NodeListObj *head_; // may be null
   NodeListObj *tail_;
+};
+
+class SubgroveSpecObj : public ELObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SubgroveSpecObj(NodePtr node, NodePtr subgrove, SymbolObj *cls,
+                  ELObj *add, ELObj *null, ELObj *remove, ELObj *sub, 
+                  ELObj *children, ELObj *label, FunctionObj *sort);
+  SubgroveSpecObj *asSubgroveSpec();
+  ~SubgroveSpecObj();
+  void traceSubObjects(Collector &) const;
+private:
+  struct SubgroveSpec {
+    NodePtr node;
+    NodePtr subgrove;
+    SymbolObj *cls;
+    ELObj *add;
+    ELObj *null;
+    ELObj *remove;
+    ELObj *sub;
+    ELObj *children; 
+    ELObj *label;
+    FunctionObj *sort;
+  };
+  SubgroveSpec *spec_;
+};
+
+class CreateSpecObj : public ELObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  enum Type {
+    root,
+    sub,
+    preced,
+    follow,
+  };
+  CreateSpecObj(Type t, ELObj *id, NodePtr node, SubgroveSpecObj *sg, 
+                StringObj *property, ELObj *label, 
+                FunctionObj *resultPath, bool optional, bool unique);
+  ~CreateSpecObj();
+  CreateSpecObj *asCreateSpec();
+  void traceSubObjects(Collector &) const;
+private:
+  struct CreateSpec {
+    Type type;
+    ELObj *groveId;
+    NodePtr node;
+    SubgroveSpecObj *sg;
+    StringObj *property;
+    ELObj *label;
+    FunctionObj *resultPath;
+    bool optional;
+    bool unique;
+  };
+  CreateSpec *spec_;
 };
 
 inline

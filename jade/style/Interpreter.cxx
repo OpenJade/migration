@@ -65,6 +65,8 @@ size_t maxObjSize()
 #ifdef SP_HAVE_LOCALE
     sizeof(RefLangObj),
 #endif
+    sizeof(SubgroveSpecObj),
+    sizeof(CreateSpecObj),
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -288,6 +290,9 @@ void Interpreter::installSyntacticKeys()
     { "rcs?", Identifier::keyIsRcs },
     { "parent", Identifier::keyParent },
     { "active", Identifier::keyActive },
+    { "label", Identifier::keyLabel },
+    { "children", Identifier::keyChildren },
+    { "class", Identifier::keyClass },
    }, styleKeys[] = {
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
@@ -305,7 +310,6 @@ void Interpreter::installSyntacticKeys()
     { "define-page-model", Identifier::keyDefinePageModel },
     { "define-column-set-model", Identifier::keyDefineColumnSetModel },
     { "use", Identifier::keyUse },
-    { "label", Identifier::keyLabel },
     { "content-map", Identifier::keyContentMap },
     { "keep-with-previous?", Identifier::keyIsKeepWithPrevious },
     { "keep-with-next?", Identifier::keyIsKeepWithNext },
@@ -373,11 +377,9 @@ void Interpreter::installSyntacticKeys()
     { "grid-n-columns", Identifier::keyGridNColumns },
     { "radical", Identifier::keyRadical },
     { "attributes", Identifier::keyAttributes },
-    { "children", Identifier::keyChildren },
     { "repeat", Identifier::keyRepeat },
     { "position", Identifier::keyPosition },
     { "only", Identifier::keyOnly },
-    { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
     { "white-point", Identifier::keyWhitePoint },
@@ -392,6 +394,18 @@ void Interpreter::installSyntacticKeys()
     { "matrix-abc", Identifier::keyMatrixAbc },
     { "matrix-lmn", Identifier::keyMatrixLmn },
     { "matrix-a", Identifier::keyMatrixA },
+  }, transformKeys[] = {
+    { "define-transliteration-map", Identifier::keyDefineTransliterationMap },
+    { "node", Identifier::keyNode },
+    { "subgrove", Identifier::keySubgrove },
+    { "add", Identifier::keyAdd },
+    { "remove", Identifier::keyRemove },
+    { "sub", Identifier::keySub },
+    { "sort-children", Identifier::keySortChildren },
+    { "optional", Identifier::keyOptional },
+    { "unique", Identifier::keyUnique },
+    { "result-path", Identifier::keyResultPath },
+    { "property", Identifier::keyProperty },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -408,7 +422,7 @@ void Interpreter::installSyntacticKeys()
       lookup(tem)->setSyntacticKey(keys[i].key);
     }
   }
-  if (style()) {
+  if (style()) 
     for (size_t i = 0; i < SIZEOF(styleKeys); i++) {
       StringC tem(makeStringC(styleKeys[i].name));
       lookup(tem)->setSyntacticKey(styleKeys[i].key);
@@ -417,7 +431,11 @@ void Interpreter::installSyntacticKeys()
         lookup(tem)->setSyntacticKey(styleKeys[i].key);
       }
     }
-  }
+  else 
+    for (size_t i = 0; i < SIZEOF(transformKeys); i++) {
+      StringC tem(makeStringC(transformKeys[i].name));
+      lookup(tem)->setSyntacticKey(transformKeys[i].key);
+    }
   if (dsssl2()) {
     for (size_t i = 0; i < SIZEOF(keys2); i++)
       lookup(makeStringC(keys2[i].name))->setSyntacticKey(keys2[i].key);
@@ -2781,8 +2799,8 @@ void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)
       if (feature_[i].supported != notSupported)
 	feature_[i].declared = 1;
   if (!style()) {
-    declareFeature(query);
-    declareFeature(expression);
+    feature_[query].declared = 1; 
+    feature_[expression].declared = 1;
   }
 }
 
@@ -2816,6 +2834,10 @@ void Interpreter::explicitFeatures()
     explicitFeatures_ = 1;
     for (int i = 1; i < nFeatures; i++) 
       feature_[i].declared = 0;
+    if (!style()) {
+      feature_[query].declared = 1; 
+      feature_[expression].declared = 1;
+    }
   }
 }
 
@@ -2979,6 +3001,11 @@ void Interpreter::checkGrovePlan()
         message(InterpreterMessages::cantAddModule, 
                 StringMessageArg(module_[i].appname));
     }
+}
+
+TransformationMode *Interpreter::transformationMode()
+{
+  return &transformationMode_;
 }
 
 #ifdef DSSSL_NAMESPACE

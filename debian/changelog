@@ -1,10 +1,11 @@
 opensp (1.5pre4-3) unstable; urgency=low
 
   * they changed the major shared library version for libosp from 1 to 2,
-    but my last version didn't reflect that
+    but my last version didn't reflect that; conflict with libosp1, which
+    should be removed from the archive
   * some more upstream patches from CVS
 
- -- Adam Di Carlo <aph@debian.org>  Sat, 20 May 2000 00:53:46 -0400
+ -- Adam Di Carlo <aph@debian.org>  Sat, 20 May 2000 02:08:36 -0400
 
 opensp (1.5pre4-2) unstable; urgency=low
 

@@ -17,8 +17,8 @@ E1+unknownBctf++unknown BCTF %1
 E1+unknownEncoding++unknown encoding %1
 E2+openFileError++cannot open output file %1 (%2)
 E2+closeFileError++cannot close output file %1 (%2)
-I1+bHelp++Use bctf %1.
-I1+eHelp++Use encoding %1.
+I1+bHelp++Use bctf %1 for output.
+I1+eHelp++Use encoding %1 for output.
 I1+fHelp++Append error messages to file %1.
 I1+vHelp++Display the program version.
 I1+hHelp++Show this help text.

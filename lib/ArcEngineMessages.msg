@@ -28,7 +28,7 @@ E1+invalidArcAuto+ISO/IEC 10744:1997 A3.4.2+invalid value %1 for ArcAuto archite
 E1+noArcNotation+ISO/IEC 10744:1997 A3.4.1+no notation declaration for architecture %1
 E0+invalidData++meta-DTD does not allow data at this point
 E1+invalidIgnD+ISO/IEC 10744:1997 A3.5.4+invalid value %1 for ArcIgnD attribute
-E1+invalidArcIndr++invalid value %1 for ArcIndr architectural support attribute
+-E1+invalidArcIndr++invalid value %1 for ArcIndr architectural support attribute
 E1+invalidQuantity++unrecognized quantity name %1
 E1+missingQuantityValue++no value specified for quantity %1
 E1+quantityValueTooLong++length of value %1 for quantity is too long
@@ -38,5 +38,3 @@ E0+arcContDuplicate+ISO/IEC 10744:1997 A3.5.2+#ARCCONT attribute already specifi
 E1+arcContInvalid+ISO/IEC 10744:1997 A3.5.2+invalid value %1 for #ARCCONT
 E1+renameFromDuplicate+ISO/IEC 10744:1997 A3.5.2+%1 already used as a substitute name
 E0+contentDuplicate+ISO/IEC 10744:1997 A3.5.2+substitute name #CONTENT already specified
-E0+sorryMaptoken++Sorry, #MAPTOKEN not implemented
-

@@ -141,7 +141,7 @@ InputPath=.\NsgmlsMessages.msg
 InputName=NsgmlsMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -153,7 +153,7 @@ InputPath=.\NsgmlsMessages.msg
 InputName=NsgmlsMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -176,7 +176,7 @@ InputPath=.\RastEventHandlerMessages.msg
 InputName=RastEventHandlerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -188,7 +188,7 @@ InputPath=.\RastEventHandlerMessages.msg
 InputName=RastEventHandlerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -250,3 +250,4 @@ SOURCE=.\RastEventHandlerMessages.rc
 # End Group
 # End Target
 # End Project
+

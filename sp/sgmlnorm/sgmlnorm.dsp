@@ -94,6 +94,37 @@ SOURCE=.\SGMLGenerator.cxx
 
 SOURCE=.\sgmlnorm.cxx
 # End Source File
+# Begin Source File
+
+SOURCE=.\SgmlnormMessages.msg
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SgmlnormMessages.msg
+InputName=SgmlnormMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SgmlnormMessages.msg
+InputName=SgmlnormMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

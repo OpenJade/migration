@@ -139,7 +139,7 @@ InputPath=.\SpamMessages.msg
 InputName=SpamMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -151,7 +151,7 @@ InputPath=.\SpamMessages.msg
 InputName=SpamMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 

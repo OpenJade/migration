@@ -140,7 +140,7 @@ InputPath=.\SxMessages.msg
 InputName=SxMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -152,7 +152,7 @@ InputPath=.\SxMessages.msg
 InputName=SxMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -175,7 +175,7 @@ InputPath=.\XmlOutputMessages.msg
 InputName=XmlOutputMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -187,7 +187,7 @@ InputPath=.\XmlOutputMessages.msg
 InputName=XmlOutputMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 

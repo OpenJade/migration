@@ -191,7 +191,7 @@ InputPath=.\ArcEngineMessages.msg
 InputName=ArcEngineMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -203,7 +203,7 @@ InputPath=.\ArcEngineMessages.msg
 InputName=ArcEngineMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -234,7 +234,7 @@ InputPath=.\CatalogMessages.msg
 InputName=CatalogMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -246,7 +246,7 @@ InputPath=.\CatalogMessages.msg
 InputName=CatalogMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -281,7 +281,7 @@ InputPath=.\CmdLineAppMessages.msg
 InputName=CmdLineAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -293,7 +293,7 @@ InputPath=.\CmdLineAppMessages.msg
 InputName=CmdLineAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -342,6 +342,37 @@ SOURCE=.\EntityApp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\EntityAppMessages.msg
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\EntityAppMessages.msg
+InputName=EntityAppMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l libModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\EntityAppMessages.msg
+InputName=EntityAppMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l libModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\EntityCatalog.cxx
 # End Source File
 # Begin Source File
@@ -364,7 +395,7 @@ InputPath=.\EntityManagerMessages.msg
 InputName=EntityManagerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -376,7 +407,7 @@ InputPath=.\EntityManagerMessages.msg
 InputName=EntityManagerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -539,7 +570,7 @@ InputPath=.\MessageFormatterMessages.msg
 InputName=MessageFormatterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -551,7 +582,7 @@ InputPath=.\MessageFormatterMessages.msg
 InputName=MessageFormatterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -574,7 +605,7 @@ InputPath=.\MessageReporterMessages.msg
 InputName=MessageReporterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -586,7 +617,7 @@ InputPath=.\MessageReporterMessages.msg
 InputName=MessageReporterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -721,7 +752,7 @@ InputPath=.\ParserAppMessages.msg
 InputName=ParserAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -733,7 +764,7 @@ InputPath=.\ParserAppMessages.msg
 InputName=ParserAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -760,7 +791,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl libModule $(InputPath)
 
 # End Custom Build
 
@@ -772,7 +803,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl libModule $(InputPath)
 
 # End Custom Build
 
@@ -811,7 +842,7 @@ InputPath=.\PosixStorageMessages.msg
 InputName=PosixStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -823,7 +854,7 @@ InputPath=.\PosixStorageMessages.msg
 InputName=PosixStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -891,7 +922,7 @@ InputPath=.\StdioStorageMessages.msg
 InputName=StdioStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -903,7 +934,7 @@ InputPath=.\StdioStorageMessages.msg
 InputName=StdioStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -970,7 +1001,7 @@ InputPath=.\URLStorageMessages.msg
 InputName=URLStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -982,7 +1013,7 @@ InputPath=.\URLStorageMessages.msg
 InputName=URLStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -1048,7 +1079,7 @@ InputPath=.\WinInetStorageMessages.msg
 InputName=WinInetStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -1060,7 +1091,7 @@ InputPath=.\WinInetStorageMessages.msg
 InputName=WinInetStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 

@@ -90,6 +90,36 @@ LINK32=link.exe
 
 SOURCE=.\spent.cxx
 # End Source File
+# Begin Source File
+SOURCE=.\SpentMessages.msg
+
+!IF  "$(CFG)" == "spent - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpentMessages.msg
+InputName=SpentMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "spent - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpentMessages.msg
+InputName=SpentMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

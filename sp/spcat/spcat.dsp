@@ -90,6 +90,37 @@ LINK32=link.exe
 
 SOURCE=.\spcat.cxx
 # End Source File
+# Begin Source File
+
+SOURCE=.\SpcatMessages.msg
+
+!IF  "$(CFG)" == "spcat - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpcatMessages.msg
+InputName=SpcatMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "spcat - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpcatMessages.msg
+InputName=SpcatMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # Begin Group "Header Files"
 

@@ -29,3 +29,5 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 	Win32CodingSystem.h WinApp.h WinInetStorage.h XMLCodingSystem.h \
 	XcharMap.cxx XcharMap.h config.h constant.h macros.h rtti.h \
 	sptchar.h types.h xnew.h
+
+BUILT_SOURCES = config.h

@@ -52,8 +52,8 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	TranslateCodingSystem.cxx Trie.h TrieBuilder.cxx TrieBuilder.h \
 	TypeId.cxx URLStorage.cxx URLStorageMessages.h \
 	UTF8CodingSystem.cxx Undo.cxx Undo.h UnicodeCodingSystem.cxx \
-	UnivCharsetDesc.cxx Win32CodingSystem.cxx WinApp.cxx \
-	WinInetStorage.cxx WinInetStorageMessages.h XMLCodingSystem.cxx \
+	UnivCharsetDesc.cxx \
+	XMLCodingSystem.cxx \
 	assert.cxx big5.h events.h gb2312.h iso646-jis.h iso8859-2.h \
 	iso8859-3.h iso8859-4.h iso8859-5.h iso8859-6.h iso8859-7.h \
 	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
@@ -68,7 +68,7 @@ EXTRA_DIST = ArcEngineMessages.msg CatalogMessages.msg CmdLineAppMessages.msg \
 	EntityManagerMessages.msg MessageFormatterMessages.msg \
 	MessageReporterMessages.msg ParserAppMessages.msg \
 	ParserMessages.msg PosixStorageMessages.msg StdioStorageMessages.msg \
-	URLStorageMessages.msg WinInetStorageMessages.msg \
+	URLStorageMessages.msg \
 	app_inst.m4 arc_inst.m4 entmgr_inst.m4 parser_inst.m4 xentmgr_inst.m4
 
 MSGGENFLAGS = -l
@@ -82,7 +82,7 @@ BUILT_SOURCES = version.h ArcEngineMessages.h ArcEngineMessages.rc \
 	ParserMessages.cxx ParserMessages.h ParserMessages.rc \
 	PosixStorageMessages.h PosixStorageMessages.rc StdioStorageMessages.h \
 	StdioStorageMessages.rc URLStorageMessages.h URLStorageMessages.rc \
-	WinInetStorageMessages.h WinInetStorageMessages.rc app_inst.cxx \
+	app_inst.cxx \
 	arc_inst.cxx entmgr_inst.cxx parser_inst.cxx xentmgr_inst.cxx
 
 URLStorage.o: URLStorageMessages.h

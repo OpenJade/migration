@@ -13,6 +13,8 @@ Changes in OpenSP 1.5.1
 * Add support for specifying Accept: headers with the
   SP_HTTP_ACCEPT environent variable (Nick Kew)
 
+* Fix for Mac OS X/Darwin compilation (Peter O'Gorman)
+
 Changes in OpenSP 1.5
 
 * Fix crash when "-m" option specified.

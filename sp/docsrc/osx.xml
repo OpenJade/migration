@@ -11,7 +11,7 @@
     <author>
        <firstname>Ian</firstname>
        <surname>Castle</surname>
-       <affiliation><email>ian.castle@openjade.org</email></affiliation>
+       <affiliation><address><email>ian.castle@openjade.org</email></address></affiliation>
     </author>
 
     <copyright>
@@ -68,7 +68,7 @@
        <title>Description</title>
 <para>
    <command>osx</command> converts SGML to XML. <command>osx</command> parses and validates the SGML document
-   contained in <arg rep="repeate"><option><replaceable>sysid</replaceable></option></arg> and writes an equivalent XML document to the
+   contained in <cmdsynopsis><arg rep="repeat"><option><replaceable>sysid</replaceable></option></arg></cmdsynopsis> and writes an equivalent XML document to the
    standard output. <command>osx</command> will warn about SGML constructs which have no XML
    equivalent.
 </para>

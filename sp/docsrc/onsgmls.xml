@@ -11,7 +11,7 @@
     <author>
        <firstname>Ian</firstname>
        <surname>Castle</surname>
-       <affiliation><email>ian.castle@openjade.org</email></affiliation>
+       <affiliation><address><email>ian.castle@openjade.org</email></address></affiliation>
     </author>
 
     <copyright>
@@ -69,7 +69,7 @@
        <title>Description</title>
 
    <para><command>onsgmls</command> parses and validates the SGML document whose document entity is
-   specified by the system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg> and prints on the
+   specified by the system identifiers <cmdsynopsis><arg rep="repeat"><replaceable>sysid</replaceable></arg></cmdsynopsis> and prints on the
    standard output a simple text representation of its Element Structure
    Information Set. (This is the information set which a
    structure-controlled conforming SGML application should act upon.) If
@@ -123,7 +123,7 @@
     <term><option>-B</option></term>
     <term><option>--batch_mode</option></term>
     <listitem>
-          <para>Batch mode. Parse each <arg rep="repeat"><option><replaceable>sysid</replaceable></option></arg> specified on the command line
+          <para>Batch mode. Parse each <cmdsynopsis><arg rep="repeat"><option><replaceable>sysid</replaceable></option></arg></cmdsynopsis> specified on the command line
           separately, rather than concatenating them. This is useful
           mainly with <option>-s</option>.</para>
           
@@ -151,7 +151,7 @@
     <term><option>-C</option></term>
     <term><option>--catalogs</option></term>
     <listitem>
-          <para>The <arg rep="repeat"><option><replaceable>filename</replaceable></option></arg> arguments specify catalog files rather than the
+          <para>The <cmdsynopsis><arg rep="repeat"><option><replaceable>filename</replaceable></option></arg></cmdsynopsis> arguments specify catalog files rather than the
           document entity. The document entity is specified by the first
           DOCUMENT entry in the catalog files.</para>
     </listitem>
@@ -497,7 +497,6 @@
                 parsing the DTD, but suppressed when parsing meta-DTDs.</para>
   	</listitem>
     </varlistentry>
-   </variablelist>
 
     <varlistentry>
       <term><option>-x</option></term>
@@ -508,6 +507,8 @@
       </listitem>
     </varlistentry>
                 
+   </variablelist>
+
    <para>The following options are also supported for backward compatibility
    with sgmls:</para>
    <variablelist>

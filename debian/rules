@@ -114,8 +114,8 @@ clean:
 	$(checkdir)
 	[ ! -f Makefile ] || $(MAKE) clean
 	[ ! -f Makefile ] || $(MAKE) maintainer-clean || true
-	dh_clean build binary-arch debian/substvars debian/copyright	\
-	    debian/$(pkg-libosp).shlibs					\
+	dh_clean build binary-arch debian/copyright	\
+	    debian/$(pkg-libosp).shlibs debian/$(pkg-libosp-dev).substvars \
 	    debian/README.Debian debian/$(pkg-libosp).README.Debian
 
 binary-indep:	build
@@ -127,16 +127,13 @@ debian/copyright:	COPYING debian/copyright.Debian
 #	 cat the Debian-specific stuff to the end of the upstream file
 	cat $^ > $@
 
-debian/substvars:
+debian/$(pkg-libosp-dev).substvars:
 #	 indicate our providing version of shlibs; this must be
 #	 sync'd with debian/control
-	: > debian/substvars
-	echo "opensp:Version=$(pkg-osp) (= $(SRC_VERSION))" \
-	    >> debian/substvars
-	echo "libosp:Version=$(pkg-libosp) (= $(SRC_VERSION))" \
-	    >> debian/substvars
-	echo "libosp:ShlibVersion=$(pkg-libosp) (>= $(SHLIBS_PKGVER))" \
-	    >> debian/substvars
+	: > $@
+	echo "opensp:Version=$(pkg-osp) (= $(SRC_VERSION))"            >> $@
+	echo "libosp:Version=$(pkg-libosp) (= $(SRC_VERSION))"         >> $@
+	echo "libosp:ShlibVersion=$(pkg-libosp) (>= $(SHLIBS_PKGVER))" >> $@
 
 debian/$(pkg-libosp).shlibs:
 #	 std shlibs file, with the first version that supplied the version
@@ -153,7 +150,7 @@ debian/$(pkg-libosp).README.Debian:	debian/$(pkg-libosp).README.Debian.in
 	sed -e 's|%{default-catalogs}|$(default-catalogs)|;		\
 		s|%{default-sgml-path}|$(default-sgml-path)|' $^ > $@
 
-install-common	:= build debian/copyright debian/substvars 		\
+install-common	:= build debian/copyright debian/$(pkg-libosp-dev).substvars \
 		   debian/$(pkg-libosp).shlibs
 
 install-opensp:	$(install-common) debian/README.Debian

@@ -1,3 +1,11 @@
+opensp (1.5pre5-4) unstable; urgency=low
+
+  * libosp-dev now has proper depends on libosp2 and opensp, modified
+    patch from Yann Dirson
+    closes: #107239
+
+ -- Adam Di Carlo <aph@debian.org>  Mon,  6 Aug 2001 10:44:15 -0400
+
 opensp (1.5pre5-3) unstable; urgency=low
 
   * debian/control: fix missing build-depends on gettext

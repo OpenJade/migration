@@ -657,11 +657,11 @@ class PiChunk : private CharsChunk {
 };
 
 class PrologPiChunk : public PiChunk {
-  AccessResult getFirstSibling(const GroveImpl *, const Chunk *&) const;
+  AccessResult getFirstSibling(const GroveImpl *, const struct Chunk *&) const;
 };
 
 class EpilogPiChunk : public PiChunk {
-  AccessResult getFirstSibling(const GroveImpl *, const Chunk *&) const;
+  AccessResult getFirstSibling(const GroveImpl *, const struct Chunk *&) const;
 };
 
 class PiNode : public ChunkNode {
@@ -3565,13 +3565,13 @@ AccessResult PiChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const
   return accessOK;
 }
 
-AccessResult PrologPiChunk::getFirstSibling(const GroveImpl *grove, const Chunk *&p) const
+AccessResult PrologPiChunk::getFirstSibling(const GroveImpl *grove, const struct Chunk *&p) const
 {
   p = grove->root()->prolog;
   return accessOK;
 }
 
-AccessResult EpilogPiChunk::getFirstSibling(const GroveImpl *grove, const Chunk *&p) const
+AccessResult EpilogPiChunk::getFirstSibling(const GroveImpl *grove, const struct Chunk *&p) const
 {
   p = grove->root()->epilog;
   return accessOK;

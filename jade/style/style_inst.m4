@@ -180,6 +180,7 @@ __instantiate(Ptr<CharMapResource<ELObjPart> >)
 __instantiate(ConstPtr<CharMapResource<ELObjPart> >)
 __instantiate(`HashTable<StringC,CharProp>')
 __instantiate(`HashTableItem<StringC,CharProp>')
+#ifndef _MSC_VER
 __instantiate(`OneRefArgCall<FOTBuilder::Address>')
 __instantiate(`OneArgCall<char const *>')
 __instantiate(`OneRefArgCall<FOTBuilder::TableCellNIC>')
@@ -207,6 +208,7 @@ __instantiate(`OneRefArgCall<FOTBuilder::OptLengthSpec>')
 __instantiate(`OneArgCall<bool>')
 __instantiate(`OneRefArgCall<FOTBuilder::InlineSpace>')
 __instantiate(`OneRefArgCall<FOTBuilder::ExternalGraphicNIC>') 
+#endif
 
 #ifdef SP_NAMESPACE
 }

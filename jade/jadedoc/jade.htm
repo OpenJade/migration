@@ -24,6 +24,7 @@
 <LI><A HREF="#backend-fot">SGML Flow Object Tree</A>
 <LI><A HREF="#backend-html">HTML</A>
 <LI><A HREF="TeX.htm">TeX</A>
+<LI><A HREF="transform.htm">SGML Transformation</A>
 </UL>
 <LI><A HREF="#source">Reading the Jade Sources</A>
 <LI><A HREF="#bugs">Reporting Bugs in Jade</A>
@@ -33,7 +34,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 0.4, which is the first beta version.
+The current version is 0.5, which is the first beta version.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -92,6 +93,11 @@ generated TeX code depends. (This backend was contributed by
 A backend that generates HTML. This isn't a real backend in that it
 cannot generate reasonable HTML using a normal DSSSL style-sheet.
 However it provides a way to use the style engine to generate HTML.
+<LI>
+A backend that generates SGML.
+This is used in conjunction with non-standard flow object classes
+to generate SGML, thus allowing Jade to be used
+for SGML transformations.
 </UL>
 <P>
 The source is in the jade directory.
@@ -108,24 +114,19 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew0_4.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew0_5.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-<ul>
-<li>
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade0_4.zip">Jade</A>,
-and
-<li>
-the sources for <A
-HREF="ftp://ftp.jclark.com/pub/sp/sp-1.1.1.tar.gz">SP 1.1.1</A>,
-if you don't already have them.
-</ul>
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade0_5.zip">Jade</A>.
+This package includes the sources for a compatible version of SP
+(which may be different from the latest released version of SP).
 <p>
-Unpack SP first, then unpack jade.zip file in the
-<CODE>sp-1.1.1</CODE> directory that was created by unpacking SP.  The
-files in jade.zip use CRLF delimited lines, so use unzip -a to unpack
-on Unix.  On Windows you must use an unzip that preserves long
-filenames, such as WinZip 6.1.
+Create a new directory and then unpack the sources file in this
+directory.  The files in sources zip file use CRLF delimited lines, so
+use unzip -a to unpack on Unix.  On Windows you must use an unzip that
+preserves long filenames, such as WinZip 6.1.  You should also make
+sure that your unzip preserves the case of filenames; this requires
+using a <SAMP>-U</SAMP> option with some versions of unzip.
 
 <h2><A NAME=building>Building Jade</A></h2>
 
@@ -206,6 +207,10 @@ Hypertext Markup Language
 <CODE>tex</CODE>
 <DD>
 TeX
+<DT>
+<CODE>sgml</CODE>
+<DD>
+SGML (used for SGML transformations)
 </DL>
 <DT>
 <CODE>-o <VAR>output_file</VAR></CODE>
@@ -233,6 +238,13 @@ This is equivalent to doing
 except that this definition will take priority over any definition of
 <VAR>variable</VAR> in a style-sheet.
 </DL>
+<P>
+Jade ignores the <SAMP>SP_CHARSET_FIXED</SAMP> and
+<SAMP>SP_SYSTEM_CHARSET</SAMP> environment variables and always uses
+Unicode as its internal character set, as if
+<SAMP>SP_CHARSET_FIXED</SAMP> was 1 and <SAMP>SP_SYSTEM_CHARSET</SAMP>
+was unset.  Thus only the <SAMP>SP_ENCODING</SAMP> environment variable
+is relevant to Jade's handling of character sets.
 
 <h2><A NAME="extensions">Jade Extensions</A></h2>
 <p>
@@ -308,6 +320,7 @@ with the following additions (all part of full DSSSL)
 <LI>node-list?
 <LI>named-node-list?
 <LI>named-node
+<LI>named-node-list-names
 <LI>process-node-list
 <LI>node-list-address (argument restricted to a singletion node-list)
 </UL>
@@ -333,9 +346,6 @@ is mapped to the Unicode character with that code.
 <P>
 Jade does not make use of any of the declaration architectural forms
 related to characters and glyphs.
-<P>
-Jade assumes your SGML document character set is Unicode (or a subset
-of Unicode such ISO/IEC 8859-1).
 <P>
 The following style language declarations (as well as the non-DSSSL
 Online declarations) are ignored:
@@ -514,8 +524,8 @@ aren't reported.
 <h3><A NAME=backend-html>HTML backend</A></h3>
 <P>
 The HTML backend does not attempt to implement the semantics of
-most DSSSL flow objects in HTML.  The widely deployed HTML browsers
-are not yet powerful enough for this.  When support for CSS is more
+most DSSSL flow objects in HTML. The widely deployed HTML browsers
+are not yet powerful enough for this. When support for CSS is more
 widespread this may be possible.
 <P>
 Instead the HTML backend provides an application-defined flow object
@@ -531,10 +541,11 @@ which specifies a string to be inserted into HTML output.  The string
 will be inserted without change into the output.  Note that when
 character flow objects are output, occurrences of the characters
 <CODE>&lt;&gt;&amp;</CODE>
-are translated into the appropriate entity references.
+are translated into the appropriate entity references. 
 For example, the following would map an <CODE>XMP</CODE> source element
 onto an HTML <CODE>PRE</CODE> element:
 <PRE>
+&lt;[ CDATA [
 (element XMP
   (sosofo-append
     (make formatting-instruction
@@ -542,25 +553,33 @@ onto an HTML <CODE>PRE</CODE> element:
     (process-children)
     (make formatting-instruction
           data: "&lt;/PRE>")))
+]]&gt;
 </PRE>
 <P>
 Obviously, procedures can be used to make this more convenient.
 <P>
-Note that this construction rule would typically need to be enclosed
+Note that this construction rule typically needs to be enclosed
 in a CDATA marked section to ensure that the PRE start- and end-tags
 are not recognized during the SGML parse of the style sheet.
 <P>
 Each scroll flow object is mapped onto a separate
-HTML document.
+HTML document. The document names are chosen according to the system
+described in <A HREF="#using">Using Jade</A>.
 <strong>Any flow objects not inside a scroll flow object will
 produce no output.</strong>
 <P>
 The HTML backend implements a few other flow objects and
 characteristics.  The link flow object is mapped onto an
-<CODE>A</CODE> element with an <CODE>HREF</CODE> attribute.  The
-backend will automatically insert the corresponding <CODE>A</CODE>
-elements with <CODE>NAME</CODE> attributes.  A paragraph flow object
-is mapped onto a <CODE>DIV</CODE> element.  The
+<CODE>A</CODE> element with an <CODE>HREF</CODE> attribute.  
+When the link destination is a node in the current document,
+then the link will refer to the start of the <i>primary flow 
+object</i> for the node,
+as defined in section 12.4.2 of the DSSSL standard.
+The backend will automatically insert a matching <CODE>A</CODE>
+element with a <CODE>NAME</CODE> attribute at this point.
+<P>
+A paragraph flow object
+is mapped onto a <CODE>DIV</CODE> element. The
 <CODE>font-posture:</CODE>, <CODE>font-weight:</CODE>,
 <CODE>color:</CODE> and <CODE>quadding:</CODE> are also automatically
 mapped to the appropriate HTML markup.
@@ -573,8 +592,28 @@ with public identifier:
 <P>
 This applies to the scroll flow object and specifies a string to be
 used as the content of the <CODE>TITLE</CODE> element of the
-corresponding HTML document.  Note that the HTML backend generates the
-<CODE>HTML</CODE> and <CODE>BODY</CODE> elements automatically, so the
+corresponding HTML document. If this title is to come from content 
+within the document, you must create the scroll flow object 
+in the document element construction rules and not in the root 
+construction rule, as there is no mechanism currently implemented for 
+accessing the document-element property of the sgml-document node.
+For example,
+<PRE>
+(element report
+         (make scroll
+	       scroll-title: (data
+	                       (node-list-first
+                                 (select-elements
+                                   (children (current-node))
+                                   "TITLE")))))
+</PRE>
+<P>
+The example assumes that the title of the HTML document
+corresponding to this scroll object should be the data content of the
+first child of the document element node that is a TITLE element.
+<P>
+Note that the HTML backend generates the <CODE>HTML</CODE> and
+<CODE>BODY</CODE> elements automatically, so the
 formatting-instruction flow object cannot be used to get markup inside
 the HTML <CODE>HEAD</CODE> element.
 

@@ -82,6 +82,7 @@ E0+noCurrentNode++attempt to use current node when there is none
 E0+noCurrentProcessingMode++attempt to process node in illegal context
 E0+invalidRadix++radix must be 2, 8, 10 or 16
 E0+sosofoContext++this context requires a sosofo
+E0+styleContext++this context requires a style object
 E0+notInCharacteristicValue++procedure can only be used in evaluation of characteristic value
 E1+expressionNotImplemented++sorry, %1 expression not implemented
 E0+RGBColorArgCount++Device RGB color requires three arguments
@@ -96,3 +97,5 @@ I1+debug++debug %1
 E0+useLoop++circular use of specification parts
 E1+missingPart++no style-specification or external-specification with ID %1
 E0+noParts++document did not contain any style-specifications or external-specifications
+E0+tableCellOutsideTable++table-cell flow object not inside a table
+E0+tableRowOutsideTable++table-row flow object not inside a table

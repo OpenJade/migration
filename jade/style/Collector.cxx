@@ -57,9 +57,12 @@ void Collector::makeSpace()
       if (allocObjs < 512)
 	allocObjs = 512;
     }
-    blocks_ = new Block(blocks_, allocObjs, maxSize_, freePtr_);
-    if (freePtr_ == &allObjectsList_)
+    if (freePtr_ == &allObjectsList_) {
+      blocks_ = new Block(blocks_, allocObjs, maxSize_, freePtr_->prev());
       freePtr_ = blocks_->firstObj;
+    }
+    else
+      blocks_ = new Block(blocks_, allocObjs, maxSize_, freePtr_);
     totalObjects_ += allocObjs;
   }
 #ifdef DEBUG

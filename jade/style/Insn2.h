@@ -21,6 +21,15 @@ private:
   InsnPtr next_;
 };
 
+class CheckStyleInsn : public Insn {
+public:
+  CheckStyleInsn(const Location &loc, InsnPtr next) : loc_(loc), next_(next) { }
+  const Insn *execute(VM &vm) const;
+private:
+  Location loc_;
+  InsnPtr next_;
+};
+
 class ProcessingMode;
 
 class PushModeInsn : public Insn {

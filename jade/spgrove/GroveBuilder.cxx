@@ -250,6 +250,7 @@ public:
   void endElement(EndElementEvent *);
   void data(DataEvent *);
   void sdataEntity(SdataEntityEvent *);
+  void nonSgmlChar(NonSgmlCharEvent *);
   void externalDataEntity(ExternalDataEntityEvent *);
   void subdocEntity(SubdocEntityEvent *);
   void pi(PiEvent *);
@@ -493,6 +494,7 @@ public:
   AccessResult siblingsIndex(unsigned long &) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
+  AccessResult getNonSgml(unsigned long &) const;
   void accept(NodeVisitor &visitor);
   static void add(GroveImpl &grove, const DataEvent &event);
 private:
@@ -573,6 +575,29 @@ public:
   static void add(GroveImpl &grove, const SdataEntityEvent &event);
 private:
   Char c_;
+};
+
+class NonSgmlNode;
+
+class NonSgmlChunk : public Chunk {
+public:
+  Char c;
+  AccessResult setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const;
+  const Chunk *after() const { return this + 1; }
+};
+
+class NonSgmlNode : public ChunkNode {
+public:
+  NonSgmlNode(const GroveImpl *grove, const NonSgmlChunk *chunk)
+    : ChunkNode(grove, chunk) { }
+  AccessResult charChunk(const SdataMapper &, GroveString &) const;
+  AccessResult getNonSgml(unsigned long &) const;
+  void accept(NodeVisitor &visitor) { visitor.sdata(*this); }
+  static void add(GroveImpl &grove, const NonSgmlCharEvent &event);
+protected:
+  const NonSgmlChunk *chunk() const {
+    return (const NonSgmlChunk *)ChunkNode::chunk();
+  }
 };
 
 class ExternalDataNode;
@@ -690,6 +715,8 @@ public:
   AccessResult getOrigin(NodePtr &ptr) const;
   AccessResult getName(GroveString &str) const;
   AccessResult getImplied(bool &implied) const;
+  AccessResult getValue(NodeListPtr &ptr) const;
+  AccessResult children(NodeListPtr &ptr) const;
   AccessResult firstChild(NodePtr &ptr) const;
   AccessResult nextChunkSibling(NodePtr &ptr) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
@@ -1410,6 +1437,12 @@ void GroveBuilderEventHandler::data(DataEvent *event)
 void GroveBuilderEventHandler::sdataEntity(SdataEntityEvent *event)
 {
   SdataNode::add(*grove_, *event);
+  delete event;
+}
+
+void GroveBuilderEventHandler::nonSgmlChar(NonSgmlCharEvent *event)
+{
+  NonSgmlNode::add(*grove_, *event);
   delete event;
 }
 
@@ -2180,6 +2213,11 @@ void DataNode::accept(NodeVisitor &visitor)
   visitor.dataChar(*this);
 }
 
+AccessResult DataNode::getNonSgml(unsigned long &) const
+{
+  return accessNull;
+}
+
 AccessResult DataNode::nextSibling(NodePtr &ptr) const
 {
   if (index_ + 1 < chunk()->size) {
@@ -2335,6 +2373,31 @@ AccessResult SdataChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node)
   return accessOK;
 }
 
+AccessResult NonSgmlChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node)
+     const
+{
+  ptr.assign(new NonSgmlNode(node->grove(), this));
+  return accessOK;
+}
+
+AccessResult NonSgmlNode::getNonSgml(unsigned long &n) const
+{
+  n = chunk()->c;
+  return accessOK;
+}
+
+AccessResult NonSgmlNode::charChunk(const SdataMapper &, GroveString &) const
+{
+  return accessNull;
+}
+
+void NonSgmlNode::add(GroveImpl &grove, const NonSgmlCharEvent &event)
+{
+  NonSgmlChunk *chunk = new (grove.allocChunk(sizeof(NonSgmlChunk))) NonSgmlChunk;
+  chunk->c = event.character();
+  grove.appendSibling(chunk);
+}
+
 void ExternalDataNode::add(GroveImpl &grove, const ExternalDataEntityEvent &event)
 {
   ExternalDataChunk *chunk = new (grove.allocChunk(sizeof(ExternalDataChunk))) ExternalDataChunk;
@@ -2481,6 +2544,11 @@ AccessResult AttributeAsgnNode::getImplied(bool &implied) const
   return accessOK;
 }
 
+AccessResult AttributeAsgnNode::getValue(NodeListPtr &ptr) const
+{
+  return children(ptr);
+}
+
 AccessResult AttributeAsgnNode::nextChunkSibling(NodePtr &ptr) const
 {
   return followSiblingRef(0, ptr);
@@ -2537,6 +2605,35 @@ AccessResult AttributeAsgnNode::firstChild(NodePtr &ptr) const
 	  break;
 	ptr.assign(makeCdataAttributeValueNode(grove(), value,
 					       attIndex_, iter));
+	return accessOK;
+      }
+    default:
+      break;
+    }
+  }
+  return accessNull;
+}
+
+AccessResult AttributeAsgnNode::children(NodeListPtr &ptr) const
+{
+  const AttributeValue *value = attributeValue(attIndex_, *grove());
+  if (value) {
+    const Text *text;
+    const StringC *str;
+    switch (value->info(text, str)) {
+    case AttributeValue::tokenized:
+      ptr.assign(new SiblingNodeList(makeAttributeValueTokenNode(grove(),
+				     (const TokenizedAttributeValue *)value,
+				     attIndex_, 0)));
+      return accessOK;
+    case AttributeValue::cdata:
+      {
+	TextIter iter(*text);
+	if (!CdataAttributeValueNode::skipBoring(iter))
+          ptr.assign(new BaseNodeList);
+	else
+	  ptr.assign(new SiblingNodeList(makeCdataAttributeValueNode(grove(), value,
+								     attIndex_, iter)));
 	return accessOK;
       }
     default:

@@ -1795,6 +1795,12 @@ class TableRowFlowObj : public CompoundFlowObj {
 public:
   TableRowFlowObj() { }
   void process(ProcessContext &context) {
+    if (!context.inTable()) {
+      // FIXME location
+      context.vm().interp->message(InterpreterMessages::tableRowOutsideTable);
+      CompoundFlowObj::processInner(context);
+      return;
+    }
     // Don't handle style here
     processInner(context);
   }
@@ -1830,6 +1836,12 @@ public:
   }
   TableCellFlowObj(const TableCellFlowObj &fo) : CompoundFlowObj(fo), nic_(new NIC(*fo.nic_)) { }
   void process(ProcessContext &context) {
+    if (!context.inTable()) {
+      // FIXME location
+      context.vm().interp->message(InterpreterMessages::tableCellOutsideTable);
+      CompoundFlowObj::processInner(context);
+      return;
+    }
     if (context.inTableRow()) {
       if (nic_->startsRow) {
 	context.endTableRow();
@@ -2169,6 +2181,9 @@ public:
 
 class FormattingInstructionFlowObj : public FlowObj {
 public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   FormattingInstructionFlowObj() {
     ASSERT(sizeof(FormattingInstructionFlowObj)
            <= sizeof(UnresolvedQuantityObj));
@@ -2178,6 +2193,254 @@ public:
   }
   FlowObj *copy(Collector &c) const {
     return new (c) FormattingInstructionFlowObj(*this);
+  }
+  void setNonInheritedC(const Identifier *ident, ELObj *obj,
+			const Location &loc, Interpreter &interp) {
+    interp.convertStringC(obj, ident, loc, data_);
+  }
+  bool hasNonInheritedC(const Identifier *ident) const {
+    Identifier::SyntacticKey key;
+    return ident->syntacticKey(key) && key == Identifier::keyData;
+  }
+private:
+  StringC data_;
+};
+
+class ElementFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ElementFlowObj();
+  ElementFlowObj(const ElementFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  bool hasNonInheritedC(const Identifier *) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+protected:
+  Owner<FOTBuilder::ElementNIC> nic_;
+};
+
+ElementFlowObj::ElementFlowObj()
+: nic_(new FOTBuilder::ElementNIC)
+{
+}
+
+ElementFlowObj::ElementFlowObj(const ElementFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::ElementNIC(*fo.nic_))
+{
+}
+
+void ElementFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  if (nic_->gi.size())
+    fotb.startElement(*nic_);
+  else {
+    const NodePtr &nd = context.vm().currentNode;
+    GroveString str;
+    if (nd && nd->getGi(str) == accessOK) {
+      FOTBuilder::ElementNIC tem(*nic_);
+      tem.gi.assign(str.data(), str.size());
+      fotb.startElement(tem);
+    }
+    else
+      fotb.startElement(*nic_);
+  }
+  CompoundFlowObj::processInner(context);
+  fotb.endElement();
+}
+
+void ElementFlowObj::setNonInheritedC(const Identifier *ident,
+				      ELObj *obj,
+				      const Location &loc,
+				      Interpreter &interp)
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyGi:
+      interp.convertStringC(obj, ident, loc, nic_->gi);
+      return;
+    case Identifier::keyAttributes:
+      {
+	Vector<StringC> &atts = nic_->attributes;
+	for (;;) {
+	  if (obj->isNil())
+	    return;
+	  PairObj *pair = obj->asPair();
+	  if (!pair)
+	    break;
+	  obj = pair->cdr();
+	  PairObj *att = pair->car()->asPair();
+	  if (!att)
+	    break;
+	  const Char *s;
+	  size_t n;
+	  if (!att->car()->stringData(s, n))
+	    break;
+	  atts.resize(atts.size() + 1);
+	  atts.back().assign(s, n);
+	  att = att->cdr()->asPair();
+	  if (!att || !att->car()->stringData(s, n) || !att->cdr()->isNil())
+	    break;
+	  atts.resize(atts.size() + 1);
+	  atts.back().assign(s, n);
+	}
+	interp.setNextLocation(loc);
+	interp.message(InterpreterMessages::invalidCharacteristicValue,
+		       StringMessageArg(ident->name()));
+      }
+      return;
+    default:
+      break;
+    }
+  }
+  CANNOT_HAPPEN();
+}
+
+bool ElementFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyGi:
+    case Identifier::keyAttributes:
+      return 1;
+    default:
+      break;
+    }
+  }
+  return 0;
+}
+
+FlowObj *ElementFlowObj::copy(Collector &c) const
+{
+  return new (c) ElementFlowObj(*this);
+}
+
+class EmptyElementFlowObj : public ElementFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  EmptyElementFlowObj() { }
+  FlowObj *copy(Collector &c) const {
+    return new (c) EmptyElementFlowObj(*this);
+  }
+  CompoundFlowObj *asCompoundFlowObj() { return 0; }
+  void processInner(ProcessContext &);
+};
+
+void EmptyElementFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  if (nic_->gi.size())
+    fotb.emptyElement(*nic_);
+  else {
+    const NodePtr &nd = context.vm().currentNode;
+    GroveString str;
+    if (nd && nd->getGi(str) == accessOK) {
+      FOTBuilder::ElementNIC tem(*nic_);
+      tem.gi.assign(str.data(), str.size());
+      fotb.emptyElement(tem);
+    }
+    else
+      fotb.emptyElement(*nic_);
+  }
+}
+
+class DocumentTypeFlowObj : public FlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  DocumentTypeFlowObj();
+  DocumentTypeFlowObj(const DocumentTypeFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  bool hasNonInheritedC(const Identifier *) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+private:
+  Owner<FOTBuilder::DocumentTypeNIC> nic_;
+};
+
+DocumentTypeFlowObj::DocumentTypeFlowObj()
+: nic_(new FOTBuilder::DocumentTypeNIC)
+{
+}
+
+DocumentTypeFlowObj::DocumentTypeFlowObj(const DocumentTypeFlowObj &fo)
+: FlowObj(fo), nic_(new FOTBuilder::DocumentTypeNIC(*fo.nic_))
+{
+}
+
+void DocumentTypeFlowObj::processInner(ProcessContext &context)
+{
+  context.currentFOTBuilder().documentType(*nic_);
+}
+
+void DocumentTypeFlowObj::setNonInheritedC(const Identifier *ident,
+				      ELObj *obj,
+				      const Location &loc,
+				      Interpreter &interp)
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyPublicId:
+      interp.convertStringC(obj, ident, loc, nic_->publicId);
+      return;
+    case Identifier::keySystemId:
+      interp.convertStringC(obj, ident, loc, nic_->systemId);
+      return;
+    case Identifier::keyName:
+      interp.convertStringC(obj, ident, loc, nic_->name);
+      return;
+    default:
+      break;
+    }
+  }
+  CANNOT_HAPPEN();
+}
+
+bool DocumentTypeFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyPublicId:
+    case Identifier::keySystemId:
+    case Identifier::keyName:
+      return 1;
+    default:
+      break;
+    }
+  }
+  return 0;
+}
+
+FlowObj *DocumentTypeFlowObj::copy(Collector &c) const
+{
+  return new (c) DocumentTypeFlowObj(*this);
+}
+
+class ProcessingInstructionFlowObj : public FlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  ProcessingInstructionFlowObj() {
+    ASSERT(sizeof(ProcessingInstructionFlowObj)
+           <= sizeof(UnresolvedQuantityObj));
+  }
+  void processInner(ProcessContext &context) {
+    context.currentFOTBuilder().processingInstruction(data_);
+  }
+  FlowObj *copy(Collector &c) const {
+    return new (c) ProcessingInstructionFlowObj(*this);
   }
   void setNonInheritedC(const Identifier *ident, ELObj *obj,
 			const Location &loc, Interpreter &interp) {
@@ -2237,6 +2500,22 @@ void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
       == "UNREGISTERED::James Clark//Flow Object Class::"
          "formatting-instruction")
     tem = new (*this) FormattingInstructionFlowObj;
+  else if (pubid
+      == "UNREGISTERED::James Clark//Flow Object Class::"
+         "element")
+    tem = new (*this) ElementFlowObj;
+  else if (pubid
+      == "UNREGISTERED::James Clark//Flow Object Class::"
+         "empty-element")
+    tem = new (*this) EmptyElementFlowObj;
+  else if (pubid
+      == "UNREGISTERED::James Clark//Flow Object Class::"
+         "document-type")
+    tem = new (*this) DocumentTypeFlowObj;
+  else if (pubid
+      == "UNREGISTERED::James Clark//Flow Object Class::"
+         "processing-instruction")
+    tem = new (*this) ProcessingInstructionFlowObj;
   else
     tem = new (*this) UnknownFlowObj;
   makePermanent(tem);

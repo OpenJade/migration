@@ -15,12 +15,38 @@ namespace DSSSL_NAMESPACE {
 
 const Char defaultChar = 0xfffd;
 
+static
+size_t maxObjSize()
+{
+  static size_t sz[] = {
+    sizeof(UnresolvedQuantityObj),
+    sizeof(VarStyleObj),
+    sizeof(OverriddenStyleObj),
+    sizeof(MergeStyleObj),
+    sizeof(DeviceRGBColorObj),
+    sizeof(ColorSpaceObj),
+    sizeof(PairObj),
+    sizeof(QuantityObj),
+    sizeof(GlyphIdObj),
+    sizeof(NamedNodeListPtrNodeListObj),
+    sizeof(ProcessNodeSosofoObj),
+    sizeof(AppendSosofoObj),
+    sizeof(SetNonInheritedCsSosofoObj),
+    sizeof(LabelSosofoObj),
+  };
+  size_t n = sz[0];
+  for (size_t i = 1; i < SIZEOF(sz); i++)
+    if (sz[i] > n)
+      n = sz[i];
+  return n;
+}
+
 Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unitsPerInch,
 			 const FOTBuilder::Extension *extensionTable)
 : rootNode_(rootNode),
   messenger_(messenger),
   extensionTable_(extensionTable),
-  QueryContext(sizeof(UnresolvedQuantityObj)),
+  QueryContext(maxObjSize()),
   partIndex_(1),  // 0 is for command-line definitions
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -761,6 +787,11 @@ void Interpreter::installSyntacticKeys()
     { "max", Identifier::keyMax },
     { "conditional?", Identifier::keyIsConditional },
     { "priority", Identifier::keyPriority },
+    { "name", Identifier::keyName },
+    { "gi", Identifier::keyGi },
+    { "attributes", Identifier::keyAttributes },
+    { "system-id", Identifier::keySystemId },
+    { "public-id", Identifier::keyPublicId },
   };
   for (size_t i = 0; i < SIZEOF(keys); i++)
     lookup(makeStringC(keys[i].name))->setSyntacticKey(keys[i].key);

@@ -886,8 +886,10 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
 				       new MaybeOverrideStyleInsn(next)));
   if (!hasUse)
     return result;
-  else
+  else {
+    result = new CheckStyleInsn(location(), result);
     return optimizeCompile(exprs_[useIndex], interp, env, stackPos, result);
+  }
 }
 
 void StyleExpression::markBoundVars(BoundVarList &vars)

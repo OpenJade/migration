@@ -16,7 +16,9 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 FOTBuilder *
-makeRtfFOTBuilder(streambuf *, const Ptr<ExtendEntityManager> &,
+makeRtfFOTBuilder(streambuf *,
+		  const Vector<StringC> &options,
+		  const Ptr<ExtendEntityManager> &,
 		  const CharsetInfo &, Messenger *,
 		  const FOTBuilder::Extension *&);
 

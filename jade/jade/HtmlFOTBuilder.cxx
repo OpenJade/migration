@@ -58,9 +58,9 @@ public:
   class OutputState {
   public:
     OutputState(const String<CmdLineApp::AppChar> *outputFilename,
-                const OutputCodingSystem *codingSystem,
-		Messenger *mgr)
-     : outputFilename_(outputFilename), codingSystem_(codingSystem), mgr_(mgr),
+                CmdLineApp *app)
+     : outputFilename_(outputFilename),
+       app_(app),
        outputDocIndex_(unsigned(-1)) { }
     void setCharStyle(const ConstPtr<CharStyle> &, OutputCharStream &);
     unsigned setOutputDocIndex(unsigned i) {
@@ -70,14 +70,14 @@ public:
     }
     unsigned outputDocIndex() const { return outputDocIndex_; }
     String<CmdLineApp::AppChar> outputFilename(unsigned i) const;
-    const OutputCodingSystem *codingSystem() const { return codingSystem_; }
-    Messenger &messenger() { return *mgr_; }
+    CmdLineApp &app() { return *app_; }
+    const OutputCodingSystem *codingSystem() const { return app_->outputCodingSystem(); }
+    Messenger &messenger() { return *app_; }
   private:
     const String<CmdLineApp::AppChar> *outputFilename_;
 
-    const OutputCodingSystem *codingSystem_;
+    CmdLineApp *app_;
     ConstPtr<CharStyle> style_;
-    Messenger *mgr_;
     unsigned outputDocIndex_;
   };
   class Item : public Link {
@@ -113,10 +113,11 @@ public:
   };
   class Markup : public Item {
   public:
-    Markup(const StringC &str) : str_(str) { }
+    Markup(const StringC &str, AddressRef *aref) : str_(str), aref_(aref) { }
     void output(OutputCharStream &, OutputState &);
   private:
     StringC str_;
+    AddressRef *aref_;
   };
   class Pcdata : public Item {
   public:
@@ -174,7 +175,7 @@ public:
     ConstPtr<StringResource<Char> > title_;
     unsigned index_;
   };
-  HtmlFOTBuilder(const String<CmdLineApp::AppChar> &, const OutputCodingSystem *, Messenger *);
+  HtmlFOTBuilder(const String<CmdLineApp::AppChar> &, CmdLineApp *);
   ~HtmlFOTBuilder();
   void setFontWeight(Symbol);
   void setFontPosture(Symbol);
@@ -250,14 +251,12 @@ private:
   Vector<Vector<size_t> > pendingAddr_;
   int nOpenElements_;
   String<CmdLineApp::AppChar> outputFilename_;
-  const OutputCodingSystem *codingSystem_;
+  CmdLineApp *app_;
   enum { basePointSize = 12, sizeIncPercent = 20 };
-  Messenger *mgr_;
 };
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
-			       const OutputCodingSystem *codingSystem,
-			       Messenger *mgr,
+			       CmdLineApp *app,
 			       const FOTBuilder::Extension *&ext)
 {
   static const FOTBuilder::Extension extensions[] = {
@@ -266,7 +265,7 @@ FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename
     { 0, 0, 0}
   };
   ext = extensions;
-  return new HtmlFOTBuilder(outputFilename, codingSystem, mgr);
+  return new HtmlFOTBuilder(outputFilename, app);
 }
 
 static
@@ -279,11 +278,9 @@ void reverse(IList<HtmlFOTBuilder::Item> &list)
 }
 
 HtmlFOTBuilder::HtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
-			       const OutputCodingSystem *codingSystem,
-			       Messenger *mgr)
+			       CmdLineApp *app)
 : outputFilename_(outputFilename),
-  codingSystem_(codingSystem),
-  mgr_(mgr),
+  app_(app),
   nDocuments_(0),
   docIndex_(unsigned(-1)),
   charStyle_(new CharStyle),
@@ -302,7 +299,7 @@ HtmlFOTBuilder::~HtmlFOTBuilder()
     reverse(*destStack_.head()->list);
     delete destStack_.get();
   }
-  OutputState state(&outputFilename_, codingSystem_, mgr_);
+  OutputState state(&outputFilename_, app_);
   DiscardOutputCharStream os;
   root_.output(os, state);
   for (size_t i = 0; i < elements_.size(); i++)
@@ -338,7 +335,7 @@ void HtmlFOTBuilder::atomic()
 
 void HtmlFOTBuilder::formattingInstruction(const StringC &s)
 {
-  dest_->insert(new Markup(s));
+  dest_->insert(new Markup(s, charStyle_->aref));
   atomic();
 }
 
@@ -553,14 +550,15 @@ void HtmlFOTBuilder::Document::output(OutputCharStream &, OutputState &state)
   filebuf file;
   String<CmdLineApp::AppChar> filename(state.outputFilename(index_));
   filename += 0;
-  if (!CmdLineApp::openFilebufWrite(file, filename.data())) {
+  if (!state.app().openFilebufWrite(file, filename.data())) {
     state.messenger()
       .message(HtmlMessages::cannotOpenOutputError,
-               StringMessageArg(CmdLineApp::convertInput(filename.data())),
+               StringMessageArg(state.app().convertInput(filename.data())),
 	       ErrnoMessageArg(errno));
     return;
   }
-  RecordOutputCharStream os(new IosOutputCharStream(&file, state.codingSystem()));
+  RecordOutputCharStream os(new IosOutputCharStream(&file,
+						    state.app().outputCodingSystem()));
   unsigned oldDocIndex = state.setOutputDocIndex(index_);
   os << "<HTML>" << RE;
   if (!title_.isNull()) {
@@ -614,8 +612,15 @@ void HtmlFOTBuilder::Pcdata::output(OutputCharStream &os, OutputState &state)
   HtmlFOTBuilder::outputCdata(s, n, os);
 }
 
-void HtmlFOTBuilder::Markup::output(OutputCharStream &os, OutputState &)
+void HtmlFOTBuilder::Markup::output(OutputCharStream &os, OutputState &state)
 {
+  if (!aref_)
+    state.setCharStyle(ConstPtr<CharStyle>(0), os);
+  else {
+    Ptr<CharStyle> style(new CharStyle);
+    style->aref = aref_;
+    state.setCharStyle(style, os);
+  }
   os << str_;
 }
 

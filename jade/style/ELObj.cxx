@@ -827,7 +827,9 @@ NodeListObj *NodeListObj::nodeListChunkRest(QueryContext &c)
 
 bool NodeListObj::optSingletonNodeList(QueryContext &c, NodePtr &node)
 {
-  if (nodeListRest(c)->nodeListFirst(c))
+  NodeListObj *rest = nodeListRest(c);
+  ELObjDynamicRoot protect(c, rest);
+  if (rest->nodeListFirst(c))
     return 0;
   node = nodeListFirst(c);
   return 1;
@@ -920,6 +922,11 @@ NodePtr NamedNodeListPtrNodeListObj::namedNode(const Char *s, size_t n)
   if (namedNodeList_->namedNode(GroveString(s, n), node) != accessOK)
     node.clear();
   return node;
+}
+
+bool NamedNodeListPtrNodeListObj::nodeName(const NodePtr &nd, GroveString &str)
+{
+  return namedNodeList_->nodeName(nd, str) == accessOK;
 }
 
 NodePtr NamedNodeListPtrNodeListObj::nodeListFirst(QueryContext &)

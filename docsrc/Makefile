@@ -4,7 +4,7 @@ JADETEX=jadetex
 PDFJADETEX=pdfjadetex
 XMLDECL=/usr/share/sgml/xml.dcl
 
-MAN_PAGES=onsgmls.1 openjade.1 osgmlnorm.1 ospam.1 osx.1 ospent.1
+MAN_PAGES=openjade.1
 
 all: $(MAN_PAGES) releasenotes.pdf releasenotes.html releasenotes.ps
 

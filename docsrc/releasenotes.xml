@@ -7,7 +7,7 @@
 	<subtitle>Release Notes</subtitle>
 	<corpauthor>OpenJade Project</corpauthor>
         <edition>Release 1.3.2</edition>
-        <pubdate>October 2002</pubdate>
+        <pubdate>December 2002</pubdate>
         <copyright>
                 <year>2002</year>
                 <holder>OpenJade Project</holder>
@@ -22,7 +22,6 @@ and extend James Clark's Jade, as well as the related SP suite of SGML/XML proce
 
 <sect1><title>Applications of OpenJade</title>
 <para>Many different projects, organizations and companies make use of OpenJade to publish documentation. The SGML/XML backend enables the generation of "world wide web ready" documents while the TeX backend allows high quality "ready for press" output to be obtained. The FreeBSD Handbook (second edition) ISBN: 1571763031 is one such example of a book created using OpenJade.</para>
-<para>The OpenSP (and SP) library has been used for the basis of a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the OpenSP library.</para>
 </sect1>
 
 <sect1><title>Obtaining OpenJade</title>
@@ -40,10 +39,10 @@ addition OpenJade will also build on Microsoft's Win32 based operating systems.
 <para>OpenJade is known to compile with both the GNU gcc c++ compiler and
 Microsoft Visual C++. Other compilers have not been extensively tested.</para>
 <para>OpenJade has been successfully built with the following GNU compilers: 
-Red Hat g++ 2.96</para>
+Red Hat g++ 2.96, GCC g++ 2.95.3, GCC g++ 3.2</para>
 <para>OpenJade has been built on a number of architectures including Intel i386 and ia64, Alpha AXP, Sparc, PPC and S/390, S/390x.</para>
 <para>The following table details known successful builds</para>
-<table id="platforms" frame="topbot"><title>Platforms on which OpenJade is known to build</title>
+<table id="platforms" frame="topbot"><title>Platforms on which OpenJade 1.3.2 is known to build.</title>
 <tgroup cols="4" align="left" colsep="0" rowsep="0">
 <colspec align="left" colname="c1" colwidth="1*" />
 <colspec colname="c2" colwidth="2*" />
@@ -59,9 +58,78 @@ Red Hat g++ 2.96</para>
 </thead>
 <tbody>
 <row>
-   <entry align="left" morerows="7">i386</entry>
+   <entry align="left">alpha</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">arm</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">hppa</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left" morerows="3">i386</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
    <entry>Red Hat Linux 7.3</entry>
    <entry>Red Hat gcc 2.96</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry>Red Hat Linux 7.3</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry>SuSE Linux 8.1</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">ia64</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">m68k</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">mips, mipsel</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">powerpc</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">s390</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
+   <entry></entry>
+</row>
+<row>
+   <entry align="left">sparc</entry>
+   <entry>Debian 3.0</entry>
+   <entry>GNU gcc 3.2</entry>
    <entry></entry>
 </row>
 </tbody>
@@ -94,9 +162,9 @@ The <command>configure</command> script supports many options. These can be disp
 In addition to the standard options, the following table describes options specific to openjade.</para>
 <table id="configure" frame="topbot"><title>OpenJade specific configure options</title>
 <tgroup cols="3" align="left" colsep="0" rowsep="0">
-<colspec colname="c1" colwidth="2*" />
+<colspec colname="c1" colwidth="1*" />
 <colspec colname="c2" colwidth="1*" />
-<colspec colname="c3" colwidth="3*" />
+<colspec colname="c3" colwidth="2*" />
 <thead>
 <row rowsep="1">
 	<entry>Option</entry>
@@ -114,11 +182,6 @@ In addition to the standard options, the following table describes options speci
   <entry><option>--enable-splibdir=path</option></entry>
   <entry>/usr/lib</entry>
   <entry>Define the path where the OpenSP library (libosp) may be found.</entry>
-</row>
-<row>
-  <entry><option>--enable-http</option></entry>
-  <entry>No http support</entry>
-  <entry>Include support for http. This allows the OpenJade tools to be used to validate or process SGML or XML documents directly from the World Wide Web. Example: <screen>onsgmls -s http://www.example.com</screen></entry>
 </row>
 <row>
   <entry><option>--disable-mif</option></entry>
@@ -196,9 +259,133 @@ It is always worth searching for your problem first, as it is often the case tha
 
 </sect1>
 <sect1><title>Version 1.3.2</title>
-<formalpara><title>Released October 2002.</title>
+<formalpara><title>Released December 2002.</title>
 <para>This release allows openjade to be built against the most recent OpenSP release - version 1.5. It also contains some fixes for the MIF backend which were omitted from the 1.3.1 release. OpenSP is now distributed in a separate package and made available on its own release cycle</para>
 </formalpara>
+<table id="openjade132fixes" frame="topbot"><title>Changes for release 1.3.2</title>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 1</entry>
+	<entry>MIF Backend Fixes</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>References</para></entry>
+	<entry><para>G. Seshadri et al.</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Software Bug</para></entry>
+</row>
+<row>
+<entry><para>Problem</para></entry>
+<entry><para>Issues with page size and page header/footers</para></entry>
+</row>
+<row>
+<entry><para>Resolution</para></entry>
+<entry><para>Fix to make sure that right header is shown in documents and
+that document page size is initialised correctly.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 2</entry>
+	<entry>Support for building OpenSP 1.5</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>References</para></entry>
+	<entry><para>Ian Castle, Karl Eichwalder</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Software Bug</para></entry>
+</row>
+<row>
+<entry><para>Problem</para></entry>
+<entry><para>OpenSP is now at version 1.5 which has many improvements
+over 1.3.4</para></entry>
+</row>
+<row>
+<entry><para>Resolution</para></entry>
+<entry><para>It is desirable to use OpenSP 1.5 which has many improvements
+over version 1.3.4 which shipped with openjade 1.3.1. However, it is
+awkward having to have two versions of OpenSP at the same time. OpenJade
+1.4 is not ready for release yet, so version 1.3.2 will link against
+OpenSP 1.5 and later - and no longer includes the old version 1.3.4 of OpenSP.  </para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 3</entry>
+	<entry>Correct definition of "attribute" in builtin.dsl</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>References</para></entry>
+	<entry><para>Toby Speight, Debian Bug #145242</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Software Bug</para></entry>
+</row>
+<row>
+<entry><para>Problem</para></entry>
+<entry><para>The definition of "attribute" (ISO/IEC 10179:1996, section 10.2.5) for SGML property operations was not correct.</para></entry>
+</row>
+<row>
+<entry><para>Resolution</para></entry>
+<entry><para>The definition has been corrected in accordance
+with the standard.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 4</entry>
+	<entry>XML backend doesn't quote "&" in attribute values</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>References</para></entry>
+	<entry><para>Toby Speight, Debian Bug #147073</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Software Bug</para></entry>
+</row>
+<row>
+<entry><para>Problem</para></entry>
+<entry><para>When using OpenJade with the XML or SGML backend to output
+attribute values containing the '&amp;' character, the output is not
+well-formed.</para></entry>
+</row>
+<row>
+<entry><para>Resolution</para></entry>
+<entry><para>Fixed the Transform FOT Builder so that for XML output the
+'&amp;' character is properly quoted.</para></entry>
+</row>
+</tbody>
+</tgroup>
+</table>
 </sect1>
 <sect1><title>Version 1.3.1</title>
 <formalpara><title>Released January 2002.</title>

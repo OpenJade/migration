@@ -73,6 +73,21 @@ then
             AC_DEFINE(SP_MANUAL_INST)
             CXXFLAGS="$CXXFLAGS -fno-implicit-templates"))
 fi
+AC_CACHE_CHECK(whether new_handler accepts size_t and returns int,
+ac_cv_cxx_fancy_new_handler,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([
+#include <stddef.h>
+#include <new.h>
+int oom(size_t) { }],[set_new_handler(oom);],
+   ac_cv_cxx_fancy_new_handler=yes,
+   ac_cv_cxx_fancy_new_handler=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_fancy_new_handler" = yes; then
+  AC_DEFINE(SP_FANCY_NEW_HANDLER)
+fi
 
 dnl FIXME these need tests 
 AC_DEFINE(SP_SET_NEW_HANDLER_EXTERN_C)
@@ -81,7 +96,6 @@ AC_DEFINE(SP_NO_STD_NAMESPACE)
 dnl AC_DEFINE(SP_QUAL_TEMPLATE_DTOR_BROKEN)
 dnl AC_DEFINE(SP_DECLARE_PLACEMENT_OPERATOR_NEW)
 dnl AC_DEFINE(SP_HAVE_PLACEMENT_OPERATOR_DELETE)
-dnl AC_DEFINE(SP_FANCY_NEW_HANDLER)
 
 dnl Checks for library functions.
 AC_REPLACE_FUNCS(memcmp)

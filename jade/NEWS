@@ -1,5 +1,7 @@
 Changes in OpenJade 1.2.2 
 
+* The HTML and MIF backends are now enabled by default.
+
 * The TeX backend has support for PDF bookmarks. This is
   supported by the new version of jadetex which is included.
 

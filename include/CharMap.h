@@ -15,24 +15,24 @@ namespace SP_NAMESPACE {
 
 class CharMapBits {
 public:
-  // 20 bits are enough for the UTF-16 range
-  enum { level0 = 8, level1 = 4, level2 = 4, level3 = 4 };
+  // 21 bits are enough for the UTF-16 range
+  enum { level0 = 5, level1 = 8, level2 = 4, level3 = 4 };
 };
 
 // These are defines rather than static member functions of CharMapBits,
 // since gcc chokes on them in array allocations.
-#define blocks         (1 << CharMapBits::level0) 
-#define pagesPerBlock  (1 << CharMapBits::level1)
+#define planes         (1 << CharMapBits::level0) 
+#define pagesPerPlane  (1 << CharMapBits::level1)
 #define columnsPerPage (1 << CharMapBits::level2)
 #define cellsPerColumn (1 << CharMapBits::level3)
-#define blockSize      (1 << (CharMapBits::level1 + CharMapBits::level2 + CharMapBits::level3))
+#define planeSize      (1 << (CharMapBits::level1 + CharMapBits::level2 + CharMapBits::level3))
 #define pageSize       (1 << (CharMapBits::level2 + CharMapBits::level3))
 #define columnSize     (1 << CharMapBits::level3)
-#define blockIndex(c)  ((c) >> (CharMapBits::level1 + CharMapBits::level2 + CharMapBits::level3)) 
-#define pageIndex(c)   (((c) >> (CharMapBits::level2 + CharMapBits::level3)) & (pagesPerBlock - 1))
+#define planeIndex(c)  ((c) >> (CharMapBits::level1 + CharMapBits::level2 + CharMapBits::level3)) 
+#define pageIndex(c)   (((c) >> (CharMapBits::level2 + CharMapBits::level3)) & (pagesPerPlane - 1))
 #define columnIndex(c) (((c) >> CharMapBits::level3) & (columnsPerPage - 1))
 #define cellIndex(c)   ((c) & (cellsPerColumn - 1))
-#define maxInBlock(c)  ((c) | (blockSize - 1))
+#define maxInPlane(c)  ((c) | (planeSize - 1))
 #define maxInPage(c)   ((c) | (pageSize - 1))
 #define maxInColumn(c) ((c) | (columnSize - 1))
 
@@ -60,13 +60,13 @@ public:
 };
 
 template<class T>
-class CharMapBlock {
+class CharMapPlane {
 public:
-  CharMapBlock();
-  CharMapBlock(const CharMapBlock<T> &);
-  void operator=(const CharMapBlock<T> &);
-  ~CharMapBlock();
-  void swap(CharMapBlock<T> &);
+  CharMapPlane();
+  CharMapPlane(const CharMapPlane<T> &);
+  void operator=(const CharMapPlane<T> &);
+  ~CharMapPlane();
+  void swap(CharMapPlane<T> &);
   CharMapPage<T> *values;
   T value;
 };
@@ -85,7 +85,7 @@ public:
   void setAll(T);
 private:
 #ifdef SP_MULTI_BYTE
-  CharMapBlock<T> values_[blocks];
+  CharMapPlane<T> values_[planes];
   T lo_[256];
 #else
   T values_[256];
@@ -107,9 +107,9 @@ T CharMap<T>::operator[](Char c) const
 {
   if (c < 256)
     return lo_[c];
-  const CharMapBlock<T> &bk = values_[blockIndex(c)];
-  if (bk.values) {
-    const CharMapPage<T> &pg = bk.values[pageIndex(c)];
+  const CharMapPlane<T> &pl = values_[planeIndex(c)];
+  if (pl.values) {
+    const CharMapPage<T> &pg = pl.values[pageIndex(c)];
     if (pg.values) {
       const CharMapColumn<T> &column = pg.values[columnIndex(c)];
       if (column.values)
@@ -121,7 +121,7 @@ T CharMap<T>::operator[](Char c) const
       return pg.value;
   }
   else
-    return bk.value;
+    return pl.value;
 }
 
 template<class T>
@@ -132,9 +132,9 @@ T CharMap<T>::getRange(Char c, Char &max) const
     max = c;
     return lo_[c];
   }
-  const CharMapBlock<T> &bk = values_[blockIndex(c)];
-  if (bk.values) {
-    const CharMapPage<T> &pg = bk.values[pageIndex(c)];
+  const CharMapPlane<T> &pl = values_[planeIndex(c)];
+  if (pl.values) {
+    const CharMapPage<T> &pg = pl.values[pageIndex(c)];
     if (pg.values) {
       const CharMapColumn<T> &column = pg.values[columnIndex(c)];
       if (column.values) {
@@ -152,8 +152,8 @@ T CharMap<T>::getRange(Char c, Char &max) const
     }
   }
   else {
-    max = maxInBlock(c);
-    return bk.value;
+    max = maxInPlane(c);
+    return pl.value;
   }
 }
 

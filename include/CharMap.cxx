@@ -20,7 +20,7 @@ CharMap<T>::CharMap(T dflt)
 {
   for (size_t i = 0; i < 256; i++)
     lo_[i] = dflt;
-  for (size_t i = 0; i < blocks; i++)
+  for (size_t i = 0; i < planes; i++)
     values_[i].value = dflt;
 }
 
@@ -29,7 +29,7 @@ void CharMap<T>::setAll(T val)
 {
   for (size_t i = 0; i < 256; i++)
     lo_[i] = val;
-  for (size_t i = 0; i < blocks; i++) {
+  for (size_t i = 0; i < planes; i++) {
     values_[i].value = val;
     delete [] values_[i].values;
     values_[i].values = 0;
@@ -44,7 +44,7 @@ void CharMap<T>::swap(CharMap<T> &map)
     lo_[i] = map.lo_[i];
     map.lo_[i] = tem;
   }
-  for (size_t i = 0; i < blocks; i++)
+  for (size_t i = 0; i < planes; i++)
     values_[i].swap(map.values_[i]);
 }
 
@@ -55,9 +55,9 @@ void CharMap<T>::setChar(Char c, T val)
     lo_[c] = val;
     return;
   }
-  CharMapBlock<T> &bk = values_[blockIndex(c)];
-  if (bk.values) {
-    CharMapPage<T> &pg = bk.values[pageIndex(c)];
+  CharMapPlane<T> &pl = values_[planeIndex(c)];
+  if (pl.values) {
+    CharMapPage<T> &pg = pl.values[pageIndex(c)];
     if (pg.values) {
       CharMapColumn<T> &column = pg.values[columnIndex(c)];
       if (column.values)
@@ -80,11 +80,11 @@ void CharMap<T>::setChar(Char c, T val)
       column.values[cellIndex(c)] = val;
     }
   }
-  else if (val != bk.value) {
-    bk.values = new CharMapPage<T>[pagesPerBlock];
-    for (size_t i = 0; i < pagesPerBlock; i++)
-      bk.values[i].value = bk.value;
-    CharMapPage<T> &page = bk.values[pageIndex(c)];
+  else if (val != pl.value) {
+    pl.values = new CharMapPage<T>[pagesPerPlane];
+    for (size_t i = 0; i < pagesPerPlane; i++)
+      pl.values[i].value = pl.value;
+    CharMapPage<T> &page = pl.values[pageIndex(c)];
     page.values = new CharMapColumn<T>[columnsPerPage];
     for (size_t i = 0; i < columnsPerPage; i++)
       page.values[i].value = page.value;
@@ -109,30 +109,30 @@ void CharMap<T>::setRange(Char from, Char to, T val)
         && to - from >= columnSize - 1) {
       if ((from & (pageSize - 1)) == 0
 	  && to - from >= pageSize - 1) {
-        if ((from & (blockSize - 1)) == 0
-	    && to - from >= blockSize - 1) {
-	  // Set a complete block.
-	  CharMapBlock<T> &bk = values_[blockIndex(from)];
-          bk.value = val;
-          delete [] bk.values;  
-          bk.values = 0; 
-	  from += blockSize - 1;
+        if ((from & (planeSize - 1)) == 0
+	    && to - from >= planeSize - 1) {
+	  // Set a complete plane.
+	  CharMapPlane<T> &pl = values_[planeIndex(from)];
+          pl.value = val;
+          delete [] pl.values;  
+          pl.values = 0; 
+	  from += planeSize - 1;
         }
         else {
 	  // Set a complete page.
-	  CharMapBlock<T> &bk = values_[blockIndex(from)];
-          if (bk.values) {
-	    CharMapPage<T> &pg = bk.values[pageIndex(from)];
+	  CharMapPlane<T> &pl = values_[planeIndex(from)];
+          if (pl.values) {
+	    CharMapPage<T> &pg = pl.values[pageIndex(from)];
 	    pg.value = val;
 	    delete [] pg.values;
 	    pg.values = 0;
           }
-          else if (val != bk.value) {
-	    // split the block
-	    bk.values = new CharMapPage<T>[pagesPerBlock];
-            for (size_t i = 0; i < pagesPerBlock; i++)
-	      bk.values[i].value = bk.value;
-	    CharMapPage<T> &page = bk.values[pageIndex(from)];
+          else if (val != pl.value) {
+	    // split the plane
+	    pl.values = new CharMapPage<T>[pagesPerPlane];
+            for (size_t i = 0; i < pagesPerPlane; i++)
+	      pl.values[i].value = pl.value;
+	    CharMapPage<T> &page = pl.values[pageIndex(from)];
             page.value = val;
 	  }
 	  from += pageSize - 1;
@@ -140,9 +140,9 @@ void CharMap<T>::setRange(Char from, Char to, T val)
       }
       else {
 	// Set a complete column.
-	CharMapBlock<T> &bk = values_[blockIndex(from)];
-        if (bk.values) {
-	  CharMapPage<T> &pg = bk.values[pageIndex(from)];
+	CharMapPlane<T> &pl = values_[planeIndex(from)];
+        if (pl.values) {
+	  CharMapPage<T> &pg = pl.values[pageIndex(from)];
 	  if (pg.values) {
 	    CharMapColumn<T> &column = pg.values[columnIndex(from)];
 	    column.value = val;
@@ -158,12 +158,12 @@ void CharMap<T>::setRange(Char from, Char to, T val)
 	    column.value = val;
 	  }
         }
-        else if (val != bk.value) {
-	  // split the block
-	  bk.values = new CharMapPage<T>[pagesPerBlock];
-          for (size_t i = 0; i < pagesPerBlock; i++)
-	    bk.values[i].value = bk.value;
-	  CharMapPage<T> &pg = bk.values[pageIndex(from)];
+        else if (val != pl.value) {
+	  // split the plane
+	  pl.values = new CharMapPage<T>[pagesPerPlane];
+          for (size_t i = 0; i < pagesPerPlane; i++)
+	    pl.values[i].value = pl.value;
+	  CharMapPage<T> &pg = pl.values[pageIndex(from)];
           pg.value = val;
 	  // split the page
 	  pg.values = new CharMapColumn<T>[columnsPerPage];
@@ -181,61 +181,61 @@ void CharMap<T>::setRange(Char from, Char to, T val)
 }
 
 template<class T>
-CharMapBlock<T>::CharMapBlock()
+CharMapPlane<T>::CharMapPlane()
 : values(0)
 {
 }
 
 template<class T>
-CharMapBlock<T>::CharMapBlock(const CharMapBlock<T> &bk)
+CharMapPlane<T>::CharMapPlane(const CharMapPlane<T> &pl)
 {
-  if (bk.values) {
-    values = new CharMapPage<T>[pagesPerBlock];
-    for (size_t i = 0; i < pagesPerBlock; i++)
-      values[i] = bk.values[i];
+  if (pl.values) {
+    values = new CharMapPage<T>[pagesPerPlane];
+    for (size_t i = 0; i < pagesPerPlane; i++)
+      values[i] = pl.values[i];
   }
   else {
-    value = bk.value;
+    value = pl.value;
     values = 0;
   }
 }
 
 template<class T>
-void CharMapBlock<T>::operator=(const CharMapBlock<T> &bk)
+void CharMapPlane<T>::operator=(const CharMapPlane<T> &pl)
 {
-  if (bk.values) {
+  if (pl.values) {
     if (!values)
-      values = new CharMapPage<T>[pagesPerBlock];
-    for (size_t i = 0; i < pagesPerBlock; i++)
-      values[i] = bk.values[i];
+      values = new CharMapPage<T>[pagesPerPlane];
+    for (size_t i = 0; i < pagesPerPlane; i++)
+      values[i] = pl.values[i];
   }
   else {
     if (values) {
       delete [] values;
       values = 0;
     }
-    value = bk.value;
+    value = pl.value;
   }
 }
 
 template<class T>
-CharMapBlock<T>::~CharMapBlock()
+CharMapPlane<T>::~CharMapPlane()
 {
   delete [] values;
 }
 
 template<class T>
-void CharMapBlock<T>::swap(CharMapBlock<T> &bk)
+void CharMapPlane<T>::swap(CharMapPlane<T> &pl)
 {
   {
     CharMapPage<T> *tem = values;
-    values = bk.values;
-    bk.values = tem;
+    values = pl.values;
+    pl.values = tem;
   }
   {
     T tem(value);
-    value = bk.value;
-    bk.value = tem;
+    value = pl.value;
+    pl.value = tem;
   }
 }
 

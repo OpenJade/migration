@@ -141,7 +141,7 @@ private:
 
 #endif /* _MSC_VER && _MT */
 
-#if (defined __MACH__) || (defined __GNU__)
+#if ((defined __MACH__) && !(defined __APPLE__)) || (defined __GNU__)
 
 // For Mach, using C Threads. May or may not work as-is on your Mach-based OS.
 // Written by Raf Schietekat <RfSchtkt@maze.ruca.ua.ac.be> on 1996-11-10.
@@ -312,7 +312,10 @@ private:
 extern "C" {
 // for some reason sigset_t is missing here (with glibc 2.0.7);
 // so we define it manually.
+  // Except for MacOS X, which has introduced it.
+#if !((defined __APPLE__) && (defined __MACH__))
 typedef __sigset_t sigset_t;
+#endif
 #include <pthread.h>
 }
 

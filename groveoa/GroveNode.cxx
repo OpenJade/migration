@@ -18,8 +18,12 @@
 #include <stdio.h>
 #include <new>
 
+#ifdef SP_NO_STD_NAMESPACE
+#define std /* as nothing */
+#endif
+
 #define TRY try {
-#define CATCH  } catch (bad_alloc) { return E_OUTOFMEMORY; }
+#define CATCH  } catch (std::bad_alloc) { return E_OUTOFMEMORY; }
 
 // A NULL BSTR is supposed to be equivalent to an empty BSTR
 // but not everybody gets this right (perl build 306, for example)

@@ -393,7 +393,7 @@ void ArcEngineImpl::data(DataEvent *event)
   const Entity *entity = event->entity();
   if (gatheringContent_) {
     if (entity)
-      content_.addCdata(entity->asInternalEntity(),
+      content_.addCdata(entity->asInternalEntity()->string(),
 			event->location().origin());
     else {
       // Do attribute value literal interpretation.
@@ -436,7 +436,7 @@ void ArcEngineImpl::data(DataEvent *event)
 void ArcEngineImpl::sdataEntity(SdataEntityEvent *event)
 {
   if (gatheringContent_) {
-    content_.addSdata(event->entity()->asInternalEntity(),
+    content_.addSdata(event->entity()->asInternalEntity()->string(),
 		      event->location().origin());
     return;
   }

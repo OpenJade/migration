@@ -80,6 +80,12 @@
                                    // 'false' (performance warning)
 #endif
 
+#if _MSC_VER >= 1200
+// Visual C++ 6.0
+#define SP_HAVE_PLACEMENT_OPERATOR_DELETE
+#define SP_HAVE_TYPENAME
+#endif
+
 #define SP_HAVE_SETMODE
 #define SP_DLLEXPORT __declspec(dllexport)
 #define SP_DLLIMPORT __declspec(dllimport)
@@ -245,6 +251,10 @@
 #ifndef SP_ANSI_FOR_SCOPE
 // This simulates the new ANSI "for" scope rules
 #define for if (0); else for
+#endif
+
+#ifndef SP_HAVE_TYPENAME
+#define typename /* as nothing */
 #endif
 
 #ifndef SP_DLLEXPORT

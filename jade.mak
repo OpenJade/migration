@@ -151,7 +151,7 @@ LINK32_OBJS= \
 OUTDIR=.\grove\Debug
 INTDIR=.\grove\Debug
 
-ALL : ".\lib\Debug\grove.dll"
+ALL : ".\dbgbin\grove.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\LocNode.obj"
@@ -161,7 +161,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\grove.exp"
 	-@erase "$(OUTDIR)\grove.lib"
 	-@erase "$(OUTDIR)\grove.pdb"
-	-@erase ".\lib\Debug\grove.dll"
+	-@erase ".\dbgbin\grove.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -209,17 +209,17 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\grove.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"dbgbin\grove.dll"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/grove.pdb" /debug /machine:I386 /out:"lib\Debug\grove.dll"\
+ /pdb:"$(OUTDIR)/grove.pdb" /debug /machine:I386 /out:"dbgbin\grove.dll"\
  /implib:"$(OUTDIR)/grove.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\LocNode.obj" \
 	"$(INTDIR)\Node.obj"
 
-".\lib\Debug\grove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\grove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -295,9 +295,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /machine:I386 /out:"bin/spgrove.dll"
+# ADD LINK32 lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /machine:I386 /out:"bin/spgrove.dll"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/spgrove.pdb" /machine:I386\
@@ -328,7 +328,7 @@ LINK32_OBJS= \
 OUTDIR=.\spgrove\Debug
 INTDIR=.\spgrove\Debug
 
-ALL : "grove - Win32 Debug" ".\lib\Debug\spgrove.dll"
+ALL : "grove - Win32 Debug" ".\dbgbin\spgrove.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\GroveApp.obj"
@@ -339,7 +339,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\spgrove.exp"
 	-@erase "$(OUTDIR)\spgrove.lib"
 	-@erase "$(OUTDIR)\spgrove.pdb"
-	-@erase ".\lib\Debug\spgrove.dll"
+	-@erase ".\dbgbin\spgrove.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -388,19 +388,19 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\spgrove.dll"
-LINK32_FLAGS=lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"dbgbin\spgrove.dll"
+LINK32_FLAGS=lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/spgrove.pdb" /debug /machine:I386\
- /out:"lib\Debug\spgrove.dll" /implib:"$(OUTDIR)/spgrove.lib" 
+ /out:"dbgbin\spgrove.dll" /implib:"$(OUTDIR)/spgrove.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\GroveApp.obj" \
 	"$(INTDIR)\GroveBuilder.obj" \
 	"$(INTDIR)\SdNode.obj" \
 	".\grove\Debug\grove.lib"
 
-".\lib\Debug\spgrove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\spgrove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -499,9 +499,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /machine:I386 /out:"bin\style.dll"
+# ADD LINK32 lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /machine:I386 /out:"bin\style.dll"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/style.pdb" /machine:I386\
@@ -555,7 +555,7 @@ LINK32_OBJS= \
 OUTDIR=.\style\Debug
 INTDIR=.\style\Debug
 
-ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\lib\Debug\style.dll"\
+ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\dbgbin\style.dll"\
  "$(OUTDIR)\style.bsc"
 
 CLEAN : 
@@ -615,7 +615,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\style.exp"
 	-@erase "$(OUTDIR)\style.lib"
 	-@erase "$(OUTDIR)\style.pdb"
-	-@erase ".\lib\Debug\style.dll"
+	-@erase ".\dbgbin\style.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -694,13 +694,13 @@ BSC32_SBRS= \
 
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\style.dll"
+# ADD LINK32 lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"dbgbin\style.dll"
 # SUBTRACT LINK32 /map
-LINK32_FLAGS=lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/style.pdb" /debug /machine:I386\
- /out:"lib\Debug\style.dll" /implib:"$(OUTDIR)/style.lib" 
+ /out:"dbgbin\style.dll" /implib:"$(OUTDIR)/style.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Collector.obj" \
 	"$(INTDIR)\common_inst.obj" \
@@ -730,7 +730,7 @@ LINK32_OBJS= \
 	".\grove\Debug\grove.lib" \
 	".\spgrove\Debug\spgrove.lib"
 
-".\lib\Debug\style.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\style.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -808,9 +808,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/jade.exe"
+# ADD LINK32 lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/jade.exe"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
  /pdb:"$(OUTDIR)/jade.pdb" /machine:I386 /out:"bin/jade.exe" 
@@ -849,7 +849,7 @@ OUTDIR=.\jade\Debug
 INTDIR=.\jade\Debug
 
 ALL : "style - Win32 Debug" "spgrove - Win32 Debug" "grove - Win32 Debug"\
- ".\lib\Debug\jade.exe"
+ ".\dbgbin\jade.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\HtmlFOTBuilder.obj"
@@ -863,7 +863,7 @@ CLEAN :
 	-@erase "$(INTDIR)\TransformFOTBuilder.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\jade.pdb"
-	-@erase ".\lib\Debug\jade.exe"
+	-@erase ".\dbgbin\jade.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -908,11 +908,11 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"lib\Debug\jade.exe"
-LINK32_FLAGS=lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"dbgbin\jade.exe"
+LINK32_FLAGS=lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
- /pdb:"$(OUTDIR)/jade.pdb" /debug /machine:I386 /out:"lib\Debug\jade.exe" 
+ /pdb:"$(OUTDIR)/jade.pdb" /debug /machine:I386 /out:"dbgbin\jade.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\HtmlFOTBuilder.obj" \
 	"$(INTDIR)\jade.obj" \
@@ -927,7 +927,7 @@ LINK32_OBJS= \
 	".\spgrove\Debug\spgrove.lib" \
 	".\style\Debug\style.lib"
 
-".\lib\Debug\jade.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\jade.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1045,8 +1045,8 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/groveoa.dll"
-LINK32_FLAGS=lib\Release\sp132.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/groveoa.dll"
+LINK32_FLAGS=lib\Release\sp133.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
  /incremental:no /pdb:"$(OUTDIR)/groveoa.pdb" /machine:I386\
@@ -1095,7 +1095,7 @@ SOURCE=$(InputPath)
 OUTDIR=.\groveoa\Debug
 INTDIR=.\groveoa\Debug
 
-ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\lib\Debug\groveoa.dll"
+ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\dbgbin\groveoa.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CGroveBuilder.obj"
@@ -1109,11 +1109,11 @@ CLEAN :
 	-@erase "$(OUTDIR)\groveoa.exp"
 	-@erase "$(OUTDIR)\groveoa.lib"
 	-@erase "$(OUTDIR)\groveoa.pdb"
+	-@erase ".\dbgbin\groveoa.dll"
+	-@erase ".\dbgbin\groveoa.ilk"
 	-@erase ".\groveoa\groveoa.h"
 	-@erase ".\groveoa\groveoa.tlb"
 	-@erase ".\groveoa\groveoa_i.c"
-	-@erase ".\lib\Debug\groveoa.dll"
-	-@erase ".\lib\Debug\groveoa.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1163,13 +1163,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/groveoa.dll"
+# ADD LINK32 lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dbgbin\groveoa.dll"
 # SUBTRACT LINK32 /incremental:no
-LINK32_FLAGS=lib\Debug\sp132d.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Debug\sp133d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
  /incremental:yes /pdb:"$(OUTDIR)/groveoa.pdb" /debug /machine:I386\
- /def:".\groveoa\groveoa.def" /out:"lib\Debug/groveoa.dll"\
+ /def:".\groveoa\groveoa.def" /out:"dbgbin\groveoa.dll"\
  /implib:"$(OUTDIR)/groveoa.lib" 
 DEF_FILE= \
 	".\groveoa\groveoa.def"
@@ -1182,7 +1182,7 @@ LINK32_OBJS= \
 	".\grove\Debug\grove.lib" \
 	".\spgrove\Debug\spgrove.lib"
 
-".\lib\Debug\groveoa.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\groveoa.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1205,9 +1205,6 @@ LINK32_OBJS= \
 # Begin Source File
 
 SOURCE=.\grove\Node.cxx
-
-!IF  "$(CFG)" == "grove - Win32 Release"
-
 DEP_CPP_NODE_=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -1218,30 +1215,12 @@ DEP_CPP_NODE_=\
 "$(INTDIR)\Node.obj" : $(SOURCE) $(DEP_CPP_NODE_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "grove - Win32 Debug"
-
-DEP_CPP_NODE_=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	".\include\macros.h"\
-	
-
-"$(INTDIR)\Node.obj" : $(SOURCE) $(DEP_CPP_NODE_) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\grove\LocNode.cxx
-
-!IF  "$(CFG)" == "grove - Win32 Release"
-
 DEP_CPP_LOCNO=\
 	".\grove\LocNode.h"\
 	".\grove\Node.h"\
@@ -1252,21 +1231,6 @@ DEP_CPP_LOCNO=\
 "$(INTDIR)\LocNode.obj" : $(SOURCE) $(DEP_CPP_LOCNO) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "grove - Win32 Debug"
-
-DEP_CPP_LOCNO=\
-	".\grove\LocNode.h"\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	
-
-"$(INTDIR)\LocNode.obj" : $(SOURCE) $(DEP_CPP_LOCNO) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 # End Target
@@ -3670,9 +3634,6 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\style\ELObj.cxx
-
-!IF  "$(CFG)" == "style - Win32 Release"
-
 DEP_CPP_ELOBJ_=\
 	".\grove\Node.h"\
 	".\include\Allocator.h"\
@@ -3799,6 +3760,9 @@ DEP_CPP_ELOBJ_=\
 	".\style\stylelib.h"\
 	".\style\VM.h"\
 	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
 # ADD CPP /Yu"stylelib.h"
 
 "$(INTDIR)\ELObj.obj" : $(SOURCE) $(DEP_CPP_ELOBJ_) "$(INTDIR)"\
@@ -3812,132 +3776,6 @@ DEP_CPP_ELOBJ_=\
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
 
-DEP_CPP_ELOBJ_=\
-	".\grove\Node.h"\
-	".\include\Allocator.h"\
-	".\include\ArcEngine.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetDecl.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\ContentToken.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\ElementType.h"\
-	".\include\Entity.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\IListIter.h"\
-	".\include\IListIterBase.h"\
-	".\include\InputSource.h"\
-	".\include\IQueue.cxx"\
-	".\include\IQueue.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Lpd.h"\
-	".\include\macros.h"\
-	".\include\Markup.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Mode.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\NamedResourceTable.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SdText.h"\
-	".\include\SgmlParser.h"\
-	".\include\ShortReferenceMap.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\spgrove\GroveApp.h"\
-	".\spgrove\GroveBuilder.h"\
-	".\style\Collector.h"\
-	".\style\dsssl_ns.h"\
-	".\style\DssslApp.h"\
-	".\style\DssslSpecEventHandler.h"\
-	".\style\ELObj.h"\
-	".\style\ELObjMessageArg.h"\
-	".\style\EvalContext.h"\
-	".\style\Expression.h"\
-	".\style\FOTBuilder.h"\
-	".\style\GroveManager.h"\
-	".\style\Insn.h"\
-	".\style\Insn2.h"\
-	".\style\Interpreter.h"\
-	".\style\InterpreterMessages.h"\
-	".\style\MacroFlowObj.h"\
-	".\style\NumberCache.h"\
-	".\style\Pattern.h"\
-	".\style\ProcessContext.h"\
-	".\style\ProcessingMode.h"\
-	".\style\SchemeParser.h"\
-	".\style\SosofoObj.h"\
-	".\style\Style.h"\
-	".\style\style_pch.h"\
-	".\style\StyleEngine.h"\
-	".\style\stylelib.h"\
-	".\style\VM.h"\
-	
 # ADD CPP /Yu"stylelib.h"
 
 BuildCmds= \
@@ -4173,9 +4011,6 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\style\FlowObj.cxx
-
-!IF  "$(CFG)" == "style - Win32 Release"
-
 DEP_CPP_FLOWO=\
 	".\grove\Node.h"\
 	".\include\Allocator.h"\
@@ -4303,6 +4138,9 @@ DEP_CPP_FLOWO=\
 	".\style\stylelib.h"\
 	".\style\VM.h"\
 	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
 # ADD CPP /Yu"stylelib.h"
 
 "$(INTDIR)\FlowObj.obj" : $(SOURCE) $(DEP_CPP_FLOWO) "$(INTDIR)"\
@@ -4316,133 +4154,6 @@ DEP_CPP_FLOWO=\
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
 
-DEP_CPP_FLOWO=\
-	".\grove\Node.h"\
-	".\include\Allocator.h"\
-	".\include\ArcEngine.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetDecl.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\ContentToken.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\ElementType.h"\
-	".\include\Entity.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\IListIter.h"\
-	".\include\IListIterBase.h"\
-	".\include\InputSource.h"\
-	".\include\IQueue.cxx"\
-	".\include\IQueue.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Lpd.h"\
-	".\include\macros.h"\
-	".\include\Markup.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Mode.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\NamedResourceTable.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SdText.h"\
-	".\include\SgmlParser.h"\
-	".\include\ShortReferenceMap.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\spgrove\GroveApp.h"\
-	".\spgrove\GroveBuilder.h"\
-	".\style\Collector.h"\
-	".\style\dsssl_ns.h"\
-	".\style\DssslApp.h"\
-	".\style\DssslSpecEventHandler.h"\
-	".\style\ELObj.h"\
-	".\style\ELObjMessageArg.h"\
-	".\style\EvalContext.h"\
-	".\style\Expression.h"\
-	".\style\FlowObj_inst.cxx"\
-	".\style\FOTBuilder.h"\
-	".\style\GroveManager.h"\
-	".\style\Insn.h"\
-	".\style\Insn2.h"\
-	".\style\Interpreter.h"\
-	".\style\InterpreterMessages.h"\
-	".\style\MacroFlowObj.h"\
-	".\style\NumberCache.h"\
-	".\style\Pattern.h"\
-	".\style\ProcessContext.h"\
-	".\style\ProcessingMode.h"\
-	".\style\SchemeParser.h"\
-	".\style\SosofoObj.h"\
-	".\style\Style.h"\
-	".\style\style_pch.h"\
-	".\style\StyleEngine.h"\
-	".\style\stylelib.h"\
-	".\style\VM.h"\
-	
 # ADD CPP /Yu"stylelib.h"
 
 BuildCmds= \
@@ -5902,9 +5613,6 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\jade\SgmlFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_SGMLF=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -5946,61 +5654,12 @@ DEP_CPP_SGMLF=\
 "$(INTDIR)\SgmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_SGMLF) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_SGMLF=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\CodingSystem.h"\
-	".\include\config.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\ExternalId.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\macros.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\xnew.h"\
-	".\jade\SgmlFOTBuilder.h"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
-
-"$(INTDIR)\SgmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_SGMLF) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\jade\RtfFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_RTFFO=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -6064,6 +5723,7 @@ DEP_CPP_RTFFO=\
 	".\jade\RtfFOTBuilder_inst.cxx"\
 	".\jade\RtfMessages.h"\
 	".\jade\RtfOle.h"\
+	".\jade\TmpOutputByteStream.h"\
 	".\style\dsssl_ns.h"\
 	".\style\FOTBuilder.h"\
 	
@@ -6071,90 +5731,12 @@ DEP_CPP_RTFFO=\
 "$(INTDIR)\RtfFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_RTFFO) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_RTFFO=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CharsetRegistry.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityManager.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\InputSource.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\macros.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\OutputByteStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StorageManager.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\jade\RtfFOTBuilder.h"\
-	".\jade\RtfFOTBuilder_inst.cxx"\
-	".\jade\RtfMessages.h"\
-	".\jade\RtfOle.h"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
-
-"$(INTDIR)\RtfFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_RTFFO) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\jade\jade.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_JADE_=\
 	".\grove\Node.h"\
 	".\include\Allocator.h"\
@@ -6262,6 +5844,9 @@ DEP_CPP_JADE_=\
 	".\style\FOTBuilder.h"\
 	".\style\GroveManager.h"\
 	
+
+!IF  "$(CFG)" == "jade - Win32 Release"
+
 # ADD CPP /D "JADE_MIF"
 
 "$(INTDIR)\jade.obj" : $(SOURCE) $(DEP_CPP_JADE_) "$(INTDIR)"
@@ -6274,113 +5859,6 @@ DEP_CPP_JADE_=\
 
 !ELSEIF  "$(CFG)" == "jade - Win32 Debug"
 
-DEP_CPP_JADE_=\
-	".\grove\Node.h"\
-	".\include\Allocator.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetDecl.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\ContentToken.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\ElementType.h"\
-	".\include\Entity.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrnoMessageArg.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Lpd.h"\
-	".\include\macros.h"\
-	".\include\Markup.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Mode.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\NamedResourceTable.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SdText.h"\
-	".\include\SgmlParser.h"\
-	".\include\ShortReferenceMap.h"\
-	".\include\sptchar.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\jade\HtmlFOTBuilder.h"\
-	".\jade\JadeMessages.h"\
-	".\jade\MifFOTBuilder.h"\
-	".\jade\RtfFOTBuilder.h"\
-	".\jade\SgmlFOTBuilder.h"\
-	".\jade\TeXFOTBuilder.h"\
-	".\jade\TransformFOTBuilder.h"\
-	".\spgrove\GroveApp.h"\
-	".\spgrove\GroveBuilder.h"\
-	".\style\dsssl_ns.h"\
-	".\style\DssslApp.h"\
-	".\style\FOTBuilder.h"\
-	".\style\GroveManager.h"\
-	
 # ADD CPP /D "JADE_MIF"
 
 "$(INTDIR)\jade.obj" : $(SOURCE) $(DEP_CPP_JADE_) "$(INTDIR)"
@@ -6398,9 +5876,6 @@ DEP_CPP_JADE_=\
 # Begin Source File
 
 SOURCE=.\jade\HtmlFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_HTMLF=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -6467,77 +5942,6 @@ DEP_CPP_HTMLF=\
 "$(INTDIR)\HtmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_HTMLF) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_HTMLF=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\ErrnoMessageArg.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\IListIter.h"\
-	".\include\IListIterBase.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\macros.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\xnew.h"\
-	".\jade\HtmlFOTBuilder.h"\
-	".\jade\HtmlFOTBuilder_inst.cxx"\
-	".\jade\HtmlMessages.h"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
-
-"$(INTDIR)\HtmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_HTMLF) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -6560,9 +5964,6 @@ SOURCE=.\jade\HtmlFOTBuilder_inst.m4
 # Begin Source File
 
 SOURCE=.\jade\jade.rc
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_RSC_JADE_R=\
 	".\jade\HtmlMessages.rc"\
 	".\jade\JadeMessages.rc"\
@@ -6571,6 +5972,9 @@ DEP_RSC_JADE_R=\
 	".\style\DssslAppMessages.rc"\
 	".\style\InterpreterMessages.rc"\
 	
+
+!IF  "$(CFG)" == "jade - Win32 Release"
+
 # ADD BASE RSC /l 0x809 /i "jade"
 # ADD RSC /l 0x809 /i "jade" /i "style" /d "JADE_MIF"
 
@@ -6581,14 +5985,6 @@ DEP_RSC_JADE_R=\
 
 !ELSEIF  "$(CFG)" == "jade - Win32 Debug"
 
-DEP_RSC_JADE_R=\
-	".\jade\HtmlMessages.rc"\
-	".\jade\JadeMessages.rc"\
-	".\jade\RtfMessages.rc"\
-	".\jade\TeXMessages.rc"\
-	".\style\DssslAppMessages.rc"\
-	".\style\InterpreterMessages.rc"\
-	
 # ADD BASE RSC /l 0x809 /i "jade"
 # ADD RSC /l 0x809 /i "jade" /i "style" /d "JADE_MIF"
 
@@ -6652,9 +6048,6 @@ SOURCE=.\jade\RtfFOTBuilder_inst.m4
 # Begin Source File
 
 SOURCE=.\jade\TeXFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_TEXFO=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -6696,52 +6089,6 @@ DEP_CPP_TEXFO=\
 "$(INTDIR)\TeXFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_TEXFO) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_TEXFO=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\ExternalId.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\OutputByteStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\xnew.h"\
-	".\jade\TeXFOTBuilder.h"\
-	".\jade\TeXFOTBuilder_inst.cxx"\
-	".\jade\TeXMessages.h"\
-	".\jade\TmpOutputByteStream.h"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
-
-"$(INTDIR)\TeXFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_TEXFO) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -6800,9 +6147,6 @@ SOURCE=.\jade\RtfMessages.msg
 # Begin Source File
 
 SOURCE=.\jade\TransformFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_TRANS=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -6859,67 +6203,6 @@ DEP_CPP_TRANS=\
 "$(INTDIR)\TransformFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_TRANS=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\ErrnoMessageArg.h"\
-	".\include\ExternalId.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\xnew.h"\
-	".\jade\TransformFOTBuilder.h"\
-	".\jade\TransformFOTBuilder_inst.cxx"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
-
-"$(INTDIR)\TransformFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -6950,9 +6233,6 @@ SOURCE=.\jade\TransformFOTBuilder_inst.m4
 # Begin Source File
 
 SOURCE=.\jade\RtfOle.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_RTFOL=\
 	".\include\Boolean.h"\
 	".\include\config.h"\
@@ -6967,25 +6247,6 @@ DEP_CPP_RTFOL=\
 "$(INTDIR)\RtfOle.obj" : $(SOURCE) $(DEP_CPP_RTFOL) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "jade - Win32 Debug"
-
-DEP_CPP_RTFOL=\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	".\include\OutputByteStream.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\jade\RtfOle.h"\
-	".\style\dsssl_ns.h"\
-	
-
-"$(INTDIR)\RtfOle.obj" : $(SOURCE) $(DEP_CPP_RTFOL) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -7010,9 +6271,6 @@ DEP_CPP_RTFOL=\
 # Begin Source File
 
 SOURCE=.\jade\MifFOTBuilder.cxx
-
-!IF  "$(CFG)" == "jade - Win32 Release"
-
 DEP_CPP_MIFFO=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -7085,6 +6343,9 @@ DEP_CPP_MIFFO=\
 	".\style\dsssl_ns.h"\
 	".\style\FOTBuilder.h"\
 	
+
+!IF  "$(CFG)" == "jade - Win32 Release"
+
 # ADD CPP /D "JADE_MIF"
 
 "$(INTDIR)\MifFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_MIFFO) "$(INTDIR)"
@@ -7097,78 +6358,6 @@ DEP_CPP_MIFFO=\
 
 !ELSEIF  "$(CFG)" == "jade - Win32 Debug"
 
-DEP_CPP_MIFFO=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrnoMessageArg.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListBase.h"\
-	".\include\InputSource.h"\
-	".\include\IQueue.cxx"\
-	".\include\IQueue.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StorageManager.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\jade\MifFOTBuilder.h"\
-	".\jade\MifFOTBuilder_inst.cxx"\
-	".\jade\MifMessages.h"\
-	".\jade\TmpOutputByteStream.h"\
-	".\style\dsssl_ns.h"\
-	".\style\FOTBuilder.h"\
-	
 # ADD CPP /D "JADE_MIF"
 
 "$(INTDIR)\MifFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_MIFFO) "$(INTDIR)"
@@ -7215,7 +6404,7 @@ SOURCE=.\jade\TeXFOTBuilder_inst.m4
 !IF  "$(CFG)" == "jadedist - Win32 Release"
 
 ".\jadedist\jade.zip" : 
-   CD C:\home\work\jade2\jadedist
+   CD jadedist
    makedist
 
 !ENDIF 
@@ -7309,10 +6498,6 @@ DEP_CPP_GROVEN=\
 	".\include\Vector.cxx"\
 	".\include\Vector.h"\
 	".\include\xnew.h"\
-	{$(INCLUDE)}"\atlbase.h"\
-	{$(INCLUDE)}"\atlcom.h"\
-	{$(INCLUDE)}"\atlconv.h"\
-	{$(INCLUDE)}"\atliface.h"\
 	
 
 !IF  "$(CFG)" == "groveoa - Win32 Release"
@@ -7333,7 +6518,7 @@ DEP_CPP_GROVEN=\
 # ADD CPP /Yu"stdafx.h"
 
 "$(INTDIR)\GroveNode.obj" : $(SOURCE) $(DEP_CPP_GROVEN) "$(INTDIR)"\
- "$(INTDIR)\groveoa.pch" ".\groveoa\groveoa.h"
+ ".\groveoa\groveoa.h" "$(INTDIR)\groveoa.pch"
    $(CPP) /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "grove" /I "spgrove"\
  /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_ATL_STATIC_REGISTRY" /D\
  "_WINDLL" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /D\
@@ -7434,10 +6619,6 @@ DEP_CPP_GROVEO=\
 	".\include\XcharMap.cxx"\
 	".\include\XcharMap.h"\
 	".\include\xnew.h"\
-	{$(INCLUDE)}"\atlbase.h"\
-	{$(INCLUDE)}"\atlcom.h"\
-	{$(INCLUDE)}"\atlconv.h"\
-	{$(INCLUDE)}"\atliface.h"\
 	
 
 !IF  "$(CFG)" == "groveoa - Win32 Release"
@@ -7458,7 +6639,7 @@ DEP_CPP_GROVEO=\
 # ADD CPP /Yu"stdafx.h"
 
 "$(INTDIR)\groveoa.obj" : $(SOURCE) $(DEP_CPP_GROVEO) "$(INTDIR)"\
- "$(INTDIR)\groveoa.pch" ".\groveoa\groveoa.h" ".\groveoa\groveoa_i.c"
+ ".\groveoa\groveoa.h" ".\groveoa\groveoa_i.c" "$(INTDIR)\groveoa.pch"
    $(CPP) /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "grove" /I "spgrove"\
  /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_ATL_STATIC_REGISTRY" /D\
  "_WINDLL" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /D\
@@ -7505,14 +6686,6 @@ DEP_RSC_GROVEOA=\
 SOURCE=.\groveoa\StdAfx.cxx
 DEP_CPP_STDAF=\
 	".\groveoa\StdAfx.h"\
-	{$(INCLUDE)}"\atlbase.h"\
-	{$(INCLUDE)}"\atlcom.h"\
-	{$(INCLUDE)}"\atlconv.cpp"\
-	{$(INCLUDE)}"\atlconv.h"\
-	{$(INCLUDE)}"\atliface.h"\
-	{$(INCLUDE)}"\atlimpl.cpp"\
-	{$(INCLUDE)}"\statreg.cpp"\
-	{$(INCLUDE)}"\statreg.h"\
 	
 
 !IF  "$(CFG)" == "groveoa - Win32 Release"
@@ -7649,10 +6822,6 @@ DEP_CPP_CGROV=\
 	".\include\XcharMap.h"\
 	".\include\xnew.h"\
 	".\spgrove\GroveBuilder.h"\
-	{$(INCLUDE)}"\atlbase.h"\
-	{$(INCLUDE)}"\atlcom.h"\
-	{$(INCLUDE)}"\atlconv.h"\
-	{$(INCLUDE)}"\atliface.h"\
 	
 
 !IF  "$(CFG)" == "groveoa - Win32 Release"
@@ -7673,7 +6842,7 @@ DEP_CPP_CGROV=\
 # ADD CPP /Yu"stdafx.h"
 
 "$(INTDIR)\CGroveBuilder.obj" : $(SOURCE) $(DEP_CPP_CGROV) "$(INTDIR)"\
- "$(INTDIR)\groveoa.pch" ".\groveoa\groveoa.h"
+ ".\groveoa\groveoa.h" "$(INTDIR)\groveoa.pch"
    $(CPP) /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "grove" /I "spgrove"\
  /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_ATL_STATIC_REGISTRY" /D\
  "_WINDLL" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /D\
@@ -7704,12 +6873,12 @@ SOURCE=.\groveoa\groveoa.idl
 !IF  "$(CFG)" == "groveoa - Win32 Release"
 
 # Begin Custom Build
-InputDir=.\groveoa
+InputDir=".\groveoa"
 InputPath=.\groveoa\groveoa.idl
 
 BuildCmds= \
 	midl /Oicf /h $(InputDir)\groveoa.h /iid $(InputDir)\groveoa_i.c /proxy\
-                                   $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
+                                    $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
 	
 
 "$(InputDir)\groveoa.tlb" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -7725,12 +6894,12 @@ BuildCmds= \
 !ELSEIF  "$(CFG)" == "groveoa - Win32 Debug"
 
 # Begin Custom Build
-InputDir=.\groveoa
+InputDir=".\groveoa"
 InputPath=.\groveoa\groveoa.idl
 
 BuildCmds= \
 	midl /Oicf /h $(InputDir)\groveoa.h /iid $(InputDir)\groveoa_i.c /proxy\
-                                   $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
+                                    $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
 	
 
 "$(InputDir)\groveoa.tlb" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"

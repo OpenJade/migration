@@ -41,6 +41,7 @@ namespace SP_NAMESPACE {
 #include "Boolean.h"
 #include "StorageObjectPosition.h"
 #include "CatalogEntry.h"
+#include "CharsetRegistry.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -552,6 +553,19 @@ typedef Ptr<CharMapResource<Char> > Dummy_37;
 template class ConstPtr<CharMapResource<Char> >;
 #else
 typedef ConstPtr<CharMapResource<Char> > Dummy_38;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Owner<CharsetRegistry::Iter>
+#else
+#ifdef __xlC__
+#pragma define(Owner<CharsetRegistry::Iter>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Owner<CharsetRegistry::Iter>;
+#else
+typedef Owner<CharsetRegistry::Iter> Dummy_39;
 #endif
 #endif
 #endif

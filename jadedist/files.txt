@@ -11,6 +11,7 @@ groveoa/StdAfx.cxx
 groveoa/StdAfx.h
 groveoa/groveoa.cxx
 groveoa/groveoa.def
+groveoa/groveoa.dsp
 groveoa/groveoa.idl
 groveoa/groveoa.rc
 groveoa/resource.h
@@ -90,10 +91,15 @@ style/FlowObj_inst.cxx
 style/common_inst.m4
 style/common_inst.cxx
 grove/Makefile.sub
+grove/grove.dsp
 spgrove/Makefile.sub
+spgrove/spgrove.dsp
 style/Makefile.sub
+style/style.dsp
 jade/jade.cxx
 jade/Makefile.sub
+jade/jade.dsp
+all/all.dsp
 jade/RtfFOTBuilder.cxx
 jade/RtfFOTBuilder.h
 jade/SgmlFOTBuilder.cxx
@@ -103,6 +109,7 @@ jade/TransformFOTBuilder.h
 jade/TransformFOTBuilder_inst.cxx
 jade/TransformFOTBuilder_inst.m4
 jade.mak
+jade.dsw
 dsssl/demo.dsl
 dsssl/demo.sgm
 dsssl/style-sheet.dtd
@@ -114,7 +121,6 @@ dsssl/jadetex.ini
 dsssl/jadetex.ins
 dsssl/pdfjadetex.ini
 dsssl/Makefile.jadetex
-Makefile.jade
 jade/HtmlFOTBuilder.cxx
 jade/HtmlFOTBuilder.h
 jade/HtmlFOTBuilder_inst.cxx
@@ -148,6 +154,7 @@ jade/MifFOTBuilder_inst.m4
 jade/MifMessages.h
 jade/MifMessages.msg
 jade/MifMessages.rc
+jadedoc/autoconf.htm
 jadedoc/copying.txt
 jadedoc/dsssl2.htm
 jadedoc/jade.htm
@@ -157,12 +164,12 @@ jadedoc/transform.htm
 jadedist/bin-files.txt
 jadedist/files.txt
 jadedist/makedist.bat
+jadedist/jadedist.dsp
 jade-generate.mak
 Makefile.comm.in
 Makefile.in
 Makefile.lib.in
 Makefile.prog.in
-README.configure
 config/configure.in
 config/config.guess
 config/config.sub

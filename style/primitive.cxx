@@ -2600,7 +2600,7 @@ DEFPRIMITIVE(GlyphSubst, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAGlyphSubstTable, 0, argv[0]);
   const FOTBuilder::GlyphId *glyphId = argv[1]->glyphId();
-  if (!glyphId);
+  if (!glyphId)
     return argError(interp, loc,
 		    InterpreterMessages::notAGlyphId, 1, argv[1]);
   return new (interp) GlyphIdObj(table->glyphSubstTable()->subst(*glyphId));

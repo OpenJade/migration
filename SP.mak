@@ -51,7 +51,7 @@ NULL=nul
 !ENDIF 
 ################################################################################
 # Begin Project
-# PROP Target_Last_Scanned "sx - Win32 Debug"
+# PROP Target_Last_Scanned "lib - Win32 Debug"
 
 !IF  "$(CFG)" == "lib - Win32 Release"
 
@@ -68,7 +68,7 @@ NULL=nul
 OUTDIR=.\lib\Release
 INTDIR=.\lib\Release
 
-ALL : ".\bin\sp132.dll"
+ALL : ".\bin\sp133.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -182,9 +182,9 @@ CLEAN :
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
 	-@erase "$(INTDIR)\XMLCodingSystem.obj"
-	-@erase "$(OUTDIR)\sp132.exp"
-	-@erase "$(OUTDIR)\sp132.lib"
-	-@erase ".\bin\sp132.dll"
+	-@erase "$(OUTDIR)\sp133.exp"
+	-@erase "$(OUTDIR)\sp133.lib"
+	-@erase ".\bin\sp133.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -232,13 +232,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp132.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp133.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp132.pdb" /machine:I386 /out:"bin/sp132.dll"\
- /implib:"$(OUTDIR)/sp132.lib" 
+ /pdb:"$(OUTDIR)/sp133.pdb" /machine:I386 /out:"bin/sp133.dll"\
+ /implib:"$(OUTDIR)/sp133.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -351,7 +351,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\xentmgr_inst.obj" \
 	"$(INTDIR)\XMLCodingSystem.obj"
 
-".\bin\sp132.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp133.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -371,7 +371,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\Debug
 INTDIR=.\lib\Debug
 
-ALL : "$(OUTDIR)\sp132d.dll"
+ALL : ".\dbgbin\sp133d.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -486,11 +486,11 @@ CLEAN :
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
 	-@erase "$(INTDIR)\XMLCodingSystem.obj"
-	-@erase "$(OUTDIR)\sp132d.dll"
-	-@erase "$(OUTDIR)\sp132d.exp"
-	-@erase "$(OUTDIR)\sp132d.ilk"
-	-@erase "$(OUTDIR)\sp132d.lib"
-	-@erase "$(OUTDIR)\sp132d.pdb"
+	-@erase "$(OUTDIR)\sp133d.exp"
+	-@erase "$(OUTDIR)\sp133d.lib"
+	-@erase "$(OUTDIR)\sp133d.pdb"
+	-@erase ".\dbgbin\sp133d.dll"
+	-@erase ".\dbgbin\sp133d.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -539,12 +539,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp132d.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"dbgbin/sp133d.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/sp132d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp132d.dll"\
- /implib:"$(OUTDIR)/sp132d.lib" 
+ /pdb:"$(OUTDIR)/sp133d.pdb" /debug /machine:I386 /out:"dbgbin/sp133d.dll"\
+ /implib:"$(OUTDIR)/sp133d.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -657,7 +657,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\xentmgr_inst.obj" \
 	"$(INTDIR)\XMLCodingSystem.obj"
 
-"$(OUTDIR)\sp132d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\sp133d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -743,7 +743,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Release\sp132.lib"
+	".\lib\Release\sp133.lib"
 
 ".\bin\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -765,7 +765,7 @@ LINK32_OBJS= \
 OUTDIR=.\nsgmls\Debug
 INTDIR=.\nsgmls\Debug
 
-ALL : "lib - Win32 Debug" ".\lib\Debug\nsgmls.exe"
+ALL : "lib - Win32 Debug" ".\dbgbin\nsgmls.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\nsgmls.obj"
@@ -777,8 +777,8 @@ CLEAN :
 	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\nsgmls.pdb"
-	-@erase ".\lib\Debug\nsgmls.exe"
-	-@erase ".\lib\Debug\nsgmls.ilk"
+	-@erase ".\dbgbin\nsgmls.exe"
+	-@erase ".\dbgbin\nsgmls.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -822,11 +822,11 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/nsgmls.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"dbgbin/nsgmls.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
  /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/nsgmls.pdb" /debug\
- /machine:I386 /out:"lib\Debug/nsgmls.exe" 
+ /machine:I386 /out:"dbgbin/nsgmls.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\nsgmls.obj" \
 	"$(INTDIR)\nsgmls.res" \
@@ -834,9 +834,9 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Debug\sp132d.lib"
+	".\lib\Debug\sp133d.lib"
 
-".\lib\Debug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -920,7 +920,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Release\sp132.lib"
+	".\lib\Release\sp133.lib"
 
 ".\bin\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -942,7 +942,7 @@ LINK32_OBJS= \
 OUTDIR=.\spam\Debug
 INTDIR=.\spam\Debug
 
-ALL : "lib - Win32 Debug" ".\lib\Debug\spam.exe"
+ALL : "lib - Win32 Debug" ".\dbgbin\spam.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CopyEventHandler.obj"
@@ -953,8 +953,8 @@ CLEAN :
 	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\spam.pdb"
-	-@erase ".\lib\Debug\spam.exe"
-	-@erase ".\lib\Debug\spam.ilk"
+	-@erase ".\dbgbin\spam.exe"
+	-@erase ".\dbgbin\spam.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -998,20 +998,20 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/spam.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"dbgbin/spam.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
  /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/spam.pdb" /debug\
- /machine:I386 /out:"lib\Debug/spam.exe" 
+ /machine:I386 /out:"dbgbin/spam.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\CopyEventHandler.obj" \
 	"$(INTDIR)\MarkupEventHandler.obj" \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Debug\sp132d.lib"
+	".\lib\Debug\sp133d.lib"
 
-".\lib\Debug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1086,7 +1086,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Release\sp132.lib"
+	".\lib\Release\sp133.lib"
 
 ".\bin\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1108,15 +1108,15 @@ LINK32_OBJS= \
 OUTDIR=.\spent\Debug
 INTDIR=.\spent\Debug
 
-ALL : "lib - Win32 Debug" ".\lib\Debug\spent.exe"
+ALL : "lib - Win32 Debug" ".\dbgbin\spent.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\spent.obj"
 	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\spent.pdb"
-	-@erase ".\lib\Debug\spent.exe"
-	-@erase ".\lib\Debug\spent.ilk"
+	-@erase ".\dbgbin\spent.exe"
+	-@erase ".\dbgbin\spent.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1159,16 +1159,16 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/spent.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"dbgbin/spent.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
  /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/spent.pdb" /debug\
- /machine:I386 /out:"lib\Debug/spent.exe" 
+ /machine:I386 /out:"dbgbin/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Debug\sp132d.lib"
+	".\lib\Debug\sp133d.lib"
 
-".\lib\Debug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1245,7 +1245,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Release\sp132.lib"
+	".\lib\Release\sp133.lib"
 
 ".\bin\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1267,7 +1267,7 @@ LINK32_OBJS= \
 OUTDIR=.\sgmlnorm\Debug
 INTDIR=.\sgmlnorm\Debug
 
-ALL : "lib - Win32 Debug" ".\lib\Debug\sgmlnorm.exe"
+ALL : "lib - Win32 Debug" ".\dbgbin\sgmlnorm.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\SGMLGenerator.obj"
@@ -1275,8 +1275,8 @@ CLEAN :
 	-@erase "$(INTDIR)\vc40.idb"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\sgmlnorm.pdb"
-	-@erase ".\lib\Debug\sgmlnorm.exe"
-	-@erase ".\lib\Debug\sgmlnorm.ilk"
+	-@erase ".\dbgbin\sgmlnorm.exe"
+	-@erase ".\dbgbin\sgmlnorm.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1319,17 +1319,17 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/sgmlnorm.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"dbgbin/sgmlnorm.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
  /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/sgmlnorm.pdb" /debug\
- /machine:I386 /out:"lib\Debug/sgmlnorm.exe" 
+ /machine:I386 /out:"dbgbin/sgmlnorm.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Debug\sp132d.lib"
+	".\lib\Debug\sp133d.lib"
 
-".\lib\Debug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1460,17 +1460,17 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/sx.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"bin/sx.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"$(OUTDIR)/sx.pdb"\
- /machine:I386 /out:"bin/sx.exe" 
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
+ /subsystem:console /incremental:no /pdb:"$(OUTDIR)/sx.pdb" /machine:I386\
+ /out:"bin/sx.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\sx.obj" \
 	"$(INTDIR)\sx.res" \
 	"$(INTDIR)\sx_inst.obj" \
 	"$(INTDIR)\XmlOutputEventHandler.obj" \
-	".\lib\Release\sp132.lib"
+	".\lib\Release\sp133.lib"
 
 ".\bin\sx.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1492,7 +1492,7 @@ LINK32_OBJS= \
 OUTDIR=.\sx\Debug
 INTDIR=.\sx\Debug
 
-ALL : "lib - Win32 Debug" ".\lib\Debug\sx.exe"
+ALL : "lib - Win32 Debug" ".\dbgbin\sx.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\sx.obj"
@@ -1502,8 +1502,8 @@ CLEAN :
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(INTDIR)\XmlOutputEventHandler.obj"
 	-@erase "$(OUTDIR)\sx.pdb"
-	-@erase ".\lib\Debug\sx.exe"
-	-@erase ".\lib\Debug\sx.ilk"
+	-@erase ".\dbgbin\sx.exe"
+	-@erase ".\dbgbin\sx.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1547,19 +1547,19 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/sx.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"dbgbin/sx.exe"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
- odbccp32.lib /nologo /subsystem:console /incremental:yes\
- /pdb:"$(OUTDIR)/sx.pdb" /debug /machine:I386 /out:"lib\Debug/sx.exe" 
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
+ /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/sx.pdb" /debug\
+ /machine:I386 /out:"dbgbin/sx.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\sx.obj" \
 	"$(INTDIR)\sx.res" \
 	"$(INTDIR)\sx_inst.obj" \
 	"$(INTDIR)\XmlOutputEventHandler.obj" \
-	".\lib\Debug\sp132d.lib"
+	".\lib\Debug\sp133d.lib"
 
-".\lib\Debug\sx.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\dbgbin\sx.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<

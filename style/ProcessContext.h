@@ -100,12 +100,11 @@ private:
   friend struct Connection;
   struct Connection : public Link {
     Connection(FOTBuilder *);
-    Connection(const StyleStack &, Port *, unsigned connectableLevel, size_t portIndex);
+    Connection(const StyleStack &, Port *, unsigned connectableLevel);
     FOTBuilder *fotb;
     StyleStack styleStack;
     Port *port;
     unsigned connectableLevel;
-    bool portIndex;
     unsigned nBadFollow;
   };
   struct Table : public Link {
@@ -140,8 +139,6 @@ private:
   unsigned pageType_;
   Vector<NodeStackEntry> nodeStack_;
   friend class CurrentNodeSetter;
-  friend struct Connection;
-  friend struct Connectable;
   friend struct Table;
 };
 

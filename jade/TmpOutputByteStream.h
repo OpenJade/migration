@@ -2,6 +2,7 @@
 #define TmpOutputByteStream_INCLUDED 1
 
 #include "OutputByteStream.h"
+#include "Boolean.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -11,16 +12,20 @@ namespace DSSSL_NAMESPACE {
 using namespace SP_NAMESPACE;
 #endif
 
-class TmpOutputByteStream2 : public OutputByteStream {
+class TmpOutputByteStream : public OutputByteStream {
 public:
-  struct Block;
+  enum { bufSize = 1024 };
+  struct Block {
+    Block *next;
+    char buf[bufSize];
+  };
   class Iter {
   public:
-    Iter(const TmpOutputByteStream2 &sb) : block_(sb.head_), lastBlockUsed_(sb.lastBlockUsed()) { }
+    Iter(const TmpOutputByteStream &sb) : block_(sb.head_), lastBlockUsed_(sb.lastBlockUsed()) { }
     bool next(const char *&p, size_t &n) {
       if (block_) {
 	p = block_->buf;
-	n = block_->next ? (size_t)TmpOutputByteStream2::bufSize : lastBlockUsed_;
+	n = block_->next ? TmpOutputByteStream::bufSize : lastBlockUsed_;
 	block_ = block_->next;
 	return 1;
       }
@@ -31,40 +36,13 @@ public:
     Block *block_;
     size_t lastBlockUsed_;
   };
-  TmpOutputByteStream2() : head_(0), last_(0), nFullBlocks_(0) {}
-  ~TmpOutputByteStream2()
-  {
-    while (head_) {
-      Block *tem = head_;
-      head_ = head_->next;
-      delete tem;
-    }
-  }
-  bool isEmpty() { return ( head_ == NULL ) ? true : false; }
-  void flush() {}
-  void flushBuf(char ch)
-  {
-    Block *tem = new Block;
-    char *p = tem->buf;
-    *p++ = ch;
-    ptr_ = p;
-    end_ = tem->buf + bufSize;
-    tem->next = 0;
-    if (last_) {
-      nFullBlocks_++;
-      last_->next = tem;
-    }
-    else
-      head_ = tem;
-      last_ = tem;
-  }  
-  enum { bufSize = 1024 };
+  TmpOutputByteStream();
+  ~TmpOutputByteStream();
+  bool isEmpty() { return head_ == 0; }
+  void flush();
+  void flushBuf(char ch);
 private:
   friend class Iter;
-  struct Block {
-    Block *next;
-    char buf[bufSize];
-  };
   size_t lastBlockUsed() const {
     return last_ ? (ptr_ - last_->buf) : 0;
   }

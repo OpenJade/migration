@@ -33,6 +33,7 @@
 #include "Boolean.h"
 #include "StorageObjectPosition.h"
 #include "CatalogEntry.h"
+#include "CharsetRegistry.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -79,6 +80,7 @@ __instantiate(CharMapColumn<Char>)
 __instantiate(CharMapResource<Char>)
 __instantiate(Ptr<CharMapResource<Char> >)
 __instantiate(ConstPtr<CharMapResource<Char> >)
+__instantiate(Owner<CharsetRegistry::Iter>)
 
 #ifdef SP_NAMESPACE
 }

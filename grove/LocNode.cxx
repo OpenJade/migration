@@ -9,6 +9,10 @@
 namespace SP_NAMESPACE {
 #endif
 
+#ifdef GROVE_NAMESPACE
+using namespace GROVE_NAMESPACE;
+#endif
+
 const Node::IID LocNode::iid = "LocNode";
 
 #ifdef SP_NAMESPACE

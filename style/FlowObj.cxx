@@ -705,7 +705,11 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  struct HeaderFooter;
+  struct HeaderFooter {
+    enum { nParts = 6 };
+    HeaderFooter();
+    SosofoObj *part[nParts];
+  };
   SimplePageSequenceFlowObj();
   SimplePageSequenceFlowObj(const SimplePageSequenceFlowObj &);
   void processInner(ProcessContext &);
@@ -716,11 +720,6 @@ public:
   void traceSubObjects(Collector &) const;
 private:
   enum { nPageTypeBits = 2 };
-  struct HeaderFooter {
-    enum { nParts = 6 };
-    HeaderFooter();
-    SosofoObj *part[nParts];
-  };
   Owner<HeaderFooter> hf_;
 };
 

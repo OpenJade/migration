@@ -54,7 +54,7 @@ public:
   }
 private:
   size_t count_;
-  Vector<RangeMapRange<From,To> >::const_iterator ptr_;
+  typename Vector<RangeMapRange<From,To> >::const_iterator ptr_;
 };
 
 #ifdef SP_NAMESPACE

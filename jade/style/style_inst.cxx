@@ -1285,6 +1285,58 @@ typedef Ptr<MacroFlowObj::Definition> Dummy_92;
 #endif
 #endif
 #endif
+#ifdef __DECCXX
+#pragma define_template HashTable<StringC,CharPart>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,CharPart>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTable<StringC,CharPart>;
+#else
+typedef HashTable<StringC,CharPart> Dummy_93;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTableItem<StringC,CharPart>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC,CharPart>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTableItem<StringC,CharPart>;
+#else
+typedef HashTableItem<StringC,CharPart> Dummy_94;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTable<StringC,StringC>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,StringC>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTable<StringC,StringC>;
+#else
+typedef HashTable<StringC,StringC> Dummy_95;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTableItem<StringC,StringC>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC,StringC>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTableItem<StringC,StringC>;
+#else
+typedef HashTableItem<StringC,StringC> Dummy_96;
+#endif
+#endif
+#endif
 #ifdef SP_SIZEOF_BOOL_1
 #ifdef __DECCXX
 #pragma define_template XcharMap<char>
@@ -1295,7 +1347,7 @@ typedef Ptr<MacroFlowObj::Definition> Dummy_92;
 #ifdef SP_ANSI_CLASS_INST
 template class XcharMap<char>;
 #else
-typedef XcharMap<char> Dummy_93;
+typedef XcharMap<char> Dummy_97;
 #endif
 #endif
 #endif
@@ -1308,7 +1360,7 @@ typedef XcharMap<char> Dummy_93;
 #ifdef SP_ANSI_CLASS_INST
 template class SharedXcharMap<char>;
 #else
-typedef SharedXcharMap<char> Dummy_94;
+typedef SharedXcharMap<char> Dummy_98;
 #endif
 #endif
 #endif
@@ -1321,7 +1373,7 @@ typedef SharedXcharMap<char> Dummy_94;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<SharedXcharMap<char> >;
 #else
-typedef Ptr<SharedXcharMap<char> > Dummy_95;
+typedef Ptr<SharedXcharMap<char> > Dummy_99;
 #endif
 #endif
 #endif
@@ -1334,7 +1386,7 @@ typedef Ptr<SharedXcharMap<char> > Dummy_95;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<SharedXcharMap<char> >;
 #else
-typedef ConstPtr<SharedXcharMap<char> > Dummy_96;
+typedef ConstPtr<SharedXcharMap<char> > Dummy_100;
 #endif
 #endif
 #endif

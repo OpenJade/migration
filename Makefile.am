@@ -2,7 +2,8 @@
 
 AUTOMAKE_OPTIONS = check-news dist-zip
 
-SUBDIRS = jadedoc dsssl style grove groveoa spgrove jade 
+## FIXME groveoa is missing, since an .am with only EXTRA_DIST doesn't work.
+SUBDIRS = jadedoc dsssl style grove spgrove jade 
 
 ## Note that we include the windows-only aux files.
 EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak jade-generate.mak

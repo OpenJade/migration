@@ -3,7 +3,7 @@ Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
 Standards-Version: 3.5.0
-Build-Depends: debhelper, automake, libtool
+Build-Depends: debhelper, automake, libtool, gettext
 
 Package: opensp
 Architecture: any

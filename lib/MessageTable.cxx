@@ -113,7 +113,7 @@ class GettextMessageTable : public MessageTable {
 public:
   GettextMessageTable();
   Boolean getText(const MessageFragment &, String<SP_TCHAR> &) const;
-  void registerMessageDomain(unsigned char module, char *domain) const;  
+  void registerMessageDomain(unsigned char module, char *domain, char *dir) const;  
 };
 
 void GettextMessageTable::registerMessageDomain(unsigned char module, 

@@ -2623,11 +2623,22 @@ ELObj *BooleanCharPropValues::defaultValue(Interpreter &interp) const
 
 bool PublicIdCharPropValues::setDefault(const StringC &name,
 					const Location &loc,
-					ELObj *obj, Interpreter &)
+					ELObj *obj, Interpreter &interp)
 {
-  Char *c;
+  const Char *c;
   size_t n;
-  if (obj->stringData (c, n));
+  if (obj->stringData (c, n)) {
+    def_ = interp.storePublicId(c, n, loc);
+    return 1;
+  }
+  if (obj == interp.makeFalse()) {
+    def_ = 0;
+    return 1;
+  }
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotPublicId,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
   return 0;
 }
 
@@ -2636,6 +2647,23 @@ bool PublicIdCharPropValues::setValue(const StringC &name,
 				      const Location &loc,
 				      ELObj *obj, Interpreter &interp)
 {
+  const Char *c;
+  size_t n;
+  FOTBuilder::PublicId pubid;
+  if (obj->stringData(c, n))
+    pubid = interp.storePublicId(c, n, loc);
+  else if (obj == interp.makeFalse())
+    pubid = 0;
+  else {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotPublicId,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return 0;
+  }
+  for (size_t i = 0; i < chars.size(); ++i)
+    map_[chars[i]] = pubid;
+  return 1;
 }
 
 ELObj *PublicIdCharPropValues::value(Char, Interpreter &) const

@@ -44,10 +44,10 @@ EntityApp::EntityApp(const char *requiredInternalCode)
   mapCatalogDocument_(0)
 {
   registerOption('c', SP_T("catalog"), 
-                 EntityAppMessages::file, EntityAppMessages::cHelp);
+                 EntityAppMessages::sysid, EntityAppMessages::cHelp);
   registerOption('C', SP_T("catalogs"), EntityAppMessages::CHelp);
   registerOption('D', SP_T("directory"), 
-                 EntityAppMessages::path, EntityAppMessages::DHelp); 
+                 EntityAppMessages::directory, EntityAppMessages::DHelp); 
 }
 
 void EntityApp::processOption(AppChar opt, const AppChar *arg)

@@ -30,7 +30,7 @@ ParserApp::ParserApp(const char *requiredInternalCode)
 : EntityApp(requiredInternalCode),
   errorLimit_(DEFAULT_ERROR_LIMIT)
 {
-  registerOption('a', SP_T("activate"), ParserAppMessages::type,
+  registerOption('a', SP_T("activate"), ParserAppMessages::name,
                  ParserAppMessages::aHelp);
   registerOption('A', SP_T("architecture"), ParserAppMessages::name,
                  ParserAppMessages::AHelp);

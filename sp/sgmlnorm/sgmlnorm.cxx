@@ -35,6 +35,7 @@ SP_DEFINE_APP(SgmlnormApp)
 SgmlnormApp::SgmlnormApp()
 : rawOutput_(0), genFlags_(0)
 {
+  changeOptionRegistration('n', AppChar(255));
   registerOption('d', SP_T("dtd"), SgmlnormMessages::dHelp);
   registerOption('m', SP_T("marked-sections"), SgmlnormMessages::mHelp);
   registerOption('n', SP_T("comments"), SgmlnormMessages::nHelp);
@@ -44,6 +45,9 @@ SgmlnormApp::SgmlnormApp()
 void SgmlnormApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
+  case AppChar(255):
+    ParserApp::processOption('n', arg);
+    break;
   case 'd':
     genFlags_ |= SGMLGenerator::generateDtd;
     break;

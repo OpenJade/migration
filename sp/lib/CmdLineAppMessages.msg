@@ -10,7 +10,7 @@ E1+ambiguousOptionError++option %1 is ambiguous
 E1+erroneousOptionArgError++option %1 doesn't allow an argument
 I1+usage++Usage: %1
 I1+usageCont++or: %1
-I1+defaultUsage++%1 [OPTION] FILE...
+I1+defaultUsage++%1 [OPTION] SYSID...
 I0+usageStart++Short options need the same arguments as their long forms.
 I2+versionInfo++%1 version %2
 E1+unknownBctf++unknown BCTF %1

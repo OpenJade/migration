@@ -76,7 +76,9 @@ AH_BOTTOM([
 #endif
 
 #ifdef HAVE_BOOL 
+#ifndef SP_HAVE_BOOL
 #define SP_HAVE_BOOL
+#endif
 #endif /* HAVE_BOOL */
 
 #ifdef HAVE_TYPENAME
@@ -160,15 +162,21 @@ AH_BOTTOM([
 #endif /* HAVE_PATHNAME_STYLE_DOS */
 
 #ifdef HAVE_INSTANTIATIONS
+#ifndef SP_ANSI_CLASS_INST
 #define SP_ANSI_CLASS_INST
+#endif
 #endif /* HAVE_INSTANTIATIONS */
 
 #ifdef HAVE_SETLOCALE
+#ifndef SP_HAVE_LOCALE
 #define SP_HAVE_LOCALE
+#endif
 #endif /* HAVE_SETLOCALE */
 
 #if defined(HAVE_GETTEXT) && defined(ENABLE_NLS)
+#ifndef SP_HAVE_GETTEXT
 #define SP_HAVE_GETTEXT 
+#endif
 #endif /* HAVE_GETTEXT && ENABLE_NLS */
 
 #ifdef WORDS_BIGENDIAN

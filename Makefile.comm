@@ -8,6 +8,7 @@
 #
 
 TOP=/free/CVS/OpenJade/jade
+top_builddir=..
 prefix=/usr/local.peano
 exec_prefix=${prefix}
 srcdir=.
@@ -18,13 +19,13 @@ datadir=${prefix}/share
 CXX=c++
 CC=gcc
 PERL=/usr/bin/perl
-LIBTOOL=$(TOP)/libtool
+LIBTOOL=$(SHELL) $(top_builddir)/libtool
 INSTALL=/usr/bin/install -c
 
 LIBOBJS=
-LIBS=
-DEFS= -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_ST_BLKSIZE=1 -DSIZEOF_SIZE_T=4 -DSIZEOF_UNSIGNED_INT=4 -DSP_HAVE_BOOL=1 -DSP_HAVE_LOCALE=1 -DSP_HAVE_GETTEXT=1 -DSP_ANSI_CLASS_INST=1 -DJADE_MIF=1 -DJADE_HTML=1 -DSP_MULTI_BYTE=1  -DDEFAULT_SCHEME_BUILTINS=\"${datadir}/builtins.dsl\"
-INCS=-I$(srcdir) -I$(srcdir)/../include $(INCLUDE)
+LIBS= -L/usr/local.peano/lib -losp
+DEFS= -DSTDC_HEADERS=1 -DHAVE_LIMITS_H=1 -DHAVE_ST_BLKSIZE=1 -DSIZEOF_SIZE_T=4 -DSIZEOF_UNSIGNED_INT=4 -DSP_HAVE_BOOL=1 -DSP_HAVE_LOCALE=1 -DSP_HAVE_GETTEXT=1 -DSP_ANSI_CLASS_INST=1 -DSP_DEFINE_TEMPLATES=1 -DHAVE_OPENSP_PARSERAPP_H=1 -DJADE_MIF=1 -DJADE_HTML=1 -DSP_MULTI_BYTE=1  -DDEFAULT_SCHEME_BUILTINS=\"${datadir}/builtins.dsl\"
+INCS=-I$(srcdir) $(INCLUDE) -I/tmp/include/OpenSP
 CXXFLAGS=-O2 $(INCS) $(DEBUG) $(DEFS)
 CFLAGS=-g -O2 $(DEBUG) $(DEFS)
 LDFLAGS=
@@ -67,7 +68,8 @@ depend.temp: FORCE
 	rm depend.temp1
 
 clean: FORCE
-	-rm -f $(CLEANFILES)
+	rm -f $(CLEANFILES)
+	rm -f $(GENSRCS)
 
 FORCE:
 

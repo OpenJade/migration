@@ -1,5 +1,0 @@
-PROG=osgmlnorm
-OBJS=sgmlnorm.o SGMLGenerator.o
-INCLUDE=
-XLIBS=
-GENSRCS=

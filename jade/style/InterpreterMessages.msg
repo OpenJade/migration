@@ -33,7 +33,6 @@ E3+notAList++%2 argument for primitive %1 of wrong type: %3 not a list
 E3+notASymbol++%2 argument for primitive %1 of wrong type: %3 not a symbol
 E3+notAString++%2 argument for primitive %1 of wrong type: %3 not a string
 E3+notAStringOrSymbol++%2 argument for primitive %1 of wrong type: %3 not a string or symbol
-E3+notASymbolOrString++%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol
 E3+notAChar++%2 argument for primitive %1 of wrong type: %3 not a char
 E3+notAStyle++%2 argument for primitive %1 of wrong type: %3 not a style
 E3+notAnExactInteger++%2 argument for primitive %1 of wrong type: %3 not an exact integer
@@ -74,7 +73,7 @@ E1+errorProc++%1
 E0+divideBy0++division by zero
 E1+invalidKeyArg++procedure does not have %1 keyword argument
 E0+keyArgsNotKey++argument not a keyword
-E0+oneBody++support for more than one style-specification-body not yet implemented
+-E0+oneBody++support for more than one style-specification-body not yet implemented
 E0+specNotArc++specification document does not have the DSSSL architecture as a base architecture
 E0+noStyleSpec++specification document did not contain a style-specification-body element
 E1+unknownCharName++unknown character name %1
@@ -84,7 +83,7 @@ E0+invalidRadix++radix must be 2, 8, 10 or 16
 E0+sosofoContext++this context requires a sosofo
 E0+styleContext++this context requires a style object
 E0+notInCharacteristicValue++procedure can only be used in evaluation of characteristic value
-E1+expressionNotImplemented++sorry, %1 expression not implemented
+-E1+expressionNotImplemented++sorry, %1 expression not implemented
 E1+colorArgCount++%1 color requires three arguments
 E1+colorArgType++arguments for %1 color must be numbers
 E1+colorArgRange++arguments for %1 color must be in the range 0 to 1
@@ -137,7 +136,7 @@ E1+invalidIdentifier++%1 is not a valid identifier
 E0+badLanguageDefinition++error in language definition
 E0+noCurrentLanguage++no current language
 E3+notALanguage++%2 argument for primitive %1 of wrong type: %3 not a language
-E3+notAPositiveInteger++%2 argument for primitive %1 of wrong type: %3 not a po
+E3+notAPositiveInteger++%2 argument for primitive %1 of wrong type: %3 not a positive integer
 E3+notAnInteger++%2 argument for primitive %1 of wrong type: %3 not an integer
 E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
 E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
@@ -162,17 +161,17 @@ E2+charPropertyNotIntegerOrFalse++value for character property %1 of wrong type:
 E1+unknownFeature++%1 not a style or transformation language feature
 E1+missingFeature++undeclared use of feature %1
 W1+unsupportedFeature++feature %1 not supported
-W1+partiallySupportedFeature++feature %1 only partially supported 
+W1+partiallySupportedFeature++feature %1 only partially supported
 E0+styleLanguage++only allowed in style language
 E0+transformationLanguage++only allowed in transformation language
 E0+mixedLanguages++style and transformation language parts mixed
 W0+partialSpec++specification is marked as partial
-W1+cantOmitModule++grove plan excluding module %1 not supported 
-W1+cantAddModule++grove plan including module %1 not supported 
+W1+cantOmitModule++grove plan excluding module %1 not supported
+W1+cantAddModule++grove plan including module %1 not supported
 E1+unknownModule++%1 not an SGML property set module
 E2+notACharInCharMap++Function for char-map characteristic returned non-char object %2 for character %1
 E2+charPropertyNotPublicId++value for character property %1 of wrong type: %2 not a public identifier or the value "#f"
-E1+duplicateVariableBinding++variable %1 occurs more than once in bindings=======
+E1+duplicateVariableBinding++variable %1 occurs more than once in bindings
 E0+subgroveArgs++exactly one of node:, subgrove: and class: needed
 W0+subgroveSubgroveArgs++add:, null:, remove:, children:, sub: make no sense with subgrove:
 W0+subgroveClassArgs++remove: makes no sense with class:

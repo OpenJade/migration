@@ -26,20 +26,47 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+/* shift a-z far enough to be outside C locale alphanumeric */
+const char docOffset = 40;
+const char specOffset = 80;
+ 
 DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
   dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
   strictMode_(0)
 {
-  registerOption('G');
-  registerOption('2');
-  registerOption('d', SP_T("dsssl_spec"));
-  registerOption('V', SP_T("variable[=value]"));
-  registerOption('s');
-  registerLongOption(SP_T("debug"), 'G');
-  registerLongOption(SP_T("dsssl-specification"), 'd', SP_T("file"));
-  registerLongOption(SP_T("define-variable"), 'V', SP_T("variable[=value]"));
-  registerLongOption(SP_T("strict"), 's');
+  registerOption('2', 0, DssslAppMessages::help2);
+  registerOption('G', SP_T("debug"), DssslAppMessages::GHelp);
+  registerOption('d', SP_T("specification"), DssslAppMessages::sysid,
+                 DssslAppMessages::dHelp);
+  registerOption('V', SP_T("define"), DssslAppMessages::vardef,
+                 DssslAppMessages::VHelp);
+  registerOption('s', SP_T("strict"), DssslAppMessages::sHelp);
+  registerOption('e' + docOffset, SP_T("doc-open-entities"), 
+                 DssslAppMessages::eHelp);
+  registerOption('g' + docOffset, SP_T("doc-open-elements"), 
+                 DssslAppMessages::gHelp);
+  registerOption('n' + docOffset, SP_T("doc-error-numbers"), 
+                 DssslAppMessages::nHelp);
+  registerOption('x' + docOffset, SP_T("doc-references"), 
+                 DssslAppMessages::xHelp);
+  registerOption('i' + docOffset, SP_T("doc-include"), DssslAppMessages::name,
+                 DssslAppMessages::iHelp);
+  registerOption('w' + docOffset, SP_T("doc-warning"), DssslAppMessages::type,
+                 DssslAppMessages::wHelp);
+  registerOption('e' + specOffset, SP_T("spec-open-entities"), 
+                 DssslAppMessages::eHelp); 
+  registerOption('g' + specOffset, SP_T("spec-open-elements"), 
+                 DssslAppMessages::gHelp);
+  registerOption('n' + specOffset, SP_T("spec-error-numbers"), 
+                 DssslAppMessages::nHelp);
+  registerOption('x' + specOffset, SP_T("spec-references"), 
+                 DssslAppMessages::xHelp);
+  registerOption('i' + specOffset, SP_T("spec-include"), DssslAppMessages::name,
+                 DssslAppMessages::iHelp);
+  registerOption('w' + specOffset, SP_T("spec-warning"), DssslAppMessages::type,
+                 DssslAppMessages::wHelp);
+  registerInfo(DssslAppMessages::prefixInfo, 1);
 }
 
 int DssslApp::init(int argc, AppChar **argv)
@@ -93,6 +120,35 @@ int DssslApp::processSysid(const StringC &sysid)
 void DssslApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
+  case AppChar('e' + docOffset):
+  case AppChar('g' + docOffset):
+  case AppChar('n' + docOffset):
+  case AppChar('x' + docOffset):
+  case AppChar('i' + docOffset):
+  case AppChar('w' + docOffset):
+    GroveApp::processOption(opt - docOffset, arg);
+    break;
+  case AppChar('e' + specOffset):
+  case AppChar('g' + specOffset):
+  case AppChar('n' + specOffset):
+  case AppChar('x' + specOffset):
+  case AppChar('i' + specOffset):
+  case AppChar('w' + specOffset):
+    docOptions_ = options_;
+    options_ = specOptions_;
+    GroveApp::processOption(opt - specOffset, arg);
+    specOptions_ = options_;
+    options_ = docOptions_;
+    break;
+  case 'e':
+  case 'g':
+  case 'n':
+  case 'x':
+  case 'i':
+  case 'w':
+    processOption(opt + docOffset, arg);
+    processOption(opt + specOffset, arg);
+    break;
   case 'G':
     debugMode_ = 1;
     break;
@@ -330,7 +386,7 @@ Boolean DssslApp::initSpecParser()
   SgmlParser::Params params;
   params.sysid = dssslSpecSysid_;
   params.entityManager = entityManager().pointer();
-  params.options = &options_;
+  params.options = &specOptions_;
   specParser_.init(params);
   specParser_.allLinkTypesActivated();
   return 1;

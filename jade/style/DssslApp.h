@@ -56,6 +56,8 @@ private:
   bool debugMode_;
   bool dsssl2_;
   bool strictMode_;
+  ParserOptions docOptions_;
+  ParserOptions specOptions_;
 };
 
 #ifdef DSSSL_NAMESPACE

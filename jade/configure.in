@@ -31,15 +31,9 @@ AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
-ALL_LINGUAS=sv
+ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
-if test "x$prefix" = "xNONE"; then
-  OPENJADE_LOCALE_DIR=/usr/local/share/locale
-else
-  OPENJADE_LOCALE_DIR=$prefix/share/locale
-fi
-AC_DEFINE_UNQUOTED(OPENJADE_LOCALE_DIR, "$OPENJADE_LOCALE_DIR")
-AC_SUBST(OPENJADE_LOCALE_DIR)
+AC_DEFINE_DIR(OPENJADE_LOCALE_DIR, datadir/locale)
 dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
 dnl rely on PACKAGE and VERSION substitutions.
 AC_SUBST(PACKAGE)

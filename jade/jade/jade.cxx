@@ -66,23 +66,13 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
   SP_T("txt"),
 };
 
-#if defined(JADE_MIF) && defined(JADE_HTML)
-#define OUTPUT_TYPES "(fot|rtf|html|tex|mif|sgml|xml|txt)"
-#elif defined(JADE_MIF)
-#define OUTPUT_TYPES "(fot|rtf|tex|mif|sgml|xml|txt)"
-#elif defined(JADE_HTML)
-#define OUTPUT_TYPES "(fot|rtf|html|tex|sgml|xml|txt)"
-#else
-#define OUTPUT_TYPES "(fot|rtf|tex|sgml|xml|txt)"
-#endif
-
 JadeApp::JadeApp()
 : DssslApp(u), outputType_(fotType)
 {
-  registerOption('t', SP_T(OUTPUT_TYPES));
-  registerOption('o', SP_T("output_file"));
-  registerLongOption(SP_T("output-type"), 't', SP_T(OUTPUT_TYPES));
-  registerLongOption(SP_T("output-file"), 'o', SP_T("file"));
+  registerOption('t', SP_T("output-type"), JadeMessages::outputType,
+                 JadeMessages::tHelp);
+  registerOption('o', SP_T("output-file"), JadeMessages::file,
+                 JadeMessages::oHelp);
 }
 
 void JadeApp::processOption(AppChar opt, const AppChar *arg)

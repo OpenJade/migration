@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    remove|deconfigure|upgrade)
+	# remove sp catalog
+	install-sgmlcatalog --remove sp
+
+	# remove sp doc-base
+	if command -v install-docs >/dev/null 2>&1; then
+	    install-docs -r sp || true
+	fi
+	
+    ;;
+esac
+
+exit 0

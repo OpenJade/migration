@@ -470,20 +470,47 @@ public:
     crossReference
   };
   enum { nFeatures = crossReference + 1 };
-  enum FeatureSupport {
+  enum Support {
     notSupported,
     partiallySupported,
-    Supported
+    supported
   };
-  struct FeatureStatus {
+  struct Status {
     bool declared;
-    FeatureSupport supported;
-    StringC name;
+    Support supported;
+    StringC rcsname;
+    StringC appname;
   };
   bool convertFeature(const StringC &, Feature &);
+  void explicitFeatures();
   void declareFeature(const StringC &);
   void declareFeature(const Feature &);
   bool requireFeature(const Feature &, const Location &);
+  enum Module {
+    baseabs,
+    prlgabs0,
+    prlgabs1,
+    instabs,
+    basesds0,
+    basesds1,
+    instsds0,
+    subdcabs,
+    sdclabs,
+    sdclsds,
+    prlgsds,
+    instsds1,
+    dtgabs,
+    rankabs,
+    srabs,
+    srsds,
+    linkabs,
+    linksds,
+    subdcsds,
+    fpiabs
+  };
+  enum { nModules = fpiabs + 1 };
+  void explicitModules();
+  void addModule(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -504,6 +531,8 @@ private:
   void installNodeProperties();
   void installCharProperties();
   void installFeatures(const FOTBuilder::Feature *);
+  void installModules();
+  void checkGrovePlan();
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -583,8 +612,10 @@ private:
   Location defaultLanguageDefLoc_;
   friend class Identifier;
   HashTable<StringC, CharProp> charProperties_;
-  FeatureStatus feature_[nFeatures];
+  Status feature_[nFeatures];
   bool explicitFeatures_;
+  Status module_[nModules];
+  bool explicitModules_;
 };
 
 inline

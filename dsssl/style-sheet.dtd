@@ -4,8 +4,9 @@
 -->
 
 <!ENTITY % declarations
- "features | add-name-chars | add-separator-chars | standard-chars | 
-  map-sdata-entity | char-repertoire"
+ "features | add-name-chars
+  | add-separator-chars | standard-chars 
+  | map-sdata-entity | char-repertoire | sgml-grove-plan"
 >
 
 <!element style-sheet o o ((%declarations;)*, style-specification,
@@ -59,6 +60,14 @@ DSSSL notation. -->
           name -- public identifier for repertoire --
                CDATA #REQUIRED
 >
+
+<!-- Declare the grove plan for the SGML property set. -->
+<!element sgml-grove-plan - O EMPTY>
+<!attlist sgml-grove-plan
+          modadd -- names of modules to be added to default grove plan --
+               NAMES #IMPLIED -- Default: none added --
+>
+
 
 <?IS10744 ArcBase DSSSL>
 <!NOTATION DSSSL   PUBLIC "ISO/IEC 10179:1996//NOTATION

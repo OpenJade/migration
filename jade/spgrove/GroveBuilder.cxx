@@ -287,7 +287,7 @@ private:
   // number of blocks allocated at this size
   size_t nBlocksThisSizeAlloced_;
   RefCount refCount_;
-  Condition moreNodesCondition_;
+  mutable Condition moreNodesCondition_;
   Mutex mutex_;
   Mutex *mutexPtr_;
   unsigned pulseStep_;

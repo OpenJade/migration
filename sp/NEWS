@@ -2,6 +2,11 @@ Changes in OpenSP 1.5pre8
 
 * Support for newer autoconf, gettext tools
 
+* Added a -x command line option to osx, which allows users to
+  say whether they want sdata entities transformed into PIs or treated like
+  normal entities (the default is the latter, which is how osx always
+  behaved before this change). Contributed by Jessica Hekman.
+
 Changes in OpenSP 1.5pre7
 
 * Option to produce error messages formatted as XML from Nick Kew

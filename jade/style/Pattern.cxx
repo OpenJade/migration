@@ -6,6 +6,7 @@
 #include <OpenSP/macros.h>
 #include <OpenSP/Vector.h>
 #include "Interpreter.h"
+#include "InterpreterMessages.h"
 #include "ProcessingMode.h"
 #include "VM.h"
 #include "ELObj.h"
@@ -173,8 +174,9 @@ void Pattern::ChildrenQualifier::contributeSpecificity(int *s) const
 
 Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &nlExpr, 
 				      Owner<Expression> &priorityExpr,
-                                      ProcessingMode *pm, Interpreter *interp)
-: interp_(interp), pm_(pm), nl_(0), priority_(0),
+                                      ProcessingMode *pm, Interpreter *interp,
+				      Location &loc)
+: interp_(interp), pm_(pm), nl_(0), priority_(0), loc_(loc),
   Collector::DynamicRoot(*interp)
 {
   nlExpr_.swap(nlExpr);
@@ -187,34 +189,44 @@ Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &nlExpr,
   }
 }
 
+void Pattern::NodeQualifier::computePriority() const
+{
+  if (priorityCompiled_)
+    return;
+#ifndef HAVE_MUTABLE
+  ((NodeQualifier *)this)->
+#endif
+    priorityCompiled_ = 1;
+
+  InsnPtr insn = priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
+  EvalContext ec;
+  VM vm(ec, *interp_);
+  ELObj *val = vm.eval(insn.pointer());
+  double tem;
+  if (!val || !val->realValue(tem)) {
+    interp_->setNextLocation(loc_);
+    interp_->message(InterpreterMessages::priorityNotNumber);
+    return;
+  }  
+  if (!val->exactIntegerValue(
+#ifndef HAVE_MUTABLE
+			      ((NodeQualifier *)this)->
+#endif
+			      priority_)) {
+    interp_->setNextLocation(loc_);
+    interp_->message(InterpreterMessages::sorryPriority);
+    return;
+  }
+}
+
 bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
 {
+  computePriority();
+
   NodePtr root;
   m->getGroveRoot(root);
   EvalContext ec;
-  EvalContext::CurrentNodeSetter cns(root, pm_, ec);
-
-  if (!priorityCompiled_) {
-    InsnPtr insn = 
-      priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
-    VM vm(ec, *interp_);
-    ELObj *val = vm.eval(insn.pointer());
-    double p;
-    if (!val || !val->realValue(p)) {
-      //FIXME: error
-      return 0;
-    }
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-    //FIXME: we're using only 3 digits here
-    priority_ = int(1000*p);
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-    priorityCompiled_ = 1;
-  }
-
+  EvalContext::CurrentNodeSetter cns(root, pm_, ec);  
   if (!nl_) {
     InsnPtr insn = nlExpr_->compile(*interp_, Environment(), 0, InsnPtr());
     VM vm(ec, *interp_);
@@ -249,27 +261,7 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
 
 void Pattern::NodeQualifier::contributeSpecificity(int *s) const
 {
-  //FIXME: should current-node and current-root work in priority-expression ?
-  EvalContext ec;
-  if (!priorityCompiled_) {
-    InsnPtr insn = 
-      priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
-    VM vm(ec, *interp_);
-    ELObj *val = vm.eval(insn.pointer());
-    double p;
-    if (!val || !val->realValue(p)) {
-      //FIXME: error
-      return;
-    }
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-    priority_ = int(1000*p);
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-    priorityCompiled_ = 1;
-  }
+  computePriority();
   s[nodeSpecificity] += 1 + priority_;
 }
 

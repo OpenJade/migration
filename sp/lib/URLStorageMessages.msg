@@ -26,3 +26,4 @@ E0+onlyHTTP++only HTTP scheme supported
 E1+winsockInitialize++could not initialize Windows Sockets (%1)
 E0+winsockVersion++incompatible Windows Sockets version
 +winsockErrorNumber++error number 
+W1+Redirect++URL Redirected to %1

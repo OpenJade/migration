@@ -7,5 +7,6 @@
 #include "HtmlMessages.rc"
 #include "RtfMessages.rc"
 #include "TeXMessages.rc"
-
-
+#ifdef JADE_MIF
+#include "MifMessages.rc"
+#endif

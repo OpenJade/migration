@@ -73,12 +73,7 @@ Boolean WinMessageTable::getText(const MessageFragment &frag,
   return 1;
 }
 
-const MessageTable *MessageTable::instance()
-{
-  if (!instance_)
-    instance_ = new WinMessageTable;
-  return instance_;
-}
+static WinMessageTable theMessageTable;
 
 #ifdef SP_NAMESPACE
 }
@@ -141,12 +136,7 @@ Boolean GettextMessageTable::getText(const MessageFragment &frag,
   return 1;
 }
 
-const MessageTable *MessageTable::instance()
-{
-  if (!instance_)
-    instance_ = new GettextMessageTable;
-  return instance_;
-}
+static GettextMessageTable theMessageTable;
 
 #ifdef SP_NAMESPACE
 }
@@ -174,12 +164,7 @@ Boolean DefaultMessageTable::getText(const MessageFragment &frag,
   return 1;
 }
 
-const MessageTable *MessageTable::instance()
-{
-  if (!instance_)
-    instance_ = new DefaultMessageTable;
-  return instance_;
-}
+static DefaultMessageTable theMessageTable;
 
 #ifdef SP_NAMESPACE
 }
@@ -193,7 +178,10 @@ const MessageTable *MessageTable::instance()
 namespace SP_NAMESPACE {
 #endif
 
-MessageTable *MessageTable::instance_ = 0;
+const MessageTable *MessageTable::instance()
+{
+  return &theMessageTable;
+}
 
 #ifdef SP_NAMESPACE
 }

@@ -24,6 +24,11 @@
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 7)
 #define SP_ANSI_FOR_SCOPE
 #endif
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 8)
+#define SP_ANSI_LIB
+#define SP_NO_STD_NAMESPACE
+#undef SP_NEW_H_MISSING
+#endif
 
 #endif /* __GNUG__ */
 

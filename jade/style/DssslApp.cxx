@@ -12,6 +12,7 @@
 #include "SdNode.h"
 #include "InputSource.h"
 #include "jade_version.h"
+#include "ArcEngine.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -337,7 +338,7 @@ void DssslApp::processGrove()
 }
 
 bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
-		    const NodePtr &parent, NodePtr &rootNode)
+		    const NodePtr &parent, NodePtr &rootNode, const Vector<StringC> &architecture)
 {
   SgmlParser::Params params;
   params.sysid = sysid;
@@ -366,10 +367,17 @@ bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
   params.options = &options_;
   SgmlParser parser;
   parser.init(params);
+
   for (size_t i = 0; i < active.size(); i++)
     parser.activateLinkType(active[i]);
   parser.allLinkTypesActivated();
-  parser.parseAll(*eh, eceh->cancelPtr());
+
+  if (architecture.size() > 0) {
+    SelectOneArcDirector director(architecture, *eh);
+    ArcEngine::parseAll(parser, director, director, eceh->cancelPtr());
+  }
+  else
+    parser.parseAll(*eh, eceh->cancelPtr());
   return 1;
 }
 

@@ -37,7 +37,8 @@ size_t maxObjSize()
     sizeof(AppendSosofoObj),
     sizeof(SetNonInheritedCsSosofoObj),
     sizeof(LabelSosofoObj),
-    sizeof(MacroFlowObj)
+    sizeof(MacroFlowObj),
+    sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -314,6 +315,7 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
+    { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -977,8 +979,11 @@ ELObj *Interpreter::convertNumber(const StringC &str, int radix)
       negative = 1;
       i++;
     }
-    else
+    else {
       negative = 0;
+      if (str[i] == '+')
+      i++;
+    }
     bool hadDecimalPoint = 0;
     bool hadDigit = 0;
     long n = 0;
@@ -1099,13 +1104,14 @@ ELObj *Interpreter::convertNumber(const StringC &str, int radix)
 
 bool Interpreter::scanSignDigits(const StringC &str, size_t &i, int &n)
 {
-  bool negative;
-  if (i < str.size() && str[i] == '-') {
-    i++;
-    negative = 1;
+  bool negative = 0;
+  if (i < str.size()) {
+    if (str[i] == '-') {
+      i++;
+      negative = 1;
+    } else if (str[i] == '+')
+      i++;
   }
-  else
-    negative = 0;
   size_t j = i;
   n = 0;
   while (i < str.size()
@@ -1124,7 +1130,11 @@ bool Interpreter::scanSignDigits(const StringC &str, size_t &i, int &n)
 ELObj *Interpreter::convertNumberFloat(const StringC &str)
 {
   String<char> buf;
-  for (size_t i = 0; i < str.size(); i++) {
+  // omit an optional radix prefix
+  size_t i0 = 0;
+  if (str.size() > 1 && str[0] == '#' && str[1] == 'd')
+    i0 = 2;
+  for (size_t i = i0; i < str.size(); i++) {
     if (str[i] > CHAR_MAX || str[i] == '\0')
       return 0;
     // 'E' is a valid exponent marker for C but not us
@@ -1135,7 +1145,7 @@ ELObj *Interpreter::convertNumberFloat(const StringC &str)
   buf += '\0';
   const char *endPtr;
   double val = strtod((char *)buf.data(), (char **)&endPtr);
-  if (endPtr - buf.data() == str.size())
+  if (endPtr - buf.data() == str.size() - i0)
     return new (*this) RealObj(val);
   if (endPtr == buf.data())
     return 0;
@@ -1152,7 +1162,7 @@ Unit *Interpreter::scanUnit(const StringC &str, size_t i, int &unitExp)
 {
   StringC unitName;
   while (i < str.size()) {
-    if (str[i] == '-' || ('0' <= str[i] && str[i] <= '9'))
+    if (str[i] == '-' || str[i] == '+' || ('0' <= str[i] && str[i] <= '9'))
       break;
     unitName += str[i++];
   }
@@ -1161,9 +1171,10 @@ Unit *Interpreter::scanUnit(const StringC &str, size_t i, int &unitExp)
   else {
     unitExp = 0;
     bool neg = 0;
-    if (str[i] == '-') {
-      i++;
+    if (str[i] == '-' || str[i] == '+') {
+      if (str[i] == '-')
       neg = 1;
+      i++;
       if (i >= str.size())
 	return 0;
     }

@@ -100,10 +100,10 @@
 <!ELEMENT simple-page-sequence
   ((simple-page-sequence.right-header
     |simple-page-sequence.center-header
-    |simple-page-sequence.left-footer
+    |simple-page-sequence.left-header
     |simple-page-sequence.right-footer
     |simple-page-sequence.center-footer
-    |simple-page-sequence.header-footer)*,
+    |simple-page-sequence.left-footer)*,
   %flow;)
 >
 
@@ -396,18 +396,14 @@ glyph-subst-table NMTOKENS #IMPLIED
 <!-- column-number of 0 has a special meaning: it identifies a dummy cell that
      can be used to fill out the row if it later proves necessary to do so -->
 <!ATTLIST table-cell
-  column-nmtoken NMTOKEN #REQUIRED
+  column-number NMTOKEN #REQUIRED
   n-columns-spanned NMTOKEN #IMPLIED
   n-rows-spanned NMTOKEN #IMPLIED
   %inherited-characteristics;
 >
 
 <!ATTLIST link
-  destination.idref CDATA #IMPLIED
-  destination.entity CDATA #IMPLIED
-  destination.system-id CDATA #IMPLIED
-  destination.element-index NMTOKEN #IMPLIED
-  destination.grove-index NMTOKEN #IMPLIED
+  destination CDATA #IMPLIED
   %inherited-characteristics;
 >
 

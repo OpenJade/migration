@@ -187,6 +187,7 @@ public:
   // returns accessOK, returns node following that chunk.
   virtual AccessResult nextChunkSibling(NodePtr &) const;
   // if result == accessOK, length must be > 0
+  virtual AccessResult nextChunkAfter(NodePtr &) const;
   virtual AccessResult charChunk(const SdataMapper &, GroveString &) const;
   // return accessNotInClass if class doesn't have children property
   // return accessNull if there isn't a first child
@@ -269,6 +270,7 @@ public:
   virtual AccessResult getImplied(bool &) const;
   // Properties only on element.
   virtual AccessResult getGi(GroveString &) const;
+  virtual bool hasGi(GroveString) const;
   virtual AccessResult getId(GroveString &) const;
   virtual AccessResult getContent(NodeListPtr &) const;
   virtual AccessResult getIncluded(bool &) const;
@@ -370,6 +372,9 @@ public:
   AccessResult assignNextSibling() { return node_->nextSibling(*this); }
   AccessResult assignNextChunkSibling() {
     return node_->nextChunkSibling(*this);
+  }
+  AccessResult assignNextChunkAfter() {
+    return node_->nextChunkAfter(*this);
   }
   AccessResult assignFirstSibling() { return node_->firstSibling(*this); }
   void assign(Node *node) {

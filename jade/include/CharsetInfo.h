@@ -41,6 +41,7 @@ public:
        const;
   void getDescSet(ISet<Char> &) const;
   int digitWeight(Char) const;
+  int hexDigitWeight(Char) const;
   const UnivCharsetDesc &desc() const;
 private:
   void init();

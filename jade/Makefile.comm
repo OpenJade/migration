@@ -3,6 +3,7 @@ ALL_CXXFLAGS=$(CXXFLAGS) -I$(srcdir) -I$(srcdir)/../include $(INCLUDE) \
  $(DEFINES)
 ALL_CFLAGS=$(CFLAGS) $(DEBUG) $(OPTIMIZE) $(INCLUDE) $(DEFINES)
 MSGGENFLAGS=
+CXXDEPGENFLAGS=-MM
 AR=ar
 RANLIB=:
 M4=m4
@@ -32,7 +33,7 @@ depend_src: depend.temp
 	mv depend.temp Makefile.dep
 
 depend.temp: FORCE
-	$(CXX) -MM $(ALL_CXXFLAGS) $(OBJS:.o=.cxx) \
+	$(CXX) -MM $(ALL_CXXFLAGS) $(CXXDEPGENFLAGS) $(OBJS:.o=.cxx) \
 	  | sed -e 's; \([^/ ][^/ ]*\)/; $$(srcdir)/\1/;g' >depend.temp
 
 clean: FORCE

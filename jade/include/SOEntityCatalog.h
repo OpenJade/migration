@@ -20,7 +20,8 @@ public:
     make(const Vector<StringC> &sysids,
 	 size_t nSysidsMustExist,
 	 const CharsetInfo *sysidCharset,
-	 const CharsetInfo *catalogCharset);
+	 const CharsetInfo *catalogCharset,
+	 Boolean useDocCatalog);
 };
 
 #ifdef SP_NAMESPACE

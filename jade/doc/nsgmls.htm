@@ -297,6 +297,11 @@ The following values of
 enable warnings:
 <DL>
 <DT>
+<SAMP>xml</SAMP>
+<DD>
+Warn about constructs that are not allowed by <A
+HREF="http://www.w3.org/TR/1998/REC-xml-19980210">XML</A>.
+<DT>
 <SAMP>mixed</SAMP>
 <DD>
 Warn about mixed content models that do not allow #pcdata anywhere.
@@ -410,9 +415,16 @@ buggy test suites.
 <DT>
 <SAMP>no-valid</SAMP>
 <DD>
-Do not give errors for a missing DTD, for undefined element types or
-for undefined attributes.
-In future releases this option may suppress other errors.
+Do not require the document to be type-valid.  This has the effect of
+changing the SGML declaration to specify <SAMP>VALIDITY
+NOASSERT</SAMP> and <SAMP>IMPLYDEF ATTLIST YES ELEMENT YES</SAMP>.
+An option of <SAMP>-wvalid</SAMP> has the effect of changing
+the SGML declaration to specify <SAMP>VALIDITY
+TYPE</SAMP> and <SAMP>IMPLYDEF ATTLIST NO ELEMENT NO</SAMP>.
+If neither <SAMP>-wvalid</SAMP> nor <SAMP>-wno-valid</SAMP> are
+specified,
+then the <SAMP>VALIDITY</SAMP> and <SAMP>IMPLYDEF</SAMP> specified
+in the SGML declaration will be used.
 </DL>
 </DL>
 <P>

@@ -59,6 +59,7 @@ public:
   ElementType *insertElementType(ElementType *);
   ElementType *insertUndefinedElementType(ElementType *);
   size_t nElementTypeIndex() const;
+  size_t allocElementTypeIndex();
   ConstElementTypeIter elementTypeIter() const;
   ElementTypeIter elementTypeIter();
 
@@ -93,6 +94,11 @@ public:
   size_t nAttributeDefinitionList() const;
   const ElementType *documentElementType() const;
   Boolean isBase() const;
+
+  Ptr<AttributeDefinitionList> &implicitElementAttributeDef();
+  void setImplicitElementAttributeDef(const Ptr<AttributeDefinitionList> &);
+  Ptr<AttributeDefinitionList> &implicitNotationAttributeDef();
+  void setImplicitNotationAttributeDef(const Ptr<AttributeDefinitionList> &);
 private:
   Dtd(const Dtd &);		// undefined
   void operator=(const Dtd &);	// undefined
@@ -108,10 +114,13 @@ private:
   size_t nCurrentAttribute_;
   size_t nElementDefinition_;
   size_t nAttributeDefinitionList_;
+  size_t nElementType_;
   ElementType *documentElementType_;
   Vector<StringC> shortrefs_;
   HashTable<StringC,int> shortrefTable_;
   Boolean isBase_;
+  Ptr<AttributeDefinitionList> implicitElementAttributeDef_;
+  Ptr<AttributeDefinitionList> implicitNotationAttributeDef_;
 };
 
 inline
@@ -301,7 +310,13 @@ inline
 size_t Dtd::nElementTypeIndex() const
 {
   // index 0 is reserved for #pcdata
-  return 1 + elementTypeTable_.count() + undefinedElementTypeTable_.count();
+  return 1 + nElementType_;
+}
+
+inline
+size_t Dtd::allocElementTypeIndex()
+{
+  return 1 + nElementType_++;
 }
 
 inline
@@ -419,6 +434,30 @@ inline
 const StringC &Dtd::shortref(size_t i) const
 {
   return shortrefs_[i];
+}
+
+inline
+Ptr<AttributeDefinitionList> &Dtd::implicitElementAttributeDef()
+{
+  return implicitElementAttributeDef_;
+}
+
+inline
+void Dtd::setImplicitElementAttributeDef(const Ptr<AttributeDefinitionList> &def)
+{
+  implicitElementAttributeDef_ = def;
+}
+
+inline
+Ptr<AttributeDefinitionList> &Dtd::implicitNotationAttributeDef()
+{
+  return implicitNotationAttributeDef_;
+}
+
+inline
+void Dtd::setImplicitNotationAttributeDef(const Ptr<AttributeDefinitionList> &def)
+{
+  implicitNotationAttributeDef_ = def;
 }
 
 #ifdef SP_NAMESPACE

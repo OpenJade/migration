@@ -327,6 +327,7 @@ public:
   AttributeDefinition *def(size_t);
   const AttributeDefinition *def(size_t) const;
   Boolean tokenIndex(const StringC &, unsigned &) const;
+  Boolean tokenIndexUnique(const StringC &, unsigned) const;
   Boolean attributeIndex(const StringC &, unsigned &) const;
   size_t index() const;
   size_t idIndex() const;
@@ -470,6 +471,7 @@ public:
   const AttributeSemantics *semantics(unsigned) const;
   Boolean tokenized(unsigned index) const;
   Boolean tokenIndex(const StringC &, unsigned &) const;
+  Boolean tokenIndexUnique(const StringC &, unsigned) const;
   Boolean attributeIndex(const StringC &, unsigned &) const;
   void finish(AttributeContext &);
   Boolean setValue(unsigned index, Text &, AttributeContext &,
@@ -521,8 +523,10 @@ public:
 
   ConstPtr<AttributeValue> makeImpliedAttributeValue();
   Boolean mayDefaultAttribute() const;
+  Boolean validate() const;
 protected:
   Boolean mayDefaultAttribute_;
+  Boolean validate_;
 private:
   ConstPtr<AttributeValue> impliedAttributeValue_;
 };
@@ -785,6 +789,12 @@ Boolean AttributeList::tokenIndex(const StringC &name, unsigned &index) const
 }
 
 inline
+Boolean AttributeList::tokenIndexUnique(const StringC &name, unsigned index) const
+{
+  return def_->tokenIndexUnique(name, index);
+}
+
+inline
 Boolean AttributeList::attributeIndex(const StringC &name, unsigned &index) const
 {
   return !def_.isNull() && def_->attributeIndex(name, index);
@@ -898,6 +908,12 @@ inline
 Boolean AttributeContext::mayDefaultAttribute() const
 {
   return mayDefaultAttribute_;
+}
+
+inline
+Boolean AttributeContext::validate() const
+{
+  return validate_;
 }
 
 #ifdef SP_NAMESPACE

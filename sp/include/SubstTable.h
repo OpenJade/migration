@@ -35,12 +35,6 @@ private:
   mutable bool isSorted_;
 };
 
-inline 
-void SubstTable::subst(Char &c) const
-{
-  c = operator[](c);
-}
-
 inline
 void SubstTable::subst(StringC &str) const
 {
@@ -55,6 +49,12 @@ Char SubstTable::operator[](Char t) const
     return lo_[t];
   else 
     return at(t);
+}
+
+inline 
+void SubstTable::subst(Char &c) const
+{
+  c = operator[](c);
 }
 
 #ifdef SP_NAMESPACE

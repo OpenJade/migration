@@ -793,8 +793,9 @@ Boolean Parser::sdParseSgmlDeclRef(SdBuilder &sdBuilder, SdParam &parm,
     if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
       return 0;
     const MessageType1 *err;
+    const MessageType1 *err1;
     PublicId::TextClass textClass;
-    if (!id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    if (id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(), *err, id.publicId()->string());
     else if (id.publicId()->getTextClass(textClass)
 	     && textClass != PublicId::SD)
@@ -897,7 +898,8 @@ Boolean Parser::sdParseCharset(SdBuilder &sdBuilder,
     Boolean found;
     PublicId::TextClass textClass;
     const MessageType1 *err;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    const MessageType1 *err1;
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());
@@ -1120,7 +1122,8 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
     PublicId id;
     PublicId::TextClass textClass;
     const MessageType1 *err;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    const MessageType1 *err1;
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());
@@ -1241,8 +1244,9 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
       return 0;
     PublicId id;
     const MessageType1 *err;
+    const MessageType1 *err1;
     PublicId::TextClass textClass;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());

@@ -21,6 +21,11 @@ class CharsetInfo;
 
 class SP_API PublicId {
 public:
+  enum Type {
+    informal,
+    fpi,
+    urn
+  };
   enum TextClass {
     CAPACITY,
     CHARSET,
@@ -43,7 +48,7 @@ public:
     unregistered
     };
   PublicId();
-
+  // FPI parts
   Boolean getOwnerType(OwnerType &) const;
   Boolean getOwner(StringC &) const;
   Boolean getTextClass(TextClass &) const;
@@ -52,25 +57,33 @@ public:
   Boolean getLanguage(StringC &) const;
   Boolean getDesignatingSequence(StringC &) const;
   Boolean getDisplayVersion(StringC &) const;
-  // If it's not a valid formal public identifier, return 0
-  // and set error, otherwise return 1.
+  // URN parts
+  Boolean getNamespaceIdentifier(StringC &) const;
+  Boolean getNamespaceSpecificString(StringC &) const;
+  // The return value describes what has been successfully parsed
   // charset describes the character set to use for parsing the
   // id.
-  Boolean init(Text &, const CharsetInfo &, Char space,
-	       const MessageType1 *&error);
+  Type init(Text &, const CharsetInfo &, Char space,
+	       const MessageType1 *&fpierror, 
+               const MessageType1 *&urnerror);
   const StringC &string() const;
   const Text &text() const;
 private:
+  Boolean initFpi(const StringC &, const CharsetInfo &, Char, 
+               const MessageType1 *&);
+  Boolean initUrn(const StringC &, const CharsetInfo &, Char,
+               const MessageType1 *&);
   static Boolean nextField(Char solidus,
 			   const Char *&next,
 			   const Char *lim,
 			   const Char *&fieldStart,
-			   size_t &fieldLength);
+			   size_t &fieldLength,
+                           Boolean dup = 1);
   static Boolean lookupTextClass(const StringC &, const CharsetInfo &,
 				 TextClass &);
   static const char *const textClasses[];
 
-  PackedBoolean formal_;
+  Type type_;
   OwnerType ownerType_;
   StringC owner_;
   TextClass textClass_;
@@ -80,6 +93,8 @@ private:
   PackedBoolean haveDisplayVersion_;
   StringC displayVersion_;
   Text text_;
+  StringC nid_;
+  StringC nss_;
 };
 
 class SP_API ExternalId {
@@ -93,12 +108,12 @@ public:
   const PublicId *publicId() const;
   void setSystem(Text &);
   void setEffectiveSystem(StringC &);
-  // If it's not a valid formal public identifier, return 0
-  // and set error, otherwise return 1.
+  // The return value tells what has been successfully parsed. 
   // charset describes the character set to use for parsing the
   // id.
-  Boolean setPublic(Text &, const CharsetInfo &, Char space,
-		    const MessageType1 *&error);
+  PublicId::Type setPublic(Text &, const CharsetInfo &, Char space,
+		    const MessageType1 *&fpierror,
+		    const MessageType1 *&urnerror);
   void setLocation(const Location &);
   // location of keyword
   const Location &location() const;

@@ -216,6 +216,7 @@ public:
   Boolean rank() const;
   Boolean datatag() const;
   Boolean formal() const;
+  Boolean urn() const;
   Boolean keeprsre() const;
   Number subdoc() const;
   StringC reservedName(int) const;
@@ -430,6 +431,12 @@ inline
 Boolean Sd::formal() const
 {
   return booleanFeature_[fFORMAL];
+}
+
+inline
+Boolean Sd::urn() const
+{
+  return booleanFeature_[fURN];
 }
 
 inline

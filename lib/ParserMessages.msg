@@ -432,6 +432,11 @@ E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document 
 E0+emptyStartTagBaseDtd+7.4.1.1+element not in the base document type can't have an empty start-tag
 E0+emptyEndTagBaseDtd+7.5.1.1+element not in base document type can't have an empty end-tag
 W0+immediateRecursion++immediately recursive element
+E1+urnMissingField++invalid universal resource name %1: missing : 
+E1+urnMissingPrefix++invalid universal resource name %1: missing urn: prefix 
+E1+urnInvalidNid++invalid universal resource name %1: invalid namespace identifier  
+E1+urnInvalidNss++invalid universal resource name %1: invalid namespace specific string 
+E1+urnExtraField++invalid universal resource name %1: extra field
 =1000
 +delimStart++delimiter 
 +delimEnd++

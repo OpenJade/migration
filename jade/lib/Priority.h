@@ -16,7 +16,8 @@ public:
   typedef unsigned char Type;
   enum {
     data = 0,
-    function = 1,
+    dataDelim = 1,
+    function = 2,
     delim = UCHAR_MAX
     };
   static inline Type blank(int n) {

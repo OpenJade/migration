@@ -17,6 +17,7 @@
 #include "FOTBuilder.h"
 #include "Node.h"
 #include "Location.h"
+#include "ProcessingMode.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -43,6 +44,7 @@ public:
   virtual ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const = 0;
   unsigned index() const;
   const Identifier *identifier() const;
+  void setIdentifier(const Identifier *);
 protected:
   void invalidValue(const Location &, Interpreter &) const;
 private:
@@ -166,12 +168,14 @@ public:
 };
 
 struct InheritedCInfo : public Resource {
-  InheritedCInfo(const ConstPtr<InheritedC> &, const VarStyleObj *, unsigned valLevel,
-                 unsigned specLevel, const Ptr<InheritedCInfo> &);
+  InheritedCInfo(const ConstPtr<InheritedC> &, const VarStyleObj *,
+		 unsigned valLevel, unsigned specLevel, const ProcessingMode::Rule *,
+		 const Ptr<InheritedCInfo> &);
   ConstPtr<InheritedC> spec;
   Ptr<InheritedCInfo> prev;
   unsigned valLevel;
   unsigned specLevel;
+  const ProcessingMode::Rule *rule;
   // If there are dependencies, then the cached value can only
   // be used only when the "value" flow object is at this level.
   ELObj *cachedValue;
@@ -200,6 +204,10 @@ public:
   ELObj *inherited(const ConstPtr<InheritedC> &, unsigned specLevel, Interpreter &,
 		   Vector<size_t> &dependencies);
   void push(StyleObj *, VM &, FOTBuilder &);
+  void pushStart();
+  void pushContinue(StyleObj *, const ProcessingMode::Rule *, const NodePtr &,
+		    Messenger *);
+  void pushEnd(VM &, FOTBuilder &);
   void pop();
   void pushEmpty() { level_++; }
   void popEmpty() { level_--; }
@@ -224,6 +232,12 @@ const Identifier *InheritedC::identifier() const
 }
 
 inline
+void InheritedC::setIdentifier(const Identifier *ident)
+{
+  ident_ = ident;
+}
+
+inline
 unsigned InheritedC::index() const
 {
   return index_;
@@ -239,6 +253,21 @@ inline
 const NodePtr &VarStyleObj::node() const
 {
   return node_;
+}
+
+inline
+void StyleStack::pushStart()
+{
+  level_++;
+  popList_ = new PopList(popList_);
+}
+
+inline
+void StyleStack::push(StyleObj *style, VM &vm, FOTBuilder &fotb)
+{
+  pushStart();
+  pushContinue(style, 0, NodePtr(), 0);
+  pushEnd(vm, fotb);
 }
 
 inline

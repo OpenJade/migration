@@ -1,5 +1,5 @@
 <!-- -*- sgml -*- -->
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
 <title>Jade - James' DSSSL Engine</title>
 <body bgcolor="#ffffff">
@@ -21,7 +21,7 @@
 <LI><A HREF="#backends">Backends</A>
 <UL>
 <LI><A HREF="#backend-rtf">RTF</A>
-<LI><A HREF="#backend-fot">SGML Flow Object Tree</A>
+<LI><A HREF="#backend-fot">XML Flow Object Tree</A>
 <LI><A HREF="TeX.htm">TeX</A>
 <LI><A HREF="transform.htm">SGML Transformation</A>
 </UL>
@@ -33,7 +33,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 1.0.1.
+The current version is 1.1.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -82,7 +82,7 @@ A command-line application, <CODE>jade</CODE>, that combines the style
 engine with the spgrove grove interface and four backends:
 <UL>
 <LI>
-A backend that generates an SGML representation of the flow
+A backend that generates an XML representation of the flow
 object tree.
 <LI>
 A backend that generates RTF.  This has been tested with
@@ -115,19 +115,20 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew1_0_1.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew1_1.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_0_1.zip">Jade</A>.
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_1.zip">Jade</A>.
 This package includes the sources for a compatible version of SP
 (which may be different from the latest released version of SP).
 <p>
 Create a new directory and then unpack the sources file in this
 directory.  The files in sources zip file use CRLF delimited lines, so
-use unzip -a to unpack on Unix.  On Windows you must use an unzip that
-preserves long filenames, such as WinZip 6.1.  You should also make
-sure that your unzip preserves the case of filenames; this requires
-using a <SAMP>-U</SAMP> option with some versions of unzip.
+use <SAMP>unzip -a</SAMP> to unpack on Unix.  On Windows you must use
+an unzip that preserves long filenames, such as WinZip 6.1.  You
+should also make sure that your unzip preserves the case of filenames;
+this requires using a <SAMP>-U</SAMP> option with some versions of
+unzip.
 
 <h2><A NAME=building>Building Jade</A></h2>
 
@@ -136,15 +137,32 @@ using a <SAMP>-U</SAMP> option with some versions of unzip.
 Only Microsoft Visual C++ 4.2b is supported.  It worked with 4.1 last
 time I tried, but it's only been tested with 4.2.
 <p>
-Open SP.mak as a makefile and build at least the
+Open <CODE>SP.mak</CODE> as a makefile and build at least the
 <code>lib - UnicodeDebug</code> and <code>lib - UnicodeRelease</code>
 configurations.
 <P>
-Then open jade.mak as a makefile and build the jade configurations.
+Then open <CODE>jade.mak</CODE> as a makefile and build the jade
+configurations.
 <P>
 With the debug configuration the DLLs and EXEs end up in the
 lib\UnicodeDebug directory;
 with the release configuration they end up in the bin directory.
+<P>
+It has also been built with Visual C++ 5.0 Service Pack 2 by using
+the following procedure:
+<OL>
+<LI>
+Build SP using the documented procedure for Visual C++ 5.0
+<LI>
+Define <CODE>GROVE_NAMESPACE</CODE> and <CODE>DSSSL_NAMESPACE</CODE>
+to be the same as <CODE>SP_NAMESPACE</CODE> (under
+Project/Settings/C++/General/Preprocessor); this is necessary to work
+around bugs in the namespaces in Visual C++ 5.0
+<LI>
+Change the name of the lib file from
+<SAMP>lib\UnicodeDebug\sp130.lib</SAMP> to
+<SAMP>..\lib\UnicodeDebug\sp130.lib</SAMP>
+</OL>
 
 <h3><A NAME=building-unix>Unix</A></h3>
 <p>
@@ -170,10 +188,10 @@ Add the directory containing the jade binary to your path,
 change directory to the dsssl directory, and do
 <pre>
 jade demo.sgm
-nsgmls -s demo.fot
 </pre>
 <P>
-If everything is working, you shouldn't get any errors.
+If everything is working, there should be a well-formed
+XML file <code>demo.fot</code> created.
 <P>
 The system identifier of the document to be processed is specified as
 an argument to Jade.  If this is omitted, standard input will be read.
@@ -254,7 +272,7 @@ Note that this disables tail-call optimization.
 <DT>
 <CODE>fot</CODE>
 <DD>
-An SGML representation of the flow object tree
+An XML representation of the flow object tree
 <DT>
 <CODE>rtf</CODE>
 <CODE>rtf-95</CODE>
@@ -710,9 +728,9 @@ Value is a length.
 Specifies the separation between columns of a grid flow object.
 </DL>
 
-<h3><A NAME=backend-fot>SGML Flow Object Tree backend</A></h3>
+<h3><A NAME=backend-fot>XML Flow Object Tree backend</A></h3>
 <p>
-The DTD for the SGML generated is in <CODE>jade/fot.dtd</CODE>.
+The DTD for the XML generated is in <CODE>dsssl/fot.dtd</CODE>.
 <p>
 Characteristics declared with <code>declare-characteristic</code> are
 not reported.
@@ -771,7 +789,7 @@ problem</strong>.  Include all DTDs that you use, whether or not they
 are standard.  Also tell me what command line I should use, and what
 is incorrect about the behaviour of jade.  If the files are large
 package them up as a tar or zip file and upload them to
-ftp://ftp.jclark.com/incoming.
+<SAMP>ftp://ftp.jclark.com/incoming</SAMP>.
 <P>
 It is useful if you have a fix for a bug, but please don't delay
 sending in the bug while you work on a fix and don't send in a fix
@@ -784,13 +802,8 @@ Here are some ways you can contribute to Jade:
 <LI>
 Send in good bug reports.
 <LI>
-Write DSSSL style sheets for popular DTDs.
-People are already working on style sheets for HTML, TEI and Docbook.
-<LI>
 Write another backend.  I would like to see the following backends:
 <UL>
-<LI>
-MIF
 <LI>
 groff/troff
 <LI>

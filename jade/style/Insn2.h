@@ -100,18 +100,20 @@ private:
 
 class SetDefaultContentInsn : public Insn {
 public:
-  SetDefaultContentInsn(const CompoundFlowObj *, InsnPtr next);
+  SetDefaultContentInsn(const CompoundFlowObj *, const Location &loc, InsnPtr next);
   const Insn *execute(VM &vm) const;
 private:
+  Location loc_;
   InsnPtr next_;
   const CompoundFlowObj *flowObj_;
 };
 
 class MakeDefaultContentInsn : public Insn {
 public:
-  MakeDefaultContentInsn(InsnPtr next);
+  MakeDefaultContentInsn(const Location &loc, InsnPtr next);
   const Insn *execute(VM &vm) const;
 private:
+  Location loc_;
   InsnPtr next_;
 };
 

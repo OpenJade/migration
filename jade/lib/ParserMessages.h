@@ -485,223 +485,223 @@ struct ParserMessages {
   // 242
   static const MessageType1 grpgtcnt;
   // 243
-  static const MessageType0 minimizedStartTag;
+  static const MessageType0 unclosedStartTagShorttag;
   // 244
-  static const MessageType0 minimizedEndTag;
+  static const MessageType0 netEnablingStartTagShorttag;
   // 245
-  static const MessageType0 multipleDtds;
+  static const MessageType0 unclosedEndTagShorttag;
   // 246
-  static const MessageType0 afterDocumentElementEntityEnd;
+  static const MessageType0 multipleDtds;
   // 247
-  static const MessageType1 declarationAfterDocumentElement;
+  static const MessageType0 afterDocumentElementEntityEnd;
   // 248
-  static const MessageType0 characterReferenceAfterDocumentElement;
+  static const MessageType1 declarationAfterDocumentElement;
   // 249
-  static const MessageType0 entityReferenceAfterDocumentElement;
+  static const MessageType0 characterReferenceAfterDocumentElement;
   // 250
-  static const MessageType0 markedSectionAfterDocumentElement;
+  static const MessageType0 entityReferenceAfterDocumentElement;
   // 251
-  static const MessageType3 requiredElementExcluded;
+  static const MessageType0 markedSectionAfterDocumentElement;
   // 252
-  static const MessageType3 invalidExclusion;
+  static const MessageType3 requiredElementExcluded;
   // 253
-  static const MessageType0 attributeValueShorttag;
+  static const MessageType3 invalidExclusion;
   // 254
-  static const MessageType0 conrefNotation;
+  static const MessageType0 attributeValueShorttag;
   // 255
-  static const MessageType1 duplicateNotationDeclaration;
+  static const MessageType0 conrefNotation;
   // 256
+  static const MessageType1 duplicateNotationDeclaration;
+  // 257
   static const MessageType1L duplicateShortrefDeclaration;
-  // 258
-  static const MessageType1 duplicateDelimGeneral;
   // 259
-  static const MessageType1 idrefGrpcnt;
+  static const MessageType1 duplicateDelimGeneral;
   // 260
-  static const MessageType1 entityNameGrpcnt;
+  static const MessageType1 idrefGrpcnt;
   // 261
-  static const MessageType2 attsplen;
+  static const MessageType1 entityNameGrpcnt;
   // 262
-  static const MessageType1 duplicateDelimShortref;
+  static const MessageType2 attsplen;
   // 263
-  static const MessageType1 duplicateDelimShortrefSet;
+  static const MessageType1 duplicateDelimShortref;
   // 264
-  static const MessageType1 defaultEntityInAttribute;
+  static const MessageType1 duplicateDelimShortrefSet;
   // 265
-  static const MessageType1 defaultEntityReference;
+  static const MessageType1 defaultEntityInAttribute;
   // 266
-  static const MessageType2 mapDefaultEntity;
+  static const MessageType1 defaultEntityReference;
   // 267
-  static const MessageType1 noSuchDtd;
+  static const MessageType2 mapDefaultEntity;
   // 268
-  static const MessageType1 noLpdSubset;
+  static const MessageType1 noSuchDtd;
   // 269
-  static const MessageType0 assocElementDifferentAtts;
+  static const MessageType1 noLpdSubset;
   // 270
-  static const MessageType1 duplicateLinkSet;
+  static const MessageType0 assocElementDifferentAtts;
   // 271
-  static const MessageType0 emptyResultAttributeSpec;
+  static const MessageType1 duplicateLinkSet;
   // 272
-  static const MessageType1 noSuchSourceElement;
+  static const MessageType0 emptyResultAttributeSpec;
   // 273
-  static const MessageType1 noSuchResultElement;
+  static const MessageType1 noSuchSourceElement;
   // 274
-  static const MessageType0 documentEndLpdSubset;
+  static const MessageType1 noSuchResultElement;
   // 275
-  static const MessageType1 lpdSubsetDeclaration;
+  static const MessageType0 documentEndLpdSubset;
   // 276
-  static const MessageType0 idlinkDeclSimple;
+  static const MessageType1 lpdSubsetDeclaration;
   // 277
-  static const MessageType0 linkDeclSimple;
+  static const MessageType0 idlinkDeclSimple;
   // 278
-  static const MessageType1 simpleLinkAttlistElement;
+  static const MessageType0 linkDeclSimple;
   // 279
-  static const MessageType0 shortrefOnlyInBaseDtd;
+  static const MessageType1 simpleLinkAttlistElement;
   // 280
-  static const MessageType0 usemapOnlyInBaseDtd;
+  static const MessageType0 shortrefOnlyInBaseDtd;
   // 281
-  static const MessageType0 linkAttributeDefaultValue;
+  static const MessageType0 usemapOnlyInBaseDtd;
   // 282
-  static const MessageType0 linkAttributeDeclaredValue;
+  static const MessageType0 linkAttributeDefaultValue;
   // 283
-  static const MessageType0 simpleLinkFixedAttribute;
+  static const MessageType0 linkAttributeDeclaredValue;
   // 284
-  static const MessageType0 duplicateIdLinkSet;
+  static const MessageType0 simpleLinkFixedAttribute;
   // 285
-  static const MessageType1 noInitialLinkSet;
+  static const MessageType0 duplicateIdLinkSet;
   // 286
-  static const MessageType1 notationUndefinedSourceDtd;
+  static const MessageType1 noInitialLinkSet;
   // 287
-  static const MessageType0 simpleLinkResultNotImplied;
+  static const MessageType1 notationUndefinedSourceDtd;
   // 288
-  static const MessageType0 simpleLinkFeature;
+  static const MessageType0 simpleLinkResultNotImplied;
   // 289
-  static const MessageType0 implicitLinkFeature;
+  static const MessageType0 simpleLinkFeature;
   // 290
-  static const MessageType0 explicitLinkFeature;
+  static const MessageType0 implicitLinkFeature;
   // 291
-  static const MessageType0 lpdBeforeBaseDtd;
+  static const MessageType0 explicitLinkFeature;
   // 292
-  static const MessageType0 dtdAfterLpd;
+  static const MessageType0 lpdBeforeBaseDtd;
   // 293
-  static const MessageType1 unstableLpdGeneralEntity;
+  static const MessageType0 dtdAfterLpd;
   // 294
-  static const MessageType1 unstableLpdParameterEntity;
+  static const MessageType1 unstableLpdGeneralEntity;
   // 295
-  static const MessageType1 multipleIdLinkRuleAttribute;
+  static const MessageType1 unstableLpdParameterEntity;
   // 296
-  static const MessageType1 multipleLinkRuleAttribute;
+  static const MessageType1 multipleIdLinkRuleAttribute;
   // 297
-  static const MessageType2 uselinkBadLinkSet;
+  static const MessageType1 multipleLinkRuleAttribute;
   // 298
-  static const MessageType1 uselinkSimpleLpd;
+  static const MessageType2 uselinkBadLinkSet;
   // 299
-  static const MessageType1 uselinkBadLinkType;
+  static const MessageType1 uselinkSimpleLpd;
   // 300
-  static const MessageType1 duplicateDtdLpd;
+  static const MessageType1 uselinkBadLinkType;
   // 301
-  static const MessageType1 duplicateLpd;
+  static const MessageType1 duplicateDtdLpd;
   // 302
-  static const MessageType1 duplicateDtd;
+  static const MessageType1 duplicateLpd;
   // 303
-  static const MessageType1 undefinedLinkSet;
+  static const MessageType1 duplicateDtd;
   // 304
-  static const MessageType1 duplicateImpliedResult;
+  static const MessageType1 undefinedLinkSet;
   // 305
-  static const MessageType1 simpleLinkCount;
+  static const MessageType1 duplicateImpliedResult;
   // 306
-  static const MessageType0 duplicateExplicitChain;
+  static const MessageType1 simpleLinkCount;
   // 307
-  static const MessageType1 explicit1RequiresSourceTypeBase;
+  static const MessageType0 duplicateExplicitChain;
   // 308
-  static const MessageType0 oneImplicitLink;
+  static const MessageType1 explicit1RequiresSourceTypeBase;
   // 309
-  static const MessageType1 sorryLink;
+  static const MessageType0 oneImplicitLink;
   // 310
-  static const MessageType0 entityReferenceMissingName;
+  static const MessageType1 sorryLink;
   // 311
-  static const MessageType1 explicitNoRequiresSourceTypeBase;
+  static const MessageType0 entityReferenceMissingName;
   // 312
-  static const MessageType0 linkActivateTooLate;
+  static const MessageType1 explicitNoRequiresSourceTypeBase;
   // 313
-  static const MessageType0 pass2Ee;
+  static const MessageType0 linkActivateTooLate;
   // 314
-  static const MessageType2 idlinkElementType;
+  static const MessageType0 pass2Ee;
   // 315
-  static const MessageType0 datatagNotImplemented;
+  static const MessageType2 idlinkElementType;
   // 316
-  static const MessageType0 startTagMissingName;
+  static const MessageType0 datatagNotImplemented;
   // 317
-  static const MessageType0 endTagMissingName;
+  static const MessageType0 startTagMissingName;
   // 318
-  static const MessageType0 startTagGroupNet;
+  static const MessageType0 endTagMissingName;
   // 319
-  static const MessageType0 documentElementUndefined;
+  static const MessageType0 startTagGroupNet;
   // 320
-  static const MessageType0 badDefaultSgmlDecl;
+  static const MessageType0 documentElementUndefined;
   // 321
+  static const MessageType0 badDefaultSgmlDecl;
+  // 322
   static const MessageType1L nonExistentEntityRef;
-  // 323
-  static const MessageType0 pcdataUnreachable;
   // 324
-  static const MessageType0 sdRangeNotSingleChar;
+  static const MessageType0 pcdataUnreachable;
   // 325
-  static const MessageType0 sdInvalidRange;
+  static const MessageType0 sdRangeNotSingleChar;
   // 326
-  static const MessageType0 sdEmptyDelimiter;
+  static const MessageType0 sdInvalidRange;
   // 327
-  static const MessageType0 tooManyCharsMinimumLiteral;
+  static const MessageType0 sdEmptyDelimiter;
   // 328
-  static const MessageType1 defaultedEntityDefined;
+  static const MessageType0 tooManyCharsMinimumLiteral;
   // 329
-  static const MessageType0 unclosedStartTag;
+  static const MessageType1 defaultedEntityDefined;
   // 330
-  static const MessageType0 unclosedEndTag;
-  // 331
   static const MessageType0 emptyStartTag;
-  // 332
+  // 331
   static const MessageType0 emptyEndTag;
-  // 333
-  static const MessageType0 netStartTag;
-  // 334
-  static const MessageType0 nullEndTag;
-  // 335
+  // 332
   static const MessageType1 unusedMap;
-  // 336
+  // 333
   static const MessageType1 unusedParamEntity;
-  // 337
+  // 334
   static const MessageType1 cannotGenerateSystemIdPublic;
-  // 338
+  // 335
   static const MessageType1 cannotGenerateSystemIdGeneral;
-  // 339
+  // 336
   static const MessageType1 cannotGenerateSystemIdParameter;
-  // 340
+  // 337
   static const MessageType1 cannotGenerateSystemIdDoctype;
-  // 341
+  // 338
   static const MessageType1 cannotGenerateSystemIdLinktype;
-  // 342
+  // 339
   static const MessageType1 cannotGenerateSystemIdNotation;
-  // 343
+  // 340
   static const MessageType1 excludeIncludeSame;
-  // 344
+  // 341
   static const MessageType1 implyingDtd;
-  // 345
+  // 342
   static const MessageType1 afdrVersion;
-  // 346
+  // 343
   static const MessageType0 missingAfdrDecl;
-  // 347
+  // 344
   static const MessageType0 enrRequired;
-  // 348
+  // 345
   static const MessageType1 numericCharRefLiteralNonSgml;
-  // 349
+  // 346
   static const MessageType2 numericCharRefUnknownDesc;
-  // 350
+  // 347
   static const MessageType3 numericCharRefUnknownBase;
-  // 351
+  // 348
   static const MessageType1 numericCharRefBadInternal;
-  // 352
+  // 349
   static const MessageType1 numericCharRefNoInternal;
+  // 350
+  static const MessageType0 wwwRequired;
+  // 351
+  static const MessageType1 attributeTokenNotUnique;
+  // 352
+  static const MessageType1 hexNumberLength;
   // 353
-  static const MessageType0 netStartTagEndTag;
+  static const MessageType1 entityNameSyntax;
   // 354
   static const MessageType0 cdataContent;
   // 355
@@ -791,11 +791,39 @@ struct ParserMessages {
   // 397
   static const MessageType0 piMissingName;
   // 398
-  static const MessageType0 statusKeywordSpecS;
+  static const MessageType0 instanceStatusKeywordSpecS;
   // 399
   static const MessageType0 externalDataEntityRef;
   // 400
   static const MessageType0 attributeValueExternalEntityRef;
+  // 401
+  static const MessageType1 dataCharDelim;
+  // 402
+  static const MessageType0 explicitSgmlDecl;
+  // 403
+  static const MessageType0 internalSubsetMarkedSection;
+  // 404
+  static const MessageType0 nestcWithoutNet;
+  // 405
+  static const MessageType0 contentAsyncEntityRef;
+  // 406
+  static const MessageType0 immednetRequiresEmptynrm;
+  // 407
+  static const MessageType0 nonSgmlCharRef;
+  // 408
+  static const MessageType0 defaultEntityDecl;
+  // 409
+  static const MessageType0 internalSubsetPsParamEntityRef;
+  // 410
+  static const MessageType0 internalSubsetTsParamEntityRef;
+  // 411
+  static const MessageType0 internalSubsetLiteralParamEntityRef;
+  // 412
+  static const MessageType0 cannotGenerateSystemIdSgml;
+  // 413
+  static const MessageType1 sdTextClass;
+  // 414
+  static const MessageType0 sgmlDeclRefRequiresWww;
   // 1000
   static const MessageFragment delimStart;
   // 1001

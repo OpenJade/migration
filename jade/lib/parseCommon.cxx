@@ -51,7 +51,7 @@ Boolean Parser::parseProcessingInstruction()
 	if (!syntax().isNameCharacter(buf[i]))
 	  break;
     }
-    if (i == 0 || i >= buf.size() || !syntax().isS(buf[i]))
+    if (i == 0 || (i < buf.size() && !syntax().isS(buf[i])))
       message(ParserMessages::piMissingName);
   }
   noteMarkup();
@@ -129,10 +129,11 @@ Boolean Parser::parseLiteral(Mode litMode,
 	text.addChar(currentChar(), currentLocation());
       break;
     case tokenCroDigit:
+    case tokenHcroHexDigit:
       {
 	Char c;
 	Location loc;
-	if (!parseNumericCharRef(c, loc))
+	if (!parseNumericCharRef(token== tokenHcroHexDigit, c, loc))
 	  return 0;
 	Boolean isSgmlChar;
 	if (!translateNumericCharRef(c, isSgmlChar))
@@ -171,8 +172,12 @@ Boolean Parser::parseLiteral(Mode litMode,
       if (flags & literalDelimInfo)
 	text.addEndDelim(currentLocation(), token == tokenLita);
       goto done;
-    case tokenEroNameStart:
     case tokenPeroNameStart:
+      if (options().warnInternalSubsetLiteralParamEntityRef
+	  && inputLevel() == 1)
+	message(ParserMessages::internalSubsetLiteralParamEntityRef);
+      // fall through
+    case tokenEroNameStart:
       {
 	ConstPtr<Entity> entity;
 	Ptr<EntityOrigin> origin;
@@ -190,6 +195,11 @@ Boolean Parser::parseLiteral(Mode litMode,
     case tokenPeroGrpo:
       message(ParserMessages::peroGrpoProlog);
       break;
+    case tokenCharDelim:
+      message(ParserMessages::dataCharDelim,
+	      StringMessageArg(StringC(currentInput()->currentTokenStart(),
+			  	       currentInput()->currentTokenLength())));
+      // fall through
     case tokenChar:
       if (text.size() > reallyMaxLength && inputLevel() == startLevel
 	  && currentChar() == syntax().standardFunction(Syntax::fRE)) {
@@ -269,23 +279,39 @@ Boolean Parser::parseNamedCharRef()
   return 1;
 }
 
-Boolean Parser::parseNumericCharRef(Char &ch, Location &loc)
+Boolean Parser::parseNumericCharRef(Boolean isHex, Char &ch, Location &loc)
 {
   InputSource *in = currentInput();
   Location startLocation = currentLocation();
   in->discardInitial();
-  extendNumber(syntax().namelen(), ParserMessages::numberLength);
   Boolean valid = 1;
   Char c = 0;
-  const Char *lim = in->currentTokenEnd();
-  for (const Char *p = in->currentTokenStart(); p < lim; p++) {
-    int val = sd().digitWeight(*p);
-    if (c <= charMax/10 && (c *= 10) <= charMax - val)
-      c += val;
-    else {
-      message(ParserMessages::characterNumber, StringMessageArg(currentToken()));
-      valid = 0;
-      break;
+  if (isHex) {
+    extendHexNumber();
+    const Char *lim = in->currentTokenEnd();
+    for (const Char *p = in->currentTokenStart(); p < lim; p++) {
+      int val = sd().hexDigitWeight(*p);
+      if (c <= charMax/16 && (c *= 16) <= charMax - val)
+	c += val;
+      else {
+	message(ParserMessages::characterNumber, StringMessageArg(currentToken()));
+	valid = 0;
+	break;
+      }
+    }
+  }
+  else {
+    extendNumber(syntax().namelen(), ParserMessages::numberLength);
+    const Char *lim = in->currentTokenEnd();
+    for (const Char *p = in->currentTokenStart(); p < lim; p++) {
+      int val = sd().digitWeight(*p);
+      if (c <= charMax/10 && (c *= 10) <= charMax - val)
+	c += val;
+      else {
+	message(ParserMessages::characterNumber, StringMessageArg(currentToken()));
+	valid = 0;
+	break;
+      }
     }
   }
   if (valid && !sd().docCharsetDecl().charDeclared(c)) {
@@ -295,7 +321,7 @@ Boolean Parser::parseNumericCharRef(Char &ch, Location &loc)
   Owner<Markup> markupPtr;
   if (wantMarkup()) {
     markupPtr = new Markup;
-    markupPtr->addDelim(Syntax::dCRO);
+    markupPtr->addDelim(isHex ? Syntax::dHCRO : Syntax::dCRO);
     markupPtr->addNumber(in);
     switch (getToken(refMode)) {
     case tokenRefc:
@@ -338,6 +364,8 @@ Boolean Parser::parseNumericCharRef(Char &ch, Location &loc)
 Boolean Parser::translateNumericCharRef(Char &ch, Boolean &isSgmlChar)
 {
   if (sd().internalCharsetIsDocCharset()) {
+    if (options().warnNonSgmlCharRef && !syntax().isSgmlChar(ch))
+      message(ParserMessages::nonSgmlCharRef);
     isSgmlChar = 1;
     return 1;
   }
@@ -349,6 +377,8 @@ Boolean Parser::translateNumericCharRef(Char &ch, Boolean &isSgmlChar)
     StringC desc;
     if (sd().docCharsetDecl().getCharInfo(ch, pubid, type, n, desc)) {
       if (type == CharsetDeclRange::unused) {
+	if (options().warnNonSgmlCharRef)
+	  message(ParserMessages::nonSgmlCharRef);
 	isSgmlChar = 0;
 	return 1;
       }
@@ -452,11 +482,9 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
     if (entity.isNull()) {
       if (haveApplicableDtd()) {
 	if (!isParameter) {
-	  Boolean known;
-	  entity = createUndefinedEntity(name, startLocation, known);
-	  if (validate() || !known)
-	    message(ParserMessages::entityUndefined,
-		    StringMessageArg(name));
+	  entity = createUndefinedEntity(name, startLocation);
+	  message(ParserMessages::entityUndefined,
+		  StringMessageArg(name));
 	}
 	else 
 	  message(ParserMessages::parameterEntityUndefined,
@@ -542,7 +570,6 @@ void Parser::extendNameToken(size_t maxLength,
   in->endToken(length);
 }
 
-
 void Parser::extendNumber(size_t maxLength, const MessageType1 &tooLongMessage)
 {
   InputSource *in = currentInput();
@@ -551,6 +578,17 @@ void Parser::extendNumber(size_t maxLength, const MessageType1 &tooLongMessage)
     length++;
   if (length > maxLength)
     message(tooLongMessage, NumberMessageArg(maxLength));
+  in->endToken(length);
+}
+
+void Parser::extendHexNumber()
+{
+  InputSource *in = currentInput();
+  size_t length = in->currentTokenLength();
+  while (syntax().isHexDigit(in->tokenChar(messenger())))
+    length++;
+  if (length > syntax().namelen())
+    message(ParserMessages::hexNumberLength, NumberMessageArg(syntax().namelen()));
   in->endToken(length);
 }
 

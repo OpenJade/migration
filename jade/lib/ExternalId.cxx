@@ -176,6 +176,7 @@ const char *const PublicId::textClasses[] = {
   "LPD",
   "NONSGML",
   "NOTATION",
+  "SD",
   "SHORTREF",
   "SUBDOC",
   "SYNTAX",

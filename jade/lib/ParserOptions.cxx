@@ -17,18 +17,20 @@ ParserOptions::ParserOptions()
   omittag(1),
   rank(1),
   shorttag(1),
+  emptynrm(0),
   linkSimple(1000),
   linkImplicit(1),
   linkExplicit(1),
   concur(0),
   subdoc(99999999),
   formal(1),
+  typeValid(sgmlDeclTypeValid),
   shortref(1),
   errorIdref(1),
   errorSignificant(1),
   errorAfdr(1),
-  errorValid(1),
-  errorLpdNotation(0)
+  noUnclosedTag(0),
+  noNet(0)
 {
   for (int i = 0; i < nQuantity; i++)
     quantity[i] = 99999999;

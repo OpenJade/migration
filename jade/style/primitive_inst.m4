@@ -13,10 +13,10 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-__instantiate(ConstPtr<ElementPattern>)
-__instantiate(Ptr<ElementPattern>)
 __instantiate(ConstPtr<MapNodeListObj::Context>)
 __instantiate(Ptr<MapNodeListObj::Context>)
+__instantiate(Ptr<SelectElementsNodeListObj::PatternSet>)
+__instantiate(ConstPtr<SelectElementsNodeListObj::PatternSet>)
 
 #ifdef DSSSL_NAMESPACE
 }

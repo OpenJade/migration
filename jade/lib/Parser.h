@@ -76,7 +76,8 @@ private:
   void operator=(const Parser &); // undefined
   Boolean setStandardSyntax(Syntax &syn, const StandardSyntaxSpec &,
 			    const CharsetInfo &docCharset,
-			    CharSwitcher &);
+			    CharSwitcher &,
+			    Boolean www);
   Boolean addRefDelimShortref(Syntax &syntax,
 			      const CharsetInfo &syntaxCharset,
 			      const CharsetInfo &docCharset,
@@ -85,7 +86,7 @@ private:
 			     const CharsetInfo &syntaxCharset,
 			     const CharsetInfo &docCharset,
 			     CharSwitcher &switcher);
-  void setRefNames(Syntax &syntax, const CharsetInfo &docCharset);
+  void setRefNames(Syntax &syntax, const CharsetInfo &docCharset, Boolean www);
 
   void giveUp();
   void compileSdModes();
@@ -106,6 +107,7 @@ private:
   void doContent();
   void extendNameToken(size_t, const MessageType1 &);
   void extendNumber(size_t, const MessageType1 &);
+  void extendHexNumber();
   void extendData();
   void extendS();
   void extendContentS();
@@ -127,6 +129,7 @@ private:
   void emptyCommentDecl();
   Boolean parseExternalId(const AllowedParams &,
 			  const AllowedParams &,
+			  Boolean,
 			  unsigned,
 			  Param &,
 			  ExternalId &);
@@ -187,7 +190,7 @@ private:
   ContentToken::OccurrenceIndicator getOccurrenceIndicator(Mode);
   Boolean parseComment(Mode);
   Boolean parseNamedCharRef();
-  Boolean parseNumericCharRef(Char &, Location &);
+  Boolean parseNumericCharRef(Boolean isHex, Char &, Location &);
   Boolean translateNumericCharRef(Char &ch, Boolean &isSgmlChar);
   Boolean parseDeclarationName(Syntax::ReservedName *, Boolean allowAfdr = 0);
   void paramInvalidToken(Token, const AllowedParams &);
@@ -248,13 +251,18 @@ private:
 				  unsigned &specLength,
 				  Ptr<AttributeDefinitionList> &newAttDefList);
 
-  void parseEndTag();
+  EndElementEvent *parseEndTag();
   void parseEndTagClose();
   void parseEmptyEndTag();
   void parseNullEndTag();
   void endAllElements();
-  void acceptEndTag(const ElementType *, EndElementEvent *);
+  void acceptEndTag(EndElementEvent *);
+  void endTagEmptyElement(const ElementType *,
+			  Boolean netEnabling,
+			  Boolean included,
+			  const Location &startLoc);
   void implyCurrentElementEnd(const Location &);
+  void implyEmptyElementEnd(const ElementType *, Boolean included, const Location &);
   void maybeDefineEntity(const Ptr<Entity> &entity);
   Notation *lookupCreateNotation(const StringC &name);
   Boolean parseExternalEntity(StringC &name,
@@ -281,6 +289,7 @@ private:
   Boolean scanForSgmlDecl(const CharsetInfo &initCharset);
   void findMissingMinimum(const CharsetInfo &charset, ISet<WideChar> &);
   Boolean parseSgmlDecl();
+  Boolean sdParseSgmlDeclRef(SdBuilder &, SdParam &, ExternalId &);
   Boolean sdParseDocumentCharset(SdBuilder &sdBuilder, SdParam &parm);
   Boolean sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm);
   Boolean sdParseScope(SdBuilder &sdBuilder, SdParam &parm);
@@ -293,10 +302,14 @@ private:
   Boolean sdParseDelim(SdBuilder &sdBuilder, SdParam &parm);
   Boolean sdParseNames(SdBuilder &sdBuilder, SdParam &parm);
   Boolean sdParseQuantity(SdBuilder &sdBuilder, SdParam &parm);
+  Boolean sdParseEntities(SdBuilder &sdBuilder, SdParam &parm);
   Boolean sdParseFeatures(SdBuilder &sd, SdParam &parm);
   Boolean sdParseAppinfo(SdBuilder &sd, SdParam &parm);
+  Boolean sdParseSeealso(SdBuilder &sd, SdParam &parm);
+  void requireWWW(SdBuilder &sdBuilder);
   Boolean parseSdParam(const AllowedSdParams &allow, SdParam &);
   Boolean parseSdParamLiteral(Boolean lita, String<SyntaxChar> &str);
+  Boolean parseSdSystemIdentifier(Boolean lita, Text &);
   Boolean stringToNumber(const Char *s, size_t length, unsigned long &);
   void sdParamConvertToLiteral(SdParam &parm);
   void sdParamInvalidToken(Token token, const AllowedSdParams &);
@@ -388,6 +401,7 @@ private:
   unsigned paramsSubdocLevel(const SgmlParser::Params &);
   void addCommonAttributes(Dtd &dtd);
   Boolean parseAfdrDecl();
+  void setSdOverrides(Sd &sd);
 };
 
 #ifdef SP_NAMESPACE

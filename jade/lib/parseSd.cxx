@@ -1,4 +1,4 @@
-// Copyright (c) 1994, 1995 James Clark
+// Copyright (c) 1994, 1995, 1997 James Clark
 // See the file COPYING for copying permission.
 
 #include "splib.h"
@@ -46,7 +46,9 @@ struct SdBuilder {
   CharSwitcher switcher;
   Boolean externalSyntax;
   Boolean enr;
+  Boolean www;
   Boolean valid;
+  Boolean external;
   IList<SdFormalError> formalErrorList;
 };
 
@@ -71,6 +73,7 @@ struct SdParam {
     capacityName,
     name,
     paramLiteral,
+    systemIdentifier,
     generalDelimiterName,
     referenceReservedName,
     quantityName,
@@ -164,8 +167,11 @@ void Parser::doInit()
   }
   Boolean found = 0;
   StringC systemId;
-  if (scanForSgmlDecl(initCharset))
+  if (scanForSgmlDecl(initCharset)) {
+    if (options().warnExplicitSgmlDecl)
+      message(ParserMessages::explicitSgmlDecl);
     found = 1;
+  }
   else {
     currentInput()->ungetToken();
     if (entityCatalog().sgmlDecl(initCharset, messenger(), systemId)) {
@@ -198,7 +204,7 @@ void Parser::doInit()
     }
     Syntax *syntaxp = new Syntax(sd());
     CharSwitcher switcher;
-    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher)) {
+    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher, 0)) {
       giveUp();
       return;
     }
@@ -253,7 +259,7 @@ Boolean Parser::implySgmlDecl()
   else
     spec = &coreSyntax;
   CharSwitcher switcher;
-  if (!setStandardSyntax(*syntaxp, *spec, sd().internalCharset(), switcher))
+  if (!setStandardSyntax(*syntaxp, *spec, sd().internalCharset(), switcher, 0))
     return 0;
   syntaxp->implySgmlChar(sd());
   for (int i = 0; i < Syntax::nQuantity; i++)
@@ -265,7 +271,8 @@ Boolean Parser::implySgmlDecl()
 Boolean Parser::setStandardSyntax(Syntax &syn,
 				  const StandardSyntaxSpec &spec,
 				  const CharsetInfo &internalCharset,
-				  CharSwitcher &switcher)
+				  CharSwitcher &switcher,
+				  Boolean www)
 {
   static UnivCharsetDesc::Range syntaxCharsetRanges[] = {
     { 0, 128, 0 },
@@ -343,7 +350,7 @@ Boolean Parser::setStandardSyntax(Syntax &syn,
   syn.setNamecaseEntity(0);
   if (!setRefDelimGeneral(syn, syntaxCharset, internalCharset, switcher))
     valid = 0;
-  setRefNames(syn, internalCharset);
+  setRefNames(syn, internalCharset, www);
   syn.enterStandardFunctionNames();
   if (spec.shortref
       && !addRefDelimShortref(syn, syntaxCharset, internalCharset, switcher))
@@ -369,6 +376,7 @@ Boolean Parser::setRefDelimGeneral(Syntax &syntax,
     { 60, 47 },
     { 41 },
     { 40 },
+    { 0 }, // HCRO
     { 34 },
     { 39 },
     { 62 },
@@ -376,6 +384,7 @@ Boolean Parser::setRefDelimGeneral(Syntax &syntax,
     { 45 },
     { 93, 93 },
     { 47 },
+    { 47 }, // NESTC
     { 63 },
     { 124 },
     { 37 },
@@ -419,14 +428,17 @@ Boolean Parser::setRefDelimGeneral(Syntax &syntax,
   return valid;
 }
 
-void Parser::setRefNames(Syntax &syntax, const CharsetInfo &internalCharset)
+void Parser::setRefNames(Syntax &syntax, const CharsetInfo &internalCharset,
+			 Boolean www)
 {
   static const char *const referenceNames[] = {
+    "ALL",
     "ANY",
     "ATTLIST",
     "CDATA",
     "CONREF",
     "CURRENT",
+    "DATA",
     "DEFAULT",
     "DOCTYPE",
     "ELEMENT",
@@ -440,6 +452,7 @@ void Parser::setRefNames(Syntax &syntax, const CharsetInfo &internalCharset)
     "IDREF",
     "IDREFS",
     "IGNORE",
+    "IMPLICIT",
     "IMPLIED",
     "INCLUDE",
     "INITIAL",
@@ -478,16 +491,29 @@ void Parser::setRefNames(Syntax &syntax, const CharsetInfo &internalCharset)
     "USELINK",
     "USEMAP"
     };
-
-  int i;
-  for (i = 0; i < Syntax::nNames; i++) {
-    StringC docName(internalCharset.execToDesc(referenceNames[i]));
-    Syntax::ReservedName tem;
-    if (syntax.lookupReservedName(docName, &tem))
-      message(ParserMessages::nameReferenceReservedName,
-	      StringMessageArg(docName));
-    if (syntax.reservedName(Syntax::ReservedName(i)).size() == 0)
-      syntax.setName(i, docName);
+  for (int i = 0; i < Syntax::nNames; i++) {
+    switch (i) {
+    case Syntax::rDATA:
+    case Syntax::rIMPLICIT:
+      if (!www)
+	break;
+      // fall through
+    case Syntax::rALL:
+      if (!www && options().errorAfdr)
+	break;
+      // fall through
+    default:
+      {
+	StringC docName(internalCharset.execToDesc(referenceNames[i]));
+	Syntax::ReservedName tem;
+        if (syntax.lookupReservedName(docName, &tem))
+	  message(ParserMessages::nameReferenceReservedName,
+	          StringMessageArg(docName));
+        if (syntax.reservedName(Syntax::ReservedName(i)).size() == 0)
+	  syntax.setName(i, docName);
+        break;
+      }
+    }
   }
 }
 
@@ -652,16 +678,52 @@ Boolean Parser::parseSgmlDecl()
   SdParam parm;
   SdBuilder sdBuilder;
 
-  if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
+  if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral, SdParam::name), parm))
     return 0;
+  if (parm.type == SdParam::name) {
+    sdBuilder.external = 1;
+    Location loc(currentLocation());
+    StringC name;
+    parm.token.swap(name);
+    ExternalId externalId;
+    if (!sdParseSgmlDeclRef(sdBuilder, parm, externalId))
+      return 0;
+    ExternalEntity *entity
+      = new ExternalTextEntity(name, EntityDecl::sgml, loc, externalId);
+    ConstPtr<Entity> entityPtr(entity);
+    entity->generateSystemId(*this);
+    if (entity->externalId().effectiveSystemId().size() == 0) {
+      message(ParserMessages::cannotGenerateSystemIdSgml);
+      return 0;
+    }
+    Ptr<EntityOrigin> origin(EntityOrigin::make(internalAllocator(), entityPtr, loc));
+    if (currentMarkup())
+      currentMarkup()->addEntityStart(origin);
+    pushInput(entityManager().open(entity->externalId().effectiveSystemId(),
+		                   sd().docCharset(),
+				   origin.pointer(),
+				   0,
+				   messenger()));
+    if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
+      return 0;
+  }
   StringC version(sd().execToInternal("ISO 8879:1986"));
   StringC enrVersion(sd().execToInternal("ISO 8879:1986 (ENR)"));
+  StringC wwwVersion(sd().execToInternal("ISO 8879:1986 (WWW)"));
   if (parm.literalText.string() == enrVersion)
     sdBuilder.enr = 1;
+  else if (parm.literalText.string() == wwwVersion) {
+    sdBuilder.enr = 1;
+    sdBuilder.www = 1;
+  }
   else if (parm.literalText.string() != version)
     message(ParserMessages::standardVersion,
 	    StringMessageArg(parm.literalText.string()));
+  if (sdBuilder.external && !sdBuilder.www)
+    message(ParserMessages::sgmlDeclRefRequiresWww);
   sdBuilder.sd = new Sd(entityManagerPtr());
+  if (sdBuilder.www)
+    sdBuilder.sd->setWww(1);
   typedef Boolean (Parser::*SdParser)(SdBuilder &, SdParam &);
   static SdParser parsers[] = {
     &Parser::sdParseDocumentCharset,
@@ -670,6 +732,7 @@ Boolean Parser::parseSgmlDecl()
     &Parser::sdParseSyntax,
     &Parser::sdParseFeatures,
     &Parser::sdParseAppinfo,
+    &Parser::sdParseSeealso,
   };
   for (size_t i = 0; i < SIZEOF(parsers); i++) {
     if (!(this->*(parsers[i]))(sdBuilder, parm))
@@ -677,8 +740,7 @@ Boolean Parser::parseSgmlDecl()
     if (!sdBuilder.valid)
       return 0;
   }
-  if (!parseSdParam(AllowedSdParams(SdParam::mdc), parm))
-    return 0;
+  setSdOverrides(*sdBuilder.sd);
   if (sdBuilder.sd->formal()) {
     while (!sdBuilder.formalErrorList.empty()) {
       SdFormalError *p = sdBuilder.formalErrorList.get();
@@ -692,7 +754,7 @@ Boolean Parser::parseSgmlDecl()
   if (sdBuilder.sd->scopeInstance()) {
     Syntax *proSyntax = new Syntax(sd());
     CharSwitcher switcher;
-    setStandardSyntax(*proSyntax, refSyntax, sd().internalCharset(), switcher);
+    setStandardSyntax(*proSyntax, refSyntax, sd().internalCharset(), switcher, sdBuilder.www);
     proSyntax->setSgmlChar(*sdBuilder.syntax->charSet(Syntax::sgmlChar));
     ISet<WideChar> invalidSgmlChar;
     proSyntax->checkSgmlChar(*sdBuilder.sd,
@@ -712,6 +774,38 @@ Boolean Parser::parseSgmlDecl()
   if (syntax().multicode())
     currentInput()->setMarkupScanTable(syntax().markupScanTable());
   return 1;
+}
+
+Boolean Parser::sdParseSgmlDeclRef(SdBuilder &sdBuilder, SdParam &parm,
+				   ExternalId &id)
+{
+  id.setLocation(currentLocation());
+  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rSYSTEM,
+                                    SdParam::reservedName + Sd::rPUBLIC,
+				    SdParam::mdc),
+		    parm))
+    return 0;
+  if (parm.type == SdParam::mdc)
+    return 1;
+  if (parm.type == SdParam::reservedName + Sd::rPUBLIC) {
+    if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
+      return 0;
+    const MessageType1 *err;
+    PublicId::TextClass textClass;
+    if (!id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(), err))
+      sdBuilder.addFormalError(currentLocation(), *err, id.publicId()->string());
+    else if (id.publicId()->getTextClass(textClass)
+	     && textClass != PublicId::SD)
+      sdBuilder.addFormalError(currentLocation(),
+			       ParserMessages::sdTextClass,
+			       id.publicId()->string());
+  }
+  if (!parseSdParam(AllowedSdParams(SdParam::systemIdentifier, SdParam::mdc), parm))
+    return 0;
+  if (parm.type == SdParam::mdc)
+    return 1;
+  id.setSystem(parm.literalText);
+  return parseSdParam(AllowedSdParams(SdParam::mdc), parm);
 }
 
 Boolean Parser::sdParseDocumentCharset(SdBuilder &sdBuilder, SdParam &parm)
@@ -1000,8 +1094,12 @@ UnivChar Parser::charNameToUniv(Sd &sd, const StringC &name)
 
 Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
 {
-  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rPUBLIC,
-				    SdParam::reservedName + Sd::rSGMLREF),
+  if (!parseSdParam(sdBuilder.www
+                    ? AllowedSdParams(SdParam::reservedName + Sd::rNONE,
+				      SdParam::reservedName + Sd::rPUBLIC,
+                                      SdParam::reservedName + Sd::rSGMLREF)
+		    : AllowedSdParams(SdParam::reservedName + Sd::rPUBLIC,
+				      SdParam::reservedName + Sd::rSGMLREF),
 		    parm))
     return 0;
 #if _MSC_VER == 1100
@@ -1011,6 +1109,9 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
   Boolean
 #endif
     pushed = 0;
+  if (parm.type == SdParam::reservedName + Sd::rNONE)
+    return parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rSCOPE),
+			parm);
   if (parm.type == SdParam::reservedName + Sd::rPUBLIC) {
     if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
       return 0;
@@ -1173,7 +1274,8 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
       if (!setStandardSyntax(*sdBuilder.syntax,
 			     *spec,
 			     sdBuilder.sd->internalCharset(),
-			     sdBuilder.switcher))
+			     sdBuilder.switcher,
+			     sdBuilder.www))
 	sdBuilder.valid = 0;
     }
     else {
@@ -1847,6 +1949,14 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
     if (delimGeneralSpecified[delimGeneral])
       message(ParserMessages::duplicateDelimGeneral,
 	      StringMessageArg(sd().generalDelimiterName(delimGeneral)));
+    switch (delimGeneral) {
+    case Syntax::dHCRO:
+    case Syntax::dNESTC:
+      requireWWW(sdBuilder);
+      break;
+    default:
+      break;
+    }
     if (!parseSdParam(sdBuilder.externalSyntax
 		      ? AllowedSdParams(SdParam::paramLiteral,
 					SdParam::number)
@@ -1869,6 +1979,10 @@ Boolean Parser::sdParseDelim(SdBuilder &sdBuilder, SdParam &parm)
     }
     delimGeneralSpecified[delimGeneral] = 1;
   }
+  if (sdBuilder.syntax->delimGeneral(Syntax::dNET).size()
+      && !sdBuilder.syntax->delimGeneral(Syntax::dNESTC).size())
+    sdBuilder.syntax->setDelimGeneral(Syntax::dNESTC,
+				      sdBuilder.syntax->delimGeneral(Syntax::dNET));
   if (!setRefDelimGeneral(*sdBuilder.syntax,
 			  sdBuilder.syntaxCharset,
 			  sdBuilder.sd->internalCharset(),
@@ -1975,6 +2089,15 @@ Boolean Parser::sdParseNames(SdBuilder &sdBuilder, SdParam &parm)
     if (parm.type == SdParam::reservedName + Sd::rQUANTITY)
       break;
     Syntax::ReservedName reservedName = parm.reservedNameIndex;
+    switch (reservedName) {
+    case Syntax::rALL:
+    case Syntax::rDATA:
+    case Syntax::rIMPLICIT:
+      requireWWW(sdBuilder);
+      break;
+    default:
+      break;
+    }
     if (!parseSdParam(sdBuilder.externalSyntax
 		      ? AllowedSdParams(SdParam::name, SdParam::paramLiteral)
 		      : AllowedSdParams(SdParam::name),
@@ -2017,7 +2140,7 @@ Boolean Parser::sdParseNames(SdBuilder &sdBuilder, SdParam &parm)
       }
     }
   }
-  setRefNames(*sdBuilder.syntax, sdBuilder.sd->internalCharset());
+  setRefNames(*sdBuilder.syntax, sdBuilder.sd->internalCharset(), sdBuilder.www);
   static Syntax::ReservedName functionNameIndex[3] = {
     Syntax::rRE, Syntax::rRS, Syntax::rSPACE
   };
@@ -2034,28 +2157,85 @@ Boolean Parser::sdParseNames(SdBuilder &sdBuilder, SdParam &parm)
 
 Boolean Parser::sdParseQuantity(SdBuilder &sdBuilder, SdParam &parm)
 {
-  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rSGMLREF),
+  if (!parseSdParam(sdBuilder.www
+                    ? AllowedSdParams(SdParam::reservedName + Sd::rNONE,
+                                      SdParam::reservedName + Sd::rSGMLREF)
+		    : AllowedSdParams(SdParam::reservedName + Sd::rSGMLREF),
 		    parm))
     return 0;
-  for (;;) {
-    int final = (sdBuilder.externalSyntax
-		 ? int(SdParam::eE)
-		 : SdParam::reservedName + Sd::rFEATURES);
-    if (!parseSdParam(AllowedSdParams(SdParam::quantityName, final), parm))
+  int final = (sdBuilder.externalSyntax
+	       ? int(SdParam::eE)
+	       : SdParam::reservedName + Sd::rFEATURES);
+  if (parm.type == SdParam::reservedName + Sd::rNONE) {
+    for (int i = 0; i < Syntax::nQuantity; i++) {
+      if (i != Syntax::qNORMSEP)
+        sdBuilder.syntax->setQuantity(Syntax::Quantity(i), Syntax::unlimited);
+    }
+    if (!parseSdParam(AllowedSdParams(final, SdParam::reservedName + Sd::rENTITIES), parm))
       return 0;
-    if (parm.type != SdParam::quantityName)
+  }
+  else {
+    for (;;) {
+      if (!parseSdParam(sdBuilder.www
+  		        ? AllowedSdParams(SdParam::quantityName,
+					  final,
+					  SdParam::reservedName + Sd::rENTITIES)
+		        : AllowedSdParams(SdParam::quantityName, final),
+		        parm))
+        return 0;
+      if (parm.type != SdParam::quantityName)
+        break;
+      Syntax::Quantity quantity = parm.quantityIndex;
+      if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
+	return 0;
+      sdBuilder.syntax->setQuantity(quantity, parm.n);
+    }
+    if (sdBuilder.sd->scopeInstance()) {
+      for (int i = 0; i < Syntax::nQuantity; i++)
+        if (sdBuilder.syntax->quantity(Syntax::Quantity(i))
+	    < syntax().quantity(Syntax::Quantity(i)))
+	   message(ParserMessages::scopeInstanceQuantity,
+		   StringMessageArg(sd().quantityName(Syntax::Quantity(i))));
+    }
+  }
+  if (parm.type == SdParam::reservedName + Sd::rENTITIES)
+    return sdParseEntities(sdBuilder, parm);
+  else
+    return 1;
+}
+
+Boolean Parser::sdParseEntities(SdBuilder &sdBuilder, SdParam &parm)
+{
+  int final = (sdBuilder.externalSyntax
+	       ? int(SdParam::eE)
+	       : SdParam::reservedName + Sd::rFEATURES);
+  for (;;) {
+    if (!parseSdParam(AllowedSdParams(final, SdParam::paramLiteral), parm))
+      return 0;
+    if (parm.type != SdParam::paramLiteral)
       break;
-    Syntax::Quantity quantity = parm.quantityIndex;
+    StringC name;
+    if (!translateSyntax(sdBuilder, parm.paramLiteralText, name))
+      name.resize(0);
+    else if (name.size() == 0
+	     || !sdBuilder.syntax->isNameStartCharacter(name[0])) {
+      message(ParserMessages::entityNameSyntax, StringMessageArg(name));
+      name.resize(0);
+    }
+    else {
+      // Check that its a valid name in the declared syntax
+      for (size_t i = 1; i < name.size(); i++)
+	if (!sdBuilder.syntax->isNameCharacter(name[i])) {
+	  message(ParserMessages::entityNameSyntax, StringMessageArg(name));
+	  name.resize(0);
+	  break;
+	}
+    }
     if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
       return 0;
-    sdBuilder.syntax->setQuantity(quantity, parm.n);
-  }
-  if (sdBuilder.sd->scopeInstance()) {
-    for (int i = 0; i < Syntax::nQuantity; i++)
-      if (sdBuilder.syntax->quantity(Syntax::Quantity(i))
-	  < syntax().quantity(Syntax::Quantity(i)))
-	message(ParserMessages::scopeInstanceQuantity,
-		StringMessageArg(sd().quantityName(Syntax::Quantity(i))));
+    Char c;
+    if (translateSyntax(sdBuilder, parm.n, c) && name.size())
+      sdBuilder.syntax->addEntity(name, c);
   }
   return 1;
 }
@@ -2067,7 +2247,8 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
     enum {
       none,
       boolean,
-      number
+      number,
+      netenabl
     } arg;
   };
   static FeatureInfo features[] = {
@@ -2075,7 +2256,25 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
     { Sd::rDATATAG, FeatureInfo::boolean },
     { Sd::rOMITTAG, FeatureInfo::boolean },
     { Sd::rRANK, FeatureInfo::boolean },
-    { Sd::rSHORTTAG, FeatureInfo::boolean },
+    { Sd::rSHORTTAG, FeatureInfo::none },
+    { Sd::rSTARTTAG, FeatureInfo::none },
+    { Sd::rEMPTY, FeatureInfo::boolean },
+    { Sd::rUNCLOSED, FeatureInfo::boolean },
+    { Sd::rNETENABL, FeatureInfo::netenabl },
+    { Sd::rENDTAG, FeatureInfo::none },
+    { Sd::rEMPTY, FeatureInfo::boolean },
+    { Sd::rUNCLOSED, FeatureInfo::boolean },
+    { Sd::rATTRIB, FeatureInfo::none },
+    { Sd::rDEFAULT, FeatureInfo::boolean },
+    { Sd::rOMITNAME, FeatureInfo::boolean },
+    { Sd::rVALUE, FeatureInfo::boolean },
+    { Sd::rEMPTYNRM, FeatureInfo::boolean },
+    { Sd::rIMPLYDEF, FeatureInfo::none },
+    { Sd::rATTLIST, FeatureInfo::boolean },
+    { Sd::rDOCTYPE, FeatureInfo::boolean },
+    { Sd::rELEMENT, FeatureInfo::boolean },
+    { Sd::rENTITY, FeatureInfo::boolean },
+    { Sd::rNOTATION, FeatureInfo::boolean },
     { Sd::rLINK, FeatureInfo::none },
     { Sd::rSIMPLE, FeatureInfo::number },
     { Sd::rIMPLICIT, FeatureInfo::boolean },
@@ -2083,49 +2282,169 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
     { Sd::rOTHER, FeatureInfo::none },
     { Sd::rCONCUR, FeatureInfo::number },
     { Sd::rSUBDOC, FeatureInfo::number },
-    { Sd::rFORMAL, FeatureInfo::boolean }
+    { Sd::rFORMAL, FeatureInfo::boolean },
+    { Sd::rURN, FeatureInfo::boolean },
+    { Sd::rKEEPRSRE, FeatureInfo::boolean },
+    { Sd::rVALIDITY, FeatureInfo::none },
   };
   int booleanFeature = 0;
   int numberFeature = 0;
   for (size_t i = 0; i < SIZEOF(features); i++) {
-    if (!parseSdParam(AllowedSdParams(SdParam::reservedName
-				      + features[i].name), parm))
-      return 0;
-    if (features[i].arg != FeatureInfo::none) {
+    switch (features[i].name) {
+    case Sd::rSTARTTAG:
+      // SHORTTAG
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rSTARTTAG,
+					SdParam::reservedName + Sd::rNO,
+					SdParam::reservedName + Sd::rYES),
+			parm))
+	return 0;
+      if (parm.type == SdParam::reservedName + Sd::rSTARTTAG)
+	break;
+      sdBuilder.sd->setShorttag(parm.type == SdParam::reservedName + Sd::rYES);
+      while (features[++i].name != Sd::rEMPTYNRM)
+	if (features[i].arg == FeatureInfo::boolean)
+	  booleanFeature++;
+      // fall through
+    case Sd::rEMPTYNRM:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName
+				        + features[i].name,
+				        SdParam::reservedName
+				        + features[i + 7].name), parm))
+	return 0;
+      if (parm.type == SdParam::reservedName + features[i].name)
+	requireWWW(sdBuilder);
+      else {
+	booleanFeature += 6;
+	i += 7;
+      }
+      break;
+    case Sd::rURN:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + features[i].name,
+	                                SdParam::reservedName + Sd::rAPPINFO), parm))
+	return 0;
+      if (parm.type == SdParam::reservedName + Sd::rAPPINFO)
+	return 1;
+      requireWWW(sdBuilder);
+      break;
+    default:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName
+				        + features[i].name), parm))
+	return 0;
+      break;
+    }
+    switch (features[i].arg) {
+    case FeatureInfo::number:
       if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
 					SdParam::reservedName + Sd::rYES),
 			parm))
 	return 0;
-#if 0
-      if (features[i].name == Sd::rDATATAG
-	  && parm.type == (SdParam::reservedName + Sd::rYES))
-	message(ParserMessages::datatagNotImplemented);
-#endif
-      if (features[i].arg == FeatureInfo::number) {
-	if (parm.type == SdParam::reservedName + Sd::rYES) {
-	  if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
-	    return 0;
-	  sdBuilder.sd->setNumberFeature(Sd::NumberFeature(numberFeature++),
-					 parm.n);
-	}
-	else
-	  sdBuilder.sd->setNumberFeature(Sd::NumberFeature(numberFeature++),
-					 0);
+      if (parm.type == SdParam::reservedName + Sd::rYES) {
+	if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
+	  return 0;
+	sdBuilder.sd->setNumberFeature(Sd::NumberFeature(numberFeature++),
+				       parm.n);
       }
       else
-	  sdBuilder.sd->setBooleanFeature(Sd::BooleanFeature(booleanFeature++),
-					  parm.type == (SdParam::reservedName
-							+ Sd::rYES));
+	sdBuilder.sd->setNumberFeature(Sd::NumberFeature(numberFeature++),
+				       0);
+      break;
+    case FeatureInfo::netenabl:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
+					SdParam::reservedName + Sd::rIMMEDNET,
+					SdParam::reservedName + Sd::rALL),
+			parm))
+	return 0;
+      switch (parm.type) {
+      case SdParam::reservedName + Sd::rNO:
+	sdBuilder.sd->setStartTagNetEnable(Sd::netEnableNo);
+	break;
+      case SdParam::reservedName + Sd::rIMMEDNET:
+	sdBuilder.sd->setStartTagNetEnable(Sd::netEnableImmednet);
+	break;
+      case SdParam::reservedName + Sd::rALL:
+	sdBuilder.sd->setStartTagNetEnable(Sd::netEnableAll);
+	break;
+      }
+      break;
+    case FeatureInfo::boolean:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
+					SdParam::reservedName + Sd::rYES),
+			parm))
+	return 0;
+      switch (features[i].name) {
+#if 0
+      case Sd::rDATATAG:
+	if (parm.type == SdParam::reservedName + Sd::rYES)
+	  message(ParserMessages::datatagNotImplemented);
+	break;
+#endif
+      case Sd::rEMPTYNRM:
+	if (parm.type == SdParam::reservedName + Sd::rNO
+	    && sdBuilder.sd->startTagNetEnable() == Sd::netEnableImmednet) {
+	  message(ParserMessages::immednetRequiresEmptynrm);
+	  sdBuilder.valid = 0;
+	}
+	break;
+      }
+      sdBuilder.sd->setBooleanFeature(Sd::BooleanFeature(booleanFeature++),
+				      parm.type == (SdParam::reservedName
+						    + Sd::rYES));
+      break;
     }
   }
-  return 1;
+  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNOASSERT,
+                                    SdParam::reservedName + Sd::rTYPE),
+		    parm))
+    return 0;
+  switch (parm.type) {
+  case SdParam::reservedName + Sd::rNOASSERT:
+    sdBuilder.sd->setTypeValid(0);
+    break;
+  case SdParam::reservedName + Sd::rTYPE:
+    sdBuilder.sd->setTypeValid(1);
+    break;
+  }
+  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rENTITIES), parm))
+    return 0;
+  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNOASSERT,
+                                    SdParam::reservedName + Sd::rREF),
+		    parm))
+    return 0;
+  if (parm.type == SdParam::reservedName + Sd::rNOASSERT) {
+    sdBuilder.sd->setIntegrallyStored(0);
+    sdBuilder.sd->setEntityRef(Sd::entityRefAny);
+  }
+  else {
+    if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNONE,
+                                      SdParam::reservedName + Sd::rINTERNAL,
+                                      SdParam::reservedName + Sd::rANY),
+		      parm))
+      return 0;
+    switch (parm.type) {
+    case SdParam::reservedName + Sd::rNONE:
+      sdBuilder.sd->setEntityRef(Sd::entityRefNone);
+      break;
+    case SdParam::reservedName + Sd::rINTERNAL:
+      sdBuilder.sd->setEntityRef(Sd::entityRefInternal);
+      break;
+    case SdParam::reservedName + Sd::rANY:
+      sdBuilder.sd->setEntityRef(Sd::entityRefAny);
+      break;
+    }
+    if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rINTEGRAL), parm))
+      return 0;
+    if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
+	                              SdParam::reservedName + Sd::rYES),
+		      parm))
+      return 0;
+    sdBuilder.sd->setIntegrallyStored(parm.type == (SdParam::reservedName + Sd::rYES));
+  }
+  return parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rAPPINFO),
+		      parm);
 }
 
 Boolean Parser::sdParseAppinfo(SdBuilder &, SdParam &parm)
 {
-  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rAPPINFO),
-		    parm))
-    return 0;
   Location location(currentLocation());
   if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNONE,
 				    SdParam::minimumLiteral),
@@ -2137,6 +2456,26 @@ Boolean Parser::sdParseAppinfo(SdBuilder &, SdParam &parm)
   else
     event = new (eventAllocator()) AppinfoEvent(location);
   eventHandler().appinfo(event);
+  return 1;
+}
+
+Boolean Parser::sdParseSeealso(SdBuilder &sdBuilder, SdParam &parm)
+{
+  SdParam::Type final = sdBuilder.external ? SdParam::eE : SdParam::mdc;
+  if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rSEEALSO, final), parm))
+    return 0;
+  if (parm.type == final)
+    return 1;
+  requireWWW(sdBuilder);
+  if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral,
+				    SdParam::reservedName + Sd::rNONE), parm))
+    return 0;
+  if (parm.type == SdParam::reservedName + Sd::rNONE)
+    return parseSdParam(AllowedSdParams(final), parm);
+  do {
+    if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral, final), parm))
+      return 0;
+  } while (parm.type != final);
   return 1;
 }
 
@@ -2568,6 +2907,11 @@ Boolean Parser::parseSdParam(const AllowedSdParams &allow,
 	    return 0;
 	  parm.type = SdParam::paramLiteral;
 	}
+	else if (allow.param(SdParam::systemIdentifier)) {
+	  if (!parseSdSystemIdentifier(lita, parm.literalText))
+	    return 0;
+	  parm.type = SdParam::systemIdentifier;
+	}
 	else {
 	  sdParamInvalidToken(token, allow);
 	  return 0;
@@ -2806,6 +3150,47 @@ Boolean Parser::parseSdParamLiteral(Boolean lita, String<SyntaxChar> &str)
   return 1;
 }
 
+Boolean Parser::parseSdSystemIdentifier(Boolean lita, Text &text)
+{
+  text.addStartDelim(currentLocation());
+
+  const unsigned refLitlen = Syntax::referenceQuantity(Syntax::qLITLEN);
+
+  Mode mode = lita ? sdslitaMode : sdslitMode;
+  for (;;) {
+    Token token = getToken(mode);
+    switch (token) {
+    case tokenEe:
+      message(ParserMessages::literalLevel);
+      return 0;
+    case tokenUnrecognized:
+      if (reportNonSgmlCharacter())
+	break;
+      if (options().errorSignificant)
+	message(ParserMessages::sdLiteralSignificant,
+		StringMessageArg(currentToken()));
+      text.addChar(currentChar(), currentLocation());
+      break;
+    case tokenLit:
+    case tokenLita:
+      text.addEndDelim(currentLocation(), token == tokenLita);
+      goto done;
+    case tokenChar:
+      text.addChar(currentChar(), currentLocation());
+      break;
+    default:
+      CANNOT_HAPPEN();
+    }
+  }
+done:
+  if (text.string().size() > refLitlen)
+    message(ParserMessages::systemIdentifierLength,
+	    NumberMessageArg(refLitlen));
+  if (currentMarkup())
+    currentMarkup()->addLiteral(text);
+  return 1;
+}
+
 Boolean Parser::stringToNumber(const Char *s, size_t length,
 			       unsigned long &result)
 {
@@ -2835,6 +3220,14 @@ void Parser::sdParamConvertToLiteral(SdParam &parm)
     parm.type = SdParam::paramLiteral;
     parm.paramLiteralText.resize(1);
     parm.paramLiteralText[0] = parm.n;
+  }
+}
+
+void Parser::requireWWW(SdBuilder &sdBuilder)
+{
+  if (!sdBuilder.www) {
+    message(ParserMessages::wwwRequired);
+    sdBuilder.www = 1;
   }
 }
 
@@ -2907,6 +3300,9 @@ void AllowedSdParamsMessageArg::append(MessageBuilder &builder) const
     case SdParam::paramLiteral:
       builder.appendFragment(ParserMessages::parameterLiteral);
       break;
+    case SdParam::systemIdentifier:
+      builder.appendFragment(ParserMessages::systemIdentifier);
+      break;
     case SdParam::capacityName:
       builder.appendFragment(ParserMessages::capacityName);
       break;
@@ -2936,7 +3332,7 @@ void AllowedSdParamsMessageArg::append(MessageBuilder &builder) const
 }
 
 SdBuilder::SdBuilder()
-: valid(1), externalSyntax(0), enr(0)
+: valid(1), externalSyntax(0), enr(0), www(0), external(0)
 {
 }
 

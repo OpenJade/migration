@@ -69,8 +69,8 @@ void InputSource::willNotRewind()
 {
 }
 
-void InputSource::setDocCharset(const CharsetInfo &docCharset,
-				const CharsetInfo &emCharset)
+void InputSource::setDocCharset(const CharsetInfo &,
+				const CharsetInfo &)
 {
 }
 

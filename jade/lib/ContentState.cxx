@@ -59,6 +59,7 @@ void ContentState::startContent(const Dtd &dtd)
   netEnablingCount_ = 0;
   totalExcludeCount_ = 0;
   lastEndedElementType_ = 0;
+  nextIndex_ = 0;
 }
 
 void ContentState::pushElement(OpenElement *e)
@@ -77,6 +78,7 @@ void ContentState::pushElement(OpenElement *e)
   }
   if (e->netEnabling())
     netEnablingCount_++;
+  e->setIndex(nextIndex_++);
   openElements_.insert(e);
 }
 
@@ -146,14 +148,14 @@ ContentState::lookupCreateUndefinedElement(const StringC &name,
 					   Dtd &dtd)
 {
   ElementType *p = new ElementType(name,
-				   dtd.nElementTypeIndex());
+				   dtd.allocElementTypeIndex());
   dtd.insertUndefinedElementType(p);
   p->setElementDefinition(new ElementDefinition(loc,
-						ElementDefinition::undefinedIndex,
-						(ElementDefinition::omitStart
-						 |ElementDefinition::omitEnd),
+						size_t(ElementDefinition::undefinedIndex),
+						0,
 						ElementDefinition::any),
 			  0);
+  p->setAttributeDef(dtd.implicitElementAttributeDef());
 
   includeCount_.push_back(0);
   excludeCount_.push_back(0);

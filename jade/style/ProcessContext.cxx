@@ -73,31 +73,60 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
     currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
   else {
     EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
-    SosofoObj *sosofoObj;
-    InsnPtr insn;
     ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
     matchSpecificity_ = ProcessingMode::Specificity();
-    if (vm().processingMode->findMatch(nodePtr, *vm_.interp, matchSpecificity_, insn, sosofoObj)) {
-      currentFOTBuilder().startNode(nodePtr, processingMode->name(),
-				    matchSpecificity_.ruleType());
-      if (sosofoObj)
-	sosofoObj->process(*this);
-      else {
-	ELObj *obj = vm().eval(insn.pointer());
-	if (vm_.interp->isError(obj)) {
-	  if (processingMode->name().size() == 0)
-	    processChildren(processingMode);
+    bool hadStyle = 0;
+    currentFOTBuilder().startNode(nodePtr, processingMode->name());
+    for (;;) {
+      const ProcessingMode::Rule *rule
+       = vm().processingMode->findMatch(nodePtr, *vm_.interp, *vm_.interp,
+					matchSpecificity_);
+      if (!rule) {
+	if (hadStyle) {
+	  currentStyleStack().pushEnd(vm(), currentFOTBuilder());
+	  currentFOTBuilder().startSequence();
 	}
+        processChildren(processingMode);
+	break;
+      }
+      if (!matchSpecificity_.isStyle()) {
+	SosofoObj *sosofoObj;
+        InsnPtr insn;
+	rule->action().get(insn, sosofoObj);
+	if (hadStyle) {
+	  currentStyleStack().pushEnd(vm(), currentFOTBuilder());
+	  currentFOTBuilder().startSequence();
+	}
+	if (sosofoObj)
+	  sosofoObj->process(*this);
 	else {
-	  ELObjDynamicRoot protect(*vm_.interp, obj);
-	  ((SosofoObj *)obj)->process(*this);
+	  ELObj *obj = vm().eval(insn.pointer());
+	  if (vm_.interp->isError(obj)) {
+	    if (processingMode->name().size() == 0)
+	      processChildren(processingMode);
+	  }
+	  else {
+	    ELObjDynamicRoot protect(*vm_.interp, obj);
+	    ((SosofoObj *)obj)->process(*this);
+	  }
 	}
+	break;
+      }
+      SosofoObj *sosofoObj;
+      InsnPtr insn;
+      rule->action().get(insn, sosofoObj);
+      ELObj *obj = vm().eval(insn.pointer());
+      if (!vm_.interp->isError(obj)) {
+	if (!hadStyle) {
+	  currentStyleStack().pushStart();
+	  hadStyle = 1;
+	}
+	currentStyleStack().pushContinue((StyleObj *)obj, rule, nodePtr, vm_.interp);
       }
     }
-    else {
-      currentFOTBuilder().startNode(nodePtr, processingMode->name(),
-				    FOTBuilder::ruleNone);
-      processChildren(processingMode);
+    if (hadStyle) {
+      currentFOTBuilder().endSequence();
+      currentStyleStack().pop();
     }
     currentFOTBuilder().endNode();
     matchSpecificity_ = saveSpecificity;
@@ -107,12 +136,17 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
 void ProcessContext::nextMatch(StyleObj *overridingStyle)
 {
   ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
-  SosofoObj *sosofoObj;
-  InsnPtr insn;
   StyleObj *saveOverridingStyle = vm().overridingStyle;
   if (overridingStyle)
     vm().overridingStyle = overridingStyle;
-  if (vm().processingMode->findMatch(vm().currentNode, *vm_.interp, matchSpecificity_, insn, sosofoObj)) {
+  const ProcessingMode::Rule *rule
+   = vm().processingMode->findMatch(vm().currentNode, *vm_.interp, *vm_.interp,
+				    matchSpecificity_);
+  if (rule) {
+    ASSERT(!matchSpecificity_.isStyle());
+    SosofoObj *sosofoObj;
+    InsnPtr insn;
+    rule->action().get(insn, sosofoObj);
     if (sosofoObj)
       sosofoObj->process(*this);
     else {
@@ -295,8 +329,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     if (port.connected) {
       port.connected++;
       SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
-						vm().processingMode->name(),
-						matchSpecificity_.ruleType());
+						vm().processingMode->name());
       c->fotb = save;
       port.saveQueue.append(save);
     }
@@ -306,8 +339,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     }
     connectionStack_.insert(c);
     currentFOTBuilder().startNode(vm().currentNode,
-				  vm().processingMode->name(),
-				  matchSpecificity_.ruleType());
+				  vm().processingMode->name());
   }
   else {
     Connection *c = new Connection(conn->styleStack, 0, connLevel, size_t(-1));
@@ -316,8 +348,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     }
     else {
       SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
-						vm().processingMode->name(),
-						matchSpecificity_.ruleType());
+						vm().processingMode->name());
       c->fotb = save;
       if (conn->flowObjLevel >= principalPortSaveQueues_.size())
 	principalPortSaveQueues_.resize(conn->flowObjLevel + 1);
@@ -325,8 +356,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     }
     connectionStack_.insert(c);
     currentFOTBuilder().startNode(vm().currentNode,
-				  vm().processingMode->name(),
-				  matchSpecificity_.ruleType());
+				  vm().processingMode->name());
   }
 }
 

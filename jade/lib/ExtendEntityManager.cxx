@@ -247,7 +247,6 @@ private:
 
 const Char RS = '\n';
 const Char RE = '\r';
-const char lineEnd = '\n';
 
 ExtendEntityManager::CatalogManager::~CatalogManager()
 {
@@ -556,8 +555,8 @@ size_t MappingDecoder::decode(Char *to, const char *s,
   const CharMap<Unsigned32> &map = *map_;
   for (size_t i = 0; i < n; i++) {
     Unsigned32 d = map[to[i]];
-    if (d & (1 << 31))
-      to[i] = (d & ~(1 << 31));
+    if (d & (unsigned(1) << 31))
+      to[i] = (d & ~(unsigned(1) << 31));
     else
       to[i] += d;
   }

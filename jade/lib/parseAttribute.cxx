@@ -105,8 +105,13 @@ Boolean Parser::handleAttributeNameToken(Text &text,
     message(ParserMessages::noSuchAttributeToken,
 	    StringMessageArg(text.string()));
   }
+  else if (sd().www() && !atts.tokenIndexUnique(text.string(), index)) {
+    atts.noteInvalidSpec();
+    message(ParserMessages::attributeTokenNotUnique,
+	    StringMessageArg(text.string()));
+  }
   else {
-    if (!sd().shorttag())
+    if (!sd().attributeOmitName())
       message(ParserMessages::attributeNameShorttag);
     else if (options().warnMissingAttributeName)
       message(ParserMessages::missingAttributeName);
@@ -140,7 +145,7 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   }
   unsigned index;
   if (!atts.attributeIndex(name, index)) {
-    if (validate())
+    if (!implydefAttlist())
       message(ParserMessages::noSuchAttribute, StringMessageArg(name));
     if (newAttDef.isNull())
       newAttDef = new AttributeDefinitionList(atts.def());
@@ -159,7 +164,7 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
     // fall through
   case tokenEtago:
   case tokenStago:
-  case tokenNet:
+  case tokenNestc:
     message(ParserMessages::unquotedAttributeValue);
     extendUnquotedAttributeValue();
     if (markup)
@@ -179,9 +184,9 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   case tokenNameStart:
   case tokenDigit:
   case tokenLcUcNmchar:
-    if (!sd().shorttag())
+    if (!sd().attributeValueNotLiteral())
       message(ParserMessages::attributeValueShorttag);
-    if (options().warnAttributeValueNotLiteral)
+    else if (options().warnAttributeValueNotLiteral)
       message(ParserMessages::attributeValueNotLiteral);
     extendNameToken(syntax().litlen() >= syntax().normsep()
 		    ? syntax().litlen() - syntax().normsep()
@@ -241,21 +246,27 @@ Boolean Parser::parseAttributeParameter(Boolean inDecl,
     return 0;
   case tokenEtago:
   case tokenStago:
-    if (!sd().shorttag())
-      message(ParserMessages::minimizedStartTag);
-    else if (options().warnUnclosedTag)
-      message(ParserMessages::unclosedStartTag);
+    if (!sd().startTagUnclosed())
+      message(ParserMessages::unclosedStartTagShorttag);
     result = AttributeParameter::end;
     currentInput()->ungetToken();
     netEnabling = 0;
     break;
-  case tokenNet:
+  case tokenNestc:
     if (markup)
-      markup->addDelim(Syntax::dNET);
-    if (!sd().shorttag())
-      message(ParserMessages::minimizedStartTag);
-    else if (options().warnNet)
-      message(ParserMessages::netStartTag);
+      markup->addDelim(Syntax::dNESTC);
+    switch (sd().startTagNetEnable()) {
+    case Sd::netEnableNo:
+      message(ParserMessages::netEnablingStartTagShorttag);
+      break;
+    case Sd::netEnableImmednet:
+      if (getToken(econnetMode) != tokenNet) 
+	message(ParserMessages::nestcWithoutNet);
+      currentInput()->ungetToken();
+      break;
+    case Sd::netEnableAll:
+      break;
+    }
     netEnabling = 1;
     result = AttributeParameter::end;
     break;
@@ -395,7 +406,7 @@ Boolean Parser::skipAttributeSpec()
 	  return 0;
 	case tokenEtago:
 	case tokenStago:
-	case tokenNet:
+	case tokenNestc:
 	case tokenTagc:
 	case tokenDsc:
 	case tokenVi:
@@ -404,7 +415,7 @@ Boolean Parser::skipAttributeSpec()
 	case tokenNameStart:
 	case tokenDigit:
 	case tokenLcUcNmchar:
-	  if (!sd().shorttag())
+	  if (!sd().attributeValueNotLiteral())
 	    message(ParserMessages::attributeValueShorttag);
 	  extendNameToken(syntax().litlen() >= syntax().normsep()
 			  ? syntax().litlen() - syntax().normsep()
@@ -438,7 +449,7 @@ Boolean Parser::skipAttributeSpec()
       else {
 	if (currentMarkup())
 	  currentMarkup()->changeToAttributeValue(nameMarkupIndex);
-	if (!sd().shorttag())
+	if (!sd().attributeOmitName())
 	  message(ParserMessages::attributeNameShorttag);
       }
     }
@@ -446,7 +457,7 @@ Boolean Parser::skipAttributeSpec()
       // It's a name token.
       if (!parseAttributeParameter(0, 0, parm, netEnabling))
 	return 0;
-      if (!sd().shorttag())
+      if (!sd().attributeOmitName())
 	message(ParserMessages::attributeNameShorttag);
     }
   }

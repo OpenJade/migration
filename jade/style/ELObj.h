@@ -39,6 +39,7 @@ class LengthSpec;
 class DisplaySpaceObj;
 class InlineSpaceObj;
 class GlyphSubstTableObj;
+class VectorObj;
 
 class ELObj : public Collector::Object {
 public:
@@ -65,6 +66,7 @@ public:
   virtual NamedNodeListObj *asNamedNodeList();
   virtual StringObj *convertToString();	// either symbol or string
   virtual BoxObj *asBox();
+  virtual VectorObj *asVector();
   virtual bool charValue(Char &);
   virtual bool stringData(const Char *&, size_t &);
   virtual void print(Interpreter &, OutputCharStream &);
@@ -83,12 +85,15 @@ public:
   virtual ELObj *resolveQuantities(bool force, Interpreter &,
 				   const Location &);
   virtual bool optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &);
-  // Implements equal? semantics
-  bool operator==(ELObj &);
-  bool operator!=(ELObj &);
+  static bool equal(ELObj &, ELObj &);
+  // Note that in DSSSL2 unlike Scheme eqv? for lists and strings is the same
+  // as equal?.  Only for vectors do they differ.
+  static bool eqv(ELObj &, ELObj &);
 protected:
   // This checks for equality of *distinct* objects.
   virtual bool isEqual(ELObj &);
+  // This checks for equivalence of *distinct* objects.
+  virtual bool isEquiv(ELObj &);
 };
 
 class ErrorObj : public ELObj {
@@ -179,9 +184,25 @@ public:
   void traceSubObjects(Collector &) const;
   ELObj *resolveQuantities(bool force, Interpreter &, const Location &);
   bool isEqual(ELObj &);
+  bool isEquiv(ELObj &);
 private:
   ELObj *car_;
   ELObj *cdr_;
+};
+
+class VectorObj : public ELObj, public Vector<ELObj *> {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  VectorObj();
+  VectorObj(Vector<ELObj *> &v);
+  void traceSubObjects(Collector &) const;
+  VectorObj *asVector();
+  bool isEqual(ELObj &);
+  bool isEquiv(ELObj &);
+  void print(Interpreter &, OutputCharStream &);
+  ELObj *resolveQuantities(bool force, Interpreter &, const Location &);
 };
 
 class CharObj : public ELObj {
@@ -463,17 +484,17 @@ private:
 };
 
 inline
-bool ELObj::operator==(ELObj &obj)
+bool ELObj::equal(ELObj &obj1, ELObj &obj2)
 {
-  return this == &obj || isEqual(obj);
+  return &obj1 == &obj2 || obj1.isEqual(obj2);
 }
     
 inline
-bool ELObj::operator!=(ELObj &obj)
+bool ELObj::eqv(ELObj &obj1, ELObj &obj2)
 {
-  return !(*this == obj);
+  return &obj1 == &obj2 || obj1.isEquiv(obj2);
 }
-    
+
 inline
 ELObj *PairObj::car()
 {

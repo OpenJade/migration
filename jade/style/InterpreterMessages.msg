@@ -54,10 +54,8 @@ E3+notAGlyphId++%2 argument for primitive %1 of wrong type: %3 not a glyph-id
 E3+notAGlyphSubstTable++%2 argument for primitive %1 of wrong type: %3 not a glyph-subst-table
 E3+notAGlyphIdPairList++%2 argument for primitive %1 of wrong type: %3 not a list of pairs of glyph-ids
 E3+notAProcedure++%2 argument for primitive %1 of wrong type: %3 not a procedure
-E0+duplicateDefaultRule++default rule already defined in same part+first definition was here
-E0+duplicateRootRule++root rule already defined in same part+first definition was here
-E1+duplicateIdRule++rule for ID %1 already defined in same part+first definition was here
-E0+duplicateElementRule++identical element rule already defined in same part+first definition was here
+E3+notAVector++%2 argument for primitive %1 of wrong type: %3 not a vector
+E0+duplicateRootRule++root rule already defined in same part with same importance+first definition was here
 E1+duplicateInitialValue++initial value already declared for characteristic %1 in same part+first declaration was here
 E1+invalidStyleKeyword++%1 is not a valid keyword in a style expression
 E2+invalidMakeKeyword++%1 is not a valid keyword in a make expression for flow object class %2
@@ -107,6 +105,21 @@ I0+stackTrace++called from here
 I1+stackTraceEllipsis++called from here...(%1 calls omitted)
 E0+processNodeLoop++node processing loop detected
 E0+spliceNotList++unquote-splicing expression does not evaluate to a list
+E0+readOnly++object is read-only
+E1+topLevelAssignment++assignment to top-level variable %1
+E0+continuationDead++invalid call to continuation
+E0+patternEmptyGi++empty generic identifier in pattern
+E0+patternNotList++pattern is not a list
+E1+patternBadGi++%1 cannot be used as a generic identifier in a pattern
+E1+patternBadMember++%1 cannot occur in a pattern
+E0+patternMissingQualifierValue++value missing for qualifier in pattern
+E1+patternUnknownQualifier++unknown pattern qualifier %1
+E2+patternBadQualifierValue++bad value %1 for %2 qualifier in pattern
+E0+patternChildRepeat++repeat qualifier not allowed inside children qualifier
+E0+patternBadAttributeQualifier++bad value for attributes qualifier in pattern
+E1+ambiguousStyle++characteristic %1 applied in style rule with same specificity+other style rule is here
+E0+ambiguousMatch++node matches more than one pattern with the same specificity
+E1+uninitializedVariableReference++reference to uninitialized variable %1
 E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here

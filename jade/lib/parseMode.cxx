@@ -62,6 +62,8 @@ static struct {
   { asMode, modeUsedInProlog },
   { slitMode, modeUsedInProlog },
   { slitaMode, modeUsedInProlog },
+  { sdslitMode, modeUsedInSd },
+  { sdslitaMode, modeUsedInSd },
   { cconMode, modeUsedInInstance },
   { rcconMode, modeUsedInInstance },
   { cconnetMode, modeUsedInInstance },
@@ -257,6 +259,38 @@ void Parser::compileModes(const Mode *modes,
     }
   }
 
+  String<EquivCode> dataDelimCodes;
+  if (options().warnDataDelim) {
+    ModeInfo iter(mconMode, sd());
+    TokenInfo ti;
+    while (iter.nextToken(&ti)) {
+      switch (ti.type) {
+      case TokenInfo::delimType:
+      case TokenInfo::delimDelimType:
+      case TokenInfo::delimSetType:
+	{
+	  if (ti.token == tokenMscMdc)
+	    break;
+	  const StringC &delim = syntax().delimGeneral(ti.delim1);
+	  if (!delim.size())
+	    break;
+	  EquivCode c = partition.charCode(delim[0]);
+	  for (size_t i = 0; ; i++) {
+	    if (i >= dataDelimCodes.size()) {
+	      dataDelimCodes += c;
+	      break;
+	    }
+	    if (dataDelimCodes[i] == c)
+	      break;
+	  }
+	}
+	break;
+      default:
+	break;
+      }
+    }
+  }
+
   const String<EquivCode> emptyString;
   Boolean multicode = syntax().multicode();
   for (i = 0; i < n; i++) {
@@ -324,6 +358,35 @@ void Parser::compileModes(const Mode *modes,
 		       Priority::delim, ambiguities);
       }
     }
+    if (options().warnDataDelim) {
+      switch (modes[i]) {
+      default:
+        if (!iter.includesShortref())
+	  break;
+	// fall through
+      case alitMode:
+      case alitaMode:
+      case aliteMode:
+      case talitMode:
+      case talitaMode:
+      case taliteMode:
+	for (size_t j = 0; j < dataDelimCodes.size(); j++) {
+	  String<EquivCode> code;
+	  code += dataDelimCodes[j];
+	  tb.recognize(code, tokenCharDelim, Priority::dataDelim, ambiguities);
+	}
+	break;
+      case plitMode:
+      case plitaMode:
+      case pliteMode:
+	{
+	  String<EquivCode> code;
+	  code += partition.charCode(syntax().delimGeneral(Syntax::dPERO)[0]);
+	  tb.recognize(code, tokenCharDelim, Priority::dataDelim, ambiguities);
+	}
+	break;
+      }
+    }
     setRecognizer(modes[i],
 		  (multicode
 		   ? new Recognizer(tb.extractTrie(), partition.map(),
@@ -354,7 +417,10 @@ void Parser::compileNormalMap()
     case TokenInfo::delimDelimType:
     case TokenInfo::delimSetType:
       {
-	Char c = syntax().delimGeneral(ti.delim1)[0];
+	const StringC &delim = syntax().delimGeneral(ti.delim1);
+	if (!delim.size())
+	  break;
+	Char c = delim[0];
 	map.setChar(c, 0);
 	StringC str(syntax().generalSubstTable()->inverse(c));
 	for (size_t i = 0; i < str.size(); i++)

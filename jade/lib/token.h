@@ -21,6 +21,7 @@ enum EnumToken {
   tokenDigit,			// 1
   tokenLcUcNmchar,		// LCNMCHAR or UCNMCHAR
   tokenChar,			// a legal data character
+  tokenCharDelim,	        // a data character which starts a delimiter
   tokenIgnoredChar,		// character in ignored marked section
   // delimiters and delimiters in context
   tokenAnd,
@@ -39,6 +40,7 @@ enum EnumToken {
   tokenEtagoGrpo,
   tokenGrpc,
   tokenGrpo,
+  tokenHcroHexDigit,
   tokenLit,
   tokenLita,
   tokenMdc,
@@ -50,6 +52,7 @@ enum EnumToken {
   tokenMinusGrpo,
   tokenMscMdc,
   tokenNet,
+  tokenNestc,
   tokenOpt,
   tokenOr,
   tokenPero,

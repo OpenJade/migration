@@ -10,6 +10,7 @@
 (define (test-expression-language)
     (sosofo-append
         (make-test "Character Primitives" test-char)
+	(make-test "Character Properties" test-char-properties)
         (make-test "String Primitives" test-string)
 	(make-test "Standard examples" test-examples)
     )
@@ -49,6 +50,28 @@
         (testcase 'char-ci>=?  #\a #\A)
     )
 )
+
+(add-char-properties funny: #\a #\a)
+(add-char-properties funny: (char-property 'funny #\a) #\b #\c)
+(add-char-properties funny: (char-property 'funny #\z) #\d)
+(declare-char-property funny 'boring)
+(define (test-char-properties)
+    (sosofo-append
+        (testcase 'char-property 'space? #\space)
+        (testcase 'char-property 'space? #\space 'foo)
+	(testcase 'char-property 'space? #\exclamation-mark)
+	(testcase 'char-property 'space? #\exclamation-mark 'foo)
+        (testcase 'char-property 'break-before-priority #\space)
+	(testcase 'char-property 'break-after-priority #\space)
+	(testcase 'char-property 'break-before-priority #\a)
+	(testcase 'char-property 'break-after-priority #\a)
+	(testcase 'char-property 'funny #\a)
+	(testcase 'char-property 'funny #\b)
+	(testcase 'char-property 'funny #\c)
+	(testcase 'char-property 'funny #\d)
+	(testcase 'char-property 'funny #\e)
+	(testcase 'char-property 'funny #\z)
+    ))
 
 (define (test-string)
     (empty-sosofo)
@@ -173,6 +196,7 @@
         (char>? . ,char>?) (char>=? . ,char>=?) (char-ci=? . ,char-ci=?)
         (char-ci<? . ,char-ci<?) (char-ci<=? . ,char-ci<=?)
         (char-ci>? . ,char-ci>?) (char-ci>=? . ,char-ci>=?)
+	(char-property . ,char-property)
         (not . ,not) (boolean? . ,boolean?) (pair? . ,pair?) 
         (cons . ,cons) (car . ,car) (cdr . ,cdr) (list? . ,list?)
 	(list . ,list) (length . ,length) (append . ,append)
@@ -206,6 +230,14 @@
         )
     )
 )       
+
+(define (reduce list combine init)
+  (let loop ((result init)
+             (list list))
+    (if (null? list)
+        result
+        (loop (combine result (car list))
+              (cdr list)))))
 
 (define (obj->string obj)
     (cond

@@ -4194,13 +4194,13 @@ DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
   StringC propname;
   ComponentName::Id cls;
   ComponentName::Id id = ComponentName::noId;
- if (*str == "tokens" 
+  if (*str == "tokens" 
       && node->getClassName(cls) == accessOK 
-     && cls == ComponentName::idModelGroup) 
-   id = ComponentName::idContentTokens;
+      && cls == ComponentName::idModelGroup) 
+    id = ComponentName::idContentTokens;
   else
     interp.lookupNodeProperty(*str, id);
- if (id != ComponentName::noId) {
+  if (id != ComponentName::noId) {
     ELObjPropertyValue value(interp,
 			     pos[2] >= 0
 			     && argv[pos[2] + 2] != interp.makeFalse());
@@ -5148,10 +5148,14 @@ DEFPRIMITIVE(StringToList, argc, argv, context, interp, loc)
   if (!argv[0]->stringData(s, n))
     return argError(interp, loc,
                     InterpreterMessages::notAString, 0, argv[0]);
-  ELObjDynamicRoot pair(interp, interp.makeNil());
-  for (int i = n; i > 0; i--) 
-    pair = interp.makePair(interp.makeChar(s[i - 1]), pair);
-  return pair;
+  ELObjDynamicRoot protect(interp, interp.makeNil());
+  for (int i = n; i > 0; i--) {
+    // We have to do it in this order, to ensure that no object is GC'ed.
+    PairObj *p = interp.makePair(0, protect);
+    protect = p;
+    p->setCar(interp.makeChar(s[i - 1]));
+  }
+  return protect;
 }
 
 DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)

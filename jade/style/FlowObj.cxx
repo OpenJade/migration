@@ -1401,8 +1401,8 @@ void BoxFlowObj::processInner(ProcessContext &context)
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startBox(*nic_);
   context.pushPrincipalPort(nic_->isDisplay
-			    ? new DisplayValidator
-			    : new InlineValidator);
+			    ? (ProcessContext::Validator*) new DisplayValidator
+			    : (ProcessContext::Validator*) new InlineValidator);
   CompoundFlowObj::processInner(context);
   context.popPrincipalPort();
   fotb.endBox();

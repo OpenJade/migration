@@ -860,6 +860,9 @@ unsigned ParserState::instantiateDtd(Ptr<Dtd> &dtd)
 {
   if (!dtd->isInstantiated()) {
     dtd->instantiate();
+    if (instantiatedDtds_ == sd().concur())
+      message(ParserMessages::concurrentInstances,
+              NumberMessageArg(sd().concur()));
     instantiatedDtds_++;
   }
   return instantiatedDtds_;

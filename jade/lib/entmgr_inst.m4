@@ -89,7 +89,6 @@ __instantiate(XcharMap<EquivCode>)
 __instantiate(Vector<char>)
 #if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(Vector<PackedBoolean>)
-__instantiate(SubstTable<Char>)
 #endif
 __instantiate(CharMap<Unsigned32>)
 #ifdef SP_MULTI_BYTE

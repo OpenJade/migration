@@ -25,7 +25,7 @@ InternalInputSource::~InternalInputSource()
   if (buf_)
     delete [] buf_;
 }
-  
+
 Xchar InternalInputSource::fill(Messenger &)
 {
   return eE;
@@ -54,6 +54,16 @@ Boolean InternalInputSource::rewind(Messenger &)
   }
   return 1;
 }
+
+const StringC *InternalInputSource::contents() {
+  return contents_;
+}
+
+InternalInputSource *InternalInputSource::asInternalInputSource()
+{
+  return this;
+}
+
 
 #ifdef SP_NAMESPACE
 }

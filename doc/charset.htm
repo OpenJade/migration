@@ -123,6 +123,13 @@ according to UCS Transformation Format 8 defined in Annex P to be
 added by the first proposed drafted amendment (PDAM 1) to ISO/IEC
 10646-1:1993.
 <DT>
+<SAMP>utf-16</SAMP>
+<DD>
+Each character is represented by a variable number of bytes
+according to UCS Transformation Format 16 defined in Annex O to be
+added by the first proposed drafted amendment (PDAM 1) to ISO/IEC
+10646-1:1993.
+<DT>
 <SAMP>ucs-2</SAMP>
 <DT>
 <SAMP>iso-10646-ucs-2</SAMP>
@@ -131,10 +138,19 @@ This is ISO/IEC 10646 with the UCS-2 transformation format.
 Each character is represented by 2 bytes.
 No special treatment is given to the byte order mark character.
 <DT>
+<SAMP>ucs-4</SAMP>
+<DT>
+<SAMP>iso-10646-ucs-4</SAMP>
+<DT>
+<SAMP>utf-32</SAMP>
+<DD>
+This is ISO/IEC 10646 with the UCS-4 transformation format.
+Each character is represented by 4 bytes.
+<DT>
 <SAMP>unicode</SAMP>
 <DD>
-Each character is represented by 2 bytes.  The bytes
-representing the entire storage object may be preceded by a pair of
+Each character is represented according to the utf-16 encoding.  
+The bytes representing the entire storage object may be preceded by a pair of
 bytes representing the byte order mark character (0xFEFF).  The bytes
 representing each character are in the system byte order, unless
 the byte order mark character is present, in which case the order of
@@ -184,6 +200,8 @@ character in the repertoire of ISO 8859-<VAR>n</var> is represented
 by a single byte.
 <DT>
 <SAMP>koi8-r</SAMP>
+<DT>
+<SAMP>koi8</SAMP>
 <DD>
 The koi8-r encoding as defined in RFC 1489.
 <DT>
@@ -231,6 +249,18 @@ Each bit combination is represented by a single byte.
 <DD>
 Each bit combination is represented by exactly 2 bytes,
 with the more significant byte first.
+<DT>
+<SAMP>fixed-4</SAMP>
+<DD>
+Each bit combination is represented by exactly 4 bytes,
+with the more significant byte first.
+<DT>
+<SAMP>utf-8</SAMP>
+<DD>
+Each bit combination is represented by a variable number of bytes
+according to UCS Transformation Format 8 defined in Annex P to be
+added by the first proposed drafted amendment (PDAM 1) to ISO/IEC
+10646-1:1993.
 <DT>
 <SAMP>euc</SAMP>
 <DD>

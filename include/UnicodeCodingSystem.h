@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef UnicodeCodingSystem_INCLUDED
@@ -15,7 +15,6 @@ public:
   UnicodeCodingSystem(const InputCodingSystem *sub = 0);
   Decoder *makeDecoder() const;
   Encoder *makeEncoder() const;
-  unsigned fixedBytesPerChar() const;
 private:
   const InputCodingSystem *sub_;
 };

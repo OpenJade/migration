@@ -71,5 +71,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 
 %files devel
 %defattr(-, root, root)
-%{_libdir}/lib*.{so,a,la}
+%{_libdir}/lib*.so
+%{_libdir}/lib*.a
+%{_libdir}/lib*.la
 %{_includedir}/@PACKAGE@/*

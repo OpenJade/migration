@@ -5,7 +5,8 @@ bin_PROGRAMS = osgmlnorm
 osgmlnorm_SOURCES = sgmlnorm.cxx SGMLGenerator.cxx SGMLGenerator.h \
 	SgmlnormMessages.h
 
-EXTRA_DIST = sgmlnorm.dsp SgmlnormMessages.msg SgmlnormMessages.rc
+EXTRA_DIST = sgmlnorm.dsp SgmlnormMessages.msg SgmlnormMessages.rc \
+	.cvsignore
 
 BUILT_SOURCES = SgmlnormMessages.h SgmlnormMessages.rc
 

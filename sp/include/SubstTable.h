@@ -12,7 +12,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SubstTable {
+class SP_API SubstTable {
 public:
   SubstTable();
   void addSubst(Char from, Char to);

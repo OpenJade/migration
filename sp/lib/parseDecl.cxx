@@ -186,7 +186,7 @@ void Parser::endProlog()
       else 
 	lpd = (ComplexLpd *)&activeLpd(i);
     eventHandler().endProlog(new (eventAllocator())
-			     EndPrologEvent(baseDtd(),
+			     EndPrologEvent(currentDtdPointer(),
 					    lpd,
 					    simpleLinkNames,
 					    simpleLinkAtts,
@@ -1053,11 +1053,25 @@ Boolean Parser::parseAttlistDecl()
 	  attributed[i]->setAttributeDef(adlCopy);
 	  curAdl = adlCopy.pointer();
 	}
-	// FIXME check for multiple ID and NOTATION attributes
 	for (size_t j = 0; j < adl->size(); j++) {
-	  unsigned tem;
-	  if (!curAdl->attributeIndex(adl->def(j)->name(), tem))
+	  size_t index;
+	  if (!curAdl->attributeIndex(adl->def(j)->name(), index)) {
+            index = curAdl->idIndex();
+            if (index != -1 && adl->def(j)->isId())
+              message(ParserMessages::multipleIdAttributes,
+                      StringMessageArg(curAdl->def(index)->name()));
+            index = curAdl->notationIndex();
+            if (index != -1 && adl->def(j)->isNotation())
+              message(ParserMessages::multipleNotationAttributes,
+                      StringMessageArg(curAdl->def(index)->name()));
 	    curAdl->append(adl->def(j)->copy());
+          }
+          else {
+            Boolean tem;
+            if (curAdl->def(index)->isSpecified(tem))
+              message(ParserMessages::specifiedAttributeRedeclared,
+                      StringMessageArg(adl->def(j)->name()));
+          }
 	}
 	if (!isNotation) {
 	  ElementType *e = (ElementType *)attributed[i];
@@ -1328,8 +1342,8 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
       AttributeList attributes(notation->attributeDef());
       if (parseParam(allowDsoSilentValue, declInputLevel, parm)
           && parm.type == Param::dso) {
-        if (attributes.size() == 0)
-          message(ParserMessages::notationNoAttributes,
+        if (attributes.size() == 0 && !sd().www())
+	  message(ParserMessages::notationNoAttributes,
                   StringMessageArg(notation->name()));
         Boolean netEnabling;
         Ptr<AttributeDefinitionList> newAttDef;
@@ -1456,6 +1470,8 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
   case Param::indicatedReservedName + Syntax::rCONREF:
     if (declaredValue->isId())
       message(ParserMessages::idDeclaredValue);
+    if (declaredValue->isNotation())
+      message(ParserMessages::notationConref);
     def = new ConrefAttributeDefinition(attributeName,
 					declaredValue.extract());
     if (isNotation)
@@ -1536,6 +1552,16 @@ Boolean Parser::parseNotationDecl()
   if (validate() && nt->defined())
     message(ParserMessages::duplicateNotationDeclaration,
 	    StringMessageArg(parm.token));
+  AttributeDefinitionList *atts = nt->attributeDef().pointer();
+  if (atts) 
+    for (size_t i = 0; i < atts->size(); i++) {
+      Boolean implicit;
+      if (atts->def(i)->isSpecified(implicit) && implicit) {
+        message(ParserMessages::notationMustNotBeDeclared,
+                StringMessageArg(parm.token));
+        break;
+      }
+    }
   static AllowedParams
     allowPublicSystem(Param::reservedName + Syntax::rPUBLIC,
 		      Param::reservedName + Syntax::rSYSTEM);
@@ -1669,23 +1695,29 @@ Boolean Parser::parseEntityDecl()
     StringC close;
     switch (bracketed) {
     case InternalTextEntity::starttag:
-      open = syntax().delimGeneral(Syntax::dSTAGO);
-      close = syntax().delimGeneral(Syntax::dTAGC);
+      open = instanceSyntax().delimGeneral(Syntax::dSTAGO);
+      close = instanceSyntax().delimGeneral(Syntax::dTAGC);
       break;
     case InternalTextEntity::endtag:
-      open = syntax().delimGeneral(Syntax::dETAGO);
-      close = syntax().delimGeneral(Syntax::dTAGC);
+      open = instanceSyntax().delimGeneral(Syntax::dETAGO);
+      close = instanceSyntax().delimGeneral(Syntax::dTAGC);
       break;
-    case InternalTextEntity::ms:
-      open = syntax().delimGeneral(Syntax::dMDO);
-      open += syntax().delimGeneral(Syntax::dDSO);
-      close = syntax().delimGeneral(Syntax::dMSC);
-      close += syntax().delimGeneral(Syntax::dMDC);
+    case InternalTextEntity::ms: {
+      const Syntax &syn = 
+	(declType == Entity::parameterEntity) ? syntax() : instanceSyntax();
+      open = syn.delimGeneral(Syntax::dMDO);
+      open += syn.delimGeneral(Syntax::dDSO);
+      close = syn.delimGeneral(Syntax::dMSC);
+      close += syn.delimGeneral(Syntax::dMDC);
       break;
-    case InternalTextEntity::md:
-      open = syntax().delimGeneral(Syntax::dMDO);
-      close = syntax().delimGeneral(Syntax::dMDC);
+    }
+    case InternalTextEntity::md: {
+      const Syntax &syn = 
+	(declType == Entity::parameterEntity) ? syntax() : instanceSyntax();
+      open = syn.delimGeneral(Syntax::dMDO);
+      close = syn.delimGeneral(Syntax::dMDC);
       break;
+    }
     default:
       CANNOT_HAPPEN();
     }
@@ -1792,7 +1824,7 @@ Boolean Parser::parseExternalEntity(StringC &name,
       return 0;
     AttributeList attributes(notation->attributeDef());
     if (parm.type == Param::dso) {
-      if (attributes.size() == 0)
+      if (attributes.size() == 0 && !sd().www()) 
 	message(ParserMessages::notationNoAttributes,
 		StringMessageArg(notation->name()));
       Boolean netEnabling;
@@ -2078,7 +2110,7 @@ Boolean Parser::parseDoctypeDeclStart()
   static AllowedParams
     allowImpliedName(Param::indicatedReservedName + Syntax::rIMPLIED,
 		     Param::name);
-  if (!parseParam(allowImpliedName, declInputLevel, parm))
+  if (!parseParam(sd().www() ? allowImpliedName : allowName, declInputLevel, parm))
     return 0;
   if (parm.type == Param::indicatedReservedName + Syntax::rIMPLIED) {
     if (sd().concur() > 0 || sd().explicitLink() > 0)
@@ -2625,10 +2657,18 @@ void Parser::addCommonAttributes(Dtd &dtd)
 	    done2Adl[adl->index()] = 1;
           if (!skip)
 	    for (size_t j = 0; j < commonAdl[i]->size(); j++) {
-	      unsigned tem;
+	      size_t index;
 	      if (!adl->attributeIndex(commonAdl[i]->def(j)->name(),
-	  			       tem))
+	  			       index))
 	        adl->append(commonAdl[i]->def(j)->copy());
+              else if (i == 2) {
+                // Give an error if an #ALL data attribute was 
+                // specified and is later redeclared as #IMPLICIT
+                Boolean implicit;
+                if (adl->def(index)->isSpecified(implicit) && !implicit)
+                  message(ParserMessages::specifiedAttributeRedeclared,
+                          StringMessageArg(adl->def(index)->name()));
+              } 
 	    }
 	}
       }

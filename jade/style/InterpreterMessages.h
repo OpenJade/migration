@@ -286,6 +286,8 @@ struct InterpreterMessages {
   static const MessageType3 notACharList;
   // 143
   static const MessageType3 lengthError;
+  // 144
+  static const MessageType1 noExactRepresentation;
 };
 
 #ifdef SP_NAMESPACE

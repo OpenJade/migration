@@ -415,6 +415,37 @@ InputName=style_inst
 # End Source File
 # Begin Source File
 
+SOURCE=..\VERSION
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+# Begin Custom Build - Building jade_version.h
+InputPath=..\VERSION
+
+"jade_version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	del /f jade_version.h
+	perl -w mkversion.pl $(InputPath)>jade_version.h
+	attrib +r jade_version.h
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
+
+# Begin Custom Build - Building jade_version.h
+InputPath=..\VERSION
+
+"jade_version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	del /f jade_version.h
+	perl -w mkversion.pl $(InputPath)>jade_version.h
+	attrib +r jade_version.h
+
+# End Custom Build
+
+!ENDIF
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\StyleEngine.cxx
 # ADD CPP /Yu"stylelib.h"
 # End Source File

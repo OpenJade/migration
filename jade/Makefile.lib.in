@@ -5,7 +5,12 @@
 #
 #  Copyright (C) 1998 Cees A. de Groot
 #
-LTVERSION=@LTVERSION@
+
+ifeq ($(LIB),sp)
+LTVERSION=@SPLTVERSION@
+else
+LTVERSION=@JADELTVERSION@
+endif
 
 CLEANFILES=-r lib$(LIB).la $(OBJS) $(COBJS) $(LT_OBJS) core .libs Makefile.lt
 

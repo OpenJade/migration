@@ -726,6 +726,7 @@ public:
   };
 
   struct STYLE_API Description {
+    // These must be zero-terminated lists
     const Extension *extensions;
     const Feature *features;
     // Set this if you want character NICs whose default values are the values
@@ -733,6 +734,10 @@ public:
     // formance, so if you don't care (i.e. the formatter has its own
     // values), set to false.
     bool wantCharPropertyNICs;
+    // A zero-terminated list of media type names according to
+    // HTML 4.0 Specification. 
+    // Instead of putting "all" in there, leave the list empty 
+    // to match any media type.
     const char **media;
   };
 

@@ -640,7 +640,7 @@ DataNode::DataNode(const GroveImpl *grove,
 {
 }
 
-class PiChunk : private CharsChunk {
+class PiChunk : protected CharsChunk {
   friend class PiNode;
   AccessResult setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const;
 };

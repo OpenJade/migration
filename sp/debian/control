@@ -7,7 +7,7 @@ Build-Depends: debhelper, automake, libtool
 
 Package: opensp
 Architecture: any
-Depends: ${shlibs-opensp:Depends}, ${libosp:ShlibVersion}, sgml-base
+Depends: ${shlibs:Depends}, sgml-base
 Suggests: doc-base, sgml-data
 Description: OpenJade group's SGML parsing tools
  This package is a collection of SGML/XML tools called OpenSP.
@@ -20,7 +20,7 @@ Description: OpenJade group's SGML parsing tools
 Package: libosp2
 Architecture: any
 Section: libs
-Depends: ${shlibs-libosp2:Depends}
+Depends: ${shlibs:Depends}
 Conflicts: libosp1
 Description: Runtime library for OpenJade group's SP suite
  This is the SP suite's shared library runtime support.  This C++

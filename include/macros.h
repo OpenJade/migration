@@ -16,6 +16,7 @@
 
 #else /* not NDEBUG */
 
+#ifdef SP_USE_OWN_ASSERT
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -28,6 +29,17 @@ extern SP_API void assertionFailed(const char *, const char *, int)
 #define ASSERT(expr) \
   ((void)((expr) || \
   (::SP_NAMESPACE_SCOPE assertionFailed(# expr, __FILE__, __LINE__), 0)))
+
+#else /* not SP_USE_OWN_ASSERT */
+#ifdef SP_ANSI_LIB
+#include <cassert>
+#else /* not SP_ANSI_LIB */
+#include <assert.h>
+#endif
+
+#define ASSERT(expr) assert(expr)
+#endif /* not SP_USE_OWN_ASSERT */
+
 #define CANNOT_HAPPEN() ASSERT(0)
 
 #endif /* not NDEBUG */

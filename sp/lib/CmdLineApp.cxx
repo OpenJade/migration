@@ -184,6 +184,10 @@ int CmdLineApp::init(int, AppChar **argv)
   progName = argv[0];
   if (progName)
     setProgramName(convertInput(progName));
+  MessageTable::instance()->registerMessageDomain(MessageFragment::libModule,
+                                                  SP_PACKAGE);
+  MessageTable::instance()->registerMessageDomain(MessageFragment::appModule,
+                                                  SP_PACKAGE);
   return 0;
 }
 

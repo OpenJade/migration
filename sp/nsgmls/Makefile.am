@@ -19,6 +19,8 @@ BUILT_SOURCES = nsgmls_inst.cxx \
 	NsgmlsMessages.h NsgmlsMessages.rc \
 	RastEventHandlerMessages.h RastEventHandlerMessages.rc 
 
+MSGGENFLAGS = -l appModule 
+
 nsgmls.o: NsgmlsMessages.h
 RastEventHandler.o: RastEventHandlerMessages.h
 

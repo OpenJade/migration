@@ -35,6 +35,8 @@ ParserApp::ParserApp(const char *requiredInternalCode)
   registerOption('e');
   registerOption('E', SP_T("max_errors"));
   registerOption('g');
+  registerOption('n');
+  registerOption('x');
   registerOption('i', SP_T("entity"));
   registerOption('w', SP_T("warning_type"));
 }
@@ -120,6 +122,14 @@ void ParserApp::processOption(AppChar opt, const AppChar *arg)
   case 'g':
     // show gis of open elements in error messages
     addOption(MessageReporter::openElements);
+    break;
+  case 'n':
+    // show message number in error messages
+    addOption(MessageReporter::messageNumbers);
+    break;
+  case 'x':
+    // show relevant clauses in error messages
+    addOption(MessageReporter::clauses);
     break;
   case 'i':
     // pretend that arg is defined as INCLUDE

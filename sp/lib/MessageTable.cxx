@@ -110,18 +110,32 @@ extern char *bindtextdomain(const char *, const char *);
 namespace SP_NAMESPACE {
 #endif
 
+// FIXME should use mutable class member
+static char *messageDomain[MessageFragment::nModules]; 
+
 class GettextMessageTable : public MessageTable {
 public:
   GettextMessageTable();
   Boolean getText(const MessageFragment &, String<SP_TCHAR> &) const;
-  
+  void registerMessageDomain(unsigned char module, char *domain) const;  
 };
+
+void GettextMessageTable::registerMessageDomain(unsigned char module, 
+                                                char *domain) const  
+{
+  if (module < MessageFragment::nModules) {
+    messageDomain[module] = domain; 
+    // FIXME should use LOCALEDIR from config.h instead
+  const char *dir = getenv("TEXTDOMAINDIR");
+  if (dir)
+      bindtextdomain(domain, dir);
+  }
+}
 
 GettextMessageTable::GettextMessageTable()
 {
-  const char *dir = getenv("TEXTDOMAINDIR");
-  if (dir)
-    bindtextdomain(MESSAGE_DOMAIN, dir);
+  for (unsigned char module = 0; module < MessageFragment::nModules; module++)
+    messageDomain[module] = 0;
 }
 
 Boolean GettextMessageTable::getText(const MessageFragment &frag,
@@ -130,7 +144,7 @@ Boolean GettextMessageTable::getText(const MessageFragment &frag,
   const char *s = frag.text();
   if (!s)
     return 0;
-  s = dgettext(MESSAGE_DOMAIN, s);
+  s = dgettext(messageDomain[frag.module()], s);
   if (!s)
     return 0;
   str.assign(s, strlen(s));

@@ -7,6 +7,12 @@
 /* define this if h_errno should be declared extern int */
 #undef SP_DECLARE_H_ERRNO
 
+/* define this if memmove  should be declared extern "C" */
+#undef DECLARE_MEMMOVE
+
+/* define this if strerror should be declared extern "C" */
+#undef DECLARE_STRERROR
+
 /* define this if sockets are available */
 #undef SP_HAVE_SOCKET
 
@@ -19,48 +25,20 @@
 /* define this if  set_new_handler() has to be declared extern "C" */
 #undef SP_SET_NEW_HANDLER_EXTERN_C 
 
+/* ??? */
 #undef SP_ANSI_LIB       
 
 /* define this if  std:: namespace is not supported */
 #undef SP_NO_STD_NAMESPACE 
 
-/* define this if setlocale() is available */
-#undef SP_HAVE_LOCALE
-
-/* define this if gettext() is available */
-#undef SP_HAVE_GETTEXT 
-
-/* define this to not compile message texts in (windows only) */
-#undef SP_NO_MESSAGE_TEXT
-
-/* define this if the OS provides wide character interfaces */
-#undef SP_WIDE_SYSTEM 
-
 /* define this to build a multi-byte version */
 #undef SP_MULTI_BYTE
-
-/* set this to the first line term character */
-#undef SP_LINE_TERM1 
-
-/* set this to the second line term character */
-#undef SP_LINE_TERM2
 
 /* define this to include template definitions in the headers */
 #undef SP_DEFINE_TEMPLATES
 
 /* define this to compile explicit template instantiations */
 #undef SP_MANUAL_INST
-
-/* define the following to build a dll (windows only) */
-#undef SP_USE_DLL
-#undef SP_DLLEXPORT
-#undef SP_DLLIMPORT
-
-/* define this to enable precompiled header support (windows only) */
-#undef SP_PCH
-
-/* define this to use win32 mutex mechanisms (windows only) */
-#undef SP_MUTEX_WIN32
 
 /* define this to use Mach mutex mechanisms (mach only) */
 #undef SP_MUTEX_MACH
@@ -74,19 +52,49 @@
 /* define this if new.h doesn't declare void *operator new(size_t, void *p) */
 #undef SP_DECLARE_PLACEMENT_OPERATOR_NEW
 
-/* define this if void T::operator delete(void *p, Allocator &); is supported */
+/* define this if void T::operator delete(void *p, Allocator &) is supported */
 #undef SP_HAVE_PLACEMENT_OPERATOR_DELETE
 
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
 
+/*** I think everything below this line can safely be ignored ***/
+
+/* set this to the path separator, this is only here to pacify autoheader */
+#undef PATH_SEPARATOR
+
+/* if this is not set it defaults to 200 */
+#undef DEFAULT_ERROR_LIMIT
+
+/* define this if you can't or don't want to use the builtin assert() macro */ 
+#undef SP_USE_OWN_ASSERT 
+
+/* set these to the line term character(s) */
+#undef SP_LINE_TERM1 
+#undef SP_LINE_TERM2
+
+/*** I think everything below this line is windows only ***/
+
+/* define this to use win32 mutex mechanisms */
+#undef SP_MUTEX_WIN32
+
 /* define this if _setmode is supported */
 #undef SP_HAVE_SETMODE
-#undef _O_BINARY 
-#undef S_IFMT 
 
-/* set this to the path separator */
-#undef PATH_SEPARATOR
+/* define this to not compile message texts in */
+#undef SP_NO_MESSAGE_TEXT
+
+/* define the following to build a dll */
+#undef SP_USE_DLL
+#undef SP_DLLEXPORT
+#undef SP_DLLIMPORT
+
+/* define this if the OS provides wide character interfaces */
+#undef SP_WIDE_SYSTEM 
+
+/* define this to enable precompiled header support */
+#undef SP_PCH
+
 
 @TOP@
 
@@ -111,8 +119,8 @@
 #undef SP_INCLUDE_OSFCN_H     
 #endif
 
-#ifndef MSDOS_FILENAMES
-#define POSIX_FILENAMES
+#ifndef SP_MSDOS_FILENAMES
+#define SP_POSIX_FILENAMES
 #endif
 
 #ifdef SP_WIDE_SYSTEM
@@ -210,4 +218,16 @@
 #ifdef HAVE_INSTANTIATIONS
 #define SP_ANSI_CLASS_INST
 #endif /* HAVE_INSTANTIATIONS */ 
+
+#ifdef HAVE_SETLOCALE
+#define SP_HAVE_LOCALE
+#endif /* HAVE_SETLOCALE */
+
+#ifdef HAVE_GETTEXT
+#define SP_HAVE_GETTEXT 
+#endif /* HAVE_GETTEXT */
+
+#ifdef WORDS_BIGENDIAN
+#define SP_BIG_ENDIAN
+#endif /* WORDS_BIGENDIAN */
 

@@ -445,7 +445,7 @@ E1+dsEntityNotationUndefined++notation %1 for external subset undefined
 # message fragments
 =1000
 +delimStart++delimiter 
-+delimEnd++
+-+delimEnd++
 +digit++digit
 +nameStartCharacter++name start character
 +sepchar++sepchar

@@ -185,7 +185,9 @@ void AllowedParamsMessageArg::append(MessageBuilder &builder) const
     const StringC &delim = syntax_->delimGeneral(delims[i]);
     builder.appendFragment(ParserMessages::delimStart);
     builder.appendChars(delim.data(), delim.size());
+#if 0
     builder.appendFragment(ParserMessages::delimEnd);
+#endif
   }
   const MessageFragment *fragment[5];
   int nFragments = 0;

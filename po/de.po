@@ -13,9 +13,6 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: ENCODING\n"
 
-#~ msgid ""
-#~ msgstr ""
-
 msgid ""
 "no system identifier could be generated for meta-DTD for architecture %1"
 msgstr ""
@@ -2580,7 +2577,8 @@ msgid "Modify the XML output according to %1."
 msgstr "Modifiziere die XML Ausgabe gem‰ﬂ %1."
 
 msgid "%1 converts SGML to XML. %1 parses and validates the SGML document"
-msgstr "%1 konvertiert SGML zu XML. %1 parsed und validiert das SGML Dokument, das in"
+msgstr ""
+"%1 konvertiert SGML zu XML. %1 parsed und validiert das SGML Dokument, das in"
 
 msgid ""
 "contained in SYSID... and writes an equivalent XML document to the standard"
@@ -2590,7 +2588,8 @@ msgstr ""
 
 msgid ""
 "output. %1 will warn about SGML constructs which have no XML equivalent."
-msgstr "ausgabe aus. %1 warnt vor SGML-Konstrukten, die keine XML-Entsprechung haben."
+msgstr ""
+"ausgabe aus. %1 warnt vor SGML-Konstrukten, die keine XML-Entsprechung haben."
 
 msgid "reference to internal SDATA entity %1 not allowed in XML"
 msgstr "Referenz auf interne SDATA Entit‰t %1 in XML nicht erlaubt"

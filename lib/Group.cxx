@@ -94,7 +94,9 @@ void AllowedGroupConnectorsMessageArg::append(MessageBuilder &builder) const
       const StringC &delim = syntax_->delimGeneral(delims[i]);
       builder.appendFragment(ParserMessages::delimStart);
       builder.appendChars(delim.data(), delim.size());
+#if 0
       builder.appendFragment(ParserMessages::delimEnd);
+#endif
     }
 }
 

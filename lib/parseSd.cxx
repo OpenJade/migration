@@ -3319,7 +3319,9 @@ void AllowedSdParamsMessageArg::append(MessageBuilder &builder) const
 	builder.appendFragment(ParserMessages::delimStart);
 	Char c = sd_->execToInternal('>');
 	builder.appendChars(&c, 1);
+#if 0
 	builder.appendFragment(ParserMessages::delimEnd);
+#endif
       }
       break;
     case SdParam::number:

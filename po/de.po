@@ -1131,430 +1131,431 @@ msgid "attributes can only be defined for base document element (not %1) in simp
 msgstr "Attribute können in einer einfachen Linkdeklarationsteilmenge nur für das Grunddokumentelement definiert werden (nicht %1)"
 
 msgid "a short reference mapping declaration is allowed only in the base DTD"
-msgstr ""
+msgstr "Eine Kurzreferenztabellendeklaration ist nur in der Grund-DTD erlaubt"
 
 msgid "a short reference use declaration is allowed only in the base DTD"
-msgstr ""
+msgstr "Eine Kurzreferenzbenutzungsdeklaration ist nur in der Grund-DTD erlaubt"
 
 msgid "default value of link attribute cannot be CURRENT or CONREF"
-msgstr ""
+msgstr "Der Standardwert eines Linkattributes kann nicht CURRENT oder CONREF sein"
 
 msgid "declared value of link attribute cannot be ID, IDREF, IDREFS or NOTATION"
-msgstr ""
+msgstr "Der deklarierte Wert eines Linkattributes kann nicht ID, IDREF, IDREFS oder NOTATION sein"
 
 msgid "only fixed attributes can be defined in simple LPD"
-msgstr ""
+msgstr "In einer einfachen LPD können nur fixierte Attribute definiert werden"
 
 msgid "only one ID link set declaration allowed in an LPD subset"
-msgstr ""
+msgstr "In einer LPD Teilmenge is nur eine ID-Linkmengendeklaration erlaubt"
 
 msgid "no initial link set defined for LPD %1"
-msgstr ""
+msgstr "Keine initiale Linkmenge für LPD %1 definiert"
 
 msgid "notation %1 not defined in source DTD"
-msgstr ""
+msgstr "Notation %1 in der Quell-DTD nicht definiert"
 
 msgid "result document type in simple link specification must be implied"
-msgstr ""
+msgstr "In einer einfachen Linkspezifikation muß der Zieldokumenttyp impliziert sein"
 
 msgid "simple link requires SIMPLE YES"
-msgstr ""
+msgstr "Ein einfacher Link benötigt SIMPLE YES"
 
 msgid "implicit link requires IMPLICIT YES"
-msgstr ""
+msgstr "Ein impliziter Link benötigt IMPLICIT YES"
 
 msgid "explicit link requires EXPLICIT YES"
-msgstr ""
+msgstr "Ein expliziter Link benötigt EXPLICIT YES"
 
 msgid "LPD not allowed before first DTD"
-msgstr ""
+msgstr "LPD vor der ersten DTD nicht erlaubt"
 
 msgid "DTD not allowed after an LPD"
-msgstr ""
+msgstr "DTD nach einer LPD nicht erlaubt"
 
 msgid "definition of general entity %1 is unstable"
-msgstr ""
+msgstr "Die Definition der allgemeinen Entität %1 ist instabil"
 
 msgid "definition of parameter entity %1 is unstable"
-msgstr ""
+msgstr "Die Definition der Parameterentität %1 ist instabil"
 
 msgid "multiple link rules for ID %1 but not all have link attribute specifications"
-msgstr ""
+msgstr "Mehrere Linkregeln für ID %1, aber nicht alle haben Linkattributspezifikationen"
 
 msgid "multiple link rules for element type %1 but not all have link attribute specifications"
-msgstr ""
+msgstr "Mehrere Linkregeln für Elementtyp %1, aber nicht alle haben Linkattributspezifikationen"
 
 msgid "link type %1 does not have a link set %2"
-msgstr ""
+msgstr "Linktyp %1 hat keine Linkmenge %2"
 
 msgid "link set use declaration for simple link process"
-msgstr ""
+msgstr "Linkmengenbenutzungsdeklaration für einen einfachen Linkprozeß"
 
 msgid "no link type %1"
-msgstr ""
+msgstr "Kein Linktyp %1"
 
 msgid "both document type and link type %1"
-msgstr ""
+msgstr "Sowohl Dokumenttyp als auch Linktyp %1"
 
 msgid "link type %1 already defined"
-msgstr ""
+msgstr "Linktyp %1 bereits definiert"
 
 msgid "document type %1 already defined"
-msgstr ""
+msgstr "Dokumenttyp %1 bereits definiert"
 
 msgid "link set %1 used in LPD but not defined"
-msgstr ""
+msgstr "Linkmenge %1 in LPD benutzt, aber nicht definiert"
 
 msgid "#IMPLIED already linked to result element type %1"
-msgstr ""
+msgstr "#IMPLIED ist bereits mit dem Zielelementtyp %1 gelinkt"
 
 msgid "number of active simple link processes exceeds quantity specified for SIMPLE parameter in SGML declaration (%1)"
-msgstr ""
+msgstr "Die Anzahl aktiver einfacher Linkprozesse überschreitet die für den SIMPLE Parameter in der SGML Deklaration angegebene Größe (%1)"
 
 msgid "only one chain of explicit link processes can be active"
-msgstr ""
+msgstr "Nur eine Kette expliziter Linkprozesse kann aktiv sein"
 
 msgid "source document type name for link type %1 must be base document type since EXPLICIT YES 1"
-msgstr ""
+msgstr "Quelldokumenttypname für Linktyp %1 muß der Grunddokumenttyp sein, da
+EXPLICIT YES 1"
 
 msgid "only one implicit link process can be active"
-msgstr ""
+msgstr "Nur ein impliziter Linkprozeß kann aktiv sein"
 
 msgid "sorry, link type %1 not activated: only one implicit or explicit link process can be active (with base document type as source document type)"
-msgstr ""
+msgstr "Sorry, Linktyp %1 nicht aktiviert: nur ein impliziter oder expliziter Linkprozeß kann aktiv sein (mit Grunddokumenttyp als Quelldokumenttyp)"
 
 msgid "name missing after name group in entity reference"
-msgstr ""
+msgstr "Name fehlt nach einer Namensgruppe in einer Referenz auf eine Entität"
 
 msgid "source document type name for link type %1 must be base document type since EXPLICIT NO"
-msgstr ""
+msgstr "Quelldokumenttypname für Linktyp %1 muß der Grunddokumenttyp sein,  da EXPLICIT NO"
 
 msgid "link process must be activated before base DTD"
-msgstr ""
+msgstr "Linkprozeß muß vor der Grund-DTD aktiviert sein"
 
 msgid "unexpected entity end while starting second pass"
-msgstr ""
+msgstr "Unerwartetes Ende einer Entität, während der zweite Durchgang begann"
 
 msgid "type %1 of element with ID %2 not associated element type for applicable link rule in ID link set"
-msgstr ""
+msgstr "Typ %1 des Elements mit ID %2 ist nicht der assoziierte Elementtyp einer anwendbaren Linkregel in einer ID-Linkmenge"
 
 msgid "DATATAG feature not implemented"
-msgstr ""
+msgstr "DATATAG nicht implementiert"
 
 msgid "generic identifier specification missing after document type specification in start-tag"
-msgstr ""
+msgstr "Generischer Bezeichner fehlt nach der Dokumenttypspezifikation"
 
 msgid "generic identifier specification missing after document type specification in end-tag"
-msgstr ""
+msgstr "Generischer Bezeichner fehlt nach der Dokumenttypspezifikation in einem Endtag"
 
 msgid "a net-enabling start-tag cannot include a document type specification"
-msgstr ""
+msgstr "Ein NET-ermöglichender Starttag kann keine Dokumenttypspezikation enthalten"
 
 msgid "DTD did not contain element declaration for document type name"
-msgstr ""
+msgstr "Die DTD enthielt keine Elementdeklaration für den Dokumenttypnamen"
 
 msgid "invalid default SGML declaration"
-msgstr ""
+msgstr "Ungültige Standard SGML Deklaration"
 
 msgid "reference to entity %1 for which no system identifier could be generated"
-msgstr ""
+msgstr "Referenz auf Entität %1, für welche kein Systembezeichner erzeugt werden konnte"
 
 msgid "entity was defined here"
-msgstr ""
+msgstr "Die Entität wurde hier definiert"
 
 msgid "content model is mixed but does not allow #PCDATA everywhere"
-msgstr ""
+msgstr "Das Inhaltsmodell ist gemischt, aber erlaubt #PCDATA nicht überall"
 
 msgid "start or end of range must specify a single character"
-msgstr ""
+msgstr "Beginn oder Ende eines Bereichs müssen ein einzelnes Zeichen spezifizieren"
 
 msgid "number of first character in range must not exceed number of second character in range"
-msgstr ""
+msgstr "Die Nummer des ersten Zeichens eines Bereichs darf die des zweiten Zeichens nicht überschreiten"
 
 msgid "delimiter cannot be an empty string"
-msgstr ""
+msgstr "Begrenzer kann nicht leer sein"
 
 msgid "too many characters assigned same meaning with minimum literal"
-msgstr ""
+msgstr "Zu viele Zeichen haben dieselbe Bedeutung mit minimalem Literal"
 
 msgid "earlier reference to entity %1 used default entity"
-msgstr ""
+msgstr "Frühere Referenz auf Entität %1 benutzte die Standardentität"
 
 msgid "empty start-tag"
-msgstr ""
+msgstr "Leerer Starttag"
 
 msgid "empty end-tag"
-msgstr ""
+msgstr "Leerer Endtag"
 
 msgid "unused short reference map %1"
-msgstr ""
+msgstr "Unbenutzte Kurzreferenztabelle %1"
 
 msgid "unused parameter entity %1"
-msgstr ""
+msgstr "Unbenutzte Parameterentität %1"
 
 msgid "cannot generate system identifier for public text %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für den öffentlichen Text %1 erzeugen"
 
 msgid "cannot generate system identifier for general entity %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für die allgemeine Entität %1 erzeugen"
 
 msgid "cannot generate system identifier for parameter entity %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für die Parameterentität %1 erzeugen"
 
 msgid "cannot generate system identifier for document type %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für Dokumenttyp %1 erzeugen"
 
 msgid "cannot generate system identifier for link type %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für Linktyp %1 erzeugen"
 
 msgid "cannot generate system identifier for notation %1"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für Notation %1 erzeugen"
 
 msgid "element type %1 both included and excluded"
-msgstr ""
+msgstr "Elementyp %1 sowohl ein- als auch ausgeschlossen"
 
 msgid "no document type declaration; implying %1"
-msgstr ""
+msgstr "Keine Dokumenttypdeklaration: impliziere %1"
 
 msgid "minimum data of AFDR declaration must be ""ISO/IEC 10744:1997"" not %1"
-msgstr ""
+msgstr "Minimale Daten der AFDR Deklaration müssen ""ISO/IEC 10744:1997"" und nicht %1 sein"
 
 msgid "AFDR declaration required before use of AFDR extensions"
-msgstr ""
+msgstr "AFDR Deklaration benötigt, bevor die AFDR Erweiterungen benutzt werden können"
 
 msgid "ENR extensions were used but minimum literal was not ""ISO 8879:1986 (ENR)"" or ""ISO 8879:1986 (WWW)"""
-msgstr ""
+msgstr "Die ENR Erweiterungen wurden benutzt, aber das minimale Literal war nicht "
 
 msgid "illegal numeric character reference to non-SGML character %1 in literal"
-msgstr ""
+msgstr "Ungültige numerische Zeichenreferenz auf das nicht-SGML Zeichen %1 in einem Literal" 
 
 msgid "cannot convert character reference to number %1 because description %2 unrecognized"
-msgstr ""
+msgstr "Kann die Zeichenreferenz auf Nummer %1 nicht konvertieren, weil die Beschreibung %2 nicht erkannt wurde"
 
 msgid "cannot convert character reference to number %1 because character %2 from baseset %3 unknown"
-msgstr ""
+msgstr "Kann die Zeichenreferenz auf Nummer %1 nicht konvertieren, weil Zeichen %2 aus der Grundmenge %3 unbekannt ist"
 
 msgid "character reference to number %1 cannot be converted because of problem with internal character set"
-msgstr ""
+msgstr "Kann die Zeichenreferenz auf Nummer %1 nicht konvertieren, weil es ein Problem mit dem internen Zeichensatz gibt"
 
 msgid "cannot convert character reference to number %1 because character not in internal character set"
-msgstr ""
+msgstr "Kann die Zeichenreferenz auf Nummer %1 nicht konvertieren, weil das Zeichen nicht im internen Zeichensatz vorhanden ist"
 
 msgid "Web SGML adaptations were used but minimum literal was not ""ISO 8879:1986 (WWW)"""
-msgstr ""
+msgstr "Die Web SGML Anpassungen wurden benutzt, aber das minimale Literal war nicht ""ISO 8879:1986 (WWW)"""
 
-msgid "token %1 can be value for more multiple attributes so attribute name required"
-msgstr ""
+msgid "token %1 can be value for multiple attributes so attribute name required"
+msgstr "Token %1 kann als Wert mehrerer Attribute vorkommen, deswegen wird ein Attributname benötigt"
 
 msgid "length of hex number must not exceed NAMELEN (%1)"
-msgstr ""
+msgstr "Die Länge einer Hex-Zahl darf NAMELEN (%1) nicht überschreiten"
 
 msgid "%1 is not a valid name in the declared concrete syntax"
-msgstr ""
+msgstr "%1 ist kein gültiger Name in der deklarierten konkreten Syntax"
 
 msgid "CDATA declared content"
-msgstr ""
+msgstr "CDATA deklarierter Inhalt"
 
 msgid "RCDATA declared content"
-msgstr ""
+msgstr "RCDATA deklarierter Inhalt"
 
 msgid "inclusion"
-msgstr ""
+msgstr "Einschluß"
 
 msgid "exclusion"
-msgstr ""
+msgstr "Ausschluß"
 
 msgid "NUMBER or NUMBERS declared value"
-msgstr ""
+msgstr "NUMBER oder NUMBERS deklarierter Wert"
 
 msgid "NAME or NAMES declared value"
-msgstr ""
+msgstr "NAME oder NAMES deklarierter Wert"
 
 msgid "NUTOKEN or NUTOKENS declared value"
-msgstr ""
+msgstr "NUTOKEN oder NUTOKENS deklarierter Wert"
 
-msgid "conref attribute"
-msgstr ""
+msgid "CONREF attribute"
+msgstr "CONREF Attribut"
 
-msgid "current attribute"
-msgstr ""
+msgid "CURRENT attribute"
+msgstr "CURRENT Attribut"
 
 msgid "TEMP marked section"
-msgstr ""
+msgstr "TEMP markierter Bereich"
 
 msgid "included marked section in the instance"
-msgstr ""
+msgstr "eingeschlossener markierter Bereich in der Instanz"
 
 msgid "ignored marked section in the instance"
-msgstr ""
+msgstr "ignorierter markierter Bereich in der Instanz"
 
 msgid "RCDATA marked section"
-msgstr ""
+msgstr "RCDATA markierter Bereich"
 
 msgid "processing instruction entity"
-msgstr ""
+msgstr "Steueranweisungsentität"
 
 msgid "bracketed text entity"
-msgstr ""
+msgstr "geklammerte Text-Entität"
 
 msgid "internal CDATA entity"
-msgstr ""
+msgstr "interne CDATA Entität"
 
 msgid "internal SDATA entity"
-msgstr ""
+msgstr "interne SDATA Entität"
 
 msgid "external CDATA entity"
-msgstr ""
+msgstr "externe CDATA Entität"
 
 msgid "external SDATA entity"
-msgstr ""
+msgstr "externe SDATA Entität"
 
 msgid "attribute definition list declaration for notation"
-msgstr ""
+msgstr "Attributdefinitionslistendeklaration für eine Notation"
 
 msgid "rank stem"
-msgstr ""
+msgstr "Rangstamm"
 
 msgid "no system id specified"
-msgstr ""
+msgstr "Kein Systembezeichner spezifiziert"
 
 msgid "comment in parameter separator"
-msgstr ""
+msgstr "Kommentar in Parametertrenner"
 
 msgid "named character reference"
-msgstr ""
+msgstr "namentliche Zeichenreferenz"
 
-msgid "and group"
-msgstr ""
+msgid "AND group"
+msgstr "AND Gruppe"
 
 msgid "attribute value not a literal"
-msgstr ""
+msgstr "Attributwert kein Literal"
 
 msgid "attribute name missing"
-msgstr ""
+msgstr "Attributname fehlt"
 
 msgid "element declaration for group of element types"
-msgstr ""
+msgstr "Elementdeklaration für eine Gruppe von Elementtypen"
 
 msgid "attribute definition list declaration for group of element types"
-msgstr ""
+msgstr "Attributdefinitionslistendeklaration für eine Gruppe von Elementtypen"
 
 msgid "empty comment declaration"
-msgstr ""
+msgstr "Leere Kommentardeklaration"
 
 msgid "S separator in comment declaration"
-msgstr ""
+msgstr "S Trenner in einer Kommentardeklaration"
 
 msgid "multiple comments in comment declaration"
-msgstr ""
+msgstr "Mehrere Kommentare in einer Kommentardeklaration"
 
 msgid "no status keyword"
-msgstr ""
+msgstr "Kein Statusschlüsselwort"
 
 msgid "multiple status keywords"
-msgstr ""
+msgstr "Mehrere Statusschlüsselwörter"
 
 msgid "parameter entity reference in document instance"
-msgstr ""
+msgstr "Referenz auf eine Parameterentität in der Dokumentinstanz"
 
-msgid "current attribute"
-msgstr ""
+msgid "CURRENT attribute"
+msgstr "CURRENT Attribut"
 
 msgid "element type minimization parameter"
-msgstr ""
+msgstr "Elementtyp-Minimierungsparameter"
 
 msgid "reference not terminated by REFC delimiter"
-msgstr ""
+msgstr "Referenz nicht durch REFC Begrenzer abgeschlossen"
 
 msgid "#PCDATA not first in model group"
-msgstr ""
+msgstr "#PCDATA nicht am Beginn einer Modellgruppe"
 
 msgid "#PCDATA in SEQ group"
-msgstr ""
+msgstr "#PCDATA in einer SEQ Gruppe"
 
 msgid "#PCDATA in nested model group"
-msgstr ""
+msgstr "#PCDATA in einer verschachtelten Modellgruppe"
 
 msgid "#PCDATA in model group that does not have REP occurrence indicator"
-msgstr ""
+msgstr "#PCDATA in einer Modellgruppe ohne den REP Häufigkeitsindikator"
 
 msgid "name group or name token group used connector other than OR"
-msgstr ""
+msgstr "Namensgruppe oder Namenstokengruppe mit Verbinder ungleich OR"
 
 msgid "processing instruction does not start with name"
-msgstr ""
+msgstr "Steueranweisung beginnt nicht mit einem Namen"
 
 msgid "S separator in status keyword specification in document instance"
-msgstr ""
+msgstr "S Trenner in einer Statusschlüsselwortspezifikation in der Dokumentinstanz"
 
 msgid "reference to external data entity"
-msgstr ""
+msgstr "Referenz auf eine externe Datenentität"
 
 msgid "reference to external entity in attribute value"
-msgstr ""
+msgstr "Referenz auf eine externe Entität in einem Attributwert"
 
 msgid "character %1 is the first character of a delimiter but occurred as data"
-msgstr ""
+msgstr "Zeichen %1 ist das erste Zeichen eines Begrenzers, kam aber als Daten vor"
 
 msgid "SGML declaration was not implied"
-msgstr ""
+msgstr "SGML Deklaration war nicht impliziert"
 
 msgid "marked section in internal DTD subset"
-msgstr ""
+msgstr "Markierter Bereich in der internen DTD Teilmenge"
 
-msgid "net-enabling start-tag not immediately followed by null end-tag"
-msgstr ""
+msgid "NET-enabling start-tag not immediately followed by null end-tag"
+msgstr "NET-ermöglichender Starttag nicht unmittelbar von einem Null Endtag gefolgt"
 
 msgid "entity end in different element from entity reference"
-msgstr ""
+msgstr "Ende einer Entität in einem anderen Element als die Referenz"
 
 msgid "NETENABL IMMEDNET requires EMPTYNRM YES"
-msgstr ""
+msgstr "NETENABL IMMEDNET benötigt EMPTYNRM YES"
 
 msgid "reference to non-SGML character"
-msgstr ""
+msgstr "Referenz auf nicht-SGML Zeichen"
 
 msgid "declaration of default entity"
-msgstr ""
+msgstr "Deklaration einer Standardentität"
 
 msgid "reference to parameter entity in parameter separator in internal subset"
-msgstr ""
+msgstr "Referenz auf eine Parameterentität in einem Parametertrenner in der internen Teilmenge"
 
 msgid "reference to parameter entity in token separator in internal subset"
-msgstr ""
+msgstr "Referenz auf eine Parameterentität in einem Tokentrenner in der internen Teilmenge"
 
 msgid "reference to parameter entity in parameter literal in internal subset"
-msgstr ""
+msgstr "Referenz auf eine Parameterentität in einem Parameterliteral in der internen Teilmenge"
 
 msgid "cannot generate system identifier for SGML declaration reference"
-msgstr ""
+msgstr "Kann keinen Systembezeichner für die Referenz auf die SGML Deklaration erzeugen"
 
 msgid "public text class of formal public identifier of SGML declaration must be SD"
-msgstr ""
+msgstr "Die öffentliche Textklasse des formalen öffentlichen Bezeichners der SGML Deklaration muß SD sein"
 
 msgid "SGML declaration reference was used but minimum literal was not ""ISO 8879:1986 (WWW)"""
-msgstr ""
+msgstr "Eine Referenz auf die SGML Deklaration wurde benutzt, obwohl das minimale Literal micht ""ISO 8879:1986 (WWW)"" ist"
 
 msgid "member of model group containing #PCDATA has occurrence indicator"
-msgstr ""
+msgstr "Ein Mitglied einer #PCDATA enthaltenden Modellgruppe hat einen Häufigkeitsindikator"
 
 msgid "member of model group containing #PCDATA is a model group"
-msgstr ""
+msgstr "Ein Mitglied einer #PCDATA enthaltenden Modellgruppe ist eine Modellgruppe"
 
 msgid "reference to non-predefined entity"
-msgstr ""
+msgstr "Referenz auf eine nicht vordefinierte Entität"
 
 msgid "reference to external entity"
-msgstr ""
+msgstr "Referenz auf eine externe Entität"
 
 msgid "declaration of default entity conflicts with IMPLYDEF ENTITY YES"
-msgstr ""
+msgstr "Die Deklaration einer Standardentität steht im Konflikt zu IMPLYDEF ENTITY YES"
 
 msgid "parsing with respect to more than one active doctype not supported"
-msgstr ""
+msgstr "Mehrere aktive Dokumenttypen nicht unterstützt"
 
 msgid "cannot have active doctypes and link types at the same time"
-msgstr ""
+msgstr "Aktive Dokument- und Linktypen können nicht gemischt werden"
 
 msgid "number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)"
 msgstr "Die Anzahl gleichzeitiger Dokumentinstanzen übersteigt die für den CONCUR Parameter in der SG"

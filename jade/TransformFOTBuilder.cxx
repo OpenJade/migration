@@ -385,10 +385,16 @@ void TransformFOTBuilder::attributes(const Vector<StringC> &atts)
   for (size_t i = 0; i < atts.size(); i += 2) {
     os() << SP_ << atts[i] << '=';
     const StringC &s = atts[i + 1];
-    if (!contains(s, '"'))
-      os() << '"' << s << '"';
-    else if (!contains(s, '\''))
-      os() << '\'' << s << '\'';
+    char quoteChar = 0;
+
+    if (!contains(s, '&'))
+      if (!contains(s, '"'))
+        quoteChar = '"';
+      else if (!contains(s, '\''))
+        quoteChar = '\'';
+
+    if (quoteChar)
+      os() << quoteChar << s << quoteChar;
     else {
       os() << '"';
       for (size_t j = 0; j < s.size(); j++) {
@@ -397,6 +403,13 @@ void TransformFOTBuilder::attributes(const Vector<StringC> &atts)
 	    os() << "&quot;";
 	  else
 	    outputNumericCharRef(os(), '"');
+	}
+	else
+	if (s[j] == '&' ) {
+          if (xml_)
+            os() << "&amp;";
+	  else
+            outputNumericCharRef(os(), '&');
 	}
         else
           os().put(s[j]);

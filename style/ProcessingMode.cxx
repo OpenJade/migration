@@ -13,6 +13,7 @@
 #include "LocNode.h"
 #include <OpenSP/macros.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -21,6 +22,10 @@ namespace DSSSL_NAMESPACE {
 ProcessingMode::ProcessingMode(const StringC &name, const ProcessingMode *initial)
 : Named(name), initial_(initial), defined_(0)
 {
+  if (initial_)
+    hasQuery_ = initial_->hasQuery();
+  else 
+    hasQuery_ = 0;
 }
 
 void ProcessingMode::compile(Interpreter &interp)
@@ -189,8 +194,9 @@ ProcessingMode::findMatch(const NodePtr &node,
 			  Messenger &mgr,
 			  Specificity &specificity) const
 {
+  printf("ProcessingMode::findMatch\n");
   GroveString gi;
-  if (node->getGi(gi) == accessOK)
+  if ((node->getGi(gi) == accessOK) || hasQuery())
     return findElementMatch(StringC(gi.data(), gi.size()), node, context, mgr,
 		            specificity);
   NodePtr tem;
@@ -207,6 +213,7 @@ ProcessingMode::findElementMatch(const StringC &gi,
 				 Messenger &mgr,
 				 Specificity &specificity) const
 {
+  printf("ProcessingMode::findElementMatch\n");
   const Vector<const ElementRule *> *vecP = 0;
 
   for (;;) {

@@ -81,6 +81,7 @@ private:
   };
   bool doDefine();
   bool doDefineUnit();
+  bool doQuery();
   bool doElement();
   bool doOrElement();
   bool doDefault();

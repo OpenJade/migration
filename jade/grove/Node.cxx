@@ -1520,13 +1520,10 @@ static const ComponentName::Id allProps_elementToken[] = {
   ComponentName::idOccurenceIndicator,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_elementToken[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::elementToken = {
   ComponentName::idElementToken,
   allProps_elementToken,
-  subnodeProps_elementToken,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId
@@ -1535,13 +1532,10 @@ static const ComponentName::Id allProps_pcdataToken[] = {
   INTRINSIC_PROPS,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_pcdataToken[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::pcdataToken = {
   ComponentName::idPcdataToken,
   allProps_pcdataToken,
-  subnodeProps_pcdataToken,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId

@@ -67,9 +67,15 @@ cvs_pure_src_dir	:= ..
 cvs_pure_src		:= $(pkg)
 
 
-config.status:
+ChangeLog:
+	[ -f $(cvs_pure_src_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz ]
+	tar -xzvf $(cvs_pure_src_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz \
+		 OpenSP-$(UPSTREAM_VERSION)/ChangeLog
+	mv ../OpenSP-1.4/ChangeLog .
+
+config.status:	ChangeLog
 	autoheader
-#	automake --add-missing
+	automake --add-missing
 	aclocal
 #	libtoolize --force --copy
 	autoconf

@@ -4,7 +4,7 @@ opensp (1.4-1) unstable; urgency=low
   * upload to unstable (woody)
   * rules: bump shlibs.local to 1.4-1
 
- -- Adam Di Carlo <aph@debian.org>  Sun,  6 Feb 2000 12:50:59 -0500
+ -- Adam Di Carlo <aph@debian.org>  Sun,  6 Feb 2000 14:29:15 -0500
 
 opensp (1.4-0.pre3-1) experimental; urgency=low
 

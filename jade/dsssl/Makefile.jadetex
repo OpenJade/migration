@@ -4,7 +4,7 @@ basic: jadetex.ltx
 	tex jadetex.ins
 
 jadetex.fmt: basic
-	tex -ini "&hugelatex" jadetex.ini
+	tex -ini "&hugelatex" -progname=jadetex jadetex.ini
 
 pdfjadetex.fmt: basic
 	pdftex -ini "&pdflatex" -progname=pdfjadetex pdfjadetex.ini
@@ -16,15 +16,18 @@ install: jadetex.fmt pdfjadetex.fmt
 	mkdir $$TT/tex/jadetex ; \
 	cp dsssl.def isoents.tex jadetex.ltx $$TT/tex/jadetex)
 
+realclean: clean
+	-rm jadetex.fmt pdfjadetex.fmt dsssl.def isoents.tex jadetex.ltx
+
 clean:
-	-rm jade*.fmt *.log *.aux *.idx dsssl.def isoents.tex jadetex.ltx
-	-rm *.toc
+	-rm  *.log *.aux *.idx *.pdf *.toc *.dvi
 
 test:
-	./jade -t tex -d ../docbook/print/docbook.dsl tex.sgm
+	./jade -t tex -d ../docbook/print/docbook.dsl test-tables.sgm
 
 distrib:
-	(cd ..; zip -r jadetex jadetex/cooked jadetex/*.dtx jadetex/*.ins \
-	jadetex/makefile jadetex/*ini)
+	(cd ..; zip -r jadetex jadetex/unicode.sty jadetex/cooked jadetex/*.dtx jadetex/*.ins \
+	jadetex/Makefile.jadetex jadetex/ChangeLog jadetex/*ini)
 
 jadetex.ltx: jadetex.dtx
+

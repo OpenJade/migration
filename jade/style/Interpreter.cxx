@@ -10,8 +10,12 @@
 #include "MacroFlowObj.h"
 #include "ELObjMessageArg.h"
 #include "VM.h"
+#include "Owner.h" 
+#include "SchemeParser.h"
 #include "macros.h"
+#include "InternalInputSource.h"
 #include <stdlib.h>
+#include "LangObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -39,6 +43,10 @@ size_t maxObjSize()
     sizeof(LabelSosofoObj),
     sizeof(MacroFlowObj),
     sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
+    sizeof(LangObj),
+#ifdef SP_HAVE_LOCALE
+    sizeof(RefLangObj),
+#endif
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -52,12 +60,14 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+                         bool strictMode,
 			 const FOTBuilder::Extension *extensionTable)
 : groveManager_(groveManager),
   messenger_(messenger),
   extensionTable_(extensionTable),
   Collector(maxObjSize()),
   partIndex_(1),  // 0 is for command-line definitions
+  dPartIndex_(1),
   lexCategory_(lexOther),
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -66,7 +76,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
   initialStyle_(0),
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
-  dsssl2_(dsssl2)
+  dsssl2_(dsssl2),
+  strictMode_(strictMode)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -77,30 +88,48 @@ Interpreter::Interpreter(GroveManager *groveManager,
                 = new (*this) AddressObj(FOTBuilder::Address::none));
   makePermanent(emptyNodeListObj_
 		= new (*this) NodePtrNodeListObj);
+  defaultLanguage_ = theFalseObj_;
   installSyntacticKeys();
   installCValueSymbols();
   installPortNames();
   installPrimitives();
   installUnits();
-  installCharNames();
+  if (!strictMode_) {
+    installCharNames();
+    installSdata();
+  }
   installFlowObjs();
   installInheritedCs();
-  installSdata();
   installNodeProperties();
 
   static const char *lexCategories[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "!$%&*/<=>?~_^:",
+    "",
     "0123456789",
     "-+.",
+    "",
     "();\"",
     " \t\r\n\f",
+    "",
   };
-      //
+  lexCategory_.setEe(lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
+
+  // #',@[\\]`{|} are ASCII chars not mentioned above,
+  // but I guess we don't want to allow any of these
+  // in names (as most of them have special meaning in
+  // scheme/dsssl).
+  if (!strictMode_)
+    for (Char i = 127; i < charMax; i++)
+      lexCategory_.setChar(i, lexAddNameStart);
+
   initialProcessingMode_.setDefined();
+  // can't be done before initializing lexCategory_
+  installBuiltins();
+  installCharProperties();
 }
 
 void Interpreter::compile()
@@ -115,6 +144,8 @@ void Interpreter::compile()
       break;
     mode->compile(*this);
   }
+  compileCharProperties();
+  compileDefaultLanguage();
 }
 
 void Interpreter::compileInitialValues()
@@ -163,7 +194,26 @@ void Interpreter::installInitialValue(Identifier *ident, Owner<Expression> &expr
 
 void Interpreter::defineVariable(const StringC &str)
 {
-  lookup(str)->setValue(makeTrue(), 0);
+  // Dk: Interpret "name=value" as a string variable Setting.
+  int Idx;
+  for (Idx = 0; (Idx < str.size()) && (str[Idx] != '='); Idx++)
+    ;
+
+  // Dk: Not name=value?
+  if (!Idx || (Idx >= (str.size())))
+  {  lookup(str)->setValue(makeTrue(), 0);
+  }
+  else
+  {  // Dk: name=value.
+     StringC Name(str.begin(), Idx);
+     Char Empty = 0;
+     StringC Value(&Empty, 0);
+     int Vlen = str.size() - Idx - 1;
+     if (Vlen) Value = StringC(str.begin() + Idx + 1, Vlen);
+     StringObj* Vs = new (*this) StringObj(Value);
+     makePermanent(Vs);
+     lookup(Name)->setValue(Vs, 0);
+  }
 }
 
 void Interpreter::installUnits()
@@ -215,10 +265,15 @@ void Interpreter::installSyntacticKeys()
     { "define", Identifier::keyDefine },
     { "else", Identifier::keyElse },
     { "=>", Identifier::keyArrow },
+    { "there-exists?", Identifier::keyThereExists },
+    { "for-all?", Identifier::keyForAll },
+    { "select-each", Identifier::keySelectEach },
+    { "union-for-each", Identifier::keyUnionForEach },
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
     { "define-unit", Identifier::keyDefineUnit },
+    { "query", Identifier::keyQuery },
     { "element", Identifier::keyElement },
     { "default", Identifier::keyDefault },
     { "root", Identifier::keyRoot },
@@ -315,6 +370,25 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
+    { "white-point", Identifier::keyWhitePoint },
+    { "black-point", Identifier::keyBlackPoint },
+    { "range", Identifier::keyRange },
+    { "range-abc", Identifier::keyRangeAbc },
+    { "range-lmn", Identifier::keyRangeLmn },
+    { "range-a", Identifier::keyRangeA },
+    { "decode-abc", Identifier::keyDecodeAbc },
+    { "decode-lmn", Identifier::keyDecodeLmn },
+    { "decode-a", Identifier::keyDecodeA },
+    { "matrix-abc", Identifier::keyMatrixAbc },
+    { "matrix-lmn", Identifier::keyMatrixLmn },
+    { "matrix-a", Identifier::keyMatrixA },
     { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
@@ -385,8 +459,12 @@ void Interpreter::installCharNames()
   } chars[] = {
 #include "charNames.h"
   };
-  for (size_t i = 0; i < SIZEOF(chars); i++)
-    namedCharTable_.insert(makeStringC(chars[i].name), chars[i].c);
+  for (size_t i = 0; i < SIZEOF(chars); i++) {
+    CharPart ch;
+    ch.c = chars[i].c;
+    ch.defPart = unsigned(-1);
+    namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installSdata()
@@ -400,8 +478,12 @@ void Interpreter::installSdata()
   } entities[] = {
 #include "sdata.h"
   };
-  for (size_t i = 0; i < SIZEOF(entities); i++)
-    sdataEntityNameTable_.insert(makeStringC(entities[i].name), entities[i].c);
+  for (size_t i = 0; i < SIZEOF(entities); i++) { 
+    CharPart ch;
+    ch.c = entities[i].c;
+    ch.defPart = unsigned(-1);
+    sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installNodeProperties()
@@ -413,17 +495,134 @@ void Interpreter::installNodeProperties()
   }
 }
 
-bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
+void Interpreter::setCharRepertoire(const StringC &pubid)
+{
+  if (pubid == "UNREGISTERED::OpenJade//Character Repertoire::OpenJade") {
+    if (strictMode_) {
+      installCharNames();
+      installSdata();
+      // This assumes that we process char-repertoire
+      // declaration before any declarations which change
+      // lexical categories.
+      for (Char i = 127; i < charMax; i++)
+        lexCategory_.setChar(i, lexAddNameStart);
+      strictMode_ = 0;
+    }
+   } else 
+     message(InterpreterMessages::unsupportedCharRepertoire,
+                StringMessageArg(pubid));
+}
+ 
+void Interpreter::addStandardChar(const StringC &name, const StringC &num)
+{
+  int n;
+  size_t i = 0;
+  if (!scanSignDigits(num, i, n)) {
+    message(InterpreterMessages::invalidCharNumber, StringMessageArg(num));
+    return;
+  }
+  
+  const CharPart *def = namedCharTable_.lookup(name);
+  CharPart ch;
+  ch.c = n;
+  ch.defPart = dPartIndex_;
+  if (def) {
+    if (dPartIndex_ < def->defPart)
+      namedCharTable_.insert(name, ch, 1);
+    else if (def->defPart == dPartIndex_ && def->c != ch.c) 
+      message(InterpreterMessages::duplicateCharName, 
+    	      StringMessageArg(name));
+  }
+  else 
+    namedCharTable_.insert(name, ch, 1);
+}
+
+void Interpreter::addNameChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddNameStart);
+}
+
+void Interpreter::addSeparatorChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp)
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddWhiteSpace);
+}
+
+void Interpreter::addSdataEntity(const StringC &ename, const StringC &etext, const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) { 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+    return; 
+  }
+
+  CharPart ch;
+  ch.c = cp->c;
+  ch.defPart = dPartIndex_;
+
+  if (ename.size() > 0) {
+    const CharPart *def = sdataEntityNameTable_.lookup(ename);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityNameTable_.insert(ename, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityName, 
+		StringMessageArg(ename));
+    }
+    else
+      sdataEntityNameTable_.insert(ename, ch);
+  }
+
+  if (etext.size() > 0) {
+    const CharPart *def = sdataEntityTextTable_.lookup(etext);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityTextTable_.insert(etext, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
+       	message(InterpreterMessages::duplicateSdataEntityText, 
+		StringMessageArg(etext));
+    }
+    else
+      sdataEntityTextTable_.insert(etext, ch);
+  }
+}
+
+bool Interpreter::sdataMap(GroveString name, GroveString text, GroveChar &c) const
 {
   StringC tem(name.data(), name.size());
-  const Char *cp = sdataEntityNameTable_.lookup(tem);
+  StringC tem2(text.data(), text.size());
+
+  const CharPart *cp = sdataEntityNameTable_.lookup(tem);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
+  
+  cp = sdataEntityTextTable_.lookup(tem2);
+  if (cp) {
+    c = cp->c;
+    return 1;
+  }
+  
   if (convertUnicodeCharName(tem, c))
     return 1;
-  // I think this is the most thing to do.
+  // I think this is the best thing to do.
   // At least it makes preserve-sdata work with unknown SDATA entities.
   c = defaultChar;
   return 1;
@@ -450,9 +649,9 @@ ELObj *Interpreter::convertGlyphId(const Char *str, size_t len, const Location &
 
 bool Interpreter::convertCharName(const StringC &str, Char &c) const
 {
-  const Char *cp = namedCharTable_.lookup(str);
+  const CharPart *cp = namedCharTable_.lookup(str);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
   return convertUnicodeCharName(str, c);
@@ -567,6 +766,11 @@ void Interpreter::endPart()
 {
   currentPartFirstInitialValue_ = initialValueNames_.size();
   partIndex_++;
+}
+
+void Interpreter::dEndPart()
+{
+  dPartIndex_++;
 }
 
 void Interpreter::normalizeGeneralName(const NodePtr &nd, StringC &str)
@@ -1150,7 +1354,7 @@ ELObj *Interpreter::convertNumberFloat(const StringC &str)
   if (endPtr == buf.data())
     return 0;
   int unitExp;
-  Unit *unit = scanUnit(str, endPtr - buf.data(), unitExp);
+  Unit *unit = scanUnit(str, endPtr - buf.data() + i0, unitExp);
   if (!unit)
     return 0;
   return new (*this) UnresolvedQuantityObj(val, unit, unitExp);
@@ -1542,15 +1746,30 @@ unsigned long Interpreter::StringSet::hash(const String<char> &str)
   return h;
 }
 
+bool Identifier::preferBuiltin_ = 0;
+
 Identifier::Identifier(const StringC &name)
-: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), flowObj_(0)
+: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
+  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0)
 {
 }
 
+void Identifier::maybeSaveBuiltin()
+{
+  if (defPart_ == unsigned(-1) && !builtin_) {
+    builtin_ = new Identifier(name());
+    if (value_)
+      builtin_->setValue(value_, defPart_);
+    else
+      builtin_->setDefinition(def_, defPart_, defLoc_);
+  }
+}
+ 
 void Identifier::setDefinition(Owner<Expression> &expr,
 			       unsigned part,
 			       const Location &loc)
 {
+  maybeSaveBuiltin();
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
@@ -1559,6 +1778,7 @@ void Identifier::setDefinition(Owner<Expression> &expr,
 
 void Identifier::setValue(ELObj *value, unsigned partIndex)
 {
+  maybeSaveBuiltin();
   value_ = value;
   // Built in functions have lowest priority.
   defPart_ = partIndex;
@@ -1575,8 +1795,15 @@ bool Identifier::defined(unsigned &part, Location &loc) const
 
 ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
 {
+  if (builtin_ && preferBuiltin_)
+    return builtin_->computeValue(force, interp);
   if (value_)
     return value_;
+  bool preferred = 0;
+  if (defPart_ == unsigned(-1) && !preferBuiltin_) {
+    preferBuiltin_ = 1;
+    preferred = 1;
+  }
   ASSERT(def_);
   if (beingComputed_) {
     if (force) {
@@ -1600,7 +1827,17 @@ ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
     }
     ((Identifier *)this)->beingComputed_ = 0;
   }
+  if (preferred)
+    preferBuiltin_ = 0;
   return value_;
+}
+
+ELObj *Identifier::computeBuiltinValue(bool force, Interpreter &interp) const
+{
+  preferBuiltin_ = 1;
+  ELObj *res = computeValue(force, interp);
+  preferBuiltin_ = 0;
+  return res;
 }
 
 Unit::Unit(const StringC &name)
@@ -1778,6 +2015,355 @@ bool operator==(const StringC &s, const char *p)
     if (p[i] == '\0' || (unsigned char)p[i] != s[i])
       return 0;
   return p[s.size()] == '\0';
+}
+
+void Interpreter::installBuiltins()
+{
+  partIndex_ = unsigned(-1);
+  StringC sysid(makeStringC(DEFAULT_SCHEME_BUILTINS));
+  StringC src;
+  groveManager_->mapSysid(sysid);
+  if (groveManager_->readEntity(sysid, src)) {
+    Owner<InputSource> in(new InternalInputSource(src,
+                              InputSourceOrigin::make()));
+    SchemeParser scm(*this, in);
+    scm.parse();
+  }
+  endPart();
+  partIndex_ = 1;
+}
+
+void Interpreter::setDefaultLanguage(Owner<Expression> &expr,
+				     unsigned part,
+				     const Location &loc)
+{
+  defaultLanguageDef_.swap(expr);
+  defaultLanguageDefPart_ = part;
+  defaultLanguageDefLoc_ = loc;
+}
+
+ELObj *Interpreter::defaultLanguage() const
+{
+  return defaultLanguage_;
+}
+
+bool Interpreter::defaultLanguageSet(unsigned &part,Location &loc) const
+{
+  if(defaultLanguageDef_) {
+    part = defaultLanguageDefPart_;
+    loc = defaultLanguageDefLoc_;
+    return true;
+  }
+  return false;
+}
+
+void Interpreter::compileDefaultLanguage()
+{
+  if(defaultLanguageDef_) {
+    InsnPtr insn = Expression::optimizeCompile(defaultLanguageDef_, *this,
+					       Environment(), 0, InsnPtr());
+    VM vm(*this);
+    ELObj *obj = vm.eval(insn.pointer());
+    if(!obj->asLanguage()) {
+      if(!isError(obj)) {
+	setNextLocation(defaultLanguageDefLoc_);
+	message(InterpreterMessages::defLangDeclRequiresLanguage,
+		ELObjMessageArg(obj, *this));
+      }
+      return;
+    }
+    makePermanent(obj);
+    defaultLanguage_ = obj;
+  }
+}
+
+void Interpreter::installCharProperties()
+{
+  //FIXME convert this to tables 
+  // initialize charProperties_;
+  // if a character doesn't have a value for a property,
+  // the CharMap contains 0. 
+
+  CharProp cp;
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.loc = Location();
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_)
+    for (int i = 0; i < 10; i++) {
+      ELObjPart num(makeInteger(i), unsigned(-1));
+      makePermanent(num.obj);
+      cp.map->setChar(i+'0', num);
+    }
+  charProperties_.insert(makeStringC("numeric-equiv"), cp);
+  
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define SPACE 
+#include "charProps.h"
+#undef SPACE
+    };
+   
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+        cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("space?"), cp);
+    
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define RECORD_END
+#include "charProps.h"
+#undef RECORD_END
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("record-end?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define BLANK
+#include "charProps.h"
+#undef BLANK
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("blank?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define INPUT_TAB
+#include "charProps.h"
+#undef INPUT_TAB
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("input-tab?"), cp);
+    
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define INPUT_WHITESPACE
+#include "charProps.h"
+#undef INPUT_WHITESPACE
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("input-whitespace?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define PUNCT
+#include "charProps.h"
+#undef PUNCT
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("punct?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c1, c2;
+      char *script;
+    } chars[] = {
+#define SCRIPT
+#include "charProps.h"
+#undef SCRIPT
+    };
+    
+    StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
+    for (size_t i = 0; i < SIZEOF(chars); i++) { 
+      StringC tem(prefix);
+      tem += makeStringC(chars[i].script);
+      StringObj *obj = new (*this) StringObj(tem);
+      makePermanent(obj);  
+      for (Char c = chars[i].c1; c <= chars[i].c2; c++)   
+	cp.map->setChar(c, ELObjPart(obj, unsigned(-1)));
+    }
+  }
+  charProperties_.insert(makeStringC("script"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("glyph-id"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("drop-after-line-break?"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("drop-unless-before-line-break?"), cp);  
+
+  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("break-before-priority"), cp);  
+
+  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("break-after-priority"), cp);  
+
+  cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("math-class"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("math-font-posture"), cp);  
+}
+
+// return 1 if the character has the property, return 0 if no such property
+// or the character doesn't have the property
+// set ret to the value or the default value
+ELObj *Interpreter::charProperty(const StringC &prop, Char c, const Location &loc, ELObj *def) 
+{
+  const CharProp *cp = charProperties_.lookup(prop);
+  if (!cp) {
+    setNextLocation(loc);
+    message(InterpreterMessages::unknownCharProperty,
+            StringMessageArg(prop));
+    return makeError();
+  }
+
+  if ((*cp->map)[c].obj) 
+    return (*cp->map)[c].obj;
+  else if (def) 
+    return def;
+  else 
+    return cp->def.obj;
+}
+
+void Interpreter::addCharProperty(const Identifier *prop, Owner<Expression> &defval)
+{
+  // FIXME: what about variable default values ?
+  defval->optimize(*this, Environment(), defval);
+  // FIXME: this is a kind of memory leak
+  makePermanent(defval->constantValue());
+  ELObjPart val(defval->constantValue(), partIndex_);
+  const CharProp *cp = charProperties_.lookup(prop->name());
+  if (cp) {
+    if (partIndex_ < cp->def.defPart) 
+      ((CharProp *)cp)->def = val;
+    else if (partIndex_ == cp->def.defPart && 
+             !ELObj::eqv(*val.obj, *cp->def.obj)) {
+      // FIXME: report previous location
+      setNextLocation(defval->location());
+      message(InterpreterMessages::duplicateCharPropertyDecl,
+              StringMessageArg(prop->name()), cp->loc);
+    }
+  }
+   else {
+    CharProp ncp;
+    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
+    ncp.def = val;
+    ncp.loc = defval->location();
+    charProperties_.insert(prop->name(), ncp);
+  }
+}
+
+void Interpreter::setCharProperty(const Identifier *prop, Char c, Owner<Expression> &val)
+{
+  // FIXME: what about variable default values ?
+  const CharProp *cp = charProperties_.lookup(prop->name());
+  if (!cp) {
+    CharProp ncp;
+    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
+    ncp.def = ELObjPart(0, unsigned(-1));
+    ncp.loc = val->location();
+    charProperties_.insert(prop->name(), ncp);
+    cp = charProperties_.lookup(prop->name());
+  }
+  val->optimize(*this, Environment(), val);
+  makePermanent(val->constantValue());
+  ELObjPart obj = ELObjPart(val->constantValue(), partIndex_);
+  
+  ELObjPart def = (*cp->map)[c];
+  if (def.obj) {
+    if (partIndex_ < def.defPart) 
+      cp->map->setChar(c, obj);
+    else if (partIndex_ == def.defPart && !ELObj::eqv(*obj.obj, *def.obj)) {
+      setNextLocation(val->location());
+      // FIXME: report previous location
+      message(InterpreterMessages::duplicateAddCharProperty,
+              StringMessageArg(prop->name()),
+              StringMessageArg(StringC(&c, 1)));
+    }
+  }
+  else 
+    cp->map->setChar(c, obj);
+}
+
+void
+Interpreter::compileCharProperties()
+{
+  HashTableIter<StringC, CharProp> iter(charProperties_);
+  const StringC *key;
+  const CharProp *val;
+  while (iter.next(key, val)) 
+    if (!val->def.obj) {
+      // FIXME location
+      setNextLocation(val->loc);
+      message(InterpreterMessages::unknownCharProperty,
+              StringMessageArg(*key));
+      ((CharProp *)val)->def = ELObjPart(makeError(), 0);
+    }
+}
+
+
+void Interpreter::installExtensionCharNIC(Identifier *ident,
+					  const StringC &pubid,
+					  const Location &loc)
+{
+  ident->setCharNIC(currentPartIndex(), loc);
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -13,6 +13,7 @@
 #include <OpenSP/InputSource.h>
 #include <OpenSP/ArcEngine.h>
 #include <OpenSP/Entity.h>
+#include <OpenSP/MessageTable.h>
 
 #include <ctype.h>
 #include <string.h>

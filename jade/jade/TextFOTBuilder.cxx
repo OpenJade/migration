@@ -142,6 +142,20 @@ struct TextArea {
   };
 };
 
+const double xCellSize = (1.0/80)*6.5*72000;
+
+Ordinate
+length2xordinate(Ordinate displaySize, const FOTBuilder::LengthSpec& ls)
+{
+  return ls.length / xCellSize + ls.displaySizeFactor * displaySize;
+}
+
+Ordinate
+length2xordinate(TextArea::Area& area, const FOTBuilder::LengthSpec& ls)
+{
+  return length2xordinate(area.width(), ls);
+}
+
 class TextFOTBuilder
 : Uncopyable, public FOTBuilder
 {
@@ -156,17 +170,23 @@ private:
   virtual void endParagraph();
   virtual void characters(const Char *, size_t);
   virtual void setQuadding(Symbol);
+  virtual void setStartIndent(const LengthSpec &);
+  virtual void setEndIndent(const LengthSpec &);
+  virtual void setFirstLineStartIndent(const LengthSpec &);
 public:
   struct Style {
     Style();
     Symbol quadding;
+    LengthSpec startIndent;
+    LengthSpec endIndent;
+    LengthSpec firstLineStartIndent;
   };
   struct Model {
     struct Generated {
       Generated() : height(0), height_specified(0) {}
       SaveFOTBuilder content;
       Ordinate height;
-      bool height_specified;
+      Boolean height_specified;
     };
     struct Region {
       Generated header;
@@ -186,6 +206,7 @@ public:
   struct Output {
     class FlowPort : Abstract {
     public:
+      // can be defined in terms of next function
       virtual Ordinate currentWidth() const = 0;
       virtual void chars(Ordinate x, const Char* chars, unsigned n) = 0;
       virtual void verticalSpace(Ordinate height) = 0;
@@ -214,12 +235,15 @@ public:
     private:
       void allocLine();
       void flushLine();
+      Ordinate currentWidth();
+      LengthSpec currentStartIndent();
     private:
       FlowPort& flow_;
       TextFOTBuilder& fotb_;
       Ordinate x_;
       Ordinate limit_;
       Ordinate offset_;
+      Boolean isFirstLine_;
     };
     class AreaFlowPort : public FlowPort {
     public:
@@ -268,6 +292,12 @@ public:
   std::stack<Style> styleStack_;
   Style style_;
 };
+
+Ordinate 
+length2xordinate(const TextFOTBuilder::Output::FlowPort& flow, const FOTBuilder::LengthSpec& ls) 
+{
+  return length2xordinate(flow.currentWidth(), ls);
+}
 
 TextFOTBuilder::Style::Style()
 : quadding ( symbolStart )
@@ -515,6 +545,7 @@ TextFOTBuilder::Output::FlowParaBuilder::FlowParaBuilder(FlowPort& flow, TextFOT
 , fotb_(fotb)
 , x_(0)
 , limit_(0)
+, isFirstLine_(1)
 {
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::FlowParaBuilder()"));
 }
@@ -525,15 +556,35 @@ TextFOTBuilder::Output::FlowParaBuilder::~FlowParaBuilder()
   flushLine();
 }
 
+TextFOTBuilder::LengthSpec
+TextFOTBuilder::Output::FlowParaBuilder::currentStartIndent() 
+{
+  LengthSpec result; // why not operator +?
+  result.length = fotb_.style().startIndent.length 
+                + isFirstLine_ * fotb_.style().firstLineStartIndent.length;
+  result.displaySizeFactor = fotb_.style().startIndent.displaySizeFactor 
+                + isFirstLine_ * fotb_.style().firstLineStartIndent.displaySizeFactor;
+  return result;
+}
+
+Ordinate
+TextFOTBuilder::Output::FlowParaBuilder::currentWidth()
+{
+  return flow_.currentWidth() 
+       - length2xordinate(flow_, currentStartIndent())
+       - length2xordinate(flow_, fotb_.style().endIndent);
+}
+
 void
 TextFOTBuilder::Output::FlowParaBuilder::allocLine()
 {
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::allocLine()"));
   x_ = 0;
-  flow_.currentWidth(); // Ensure there is an area allocated. FIXME.
+  currentWidth(); // Ensure there is an area allocated. FIXME.
   fotb_.lineWidthProvider_.nextLine();
-  limit_ = flow_.currentWidth() - fotb_.lineWidthProvider_.freeLineWidth();
-  offset_ = fotb_.quaddingOffset(fotb_.style().quadding, flow_.currentWidth() - limit_);
+  limit_ = currentWidth() - fotb_.lineWidthProvider_.freeLineWidth();
+  offset_ = length2xordinate(flow_, currentStartIndent())
+    + fotb_.quaddingOffset(fotb_.style().quadding, currentWidth() - limit_);
   DBG(dbg << "limit = " << limit_ << "; setting quadding offset at " << offset_ << endl);
 }
 
@@ -547,6 +598,7 @@ TextFOTBuilder::Output::FlowParaBuilder::flushLine()
     fotb_.lineWidthProvider_.freeLineWidth() = limit_ - x_;
   }
   x_ = limit_ = 0;
+  isFirstLine_ = 0;
 }
 
 void
@@ -752,6 +804,23 @@ void
 TextFOTBuilder::setQuadding(Symbol quadding)
 {
   style_.quadding = quadding;
+}
+
+void 
+TextFOTBuilder::setStartIndent(const LengthSpec& l)
+{
+  style_.startIndent = l;
+}
+void 
+TextFOTBuilder::setEndIndent(const LengthSpec& l)
+{
+  style_.endIndent = l;
+}
+
+void 
+TextFOTBuilder::setFirstLineStartIndent(const LengthSpec& l)
+{
+  style_.firstLineStartIndent = l;
 }
 
 void 

@@ -15,6 +15,10 @@
 #ifndef SP_MANUAL_INST
 #define SP_MANUAL_INST
 #endif
+#ifdef __APPLE__
+#define SP_DEFINE_TEMPLATES
+#undef SP_MANUAL_INST
+#endif
 #ifndef SP_ANSI_CLASS_INST
 #define SP_ANSI_CLASS_INST
 #endif

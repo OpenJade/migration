@@ -1237,7 +1237,7 @@ FOTBuilder::LeaderNIC::LeaderNIC()
 }
 
 FOTBuilder::CharacterNIC::CharacterNIC()
-: valid(0), specifiedC(0), stretchFactor(1.0)
+: specifiedC(0), stretchFactor(1.0)
 {
 }
 

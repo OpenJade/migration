@@ -290,7 +290,6 @@ public:
       cBreakBeforePriority,
       cBreakAfterPriority
     };
-    bool valid;
     unsigned specifiedC;
     Char ch;
     GlyphId glyphId;

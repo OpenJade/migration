@@ -1675,7 +1675,8 @@ static OutputByteStream &operator<<(OutputByteStream &os, double d)
 }
 
 FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
-			      const FOTBuilder::Extension *&ext)
+			      const FOTBuilder::Extension *&ext,
+			      const FOTBuilder::Feature *&f)
 {  
   static const TeXFOTBuilder::PageFloatFlowObj pageFloat;
   static const TeXFOTBuilder::PageFootnoteFlowObj pageFootnote;
@@ -1790,6 +1791,16 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
     { 0, 0, 0}
   };
   ext = extensions;
+
+  static const FOTBuilder::Feature features[] = {
+    { "sideline", 0},
+    { "table", 0},
+    { "math", 0},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  f = features;
+
   return new TeXFOTBuilder(os, mgr);
 }
 

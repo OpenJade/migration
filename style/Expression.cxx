@@ -233,6 +233,7 @@ InsnPtr VariableExpression::compile(Interpreter &interp,
 		   StringMessageArg(ident_->name()));
     return new ErrorInsn;
   }
+  ident_->requireFeature(interp, location());
   ELObj *val = ident_->computeValue(0, interp);
   if (!val)
     return new TopRefInsn(ident_, next);
@@ -252,7 +253,8 @@ void VariableExpression::optimize(Interpreter &interp, const Environment &env,
   isTop_ = 1;
   Location loc;
   unsigned part;
-  if (ident_->defined(part, loc)) {
+  if (ident_->defined(part, loc)) { 
+    ident_->requireFeature(interp, location());
     ELObj *obj = ident_->computeValue(0, interp);
     if (obj && !interp.isError(obj)) {
       interp.makePermanent(obj);
@@ -1266,6 +1268,7 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     flowObj = new (interp) SequenceFlowObj;
     interp.makePermanent(flowObj);
   }
+  foc_->requireFeature(interp, location(), 1);
   Owner<Expression> *contentMapExpr = 0;
   InsnPtr rest(next);
   for (size_t i = 0; i < keys_.size(); i++) {

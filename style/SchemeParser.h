@@ -22,6 +22,8 @@ public:
   void parseMapSdataEntity(const StringC &name, const StringC &text);
   void parseNameChars();
   void parseSeparatorChars();
+  void parseFeatures();
+  void parseGrovePlan();
   bool parseExpression(Owner<Expression> &);
 private:
   SchemeParser(const SchemeParser &); // undefined

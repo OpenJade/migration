@@ -206,6 +206,8 @@ public:
   bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
   void setFlowObj(FlowObj *, unsigned part, const Location &);
+  void setFeature(int);
+  bool requireFeature(Interpreter &, const Location &, bool fo = 0) const;
 private:
   unsigned defPart_;
   Owner<Expression> def_;
@@ -225,6 +227,9 @@ private:
   void maybeSaveBuiltin();
   Identifier *builtin_;
   static bool preferBuiltin_;
+  friend class Interpreter;
+  // FIXME This should be Interpreter::Feature
+  int feature_;
 };
 
 class Unit : public Named {
@@ -319,7 +324,8 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
+	      bool dsssl2, bool style, bool strictMode, 
+	      const FOTBuilder::Extension *, const FOTBuilder::Feature *);
   void endPart();
   void dEndPart();
   FalseObj *makeFalse();
@@ -392,6 +398,7 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool style() const;
   bool strictMode() const;
   void setNodeLocation(const NodePtr &);
   void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
@@ -427,6 +434,83 @@ public:
   void addNameChar(const StringC &);
   void addSeparatorChar(const StringC &);
   void setCharRepertoire(const StringC &);
+  enum Feature {
+    noFeature,
+    combineChar,
+    keyword,
+    multiSource,
+    multiResult,
+    regexp,
+    word,
+    hytime,
+    charset,
+    expression,
+    multiProcess,
+    query,
+    sideBySide,
+    sideline,
+    alignedColumn,
+    bidi,
+    vertical,
+    math,
+    table,
+    tableAutoWidth,
+    simplePage,
+    page,
+    multiColumn,
+    nestedColumnSet,
+    generalIndirect,
+    inlineNote,
+    glyphAnnotation,
+    emphasizingMark,
+    includedContainer,
+    actualCharacteristic,
+    online,
+    fontInfo,
+    crossReference
+  };
+  enum { nFeatures = crossReference + 1 };
+  enum Support {
+    notSupported,
+    partiallySupported,
+    supported
+  };
+  struct Status {
+    bool declared;
+    Support supported;
+    StringC rcsname;
+    StringC appname;
+  };
+  bool convertFeature(const StringC &, Feature &);
+  void explicitFeatures();
+  void declareFeature(const StringC &);
+  void declareFeature(const Feature &);
+  bool requireFeature(const Feature &, const Location &);
+  enum Module {
+    baseabs,
+    prlgabs0,
+    prlgabs1,
+    instabs,
+    basesds0,
+    basesds1,
+    instsds0,
+    subdcabs,
+    sdclabs,
+    sdclsds,
+    prlgsds,
+    instsds1,
+    dtgabs,
+    rankabs,
+    srabs,
+    srsds,
+    linkabs,
+    linksds,
+    subdcsds,
+    fpiabs
+  };
+  enum { nModules = fpiabs + 1 };
+  void explicitModules();
+  void addModule(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -434,7 +518,7 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *, PrimitiveObj *);
+  void installPrimitive(const char *, PrimitiveObj *, Feature f);
   void installXPrimitive(const char *, const char *, PrimitiveObj *);
   void installBuiltins();
   void installUnits();
@@ -446,6 +530,9 @@ private:
   void installSdata();
   void installNodeProperties();
   void installCharProperties();
+  void installFeatures(const FOTBuilder::Feature *);
+  void installModules();
+  void checkGrovePlan();
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -517,6 +604,7 @@ private:
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool style_;
   bool strictMode_;
   ELObj *defaultLanguage_;
   Owner<Expression> defaultLanguageDef_;
@@ -524,6 +612,10 @@ private:
   Location defaultLanguageDefLoc_;
   friend class Identifier;
   HashTable<StringC, CharProp> charProperties_;
+  Status feature_[nFeatures];
+  bool explicitFeatures_;
+  Status module_[nModules];
+  bool explicitModules_;
 };
 
 inline
@@ -717,6 +809,12 @@ inline
 bool Interpreter::dsssl2() const
 {
   return dsssl2_;
+}
+
+inline
+bool Interpreter::style() const
+{
+  return style_;
 }
 
 inline

@@ -1838,9 +1838,8 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	    currentToken_.assign(in->currentTokenStart(),
 	                         in->currentTokenLength() - 1);
 	    tok = tokenKeyword;
-	    if (currentToken_.size() == 1 
-                || currentToken_[currentToken_.size() - 2] == ':'
-	        || invalid)
+	    if (invalid || (currentToken_.size() > 1 
+                  && currentToken_[currentToken_.size() - 1] == ':'))
 	      message(InterpreterMessages::invalidIdentifier, 
 		      StringMessageArg(currentToken_));
 	    return 1;

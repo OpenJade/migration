@@ -2433,6 +2433,9 @@ bool SchemeParser::doDefineLanguage()
     }
   }
   lang_ = new (*interp_) LangObj;
+  bool hadCollate = 0;
+  bool hadToupper = 0;
+  bool hadTolower = 0;
   for (;;) {
     if (!getToken(allowOpenParen|allowCloseParen, tok))
       return 0;
@@ -2447,16 +2450,19 @@ bool SchemeParser::doDefineLanguage()
     else {
       switch (key) {
       case Identifier::keyCollate:
-        if (!doCollate())
+        if (hadCollate || !doCollate())
           return 0;
+        hadCollate = 1;
         break;
       case Identifier::keyToupper:
-        if (!doToupper())
+        if (hadToupper || !doToupper())
           return 0;
+        hadToupper = 1; 
         break;
       case Identifier::keyTolower:
-        if (!doTolower())
+        if (hadTolower || !doTolower())
           return 0;
+        hadTolower = 1;
         break;
       default:
         return 0;

@@ -201,6 +201,10 @@ Boolean PosixStorageManager::isSafe(const StringC &file) const
           || file[i] == '.'
           || file[i] == '-'
           || file[i] == '_'
+#ifdef SP_MSDOS_FILENAMES
+          || file[i] == '\\'
+          || file[i] == ':'
+#endif
        )) return 0;
   }
 
@@ -212,11 +216,20 @@ Boolean PosixStorageManager::isSafe(const StringC &file) const
     if (dir.size() >= searchDir.size()) {
       size_t j = 0;
       for (; j < searchDir.size(); j++) {
-        if (searchDir[j] != dir[j]) break;
+        if (searchDir[j] != dir[j]
+#ifdef SP_MSDOS_FILENAMES
+        && ((searchDir[j] != '/' && dir[j] == '\\') ||
+            (searchDir[j] != '\\' && dir[j] == '/'))
+#endif
+        ) break;
       }
 
       if (j == searchDir.size() &&
-           (dir.size() == searchDir.size() || dir[j] == '/')) return 1;
+           (dir.size() == searchDir.size() || dir[j] == '/'
+#ifdef SP_MSDOS_FILENAMES
+                                           || dir[j] == '\\'
+#endif
+           )) return 1;
     }
   }
 

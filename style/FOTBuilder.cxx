@@ -158,7 +158,7 @@ void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 
 void FOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & (1 << CharacterNIC::cChar))
+  if (nic.valid)
     characters(&nic.ch, 1);
   atomic();
 }
@@ -1182,8 +1182,7 @@ FOTBuilder::LeaderNIC::LeaderNIC()
 }
 
 FOTBuilder::CharacterNIC::CharacterNIC()
-: specifiedC(0),
-  stretchFactor(1.0)
+: valid(0), specifiedC(0), stretchFactor(1.0)
 {
 }
 

@@ -1319,7 +1319,7 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
   FlowObj *flowObj = foc_->flowObj();
   if (!flowObj)
     return next;
-  bool gotOne = 0;
+  bool gotOne = flowObj->isCharacter();
   BoundVarList boundVars;
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
@@ -1340,8 +1340,10 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
 			          new SetNonInheritedCInsn(keys_[i],
 						           exprs_[i]->location(),
 						           code));
-  return compilePushVars(interp, env, stackPos, boundVars, 0,
-			 new SetNonInheritedCsSosofoInsn(code, boundVars.size(), next));
+  InsnPtr rest(new SetNonInheritedCsSosofoInsn(code, boundVars.size(), next));
+  if (flowObj->isCharacter()) 
+    rest = new SetImplicitCharInsn(Location(), rest); 
+  return compilePushVars(interp, env, stackPos, boundVars, 0, rest);
 }
 
 void MakeExpression::unknownStyleKeyword(const Identifier *ident, Interpreter &interp,

@@ -11,6 +11,7 @@
 #include "XMLCodingSystem.h"
 #include "UTF8CodingSystem.h"
 #include "UTF16CodingSystem.h"
+#include "Fixed4CodingSystem.h"
 #include "CodingSystemKit.h"
 #include "Boolean.h"
 #include "Owner.h"
@@ -164,26 +165,26 @@ size_t XMLDecoder::decode(Char *to, const char *from, size_t fromLen,
 		| ((unsigned char)from[2] << 8)
 		| (unsigned char)from[3]) {
 	case 0x0000003C:
-	  lsbFirst_ = 1;
-	  lswFirst_ = 1;
+	  lsbFirst_ = 0;
+	  lswFirst_ = 0;
 	  phase_ = phasePI;
 	  guessBytesPerChar_ = 4;
 	  break;
 	case 0x00003C00:
-	  lsbFirst_ = 0;
-	  lswFirst_ = 1;
-	  phase_ = phasePI;
-	  guessBytesPerChar_ = 4;
-	  break;
-	case 0x003C0000:
 	  lsbFirst_ = 1;
 	  lswFirst_ = 0;
 	  phase_ = phasePI;
 	  guessBytesPerChar_ = 4;
 	  break;
-	case 0x3C000000:
+	case 0x003C0000:
 	  lsbFirst_ = 0;
-	  lswFirst_ = 0;
+	  lswFirst_ = 1;
+	  phase_ = phasePI;
+	  guessBytesPerChar_ = 4;
+	  break;
+	case 0x3C000000:
+	  lsbFirst_ = 1;
+	  lswFirst_ = 1;
 	  phase_ = phasePI;
 	  guessBytesPerChar_ = 4;
 	  break;
@@ -307,6 +308,12 @@ void XMLDecoder::initDecoderDefault()
     {
       UTF16CodingSystem utf16;
       subDecoder_ = utf16.makeDecoder(lsbFirst_); 
+    }
+    break;
+  case 4:
+    {
+      Fixed4CodingSystem utf32;
+      subDecoder_ = utf32.makeDecoder(lsbFirst_, lswFirst_); 
     }
     break;
   default:

@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = check-news
 SUBDIRS = pubtext unicode doc \
 	include generic \
 	lib nsgmls spent spam sgmlnorm sx spcat \
-	intl po
+	intl po tests
 
 pkginclude_HEADERS = config.h
 

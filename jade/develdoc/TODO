@@ -1,4 +1,7 @@
-* Fix doctypes-and-linktypes to return a list of all dtds.
+* Fix spgrove for 32bit chars.
+
+* Add more error messages to the SchemeParser. Currently, many parser
+  functions just return 0 to the caller; they should also issue a message.
 
 * Free Expressions when they are no longer needed. Later, maybe replace the
   allocation mechanism with a simpler one that does not actually free
@@ -45,8 +48,8 @@ Things which are missing and need a lot of work
   by scanning the cmdline args for "-s"/"--strict" before
   constructing the JadeApp instance.  
 
-  Since Char is only 16bit, have to map other-chars in the 
-  Unicode private area somewhere and tell the user/backend about it.
+  We have to map other-chars in the Unicode/UCS private area somewhere and
+  tell the user/backend about it. 
  
 * combine-char: If we do this, we can't do character translation
   as a map char --> char any longer, but instead have to deal

@@ -89,7 +89,7 @@ BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	ParserMessages.cxx ParserMessages.h ParserMessages.rc \
 	PosixStorageMessages.h PosixStorageMessages.rc \
 	StdioStorageMessages.h StdioStorageMessages.rc \
-	RLStorageMessages.h URLStorageMessages.rc \
+	URLStorageMessages.h URLStorageMessages.rc \
 	WinInetStorageMessages.h WinInetStorageMessages.rc \
 	app_inst.cxx arc_inst.cxx entmgr_inst.cxx parser_inst.cxx \
 	xentmgr_inst.cxx

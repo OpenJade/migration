@@ -786,6 +786,7 @@ ConstPtr<Notation> ParserState::getAttributeNotation(const StringC &name,
       ExternalId id;
       nt->setExternalId(id, Location());
       nt->generateSystemId(*this);				       
+      nt->setAttributeDef(currentDtdNonConst().implicitNotationAttributeDef());
       currentDtdNonConst().insertNotation(nt);
       notation = currentDtd().lookupNotation(name);      
     }

@@ -1,0 +1,195 @@
+Some temporary notes:
+
+==============================================================================
+
+For reference, here is how some of this can be hacked in jadetex using 
+sgml-parse:
+
+cat >>jadetex.cfg <<EOF
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% page-number and category-page-number support
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% We need a counter totalpages which truly counts the pages 
+% shipped out so far (unlike page, which counts something 
+% like the DSSSL category-page-number).  
+%
+\newcounter{totalpages}
+\setcounter{totalpages}{1}
+
+% Wow, changing the LaTeX output routine !
+\let\@@outputpage\@outputpage
+\def\@outputpage{\@@outputpage\stepcounter{totalpages}}
+
+% Produce an SGML file which can be read by sgml-parse
+\newwrite\@dssslindexfile
+\immediate\openout\@dssslindexfile=\jobname.index
+\begingroup
+  \catcode`\#=12
+  \immediate\write\@dssslindexfile
+  {<!doctype pagelist [^^J %
+<!element pagelist - - (node+) >^^J 
+<!element node - - (firstarea,node*,lastarea) >^^J 
+<!attlist node id ID #IMPLIED >^^J 
+<!element (firstarea,lastarea) - - EMPTY >^^J 
+<!attlist (firstarea,lastarea)^^J   
+page NUMBER #REQUIRED^^J   
+category NUMBER #REQUIRED >^^J%
+]>^^J%
+<pagelist>}
+\endgroup
+\typeout{Writing DSSSL page number information to \jobname.index.}
+
+\newcounter{elno}
+\let\@@Node\Node
+\def\Node#1{%
+  \@@Node{#1}%
+  \DEBUG{Label \Label}%
+  \DEBUG{Element \Element}%
+  \def\pgid{}%
+  \ifx\Label\@empty
+    \ifx\Element\@empty\else
+     \setcounter{elno}{\Element}%
+     \addtocounter{elno}{1}%
+     \edef\pgid{ELNO\arabic{elno}}%
+    \fi
+  \else
+    \let\pgid\Label
+  \fi
+    \immediate\write\@dssslindexfile
+    {<node\ifx\pgid\@empty\else\space id="\pgid"\fi>^^J
+       <firstarea page="\arabic{totalpages}" 
+                  category="\arabic{page}">}}
+\let\@@endNode\endNode
+\def\endNode#1{%
+  \DEBUG{endNode: \Label, \Element}%
+    \immediate\write\@dssslindexfile
+    { <lastarea page="\arabic{totalpages}"
+                category="\arabic{page}">^^J</node>}%
+  \@@endNode{#1}}
+\let\@@endFOT\endFOT
+\def\endFOT{%
+ \immediate\write\@dssslindexfile{</pagelist>}%
+ \immediate\closeout\@dssslindexfile
+ \@@endFOT}
+
+EOF
+
+Explanation for the TeXagnostics: What this does is write an SGML file
+xyz.index (assuming you started with xyz.sgml from which jade -ttex produced 
+xyz.tex) with the following DTD
+
+<!element pagelist - - (node+) >
+<!element node - - (firstarea,node*,lastarea) >
+<!attlist node id ID #IMPLIED >
+<!element (firstarea,lastarea) - - EMPTY >
+<!attlist (firstarea,lastarea)
+	page NUMBER #REQUIRED
+	category NUMBER #REQUIRED >
+ 
+jadetex emits a node element for each node in the FOT (in reality there
+are no nodes in the FOT, but the TeXFOTBuilder emits enough information
+for jadetex to know which node was current when a FO was created).
+
+The page and category attributes of the firstarea and lastarea elements 
+contain the values we want to get via 
+
+(page-number first-area-of-node: nd)
+(page-number last-area-of-node: nd)
+(category-page-number first-area-of-node: nd)
+(category-page-number last-area-of-node: nd)
+
+if nd is the node in question.
+
+Here is how to define page-number and category-page-number using sgml-parse.
+The ugly thing is that the name of the index file is hardcoded. This 
+could be improved using the -V extensions of OpenJade.
+
+cat >>page-numbers.dsl <<EOF
+
+(define index-sysid "xyz.index")
+(define index-page-grove (sgml-parse index-sysid))
+
+(define (page-number #!key first-area-of-node last-area-of-node) 
+  (wrap-generated-object
+  (if (and first-area-of-node last-area-of-node)
+     (error "page-number accepts at most one key argument")
+     (let* ((snl (or first-area-of-node last-area-of-node (current-node))) 
+            (area (if last-area-of-node "LASTAREA" "FIRSTAREA"))
+	    (tid (or (id snl) (string-append "ELNO" 
+					     (format-number
+					      (all-element-number snl) "1")))))
+       (if tid
+	   (string->number 
+	    (or (attribute-string 
+		 "PAGE" (select-elements 
+			 (children (element-with-id tid index-page-grove))
+			 area))
+		"0"))
+	   (error "page-number currently works only on elements 
+and nodes with id"))))))
+	   
+(define (category-page-number #!key first-area-of-node last-area-of-node) 
+  (wrap-generated-object
+  (if (and first-area-of-node last-area-of-node)
+     (error "category-page-number accepts at most one key argument")
+     (let* ((snl (or first-area-of-node last-area-of-node (current-node))) 
+            (area (if last-area-of-node "LASTAREA" "FIRSTAREA"))
+	    (tid (or (id snl) (string-append "ELNO" 
+					     (format-number
+					      (all-element-number snl) "1")))))
+       (if tid
+	   (string->number 
+	    (or (attribute-string 
+		 "CATEGORY" (select-elements 
+			 (children (element-with-id tid index-page-grove))
+			 area))
+		"0"))
+	   (error "category-page-number currently works only on elements 
+and nodes with id"))))))
+
+
+;; I used wrap-generated-object to fake a new type for generated objects.
+
+(define (wrap-generated-object x) (cons 'generated-object x))
+
+(define (generated-object? x) 
+  (and (pair? x) (equal? (car x) 'generated-object)))
+
+(define (unwrap-generated-object x) 
+  (if (generated-object? x) 
+      (cdr x)
+      (error "generated object required")))
+
+
+;; Of course we also need some of the DSSSL functions dealing with
+;; generated objects.
+
+; This is a *very* partial implementation of general-indirect-sosofo.
+(define (general-indirect-sosofo fun #!rest li) 
+  (fun (map unwrap-generated-object li)))
+
+(define (number-indirect-sosofo x #!key (format "1") (add 0) (multiple 1))
+  (let ((y (unwrap-generated-object x)))
+    (if (not (number? y))
+	(error "number-indirect-sosofo: kernel of generated object 
+not a number")
+	(let ((n (+ add y))) 
+	  (if (= 0 (remainder n multiple))
+	      (literal (format-number n format))
+	      (literal ""))))))
+
+(define (asis-indirect-sosofo x)
+  (let ((y (unwrap-generated-object x)))
+    (if (not (sosofo? y))
+	(error "asis-indirect-sosofo: kernel of generated object 
+not a sosofo")
+	y)))
+
+EOF
+
+==============================================================================

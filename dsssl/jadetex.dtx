@@ -1,0 +1,2756 @@
+% \iffalse
+% RCS: $Id$
+% File: jadetex.dtx Copyright (C) 1996, 1997, 1998
+% Sebastian Rahtz  <s.rahtz@elsevier.co.uk>
+%
+% Permission is hereby granted, free of charge, to any person obtaining
+% a copy of this software and associated documentation files (the
+% ``Software''), to deal in the Software without restriction, including
+% without limitation the rights to use, copy, modify, merge, publish,
+% distribute, sublicense, and/or sell copies of the Software, and to
+% permit persons to whom the Software is furnished to do so, subject to
+% the following conditions:
+% 
+% The above copyright notice and this permission notice shall be included
+% in all copies or substantial portions of the Software.
+% 
+% THE SOFTWARE IS PROVIDED ``AS IS'', WITHOUT WARRANTY OF ANY KIND, EXPRESS
+% OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+% MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+% IN NO EVENT SHALL SEBASTIAN RAHTZ BE LIABLE FOR ANY CLAIM, DAMAGES OR
+% OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+% ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+% OTHER DEALINGS IN THE SOFTWARE.
+%
+%<isoent>\ProvidesFile{isoents.tex}
+%<dsssldef>\ProvidesFile{dsssl.def}
+%<*dtx>
+          \ProvidesFile{jadetex.ltx}
+%</dtx>
+%<package>\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+%<package>\ProvidesFile{jadetex.ltx}
+%\GetFileInfo{jadetex.dtx}
+%<driver> \ProvidesFile{jadetex.drv}
+% \fi
+%         \ProvidesFile{jadetex.dtx}
+%
+% \iffalse
+%<*driver>
+\documentclass{ltxdoc}
+\usepackage{times,array,longtable,colortbl}
+\usepackage[T1]{fontenc}
+\makeatletter
+  \let\\\@centercr
+
+\def\arraybackslash{\let\\=\@arraycr}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\makeatother
+\EnableCrossrefs
+\CodelineIndex
+\begin{document}
+ \title{Jade DSSSL \TeX{} backend macros}
+ \author{Sebastian Rahtz\\Email: \texttt{s.rahtz@elsevier.co.uk}}
+ \date{printed \today}
+ \maketitle
+ \tableofcontents
+ \DocInput{jadetex.dtx}
+\end{document}
+%</driver>
+% \fi
+% \CheckSum{5350}
+% \StopEventually{}
+%
+% \section{Introduction}
+% \subsection{Acknowledgements}
+% Developed from the skeleton by  David Megginson
+% (\texttt{dmeggins@microstar.com}), who wrote the original Jade
+% \texttt{TeXFOTBuilder} module. This version incorporates support for
+% important changes made by Paul Prescod and Kathleen Marszal for tables;
+% those changes and the corresponding work in Jadetex were commissioned by
+% Kendall Clark (Novare), to whom considerable thanks are due.
+%
+% Considerable benefit has been had from corrections, additions and
+% discusions from David Carlisle, Matthias Clasen,
+% Ulrich Drepper and Christian Leutloff.
+%
+% \subsection{Usage}
+% The file |jadetex.ltx| can either be loaded before the Jade output
+% or (better) made into a format file for fast loading; it
+% sits on top of \LaTeX, so do:
+% \begin{verbatim}
+% tex -ini \&latex jadetex.ltx '\dump'
+% \end{verbatim}
+% Be warned that because many elements can get labelled in Jadetex, it is
+% easy to run out of memory. You will very likely need to increase poolsize.
+%
+% If you really want to gain speed and save memory memory, 
+% prepare an even more cut down \LaTeX with unneeded chunks cut out.
+% (such as the picture environment etc). Be careful and be legal, please.
+%
+% We build on \LaTeX, but do not need a lot of the paraphernalia
+% of the document classes, so we just load the \texttt{minimal} class,
+% designed for this purpose. We also need access to
+% input and output font encoding, color, graphics inclusion, and
+% headers and footers; so we load some standard packages. The
+% \texttt{inputenc} option is temporary, and needs more thought.
+% Eventually we want Unicode input working, with Omega.
+%    \begin{macrocode}
+%<*package>
+\def\JadeTeXMajorVersion{2}
+\def\JadeTeXMinorVersion{1}
+\def\JadeTeXDate{1998/09/14}
+\documentclass{minimal}
+\RequirePackage{amssymb}[1995/01/01]
+\RequirePackage{array}[1995/01/01]
+\RequirePackage{longtable}[1995/01/01]
+\RequirePackage{color}[1997/09/09]
+\RequirePackage{graphicx}[1997/06/09]
+\RequirePackage{multicol}[1997/12/16]
+\RequirePackage{textcomp}[1998/01/16]
+\RequirePackage[dsssl]{inputenc}[1997/12/20]
+\RequirePackage[OT2,T1]{fontenc}
+\fontencoding{T1}\selectfont
+\RequirePackage{fancyhdr}
+\RequirePackage[german,french,english]{babel}[1997/01/23]
+\RequirePackage[implicit=false,bookmarks=false]{hyperref}[1998/08/08]
+\def\PDFBorders{0 0 0}
+\def\TeXFOTversion{0.0} 
+\makeatletter
+%    \end{macrocode}
+% This was suggested by Matthias Clasen, checking that the macros
+% come from the right version of the Jade TeX backend. The package
+% will have a n.m version number, where the n changes when Jade changes,
+% and the m changes when the JadeTeX package changes.
+%    \begin{macrocode}
+\def\checkFOTversion#1{%
+\ifx\\#1\\\def\TeXFOTmajor{0}
+\else
+ \def\TeXFOTmajor{#1}%
+\fi
+ \let\next\relax
+ \ifnum\TeXFOTmajor=\JadeTeXMajorVersion
+ \else
+   \message{Your file was generated by Jade TeX backend version \TeXFOTmajor}
+   \message{- these macros are for version \JadeTeXMajorVersion. }
+   \message{I'll stop here...}
+   \let\next\@@end
+ \fi
+ \next}
+%    \end{macrocode}
+% \section{Inherited characteristics}
+% Here we list the default values; non-inherited characteristics 
+% will always be specified.
+%    \begin{macrocode}
+\def\AlignLeader{}
+\def\AsisWrapIndent{}
+\def\BackgroundColor{}
+\def\BackgroundLayer{}
+\def\BackgroundTile{}
+\def\BorderAlignment{}
+\def\BorderOmitAtBreak{}
+\def\BorderPresent{0}
+\def\BorderPriority{}
+\def\BoxBorderAlignment{}
+\def\BoxCornerRadius{}
+\def\BoxOpenEnd{}
+\def\BoxType{}
+\def\CellBackground{}
+\def\CellCrossed{}
+\def\CellRowAlignment{start}
+\def\CellBeforeRowMargin{\z@}
+\def\CellAfterRowMargin{\z@}
+\def\CellBeforeColumnMargin{\z@}
+\def\CellAfterColumnMargin{\z@}
+\def\Color{}
+\def\Country{}
+\def\DisplayAlignment{}
+\def\EndIndent{\z@}
+\def\EndMargin{}
+\def\ExpandTabs{}
+\def\FieldAlign{start}
+\def\FieldWidth{0pt}
+\def\FillingDirection{}
+\def\FirstLineStartIndent{0pt}
+\def\FloatOutLineNumbers{}
+\def\FloatOutMarginalia{}
+\def\FloatOutSidelines{}
+\def\fFamName{Times-Roman} % Use Adobe Times Roman by default
+\def\fPosture{normal} 
+\def\fProportionateWidth{medium}
+\def\fSize{10pt}
+\def\fStructure{}
+\def\fWeight{medium}
+\def\GlyphAlignmentMode{}
+\def\GlyphReorderMethod{}
+\def\GlyphSubstMethod{}
+\def\HangingPunct{}
+\def\HeadingLevel{0}
+\def\Hyphenate{}
+\def\HyphenationKeep{}
+\def\HyphenationLadderCount{}
+\def\HyphenationMethod{}
+\def\HyphenationPushCharCount{}
+\def\HyphenationRemainCharCount{}
+\def\IgnoreRecordEnd{}
+\def\ImplicitBidiMethod{}
+\def\InhibitLineBreaks{}
+\def\InputWhitespaceTreatment{}
+\def\JustifyGlyphSpaceMaxAdd{}
+\def\JustifyGlyphSpaceMaxRemove{}
+\def\KernMode{}
+\def\Kern{}
+\def\Language{}
+\def\LastLineEndIndent{}
+\def\LastLineJustifyLimit{}
+\def\LastLineQuadding{}
+\def\Layer{}
+\def\Ligature{}
+\def\LineBreakingMethod{}
+\def\LineCap{}
+\def\LineCompositionMethod{}
+\def\LineJoin{}
+\def\LineNumberSep{}
+\def\LineNumberSide{}
+\def\LineRepeat{}
+\def\LineSpacing{12pt}
+\def\Lines{}
+\def\MarginaliaKeepWithPrevious{}
+\def\MarginaliaSep{}
+\def\MarginaliaSide{}
+\def\MathDisplayMode{inline}
+\def\MinLeaderRepeat{}
+\def\NColumnsSpanned{1}
+\def\NumberedLines{}
+\def\OrphanCount{}
+\def\PositionPreference{}
+\def\PrincipalModeSimultaneous{}
+\def\Quadding{start}
+\def\ScoreSpaces{}
+\def\SidelineSep{}
+\def\SidelineSide{}
+\def\SpanWeak{}
+\def\Span{0}
+\def\StartIndent{\z@}
+\def\StartMargin{}
+\def\TableAutoWidthMethod{}
+\def\TableCornerRadius{}
+\def\TablePartOmitMiddleFooter{}
+\def\TablePartOmitMiddleHeader{}
+\def\TruncateLeader{}
+\def\WidowCount{}
+\def\WritingMode{}
+\def\AlignLeader{1}% true
+\def\BreakAfter{0}%  false
+\def\BreakAfterPriority{0}%
+\def\BreakBefore{0}%  false
+\def\BreakBeforePriority{0}%
+\def\CoalesceId{0}%  false
+\def\EntitySystemId{}% [required]
+\def\EscapementDirection{}% [=writing-mode]
+\def\IdrefAddress{}%
+\def\IsDisplay{0}%  false
+\def\Keep{0}%  false
+\def\KeepWithNext{0}%  false
+\def\KeepWithPrevious{0}%  false
+\def\MayViolateKeepAfter{0}%  false
+\def\MayViolateKeepBefore{0}%  false
+\def\MaxWidth{!}
+\def\MaxHeight{!}
+\def\NotationSystemId{}% [required]
+\def\Orientation{}% [required]
+\def\PageNColumns{1}
+\def\GridColumnSep{\z@}
+\def\PositionPointShift{\z@}
+\def\PositionPointShiftFactor{}
+\def\PositionPointX{}% ??
+\def\PositionPointY{}% ??
+\def\PositionPreference{0}%  false
+\def\ScaleType{max-uniform}%
+\def\ScaleX{}% [n/a] =scale
+\def\ScaleY{}% [n/a] =scale
+\def\ScoreLength{}% ??
+\def\ScoreType{}% [required] =type
+\def\saConditional{0}%  false =space-after
+\def\saForce{0}%  false =space-after
+\def\saMax{0pt}% =space-after
+\def\saMaxFactor{0}%  =space-after
+\def\saMin{0pt}% =space-after
+\def\saMinFactor{0}%  =space-after
+\def\saNom{0pt}% =space-after
+\def\saNomFactor{0}%  =space-after
+\def\saPriority{0}%  =space-after
+\def\sbConditional{0}%  false
+\def\sbForce{0}%  false
+\def\sbMax{0pt}%
+\def\sbMaxFactor{0}%
+\def\sbMin{0pt}%
+\def\sbMinFactor{0}%
+\def\sbNom{0pt}%
+\def\sbNomFactor{0}%
+\def\sbPriority{0}%
+\newdimen\CurrentSpaceNom
+\newdimen\CurrentSpaceMin
+\newdimen\CurrentSpaceMax
+\CurrentSpaceNom0pt
+\CurrentSpaceMax0pt
+\CurrentSpaceMin0pt
+\newdimen\LastSpaceNom
+\newdimen\LastSpaceMin
+\newdimen\LastSpaceMax
+\LastSpaceNom0pt
+\LastSpaceMax0pt
+\LastSpaceMin0pt
+\def\LastSpaceConditional{0}%  false
+\def\LastSpaceForce{0}%  false
+\def\LastSpaceMaxFactor{0}%
+\def\LastSpaceMinFactor{0}%
+\def\LastSpaceNomFactor{0}%
+\def\LastSpacePriority{0}%
+\def\TruncateLeader{0}%  false
+\def\Width{}% [required] *
+\def\Length{}% [context]
+\def\TableWidth{\hsize}% 
+\def\ColumnIndex{}% [contextual] =column-number?
+\def\HeaderMargin{0pt}
+\def\FooterMargin{0pt}
+\def\LeftMargin{0pt}
+\def\RightMargin{0pt}
+\def\TopMargin{0pt}
+\def\BottomMargin{0pt}
+\def\PageWidth{211mm}
+\def\PageHeight{297mm}
+\def\placement{htbp}
+\edef\OldFontSize{\fSize}
+\edef\OldLineSpacing{\LineSpacing}
+\edef\OldFontPosture{\fPosture}
+\edef\OldFontProportionateWidth{\fProportionateWidth}
+\edef\OldFontWeight{\fWeight}
+\edef\OldfFamName{\fFamName}
+\let\pageFontSize\fSize
+\let\pageLineSpacing\LineSpacing
+\let\pageFontPosture\fPosture
+\let\pageFontProportionateWidth\fProportionateWidth
+\let\pageFontWeight\fWeight
+\let\pagefFamName\fFamName
+\let\ColorRed\@empty
+\newtoks\JadeTeXtoks
+\def\DEBUG#1{\typeout{DBG: #1 at \the\inputlineno}}
+%    \end{macrocode}
+% \section{Nodes and labels}
+%    \begin{macrocode}
+\let\Label\@empty
+\let\Element\@empty
+\def\Node#1{%
+\ifnum\Mathcount>1\relax
+\else
+ \ifx\\#1\\\else
+    \let\ProcessingMode\@empty
+    #1%
+    \ifx\ProcessingMode\@empty\else
+     \let\Label\@empty\let\Element\@empty
+    \fi
+%    \typeout{Node <\Label> or <\Element> -- pending at \the\inputlineno}%
+ \fi
+\fi
+}
+\def\endNode#1{%
+   \ifTableMode
+   \else
+      \let\Label\@empty\let\Element\@empty%\noindent
+   \fi}
+\def\PageLabel#1{%
+  \@bsphack
+  \expandafter\ifx\csname p@#1\endcsname\relax
+  \else
+  \protected@write\@auxout{}%
+         {\string\pagelabel{#1}{\thepage}}%
+  \fi
+  \@esphack}
+\def\OriginalPageLabel#1{%
+  \@bsphack\protected@write\@auxout{}%
+         {\string\pagelabel{#1}{\thepage}}\@esphack}
+\def\pagelabel#1#2{\global\@namedef{p@#1}{#2}}
+\def\Pageref#1{\expandafter\@Setref\csname p@#1\endcsname{#1}}
+\def\@Setref#1#2{%
+  \ifx#1\relax
+   \immediate\write\@mainaux{\string\pagelabel{#2}{-999}}%
+   \protect\G@refundefinedtrue
+   \nfss@text{\reset@font\bfseries ??}%
+   \@latex@warning{Reference `#2' on page \thepage \space
+             undefined}%
+  \else
+   \ifNestedLink{#1}%
+   \else
+    \hyper@@link[Page]{}{page.#1}{#1}%
+   \fi
+  \fi
+}
+%
+\def\insertCurrentNodePageNumber#1{%
+ \bgroup
+ \SetupICs{#1}%
+ \InlineNIC
+ \ifx\Label\@empty
+     \Pageref{\Element}%
+ \else
+     \Pageref{\Label}%
+ \fi
+ \endInlineNIC
+ \endSetupICs
+ \egroup
+}
+%    \end{macrocode}
+%\section{Atomic flow objects}
+%    \begin{macrocode}
+\def\insertAlignmentPoint#1{}
+%    \end{macrocode}
+% \subsection{Maths}
+% \subsubsection{General math sequences}
+%    \begin{macrocode}
+\def\@display{display}
+%    \end{macrocode}
+% We are likely to meet nested math sequences, so maintain a counter
+% to determine if we are at the outer level, and should turn
+% math (display or inline) off or on.
+%    \begin{macrocode}
+\newcount\Mathcount
+\def\MathSeq#1{%
+    \bgroup
+    \SetupICs{#1}%
+    \FlowObjectSetup{0}%
+    \global\advance\Mathcount by 1%
+    \let\Action\relax
+    \ifnum\Mathcount=1
+     \ifx\MathDisplayMode\@display\let\Action\Dmath\else\let\Action\Imath\fi
+    \fi
+    \Action
+}
+\def\endMathSeq{%
+  \global\advance\Mathcount by -1%
+  \let\Action\relax
+  \ifnum\Mathcount=0
+     \ifx\MathDisplayMode\@display\let\Action\endDmath\else\let\Action\Imath\fi
+  \fi
+  \Action
+  \endSetupICs
+  \egroup
+}
+\def\Dmath{\vskip\MinLeading$\displaystyle }
+\def\endDmath{$\vskip\MinLeading}
+\def\Imath{$}
+\def\Cleanmath{\def\Node##1{}\def\endNode##1{}%
+ \def\MathSeq##1{}\def\endMathSeq##1{}
+}
+%    \end{macrocode}
+% \subsubsection{Fences}
+%    \begin{macrocode}
+\def\FenceSerial#1#2#3#4{#1\FlowObjectSetup{0}%
+ {\Cleanmath
+%
+% #1: fence characteristics
+% #2: fence contents
+% #3  open character
+% #4  close character
+%
+\DEBUG{Fence: #3 and #4}%
+  \ifx\\#3\\\left.\else\left#3\fi
+  {#2}%
+  \ifx\\#4\\\right.\else\right#4\fi
+ }%
+}
+%    \end{macrocode}
+% \subsubsection{Fractions}
+% These simply translate into |{Numerator \over Denominator}|
+%    \begin{macrocode}
+\def\FractionSerial#1{#1\FlowObjectSetup{0}\bgroup}
+\def\endFractionSerial{\egroup}
+\def\FractionDenominator{}
+\def\endFractionDenominator{}
+\def\FractionNumerator{}
+\def\endFractionNumerator{\over }
+\def\insertFractionBar{}
+%    \end{macrocode}
+% \subsubsection{Marks}
+% Waiting to be implemented.
+%    \begin{macrocode}
+\def\MarkOver#1#2\endMarkOver{}
+\def\MarkUnder#1#2\endMarkUnder{}
+\def\MarkSerial#1{}
+\def\endMarkSerial{}
+%    \end{macrocode}
+% \subsubsection{Operators/limits}
+%    \begin{macrocode}
+\def\MathOperatorSerial#1{#1\FlowObjectSetup{0}\begingroup\Cleanmath}
+\def\endMathOperatorSerial{\endgroup}
+\def\MathOperatorOperator#1#2\endMathOperatorOperator#3{#1%
+ \mathop{#2}}
+\def\MathOperatorLowerLimit#1{#1_\bgroup}
+\def\endMathOperatorLowerLimit#1{\egroup}
+\def\MathOperatorUpperLimit#1{#1^\bgroup}
+\def\endMathOperatorUpperLimit#1{\egroup}
+%    \end{macrocode}
+% \subsubsection{Radicals}
+%    \begin{macrocode}
+\def\RadicalSerial#1\insertRadicalRadicalDefaulted#2#3\RadicalDegree#4#5\endRadicalDegree#6\endRadicalSerial{#1\FlowObjectSetup{0}%
+\ifx\\#5\\\ensuremath{\sqrt{#3}}\else\ensuremath{\root #5 \of {#3}}\fi}
+%    \end{macrocode}
+% \subsubsection{Grids}
+%    \begin{macrocode}
+\newcount\GridCells
+\newcount\GridRows
+\newif\ifExplicitGrid
+\def\Grid#1{#1%
+ \begingroup
+ \FlowObjectSetup{0}%
+ \Cleanmath
+ \global\GridCells\@ne\global\GridRows0
+ \ifnum\NColumns=0 \ExplicitGridtrue\def\NColumns{25}%
+ \else\ExplicitGridfalse\fi
+ \begin{array}{*{\NColumns}{c}}%
+}
+\def\endGrid{\end{array}\endgroup}
+\def\GridCell#1{#1\FlowObjectSetup{0}}
+\def\endGridCell#1{%
+  \ifnum\NColumns=\GridCells
+    \global\GridCells\@ne
+    \def\@tempa{\cr}%
+  \else
+    \global\advance\GridCells\@ne
+    \def\@tempa{&}%
+  \fi
+  \@tempa}
+\def\NewColumn{&}
+\def\NewRow{\\}
+%    \end{macrocode}
+% \subsubsection{Superscript, subscript}
+%    \begin{macrocode}
+\def\Subscript#1#2{_{#2}}
+\def\Superscript#1#2{^{#2}}
+%    \end{macrocode}
+% \subsubsection{Unmath}
+%    \begin{macrocode}
+\def\Unmath#1#2{%
+  {\SetupICs{#1}\mbox{#2}\endSetupICs}%
+}
+%    \end{macrocode}
+% \subsubsection{ScriptSerial}
+%    \begin{macrocode}
+\def\ScriptSerial#1#2#3#4#5#6#7#8{%
+ \begingroup
+ \let\MathSeq\@gobble
+ \let\Node\@gobble
+ \let\endNode\@gobble
+ \let\endMathSeq\@gobble
+ \endgroup
+  \ifx$#3#4$%
+  \else
+    \vphantom{#2}_{#4}^{#3}%
+  \fi
+  \ifx$#7$\else [[[over #7]]]\fi
+  \ifx$#8$\else [[[over #8]]]\fi
+  {#2}_{#6}^{#5}}
+%    \end{macrocode}
+% \subsection{External Graphic flow object class (clause 12.6.15)}
+% How we include graphics depends on the NotationSystemId. 
+% Ulrich Drepper <drepper@ipd.info.uni-karlsruhe.de> worked this
+% out, and he also made the alignment and indentation work correctly.
+%If any other notation needs special
+% handling it can be implemented by adding a macro
+%	|insertExternalGraphicNotationXXX|
+% where XXX is the notation name.
+%    \begin{macrocode}
+\def\insertExternalGraphic#1{%
+  \ifGroupMode\begingroup\fi
+  \SetupICs{#1}%
+  \expandafter\ifx\csname insertExternalGraphicNotation\NotationSystemId\endcsname\relax%
+  \insertExternalGraphicNotation%
+ \else
+ \csname insertExternalGraphicNotation\NotationSystemId\endcsname
+ \fi
+ \ifGroupMode\endgroup\fi
+}
+\def\insertExternalGraphicNotation{%
+  \ifTableMode\def\IsDisplay{0}\fi
+  \ExternalGraphicNIC
+  \ifcase\IsDisplay
+     \expandafter\IncludeGraphic\EntitySystemId\\%
+  \or%
+    \DisplayNIC
+    \@@par%
+    \@tempdima\textwidth
+    \ifdim\EndIndent>\z@
+      \advance\@tempdima by-\EndIndent
+    \fi
+    \ifdim\StartIndent>\z@
+      \advance\@tempdima by-\StartIndent
+      \moveright\StartIndent
+    \fi
+    \hbox to\@tempdima{%
+      \ifx\DisplayAlignment\A@center\hfill\fi%
+      \ifx\DisplayAlignment\A@end\hfill\fi%
+      \expandafter\IncludeGraphic\EntitySystemId\\%
+      \ifx\DisplayAlignment\A@center\hfill\fi%
+      \ifx\DisplayAlignment\A@start\hfill\fi%
+    }%
+    \@@par%
+  \else%
+   \expandafter\IncludeGraphic\EntitySystemId\\%
+  \fi
+  \endExternalGraphicNIC
+  \ifcase\IsDisplay
+  \or  
+    \endDisplayNIC  
+  \fi
+}
+\def\insertExternalGraphicNotationTEX{%
+ \input\EntitySystemId
+}
+\def\IncludeGraphic{\@ifnextchar<{\@IncludeGraphic}{\@IncludeGraphic<>}}
+\def\scale@max{max}
+\def\scale@false{false}
+\def\scale@maxuniform{max-uniform}
+%    \end{macrocode}
+% There are three situations: ScaleX and ScaleY are supplied
+% (possibly identical), in which case ScaleType is `false', or
+% ScaleType is `max' or `max-uniform' (the default); in the latter
+% cases, use MaxWidth and MaxHeight, with and without preserved
+% aspect ratio. The width and height default to \LaTeX{} graphics package
+% `!', ie their natural size. I \emph{think} this is the right
+% interpretation of the standard.
+%    \begin{macrocode}
+\def\Exclams{!!}
+\def\@IncludeGraphic<#1>#2\\{%
+  \ifx\ScaleType\scale@false
+    \ifx\ScaleX\ScaleY
+     \scalebox{\ScaleX}{\includegraphics{#2}}%
+    \else
+     \scalebox{\ScaleX}[\ScaleY]{\includegraphics{#2}}%
+    \fi
+  \else
+    \ifx\ScaleType\scale@maxuniform  
+      \edef\MaxBoth{\MaxHeight\MaxWidth}%
+      \ifx\MaxBoth\Exclams
+           \includegraphics{#2}%
+      \else
+            \includegraphics[width=\MaxWidth,keepaspectratio=true,
+             height=\MaxHeight]{#2}%
+      \fi
+    \else
+      \ifx\ScaleType\scale@max
+        \includegraphics[width=\MaxWidth,height=\MaxHeight,
+             keepaspectratio=false]{#2}%
+      \else
+        \typeout{ERROR: invalid scale type of \ScaleType}%
+      \fi
+    \fi
+  \fi
+}
+\def\insertPageNumber#1{#1\arabic{page}}
+\def\insertParagraphBreak#1{\@@par}
+%
+\def\horizontal{horizontal}
+\def\LineThickness{1pt}
+\def\A@center{center}
+\def\A@end{end}
+\def\A@start{start}
+\def\insertRule#1{\bgroup
+ \@@par
+ \SetupICs{#1}%
+ \RuleNIC
+%    \end{macrocode}
+% Rules are messy; we have to indent them by the amount of
+% |\StartIndent|, and also align them according to the value
+% of |\DisplayAlignment|. We render them with rule leaders, inside
+% an hbox, if a width is supplied.
+%    \begin{macrocode}
+ \@tempdima\linewidth
+ \ifdim\EndIndent>\z@
+    \advance\@tempdima by-\EndIndent
+ \fi
+ \ifdim\StartIndent>\z@
+   \advance\@tempdima by-\StartIndent 
+   \moveright\StartIndent
+ \fi
+ \hbox to\@tempdima{%
+ \ifx\DisplayAlignment\A@center\hfill\fi
+ \ifx\DisplayAlignment\A@end\hfill\fi
+ \ifx\Orientation\horizontal   
+   \ifx\Length\@empty\else \hbox to \Length\fi
+    {\leaders\hrule  height \LineThickness \hfill}%
+ \else
+  \hbox to  \LineThickness {\leaders\hrule 
+    \ifx\Length\@empty\else height \Length \fi \relax
+    \hfill}%
+ \fi
+ \ifx\DisplayAlignment\A@center\hfill\fi
+ \ifx\DisplayAlignment\A@start\hfill\fi
+ }%
+ \@@par
+ \endRuleNIC
+ \endSetupICs 
+ \egroup
+}
+%    \end{macrocode}
+% \subsection{Tables}
+%    \begin{macrocode}
+\setlength\arraycolsep\z@
+\setlength\tabcolsep\z@
+\extrarowheight3\p@
+\setlength\arrayrulewidth{.4\p@}
+\setlength\doublerulesep{2\p@}
+\def\arraybackslash{\let\\=\@arraycr}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\def\insertTableAfterColumnBorder#1{}
+\def\insertTableAfterRowBorder#1{}
+\def\insertTableBeforeColumnBorder#1{}
+\def\insertTableBeforeRowBorder#1{}
+%
+\def\insertTableCellAfterColumnBorder#1{\edef\AfterCol{\BorderPresent}}
+\def\insertTableCellAfterRowBorder#1{\edef\AfterRow{\BorderPresent}}
+\def\insertTableCellBeforeColumnBorder#1{\edef\BeforeCol{\BorderPresent}}
+\def\insertTableCellBeforeRowBorder#1{\edef\BeforeRow{\BorderPresent}}
+\def\insertTableColumn#1{#1}
+%    \end{macrocode}
+% \section{Non-atomic flow objects}
+% \subsection{Box flow object class}
+%    \begin{macrocode}
+\def\BOX#1{%
+ \SetupICs{#1}%
+ \fboxrule\LineThickness
+ \@tempdima\columnwidth
+ \ifdim\EndIndent>\z@
+    \advance\@tempdima by-\EndIndent
+ \fi
+ \ifdim\StartIndent>\z@
+   \advance\@tempdima by-\StartIndent 
+   \hspace*{\StartIndent}%
+ \fi
+ \advance\@tempdima by-\StartIndent 
+ \setbox0\vbox\bgroup\def\StartIndent{\z@}\hsize\@tempdima\ignorespaces}
+\def\endBOX{%
+  \ifhmode\unskip\fi
+  \egroup
+  \ifdim\ht0>\ht\strutbox
+    \noindent\fbox{\box0}%
+  \else
+    \setbox0\vbox{\unvbox0\global\setbox1\lastbox}%
+    \noindent\fbox{\kern-\parindent\unhbox1\unskip\unskip}%
+  \fi}
+%    \end{macrocode}
+% \subsection{Display group flow object class (clause 12.6.2)}
+%    \begin{macrocode}
+\def\DisplayGroup#1{\ifTableMode\else\@DisplayGroup{#1}\fi}
+\def\@DisplayGroup#1{%
+ {#1\global\edef\SavedSpan{\Span}}%
+ \ifnum\SavedSpan>1
+  \ifnum\col@number>1 
+    \end{multicols}
+  \fi
+ \fi
+ \ifGroupMode\begingroup\fi
+ \SetupICs{#1}%
+ \DisplayGroupNIC
+ \ifnum\Mathcount>0\relax\else\@@par\fi
+ \FlowObjectSetup{1}%
+}
+\def\endDisplayGroup#1{\ifTableMode\else\@endDisplayGroup{#1}\fi}
+\def\@endDisplayGroup#1{%
+ \ifnum\Mathcount>0\relax\else
+  \@@par
+ \fi
+ \endDisplayGroupNIC
+ \ifGroupMode\endgroup\fi
+ \ifnum\SavedSpan>1
+  \ifnum\PageNColumns>1
+    \begin{multicols}{\PageNColumns}
+  \fi
+ \fi 
+ \gdef\SavedSpan{0}%
+}
+%    \end{macrocode}
+% \subsection{Leader flow object class}
+%    \begin{macrocode}
+\newsavebox{\leaderbox}
+\def\Leader#1{#1\begin{LRbox}{\dssslbox}}
+\def\endLeader{\end{LRbox}\leaders\box\dssslbox\hfill}
+%    \end{macrocode}
+% \subsection{Line Field flow object class}
+% Field align can be \emph{start}, \emph{end}, or \emph{center}.
+%    \begin{macrocode}
+\newsavebox\dssslbox
+\def\LRbox#1{%
+  \edef\reserved@a{%
+    \endgroup
+    \setbox#1\hbox{%
+      \begingroup\aftergroup}%
+        \def\noexpand\@currenvir{\@currenvir}}%
+  \reserved@a
+    \@endpefalse
+    \color@setgroup\ignorespaces
+}
+\def\LRboxW#1#2{%
+  \edef\reserved@a{%
+    \endgroup
+    \setbox#1\hbox to #2{%
+      \begingroup\aftergroup}%
+        \def\noexpand\@currenvir{\@currenvir}}%
+  \reserved@a
+    \@endpefalse
+    \color@setgroup\ignorespaces
+}
+\def\endLRbox{\color@endgroup}
+\let\endLRboxW\endLRbox
+\def\LineField#1{\bgroup
+ \SetupICs{#1}%
+ \LineFieldNIC
+ \FlowObjectSetup{0}%
+ \begin{LRbox}{\dssslbox}%
+}
+\def\endLineField{%
+ \end{LRbox}%
+ \ifdim\wd\dssslbox>\FieldWidth\def\FieldWidth{\wd\dssslbox}\fi
+  \makebox[\FieldWidth][\csname Fld@\FieldAlign\endcsname]{%
+    \ifdim\PositionPointShift=\z@ 
+        \usebox{\dssslbox}%
+    \else
+        \raisebox{\PositionPointShift}{\usebox{\dssslbox}}%
+    \fi  
+   \EndSetFont}%
+ \endLineFieldNIC
+ \endSetupICs
+ \egroup
+}
+%
+%    \end{macrocode}
+% \subsection{Link flow object class (clause 12.6.28.3)}
+%    \begin{macrocode}
+\newif\ifLabelElements
+\LabelElementstrue
+\newif\ifNestedLink
+\NestedLinkfalse
+\def\Link#1{%
+  \begingroup
+  \SetupICs{#1}%
+  \ifx\Label\@empty\let\Label\Element\fi
+  \hyper@linkstart{link}{\Label}%
+  \NestedLinktrue
+}
+\def\endLink{%
+  \hyper@linkend
+  \NestedLinkfalse
+  \endSetupICs
+  \endgroup
+}
+%    \end{macrocode}
+% \subsection{Marginalia flow object class (clause 12.6.28.4)}
+%    \begin{macrocode}
+\def\Marginalia#1{#1\FlowObjectSetup{0}}
+\def\endMarginalia{}
+%    \end{macrocode}
+% \subsection{Paragraph flow object class (clause 12.6.6)}
+%\begin{longtable}{|P{.2\textwidth}|l|P{.25\textwidth}|l|l|}
+%\hline
+%\itshape
+%Characteristic&
+%\itshape Inh.&\itshape Values&\itshape Default&\itshape Dsssl-o\\
+%\hline
+%\endhead
+%\hline
+%\endfoot
+%lines&I&wrap, asis, asis-wrap*, asis-truncate*, none&wrap&Partial\\
+%\rowcolor{yellow}
+%asis-truncate-char&I&\#f, \emph{char object}& &Ignore\\
+%asis-wrap-char&I&\#f, \emph{char object}& &Ignore\\
+%\rowcolor{yellow}
+%asis-wrap-indent&I&\emph{length-spec}& &Ignore\\
+%first-line-align&I&\#f, \emph{char object}& &Ignore\\
+%\rowcolor{yellow}
+%alignment-point-offset&I&\#f, \emph{number between 0 and 100}& &Ignore\\
+%ignore-record-end?&I&\#f, \#t&\#f&Standard\\
+%\rowcolor{yellow}
+%expand-tabs?&I&\#f, \emph{integer greater than zero}&8&Standard\\
+%line-spacing&I&\emph{length-spec}&12pt&Standard\\
+%\rowcolor{yellow}
+%line-spacing-priority&I&force, \emph{integer}&0&Default\\
+%min-pre-line-spacing&I&\#f, \emph{length-spec}&\#f&Default\\
+%\rowcolor{yellow}
+%min-post-line-spacing&I&\#f, \emph{length-spec}&\#f&Default\\
+%min-leading&I&\#f, \emph{length-spec}&\#f&Standard\\
+%\rowcolor{yellow}
+%first-line-start-indent&I&\emph{length-spec}&0m&Standard\\
+%last-line-end-indent&I&\emph{length-spec}&0m&Default\\
+%\rowcolor{yellow}
+%hyphenation-char&I&\emph{character}& &Ignore\\
+%hyphenation-method&I&\#f, \emph{public identifier}&\#f&Default\\
+%\rowcolor{yellow}
+%hyphenation-ladder-count&I&\#f, \emph{integer greater than zero}&\#f&Default\\
+%hyphenation-remain-char-count&I&\emph{positive integer}&2&Ignore\\
+%\rowcolor{yellow}
+%hyphenation-push-char-count&I&\emph{positive integer}&2&Ignore\\
+%hyphenation-keep&I&\#f, spread, page, column&\#f&Default\\
+%\rowcolor{yellow}
+%hyphenation-exceptions&I&\emph{list of strings}&empty list&Default\\
+%line-breaking-method&I&\#f, \emph{public identifier}&\#f&Default\\
+%\rowcolor{yellow}
+%line-composition-method&I&\#f, \emph{public identifier}&\#f&Default\\
+%implicit-bidi-method&I&\#f, \emph{public identifier}& &Default\\
+%\rowcolor{yellow}
+%glyph-alignment-mode&I&base, center, top, bottom, font&font&Default\\
+%font-family-name&I&\#f, \emph{string}&iso-serif&Standard\\
+%\rowcolor{yellow}
+%font-weight&I&\#f, not-applicable*, ultra-light*, extra-light*, light, semi-light*, medium, semi-bold*, bold, extra-bold*, ultra-bold*&medium&Partial\\
+%font-posture&I&\#f, not-applicable*, upright, oblique, back-slanted-oblique*, italic, back-slanted-italic*&upright&Partial\\
+%\rowcolor{yellow}
+%font-structure&I&\#f, not-applicable, solid, outline&solid&Default\\
+%font-proportionate-width&I&\#f, not-applicable*, ultra-condensed*, extra-condensed*, condensed, semi-condensed*, medium, semi-expanded*, expanded, extra-expanded*, ultra-expanded*&medium&Partial\\
+%\rowcolor{yellow}
+%font-name&I&\#f, \emph{public identifier}& &Standard\\
+%font-size&I&\emph{length}&10pt&Standard\\
+%\rowcolor{yellow}
+%numbered-lines?&I&\#f, \#t&\#t&Ignore\\
+%line-number&I&\#f, \emph{unlabeled sosofo}& &Ignore\\
+%\rowcolor{yellow}
+%line-number-side&I&start, end, spread-inside, spread-outside, page-inside, page-outside& &Ignore\\
+%line-number-sep&I&\emph{length-spec}& &Ignore\\
+%\rowcolor{yellow}
+%quadding&I&start, end, spread-inside*, spread-outside*, page-inside*, page-outside*, center, justify*&start&Partial\\
+%last-line-quadding&I&relative, start, end, spread-inside, spread-outside, page-inside, page-outside, center, justify&relative&Default\\
+%\rowcolor{yellow}
+%last-line-justify-limit&I&\emph{length-spec}&0&Ignore\\
+%justify-glyph-space-max-add&I&\emph{length-spec}&0m&Ignore\\
+%\rowcolor{yellow}
+%justify-glyph-space-max-remove&I&\emph{length-spec}&0m&Ignore\\
+%hanging-punct?&I&\#f, \#t&\#f&Default\\
+%\rowcolor{yellow}
+%widow-count&I&\emph{positive integer}&2&Default\\
+%orphan-count&I&\emph{positive integer}&2&Default\\
+%\rowcolor{yellow}
+%language&I&\#f, \emph{ISO 639 language code}&\#f&Standard\\
+%country&I&\#f, \emph{ISO 3166 country code}&\#f&Standard\\
+%\rowcolor{yellow}
+%position-preference&N&\#f, top, bottom&\#f&Ignore\\
+%writing-mode&I&left-to-right, right-to-left, top-to-bottom&left-to-right&Default\\
+%\rowcolor{yellow}
+%start-indent&I&\emph{length-spec}&0m&Standard\\
+%end-indent&I&\emph{length-spec}&0m&Standard\\
+%\rowcolor{yellow}
+%span&I&\emph{integer greater than zero}&1&Default\\
+%span-weak?&I&\#f, \#t&\#f&Default\\
+%\rowcolor{yellow}
+%space-before&N&\emph{display space}&no space before &Standard\\
+%space-after&N&\emph{display space}&no space after &Standard\\
+%\rowcolor{yellow}
+%keep-with-previous?&N&\#f, \#t&\#f&Standard\\
+%keep-with-next?&N&\#f, \#t&\#f&Standard\\
+%\rowcolor{yellow}
+%break-before&N&\#f, page, page-region*, column*, column-set*&\#f&Partial\\
+%break-after&N&\#f, page, page-region*, column*, column-set*&\#f&Partial\\
+%\rowcolor{yellow}
+%keep&N&\#f, page, column-set*, column*, \#t*&\#f&Partial\\
+%may-violate-keep-before?&N&\#f, \#t&\#f&Default\\
+%\rowcolor{yellow}
+%may-violate-keep-after?&N&\#f, \#t&\#f&Default\\
+%\end{longtable}
+%    \begin{macrocode}
+\newif\ifTableMode
+\newif\ifGroupMode
+\newcount\@TablePars
+\newcount\@ParNest
+\TableModefalse
+\GroupModetrue
+\def\Par#1{%
+%    \end{macrocode}
+% We need to end the current paragraph, with its current line spacing,
+% hyphenation, what have you, before anything is done.
+% This could have horrible repercussions, but something like
+% it is necessary.
+%
+% If this is the second or subsequent paragraph inside a table cell,
+% start with a line break. But not if its a \emph{nested} paragraph.
+%    \begin{macrocode}
+ \ifTableMode
+   \global\advance\@ParNest by 1
+   \ifnum\@ParNest=1
+     \ifnum\@TablePars>0%
+       \@arraycr
+     \fi
+   \else
+      \ifnum\@ParNest>1
+        \ifnum\@TablePars>0\par\paraSetup\fi
+      \fi
+   \fi
+ \else
+   \@@par
+ \fi
+ \ifGroupMode\begingroup\fi
+ \SetupICs{#1}%
+ \ifTableMode
+   \csname startQ@\Quadding\endcsname
+ \else
+    \ParagraphNIC
+ \fi
+ \FlowObjectSetup{1}%
+ \ifTableMode
+   \hskip \CellBeforeColumnMargin
+ \fi
+}
+\def\endPar#1{%
+ \ifTableMode
+   \ifnum\@ParNest>1
+        \ifnum\@TablePars>0\@@par\fi
+   \fi
+   \hskip \CellAfterColumnMargin
+   \csname endQ@\Quadding\endcsname\null
+   \global\advance\@TablePars by 1
+   \global\advance\@ParNest by -1
+ \else 
+  \@@par
+  \endParagraphNIC
+ \fi
+ \endSetupICs
+ \ifGroupMode
+  \endgroup
+ \fi
+}
+%    \end{macrocode}
+% \subsection{Score flow object class (clause 12.6.17)}
+%    \begin{macrocode}
+\def\Score#1{#1}
+\def\endScore{}
+%    \end{macrocode}
+% \subsection{Scroll flow object class (clause 12.6.28.1)}
+%    \begin{macrocode}
+\def\Scroll{\SpS}
+\def\endScroll{\endSpS}
+%    \end{macrocode}
+% \subsection{Sequence flow object class (clause 12.6.1)}
+%    \begin{macrocode}
+\newdimen\CurPosShift\CurPosShift\z@
+\newif\if@Raised
+\def\Seq#1{%
+ \ifGroupMode\begingroup\fi
+ \SetupICs{#1}%
+ \ifx \@nodocument\relax
+ \else
+   \JadeSetPage
+   \JadeBeginDocument
+   \GroupModetrue
+   \ifnum\PageNColumns>1
+     \columnsep\PageColumnSep
+     \begin{multicols}{\PageNColumns}
+   \fi
+ \fi
+ \FlowObjectSetup{0}%
+ \@Raisedfalse
+ \ifdim\PositionPointShift=\CurPosShift
+ \else
+   \@tempdima\PositionPointShift
+   \ifdim\PositionPointShift>\CurPosShift
+     \advance\@tempdima by -\CurPosShift
+   \else
+     \advance\@tempdima by \CurPosShift
+   \fi
+   \CurPosShift\PositionPointShift
+   \@Raisedtrue
+ \fi
+ \if@Raised\leavevmode\raise\@tempdima\hbox\bgroup\fi
+}
+\def\endSeq{%
+ \if@Raised\egroup\fi
+ \EndSetFont
+ \endSetupICs
+ \ifGroupMode\endgroup\fi
+}
+%    \end{macrocode}
+% \subsection{Side Line flow object class}
+%    \begin{macrocode}
+\def\SideLine#1{#1}
+\def\endSideLine{}
+%    \end{macrocode}
+% \subsection{Simple Page Sequence flow object class (clause 12.6.3)}
+% Look out for the canonical 1in margins in TeX systems!
+%    \begin{macrocode}
+\def\JadeSetPage{%
+ \footskip\FooterMargin
+ \oddsidemargin\LeftMargin
+ \evensidemargin\LeftMargin
+ \topmargin\TopMargin
+ \headsep\HeaderMargin
+ \paperwidth\PageWidth
+ \paperheight\PageHeight
+ \textheight\paperheight
+ \textwidth\paperwidth
+ \advance\textheight by -\TopMargin
+ \advance\textheight by -\HeaderMargin
+ \advance\textheight by -\BottomMargin
+ \advance\textheight by -\FooterMargin
+ \advance\textwidth by -\LeftMargin
+ \advance\textwidth by -\RightMargin
+ \ifx\pdfimage\@undefined
+  \else
+   \global\pdfpagewidth\paperwidth
+   \global\pdfpageheight\paperheight
+ \fi
+ \@colht\textheight
+ \@colroom\textheight 
+ \vsize\textheight
+ \headwidth\textwidth
+ \linewidth\textwidth
+ \columnwidth\textwidth
+ \hsize\columnwidth \linewidth\hsize
+ \def\headheight{12pt}%
+ \let\pageFontSize\fSize
+ \let\pageLineSpacing\LineSpacing
+ \let\pageFontPosture\fPosture
+ \let\pageFontProportionateWidth\fProportionateWidth
+ \let\pageFontWeight\fWeight
+ \let\pagefFamName\fFamName
+ \arraycolsep\GridColumnSep
+}
+% initialize it
+\JadeSetPage
+\def\JadeBeginDocument{%
+%    \end{macrocode}
+% We borrow most of the code of |\begin{document}|; we do not
+% want it all, as it interposes an unwanted group.
+%    \begin{macrocode}
+  \@clubpenalty\clubpenalty
+  \begingroup\@floatplacement\@dblfloatplacement
+    \makeatletter\let\@writefile\@gobbletwo
+    \global \let \@multiplelabels \relax
+    \@input{\jobname.aux}%
+  \endgroup
+  \immediate\openout\@mainaux\jobname.aux
+  \immediate\write\@mainaux{\relax}%
+  \process@table
+  \let\glb@currsize\@empty  %% Force math initialisation.
+  \normalsize
+  \everypar{}%
+  \@noskipsecfalse
+  \let \@refundefined \relax
+  \let\AtBeginDocument\@firstofone
+  \@begindocumenthook
+  \ifdim\topskip<1sp\global\topskip 1sp\relax\fi
+  \global\@maxdepth\maxdepth
+  \global\let\@begindocumenthook\@undefined
+  \global\let\@filelist\relax
+  \global\let\@addtofilelist\@gobble
+  \gdef\do##1{\global\let ##1\@notprerr}%
+  \@preamblecmds
+  \global\let \@nodocument \relax
+  \global\let\do\noexpand
+  \ignorespaces
+}
+\def\SpS#1{%
+ \DoFOBSettrue
+ \SetupICs{#1}%
+%    \end{macrocode}
+% The basic page setup needs to be delayed to this point, otherwise
+% the first page will be `frozen' in the format file. So check
+% here whether we are at the start of the document, and if so trigger
+% \LaTeX's |\begin{document}|. This is a pain, delaying the start of
+% the document. It means that documents which don't have a simple-page-
+% sequence at the start will fail.
+%    \begin{macrocode}
+ \JadeSetPage
+ \ifx \@nodocument\relax
+ \else
+   \JadeBeginDocument
+ \fi
+%    \end{macrocode}
+% Grouping is turned on now we are inside a simple page sequence.
+% but is itself inside a group of the page sequence. 
+% The problem is that if we start a Sequence, then start a
+% PageSequence, the |\begin{document}| occurs inside a group,
+% and so gets in a mess. If we turn off grouping
+% outside simple page sequences, any changes become global!
+% Does it make sense to have material not in a page
+% sequence, in TeX? Sadly, yes. The
+% document will still \emph{start} in non-group mode.
+%    \begin{macrocode}
+ \DisplayNIC
+ \GroupModetrue
+ \ifnum\PageNColumns>1
+   \columnsep\PageColumnSep
+   \begin{multicols}{\PageNColumns}
+ \fi
+}
+\def\endSpS{%
+ \DoFOBSetfalse
+ \ifnum\col@number>1 
+    \end{multicols}
+ \fi
+ \newpage
+ \endDisplayNIC
+ \let\FancyHook\@empty
+ \let\FancyFirstHook\@empty
+}
+%    \end{macrocode}
+% \subsection{Headers and footers}
+%    \begin{macrocode}
+\def\SpSCenterFooter#1{\Setfoot[C]{#1}{CenterFooter}}
+\def\SpSCenterHeader#1{\Sethead[C]{#1}{CenterHeader}}
+\def\SpSLeftFooter#1{\Setfoot[L]{#1}{LeftFooter}}
+\def\SpSLeftHeader#1{\Sethead[L]{#1}{LeftHeader}}
+\def\SpSRightFooter#1{\Setfoot[R]{#1}{RightFooter}}
+\def\SpSRightHeader#1{\Sethead[R]{#1}{RightHeader}}
+%
+\def\SpSOtherBackCenterFooter#1{\Setfoot[CE]{#1}{OtherBackCenterFooter}}
+\def\SpSOtherBackLeftFooter#1{\Setfoot[LE]{#1}{OtherBackLeftFooter}}
+\def\SpSOtherBackRightFooter#1{\Setfoot[RE]{#1}{OtherBackRightFooter}}
+\def\SpSOtherBackRightHeader#1{\Sethead[RE]{#1}{OtherBackRightHeader}}
+\def\SpSOtherBackCenterHeader#1{\Sethead[CE]{#1}{OtherBackCenterHeader}}
+\def\SpSOtherBackLeftHeader#1{\Sethead[LE]{#1}{OtherBackLeftHeader}}
+%
+\def\SpSOtherFrontCenterFooter#1{\Setfoot[CO]{#1}{OtherFrontCenterFooter}}
+\def\SpSOtherFrontLeftFooter#1{\Setfoot[LO]{#1}{OtherFrontLeftFooter}}
+\def\SpSOtherFrontRightFooter#1{\Setfoot[RO]{#1}{OtherFrontRightFooter}}
+\def\SpSOtherFrontRightHeader#1{\Sethead[RO]{#1}{OtherFrontRightHeader}}
+\def\SpSOtherFrontCenterHeader#1{\Sethead[CO]{#1}{OtherFrontCenterHeader}}
+\def\SpSOtherFrontLeftHeader#1{\Sethead[LO]{#1}{OtherFrontLeftHeader}}
+%
+\def\SpSFirstBackCenterFooter#1{\SetFirstfoot[CE]{#1}{FirstBackCenterFooter}}
+\def\SpSFirstBackLeftFooter#1{\SetFirstfoot[LE]{#1}{FirstBackLeftFooter}}
+\def\SpSFirstBackRightFooter#1{\SetFirstfoot[RE]{#1}{FirstBackRightFooter}}
+\def\SpSFirstBackCenterHeader#1{\SetFirsthead[CE]{#1}{FirstBackCenterHeader}}
+\def\SpSFirstBackLeftHeader#1{\SetFirsthead[LE]{#1}{FirstBackLeftHeader}}
+\def\SpSFirstBackRightHeader#1{\SetFirsthead[RE]{#1}{FirstBackRightHeader}}
+
+\def\SpSFirstFrontCenterFooter#1{\SetFirstfoot[CO]{#1}{FirstFrontCenterFooter}}
+\def\SpSFirstFrontLeftFooter#1{\SetFirstfoot[LO]{#1}{FirstFrontLeftFooter}}
+\def\SpSFirstFrontRightFooter#1{\SetFirstfoot[RO]{#1}{FirstFrontRightFooter}}
+\def\SpSFirstFrontCenterHeader#1{\SetFirsthead[CO]{#1}{FirstFrontCenterHeader}}
+\def\SpSFirstFrontLeftHeader#1{\SetFirsthead[LO]{#1}{FirstFrontLeftHeader}}
+\def\SpSFirstFrontRightHeader#1{%
+ \SetFirsthead[RO]{#1}{FirstFrontRightHeader}%
+%    \end{macrocode}
+% This one comes last, so now set up page styles. YUCK!
+%    \begin{macrocode}
+ \pagestyle{jadeother}%
+ \thispagestyle{jadefirst}%
+}
+\fancypagestyle{jadeother}{\fancyhf{}\FancyHook}%
+\fancypagestyle{jadefirst}{\fancyhf{}\FancyFirstHook}%
+%
+\def\Sethead[#1]#2#3{%
+ \ifx\\#2\\\relax\else
+ \DEBUG{Head: #3: #1}%
+  \g@addto@macro\FancyHook{\fancyhead[#1]{\setnormal#2}}%
+ \fi
+}
+\def\Setfoot[#1]#2#3{%
+ \ifx\\#2\\\relax\else
+ \DEBUG{Foot: #3: #1}%
+  \g@addto@macro\FancyHook{\fancyfoot[#1]{\setnormal#2}}%
+ \fi
+}
+\def\SetFirsthead[#1]#2#3{%
+ \ifx\\#2\\\relax\else
+ \DEBUG{FirstHead: #3: #1}%
+  \g@addto@macro\FancyFirstHook{\fancyhead[#1]{\setnormal#2}}%
+ \fi
+}
+\def\SetFirstfoot[#1]#2#3{%
+ \ifx\\#2\\\relax\else
+ \DEBUG{FirstFoot: #3: #1}%
+ \g@addto@macro\FancyFirstHook{\fancyfoot[#1]{\setnormal#2}}%
+\fi
+}
+\def\FancyHook{}
+\def\FancyFirstHook{}
+\pagestyle{jadeother}
+%    \end{macrocode}
+% \subsection{Table flow object class}
+%    \begin{macrocode}
+\def\Table#1{#1}
+\def\endTable{}
+\def\@full{full}
+\newenvironment{TeXTable}[3]{% width, ncolumns, template
+ \ifx\TableWidth\@full\def\TableWidth{\hsize}\fi
+ \TableNIC
+ \FlowObjectSetup{0}%
+ \TableModetrue
+% \GroupModefalse
+ \setlength\LTleft\StartIndent
+ \setlength\LTright\fill
+  \ifnum\PageNColumns>1
+    \tabular{#3}%
+  \else
+    \longtable{#3}%
+  \fi
+}{%
+  \ifnum\PageNColumns>1
+    \endtabular
+  \else
+    \endlongtable
+  \fi
+ \TableModefalse
+ \GroupModetrue
+ \endTableNIC
+}
+%    \end{macrocode}
+% \subsection{Table Cell flow object class}
+%    \begin{macrocode}
+\def\Hline{\hline}
+\def\Cline{\cline}
+\newif\inCell
+\newcount\CellCount
+\newdimen\FinalCellAfterRowMargin
+\def\MultiPar{0}
+\def\TableCell#1{%
+ #1\ifdim\CellAfterRowMargin>\FinalCellAfterRowMargin
+   \global\FinalCellAfterRowMargin\CellAfterRowMargin
+ \fi
+ \ifnum\CellCount=0\relax
+   \def\@action{\extrarowheight\CellBeforeRowMargin}%
+ \else
+   \def\@action{&#1}%
+ \fi
+ \global\advance\CellCount by1
+ \TableCellNIC
+ \FlowObjectSetup{0}%
+ \global\@TablePars0
+ \let\@action\relax
+ \ifnum\MultiPar>0\def\@action{\begin{tabular}[t]{@{}l@{}}}\fi
+ \@action
+}
+\def\endTableCell#1{%
+ \let\@action\relax
+ \ifnum\MultiPar>0\def\@action{\end{tabular}}\fi
+ \@action
+ \endTableCellNIC
+}
+%    \end{macrocode}
+% \subsection{Table Part flow object class}
+%    \begin{macrocode}
+\def\TablePart#1{#1\FlowObjectSetup{0}}
+\def\TablePartHeader#1{}
+\def\TablePartFooter#1{}
+\def\endTablePartFooter#1{}
+\def\endTablePartHeader#1{}
+\def\endTablePart{}
+%    \end{macrocode}
+% \subsection{Table Row flow object class}
+%    \begin{macrocode}
+\def\TableRow#1{#1\global\CellCount0}
+\def\endTableRow#1{\\[\FinalCellAfterRowMargin]}
+%    \end{macrocode}
+%
+% \subsection{Character mapping}
+%    \begin{macrocode}
+%\def\insertCharacter#1{#1%
+%   \expandafter\ifx\csname Ch@\Ch\endcsname\relax
+%     <\Ch>\typeout{Warning: Unknown character \Ch, at \the\inputlineno}%
+%   \else\csname Ch@\Ch\endcsname\fi
+%}
+\def\Character#1{%
+   \expandafter\ifx\csname Ch@#1\endcsname\relax
+     <#1>\typeout{Warning: Unknown character #1, at \the\inputlineno}%
+   \else\csname Ch@#1\endcsname\fi
+}
+%    \end{macrocode}
+%\subsection{DisplayNIC}
+%    \begin{macrocode}
+\def\@force{force}
+\newdimen\LastDisplaySpace
+\newcount\DisplayStack
+\newcount\LastDisplayStack
+\let\@sBeforeMin\sbMin
+\let\@sBeforeMax\sbMax
+\let\@sBeforeNom\sbNom
+\let\@sBeforePriority\sbPriority
+\DisplayStack0
+\LastDisplayStack-1
+\def\DisplayNIC{%
+ \advance\DisplayStack by 1
+%\message{DEBUG: \the\inputlineno: contrast \the\lastskip, \the\LastDisplaySpace}%
+\ifBreakMe\penalty \@M\fi
+ \ifdim\LastDisplaySpace>\lastskip
+  %\message{DEBUG: \the\inputlineno: UP \the\LastDisplaySpace}%
+  \vskip-\LastDisplaySpace
+  \global\LastDisplaySpace\z@
+ \else
+  %\message{DEBUG: \the\inputlineno: UP \the\lastskip}%
+  \vskip-\lastskip
+ \fi
+%\message{DEBUG: \the\inputlineno: DisplayNic depth \the\DisplayStack, \the\LastDisplayStack}%
+%    \end{macrocode}
+% What we are trying to identify is a display which starts 
+% inside another display.
+%    \begin{macrocode}
+ \ifnum\DisplayStack>\LastDisplayStack
+   \def\sbPriority{force}%
+   \def\LastSpaceBeforePriority{0}%
+%   \LastDisplaySpace\z@
+ \fi
+ \let\@sAfterMin\saMin
+ \let\@sAfterMax\saMax
+ \let\@sAfterNom\saNom
+ \let\@sAfterPriority\saPriority
+%
+ \begingroup
+ \ifx\BreakBefore\relax\else
+  \csname Break@\BreakBefore\endcsname
+ \fi
+ \CurrentSpaceMin=\sbMin
+ \CurrentSpaceNom=\sbNom
+ \CurrentSpaceMax=\sbMax
+\DEBUG{[\the\CurrentSpaceNom][\the\LastSpaceNom][\saNom]}
+%
+ \edef\CurrentSpacePriority{\sbPriority}%
+%    \end{macrocode}
+% See if either display space priority is set to `force';
+% if so, use that set of values;
+% if both priorities are `force', add values together
+%    \begin{macrocode}
+\ifx\sbPriority\@force
+  \ifx\LastSpacePriority\@force
+   \advance\CurrentSpaceMin by \LastSpaceMin
+   \advance\CurrentSpaceNom by \LastSpaceNom
+   \advance\CurrentSpaceMin by \LastSpaceMax
+  \fi
+\else
+  \ifx\LastSpacePriority\@force
+    \CurrentSpaceMin=\LastSpaceMin
+    \CurrentSpaceNom=\LastSpaceNom
+    \CurrentSpaceMax=\LastSpaceMax
+%    \end{macrocode}
+% See if the priority of either set is higher, if so use that
+%    \begin{macrocode}
+  \else
+    \ifnum\CurrentSpacePriority>\LastSpacePriority 
+      \relax
+    \else
+       \ifnum\LastSpacePriority>\CurrentSpacePriority 
+         \CurrentSpaceMin=\LastSpaceMin
+         \CurrentSpaceNom=\LastSpaceNom
+         \CurrentSpaceMax=\LastSpaceMax
+       \else
+%    \end{macrocode}
+% So the priorities are equal; take the one with the larger Nom
+%    \begin{macrocode}
+         \ifdim\CurrentSpaceNom>\LastSpaceNom
+            \relax
+         \else
+            \ifdim\LastSpaceNom>\CurrentSpaceNom
+              \CurrentSpaceMin=\LastSpaceMin
+              \CurrentSpaceNom=\LastSpaceNom
+              \CurrentSpaceMax=\LastSpaceMax
+            \else
+%    \end{macrocode}
+% Dang, the Noms are equal. Take the larger minimum, and smaller
+% maximum
+%    \begin{macrocode}
+               \ifdim\LastSpaceMax<\CurrentSpaceMax
+                 \CurrentSpaceMax\LastSpaceMax
+               \fi
+               \ifdim\LastSpaceMin>\CurrentSpaceMin
+                  \CurrentSpaceMin\LastSpaceMin
+               \fi
+            \fi
+         \fi
+       \fi
+    \fi
+  \fi
+ \fi
+ \@tempdima\CurrentSpaceNom 
+ \advance\@tempdima by -\CurrentSpaceMin
+ \@tempdimb\CurrentSpaceNom 
+ \advance\@tempdimb by -\CurrentSpaceMax
+  %\message{DEBUG: \the\inputlineno: DOWN (start) \the\CurrentSpaceNom}%
+ \ifBreakMe\penalty \@M\fi
+ \vskip \CurrentSpaceNom plus \@tempdimb minus \@tempdima
+ \paraSetup
+ \let\Keep\relax
+ \let\BreakBefore\relax
+ \let\BreakAfter\relax
+ \let\KeepWithPrevious\relax
+ \let\MayViolateKeepBefore\relax
+ \let\MayViolateKeepAfter\relax
+ \def\sbMin{\z@}%
+ \def\sbMax{\z@}%
+ \def\sbNom{\z@}%
+ \def\sbPriority{0}%
+ \def\saMin{\z@}%
+ \def\saMax{\z@}%
+ \def\saNom{\z@}%
+ \def\saPriority{0}%
+}
+\def\paraSetup{%
+ \rightskip\EndIndent
+ \leftskip\StartIndent
+ \csname Q@\Quadding\endcsname
+ \csname L@\Language\endcsname
+ \ifx\FirstLineStartIndent\@empty\relax
+   \else\parindent\FirstLineStartIndent
+ \fi 
+ \ifx\InputWhitespaceTreatment\@empty\relax
+   \else\csname White@\InputWhitespaceTreatment\endcsname
+ \fi
+ \ifx\Lines\@empty\relax
+   \else\csname Lines@\Lines\endcsname
+ \fi
+}
+\newif\ifBreakMe
+\BreakMefalse
+\def\endDisplayNIC{%
+%    \end{macrocode}
+% If the last thing on the current list was a skip, throw it away.
+%    \begin{macrocode}
+ %\message{DEBUG: \the\inputlineno: UP (end) \the\lastskip}%
+ \ifnum\KeepWithNext=1\penalty \@M\global\BreakMetrue\else\global\BreakMefalse\fi
+ \vskip-\lastskip
+ \endgroup
+ \global\LastSpaceNom=\@sAfterNom
+ \global\LastSpaceMax=\@sAfterMax
+ \global\LastSpaceMin=\@sAfterMin
+ \global\edef\LastSpacePriority{\@sAfterPriority}%
+ \@tempdima\@sAfterNom 
+ \advance\@tempdima by -\@sAfterMin
+ \@tempdimb\@sAfterNom 
+ \advance\@tempdimb by -\@sAfterMax
+ %\message{DEBUG: \the\inputlineno: DOWN (end) \@sAfterNom}%
+ \ifBreakMe\penalty \@M\fi
+ \vskip \@sAfterNom plus \@tempdimb minus \@tempdima
+ \global\LastDisplaySpace=\lastskip
+ \global\LastDisplayStack=\DisplayStack
+ \advance\DisplayStack by -1
+}
+%    \end{macrocode}
+%\section{Setup of non-inherited characteristics}
+%\subsection{Inline}
+%    \begin{macrocode}
+\def\InlineNIC{%
+ \begingroup
+}
+\def\endInlineNIC{%
+ \let\BreakBeforePriority\relax
+ \let\BreakAfterPriority\relax
+ \endgroup
+}
+%    \end{macrocode}
+%\subsection{Display}
+%    \begin{macrocode}
+\def\DisplayGroupNIC{%
+ \DisplayNIC 
+}
+\def\endDisplayGroupNIC{%
+ \endDisplayNIC 
+}
+%    \end{macrocode}
+%\subsection{Graphics, boxes, leaders}
+%    \begin{macrocode}
+\def\ExternalGraphicNIC{%
+ \InlineNIC
+}
+\def\endExternalGraphicNIC{%
+ \endInlineNIC
+}
+\def\BoxNIC{%
+ \DisplayNIC
+ \InlineNIC 
+}
+\def\endBoxNIC{%
+ \endInlineNIC 
+ \endDisplayNIC
+}
+\def\RuleNIC{%
+ \DisplayNIC
+ \InlineNIC 
+}
+\def\endRuleNIC{%
+ \endInlineNIC 
+ \endDisplayNIC
+}
+\def\LeaderNIC{%
+ \InlineNIC 
+}
+\def\LeaderNIC{%
+ \InlineNIC 
+}
+%    \end{macrocode}
+%\subsection{Tables}
+%    \begin{macrocode}
+\def\TableNIC{%
+ \DisplayNIC
+}
+\def\endTableNIC{%
+ \endDisplayNIC
+}
+\def\TableColumnNIC{}
+\def\endTableColumnNIC{}
+\def\TableCellNIC{}
+\def\endTableCellNIC{}
+\def\GridNIC{}
+\def\endGridNIC{}
+\def\GridCellNIC{}
+\def\endGridCellNIC{}
+\let\ParagraphNIC\DisplayNIC
+\let\LineFieldNIC\InlineNIC
+\let\endParagraphNIC\endDisplayNIC
+\let\endLineFieldNIC\endInlineNIC
+%    \end{macrocode}
+%\section{Setup of inherited characteristics}
+% A problem arises here is `whitespacetreatment' is set to
+% `preserve', as this makes spaces active. If then a font name
+% like `Times Roman' is processed, the space in the middle
+% is processed! We replace spaces in font family names with `-'
+% in TeXFOTBuilder.cxx
+%    \begin{macrocode}
+\newif\ifNeedsSelect
+\chardef\nonactive=10
+\def\SetupICs#1{#1%
+\let\current@f@series\f@series
+\let\current@f@shape\f@shape
+\let\current@f@family\f@family
+\let\current@f@size\f@size
+\edef\LaTeXshape{\csname Width@\fProportionateWidth\endcsname
+      \csname Weight@\fWeight\endcsname}%
+\ifx\LaTeXshape\@empty\def\LaTeXshape{m}\fi
+\edef\f@series{\LaTeXshape}%
+\edef\f@shape{\csname Posture@\fPosture\endcsname}%
+\edef\f@family{%
+    \expandafter\ifx\csname Family@\fFamName\endcsname\relax
+     \csname Family@\DefaultfFamName\endcsname
+    \else
+     \csname Family@\fFamName\endcsname
+    \fi
+   }%
+\set@fontsize\baselinestretch{\fSize}{\LineSpacing}%
+%\NeedsSelecttrue
+%\ifx\f@size\current@f@size\relax\NeedsSelectfalse\fi
+%\ifx\f@family\current@f@family\relax\NeedsSelectfalse\fi
+%\ifx\f@shape\current@f@shape\relax\NeedsSelectfalse\fi
+%\ifx\f@series\current@f@series\relax\NeedsSelectfalse\fi
+%\ifNeedsSelect
+  \selectfont
+%\fi
+\ifx\ColorRed\@empty\relax\else
+   \RGBColor{\ColorRed}{\ColorGreen}{\ColorBlue}%
+\fi
+}
+\def\endSetupICs{}
+%    \end{macrocode}
+% |\FlowObjectSetup| should be called at the beginning of every object
+% that can be meaningfully labelled. Its this that creates an anchor,
+% not the |\Node|, to avoid duplicates and wastage.
+%
+% Because labelling writes to an external file, or does a |\special|,
+% it adds a whatsit to the main vertical list. This wrecks the
+% |\vskip-\lastskip| which every paragraph or display does. Bad news! 
+% Labelling when we are in a Link element is not a good thing. 
+% It messes up the references.
+%    \begin{macrocode}
+\newif\ifDoFOBSet
+\DoFOBSettrue
+\def\FlowObjectSetup#1{%
+\ifDoFOBSet
+  \ifLabelElements\ifx\Label\@empty\let\Label\Element\fi\fi
+  \ifx\Label\@empty\else
+     \@ifundefined{x@\Label}{%
+%      \typeout{Node <\Label> defined at line \the\inputlineno}%
+      \bgroup
+       \hyper@anchorstart{\Label}\hyper@anchorend
+       \ifNestedLink
+       \else
+         \PageLabel{\Label}%
+      \fi
+      \egroup
+      \expandafter\let\csname x@\Label\endcsname\@empty
+      \let\Label\@empty
+      \let\Element\@empty
+      }{}%
+  \fi
+\fi
+}
+%    \end{macrocode}
+% \section{Non-standard flow objects}
+%    \begin{macrocode}
+\def\fps@figure{htbp}	% prefer figures to be placed here
+\def\ftype@figure{1}
+\def\PageFloat#1{\SetupICs{#1}%
+  \ifnum\Span>0
+   \def\Span{0}%
+   \typeout{JadeTeX WARNING: specifying column spans for floats not supported}%
+  \fi
+  \FlowObjectSetup{0}%
+  \@dblfloat{figure}[\placement]%
+}
+\def\endPageFloat{\end@dblfloat}
+\def\Footnotesize{\@setfontsize\small\@ixpt{11}}
+\long\def\PageFootnote#1#2{#1\insert\footins{%
+    \reset@font\Footnotesize
+    \interlinepenalty\interfootnotelinepenalty
+    \splittopskip\footnotesep
+    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
+    \hsize\columnwidth \@parboxrestore
+    \color@begingroup
+      \@makefntext{%
+        \rule\z@\footnotesep\ignorespaces#2\@finalstrut\strutbox}
+    \color@endgroup}}
+\def\@makefntext#1{%
+    \parindent 1em%
+    \noindent
+    #1}
+
+%    \end{macrocode}
+% \section{Color}
+% Only RGB color working at present. Sorry.
+%    \begin{macrocode}
+\def\RGBColor#1#2#3{%
+ \c@lor@RGB@rgb{#1}\@tempa
+ \c@lor@RGB@rgb{#2}\@tempb
+ \c@lor@RGB@rgb{#3}\@tempc
+% \typeout{Set Color \@tempa, \@tempb, \@tempc}%
+ \color[rgb]{\@tempa, \@tempb, \@tempc}%
+  }
+\def\c@lor@RGB@rgb#1#2{%
+  \dimen@#1\p@
+  \divide\dimen@\@cclv
+  \edef#2{\strip@pt\dimen@}}
+\def\EndSetFont{%
+   \ifx\csname\fPosture Over\endcsname\relax
+   \relax\else\csname\fPosture Over\endcsname\fi
+}
+%    \end{macrocode}
+% \section{Expansion of DSSSL names}
+% \subsection{Fonts}
+%    \begin{macrocode}
+%
+\DeclareFontFamily{T1}{pzd}{}  
+\DeclareFontShape{T1}{pzd}{m}{n}{<->pzdr}{} 
+%
+\def\DefaultfFamName{unknown} 
+\def\Family@unknown{<unknown>} 
+\def\Family@Arial{phv}
+\def\Family@Helvetica{phv}
+\def\Family@Palatino{ppl}
+\def\Family@Bookman{pbk}
+\def\Family@Courier{pcr}
+\def\Family@Symbol{psy}
+\def\Family@Wingdings{pzd}
+\def\Family@WingDings{pzd}
+\def\Family@LucidaSans{hls}
+\def\Family@LucidaBright{hlc}
+\def\family@Savoy{usb}
+\def\family@ACaslon{pca}
+\def\family@Caslon{Uca}
+\def\Family@Formata{pfa}
+\def\Family@FranklinGothic{pfg}
+\def\Family@AGaramond{pad}
+\expandafter\def\csname Family@Avant-Garde\endcsname{pag}
+\expandafter\def\csname Family@New-Century-Schoolbook\endcsname{pnc}
+\expandafter\def\csname Family@Times-Roman\endcsname{ptm}
+\expandafter\def\csname Family@Trade-Gothic\endcsname{ptg}
+\expandafter\def\csname Family@Times-New-Roman\endcsname{ptm}
+\expandafter\def\csname Family@Times-NR-MT\endcsname{mnt}
+\expandafter\def\csname Family@Courier-New\endcsname{pcr}
+\expandafter\def\csname Family@Zapf-Dingbats\endcsname{pzd}
+\expandafter\def\csname Family@Gill-Sans\endcsname{pgs}
+\expandafter\def\csname Family@iso-serif\endcsname{ptm}
+\expandafter\def\csname Family@iso-sanserif\endcsname{phv}
+\expandafter\def\csname Family@iso-monocase\endcsname{pcr}
+%    \end{macrocode}
+% Matthias Clasen asked for the special code to be able
+% to access Computer Modern caps and small caps as a font family.
+%    \begin{macrocode}
+\expandafter\def\csname Family@Computer-Modern-Typewriter\endcsname{cmtt}
+\expandafter\def\csname Family@Computer-Modern-Sans\endcsname{cmss}
+\expandafter\def\csname Family@Computer-Modern\endcsname{cmr}
+\providecommand{\EC@family}[5]{%
+  \DeclareFontShape{#1}{#2}{#3}{#4}%
+  {<5><6><7><8><9><10><10.95><12><14.4>%
+   <17.28><20.74><24.88>genb*#5}{}}
+\DeclareFontFamily{T1}{cmcsc}{}
+\EC@family{T1}{cmcsc}{m}{n}{eccc}
+\EC@family{T1}{cmcsc}{bx}{n}{ecxc}
+\EC@family{T1}{cmcsc}{m}{sl}{ecsc}
+\EC@family{T1}{cmcsc}{bx}{sl}{ecoc}
+\expandafter\def\csname Family@Computer-Modern-Caps-And-Small-Caps\endcsname{cmcsc}
+\def\Family@cmr{cmr}
+\def\Family@cmss{cmss}
+\def\Family@cmtt{cmtt}
+\def\Family@cmcsc{cmcsc}
+\def\Family@ectt{ectt}
+%
+\def\Posture@upright{n}
+\def\Posture@normal{n}
+\def\Posture@math{it}
+\def\Posture@oblique{sl}
+\def\Posture@backslantedoblique{ui}
+\def\Posture@italic{it}
+\def\Posture@backslanteditalic{ui}
+%
+\def\Weight@ultralight{ul}
+\def\Weight@extralight{el}
+\def\Weight@light{l}
+\def\Weight@semilight{sl}
+\def\Weight@medium{}
+\def\Weight@semibold{sb}
+\def\Weight@bold{b}
+\def\Weight@extrabold{eb}
+\def\Weight@ultrabold{ub}
+\def\Weight@false{}
+%
+\def\Width@ultracondensed{uc}
+\def\Width@extracondensed{ec}
+\def\Width@condensed{c}
+\def\Width@semicondensed{sc}
+\def\Width@medium{}
+\def\Width@semiexpanded{sx}
+\def\Width@expanded{x}
+\def\Width@extraexpanded{ex}
+\def\Width@ultraexpanded{ux}
+%
+%    \end{macrocode}
+% \subsection{Languages}
+% This needs the jadetex format to have these languages selected, of course.
+% That is up to the users.
+%    \begin{macrocode}
+\def\L@{}
+\def\L@US{\selectlanguage{english}}
+\def\L@FR{\selectlanguage{francais}}
+\def\L@DE{\selectlanguage{german}}
+\def\L@CA{\selectlanguage{catalan}}
+\def\L@HR{\selectlanguage{croatian}}
+\def\L@CZ{\selectlanguage{czech}}
+\def\L@DK{\selectlanguage{danish}}
+\def\L@NE{\selectlanguage{dutch}}
+\def\L@ET{\selectlanguage{estonian}}
+\def\L@FI{\selectlanguage{finnish}}
+\def\L@EL{\selectlanguage{greek}}
+\def\L@HU{\selectlanguage{hungarian}}
+\def\L@IT{\selectlanguage{italian}}
+\def\L@NO{\selectlanguage{norwegian}}
+\def\L@PL{\selectlanguage{polish}}
+\def\L@PT{\selectlanguage{portuges}}
+\def\L@RO{\selectlanguage{romanian}}
+\def\L@SI{\selectlanguage{slovene}}
+\def\L@SK{\selectlanguage{slovak}}
+\def\L@SH{\selectlanguage{serbocroat}}
+\def\L@ES{\selectlanguage{spanish}}
+\def\L@GB{\selectlanguage{ukenglish}}
+\def\L@CY{\selectlanguage{welsh}}
+%
+%    \end{macrocode}
+% \subsection{Paragraphs}
+%    \begin{macrocode}
+\def\italicOver{\ifhmode\@@italiccorr\fi}
+%
+\def\startQ@justify{}
+\def\endQ@justify{}
+%
+\def\startQ@center{\hskip0pt plus 1filll}
+\def\endQ@center{\hskip0pt plus 1filll}
+%
+\def\startQ@pageoutside{\hfill}
+\def\endQ@pageoutside{}
+%
+\def\startQ@pageinside{}
+\def\endQ@pageinside{\hfill}
+%
+\def\startQ@start{}
+\def\endQ@start{\hfill}
+%
+\def\startQ@end{\hfill}
+\def\endQ@end{}
+\def\Q@justify{%
+  \let\\\@normalcr
+  \parfillskip\@flushglue
+  \parindent\z@
+}
+\def\Q@start{% raggedright, I hope
+  \let\\\@centercr
+  \rightskip\EndIndent plus 1fil
+  \parfillskip\z@skip
+  \parindent\z@
+}
+\def\Q@end{% raggedleft, I hope
+  \let\\\@centercr
+  \leftskip\StartIndent plus 1fil%
+  \parfillskip\z@skip
+}
+\def\Q@center{%
+  \let\\\@centercr
+  \rightskip\EndIndent plus 1fil%
+  \leftskip\StartIndent plus 1fil%
+  \parfillskip\z@skip\parindent\z@
+}
+\def\Q@pageoutside{%
+  \let\\\@centercr
+  \leftskip\StartIndent plus 1fil%
+  \parfillskip\z@skip
+}
+\def\Q@pageinside{%
+  \let\\\@centercr
+  \rightskip\EndIndent plus 1fil%
+  \parfillskip\z@skip
+}
+\def\JObeylines{%
+  \@tempswafalse
+  \def\par{%
+    \if@tempswa
+      \leavevmode \null \@@par\penalty\interlinepenalty
+    \else
+      \@tempswatrue
+      \ifhmode\@@par\penalty\interlinepenalty\fi
+    \fi}%
+  \obeylines\everypar \expandafter{\the\everypar \unpenalty}%
+}
+\newif\if@obeylines
+\@obeylinesfalse
+\def\Lines@asis{\JObeylines\@obeylinestrue}
+\def\Lines@wrap{\@obeylinesfalse}
+\expandafter\def\csname Lines@asis-truncate\endcsname{%
+  \JObeylines\@obeylinestrue}
+\expandafter\def\csname Lines@asis-wrap\endcsname{\@obeylinesfalse}
+%
+\def\Fld@start{l}
+\def\Fld@center{c}
+\def\Fld@end{r}
+%
+\def\White@preserve{\catcode`\ =\active\@vobeyspaces}
+%
+\def\Break@page{\newpage}
+\def\Break@{}
+%
+\def\DefineCharacter#1#2{\expandafter\def\csname Ch@#1\endcsname{#2}}
+%    \end{macrocode}
+% \section{Unicode Characters}
+% Here are some characters we have encountered for which
+% we know the mappings. Some of these need the Elsevier font
+% packages, so unclean at present.
+%    \begin{macrocode}
+\def\Entity#1{%
+   \expandafter\ifx\csname Ent#1\endcsname\relax
+     \&#1;\typeout{Warning: Undefined entity #1 at \the\inputlineno}%
+   \else\csname Ent#1\endcsname\fi
+}
+%    \end{macrocode}
+% Some common entities 
+%    \begin{macrocode}
+\def\Entamp{\&}
+\def\Entnbsp{~}
+\def\Entlsqb{[}
+\def\Entmdash{---}
+\def\Entndash{--}
+\def\Entrsqb{]}
+%
+\DefineCharacter{279}{\ensuremath{\doteq}} %edot
+\DefineCharacter{289}{\ensuremath{\gtrdot}} %gdot
+\DefineCharacter{338}{\OE} %OElig
+\DefineCharacter{339}{\oe} %oelig
+\DefineCharacter{732}{\ifmmode\tilde{}\else\~{}\fi}
+\DefineCharacter{915}{\ifmmode\Gamma\else\textGamma\fi} %Gamma
+\DefineCharacter{916}{\ifmmode\Delta\else\textDelta\fi} %Delta
+\DefineCharacter{920}{\ifmmode\Theta\else\textTheta\fi} %Theta
+\DefineCharacter{923}{\ifmmode\Lambda\else\textLambda\fi} %Lambda
+\DefineCharacter{926}{\ifmmode\Xi\else\textXi\fi} %Xi
+\DefineCharacter{928}{\ifmmode\Pi\else\textPi\fi} %Pi
+\DefineCharacter{931}{\ifmmode\Sigma\else\textSigma\fi} %Sigma
+\DefineCharacter{931}{\textvarTheta}
+\DefineCharacter{933}{\ensuremath{\Upsilon}} %Upsi
+\DefineCharacter{934}{\ifmmode\Phi\else\textPhi\fi} %Phi
+\DefineCharacter{936}{\ifmmode\Psi\else\textPsi\fi} %Psi
+\DefineCharacter{937}{\ifmmode\Omega\else\textOmega\fi} %Omega
+\DefineCharacter{945}{\ifmmode\alpha\else\textalpha\fi} %alpha
+\DefineCharacter{946}{\ifmmode\beta\else\textbeta\fi} %beta
+\DefineCharacter{947}{\ifmmode\gamma\else\textgamma\fi} %gamma
+\DefineCharacter{948}{\ifmmode\delta\else\textdelta\fi} %delta
+\DefineCharacter{949}{\ifmmode\epsilon\else\textepsilon\fi} %delta
+\DefineCharacter{950}{\ifmmode\zeta\else\textzeta\fi} %zeta
+\DefineCharacter{951}{\ifmmode\eta\else\texteta\fi} %eta
+\DefineCharacter{953}{\ifmmode\iota\else\textiota\fi} %iota
+\DefineCharacter{954}{\ifmmode\kappa\else\textkappa\fi} %kappa
+\DefineCharacter{955}{\ifmmode\lambda\else\textlambda\fi} %lambda
+\DefineCharacter{956}{\ifmmode\mu\else\textmu\fi} %mu
+\DefineCharacter{957}{\ifmmode\nu\else\textnu\fi} %nu
+\DefineCharacter{958}{\ifmmode\xi\else\textxi\fi} %xi
+\DefineCharacter{960}{\ensuremath{\pi}} %pi
+\DefineCharacter{963}{\ifmmode\sigma\else\textsigma\fi} %sigma
+\DefineCharacter{964}{\ifmmode\tau\else\texttau\fi} %tau
+\DefineCharacter{967}{\ifmmode\chi\else\textchi\fi} %chi
+\DefineCharacter{968}{\ifmmode\psi\else\textpsi\fi} %psi
+\DefineCharacter{989}{\ensuremath{\digamma}} %gammad
+\DefineCharacter{1041}{\CYRBuki} %Bcy
+\DefineCharacter{1043}{\CYRGlagol} %Gcy
+\DefineCharacter{1046}{\CYRJu} %ZHcy
+\DefineCharacter{1047}{\CYRSemlja} %Zcy
+\DefineCharacter{1048}{\CYRIsche} %Icy
+\DefineCharacter{1049}{\CYRSchiwete} %Jcy
+\DefineCharacter{1050}{\CYRKako} %Kcy
+\DefineCharacter{1051}{\CYRLjudi} %Lcy
+\DefineCharacter{1055}{\CYRPakoy} %Pcy
+\DefineCharacter{1059}{\CYRU} %Ucy
+\DefineCharacter{1060}{\CYRFert} %Fcy
+\DefineCharacter{1061}{\CYRTscherw} %KHcy
+\DefineCharacter{1062}{\CYRZui} %TScy
+\DefineCharacter{1064}{\CYRScha} %SHcy
+\DefineCharacter{1065}{\CYRSchtscha} %SHCHcy
+\DefineCharacter{1066}{\CYRJerr} %HARDcy
+\DefineCharacter{1067}{\CYRJerui} %Ycy
+\DefineCharacter{1068}{\CYRJher} %SOFTcy
+\DefineCharacter{1069}{\CYRDsche} %Ecy
+\DefineCharacter{1070}{\CYRtjsche} %YUcy
+\DefineCharacter{1071}{\CYRZelo} %YAcy
+\DefineCharacter{1073}{\CYRbuki} %bcy
+\DefineCharacter{1074}{\CYRwjedi} %vcy
+\DefineCharacter{1075}{\CYRglagol} %gcy
+\DefineCharacter{1076}{\CYRdobro} %dcy
+\DefineCharacter{1078}{\CYRju} %zhcy
+\DefineCharacter{1079}{\CYRsemlja} %zcy
+\DefineCharacter{1080}{\CYRische} %icy
+\DefineCharacter{1081}{\CYRschiwete} %jcy
+\DefineCharacter{1082}{\CYRkako} %kcy
+\DefineCharacter{1083}{\CYRljudi} %lcy
+\DefineCharacter{1084}{\CYRmuislette} %mcy
+\DefineCharacter{1085}{\CYRnasch} %ncy
+\DefineCharacter{1087}{\CYRpakoy} %pcy
+\DefineCharacter{1090}{\CYRtwerdo} %tcy
+\DefineCharacter{1092}{\CYRfert} %fcy
+\DefineCharacter{1093}{\CYRtscherw} %khcy
+\DefineCharacter{1094}{\CYRzui} %tscy
+\DefineCharacter{1096}{\CYRscha} %shcy
+\DefineCharacter{1097}{\CYRschtscha} %shchcy
+\DefineCharacter{1098}{\CYRjerr} %hardcy
+\DefineCharacter{1099}{\CYRjerui} %ycy
+\DefineCharacter{1100}{\CYRjher} %softcy
+\DefineCharacter{1101}{\CYRsemlja} %ecy
+\DefineCharacter{1102}{\CYRJa} %yucy
+\DefineCharacter{1103}{\CYRzelo} %yacy
+\DefineCharacter{8194}{\leavevmode\hbox to 1em{\hfil}}
+\DefineCharacter{8200}{\ensuremath{\;}} %puncsp
+\DefineCharacter{8201}{\,} %thinsp
+\DefineCharacter{8211}{\ifmmode\mbox{\textendash}\else\textendash\fi} %ndash
+\DefineCharacter{8212}{\textemdash} %mdash
+\DefineCharacter{8216}{\textquoteleft} %lsquo
+\DefineCharacter{8217}{\textquoteright} %rsquo
+\DefineCharacter{8220}{\textquotedblleft} %ldquo
+\DefineCharacter{8221}{\textquotedblright} %rdquo
+\DefineCharacter{8222}{\glqq} %ldquor 
+\DefineCharacter{8224}{\dag} %dagger
+\DefineCharacter{8225}{\ddag} %Dagger
+\DefineCharacter{8226}{\ifmmode\blackcircle\else\textbullet\fi}
+\DefineCharacter{8230}{\ensuremath{\ldots}} %hellip
+\DefineCharacter{8230}{\textellipsis{}}
+\DefineCharacter{8240}{\textperthousand}
+\DefineCharacter{8242}{\ensuremath{\prime}}
+\DefineCharacter{8243}{\ensuremath{''}} %Prime
+\DefineCharacter{8244}{\ensuremath{'''}} %tprime
+\DefineCharacter{8245}{\ensuremath{\backprime}} %bprime
+\DefineCharacter{8412}{\ensuremath{\ddddot}} %DotDot
+\DefineCharacter{8467}{\ensuremath{\ell}} %ell
+\DefineCharacter{8472}{\ensuremath{\wp}} %weierp
+\DefineCharacter{8501}{\ensuremath{\aleph}} %aleph
+\DefineCharacter{8502}{\ensuremath{\beth}} %beth
+\DefineCharacter{8503}{\ensuremath{\gimel}} %gimel
+\DefineCharacter{8504}{\ensuremath{\daleth}} %daleth
+\DefineCharacter{8592}{\ensuremath{\leftarrow}} %larr
+\DefineCharacter{8593}{\ensuremath{\uparrow}} %uarr
+\DefineCharacter{8594}{\ensuremath{\rightarrow}} %rarr
+\DefineCharacter{8595}{\ensuremath{\downarrow}} %darr
+\DefineCharacter{8596}{\ensuremath{\leftrightarrow}} %harr
+\DefineCharacter{8597}{\ensuremath{\updownarrow}} %varr
+\DefineCharacter{8598}{\ensuremath{\nwarrow}} %nwarr
+\DefineCharacter{8599}{\ensuremath{\nearrow}} %nearr
+\DefineCharacter{8602}{\ensuremath{\nleftarrow}} %nlarr
+\DefineCharacter{8603}{\ensuremath{\nrightarrow}} %nrarr
+\DefineCharacter{8606}{\ensuremath{\twoheadleftarrow}} %Larr
+\DefineCharacter{8608}{\ensuremath{\twoheadrightarrow}} %Rarr
+\DefineCharacter{8610}{\ensuremath{\leftarrowtail}} %larrtl
+\DefineCharacter{8611}{\ensuremath{\rightarrowtail}} %rarrtl
+\DefineCharacter{8614}{\ensuremath{\mapsto}} %map
+\DefineCharacter{8617}{\ensuremath{\hookleftarrow}} %larrhk
+\DefineCharacter{8618}{\ensuremath{\hookrightarrow}} %rarrhk
+\DefineCharacter{8619}{\ensuremath{\looparrowleft}} %larrlp
+\DefineCharacter{8620}{\ensuremath{\looparrowright}} %rarrlp
+\DefineCharacter{8621}{\ensuremath{\leftrightsquigarrow}} %harrw
+\DefineCharacter{8622}{\ensuremath{\nleftrightarrow}} %nharr
+\DefineCharacter{8624}{\ensuremath{\Lsh}} %lsh
+\DefineCharacter{8625}{\ensuremath{\Rsh}} %rsh
+\DefineCharacter{8630}{\ensuremath{\curvearrowleft}} %cularr
+\DefineCharacter{8631}{\ensuremath{\curvearrowright}} %curarr
+\DefineCharacter{8636}{\ensuremath{\leftharpoonup}} %lharu
+\DefineCharacter{8637}{\ensuremath{\leftharpoondown}} %lhard
+\DefineCharacter{8638}{\ensuremath{\upharpoonright}} %uharr
+\DefineCharacter{8639}{\ensuremath{\upharpoonleft}} %uharl
+\DefineCharacter{8640}{\ensuremath{\rightharpoonup}} %rharu
+\DefineCharacter{8641}{\ensuremath{\rightharpoondown}} %rhard
+\DefineCharacter{8642}{\ensuremath{\downharpoonright}} %dharr
+\DefineCharacter{8643}{\ensuremath{\downharpoonleft}} %dharl
+\DefineCharacter{8644}{\ensuremath{\rightleftarrows}} %rlarr2
+\DefineCharacter{8646}{\ensuremath{\leftrightarrows}} %lrarr2
+\DefineCharacter{8647}{\ensuremath{\leftleftarrows}} %larr2
+\DefineCharacter{8648}{\ensuremath{\upuparrows}} %uarr2
+\DefineCharacter{8649}{\ensuremath{\rightrightarrows}} %rarr2
+\DefineCharacter{8650}{\ensuremath{\downdownarrows}} %darr2
+\DefineCharacter{8651}{\ensuremath{\leftrightharpoons}}
+\DefineCharacter{8651}{\ensuremath{\leftrightharpoons}} %lrhar2
+\DefineCharacter{8652}{\ensuremath{\rightleftharpoons}} %rlhar2
+\DefineCharacter{8653}{\ensuremath{\nLeftarrow}} %nlArr
+\DefineCharacter{8654}{\ensuremath{\nLeftrightarrow}} %nhArr
+\DefineCharacter{8655}{\ensuremath{\nRightarrow}} %nrArr
+\DefineCharacter{8656}{\ensuremath{\Leftarrow}} %lArr
+\DefineCharacter{8657}{\ensuremath{\Uparrow}} %uArr
+\DefineCharacter{8658}{\ensuremath{\Longrightarrow}} %rArr
+\DefineCharacter{8659}{\ensuremath{\Downarrow}} %dArr
+\DefineCharacter{8660}{\ensuremath{\Leftrightarrow}} %iff
+\DefineCharacter{8661}{\ensuremath{\Updownarrow}} %vArr
+\DefineCharacter{8666}{\ensuremath{\Lleftarrow}} %lAarr
+\DefineCharacter{8667}{\ensuremath{\Rrightarrow}} %rAarr
+\DefineCharacter{8669}{\ensuremath{\leadsto}} %rarrw
+\DefineCharacter{8704}{\ensuremath{\forall}} %forall
+\DefineCharacter{8705}{\ensuremath{\complement}} %comp
+\DefineCharacter{8706}{\ensuremath{\partial}} %part
+\DefineCharacter{8707}{\ensuremath{\exists}} %exist
+\DefineCharacter{8708}{\ensuremath{\nexists}} %nexist
+\DefineCharacter{8709}{\ensuremath{\emptyset}} %empty
+\DefineCharacter{8711}{\ensuremath{\nabla}} %nabla
+\DefineCharacter{8712}{\ensuremath{\in}} %isin
+\DefineCharacter{8713}{\ensuremath{\not\in}} %notin
+\DefineCharacter{8715}{\ensuremath{\ni}} %ni
+\DefineCharacter{8719}{\ensuremath{\prod}}
+\DefineCharacter{8719}{\ensuremath{\prod}} %prod
+\DefineCharacter{8720}{\ensuremath{\amalg}} %amalg
+\DefineCharacter{8720}{\ensuremath{\coprod}} %coprod
+\DefineCharacter{8721}{\ensuremath{\sum}} %sum
+\DefineCharacter{8722}{\ensuremath{-}}
+\DefineCharacter{8723}{\ensuremath{\mp}} %mnplus
+\DefineCharacter{8724}{\ensuremath{\dotplus}} %plusdo
+\DefineCharacter{8725}{\ensuremath{/}} %nsup
+\DefineCharacter{8728}{\ensuremath{\circ}} %compfn
+\DefineCharacter{8733}{\ensuremath{\propto}} %prop
+\DefineCharacter{8734}{\ensuremath{\infty}} %infin
+\DefineCharacter{8736}{\ensuremath{\angle}} %ang
+\DefineCharacter{8737}{\ensuremath{\measuredangle}} %angmsd
+\DefineCharacter{8738}{\ensuremath{\sphericalangle}} %angsph
+\DefineCharacter{8739}{\ensuremath{|}} %mid
+\DefineCharacter{8740}{\ensuremath{\nmid}} %nmid
+\DefineCharacter{8741}{\ensuremath{\parallel}} %par
+\DefineCharacter{8742}{\ensuremath{\nparallel}} %npar
+\DefineCharacter{8743}{\ensuremath{\land}} %and
+\DefineCharacter{8744}{\ensuremath{\lor}} %or
+\DefineCharacter{8745}{\ensuremath{\cap}} %cap
+\DefineCharacter{8746}{\ensuremath{\cup}} %cup
+\DefineCharacter{8747}{\ensuremath{\int}}
+\DefineCharacter{8747}{\ensuremath{\int}} %int
+\DefineCharacter{8750}{\ensuremath{\oint}} %conint
+\DefineCharacter{8756}{\ensuremath{\therefore}} %there4
+\DefineCharacter{8757}{\ensuremath{\because}} %becaus
+\DefineCharacter{8764}{\ensuremath{\sim}} %sim
+\DefineCharacter{8765}{\ensuremath{\backsim}} %bsim
+\DefineCharacter{8768}{\ensuremath{\wr}} %wreath
+\DefineCharacter{8769}{\ensuremath{\nsim}} %nsim
+\DefineCharacter{8771}{\ensuremath{\simeq}} %sime
+\DefineCharacter{8772}{\ensuremath{\not\simeq}} %nsime
+\DefineCharacter{8773}{\ensuremath{\cong}} %cong
+\DefineCharacter{8775}{\ensuremath{\ncong}} %ncong
+\DefineCharacter{8776}{\ensuremath{\approx}} %ap
+\DefineCharacter{8777}{\ensuremath{\not\approx}} %nap
+\DefineCharacter{8778}{\ensuremath{\approxeq}} %ape
+\DefineCharacter{8781}{\ensuremath{\asymp}} %asymp
+\DefineCharacter{8782}{\ensuremath{\Bumpeq}} %bump
+\DefineCharacter{8783}{\ensuremath{\bumpeq}} %bumpe
+\DefineCharacter{8785}{\ensuremath{\doteqdot}} %eDot
+\DefineCharacter{8786}{\ensuremath{\fallingdotseq}} %efDot
+\DefineCharacter{8787}{\ensuremath{\risingdotseq}} %erDot
+\DefineCharacter{8788}{\ensuremath{\colone}} %colone
+\DefineCharacter{8790}{\ensuremath{\eqcirc}} %ecir
+\DefineCharacter{8791}{\ensuremath{\circeq}} %cire
+\DefineCharacter{8796}{\ensuremath{\triangleq}} %trie
+\DefineCharacter{8800}{\ensuremath{\ne}} %ne
+\DefineCharacter{8801}{\ensuremath{\equiv}} %equiv
+\DefineCharacter{8802}{\ensuremath{\not\equiv}} %nequiv
+\DefineCharacter{8804}{\ensuremath{\leqslant}} %les
+\DefineCharacter{8804}{\ensuremath{\leq}} %le
+\DefineCharacter{8804}{\ensuremath{\le}}
+\DefineCharacter{8805}{\ensuremath{\geqslant}} %ges
+\DefineCharacter{8805}{\ensuremath{\ge}}
+\DefineCharacter{8805}{\ensuremath{\ge}} %ge
+\DefineCharacter{8806}{\ensuremath{\leqq}} %lE
+\DefineCharacter{8807}{\ensuremath{\geqq}} %gE
+\DefineCharacter{8808}{\ensuremath{\lneqq}} %lnE
+\DefineCharacter{8809}{\ensuremath{\gneqq}} %gnE
+\DefineCharacter{8810}{\ensuremath{\ll}} %Lt
+\DefineCharacter{8811}{\ensuremath{\gg}} %Gt
+\DefineCharacter{8812}{\ensuremath{\between}} %twixt
+\DefineCharacter{8814}{\ensuremath{\nless}} %nlt
+\DefineCharacter{8815}{\ensuremath{\ngtr}} %ngt
+\DefineCharacter{8816}{\ensuremath{\nleqslant}} %nles
+\DefineCharacter{8816}{\ensuremath{\nleq}} %nle
+\DefineCharacter{8817}{\ensuremath{\ngeqslant}} %nges
+\DefineCharacter{8817}{\ensuremath{\ngeq}} %nge
+\DefineCharacter{8818}{\ensuremath{\lesssim}} %lsim
+\DefineCharacter{8819}{\ensuremath{\gtrsim}} %gsim
+\DefineCharacter{8822}{\ensuremath{\lessgtr}} %lg
+\DefineCharacter{8823}{\ensuremath{\gtrless}} %gl
+\DefineCharacter{8826}{\ensuremath{\prec}} %pr
+\DefineCharacter{8827}{\ensuremath{\succ}} %sc
+\DefineCharacter{8829}{\ensuremath{\succcurlyeq}} %sccue
+\DefineCharacter{8830}{\ensuremath{\precsim}} %prsim
+\DefineCharacter{8831}{\ensuremath{\succsim}} %scsim
+\DefineCharacter{8832}{\ensuremath{\nprec}} %npr
+\DefineCharacter{8833}{\ensuremath{\nsucc}} %nsc
+\DefineCharacter{8834}{\ensuremath{\subset}} %sub
+\DefineCharacter{8835}{\ensuremath{\supset}} %sup
+\DefineCharacter{8836}{\ensuremath{\not\subset}} %nsub
+\DefineCharacter{8837}{\ensuremath{\not\supset}} %nsup
+\DefineCharacter{8838}{\ensuremath{\subseteq}} %sube
+\DefineCharacter{8839}{\ensuremath{\supseteq}} %supe
+\DefineCharacter{8840}{\ensuremath{\not\subseteq}} %nsube
+\DefineCharacter{8841}{\ensuremath{\not\supseteq}} %nsupe
+\DefineCharacter{8842}{\ensuremath{\subsetneqq}} %subnE
+\DefineCharacter{8843}{\ensuremath{\supsetneqq}} %supnE
+\DefineCharacter{8846}{\ensuremath{\uplus}} %uplus
+\DefineCharacter{8847}{\ensuremath{\sqsubset}} %sqsub
+\DefineCharacter{8848}{\ensuremath{\sqsupset}} %sqsup
+\DefineCharacter{8849}{\ensuremath{\sqsubseteq}} %sqsube
+\DefineCharacter{8851}{\ensuremath{\sqcap}} %sqcap
+\DefineCharacter{8852}{\ensuremath{\sqcup}} %sqcup
+\DefineCharacter{8853}{\ensuremath{\oplus}} %oplus
+\DefineCharacter{8854}{\ensuremath{\ominus}} %ominus
+\DefineCharacter{8855}{\ensuremath{\otimes}} %otimes
+\DefineCharacter{8856}{\ensuremath{\oslash}} %osol
+\DefineCharacter{8857}{\ensuremath{\odot}} %odot
+\DefineCharacter{8858}{\ensuremath{\circledcirc}} %ocir
+\DefineCharacter{8859}{\ensuremath{\circledast}} %oast
+\DefineCharacter{8861}{\ensuremath{\circleddash}} %odash
+\DefineCharacter{8862}{\ensuremath{\boxplus}} %plusb
+\DefineCharacter{8863}{\ensuremath{\boxminus}} %minusb
+\DefineCharacter{8864}{\ensuremath{\boxtimes}} %timesb
+\DefineCharacter{8866}{\ensuremath{\vdash}} %vdash
+\DefineCharacter{8867}{\ensuremath{\dashv}} %dashv
+\DefineCharacter{8869}{\ensuremath{\perp}} %perp
+\DefineCharacter{8872}{\ensuremath{\vDash}} %vDash
+\DefineCharacter{8873}{\ensuremath{\Vdash}} %Vdash
+\DefineCharacter{8874}{\ensuremath{\Vvdash}} %Vvdash
+\DefineCharacter{8876}{\ensuremath{\nvdash}} %nvdash
+\DefineCharacter{8877}{\ensuremath{\nvDash}} %nvDash
+\DefineCharacter{8878}{\ensuremath{\nVdash}} %nVdash
+\DefineCharacter{8879}{\ensuremath{\nVDash}} %nVDash
+\DefineCharacter{8884}{\ensuremath{\unlhd}} %ltrie
+\DefineCharacter{8885}{\ensuremath{\unrhd}} %rtrie
+\DefineCharacter{8888}{\ensuremath{\multimap}} %mumap
+\DefineCharacter{8890}{\ensuremath{\top}} %intcal
+\DefineCharacter{8891}{\ensuremath{\veebar}} %veebar
+\DefineCharacter{8892}{\ensuremath{\barwedge}} %barwed
+\DefineCharacter{8900}{\ensuremath{\diamond}} %diam
+\DefineCharacter{8903}{\ensuremath{\divideontimes}} %divonx
+\DefineCharacter{8904}{\ensuremath{\bowtie}} %bowtie
+\DefineCharacter{8905}{\ensuremath{\ltimes}} %ltimes
+\DefineCharacter{8906}{\ensuremath{\rtimes}} %rtimes
+\DefineCharacter{8907}{\ensuremath{\leftthreetimes}} %lthree
+\DefineCharacter{8908}{\ensuremath{\rightthreetimes}} %rthree
+\DefineCharacter{8909}{\ensuremath{\backsimeq}} %bsime
+\DefineCharacter{8910}{\ensuremath{\curlyvee}} %cuvee
+\DefineCharacter{8911}{\ensuremath{\curlywedge}} %cuwed
+\DefineCharacter{8912}{\ensuremath{\Subset}} %Sub
+\DefineCharacter{8913}{\ensuremath{\Supset}} %Sup
+\DefineCharacter{8914}{\ensuremath{\Cap}} %Cap
+\DefineCharacter{8915}{\ensuremath{\Cup}} %Cup
+\DefineCharacter{8916}{\ensuremath{\pitchfork}} %fork
+\DefineCharacter{8918}{\ensuremath{\lessdot}} %ldot
+\DefineCharacter{8920}{\ensuremath{\lll}} %Ll
+\DefineCharacter{8921}{\ensuremath{\ggg}} %Gg
+\DefineCharacter{8922}{\ensuremath{\lesseqgtr}} %leg
+\DefineCharacter{8923}{\ensuremath{\gtreqless}} %gel
+\DefineCharacter{8924}{\ensuremath{\eqslantless}} %els
+\DefineCharacter{8925}{\ensuremath{\eqslantgtr}} %egs
+\DefineCharacter{8926}{\ensuremath{\curlyeqprec}} %cuepr
+\DefineCharacter{8927}{\ensuremath{\curlyeqsucc}} %cuesc
+\DefineCharacter{8928}{\ensuremath{\npreceq}} %npre
+\DefineCharacter{8929}{\ensuremath{\nsucceq}} %nsce
+\DefineCharacter{8934}{\ensuremath{\lnsim}} %lnsim
+\DefineCharacter{8935}{\ensuremath{\gnsim}} %gnsim
+\DefineCharacter{8936}{\ensuremath{\precnsim}} %prnsim
+\DefineCharacter{8937}{\ensuremath{\succnsim}} %scnsim
+\DefineCharacter{8938}{\ensuremath{\ntriangleleft}} %nltri
+\DefineCharacter{8939}{\ensuremath{\ntriangleright}} %nrtri
+\DefineCharacter{8940}{\ensuremath{\ntrianglelefteq}} %nltrie
+\DefineCharacter{8941}{\ensuremath{\ntrianglerighteq}} %nrtrie
+\DefineCharacter{8968}{\ensuremath{\lceil}} %lceil
+\DefineCharacter{8969}{\ensuremath{\rceil}} %rceil
+\DefineCharacter{8970}{\ensuremath{\lfloor}} %lfloor
+\DefineCharacter{8971}{\ensuremath{\rfloor}} %rfloor
+\DefineCharacter{8988}{\ensuremath{\ulcorn}} %ulcorn
+\DefineCharacter{8989}{\ensuremath{\urcorn}} %urcorn
+\DefineCharacter{8990}{\ensuremath{\dlcorn}} %dlcorn
+\DefineCharacter{8991}{\ensuremath{\drcorn}} %drcorn
+\DefineCharacter{8994}{\ensuremath{\frown}} %frown
+\DefineCharacter{8995}{\ensuremath{\smile}} %smile
+\DefineCharacter{9001}{\ensuremath{\langle}} %lang
+\DefineCharacter{9002}{\ensuremath{\rangle}} %rang
+\DefineCharacter{9633}{\ensuremath{\square}} %squ
+\DefineCharacter{9642}{\ensuremath{\blacksquare}} %squf
+\DefineCharacter{9651}{\ensuremath{\bigtriangleup}} %xutri
+\DefineCharacter{9652}{\ensuremath{\blacktriangle}} %utrif
+\DefineCharacter{9653}{\ensuremath{\triangle}} %utri
+\DefineCharacter{9656}{\ensuremath{\blacktriangleright}} %rtrif
+\DefineCharacter{9657}{\ensuremath{\rhd}} %rtri
+\DefineCharacter{9661}{\ensuremath{\bigtriangledown}} %xdtri
+\DefineCharacter{9662}{\ensuremath{\blacktriangledown}} %dtrif
+\DefineCharacter{9663}{\ensuremath{\triangledown}} %dtri
+\DefineCharacter{9666}{\ensuremath{\blacktriangleleft}} %ltrif
+\DefineCharacter{9667}{\ensuremath{\lhd}} %ltri
+\DefineCharacter{9675}{\ensuremath{\bigcirc}} %cir
+\DefineCharacter{9733}{\ensuremath{\bigstar}} %starf
+\DefineCharacter{9734}{\ding73} %star
+\DefineCharacter{9742}{\ding37} %phone
+\DefineCharacter{9824}{\ensuremath{\spadesuit}} %spades
+\DefineCharacter{9825}{\ensuremath{\heartsuit}} %hearts
+\DefineCharacter{9826}{\ensuremath{\diamondsuit}} %diams
+\DefineCharacter{9827}{\ensuremath{\clubsuit}} %clubs
+\DefineCharacter{9837}{\ensuremath{\flat}} %flat
+\DefineCharacter{9838}{\ensuremath{\natural}} %natur
+\DefineCharacter{9839}{\ensuremath{\sharp}} %sharp
+\DefineCharacter{10003}{\ensuremath{\surd}} %check
+\DefineCharacter{10016}{\ensuremath{\maltese}} %malt
+\DefineCharacter{10023}{\ensuremath{\lozenge}} %loz
+\DefineCharacter{12296}{\langle}
+\let\DEBUG\@gobble
+%    \end{macrocode}
+% \section{Startup}
+%    \begin{macrocode}
+\def\endFOT{%\let\normalcolor\relax
+ \ifnum\col@number>1 
+    \end{multicols}
+ \fi
+ \enddocument}
+\def\FOT#1{%
+\checkFOTversion{#1}%
+\@twosidetrue
+\hoffset-1in\voffset-1in
+\def\setnormal{%
+ \let\fSize\pageFontSize
+ \let\LineSpacing\pageLineSpacing
+ \let\fPosture\pageFontPosture
+ \let\fProportionateWidth\pageFontProportionateWidth
+ \let\fWeight\pageFontWeight
+ \let\fFamName\pagefFamName
+}
+\def\headrulewidth{0\p@}
+\def\footrulewidth{0\p@}
+\fancyhf{}
+\def\familydefault{ptm}
+\fontfamily{\familydefault}\selectfont
+\pagenumbering{arabic}
+\input{isoents.tex}
+%    \end{macrocode}
+% Individual users or projects can override anything in this 
+% setup with a configuration file, loaded here, called
+% \texttt{jadetex.cfg}.
+%    \begin{macrocode}
+\InputIfFileExists{jadetex.cfg}{}{}
+\everyjob{\typeout{JadeTeX \JadeTeXDate: 
+   \JadeTeXMajorVersion.\JadeTeXMinorVersion}}
+\ifLabelElements\typeout{Elements will be labelled}\else
+\typeout{Elements will NOT be labelled}\fi
+\nonstopmode
+\Mathcount0
+%    \end{macrocode}
+% We do not put out a |\begin{document}|, as that would fix
+% the page size in advance; we delay that for the first
+% page sequence.
+%    \begin{macrocode}
+\let\default@color\current@color
+}
+\catcode`\^^M=10%
+%</package>
+%<*dsssldef>
+\NeedsTeXFormat{LaTeX2e}[1995/12/01]
+\ProvideTextCommandDefault{\textonequarter}{\ensuremath{\frac14}}
+\ProvideTextCommandDefault{\textonehalf}{\ensuremath{\frac12}}
+\ProvideTextCommandDefault{\textthreequarters}{\ensuremath{\frac34}}
+\ProvideTextCommandDefault{\textcent}
+   {\TextSymbolUnavailable\textcent}
+\ProvideTextCommandDefault{\textyen}
+   {\TextSymbolUnavailable\textyen}
+\ProvideTextCommandDefault{\textcurrency}
+   {\TextSymbolUnavailable\textcurrency}
+\ProvideTextCommandDefault{\textbrokenbar}
+   {\TextSymbolUnavailable\textbrokenbar}
+\providecommand{\mathdegree}{{\ensuremath{^\circ}}
+}
+\providecommand{\mathonesuperior}{{^1}}
+\providecommand{\mathtwosuperior}{{^2}}
+\providecommand{\maththreesuperior}{{^3}}
+\providecommand{\mathordmasculine}{\mathrm{^{\underline{o}}}}
+\providecommand{\mathordfeminine}{\mathrm{^{\underline{a}}}}
+\DeclareInputText{"0A0}{\nobreakspace}
+\DeclareInputMath{"0B0}{\mathdegree}
+\DeclareInputText{"0A1}{\textexclamdown}
+\DeclareInputMath{"0B1}{\ensuremath{\pm}}
+\DeclareInputText{"0A2}{\textcent}
+\DeclareInputMath{"0B2}{\mathtwosuperior}
+\DeclareInputText{"0B2}{\ensuremath{\mathtwosuperior}}
+\DeclareInputText{"0A3}{\pounds}
+\DeclareInputMath{"0B3}{\maththreesuperior}
+\DeclareInputText{"0B3}{\ensuremath{\maththreesuperior}}
+\DeclareInputText{"0A4}{\textcurrency}
+\DeclareInputText{"0B4}{\@tabacckludge'{}}
+\DeclareInputText{"0A5}{\textyen}
+\DeclareInputMath{"0B5}{\mu}
+\DeclareInputText{"0B5}{\textmu}
+\DeclareInputText{"0A6}{\textbrokenbar}
+\DeclareInputText{"0B6}{\P}
+\DeclareInputText{"0A7}{\S}
+\DeclareInputText{"0B7}{\textperiodcentered}
+\DeclareInputText{"0A8}{\"{}}
+\DeclareInputText{"0B8}{\c{}}
+\DeclareInputText{"0A9}{\copyright}
+\DeclareInputMath{"0B9}{\mathonesuperior}
+\DeclareInputMath{"0AA}{\mathordfeminine}
+\DeclareInputMath{"0BA}{\mathordmasculine}
+\DeclareInputText{"0B9}{\ensuremath{\mathonesuperior}}
+\DeclareInputText{"0AA}{\ensuremath{\mathordfeminine}}
+\DeclareInputText{"0BA}{\ensuremath{\mathordmasculine}}
+\DeclareInputText{"0AB}{\guillemotleft}
+\DeclareInputText{"0BB}{\guillemotright}
+\DeclareInputMath{"0AC}{\lnot}
+\DeclareInputText{"0AC}{\ensuremath{\lnot}}
+\DeclareInputText{"0BC}{\textonequarter}
+\DeclareInputText{"0AD}{\-}
+\DeclareInputText{"0BD}{\textonehalf}
+\DeclareInputText{"0AE}{\textregistered}
+\DeclareInputText{"0BE}{\textthreequarters}
+\DeclareInputText{"0AF}{\ifmmode\else\@tabacckludge={}\fi}
+\DeclareInputText{"0BF}{\textquestiondown}
+\DeclareInputText{"0C0}{\@tabacckludge`A}
+\DeclareInputText{"0D0}{\DH}
+\DeclareInputText{"0C1}{\@tabacckludge'A}
+\DeclareInputText{"0D1}{\~N}
+\DeclareInputText{"0C2}{\^A}
+\DeclareInputText{"0D2}{\@tabacckludge`O}
+\DeclareInputText{"0C3}{\~A}
+\DeclareInputText{"0D3}{\@tabacckludge'O}
+\DeclareInputText{"0C4}{\"A}
+\DeclareInputText{"0D4}{\^O}
+\DeclareInputText{"0C5}{\AA}
+\DeclareInputText{"0D5}{\~O}
+\DeclareInputText{"0C6}{\AE}
+\DeclareInputText{"0D6}{\"O}
+\DeclareInputText{"0C7}{\c C}
+\DeclareInputMath{"0D7}{\ensuremath{\times}}
+\DeclareInputText{"0C8}{\@tabacckludge`E}
+\DeclareInputText{"0D8}{\O}
+\DeclareInputText{"0C9}{\@tabacckludge'E}
+\DeclareInputText{"0D9}{\@tabacckludge`U}
+\DeclareInputText{"0CA}{\^E}
+\DeclareInputText{"0DA}{\@tabacckludge'U}
+\DeclareInputText{"0CB}{\"E}
+\DeclareInputText{"0DB}{\^U}
+\DeclareInputText{"0CC}{\@tabacckludge`I}
+\DeclareInputText{"0DC}{\"U}
+\DeclareInputText{"0CD}{\@tabacckludge'I}
+\DeclareInputText{"0DD}{\@tabacckludge'Y}
+\DeclareInputText{"0CE}{\^I}
+\DeclareInputText{"0DE}{\TH}
+\DeclareInputText{"0CF}{\"I}
+\DeclareInputText{"0DF}{\ss}
+\DeclareInputText{"0E0}{\@tabacckludge`a}
+\DeclareInputText{"0F0}{\dh}
+\DeclareInputText{"0E1}{\@tabacckludge'a}
+\DeclareInputText{"0F1}{\~n}
+\DeclareInputText{"0E2}{\^a}
+\DeclareInputText{"0F2}{\@tabacckludge`o}
+\DeclareInputText{"0E3}{\~a}
+\DeclareInputText{"0F3}{\@tabacckludge'o}
+\DeclareInputText{"0E4}{\"a}
+\DeclareInputText{"0F4}{\^o}
+\DeclareInputText{"0E5}{\aa}
+\DeclareInputText{"0F5}{\~o}
+\DeclareInputText{"0E6}{\ae}
+\DeclareInputText{"0F6}{\"o}
+\DeclareInputText{"0E7}{\c c}
+\DeclareInputMath{"0F7}{\ensuremath{\div}}
+\DeclareInputText{"0E8}{\@tabacckludge`e}
+\DeclareInputText{"0F8}{\o}
+\DeclareInputText{"0E9}{\@tabacckludge'e}
+\DeclareInputText{"0F9}{\@tabacckludge`u}
+\DeclareInputText{"0EA}{\^e}
+\DeclareInputText{"0FA}{\@tabacckludge'u}
+\DeclareInputText{"0EB}{\"e}
+\DeclareInputText{"0FB}{\^u}
+\DeclareInputText{"0EC}{\@tabacckludge`\i}
+\DeclareInputText{"0FC}{\"u}
+\DeclareInputText{"0ED}{\@tabacckludge'\i}
+\DeclareInputText{"0FD}{\@tabacckludge'y}
+\DeclareInputText{"0EE}{\^\i}
+\DeclareInputText{"0FE}{\th}
+\DeclareInputText{"0EF}{\"\i}
+\DeclareInputText{"0FF}{\"y}
+%</dsssldef>
+%<*isoent>
+\def\EntPrime{\ensuremath{''}}
+\def\Entprime{\ensuremath{'}}
+%    \end{macrocode}
+% Ulrich Drepper <drepper@ipd.info.uni-karlsruhe.de> 
+% contributed this set of |\Ent| definitions for some ISO
+% entity sets. You can include this in a jade.cfg file if
+% you choose to use preserve-sdata?
+%
+%\subsection{Entities from ISOlat1}
+%    \begin{macrocode}
+\def\Entaacute{\'a}
+\def\EntAacute{\'A}
+\def\Entacirc{\^a}
+\def\EntAcirc{\^A}
+\def\Entagrave{\`a}
+\def\EntAgrave{\`A}
+\def\Entaring{\aa}
+\def\EntAring{\AA}
+\def\Entatilde{\~a}
+\def\EntAtilde{\~A}
+\def\Entauml{\"a}
+\def\EntAuml{\"A}
+\def\Entaelig{\ae}
+\def\EntAElig{\AE}
+\def\Entccedil{\c{c}}
+\def\EntCcedil{\c{C}}
+%\def\Enteth{MISSING}
+%\def\EntETH{MISSING}
+\def\Enteacute{\'e}
+\def\EntEacute{\'E}
+\def\Entecirc{\^e}
+\def\EntEcirc{\^E}
+\def\Entegrave{\`e}
+\def\EntEgrave{\`E}
+\def\Enteuml{\"e}
+\def\EntEuml{\"E}
+\def\Entiacute{\'\i}
+\def\EntIacute{\'I}
+\def\Enticirc{\^\i}
+\def\EntIcirc{\^I}
+\def\Entigrave{\`\i}
+\def\EntIgrave{\`I}
+\def\Entiuml{\"\i}
+\def\EntIuml{\"I}
+\def\Entntilde{\~n}
+\def\EntNtilde{\~N}
+\def\Entoacute{\'o}
+\def\EntOacute{\'O}
+\def\Entocirc{\^o}
+\def\EntOcirc{\^O}
+\def\Entograve{\`o}
+\def\EntOgrave{\`O}
+\def\Entoslash{\o}
+\def\EntOslash{\O}
+\def\Entouml{\"o}
+\def\EntOuml{\"O}
+\def\Entszlig{\ss}
+%\def\Entthorn{MISSING}
+%\def\EntTHORN{MISSING}
+\def\Entuacute{\'u}
+\def\EntUacute{\'U}
+\def\Entucirc{\^u}
+\def\EntUcirc{\^U}
+\def\Entugrave{\`u}
+\def\EntUgrave{\`U}
+\def\Entuuml{\"u}
+\def\EntUuml{\"U}
+\def\Entyacute{\'y}
+\def\EntYacute{\'Y}
+\def\Entyuml{\"y}
+%    \end{macrocode}
+%\subsection{Entities from ISOlat2}
+%    \begin{macrocode}
+\def\Entabreve{\u{a}}
+\def\EntAbreve{\u{A}}
+\def\Entamacr{\=a}
+\def\EntAmacr{\=A}
+%\def\Entaogon{MISSING}
+%\def\EntAogon{MISSING}
+\def\Entcacute{\'c}
+\def\EntCacute{\'C}
+\def\Entccaron{\v{c}}
+\def\EntCcaron{\v{C}}
+\def\Entccirc{\^c}
+\def\EntCcirc{\^C}
+\def\Entcdot{\.c}
+\def\EntCdot{\.C}
+\def\Entdcaron{\v{d}}
+\def\EntDcaron{\v{D}}
+%\def\Entdstrok{MISSING}
+%\def\EntDstrok{MISSING}
+\def\Entecaron{\v{e}}
+\def\EntEcaron{\v{E}}
+\def\Entedot{\.e}
+\def\EntEdot{\.E}
+\def\Entemacr{\=e}
+\def\EntEmacr{\=E}
+%\def\Enteogon{MISSING}
+%\def\EntEogon{MISSING}
+\def\Entgacute{\'g}
+\def\Entgbreve{\u{g}}
+\def\EntGbreve{\u{G}}
+\def\EntGcedil{\c{G}}
+\def\Entgcirc{\^g}
+\def\EntGcirc{\^G}
+\def\Entgdot{\.g}
+\def\EntGdot{\.G}
+\def\Enthcirc{\^h}
+\def\EntHcirc{\^H}
+%\def\Enthstrok{MISSING}
+%\def\EntHstrok{MISSING}
+\def\EntIdot{\.I}
+\def\Entimacr{\=\i}
+\def\EntImacr{\=I}
+%def\Entijlig{MISSING}
+%def\EntIJlig{MISSING}
+\def\Entinodot{\i}
+%\def\Entiogon{MISSING}
+%\def\EntIogon{MISSING}
+\def\Entitilde{\~\i}
+\def\EntItilde{\~I}
+\def\Entjcirc{\^\j}
+\def\EntJcirc{\^J}
+\def\Entkcedil{\c{k}}
+\def\EntKcedil{\c{K}}
+%\def\Entkgreen{MISSING}
+\def\Entlacute{\'l}
+\def\EntLacute{\'L}
+\def\Entlcaron{\v{l}}
+\def\EntLcaron{\v{L}}
+\def\Entlcedil{\c{l}}
+\def\EntLcedil{\c{L}}
+%\def\Entlmidot{MISSING}
+%\def\EntLmidot{MISSING}
+\def\Entlstrok{\l}
+\def\EntLstrok{\L}
+\def\Entnacute{\'n}
+\def\EntNacute{\'N}
+%\def\Enteng{MISSING}
+%\def\EntENG{MISSING}
+%\def\Entnapos{MISSING}
+\def\Entncaron{\v{n}}
+\def\EntNcaron{\v{N}}
+\def\Entncedil{\c{n}}
+\def\EntNcedil{\c{N}}
+\def\Entodblac{\H{o}}
+\def\EntOdblac{\H{O}}
+\def\Entomacr{\=\o}
+\def\EntOmacr{\=O}
+\def\Entoelig{\oe}
+\def\EntOElig{\OE}
+\def\Entracute{\'r}
+\def\EntRacute{\'R}
+\def\Entrcaron{\v{r}}
+\def\EntRcaron{\v{R}}
+\def\Entrcedil{\c{r}}
+\def\EntRcedil{\c{R}}
+\def\Entsacute{\'s}
+\def\EntSacute{\'S}
+\def\Entscaron{\v{s}}
+\def\EntScaron{\v{S}}
+\def\Entscedil{\c{s}}
+\def\EntScedil{\c{S}}
+\def\Entscirc{\^s}
+\def\EntScirc{\^S}
+\def\Enttcaron{\v{t}}
+\def\EntTcaron{\v{T}}
+\def\Enttcedil{\c{t}}
+\def\EntTcedil{\c{T}}
+%\def\Enttstrok{MISSING}
+%\def\EntTstrok{MISSING}
+\def\Entubreve{\u{u}}
+\def\EntUbreve{\u{U}}
+\def\Entudblac{\H{u}}
+\def\EntUdblac{\H{U}}
+\def\Entumacr{\=\u}
+\def\EntUmacr{\=U}
+%\def\Entuogon{MISSING}
+%\def\EntUogon{MISSING}
+%\def\Enturing{MISSING}
+%\def\EntUring{MISSING}
+\def\Entutilde{\~u}
+\def\EntUtilde{\~U}
+\def\Entwcirc{\^w}
+\def\EntWcirc{\^W}
+\def\Entycirc{\^y}
+\def\EntYcirc{\^Y}
+\def\EntYuml{\"Y}
+\def\Entzacute{\'z}
+\def\EntZacute{\'Z}
+\def\Entzcaron{\v{z}}
+\def\EntZcaron{\v{Z}}
+\def\Entzdot{\.z}
+\def\EntZdot{\.Z}
+%
+%    \end{macrocode}
+%\subsection{Entities from ISOnum}
+%    \begin{macrocode}
+%\def\Enthalf{MISSING}
+%\def\Entfraconetwo{MISSING}
+\def\Entplus{\ensuremath{+}}
+\def\Entplusmn{\ensuremath{\pm}}
+\def\Entlt{{<}}
+\def\Entequals{{=}}
+\def\Entgt{{>}}
+\def\Entdivide{\ensuremath{\div}}
+\def\Enttimes{\ensuremath{\times}}
+%\def\Entcurren{MISSING}
+\def\Entpound{\pounds}
+\def\Entdollar{\$}
+\def\Entcent{\textcent}
+%\def\Entyen{MISSING}
+\def\Entnum{\#}
+\def\Entpercnt{\%}
+\def\Entamp{\&}
+\def\Entast{\ensuremath{\ast}}
+\def\Entcommat{@}
+\def\Entlsqb{[}
+\def\Entbsol{\char{95}}
+\def\Entrsqb{]}
+\def\Entlcub{\{}
+%\def\Enthorbar{MISSING}
+\def\Entverbar{\ensuremath{\mid}}
+\def\Entrcub{\}}
+\def\Entmicro{\ensuremath{\mu}}
+\def\Entohm{\ensuremath{\Omega}}
+\def\Entdeg{\ensuremath{^\circ}}
+%\def\Entordm{MISSING}
+%\def\Entordf{MISSING}
+\def\Entsect{\S}
+\def\Entpara{\P}
+\def\Entmiddot{\ensuremath{\cdot}}
+\def\Entlarr{\ensuremath{\leftarrow}}
+\def\Entrarr{\ensuremath{\rightarrow}}
+\def\Entuarr{\ensuremath{\uparrow}}
+\def\Entdarr{\ensuremath{\downarrow}}
+\def\Entcopy{\copyright}
+\def\Entreg{\textregistered}
+\def\Enttrade{\texttrademark}
+%\def\Entbrvbar{MISSING}
+\def\Entnot{\ensuremath{\lnot}}
+%\def\Entsung{MISSING}
+\def\Entexcl{!}
+\def\Entiexcl{!'}
+\def\Entquot{"}
+\def\Entapos{\'\ }
+\def\Entlpar{(}
+\def\Entrpar{)}
+\def\Entcomma{,}
+\def\Entlowbar{\_}
+\def\Enthyphen{-}
+\def\Entperiod{.}
+\def\Entsol{/}
+\def\Entsolon{:}
+\def\Entsemi{;}
+\def\Entquest{?}
+\def\Entiquest{?'}
+\def\Entlaquo{\guillemotleft}
+\def\Entraquo{\guillemotright}
+\def\Entlsquo{`}
+\def\Entrsquo{'}
+\def\Entldquo{\textquotedblleft}
+\def\Entrdquo{\textquotedblright}
+\def\Entnbsp{\ }
+%\def\Entshy{MISSING}
+%</isoent>
+%    \end{macrocode}
+% \Finale
+%
+\endinput
+

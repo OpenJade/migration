@@ -23,9 +23,11 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 bool debugMode,
 			 bool dsssl2,
                          bool strictMode,
-			 const FOTBuilder::Extension *extensionTable)
+			 const FOTBuilder::Extension *extensionTable,
+			 const FOTBuilder::Feature *features)
 : interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
-                               debugMode, dsssl2, strictMode, extensionTable))
+                               debugMode, dsssl2, strictMode, 
+			       extensionTable, features))
 {
 }
 
@@ -37,7 +39,10 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   DssslSpecEventHandler specHandler(mgr);
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
-  for (int phase = 0; phase < 2; phase++) {
+  
+  interpreter_->declareFeature(Interpreter::style);
+
+  for (int phase = 0; phase < 3; phase++) {
     for (size_t i = 0; i < parts.size(); i++) {
       DssslSpecEventHandler::Part::DIter diter(parts[i]->doc()->diter());
       bool local = 0;
@@ -46,10 +51,15 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
     	  diter = parts[i]->diter();
 	local = !local;
 	for (; !diter.done(); diter.next()) {
-	  if ((diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::charRepertoire ||
+          // parse in three phases:
+          // 1. features
+          // 2. char-repertoire, standard-chars, other-chars
+          // 3. the rest
+	  if (diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::features ? phase == 0 : 
+              ((diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::charRepertoire ||
                diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::standardChars)
-	      ? phase == 0
-	      : phase == 1) {
+	      ? phase == 1 
+	      : phase == 2)) {
 	    Owner<InputSource> in;
 	    diter.cur()->makeInputSource(specHandler, in);
 	    SchemeParser scm(*interpreter_, in);
@@ -68,6 +78,9 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
               break;
             case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
               scm.parseSeparatorChars();
+              break;
+            case DssslSpecEventHandler::DeclarationElement::features:
+              scm.parseFeatures(); 
               break;
             default:
               interpreter_->message(

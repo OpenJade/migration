@@ -3,10 +3,10 @@ default: jadetex.fmt pdfjadetex.fmt
 basic: jadetex.ltx
 	tex jadetex.ins
 
-jadetex.fmt: basic
-	tex -ini "&hugelatex" -progname=jadetex jadetex.ini
+jadetex.fmt: 
+	tex -ini "&latex" -progname=jadetex jadetex.ini
 
-pdfjadetex.fmt: basic
+pdfjadetex.fmt: 
 	pdftex -ini "&pdflatex" -progname=pdfjadetex pdfjadetex.ini
 
 install: jadetex.fmt pdfjadetex.fmt

@@ -713,6 +713,11 @@ public:
     const ExtensionFlowObj *flowObj;
   };
 
+  struct STYLE_API Feature {
+    const char *name;
+    bool partial;
+  };
+
   static const char *symbolName(Symbol);
 };
 

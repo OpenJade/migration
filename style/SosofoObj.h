@@ -122,6 +122,7 @@ public:
   virtual void pushStyle(ProcessContext &, unsigned &);
   virtual void popStyle(ProcessContext &, unsigned);
   virtual void processInner(ProcessContext &) = 0;
+  virtual void requireFeature(Interpreter &);
 protected:
   static
     bool setDisplayNIC(FOTBuilder::DisplayNIC &,

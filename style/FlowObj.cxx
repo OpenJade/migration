@@ -18,6 +18,10 @@ FlowObj::FlowObj()
   hasSubObjects_ = 1;
 }
 
+void FlowObj::requireFeature(Interpreter &)
+{
+}
+
 void FlowObj::process(ProcessContext &context)
 {
   context.startFlowObj();
@@ -609,6 +613,7 @@ public:
   SidelineFlowObj() { }
   FlowObj *copy(Collector &) const;
   void processInner(ProcessContext &);
+  void requireFeature(Interpreter &);
 };
 
 FlowObj *SidelineFlowObj::copy(Collector &c) const
@@ -623,6 +628,12 @@ void SidelineFlowObj::processInner(ProcessContext &context)
   CompoundFlowObj::processInner(context);
   fotb.endSideline();
 }
+
+void SidelineFlowObj::requireFeature(Interpreter &interp)
+{
+   interp.requireFeature(Interpreter::sideline, Location());
+}
+
 void SequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -718,6 +729,9 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   void traceSubObjects(Collector &) const;
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::simplePage, Location());
+  }
 private:
   enum { nPageTypeBits = 2 };
   Owner<HeaderFooter> hf_;
@@ -841,6 +855,9 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::online, Location());
+  } 
 private:
   AddressObj *addressObj_;
 };
@@ -902,6 +919,9 @@ public:
   ScrollFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::online, Location());
+  } 
 };
 
 void ScrollFlowObj::processInner(ProcessContext &context)
@@ -922,6 +942,9 @@ public:
   MarginaliaFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::online, Location());
+  } 
 };
 
 void MarginaliaFlowObj::processInner(ProcessContext &context)
@@ -955,6 +978,9 @@ public:
     FOTBuilder::MultiMode principalMode;
     Vector<FOTBuilder::MultiMode> namedModes;
   };
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::online, Location());
+  } 
 private:
   bool handleMultiModesMember(const Identifier *, ELObj *obj,
 			      const Location &, Interpreter &);
@@ -1290,6 +1316,7 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  void requireFeature(Interpreter &);
 protected:
   Owner<FOTBuilder::DisplayNIC> nic_;
 };
@@ -1329,6 +1356,11 @@ FlowObj *SideBySideFlowObj::copy(Collector &c) const
   return new (c) SideBySideFlowObj(*this);
 }
 
+void SideBySideFlowObj::requireFeature(Interpreter &interp)
+{
+  interp.requireFeature(Interpreter::sideBySide, Location());
+}
+
 class SideBySideItemFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -1336,6 +1368,7 @@ public:
   }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  void requireFeature(Interpreter &);
 };
 
 void SideBySideItemFlowObj::processInner(ProcessContext &context)
@@ -1349,6 +1382,11 @@ void SideBySideItemFlowObj::processInner(ProcessContext &context)
 FlowObj *SideBySideItemFlowObj::copy(Collector &c) const
 {
   return new (c) SideBySideItemFlowObj(*this);
+}
+
+void SideBySideItemFlowObj::requireFeature(Interpreter &interp)
+{
+  interp.requireFeature(Interpreter::sideBySide, Location());
 }
 
 class LeaderFlowObj : public CompoundFlowObj {
@@ -1778,6 +1816,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) MathSequenceFlowObj(*this);
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  };
 };
 
 class FractionFlowObj : public CompoundFlowObj {
@@ -1785,6 +1826,7 @@ public:
   FractionFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  void requireFeature(Interpreter &interp);
 };
 
 void FractionFlowObj::processInner(ProcessContext &context)
@@ -1820,6 +1862,11 @@ FlowObj *FractionFlowObj::copy(Collector &c) const
   return new (c) FractionFlowObj(*this);
 }
 
+void FractionFlowObj::requireFeature(Interpreter &interp) 
+{
+  interp.requireFeature(Interpreter::math, Location());
+}
+
 class UnmathFlowObj : public CompoundFlowObj {
 public:
   UnmathFlowObj() { }
@@ -1831,6 +1878,9 @@ public:
   }
   FlowObj *copy(Collector &c) const {
     return new (c) UnmathFlowObj(*this);
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
   }
 };
 
@@ -1846,6 +1896,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) SuperscriptFlowObj(*this);
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 };
 
 class SubscriptFlowObj : public CompoundFlowObj {
@@ -1860,6 +1913,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) SubscriptFlowObj(*this);
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 };
 
 class ScriptFlowObj : public CompoundFlowObj {
@@ -1869,7 +1925,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) ScriptFlowObj(*this);
   }
-
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 };
 
 void ScriptFlowObj::processInner(ProcessContext &context)
@@ -1898,6 +1956,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) MarkFlowObj(*this);
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 };
 
 void MarkFlowObj::processInner(ProcessContext &context)
@@ -1920,6 +1981,9 @@ public:
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &c) const {
     return new (c) FenceFlowObj(*this);
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
   }
 };
 
@@ -1950,6 +2014,9 @@ public:
   void traceSubObjects(Collector &c) const {
     c.trace(radical_);
     CompoundFlowObj::traceSubObjects(c);
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
   }
 private:
   SosofoObj *radical_;
@@ -2003,6 +2070,9 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) MathOperatorFlowObj(*this);
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 };
 
 void MathOperatorFlowObj::processInner(ProcessContext &context)
@@ -2034,6 +2104,9 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 private:
   Owner<FOTBuilder::GridNIC> nic_;
 };
@@ -2113,6 +2186,9 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::math, Location());
+  }
 private:
   Owner<FOTBuilder::GridCellNIC> nic_;
 };
@@ -2278,6 +2354,9 @@ public:
       CANNOT_HAPPEN();
     }
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
+  }
 private:
   void border(StyleObj *style, StyleObj *style2,
               void (FOTBuilder::*setter)(), ProcessContext &context) {
@@ -2332,6 +2411,9 @@ public:
     if (key == Identifier::keyPositionPreference)
       return 0;
     return 1;
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
   }
 private:
   Owner<FOTBuilder::TablePartNIC> nic_;
@@ -2422,6 +2504,9 @@ public:
     }
     CANNOT_HAPPEN();
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
+  }
 private:
   Owner<NIC> nic_;
 };
@@ -2449,6 +2534,9 @@ public:
   }
   FlowObj *copy(Collector &c) const {
     return new (c) TableRowFlowObj(*this);
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
   }
 };
 
@@ -2600,6 +2688,9 @@ public:
     }
     CANNOT_HAPPEN();
   }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
+  }
 private:
   void border(const ConstPtr<InheritedC> &ic, void (FOTBuilder::*setter)(),
 	      ProcessContext &context) {
@@ -2637,6 +2728,9 @@ public:
   }
   FlowObj *copy(Collector &c) const {
     return new (c) TableBorderFlowObj(*this);
+  }
+  void requireFeature(Interpreter &interp) {
+    interp.requireFeature(Interpreter::table, Location());
   }
 };
 

@@ -4,7 +4,7 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	HtmlFOTBuilder.cxx TeXFOTBuilder.cxx TransformFOTBuilder.cxx \
 	MifFOTBuilder.cxx SgmlFOTBuilder.h RtfFOTBuilder.h \
 	HtmlFOTBuilder.h TeXFOTBuilder.h TransformFOTBuilder.h \
-	MifFOTBuilder.h \
+	MifFOTBuilder.h TextFOTBuilder.h TextFOTBuilder.cxx \
 	JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
 	HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx TeXFOTBuilder_inst.cxx \
 	TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx

@@ -172,7 +172,7 @@ install-opensp:	$(install-common) debian/README.Debian
 	$(install_script) unicode/gensyntax.pl $(libdir-osp)/unicode
 
 #	 doc-base etc
-	dh_installdocs -p$(pkg)
+	dh_installdocs -p$(pkg) doc/*.htm
 #	 optionally, install upstream ChangeLog
 	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg) ChangeLog
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg)

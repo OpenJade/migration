@@ -1,4 +1,7 @@
 * Allow different options for spec parser and doc parser ?
+  Idea: change semantics of cmdline so that parser options
+  before the -d flag apply only to the spec parser, options
+  after it only to the doc parser.
 
 Things which are missing and need a lot of work
 ===============================================
@@ -24,6 +27,13 @@ Things which are missing and need a lot of work
   in the instance, go over all definitions and recompile the model 
   groups. Also adjust the inclusions/exclusions. Optimization: recompile 
   only those which actually use #ALL/#IMPLICIT.
+
+* Annex K DTD data entities: add a DTD notation framework. Applications
+  should have a way to register DTD notation handlers which would then
+  be called for DTD data entities with the corresponding notation. They
+  would get a pointer to the entity and to the current Dtd and would
+  add the element and entity declarations they extract from the entity
+  to the Dtd.
 
 * check table-auto-width and multi-process features.
 

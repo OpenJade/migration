@@ -5299,22 +5299,27 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
     return interp.makeError();
   }
   NodeListObj *nl = argv[1]->asNodeList();
+  ELObjDynamicRoot protect1(interp, nl);
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 1, argv[1]);
   AppendSosofoObj *obj = new (interp) AppendSosofoObj;
+  ELObjDynamicRoot protect2(interp, obj);
   NodePtr nd;
   ELObj *ret;
+  InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
   while (nd = nl->nodeListFirst(context, interp)) {
     nl = nl->nodeListRest(context, interp);
+    protect1 = nl;
     EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
-    InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
     VM vm(context, interp);
     ret = vm.eval(insn.pointer());
-    SosofoObj *sosofo = ret->asSosofo();
-    if (!sosofo) 
+    if (!ret->asSosofo()) { 
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::returnNotSosofo);
       return interp.makeError();
-    obj->append(sosofo);
+    }
+    obj->append(ret->asSosofo());
   }
   return obj;
 }

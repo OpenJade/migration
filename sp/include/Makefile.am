@@ -29,7 +29,8 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 	TranslateCodingSystem.h TypeId.h URLStorage.h UTF8CodingSystem.h \
 	UnicodeCodingSystem.h UnivCharsetDesc.h Vector.cxx Vector.h \
 	XMLCodingSystem.h XcharMap.cxx XcharMap.h constant.h \
-	macros.h rtti.h sptchar.h types.h xnew.h
+	macros.h rtti.h sptchar.h types.h xnew.h \
+	UTF16CodingSystem.h Fixed4CodingSystem.h
 
 ## We don't install the windows-only headers on unix systems, but
 ## we still include it in the distribution

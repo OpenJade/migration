@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<fot>
+<simple-page-sequence>
+<sequence>
+<paragraph>
+<a name="0"/>
+<text>test-mode default rule matching SUB in B</text>
+</paragraph>
+<paragraph>
+<text>test-mode query rule matching SUB in A</text>
+</paragraph>
+</sequence>
+</simple-page-sequence>
+</fot>

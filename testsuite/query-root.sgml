@@ -1,0 +1,6 @@
+
+<!doctype a [
+<!element a - - (sub) >
+<!element sub - o empty >
+]>
+<a><sub></a>

@@ -2641,7 +2641,7 @@ bool PublicIdCharPropValues::setDefault(const StringC &name,
 					const Location &loc,
 					ELObj *obj, Interpreter &)
 {
-  Char *c;
+  const Char *c;
   size_t n;
   if (obj->stringData (c, n));
   return 0;

@@ -36,7 +36,8 @@ transform = @program_transform_name@
 mkinstalldirs = $(SHELL) $(TOP)/config/mkinstalldirs
 man1dir=$(mandir)/man1
 
-man_MANS = onsgmls.1 openjade.1 osgmlnorm.1 ospam.1 osx.1
+man_MANS = onsgmls.1 osgmlnorm.1 ospent.1 openjade.1 ospam.1 osx.1 \
+			jade.1 nsgmls.1 sgmlnorm.1 spam.1 spent.1 sx.1
 MANS = $(man_MANS)
 
 SP_LIBDIRS=lib $(XLIBDIRS)

@@ -3,6 +3,9 @@
 
 #include "Anchor.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
 
 void AnchorFlowObj::processInner(ProcessContext &context)
 {
@@ -53,3 +56,7 @@ void AnchorFlowObj::setNonInheritedC(const Identifier *ident,
  }
  CANNOT_HAPPEN();
 }
+
+#ifdef DSSSL_NAMESPACE
+}
+#endif

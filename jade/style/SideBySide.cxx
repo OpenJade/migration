@@ -1,5 +1,9 @@
 #include "SideBySide.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 SideBySideFlowObj::SideBySideFlowObj()
 : nic_(new FOTBuilder::DisplayNIC)
 {
@@ -35,6 +39,8 @@ FlowObj *SideBySideFlowObj::copy(Collector &c) const
   return new (c) SideBySideFlowObj(*this);
 }
 
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif
 
 

@@ -1,6 +1,10 @@
 
 #include "PageSequence.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 PageSequenceFlowObj::PageSequenceFlowObj()
 {
   hasSubObjects_ = 1;
@@ -29,3 +33,6 @@ FlowObj *PageSequenceFlowObj::copy(Collector &c) const
   return new (c) PageSequenceFlowObj(*this);
 }
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

@@ -12,8 +12,13 @@
 //aligned-column
 /**
  *@class AlignedColumnFlowObj
- *@brief clase que crea el objeto de flujo aligned-column
+ *@brief Class which creates the aligned-column flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class AlignedColumnFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -32,3 +37,6 @@ private:
   Owner<FOTBuilder::DisplayNIC> nic_;
 };
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

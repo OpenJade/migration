@@ -7,7 +7,7 @@ use POSIX;
 
 # Package and version.
 $package = 'openjade';
-$version = '1.3.2';
+$version = '1.3.3-pre1';
 $package = $package; $version = $version; # be quiet, -w
 
 $prog = $0;

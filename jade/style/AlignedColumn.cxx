@@ -1,6 +1,10 @@
 
 #include "AlignedColumn.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 void AlignedColumnFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -36,4 +40,6 @@ void AlignedColumnFlowObj::setNonInheritedC(const Identifier *ident,
 
 }
 
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

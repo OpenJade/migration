@@ -1,6 +1,18 @@
-Changes in OpenJade 1.3.2 (xxxx 2003)
+Changes in OpenJade 1.3.3-pre1 (April 2003)
 
-* Support for many new flow objects (cristian)
+* Support for many new flow objects (Cristian Tornador)
+
+	page-sequence
+	column-set-sequence
+	embedded-text
+	anchor
+	included-container-area
+	glyph-annotation
+	aligned-column
+	multi-line-inline-note
+	emphasizing-mark
+	side-by-side
+	side-by-side-item
 
 Changes in OpenJade 1.3.2 (December 2002)
 

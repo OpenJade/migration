@@ -1,6 +1,10 @@
 
 #include "EmbeddedText.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 void EmbeddedTextFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -53,4 +57,6 @@ void EmbeddedTextFlowObj::setNonInheritedC(const Identifier *ident,
  CANNOT_HAPPEN();
 }
 
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

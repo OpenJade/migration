@@ -10,8 +10,12 @@
 
 /**
  *@class SideBySideFlowObj
- *@brief clase que implementa el objeto de flujo side-by-side
+ *@brief Class which implements the "side-by-side" flow object
  */
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class SideBySideFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -28,3 +32,7 @@ protected:
   Owner<FOTBuilder::DisplayNIC> nic_;
   
 };
+
+#ifdef DSSSL_NAMESPACE
+}
+#endif

@@ -3,6 +3,9 @@
 
 #include "EmphasizingMark.h"
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
 
 void EmphasizingMarkFlowObj::traceSubObjects(Collector &c) const
 {
@@ -79,3 +82,6 @@ void EmphasizingMarkFlowObj::setNonInheritedC(const Identifier *ident,
  CANNOT_HAPPEN();
 }
 
+#ifdef DSSSL_NAMESPACE
+}
+#endif

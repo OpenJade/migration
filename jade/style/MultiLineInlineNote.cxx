@@ -2,6 +2,9 @@
 #include "MultiLineInlineNote.h"
 #include <iostream.h>
 
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
 
 MultiLineInlineNoteFlowObj::NIC::NIC()
 {
@@ -101,4 +104,6 @@ void MultiLineInlineNoteFlowObj::setNonInheritedC(const Identifier *ident,
 
 }
 
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

@@ -11,8 +11,13 @@
 //column-set-sequence
 /**
  * @class ColumnSetSequenceFlowObj
- * @brief clase que crea el objeto column-set-sequence
+ * @brief Class which creates the "column-set-sequence" flow object
  */
+
+#ifdef DSSSL_NAMESPACE
+namespace DSSSL_NAMESPACE {
+#endif
+
 class ColumnSetSequenceFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -32,5 +37,6 @@ private:
   Owner<FOTBuilder::DisplayNIC> nic_;
 };
 
-
-
+#ifdef DSSSL_NAMESPACE
+}
+#endif

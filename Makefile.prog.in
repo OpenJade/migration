@@ -1,0 +1,26 @@
+#
+#  Makefile.prog.in - Makerules for bilding programs
+#
+#  $Id$
+#
+#  Copyright (C) 1998 Cees A. de Groot
+#
+CLEANFILES=-r $(PROG) $(OBJS) core .libs Makefile.lt
+
+ALL_LIBS := $(XLIBS) $(LIBS)
+Makefile.lt:
+	echo 'LT_LIBS := '`echo $(ALL_LIBS)|sed 's/\.a/.la/g'` >Makefile.lt
+
+all: $(PROG)
+
+$(PROG): $(OBJS) $(COBJS) $(LT_LIBS)
+	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(LT_LIBS)
+
+install: $(PROG)
+	-test -d $(bindir) || (mkdir $(bindir); chmod 755 $(bindir))
+	-rm -f $(bindir)/$(PROG)
+	$(LIBTOOL) --mode=install $(INSTALL) $(PROG) $(bindir)
+
+depend: depend_src
+depend.temp: $(GENSRCS)
+gen: $(GENSRCS)

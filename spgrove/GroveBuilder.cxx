@@ -5796,12 +5796,15 @@ AttributeDefOrigin::makeAttributeValueNode(const GroveImpl *grove,
     case AttributeValue::cdata:
       {
 	TextIter iter(*text);
-	if (!CdataAttributeValueNode::skipBoring(iter))
+	if (!CdataAttributeValueNode::skipBoring(iter)) {
           ptr.assign(0);
-	else
+	  return accessNull;
+        }
+	else {
 	  ptr.assign(makeCdataAttributeValueNode(grove, value,
 		 			         attIndex_, iter));
-	return accessOK;
+	  return accessOK;
+        }
       }
     default:
       break;

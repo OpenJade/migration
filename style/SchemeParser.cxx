@@ -346,29 +346,18 @@ bool SchemeParser::doMode()
 bool SchemeParser::doQuery()
 {
   Location loc(in_->currentLocation());
-  Owner<Expression> query, construct, priority;
+  Owner<Expression> query, expr, priority;
   Token tok;
   Identifier::SyntacticKey key;
   if (!parseExpression(0, query, key, tok))
     return 0;
-  
-  if (!parseExpression(0, construct, key, tok))
+
+  ProcessingMode::RuleType ruleType;
+  if (!parseRuleBody(expr, priority, ruleType, 1))
     return 0;
 
-  if (!parseExpression(allowCloseParen, priority, key, tok))
-    return 0;
-
-  IList<Pattern::Element> list;
-  Pattern::Element *elem = new Pattern::Element(StringC(), 0);
-  list.insert(elem);
-  elem->addQualifier(new Pattern::NodeQualifier(query, priority, 
-                                                defMode_, interp_, loc));
-  Pattern pattern(list);
-  NCVector<Pattern> patterns(1);
-  patterns[0].swap(pattern);
-  defMode_->addRule(0, patterns, construct, ProcessingMode::constructionRule, 
-                      loc, *interp_);
-  defMode_->setQuery();
+  defMode_->addQueryRule(query, expr, priority, ruleType, loc, *interp_);
+  return 1;
 }
 
 bool SchemeParser::doElement()
@@ -389,7 +378,7 @@ bool SchemeParser::doElement()
   if (interp_->convertToPattern(obj, loc, patterns[0])) {
     if (!parseRuleBody(expr, ruleType))
       return 0;
-    defMode_->addRule(0, patterns, expr, ruleType, loc, *interp_);
+    defMode_->addElementRule(patterns, expr, ruleType, loc, *interp_);
   }
   else if (!parseRuleBody(expr, ruleType))
     return 0;
@@ -428,7 +417,7 @@ bool SchemeParser::doOrElement()
   if (!parseRuleBody(expr, ruleType))
     return 0;
   if (ok)
-    defMode_->addRule(0, patterns, expr, ruleType, loc, *interp_);
+    defMode_->addElementRule(patterns, expr, ruleType, loc, *interp_);
   return 1;
 }
 
@@ -455,7 +444,7 @@ bool SchemeParser::doId()
   Pattern pattern(list);
   NCVector<Pattern> patterns(1);
   patterns[0].swap(pattern);
-  defMode_->addRule(0, patterns, expr, ruleType, loc, *interp_);
+  defMode_->addElementRule(patterns, expr, ruleType, loc, *interp_);
   return 1;
 }
 
@@ -476,7 +465,7 @@ bool SchemeParser::doDefault()
   Pattern pattern(list);
   NCVector<Pattern> patterns(1);
   pattern.swap(patterns[0]);
-  defMode_->addRule(0, patterns, expr, ruleType, loc, *interp_);
+  defMode_->addElementRule(patterns, expr, ruleType, loc, *interp_);
   return 1;
 }
 
@@ -492,12 +481,17 @@ bool SchemeParser::doRoot()
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
     return 0;
-  NCVector<Pattern> patterns;
-  defMode_->addRule(1, patterns, expr, ruleType, loc, *interp_);
+  defMode_->addRootRule(expr, ruleType, loc, *interp_);
   return 1;
 }
 
 bool SchemeParser::parseRuleBody(Owner<Expression> &expr, ProcessingMode::RuleType &ruleType)
+{
+  Owner<Expression> tem;
+  return parseRuleBody(expr, tem, ruleType, 0);
+}
+
+bool SchemeParser::parseRuleBody(Owner<Expression> &expr, Owner<Expression> &priority, ProcessingMode::RuleType &ruleType, bool query)
 {
   Token tok;
   Identifier::SyntacticKey key;
@@ -524,6 +518,12 @@ bool SchemeParser::parseRuleBody(Owner<Expression> &expr, ProcessingMode::RuleTy
   }
   else {
     ruleType = ProcessingMode::constructionRule;
+    if (query) {
+      if (!parseExpression(allowCloseParen, priority, key, tok))
+	return 0;
+      if (tok == tokenCloseParen)
+	return 1;
+    }
     if (!getToken(allowCloseParen, tok))
       return 0;
   }

@@ -147,18 +147,23 @@ int ProcessingMode::ElementRule::compareSpecificity(const Rule &r) const
   return Pattern::compareSpecificity(*this, (const ElementRule &)r);
 }
 
-void ProcessingMode::addRule(bool root,
-			     NCVector<Pattern> &patterns,
-			     Owner<Expression> &expr,
-			     RuleType ruleType,
-			     const Location &loc,
-			     Interpreter &interp)
+void ProcessingMode::addElementRule(NCVector<Pattern> &patterns,
+				    Owner<Expression> &expr,
+				    RuleType ruleType,
+				    const Location &loc,
+				    Interpreter &interp)
 {
   Ptr<Action> action = new Action(interp.currentPartIndex(), expr, loc);
   for (size_t i = 0; i < patterns.size(); i++)
     elementRules_[ruleType].insert(new ElementRule(action, patterns[i]));
-  if (!root)
-    return;
+}
+
+void ProcessingMode::addRootRule(Owner<Expression> &expr,
+				 RuleType ruleType,
+				 const Location &loc,
+				 Interpreter &interp)
+{
+  Ptr<Action> action = new Action(interp.currentPartIndex(), expr, loc);
   Vector<Rule> &rules = rootRules_[ruleType];
   rules.push_back(Rule(action));
   for (size_t i = rules.size() - 1; i > 0; i--) {
@@ -173,6 +178,25 @@ void ProcessingMode::addRule(bool root,
     }
     rules[i - 1].swap(rules[i]);
   }
+}
+
+void ProcessingMode::addQueryRule(Owner<Expression> &query, 
+				  Owner<Expression> &expr,
+				  Owner<Expression> &priority,
+				  RuleType ruleType, 
+				  const Location &loc, 
+				  Interpreter &interp)
+{
+  IList<Pattern::Element> list;
+  Pattern::Element *elem = new Pattern::Element(StringC(), 0);
+  list.insert(elem);
+  elem->addQualifier(new Pattern::NodeQualifier(query, priority, 
+                                                this, &interp, loc));
+  Pattern pattern(list);
+  NCVector<Pattern> patterns(1);
+  patterns[0].swap(pattern);
+  addElementRule(patterns, expr, ruleType, loc, interp);
+  hasQuery_ = 1;
 }
 
 ProcessingMode::GroveRules::GroveRules()

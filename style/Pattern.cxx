@@ -175,7 +175,7 @@ void Pattern::ChildrenQualifier::contributeSpecificity(long *s) const
 Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &nlExpr, 
 				      Owner<Expression> &priorityExpr,
                                       ProcessingMode *pm, Interpreter *interp,
-				      Location &loc)
+				      const Location &loc)
 : interp_(interp), pm_(pm), nl_(0), priority_(0), priorityCompiled_(0),
   loc_(loc), Collector::DynamicRoot(*interp)
 {

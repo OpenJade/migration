@@ -7,6 +7,7 @@
 #include "ErrorCountEventHandler.h"
 #include "GroveNode.h"
 #include "MessageTable.h"
+#include "ArcEngine.h"
 #include <new>
 #include <signal.h>
 #include <process.h>
@@ -40,17 +41,48 @@ public:
   SP_NAMESPACE::Owner<SP_NAMESPACE::EventHandler> eh;
   SP_NAMESPACE::SgmlParser parser;
   SP_NAMESPACE::Ptr<SP_NAMESPACE::EntityManager> em;
+  SP_NAMESPACE::Vector<SP_NAMESPACE::StringC> archNames;
   static unsigned __stdcall start(void *p);
 private:
   sig_atomic_t cancel_;
   HANDLE thread_;
 };
 
+void convertBSTR(BSTR str, StringC &result)
+{
+  if (str)
+    result.assign(str, ::SysStringLen(str));
+  else
+    result.resize(0);
+}
+
 STDMETHODIMP CGroveBuilder::parse(BSTR sysid, SgmlDocumentNode **retval)
+{
+  return archParse( sysid, 0, retval );
+}
+
+STDMETHODIMP CGroveBuilder::archParse
+ (BSTR sysid, BSTR archNames, SgmlDocumentNode **retval)
 {
   TRY
   SpParserThread *parserThread = new SpParserThread;
   SP_NAMESPACE::Owner<ParserThread> tem(parserThread);
+ 
+  if( archNames != 0 ) {
+    StringC archNames_;
+    convertBSTR(archNames, archNames_);
+    StringC archName;
+    for( short i = 0; i < archNames_.size(); i++ )
+      if( archNames_[i] != ' ' )
+        archName += archNames_[i];
+      else if( archName.size() != 0 ) {
+        parserThread->archNames.push_back( archName );
+        archName.resize( 0 );
+      }
+    if( archName.size() != 0 )
+      parserThread->archNames.push_back( archName );
+  }
+
   GROVE_NAMESPACE::NodePtr root;
   parserThread->eh
     = SP_NAMESPACE::GroveBuilder::make(0, parserThread, parserThread, validateOnly_ != 0, root);
@@ -72,14 +104,6 @@ HRESULT makeBSTR(const StringC &str, BSTR *retval)
       return E_OUTOFMEMORY;
   }
   return NOERROR;
-}
-
-void convertBSTR(BSTR str, StringC &result)
-{
-  if (str)
-    result.assign(str, ::SysStringLen(str));
-  else
-    result.resize(0);
 }
 
 STDMETHODIMP CGroveBuilder::get_ExtraCatalogs(BSTR *retval)
@@ -315,7 +339,11 @@ unsigned __stdcall SpParserThread::start(void *p)
 {
   SpParserThread *arg = (SpParserThread *)p;
   try {
-    arg->parser.parseAll(*arg->eh, &arg->cancel_);
+    if (arg->archNames.size() > 0) {
+      SP_NAMESPACE::SelectOneArcDirector director(arg->archNames, *arg->eh);
+      SP_NAMESPACE::ArcEngine::parseAll(arg->parser, director, director, &arg->cancel_);
+    } else
+      arg->parser.parseAll(*arg->eh, &arg->cancel_);
   }
   catch (std::bad_alloc) {
     // FIXME how to report this?

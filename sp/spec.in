@@ -1,7 +1,7 @@
 # Copyright (C) 2000 Matthias Clasen
 # See the file COPYING for copying permissions.
-#########################################################################
-Summary: An SGML system
+
+Summary: OpenJade group's SGML parsing tools 
 Name: @PACKAGE@
 Version: @VERSION@
 Release: 1
@@ -12,37 +12,60 @@ Source: http://download.sourceforge.net/openjade/@PACKAGE@-@VERSION@.tar.gz
 URL: http://openjade.sourceforge.net
 Vendor: The OpenJade team <jade-devel@infomansol.com>
 Packager: Matthias Clasen <clasen@mathematik.uni-freiburg.de>
+Requires: @PACKAGE@-lib
 
-#########################################################################
 %description
-This package contains a SGML system based on James Clarks SP.
+This package is a collection of SGML/XML tools called OpenSP.
+It is a fork from James Clark's SP suite.
+These tools are used to parse, validate, and normalize SGML and XML
+files.  
+     
+%package lib
+Summary: Runtime library for OpenJade group's SP suite
+Group: System Environment/Libraries
 
-#########################################################################
+%description lib 
+This is the SP suite's shared library runtime support.  This C++
+library contains entity management functions, parsing functions, and
+other functions useful for SGML/XML/DSSSL development.
+
+%package devel
+Summary: Libraries and include files for developing OpenSP applications.
+Group: Development/Libraries
+
+%description devel 
+This contains include files and libraries for OpenSP.
+This C++ library contains entity management functions, parsing functions,
+and other functions useful for SGML/XML/DSSSL development.
+
 %prep
 # unpack source .tar.gz package
 %setup
 
-#########################################################################
 %build
 # configure build system according to rpm settings
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} --bindir=%{_bindir} --sbindir=%{_sbindir} --libexecdir=%{_libexecdir} --datadir=%{_datadir} --sysconfdir=%{_sysconfdir} --sharedstatedir=%{_sharedstatedir} --localstatedir=%{_localstatedir} --libdir=%{_libdir} --includedir=%{_includedir} --oldincludedir=%{_oldincludedir} --infodir=%{_infodir} --mandir=%{_mandir}
 # compile and link
 make CFLAGS="${RPM_OPT_FLAGS}"
 
-#########################################################################
 %install
 # install all files
 make "DESTDIR=${RPM_BUILD_ROOT}" install
-# make list of installed files
-find "${RPM_BUILD_ROOT}" -type f -print | sed "s/$(echo ${RPM_BUILD_ROOT} | sed 's/\//\\\//g')//" | sed 's/^\(.*\/doc\/.*\)$/%doc \1/' | grep . > @PACKAGE@-@VERSION@.files
 
-#########################################################################
-%files -f @PACKAGE@-@VERSION@.files
-
-#########################################################################
 %clean
 test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 
+%files
+%defattr(-, root, root)
+/usr/bin/*
+/usr/share/@PACKAGE@/*
+%doc /usr/doc/@PACKAGE@/*
 
+%files lib
+%defattr(-, root, root)
+/usr/lib/*.so.*
 
-
+%files devel
+%defattr(-, root, root)
+/usr/lib/*
+/usr/include/@PACKAGE@/*

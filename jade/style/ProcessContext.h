@@ -43,10 +43,12 @@ public:
   // Uses of label: do this
   void startConnection(SymbolObj *, const Location &);
   void endConnection();
-  // happens only for objcet with a non-principal port
+  // happens only for object with a non-principal port
   void pushPorts(bool hasPrincipalPort,
 		 const Vector<SymbolObj *> &ports, const Vector<FOTBuilder *> &fotbs);
   void popPorts();
+  void pushPrincipalPort(FOTBuilder* principalPort);
+  void popPrincipalPort();
   // happens inside pushPorts() (if any)
   void startMapContent(ELObj *, const Location &);
   void endMapContent();
@@ -80,7 +82,7 @@ private:
   struct Port {
     Port();
     FOTBuilder *fotb;
-    IQueue<SaveFOTBuilder> saveQueue;
+    IQueue<NodeSaveFOTBuilder> saveQueue;
     Vector<SymbolObj *> labels;
     unsigned connected;
   };
@@ -131,7 +133,7 @@ private:
   IList<Connectable> connectableStack_;
   unsigned connectableStackLevel_;
   IList<Table> tableStack_;
-  NCVector<IQueue<SaveFOTBuilder> > principalPortSaveQueues_;
+  NCVector<IQueue<NodeSaveFOTBuilder> > principalPortSaveQueues_;
   VM vm_;
   ProcessingMode::Specificity matchSpecificity_;
   unsigned flowObjLevel_;

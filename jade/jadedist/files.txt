@@ -27,6 +27,7 @@ style/DssslSpecEventHandler.h
 style/dsssl_ns.h
 style/ELObj.h
 style/ELObjMessageArg.h
+style/ELObjPropVal.h
 style/EvalContext.h
 style/Expression.h
 style/FOTBuilder.h
@@ -36,6 +37,7 @@ style/Insn2.h
 style/Interpreter.h
 style/InterpreterMessages.h
 style/jade_version.h
+style/LangObj.h
 style/MacroFlowObj.h
 style/NumberCache.h
 style/primitive.h
@@ -61,6 +63,7 @@ style/GroveManager.cxx
 style/Insn.cxx
 style/Interpreter.cxx
 style/InterpreterMessages.cxx
+style/LangObj.cxx
 style/MacroFlowObj.cxx
 style/NumberCache.cxx
 style/primitive.cxx
@@ -170,6 +173,7 @@ Makefile.comm.in
 Makefile.in
 Makefile.lib.in
 Makefile.prog.in
+NEWS
 config/configure.in
 config/config.guess
 config/config.sub

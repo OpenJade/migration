@@ -16,12 +16,14 @@ namespace DSSSL_NAMESPACE {
 class STYLE_API DssslApp : public GroveApp, public GroveManager {
 public:
   DssslApp(int unitsPerInch);
-  virtual FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&) = 0;
+  virtual FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&,
+				     const FOTBuilder::Feature *&) = 0;
   int processSysid(const StringC &);
   bool load(const StringC &sysid, const Vector<StringC> &active,
 	    const NodePtr &parent, NodePtr &rootNode,
 	    const Vector<StringC> &architecture);
   bool readEntity(const StringC &, StringC &);
+  void mapSysid(StringC &);
 protected:
   void processOption(AppChar opt, const AppChar *arg);
   int init(int argc, AppChar **argv);
@@ -54,6 +56,7 @@ private:
   StringC rootSystemId_;
   bool debugMode_;
   bool dsssl2_;
+  bool strictMode_;
 };
 
 #ifdef DSSSL_NAMESPACE

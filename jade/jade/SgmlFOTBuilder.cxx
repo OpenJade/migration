@@ -72,6 +72,9 @@ public:
   void setGridColumnAlignment(Symbol);
   void setGridRowAlignment(Symbol);
   void setBoxType(Symbol);
+  void setSideBySideOverlapControl(Symbol sym);
+  void setSideBySidePreAlign(Symbol sym);
+  void setSideBySidePostAlign(Symbol sym);
   void setGlyphAlignmentMode(Symbol);
   void setBoxBorderAlignment(Symbol);
   void setCellRowAlignment(Symbol);
@@ -160,8 +163,8 @@ public:
   void rule(const RuleNIC &);
   void alignmentPoint();
 
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   void pageNumber();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
@@ -186,6 +189,10 @@ public:
   void endSideline();
   void startBox(const BoxNIC &);
   void endBox();
+  void startSideBySide(const DisplayNIC&);
+  void endSideBySide();
+  void startSideBySideItem();
+  void endSideBySideItem();
   void startParagraph(const ParagraphNIC &);
   void endParagraph();
   void startSequence();
@@ -506,8 +513,19 @@ OutputCharStream &operator<<(OutputCharStream &os,
   return os;
 }
 
-FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os)
+FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os, 
+	                       const FOTBuilder::Feature *&f)
 {
+  static const FOTBuilder::Feature features[] = {
+    { "sideline", 0},
+    { "side-by-side", 0},
+    { "table", 0},
+    { "math", 0},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  f = features;
+
   return new SgmlFOTBuilder(os);
 }
 
@@ -870,6 +888,21 @@ void SgmlFOTBuilder::setGridRowAlignment(Symbol sym)
 void SgmlFOTBuilder::setBoxType(Symbol sym)
 {
   symbolC("box-type", sym);
+}
+
+void SgmlFOTBuilder::setSideBySideOverlapControl(Symbol sym)
+{
+  symbolC("side-by-side-overlap-control", sym);
+}
+
+void SgmlFOTBuilder::setSideBySidePreAlign(Symbol sym)
+{
+  symbolC("side-by-side-pre-align", sym);
+}
+
+void SgmlFOTBuilder::setSideBySidePostAlign(Symbol sym)
+{
+  symbolC("side-by-side-post-align", sym);
 }
 
 void SgmlFOTBuilder::setGlyphAlignmentMode(Symbol sym)
@@ -1613,14 +1646,14 @@ void SgmlFOTBuilder::endScore()
   endFlow("score");
 }
 
-void SgmlFOTBuilder::startSimplePageSequence()
+void SgmlFOTBuilder::startSimplePageSequenceSerial()
 {
   startSimpleFlowObj("simple-page-sequence");
   suppressAnchors_ = 1;
   curOs_ = &hfs_;
 }
  
-void SgmlFOTBuilder::endSimplePageSequence()
+void SgmlFOTBuilder::endSimplePageSequenceSerial()
 {
   endFlow("simple-page-sequence");
 }
@@ -2100,6 +2133,33 @@ void SgmlFOTBuilder::startBox(const BoxNIC &nic)
 void SgmlFOTBuilder::endBox()
 {
   endFlow("box");
+}
+
+void SgmlFOTBuilder::startSideBySide(const DisplayNIC& nic)
+{
+  flushPendingElements();
+  os() << "<side-by-side";
+  displayNIC(nic);
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endSideBySide()
+{
+  endFlow("side-by-side");
+}
+
+void SgmlFOTBuilder::startSideBySideItem()
+{
+  os() << "<side-by-side-item";
+  flushPendingElements();
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endSideBySideItem()
+{
+  endFlow("side-by-side-item");
 }
 
 void SgmlFOTBuilder::alignmentPoint()

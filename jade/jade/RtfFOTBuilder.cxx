@@ -100,8 +100,9 @@ public:
   void setPageColumnSep(Length);
   void setPageBalanceColumns(bool);
   void setSpan(long);
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  enum { nHF = FOTBuilder::nHF };
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
   void endAllSimplePageSequenceHeaderFooter();
@@ -637,7 +638,8 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
 			      const Ptr<ExtendEntityManager> &entityManager,
 			      const CharsetInfo &systemCharset,
 			      Messenger *mgr,
-			      const FOTBuilder::Extension *&ext)
+			      const FOTBuilder::Extension *&ext,
+			      const FOTBuilder::Feature *&f)
 {
   static const FOTBuilder::Extension extensions[] = {
     {
@@ -725,6 +727,15 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
     { 0, 0, 0}
   };
   ext = extensions;
+
+  static const FOTBuilder::Feature features[] = {
+    { "table", 0},
+    { "math", 1},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  f = features;
+
   return new RtfFOTBuilder(os, options, entityManager, systemCharset, mgr);
 }
 
@@ -2158,7 +2169,7 @@ void RtfFOTBuilder::setSpan(long n)
   specFormat_.span = n > 1;
 }
 
-void RtfFOTBuilder::startSimplePageSequence()
+void RtfFOTBuilder::startSimplePageSequenceSerial()
 {
   inSimplePageSequence_++;
   start();
@@ -2209,7 +2220,7 @@ void RtfFOTBuilder::startSimplePageSequence()
   accumSpace_ = 0;
 }
 
-void RtfFOTBuilder::endSimplePageSequence()
+void RtfFOTBuilder::endSimplePageSequenceSerial()
 {
   if (inlineState_ != inlineFirst) {
     if (hyphenateSuppressed_) {

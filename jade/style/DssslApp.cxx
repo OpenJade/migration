@@ -13,6 +13,7 @@
 #include "InputSource.h"
 #include "jade_version.h"
 #include "ArcEngine.h"
+#include "Entity.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -27,12 +28,14 @@ namespace DSSSL_NAMESPACE {
 
 DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
-  dssslSpecOption_(0), debugMode_(0), dsssl2_(0)
+  dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
+  strictMode_(0)
 {
   registerOption('G');
   registerOption('2');
   registerOption('d', SP_T("dsssl_spec"));
-  registerOption('V', SP_T("variable"));
+  registerOption('V', SP_T("variable[=value]"));
+  registerOption('s');
 }
 
 int DssslApp::init(int argc, AppChar **argv)
@@ -97,6 +100,9 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'V':
     defineVars_.push_back(convertInput(arg));
+    break;
+  case 's':
+    strictMode_ = 1;
     break;
   case 'v':
     message(DssslAppMessages::versionInfo,
@@ -327,10 +333,12 @@ void DssslApp::processGrove()
   if (!initSpecParser())
     return;
   const FOTBuilder::Extension *extensions = 0;
-  Owner<FOTBuilder> fotb(makeFOTBuilder(extensions));
+  const FOTBuilder::Feature *features = 0;
+  Owner<FOTBuilder> fotb(makeFOTBuilder(extensions, features));
   if (!fotb)
     return;
-  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, dsssl2_, extensions);
+  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
+                 dsssl2_, strictMode_, extensions, features);
   for (size_t i = 0; i < defineVars_.size(); i++)
     se.defineVariable(defineVars_[i]);
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this);
@@ -379,6 +387,14 @@ bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
   else
     parser.parseAll(*eh, eceh->cancelPtr());
   return 1;
+}
+
+void DssslApp::mapSysid(StringC &id)
+{
+ // find the sysid for id by looking through the catalogs. 
+  ConstPtr<EntityCatalog> 
+     catalog(entityManager()->makeCatalog(id, systemCharset(), *this));
+  catalog->lookupPublic(id, systemCharset(), *this, id); 
 }
 
 bool DssslApp::readEntity(const StringC &sysid, StringC &contents) 

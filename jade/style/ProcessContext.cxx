@@ -177,29 +177,23 @@ void ProcessContext::processChildren(const ProcessingMode *processingMode)
 }
 
 inline
-bool isWhiteSpace(Char c)
+bool isWhiteSpace(Char c, Interpreter &interp)
 {
-  switch (c) {
-  case '\f':
-  case '\r':
-  case '\n':
-  case '\t':
-  case ' ':
-    return 1;
-  }
-  return 0;
+  return 
+    interp.charProperty(
+      interp.makeStringC("input-whitespace?"), c, Location(), 0)->isTrue(); 
 }
 
 static
-bool onlyWhiteSpaceFollows(const NodePtr &node, const SdataMapper &mapper)
+bool onlyWhiteSpaceFollows(const NodePtr &node, Interpreter &interp)
 {
   NodePtr tem;
   if (node->nextChunkSibling(tem) == accessOK) {
     do {
       GroveString str;
-      if (tem->charChunk(mapper, str) == accessOK) {
+      if (tem->charChunk(interp, str) == accessOK) {
 	for (size_t i = 0; i < str.size(); i++)
-	  if (!isWhiteSpace(str[i]))
+	  if (!isWhiteSpace(str[i], interp))
 	    return 0;
       }
       else if (tem->getGi(str) == accessOK)
@@ -221,7 +215,7 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 	  const Char *s = str.data();
 	  size_t n = str.size();
 	  for (; n > 0; n--, s++) {
-	    if (!isWhiteSpace(*s))
+	    if (!isWhiteSpace(*s, *vm().interp))
 	      break;
 	  }
 	  if (n == 0)
@@ -236,10 +230,10 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 	  }
   	}
 	if (str.size()) {
-	  if (isWhiteSpace(str[str.size() - 1])
+	  if (isWhiteSpace(str[str.size() - 1], *vm().interp)
 	      && onlyWhiteSpaceFollows(curNode, *vm().interp)) {
 	    for (size_t n = str.size() - 1; n > 0; n--) {
-	      if (!isWhiteSpace(str[n - 1])) {
+	      if (!isWhiteSpace(str[n - 1], *vm().interp)) {
 		currentFOTBuilder().charactersFromNode(curNode, str.data(), n);
 		return;
 	      }
@@ -297,7 +291,7 @@ void ProcessContext::endConnection()
     Port *port = connectionStack_.head()->port;
     if (port && --(port->connected) == 0) {
       while (!port->saveQueue.empty()) {
-	SaveFOTBuilder *saved = port->saveQueue.get();
+	NodeSaveFOTBuilder *saved = port->saveQueue.get();
 	saved->emit(*port->fotb);
 	delete saved;
       }
@@ -318,7 +312,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     Connection *c = new Connection(conn->styleStack, &port, connLevel);
     if (port.connected) {
       port.connected++;
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       port.saveQueue.append(save);
@@ -337,7 +331,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
       c->fotb = &currentFOTBuilder();
     }
     else {
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       if (conn->flowObjLevel >= principalPortSaveQueues_.size())
@@ -354,9 +348,9 @@ void ProcessContext::endFlowObj()
 {
   flowObjLevel_--;
   if (flowObjLevel_ < principalPortSaveQueues_.size()) {
-    IQueue<SaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
+    IQueue<NodeSaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
     while (!saveQueue.empty()) {
-      SaveFOTBuilder *saved = saveQueue.get();
+      NodeSaveFOTBuilder *saved = saveQueue.get();
       saved->emit(currentFOTBuilder());
       delete saved;
     }
@@ -392,6 +386,16 @@ void ProcessContext::popPorts()
 {
   connectableStackLevel_--;
   delete connectableStack_.get();
+}
+
+void ProcessContext::pushPrincipalPort(FOTBuilder* principalPort)
+{
+  connectionStack_.insert(new Connection(principalPort));
+}
+
+void ProcessContext::popPrincipalPort()
+{
+  delete connectionStack_.get();
 }
 
 void ProcessContext::startDiscardLabeled(SymbolObj *label)
@@ -641,8 +645,8 @@ void PageNumberSosofoObj::process(ProcessContext &context)
 }
 
 SetNonInheritedCsSosofoObj
-::SetNonInheritedCsSosofoObj(FlowObj *flowObj, const InsnPtr &code, ELObj **display)
-: flowObj_(flowObj), code_(code), display_(display)
+::SetNonInheritedCsSosofoObj(FlowObj *flowObj, const InsnPtr &code, ELObj **display, const NodePtr &node)
+: flowObj_(flowObj), code_(code), display_(display), node_(node)
 {
   hasSubObjects_ = 1;
 }
@@ -655,6 +659,7 @@ SetNonInheritedCsSosofoObj::~SetNonInheritedCsSosofoObj()
 ELObj *SetNonInheritedCsSosofoObj::resolve(ProcessContext &context)
 {
   VM &vm = context.vm();
+  EvalContext::CurrentNodeSetter cns(node_, 0, vm);
   StyleStack *saveStyleStack = vm.styleStack;
   vm.styleStack = &context.currentStyleStack();
   unsigned saveSpecLevel = vm.specLevel;

@@ -1320,6 +1320,7 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
     if (!invalidSgmlChar.isEmpty())
       message(ParserMessages::invalidSgmlChar, CharsetMessageArg(invalidSgmlChar));
   }
+  checkSyntaxNames(*sdBuilder.syntax);
   checkSyntaxNamelen(*sdBuilder.syntax);
   checkSwitchesMarkup(sdBuilder.switcher);
   return 1;
@@ -2801,6 +2802,21 @@ Boolean Parser::checkSwitchesMarkup(CharSwitcher &switcher)
       valid = 0;
     }
   return valid;
+}
+
+void Parser::checkSyntaxNames(const Syntax &syn)
+{
+  HashTableIter<StringC,Char> iter(syn.functionIter());
+  const StringC *name;
+  const Char *c;
+  while (iter.next(name, c)) {
+    for (size_t i = 1; i < name->size(); i++)
+      if (!syn.isNameCharacter((*name)[i])) {
+	message(ParserMessages::reservedNameSyntax,
+		StringMessageArg(*name));
+	break;
+      }	
+  }  
 }
 
 void Parser::checkSyntaxNamelen(const Syntax &syn)

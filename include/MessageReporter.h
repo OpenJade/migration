@@ -51,10 +51,12 @@ protected:
   StringC programName_;
 };
 class SP_API XMLMessageReporter : public MessageReporter {
+  long unsigned int id ;
+  enum { SP_MESSAGES_NONE, SP_MESSAGES_TRADITIONAL, SP_MESSAGES_XML } msgmode ;
 protected:
   virtual void printLocation(const ExternalInfo *info, Offset off);
 public:
-  XMLMessageReporter(OutputCharStream * o) : MessageReporter(o) {}
+  XMLMessageReporter(OutputCharStream * o) ; //: MessageReporter(o), id(0) {}
   virtual void dispatchMessage(const Message &);
   virtual Boolean XMLformatFragment(const MessageFragment &, OutputCharStream &);
   virtual void formatMessage(const MessageFragment &,
@@ -69,7 +71,10 @@ public:
 	showOpenEntities(loc.origin().pointer(), loc.index(), off) ;
   }
   virtual const ExternalInfo *locationHeader(const Location &loc, Offset &off) {
+    if ( msgmode == SP_MESSAGES_XML )
 	return locationHeader(loc.origin().pointer(), loc.index(), off) ;
+    else if ( msgmode == SP_MESSAGES_TRADITIONAL )
+	return MessageReporter::locationHeader(loc, off) ;
   }
 
 } ;

@@ -17,6 +17,7 @@
 #include "ISetIter.h"
 #include "XcharMap.h"
 #include "StringResource.h"
+#include "SubstTable.h"
 #include "CharMap.h"
 #undef SP_DEFINE_TEMPLATES
 
@@ -84,6 +85,7 @@ __instantiate(CharMapColumn<Unsigned32>)
 __instantiate(CharMapResource<Unsigned32>)
 __instantiate(Ptr<CharMapResource<Unsigned32> >)
 __instantiate(ConstPtr<CharMapResource<Unsigned32> >)
+__instantiate(Vector<SubstTable::Pair>)
 
 #ifdef SP_NAMESPACE
 }

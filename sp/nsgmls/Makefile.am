@@ -8,7 +8,7 @@ onsgmls_SOURCES = nsgmls.cxx SgmlsEventHandler.cxx SgmlsEventHandler.h \
 
 EXTRA_DIST = nsgmls_inst.m4 NsgmlsMessages.msg NsgmlsMessages.rc \
 	RastEventHandlerMessages.msg RastEventHandlerMessages.rc \
-	nsgmls.rc nsgmls.dsp
+	nsgmls.rc nsgmls.dsp .cvsignore
 
 onsgmls_LDADD = $(top_builddir)/lib/libosp.la
 

@@ -547,7 +547,9 @@ CmdLineApp::lookupCodingSystem(const AppChar *codingName)
 StringC CmdLineApp::convertInput(const SP_TCHAR *s)
 {
 #ifdef SP_WIDE_SYSTEM
-  StringC str(s, wcslen(s));
+  StringC str;
+  for (size_t i = 0; i < tcslen(s); i++)
+    str += SP_TCHAR(s[i]);
 #else
   StringC str(codingSystem()->convertIn(s));
 #endif

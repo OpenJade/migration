@@ -119,7 +119,7 @@ InputName=spam_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

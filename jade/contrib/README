@@ -26,5 +26,8 @@ customize.dtd - a dtd derived from the DSSSL architecture which includes
     information about user-settable variables and characteristics. This
     allows menu-driven customization.
 
-jadetex - the JadeTeX macros needed to process the output of the TeX backend.
+jadetex - the JadeTeX macros needed to process the output of the TeX 
+    backend used to be included here.  However, they were removed;
+    just get them from upstream:
     <URL:http://www.tug.org/applications/jadetex/>
+

@@ -32,7 +32,7 @@ Changes in OpenJade 1.4devel
 * (test => recipient) cond clauses are supported.
 
 * RTF output had extra spaces that were detrimental to display;
-  patch from Andrey Taranov
+  patch from Andrey Taranov.
 
 * Better time string support; it is possible to compare time, date and
   datetime (not only datetime). Also partial formats (like YY-MM-DD,
@@ -63,7 +63,7 @@ Changes in OpenJade 1.4devel
   produced through a "sgml-parse" by hacking on the NodeIndex
   instruction.  Patch from Jean-Marie Kubek.
 
-* Update contrib/jadetex to version 3.2.
+* remove contrib/jadetex, get it from upstream if you want it
 
 Changes in OpenJade 1.3
 

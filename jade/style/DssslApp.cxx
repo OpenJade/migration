@@ -307,6 +307,7 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
   Boolean hadHref = 0;
   StringC href;
   Boolean hadTitle = 0;
+  StringC title;
   Boolean hadMedia = 0;
   Boolean isDsssl = 0;
   StringC name;
@@ -333,8 +334,7 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
     }
     else if (matchCi(name, "title")) {
       hadTitle = 1;
-      if (specTitleOption_ && specTitle_ != value) 
-        return 0;
+      value.swap(title);
     }
     else if (matchCi(name, "media")) { 
       /* There is no point in doing detailed comparisons if either
@@ -376,8 +376,12 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
         return 0;
     }
   }
-  if (!isDsssl || !hadHref || (specTitleOption_ && ! hadTitle))
+  if (!isDsssl || !hadHref || (specTitleOption_ && !hadTitle))
     return 0;
+  if (specTitleOption_ && specTitle_ != title) { 
+    availableSpecTitles_.push_back(title);
+    return 0;
+  }
   splitOffId(href, dssslSpecId_);
   // FIXME should use location of attribute value rather than location of PI
   return entityManager()->expandSystemId(href, loc, 0, systemCharset(), 0, *this,
@@ -458,9 +462,15 @@ Boolean DssslApp::getAttribute(const Char *&s, size_t &n,
 
 Boolean DssslApp::initSpecParser()
 {
-  if (!dssslSpecOption_ && !getDssslSpecFromProlog() && dssslSpecSysid_.size() == 0) {
-    message(DssslAppMessages::noSpec);
-    return 0;
+  if (!dssslSpecOption_ && !getDssslSpecFromProlog()) {
+    if (specTitleOption_ && availableSpecTitles_.size() > 0)
+      message(DssslAppMessages::noSpecTitle, 
+              StringMessageArg(specTitle_),
+              StringVectorMessageArg(availableSpecTitles_));
+    if (dssslSpecSysid_.size() == 0) {
+      message(DssslAppMessages::noSpec);
+      return 0;
+    }
   }
   SgmlParser::Params params;
   params.sysid = dssslSpecSysid_;

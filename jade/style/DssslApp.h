@@ -63,6 +63,7 @@ private:
   const FOTBuilder::Description *fotbDescr_;
   Boolean specTitleOption_;
   StringC specTitle_;
+  Vector<StringC> availableSpecTitles_;
 };
 
 #ifdef DSSSL_NAMESPACE

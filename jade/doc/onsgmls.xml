@@ -8,6 +8,11 @@
        <firstname>James</firstname>
        <surname>Clark</surname>
     </author>
+    <author>
+       <firstname>Ian</firstname>
+       <surname>Castle</surname>
+       <affiliation><email>ian.castle@looksystems.co.uk</email></affiliation>
+    </author>
 
     <copyright>
        <year>2002</year>
@@ -44,17 +49,17 @@
    ] [ -tfile ] [ -wwarning_type ] [ sysid... ]
 -->
           <arg choice="opt"><option>-BCdeglprsuv</option></arg>
-          <arg choice="opt"><option>-alinktype</option></arg>
-          <arg choice="opt"><option>-bbctf</option></arg>
-          <arg choice="opt"><option>-csysid></option></arg>
-          <arg choice="opt"><option>-Ddirectory</option></arg>
-          <arg choice="opt"><option>-Emax_errors</option></arg>
-          <arg choice="opt"><option>-ffile</option></arg>
-          <arg choice="opt"><option>-iname</option></arg>
-          <arg choice="opt"><option>-ooutput_option</option></arg>
-          <arg choice="opt"><option>-tfile></option></arg>
-          <arg choice="opt"><option>-wwarning_type</option></arg>
-          <arg choice="opt"><option><replaceable>sysid</replaceable></option></arg>
+          <arg choice="opt"><option>-a<replaceable>linktype</replaceable></option></arg>
+          <arg choice="opt"><option>-b<replaceable>bctf</replaceable></option></arg>
+          <arg choice="opt" rep="repeat"><option>-c<replaceable>sysid</replaceable></option></arg>
+          <arg choice="opt"><option>-D<replaceable>directory</replaceable></option></arg>
+          <arg choice="opt"><option>-E<replaceable>max_errors</replaceable></option></arg>
+          <arg choice="opt"><option>-f<replaceable>file</replaceable></option></arg>
+          <arg choice="opt"><option>-i<replaceable>name</replaceable></option></arg>
+          <arg choice="opt" rep="repeat"><option>-o<replaceable>output_option</replaceable></option></arg>
+          <arg choice="opt"><option>-t<replaceable>file</replaceable></option></arg>
+          <arg choice="opt" rep="repeat"><option>-w<replaceable>warning_type</replaceable></option></arg>
+          <arg choice="opt" rep="repeat"><option><replaceable>sysid</replaceable></option></arg>
        </cmdsynopsis>
 
      </refsynopsisdiv>
@@ -62,28 +67,28 @@
      <refsect1>
        <title>Description</title>
 
-   <para>Nsgmls parses and validates the SGML document whose document entity is
-   specified by the [1]system identifiers sysid... and prints on the
+   <para><command>onsgmls</command> parses and validates the SGML document whose document entity is
+   specified by the system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg> and prints on the
    standard output a simple text representation of its Element Structure
    Information Set. (This is the information set which a
    structure-controlled conforming SGML application should act upon.) If
    more than one system identifier is specified, then the corresponding
    entities will be concatenated to form the document entity. Thus the
-   document entity may be spread amongst several files; for example, the
-   SGML declaration, prolog and document instance set could each be in a
+   document entity may be spread among several files; for example, the
+   SGML declaration, prologue and document instance set could each be in a
    separate file. If no system identifiers are specified, then onsgmls
    will read the document entity from the standard input. A command line
    system identifier of - can be used to refer to the standard input.
-   (Normally in a system identifier, &lt;osfd&gt;0 is used to refer to standard
+   (Normally in a system identifier, &lt;OSFD&gt;0 is used to refer to standard
    input.)</para>
 
    <para>The following options are available:</para>
    
 <variablelist>
   <varlistentry>
-   <term><option>-alinktype</option></term>
+   <term><option>-a<replaceable>linktype</replaceable></option></term>
    <listitem>
-          <para>Make link type linktype active. Not all ESIS information is
+          <para>Make link type <replaceable>linktype</replaceable> active. Not all ESIS information is
           output in this case: the active LPDs are not explicitly
           reported, although each link attribute is qualified with its
           link type name; there is no information about result elements;
@@ -93,8 +98,8 @@
   </varlistentry>
 
   <varlistentry>
-    <term><option>-bbctf</option></term>
-    <term><option>-bencoding</option></term>
+    <term><option>-b<replaceable>bctf</replaceable></option></term>
+    <term><option>-b<replaceable>encoding</replaceable></option></term>
     <listitem>
           <para>This determines the encoding used for output. If in fixed
           character set mode it specifies the name of an encoding; if
@@ -107,40 +112,40 @@
     <listitem>
           <para>Batch mode. Parse each sysid... specified on the command line
           separately, rather than concatenating them. This is useful
-          mainly with -s.</para>
+          mainly with <option>-s</option>.</para>
           
-          <para>If -tfilename is also specified, then the specified filename
+          <para>If <option>-t<replaceable>filename</replaceable></option> is also specified, then the specified filename
           will be prefixed to the sysid to make the filename for the RAST
           result for each sysid.</para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term><option>-csysid</option></term>
+    <term><option>-c<replaceable>sysid</replaceable></option></term>
     <listitem>
           <para>Map public identifiers and entity names to system identifiers
           using the catalog entry file whose system identifier is sysid.
-          Multiple -c options are allowed. If there is a catalog entry
+          Multiple <option>-c</option> options are allowed. If there is a catalog entry
           file called catalog in the same place as the document entity,
           it will be searched for immediately after those specified by
-          -c.</para>
+          <option>-c</option>.</para>
     </listitem>
   </varlistentry>
           
   <varlistentry>
     <term><option>-C</option></term>
     <listitem>
-          <para>The filename... arguments specify catalog files rather than the
+          <para>The <arg rep="repeat"><option><replaceable>filename</replaceable></option></arg> arguments specify catalog files rather than the
           document entity. The document entity is specified by the first
           DOCUMENT entry in the catalog files.</para>
     </listitem>
   </varlistentry>
 
   <varlistentry>
-    <term><option>-Ddirectory</option></term>
+    <term><option>-D<replaceable>directory</replaceable></option></term>
     <listitem>
           <para>Search directory for files specified in system identifiers.
-          Multiple -D options are allowed. See the description of the
+          Multiple <option>-D</option> options are allowed. See the description of the
           osfile storage manager for more information about file
           searching.</para>
     </listitem>
@@ -156,17 +161,17 @@
   </varlistentry>
           
   <varlistentry>
-    <term><option>-Emax_errors</option></term>
+    <term><option>-E<replaceable>max_errors</replaceable></option></term>
     <listitem>
-          <para>onsgmls will exit after max_errors errors. If max_errors is 0,
+          <para>onsgmls will exit after <replaceable>max_errors</replaceable> errors. If <replaceable>max_errors</replaceable> is 0,
           there is no limit on the number of errors. The default is 200.</para>
     </listitem>
   </varlistentry>
           
   <varlistentry>
-    <term><option>-ffile</option></term>
+    <term><option>-f<replaceable>file</replaceable></option></term>
     <listitem>
-          <para>Redirect errors to file. This is useful mainly with shells that
+          <para>Redirect errors to <replaceable>file</replaceable>. This is useful mainly with shells that
           do not support redirection of stderr.</para>
     </listitem>
   </varlistentry>
@@ -180,7 +185,7 @@
   </varlistentry>
 
   <varlistentry>
-    <term><option>-iname</option></term>
+    <term><option>-i<replaceable>name</replaceable></option></term>
     <listitem>
           <para>Pretend that</para>
           
@@ -206,9 +211,9 @@
   </varlistentry>
 
   <varlistentry>
-    <term><option>-ooutput_option</option></term>
+    <term><option>-o<replaceable>output_option</replaceable></option></term>
     <listitem>
-          <para>Output additional information according to output_option:</para>
+          <para>Output additional information according to <replaceable>output_option</replaceable>:</para>
                 <para><option>entity</option> Output definitions of all general entities not just for
                 data or subdoc entities that are referenced or named in
                 an ENTITY or ENTITIES attribute.</para>
@@ -218,7 +223,7 @@
                 filename.</para>
 
       <para><option>included</option>
-                Output an i command for included subelements.</para>
+                Output an i command for included sub-elements.</para>
       <para><option>empty</option>
                 Output an e command for elements which are not allowed to
                 have an end-tag, that is those with a declared content of
@@ -231,14 +236,14 @@
                 sequences for non-SGML data characters. Non-SGML data
                 characters can result from numeric character references.</para>
                 
-          <para>Multiple -o options are allowed.</para>
+          <para>Multiple <option>-o</option> options are allowed.</para>
     </listitem>
     </varlistentry>
     <varlistentry>
       <term><option>-p</option></term>
       <listitem>
-          <para>Parse only the prolog. Nsgmls will exit after parsing the
-          document type declaration. Implies -s.</para>
+          <para>Parse only the prologue. <command>onsgmls</command> will exit after parsing the
+          document type declaration. Implies <option>-s</option>.</para>
       </listitem>
     </varlistentry>
     <varlistentry>
@@ -248,7 +253,7 @@
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term><option>-tfile</option></term>
+      <term><option>-t<replaceable>file</replaceable></option></term>
       <listitem>
           <para>Output to file the RAST result as defined by ISO/IEC 13673:1995
           (actually this isn't quite an IS yet; this implements the
@@ -267,7 +272,7 @@
     <varlistentry>
       <term><option>-w<replaceable>type</replaceable></option></term>
       <listitem>
-          <para>Control warnings and errors. Multiple -w options are allowed.
+          <para>Control warnings and errors. Multiple <option>-w</option> options are allowed.
           The following values of type enable warnings:</para>
  
       <para><option>xml</option>
@@ -335,7 +340,7 @@
           Thus <option>-wall</option> <option>-wno-duplicate</option> will enable all warnings except those
           about duplicate entity declarations.</para>
           
-          <para>The following values for warning_type disable errors:</para>
+          <para>The following values for <replaceable>warning_type</replaceable> disable errors:</para>
           
         <para><option>no-idref</option>
                 Do not give an error for an ID reference value which no
@@ -362,7 +367,7 @@
     </varlistentry>
    </variablelist>
                 
-   <para>The following options are also supported for backwards compatibility
+   <para>The following options are also supported for backward compatibility
    with sgmls:</para>
    <variablelist>
    <varlistentry>
@@ -379,7 +384,7 @@
    </varlistentry>
   
    <varlistentry>
-     <term><option>-msysid</option></term>
+     <term><option>-m<replaceable>sysid</replaceable></option></term>
      <listitem>
           <para>Same as <option>-c</option>.</para>
      </listitem>

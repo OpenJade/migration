@@ -1,3 +1,8 @@
+2002-12-08  Karl Eichwalder  <ke@suse.de>
+
+	* tests/af-16: New file
+	* tests/Makefile.am (TESTS): Add af-16.
+
 2002-12-07  Karl Eichwalder  <ke@suse.de>
 
 	* tests/af-12: New file.

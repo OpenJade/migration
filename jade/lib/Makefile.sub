@@ -1,5 +1,7 @@
-LIB=sp
+LTVERSION=0:0:0
+LIB=osp
 INCLUDE=-I$(srcdir)/../generic
+DEPLIBS=-lm
 MSGGENFLAGS=-l
 COMMON_OBJS=Allocator.o Link.o IListBase.o TypeId.o assert.o
 ENTMGR_OBJS=CharsetInfo.o EntityCatalog.o EntityDecl.o EntityManager.o \
@@ -47,3 +49,26 @@ $(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@
 	$(PERL) -w $(srcdir)/mkversion.pl $(srcdir)/../VERSION >$@
 	chmod -w $@
+
+URLStorage.o: URLStorageMessages.h
+URLStorage.lo: URLStorageMessages.h
+PosixStorage.o: PosixStorageMessages.h
+PosixStorage.lo: PosixStorageMessages.h
+StdioStorage.o: StdioStorageMessages.h
+StdioStorage.lo: StdioStorageMessages.h
+SOEntityCatalog.o: CatalogMessages.h
+SOEntityCatalog.lo: CatalogMessages.h
+ExtendEntityManager.o: EntityManagerMessages.h
+ExtendEntityManager.lo: EntityManagerMessages.h
+ParserState.o: ParserMessages.h
+ParserState.lo: ParserMessages.h
+MessageFormatter.o: MessageFormatterMessages.h
+MessageFormatter.lo: MessageFormatterMessages.h
+MessageReporter.o: MessageReporterMessages.h
+MessageReporter.lo: MessageReporterMessages.h
+CmdLineApp.o: version.h CmdLineAppMessages.h
+CmdLineApp.lo: version.h CmdLineAppMessages.h
+ParserApp.o: ParserAppMessages.h
+ParserApp.lo: ParserAppMessages.h
+ArcEngine.o: ArcEngineMessages.h
+ArcEngine.lo: ArcEngineMessages.h

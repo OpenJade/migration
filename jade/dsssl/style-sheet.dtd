@@ -1,17 +1,36 @@
 <!-- A DTD for DSSSL Style Sheets.  The public identifier for this is
 
-     "-//James Clark//DTD DSSSL Style Sheet//EN"
+     "-//OpenJade//DTD DSSSL Style Sheet//EN"
 -->
 
-<!element style-sheet o o (style-specification,
-			   (external-specification|style-specification)*)>
-<!element style-specification o o (style-specification-body)>
+<!ENTITY % declarations
+ "features | add-name-chars
+  | add-separator-chars | standard-chars 
+  | map-sdata-entity | char-repertoire | sgml-grove-plan"
+>
+
+<!element style-sheet o o ((%declarations;)*, 
+                           (style-specification|transformation-specification),
+			   (external-specification|style-specification
+                                            |transformation-specification)*)>
+<!element style-specification o o ((%declarations;)*, style-specification-body)>
 <!attlist style-specification
   id id #implied
   use idrefs #implied
+  partial (partial | complete) complete
 >
 <!element style-specification-body o o (#pcdata)>
 <!attlist style-specification-body
+  content entity #conref
+>
+<!element transformation-specification o o ((%declarations;)*, transformation-specification-body)>
+<!attlist transformation-specification
+  id id #implied
+  use idrefs #implied
+  partial (partial | complete) complete
+>
+<!element transformation-specification-body o o (#pcdata)>
+<!attlist transformation-specification-body
   content entity #conref
 >
 <!element external-specification - o empty>
@@ -20,6 +39,49 @@
   document entity #required
   specid name #implied
 >
+
+<!-- Declares features used by specification. -->
+<!element features - O (#PCDATA) 
+  -- dlextype(featurename*) -->
+
+<!-- Declare additional characters allowed in name within DSSSL notation. -->
+<!element add-name-chars - O (#PCDATA) 
+  -- dlextype(charname*) -->
+
+<!-- Declare additional characters allowed as separators within
+DSSSL notation. -->
+<!element add-separator-chars - O (#PCDATA)
+  -- dlextype(charname*) -->
+
+<!-- Define characters associating names with universal codes. -->
+
+<!element standard-chars - O (#PCDATA)
+  -- dlextype((charname, number))*) -->
+
+<!-- Map an SDATA entity onto a character. -->
+
+<!element map-sdata-entity - O (#PCDATA)
+  -- dlextype(charname) -->
+<!attlist map-sdata-entity
+         name CDATA #IMPLIED -- Default: mapping uses replacement text only --
+         text CDATA #IMPLIED -- Default: mapping uses name only --
+>
+
+<!-- Declare a character repertoire. -->
+<!element char-repertoire - O EMPTY>
+<!attlist char-repertoire
+          name -- public identifier for repertoire --
+               CDATA #REQUIRED
+>
+
+<!-- Declare the grove plan for the SGML property set. -->
+<!element sgml-grove-plan - O EMPTY>
+<!attlist sgml-grove-plan
+          modadd -- names of modules to be added to default grove plan --
+               NAMES #IMPLIED -- Default: none added --
+>
+
+
 <?IS10744 ArcBase DSSSL>
 <!NOTATION DSSSL   PUBLIC "ISO/IEC 10179:1996//NOTATION
                    DSSSL Architecture Definition Document//EN"

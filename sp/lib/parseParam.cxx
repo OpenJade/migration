@@ -200,12 +200,22 @@ Boolean Parser::parseParam(const AllowedParams &allow,
       case Param::reservedName:
 	return parseReservedName(allow, parm);
       case Param::name:
+        {
 	extendNameToken(syntax().namelen(), ParserMessages::nameLength);
 	parm.type = Param::name;
-	getCurrentToken(syntax().generalSubstTable(), parm.token);
+        getCurrentToken(parm.origToken);
+        StringC *substToken = new StringC(parm.origToken);
+        parm.token = *substToken;
+        const SubstTable *subst = syntax().generalSubstTable();
+        StringC::iterator s = parm.token.begin();
+        size_t count = parm.token.size();
+        const Char *tokenData = parm.token.data();
+        for (; count > 0; --count)
+          *s++ = (*subst)[*tokenData++];
 	if (currentMarkup())
 	  currentMarkup()->addName(currentInput());
 	return 1;
+        }
       case Param::entityName:
 	extendNameToken(syntax().namelen(), ParserMessages::nameLength);
 	parm.type = Param::entityName;
@@ -292,8 +302,8 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
 	  message(ParserMessages::peroGrpoProlog);
 	Boolean start;
 	if (inTag(start))
-	    message(start 
-		    ? ParserMessages::peroGrpoStartTag 
+	    message(start
+		    ? ParserMessages::peroGrpoStartTag
 		    : ParserMessages::peroGrpoEndTag);
 	// fall through
       }
@@ -585,10 +595,10 @@ void Parser::groupConnectorInvalidToken(Token token,
 }
 
 static AllowedGroupTokens allowName(GroupToken::name);
-  
+
 Boolean Parser::parseElementNameGroup(unsigned declInputLevel, Param &parm)
 {
-  static AllowedGroupTokens allowCommonName(GroupToken::name, 
+  static AllowedGroupTokens allowCommonName(GroupToken::name,
                                              GroupToken::all,
                                              GroupToken::implicit);
   if (!parseGroup(sd().www() ? allowCommonName : allowName, declInputLevel, parm))
@@ -694,7 +704,7 @@ Boolean Parser::parseGroup(const AllowedGroupTokens &allowToken,
 							GroupConnector::andGC,
 							GroupConnector::seqGC,
 							GroupConnector::grpcGC);
-			    
+
     if (!parseGroupConnector(allowAnyConnectorGrpc, declInputLevel,
 			     groupInputLevel, gc))
       return 0;

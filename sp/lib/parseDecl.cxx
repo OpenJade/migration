@@ -550,6 +550,7 @@ Boolean Parser::parseElementDecl()
   else {
     nameVector.resize(1);
     parm.token.swap(nameVector[0].name);
+    parm.origToken.swap(nameVector[0].origName);
   }
   static AllowedParams
     allowRankOmissionContent(Param::number,
@@ -600,8 +601,12 @@ Boolean Parser::parseElementDecl()
       return 0;
   }
   else {
-    for (i = 0; i < elements.size(); i++)
+    for (i = 0; i < elements.size(); i++) {
+      StringC *origName;
+      origName = new StringC(nameVector[i].origName);
       elements[i] = lookupCreateElement(nameVector[i].name);
+      elements[i]->setOrigName(nameVector[i].origName);
+    }
   }
   for (i = 0; i < elements.size(); i++)
     if (defDtd().lookupRankStem(elements[i]->name()) && validate())
@@ -896,7 +901,7 @@ Boolean Parser::parseAttlistDecl()
   size_t idIndex = size_t(-1);
   size_t notationIndex = size_t(-1);
   Boolean anyCurrent = 0;
-  
+
   Boolean isNotation;
   Vector<Attributed *> attributed;
   if (!parseAttributed(declInputLevel, parm, attributed, isNotation))
@@ -906,7 +911,9 @@ Boolean Parser::parseAttlistDecl()
     return 0;
   while (parm.type != Param::mdc) {
     StringC attributeName;
+    StringC origAttributeName;
     parm.token.swap(attributeName);
+    parm.origToken.swap(origAttributeName);
     attcnt++;
     Boolean duplicate = 0;
     size_t i;
@@ -956,6 +963,7 @@ Boolean Parser::parseAttlistDecl()
       return 0;
     if (haveDefLpd() && defLpd().type() == Lpd::simpleLink && !def->isFixed())
       message(ParserMessages::simpleLinkFixedAttribute);
+    def->setOrigName(origAttributeName);
     if (!duplicate) {
       defs.resize(defs.size() + 1);
       defs.back() = def.extract();
@@ -1240,7 +1248,7 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
 					  SIZEOF(declaredValues) - 1);
   static AllowedParams allowDeclaredValueData(declaredValues,
 					      SIZEOF(declaredValues));
-  if (!parseParam(sd().www() ? allowDeclaredValueData : allowDeclaredValue, 
+  if (!parseParam(sd().www() ? allowDeclaredValueData : allowDeclaredValue,
                   declInputLevel, parm))
     return 0;
   enum { asDataAttribute = 01, asLinkAttribute = 02 };
@@ -1328,9 +1336,14 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
   case Param::nameTokenGroup:
     {
       Vector<StringC> group(parm.nameTokenVector.size());
-      for (size_t i = 0; i < group.size(); i++)
+      Vector<StringC> origGroup(parm.nameTokenVector.size());
+      for (size_t i = 0; i < group.size(); i++) {
 	parm.nameTokenVector[i].name.swap(group[i]);
-      declaredValue = new NameTokenGroupDeclaredValue(group);
+	parm.nameTokenVector[i].origName.swap(origGroup[i]);
+      }
+      GroupDeclaredValue *grpVal = new NameTokenGroupDeclaredValue(group);
+      grpVal->setOrigAllowedValues(origGroup);
+      declaredValue = grpVal;
     }
     break;
   case Param::reservedName + Syntax::rDATA:
@@ -1433,7 +1446,7 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
   case Param::attributeValue:
     if (options().warnAttributeValueNotLiteral)
       message(ParserMessages::attributeValueNotLiteral);
-    // falll through
+    // fall through
   case Param::attributeValueLiteral:
   case Param::tokenizedAttributeValueLiteral:
     {
@@ -1454,7 +1467,7 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
 					  declaredValue.extract());
     break;
   case Param::indicatedReservedName + Syntax::rCURRENT:
-    anyCurrent = 1;	       
+    anyCurrent = 1;
     if (declaredValue->isId())
       message(ParserMessages::idDeclaredValue);
     def = new CurrentAttributeDefinition(attributeName,

@@ -45,6 +45,8 @@ public:
     PackedBoolean intDecl;
     PackedBoolean extDecl;
     PackedBoolean sdataAsPi;
+    PackedBoolean preserveCase;
+    PackedBoolean overwrite;
     PackedBoolean writeOutsideOutDir;
   };
   XmlOutputEventHandler(const Options &,
@@ -88,9 +90,11 @@ private:
   void inputOpened(InputSource *in);
   void inputClosed(InputSource *in);
   const StringC &generalName(const StringC &name, StringC &buf);
+  Boolean equalsIgnoreCase(const StringC &str1, StringC &str2);
   char *convertSuffix(char *name);
   int maybeCreateDirectories(char *path);
   Boolean checkFirstSeen(const StringC &name);
+  void uniqueFilename(char *filename);
   char getQuoteMark(const StringC *contents);
 
   CmdLineApp *app_;

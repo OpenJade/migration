@@ -26,6 +26,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include <unistd.h>
+#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -104,10 +106,14 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
   // Open file for writing external entity declarations if we are preserving
   // any entities
   if (! options_.expExt) {
-    ParserApp::AppChar filePath[strlen(outputDir_) + 17];
+    ParserApp::AppChar filePath[strlen(outputDir_) + 21];
     strcpy (filePath, outputDir_);
     strcat (filePath, "/");
     strcat (filePath, EXT_ENT_FILE);
+
+    if (! options_.overwrite) {
+      uniqueFilename(filePath);
+    }
 
     // Create directories if necessary
     char *dirs = strdup (filePath);
@@ -134,10 +140,14 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
   // Open file for writing external entity declarations if we are preserving
   // any entities
   if (! options_.expInt) {
-    char filePath[strlen(outputDir_) + 17];
+    char filePath[strlen(outputDir_) + 21];
     strcpy (filePath, outputDir_);
     strcat (filePath, "/");
     strcat (filePath, INT_ENT_FILE);
+
+    if (! options_.overwrite) {
+      uniqueFilename(filePath);
+    }
 
     // Create directories if necessary
     char *dirs = strdup (filePath);
@@ -253,7 +263,13 @@ void XmlOutputEventHandler::startElement(StartElementEvent *event)
     nCdataEndMatched_ = 0;
     os() << "]]>";
   }
-  os() << '<' << generalName(event->name(), nameBuf_);
+
+  if (options_.preserveCase) {
+    os() << '<' << event->elementType()->origName();
+  } else {
+    os() << '<' << generalName(event->name(), nameBuf_);
+  }
+
   size_t nAttributes = event->attributes().size();
   for (size_t i = 0; i < nAttributes; i++)
     outputAttribute(event->attributes(), i);
@@ -284,7 +300,12 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
     os() << RE;
   else
     os() << ' ';
-  os() << generalName(attributes.name(i), nameBuf_) << "=\"";
+
+  if (options_.preserveCase) {
+    os() << attributes.def()->def(i)->origName() << "=\"";
+  } else {
+    os() << generalName(attributes.name(i), nameBuf_) << "=\"";
+  }
   if (type == AttributeValue::cdata) {
     TextIter iter(*text);
     TextItem::Type type;
@@ -366,7 +387,24 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
   else if (attributes.def()->def(i)->isEntity())
     os() << *string;
   else
-    os() << generalName(*string, nameBuf_);
+    if (options_.preserveCase) {
+      const Vector<StringC> *tokensPtr =
+        attributes.def()->def(i)->getOrigTokens();
+      if (tokensPtr) {
+        size_t nTokens = tokensPtr->size();
+        Vector<StringC>::const_iterator tokens = tokensPtr->begin();
+        for (i = 0; i < nTokens; i++) {
+          if (equalsIgnoreCase(*string, (StringC &)tokens[i])) {
+            os() << tokens[i];
+          }
+        }
+      } else {
+        os() << *string;
+      }
+
+    } else {
+      os() << generalName(*string, nameBuf_);
+    }
   os() << '"';
 }
 
@@ -377,7 +415,11 @@ void XmlOutputEventHandler::endElement(EndElementEvent *event)
       && event->elementType()->definition()->declaredContent() == ElementDefinition::empty)
     ;
   else {
-    os() << "</" << generalName(event->name(), nameBuf_);
+    if (options_.preserveCase) {
+      os() << "</" << event->elementType()->origName();
+    } else {
+      os() << "</" << generalName(event->name(), nameBuf_);
+    }
 #if 0
     if (options_.nlInTag)
       os() << RE;
@@ -688,10 +730,19 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
       if (adl) {
 	if (options_.attlist) {
 	    maybeStartDoctype(doctypeStarted, dtd);
-	    os() << "<!ATTLIST " << generalName(elementType->name(), nameBuf_);
+            if (options_.preserveCase) {
+              os() << "<!ATTLIST " << elementType->origName();
+            } else {
+              os() << "<!ATTLIST " <<
+                generalName(elementType->name(), nameBuf_);
+            }
 	    for (size_t i = 0; i < adl->size(); i++) {
 	      const AttributeDefinition *def = adl->def(i);
-	      os() << RE << generalName(def->name(), nameBuf_);
+              if (options_.preserveCase) {
+                os() << RE << def->origName();
+              } else {
+                os() << RE << generalName(def->name(), nameBuf_);
+              }
 	      AttributeDefinitionDesc desc;
 	      def->getDesc(desc);
 	      switch (desc.declaredValue) {
@@ -731,12 +782,22 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
 	      case AttributeDefinitionDesc::nameTokenGroup:
 		{
 		  os() << " (";
-		  for (size_t j = 0; j < desc.allowedValues.size(); j++) {
-		    if (j > 0)
-		      os() << '|';
-		    os() << desc.allowedValues[j];
-		  }
-		  os() << ") #IMPLIED";
+                  if (options_.preserveCase) {
+                    for (size_t j = 0;
+                         j < desc.origAllowedValues.size(); j++) {
+                      if (j > 0)
+                        os() << '|';
+                      os() << desc.origAllowedValues[j];
+                    }
+                    os() << ") #IMPLIED";
+                  } else {
+                    for (size_t j = 0; j < desc.allowedValues.size(); j++) {
+                      if (j > 0)
+                        os() << '|';
+                      os() << desc.allowedValues[j];
+                    }
+                    os() << ") #IMPLIED";
+                  }
 		}
 		break;
 	      default:
@@ -1089,9 +1150,10 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 
 	  /* Construct new output path, prepending the output
 	     directory: so, for example, /usr/local/lib/ents/foo
-	     becomes ./usr/local/lib/ents/foo.xml. */
+	     becomes ./usr/local/lib/ents/foo.xml; possible 2-digit
+             suffix (for uniqueness) */
 
-	  char filePath[strlen(outputDir_) + 6 +
+	  char filePath[strlen(outputDir_) + 9 +
 		       outputCodingSystem->convertOut
 			(*systemIdPointer).size()];
 
@@ -1151,6 +1213,10 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 	  *extEnts_ << "<!ENTITY " << entDecl->name() << " SYSTEM \""
 		    << filePath << "\">\n";
 	  extEnts_->flush();
+
+          if (! options_.overwrite) {
+            uniqueFilename(filePath);
+          }
 
 	  // Open the file, exiting if we fail to do so.
 	  FileOutputByteStream *file = new FileOutputByteStream;
@@ -1313,6 +1379,7 @@ void XmlOutputEventHandler::inputClosed(InputSource *in)
 const StringC &XmlOutputEventHandler::generalName(const StringC &name,
 					          StringC &buf)
 {
+
   if (options_.lower && namecaseGeneral_) {
     for (size_t i = 0; i < name.size(); i++) {
       Char c = lowerSubst_[name[i]];
@@ -1326,6 +1393,20 @@ const StringC &XmlOutputEventHandler::generalName(const StringC &name,
     }
   }
   return name;
+}
+
+Boolean XmlOutputEventHandler::equalsIgnoreCase(const StringC &str1,
+                                                StringC &str2)
+{
+
+  if (str1.size() != str2.size())
+    return false;
+
+  for (size_t i = 0; i < str1.size(); i++) {
+    if (lowerSubst_[str1[i]] != lowerSubst_[str2[i]])
+      return false;
+  }
+  return true;
 }
 
 /** Make this string's suffix ".xml", attempting to do the right thing
@@ -1412,6 +1493,39 @@ Boolean XmlOutputEventHandler::checkFirstSeen(const StringC &name)
   }
 
   return false;
+}
+
+
+/** Set the newFilename to a filename which, while similar or
+    identical to originalFilename, does not correspond to an existing
+    file. Gives an error if called more than 99 times on the same
+    filename (during the same or different executions of osx). Assumes
+    that the char array it's given is long enough to accept a two-digit
+    suffix in addition to the string that's already in there.
+ */
+void XmlOutputEventHandler::uniqueFilename(char *filePath) {
+
+  char baseFilePath[strlen(filePath)];
+  strcpy (baseFilePath, filePath);
+
+  struct stat statbuf;
+  int num = 0;
+  char numStr[3];
+
+  while (stat(filePath, &statbuf) == 0 && num <= 100) {
+    num++;
+    strcpy (filePath, baseFilePath);
+    strcat (filePath, ".");
+    sprintf(numStr, "%d", num);
+    strcat (filePath, numStr);
+  }
+
+  if (num >= 100) {
+    app_->message(XmlOutputMessages::tooManyOutputFiles,
+                  StringMessageArg
+                  (app_->codingSystem()->convertIn(baseFilePath)));
+    exit(1);
+  }
 }
 
 char XmlOutputEventHandler::getQuoteMark(const StringC *contents)

@@ -185,6 +185,10 @@ Preserve external entities (producing a new output file for each input file proc
 <DD>
 Preserve internal entities, write a declaration driver file named "intEntities.dtf", and include that file in the instance's internal subset.
 <DT>
+<CODE>preserve-case</CODE>
+<DD>
+Preserve casing as specified in the DTD for element names; attribute names; attribute values which are token lists.
+<DT>
 <CODE>no-external-decl
 <DD>
 Do not include the external entities declaration driver file in the instance's internal subset.
@@ -202,6 +206,12 @@ processing instructions instead of as general internal entities.
 <CODE>no-output-outside-outdir
 <DD>
 When preserving external entities, do not write output files outside the specified output directory ("." by default). In other words, if an external entity's system identifier includes enough instances of ".." to cause osx to write a file outside (above) the output directory, exit. (By default, osx will issue a warning but will write the file and continue.)
+<DT>
+<CODE>no-overwrite
+<DD>
+When preserving internal or external entities, multiple output files will be written.
+If this option is specified, do not overwrite existing files; instead, attempt to append a number to the end of the original filename to create a unique filename.
+Exit with an error if too many (100) such files already exist.
 </DL>
 <P>
 Multiple

@@ -357,6 +357,27 @@
                 Do not include the internal entities declaration driver file
                 in the instance's internal subset.</para>
 
+      <para><option>no-output-outside-outdir</option>
+                When preserving external entities, do not write output files
+                outside the specified output directory ("." by default).
+                In other words, if an external entity's system identifier
+                includes enough instances of ".." to cause osx to write
+                a file outside (above) the output directory, exit (by default
+                osx will issue a warning but will write the file and
+                continue.</para>
+
+      <para><option>no-overwrite</option>
+                When preserving internal or external entities, multiple 
+                output files will be written. If this option is specified,
+                do not overwrite existing files; instead, attempt to append
+                a number to the end of the original filename to create a
+                unique filename. Exit with an error if too many (100)
+                such files already exist.</para>
+
+      <para><option>preserve-case</option>
+                Preserve casing as specified in the DTD for element names;
+                attribute names; attribute values which are token lists.</para>
+
       <para><option>sdata-as-pis</option>
                 When translating SDATA entities (whether expanding them or
                 providing a definition for them in the output's internal

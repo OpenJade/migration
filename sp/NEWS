@@ -11,9 +11,13 @@ Changes in OpenSP 1.5.1
   SP_HTTP_USER_AGENT environment variable (Nick Kew)
 
 * Add support for specifying Accept: headers with the
-  SP_HTTP_ACCEPT environent variable (Nick Kew)
+  SP_HTTP_ACCEPT environment variable (Nick Kew)
 
 * Fix for Mac OS X/Darwin compilation (Peter O'Gorman)
+
+* Build Infrastructure/Localisation enhancements (Neil Roeth)
+
+* Enhancements to osx. Preserve case option, security fixes (Jessica Perry Hekman)
 
 Changes in OpenSP 1.5
 

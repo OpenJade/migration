@@ -1,4 +1,15 @@
-* Allow different options for spec parser and doc parser ?
+* Remove the silly MIF: prefix from all mif backend messages 
+
+
+* Finish long options support:
+  Add long alternatives for more options,
+  Improve the option-related error messages a bit (cut the option name off
+  before '=')
+  Add descriptive text to be used in usage message
+  Rewrite CmdLineApp::usageString() to use that text and mention long options.
+  Figure out how to add separate parser options for spec/doc.
+  Document the long options 
+
 
 Things which are missing and need a lot of work
 ===============================================

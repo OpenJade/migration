@@ -1,4 +1,4 @@
-opensp (1.5pre5-1.5pre6-1) unstable; urgency=low
+opensp (1.5pre5-2) unstable; urgency=low
 
   * ship PO files in libosp package
   * some upstream changes from CVS, not yet released; this version will

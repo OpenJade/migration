@@ -36,6 +36,21 @@ DocumentGenerator::DocumentGenerator(SdataMapper *smap, OutputCharStream *os)
 {
 }
 
+void DocumentGenerator::emit(const GroveStringListPtr &strs, 
+                             const char *a, 
+                             const char *sep,
+                             const char *o)
+{
+  ConstGroveStringListIter iter(ConstGroveStringListIter(strs->iter()));
+  if (!iter.done()) {
+    os() << a << iter.cur();
+    iter.next();
+    for (;!iter.done();iter.next()) 
+      os() << sep << iter.cur();
+    os() << o;
+  }
+}
+
 void DocumentGenerator::emit(const NodePtr &ptr) 
 {
   switch (ptr->classDef().className) {
@@ -45,14 +60,14 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     emit(gdtd);
     NodeListPtr prolog;
     GroveString sep;
-    ptr->getProlog(prolog);
-    emit(prolog, sep);
+    if (ptr->getProlog(prolog) == accessOK)
+      emit(prolog, sep);
     NodePtr docelem;
-    ptr->getDocumentElement(docelem);
-    emit(docelem);
+    if (ptr->getDocumentElement(docelem) == accessOK)
+      emit(docelem);
     NodeListPtr epilog;
-    ptr->getProlog(epilog);
-    emit(epilog, sep);
+    if (ptr->getProlog(epilog) == accessOK)
+      emit(epilog, sep);
     break;
   }
   case ComponentName::idElement: {
@@ -60,13 +75,16 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     ptr->getGi(gi);
     os() << "<" << gi;
     NamedNodeListPtr atts;
-    GroveString sep;
-    ptr->getAttributes(atts);
-    emit(atts->nodeList(), sep);
+    GroveChar ch = ' ';
+    GroveString sep(&ch, 1);
+    if (ptr->getAttributes(atts) == accessOK) {
+      os() << " ";
+      emit(atts->nodeList(), sep);
+    }
     os() << ">"; 
     NodeListPtr content;
-    ptr->getContent(content);
-    emit(content, sep);
+    if (ptr->getContent(content) == accessOK)
+      emit(content, sep);
     bool mustOmitEndTag;
     ptr->getMustOmitEndTag(mustOmitEndTag);
     if (!mustOmitEndTag) 
@@ -85,14 +103,14 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     if (!implied) {
       GroveString name;
       ptr->getName(name);
-      os() << " " << name << "='";
+      os() << name << "='";
       GroveChar ch;
       GroveString sep;
       if (ptr->getTokenSep(ch) != accessNull) 
         sep.assign(&ch, 1);
       NodeListPtr value;
-      ptr->getValue(value); 
-      emit(value, sep); 
+      if (ptr->getValue(value) == accessOK)
+	emit(value, sep); 
       os() << "'";
     }
     break;
@@ -113,25 +131,12 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     }
     break;
   }
-  case ComponentName::idSdata: {
-    GroveString str;
-    if (ptr->getEntityName(str) == accessOK) 
-      os() << "&" << str << ";";
-    else {
-      printf("can't emit sdata entity reference without name\n");
-      GroveChar ch;
-      ptr->getChar(*smap_, ch);
-      os() << ch;
-    }
-    break;
-  }
+  case ComponentName::idSdata: 
   case ComponentName::idSubdocument:
   case ComponentName::idExternalData: {
     GroveString str;
-    if (ptr->getEntityName(str) == accessOK) 
-      os() << "&" << str << ";";
-    else 
-      printf("can't emit entity reference without name\n");
+    ptr->getEntityName(str);
+    os() << "&" << str << ";";
     break;
   }
   case ComponentName::idDocumentType: {
@@ -140,30 +145,38 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     ptr->getName(name);
     os() << "<!DOCTYPE " << name << " [" << RE;
     NamedNodeListPtr nnl;
-    ptr->getNotations(nnl);
-    emit(nnl->nodeList(), sep);
-    ptr->getParameterEntities(nnl);
-    emit(nnl->nodeList(), sep);
-    ptr->getGeneralEntities(nnl);
-    emit(nnl->nodeList(), sep);
+    if (ptr->getNotations(nnl) == accessOK)
+      emit(nnl->nodeList(), sep);
+    if (ptr->getParameterEntities(nnl) == accessOK)
+      emit(nnl->nodeList(), sep);
+    if (ptr->getGeneralEntities(nnl) == accessOK)
+      emit(nnl->nodeList(), sep);
     NodePtr dent;
-    if (ptr->getDefaultEntity(dent) == accessOK) {
+    if (ptr->getDefaultEntity(dent) == accessOK) 
       emit(dent);
-    }
-    ptr->getElementTypes(nnl);
-    emit(nnl->nodeList(), sep);
+    if (ptr->getElementTypes(nnl) == accessOK)
+      emit(nnl->nodeList(), sep);
     os() << "]>" << RE;
     break;
   } 
   case ComponentName::idNotation: {
     GroveString name;
     ptr->getName(name);
-    os() << "<!notation " << name << " ";
+    os() << "<!NOTATION " << name << " ";
     NodePtr extid;
-    ptr->getExternalId(extid);
-    emit(extid);
+    if (ptr->getExternalId(extid) == accessOK)
+      emit(extid);
     os() << ">" << RE;
-    //FIXME: handle attributes
+    NamedNodeListPtr atts;
+    NodePtr first;
+    if (ptr->getAttributeDefs(atts) == accessOK
+	&& atts->nodeList()->first(first) == accessOK) {
+      os() << "<!ATTLIST #NOTATION " << name << RE;
+      GroveChar ch = RE;
+      GroveString sep(&ch, 1);
+      emit(atts->nodeList(), sep);
+      os() << " >" << RE;
+    }
     break;
   }
   case ComponentName::idDefaultEntity: 
@@ -186,16 +199,16 @@ void DocumentGenerator::emit(const NodePtr &ptr)
       emit(extid);
       switch (type) {
       case Node::EntityType::subdocument:
-	os() << "SUBDOC";
+	os() << " SUBDOC";
 	break;
       case Node::EntityType::cdata:
-	os() << "CDATA";
+	os() << " CDATA";
 	break;
       case Node::EntityType::sdata:
-	os() << "SDATA";
+	os() << " SDATA";
 	break;
       case Node::EntityType::ndata: 
-	os()  << "NDATA";
+	os()  << " NDATA";
 	break;
       default:
 	CANNOT_HAPPEN();
@@ -206,8 +219,17 @@ void DocumentGenerator::emit(const NodePtr &ptr)
       case Node::EntityType::ndata: {
 	GroveString notname;
 	ptr->getNotationName(notname);
-	os() << " " << notname;
-	//FIXME: handle data attributes
+	os() << " " << notname << " ";
+        NamedNodeListPtr atts;
+        NodePtr first;
+        if (ptr->getAttributes(atts) == accessOK 
+          && atts->nodeList()->first(first) == accessOK) {
+          os() << "[";
+	  GroveChar ch = ' ';
+          GroveString sep(&ch, 1);
+          emit(atts->nodeList(), sep);
+	  os() << "] ";
+        }
 	break;
       }
       default:
@@ -232,7 +254,7 @@ void DocumentGenerator::emit(const NodePtr &ptr)
       }
       GroveString text;
       ptr->getText(text);
-      os() << "'" << text << "'"; 
+      os() << "'" << text << "' "; 
     }
     os() << ">" << RE;
     break;
@@ -262,47 +284,203 @@ void DocumentGenerator::emit(const NodePtr &ptr)
       break;
     case Node::ContentType::modelgrp: {
       NodePtr model;
-      ptr->getModelGroup(model);
-      emit(model);
+      if (ptr->getModelGroup(model) == accessOK)
+	emit(model);
       break;
     }
     default:
       CANNOT_HAPPEN();
     }
-    //FIXME: handle inclusions and exclusions
-    os() << ">" << RE;
+    GroveStringListPtr cl;
+    if (ptr->getExclusions(cl) == accessOK) 
+      emit(cl, " -(", "|", ")");  
+    if (ptr->getInclusions(cl) == accessOK) 
+      emit(cl, " +(", "|", ")");  
+    os() << " >" << RE;
     NamedNodeListPtr atts;
-    ptr->getAttributeDefs(atts);
     NodePtr first;
-    if (atts->nodeList()->first(first) == accessOK) {
+    if (ptr->getAttributeDefs(atts) == accessOK
+	&& atts->nodeList()->first(first) == accessOK) {
       os() << "<!ATTLIST " << gi << RE;
       GroveChar ch = RE;
       GroveString sep(&ch, 1);
       emit(atts->nodeList(), sep);
-      os() << RE << ">" << RE;
+      os() << " >" << RE;
     }
-    break;
+     break;
   }
   case ComponentName::idAttributeDef: {
     GroveString name;
     ptr->getName(name);
-    os() << "  " << name;
-    //FIXME
+    os() << "  " << name << " ";
+    Node::DeclValueType::Enum decl;
+    ptr->getDeclValueType(decl); 
+    switch (decl) {
+    case Node::DeclValueType::cdata:
+      os() << "CDATA ";
+      break; 
+    case Node::DeclValueType::entity:
+      os() << "ENTITY ";
+      break; 
+    case Node::DeclValueType::entities:
+      os() << "ENTITIES ";
+      break; 
+    case Node::DeclValueType::id:
+      os() << "ID ";
+      break; 
+    case Node::DeclValueType::idref:
+      os() << "IDREF ";
+      break; 
+    case Node::DeclValueType::idrefs:
+      os() << "IDREFS ";
+      break; 
+    case Node::DeclValueType::name:
+      os() << "NAME ";
+      break; 
+    case Node::DeclValueType::names:
+      os() << "NAMES ";
+      break; 
+    case Node::DeclValueType::nmtoken:
+      os() << "NMTOKEN ";
+      break; 
+    case Node::DeclValueType::nmtokens:
+      os() << "NMTOKENS ";
+      break; 
+    case Node::DeclValueType::number:
+      os() << "NUMBER ";
+      break; 
+    case Node::DeclValueType::numbers:
+      os() << "NUMBERS ";
+      break; 
+    case Node::DeclValueType::nutoken:
+      os() << "NUTOKEN ";
+      break; 
+    case Node::DeclValueType::nutokens:
+      os() << "NUTOKENS ";
+      break; 
+    case Node::DeclValueType::notation: 
+      os() << "NOTATION ";
+      // fall through
+    case Node::DeclValueType::nmtkgrp: {
+      GroveStringListPtr toks;
+      ptr->getTokens(toks);
+      emit(toks, "(", "|", ") "); 
+      break; 
+    } 
+    default: 
+      CANNOT_HAPPEN();
+    }
+    Node::DefaultValueType::Enum deflt;
+    ptr->getDefaultValueType(deflt);
+    switch (deflt) {
+    case Node::DefaultValueType::fixed:
+      os() << "#FIXED ";
+      // fall through
+    case Node::DefaultValueType::value: {
+      NodeListPtr val;
+      GroveString sep;
+      if (ptr->getDefaultValue(val) == accessOK)
+	emit(val, sep); 
+      break; 
+    }
+    case Node::DefaultValueType::required:
+      os() << "#REQUIRED";
+      break;
+    case Node::DefaultValueType::current:
+      os() << "#CURRENT";
+      break;
+    case Node::DefaultValueType::conref:
+      os() << "#CONREF";
+      break;
+    case Node::DefaultValueType::implied:
+      os() << "#IMPLIED";
+      break;
+    default:
+      CANNOT_HAPPEN();
+    }
     break;
   }
   case ComponentName::idExternalId: {
+    GroveString pubid, sysid;
+    if (ptr->getPublicId(pubid) == accessOK) 
+      os() << "PUBLIC '" << pubid << "'";
+    if (ptr->getSystemId(sysid) == accessOK) 
+      os() << (pubid.size() > 0 ? " " : "") << "SYSTEM '" << sysid << "'";
     break;
   }
   case ComponentName::idModelGroup: {
+    //FIXME: fails for (#pcdata)
+    os() << "(";
+    Node::Connector::Enum conn;
+    ptr->getConnector(conn); 
+    GroveChar ch;
+    switch (conn) {
+    case Node::Connector::and_: 
+      ch = '&';
+      break;
+    case Node::Connector::or_: 
+      ch = '|';
+      break;
+    case Node::Connector::seq: 
+      ch = ',';
+      break;
+    default:
+      CANNOT_HAPPEN();
+    }
+    GroveString sep(&ch, 1);
+    NodeListPtr toks;
+    if (ptr->getContentTokens(toks) == accessOK)
+      emit(toks, sep);
+    os() << ")";
+    Node::OccurIndicator::Enum occur;
+    if (ptr->getOccurIndicator(occur) == accessOK) {
+      switch (occur) {
+      case Node::OccurIndicator::opt:
+        os() << '?';
+        break;
+      case Node::OccurIndicator::plus:
+        os() << '+';
+        break;
+      case Node::OccurIndicator::rep:
+        os() << '*';
+        break;
+      default:
+        CANNOT_HAPPEN();
+      } 
+    }
     break;
   }
-  case ComponentName::idSgmlConstants: {
+  case ComponentName::idElementToken: {
+    GroveString gi;
+    ptr->getGi(gi);
+    os() << gi; 
+    Node::OccurIndicator::Enum occur;
+    if (ptr->getOccurIndicator(occur) == accessOK) {
+      switch (occur) {
+      case Node::OccurIndicator::opt:
+        os() << '?';
+        break;
+      case Node::OccurIndicator::plus:
+        os() << '+';
+        break;
+      case Node::OccurIndicator::rep:
+        os() << '*';
+        break;
+      default:
+        CANNOT_HAPPEN();
+      } 
+    }
+    break;
+  }
+  case ComponentName::idPcdataToken: {
+    os() << "#PCDATA";
+    break;
+  }
+  case ComponentName::idSgmlConstants: 
   case ComponentName::noId: // message and nonSgml 
     break;
-  }
-  default: {
-    printf("unsupported node class skipped\n");
-  }
+  default: 
+    CANNOT_HAPPEN(); 
   }
 }
 
@@ -310,14 +488,12 @@ void DocumentGenerator::emit(const NodeListPtr &ptr, const GroveString &sep)
 {
    NodeListPtr nl(ptr);
    NodePtr nd;
-   if (nl->first(nd) == accessNull)
-     return;
-   nl->rest(nl);
    for (;;) {
-     emit(nd);
-     if (nl->first(nd) == accessNull)
+     if (nl->first(nd) != accessOK)
        return;
-     nl->rest(nl);
+     emit(nd);
+     if (nl->rest(nl) != accessOK)
+       return;
      os() << sep;
    }  
 } 

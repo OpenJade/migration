@@ -25,7 +25,7 @@ Description: Implementation of the DSSSL language
 
 Package: libostyle0
 Architecture: any
-Depends: ${shlibs-libostyle:Depends}
+Depends: ${shlibs-libostyle0:Depends}
 Description: Runtime libraries for OpenJade
  OpenJade's shared libraries, runtime support.  Includes libogrove,
  providing an abstract interface to groves; libospgrove, an interface

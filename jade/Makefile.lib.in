@@ -21,7 +21,7 @@ lib$(LIB).la: $(LT_OBJS)
 	    -rpath $(libdir) -version-info $(LTVERSION) $(DEPLIBS)
 
 install:
-	$(LIBTOOL) --mode=install $(INSTALL) lib$(LIB).la $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) lib$(LIB).la $(DESTDIR)$(libdir)
 
 install-man:
 depend: depend_src

@@ -16,6 +16,8 @@ srcdir=@srcdir@
 bindir=@bindir@
 datadir=@datadir@
 
+DESTDIR=
+
 LIBTOOL=@LIBTOOL@
 
 SP_LIBDIRS=lib $(XLIBDIRS)
@@ -31,9 +33,9 @@ do=all
 $(TARGETS): FORCE
 	@$(MAKE) -f Makefile do=$@ $(dodirs)
 	@if test $@ = 'install'; then \
-	  $(LIBTOOL) --finish $(libdir); \
-	  mkdir -p $(datadir); \
-	  cp -f dsssl/builtins.dsl $(datadir); \
+	  $(LIBTOOL) --finish $(DESTDIR)$(libdir); \
+	  mkdir -p $(DESTDIR)$(datadir); \
+	  cp -f dsssl/builtins.dsl $(DESTDIR)$(datadir); \
 	fi;
 
 $(LIBDIRS): FORCE

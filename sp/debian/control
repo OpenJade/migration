@@ -2,11 +2,12 @@ Source: opensp
 Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
-Standards-Version: 3.1.1
+Standards-Version: 3.5.0
+Build-Depends: debhelper, automake, libtool, gettext
 
 Package: opensp
 Architecture: any
-Depends: ${shlibs-opensp:Depends}, ${libosp:ShlibVersion}, sgml-base
+Depends: ${shlibs:Depends}, sgml-base
 Suggests: doc-base, sgml-data
 Description: OpenJade group's SGML parsing tools
  This package is a collection of SGML/XML tools called OpenSP.
@@ -16,9 +17,11 @@ Description: OpenJade group's SGML parsing tools
  files.  The central programs included in this package are 'onsgmls',
  which replaces sgmls, 'ospam', 'ospent', 'osgmlnorm', and 'osgml2xml'.
 
-Package: libosp1
+Package: libosp2
 Architecture: any
-Depends: ${shlibs-libosp1:Depends}
+Section: libs
+Depends: ${shlibs:Depends}
+Conflicts: libosp1
 Description: Runtime library for OpenJade group's SP suite
  This is the SP suite's shared library runtime support.  This C++
  library contains entity management functions, parsing functions, and
@@ -28,6 +31,7 @@ Description: Runtime library for OpenJade group's SP suite
 
 Package: libosp-dev
 Architecture: any
+Section: devel
 Depends: ${opensp:Version}, ${libosp:Version}, libc6-dev, libstdc++-dev
 Recommends: c++-compiler
 Description: OpenJade group's SP suite, developer support

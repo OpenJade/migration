@@ -12,7 +12,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SubstTable {
+class SP_API SubstTable {
 public:
   SubstTable();
   void addSubst(Char from, Char to);
@@ -23,23 +23,17 @@ public:
   Char at(Char from) const;
   StringC inverse(Char to) const;
   void inverseTable(SubstTable &) const;
-private:
   struct Pair {
     Pair() {}
     Pair(Char f, Char t) : from(f), to(t) {}
     Char from;
     Char to;
   };
+private:
   Char lo_[256];
   mutable Vector<Pair> map_; 
   mutable bool isSorted_;
 };
-
-inline 
-void SubstTable::subst(Char &c) const
-{
-  c = operator[](c);
-}
 
 inline
 void SubstTable::subst(StringC &str) const
@@ -55,6 +49,12 @@ Char SubstTable::operator[](Char t) const
     return lo_[t];
   else 
     return at(t);
+}
+
+inline 
+void SubstTable::subst(Char &c) const
+{
+  c = operator[](c);
 }
 
 #ifdef SP_NAMESPACE

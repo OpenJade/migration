@@ -11,7 +11,8 @@
 
 pkg		:= opensp
 pkg-osp		:= $(pkg)
-pkg-libosp	:= libosp1
+libosp-maj-ver	:= 2
+pkg-libosp	:= libosp2
 pkg-libosp-dev	:= libosp-dev
 
 # default SGML pathing
@@ -41,15 +42,30 @@ libdir-libosp-dev	:= $(prefix-libosp-dev)/usr/lib
 # build tool abstraction
 install_file	:= install -o root -g root -m 644 -p
 install_script	:= install -o root -g root -m 755 -p
-install_program	:= install -o root -g root -m 755 -p --strip
+install_program	:= install -o root -g root -m 755 -p
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+  install_program += --strip
+endif
 make_directory	:= install -d -o root -g root -m 755
 compress	:= gzip -9f
+
+CFLAGS		:= -O2 --pipe
+CXXFLAGS	:= -O2 --pipe
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -g
+  CXXFLAGS += -g
+endif
+export CFLAGS
+export CXXFLAGS
 
 # flags to get automake to use the above
 am_inst_flags	:= INSTALL='install -o root -g root -p' INSTALL_PROGRAM='$(install_program)' INSTALL_SCRIPT='$(install_script)' INSTALL_DATA='$(install_file)'
 
 # first version of package providing the right shlibs
-SHLIBS_PKGVER	:= 1.4-1
+SHLIBS_PKGVER	:= 1.5pre4-3
+
+# extra docs we don't want
+DOCS_TOO_MUCH	:= ABOUT-NLS COPYING ChangeLog
 
 # determine our version numbers
 SRC_VERSION	:= $(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | sed 's/^Version: *//')
@@ -75,21 +91,20 @@ ChangeLog:
 	mv OpenSP-$(UPSTREAM_VERSION)/ChangeLog .
 	rm -r OpenSP-$(UPSTREAM_VERSION)
 
-config.status:	ChangeLog
-	autoheader
-	automake --add-missing
+config.status Makefile:	ChangeLog
 	aclocal
-#	libtoolize --force --copy
+	autoheader
+	libtoolize --force
+	automake --add-missing
 	autoconf
-	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
-	   ./configure --prefix=/usr --sysconfdir=/etc			\
+	./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
-	   --enable-http --enable-static --enable-shared		\
+	   --enable-http --enable-shared --enable-static		\
 	   --enable-default-catalog=$(default-catalogs)			\
 	   --enable-default-search-path=$(default-sgml-path)
 
 
-build:	config.status
+build:	config.status Makefile
 	$(checkdir)
 	$(MAKE) SUBDIRS=lib CXXFLAGS="-O2 --pipe -D_REENTRANT"
 	$(MAKE)
@@ -97,7 +112,8 @@ build:	config.status
 
 clean:
 	$(checkdir)
-	[ ! -f Makefile ] || $(MAKE) maintainer-clean
+	[ ! -f Makefile ] || $(MAKE) clean
+	[ ! -f Makefile ] || $(MAKE) maintainer-clean || true
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libosp).shlibs					\
 	    debian/README.Debian debian/$(pkg-libosp).README.Debian
@@ -125,7 +141,7 @@ debian/substvars:
 debian/$(pkg-libosp).shlibs:
 #	 std shlibs file, with the first version that supplied the version
 #	  that applications should build with
-	echo "libosp      1 $(pkg-libosp) (>= $(SHLIBS_PKGVER))" > $@
+	echo "libosp      $(libosp-maj-ver) $(pkg-libosp) (>= $(SHLIBS_PKGVER))" > $@
 
 debian/README.Debian:	debian/README.Debian.in
 #	 substitute the catalog paths
@@ -153,6 +169,8 @@ install-opensp:	$(install-common) debian/README.Debian
 	    pkgdocdir=$(docdir-osp)
 #	 it insists on installing config.h
 	rm -rf $(prefix-osp)/usr/include
+#	 remove the extra docs installed from top-level Makefile
+	cd $(docdir-osp) && rm -f $(DOCS_TOO_MUCH)
 
 #	 install declarations
 	$(make_directory) $(sgmldir-osp)/declaration
@@ -166,7 +184,7 @@ install-opensp:	$(install-common) debian/README.Debian
 	$(install_script) unicode/gensyntax.pl $(libdir-osp)/unicode
 
 #	 doc-base etc
-	dh_installdocs -p$(pkg) NEWS AUTHORS README
+	dh_installdocs -p$(pkg) doc/*.htm
 #	 optionally, install upstream ChangeLog
 	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg) ChangeLog
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg)
@@ -186,17 +204,19 @@ install-libosp:	$(install-common) debian/$(pkg-libosp).README.Debian
 
 	$(make_directory) $(libdir-libosp)
 
-	$(MAKE) install SUBDIRS="lib"					\
+	$(MAKE) install SUBDIRS="lib po"				\
 	    prefix=$(SRCDIR)/$(prefix-libosp)/usr $(am_inst_flags)	\
 	    pkgdocdir=$(docdir-libosp)
 #	 it insists on installing config.h
 	rm -rf $(prefix-libosp)/usr/include
+#	 remove the extra docs installed from top-level Makefile
+	cd $(docdir-libosp) && rm -f $(DOCS_TOO_MUCH)
 
 	rm -f $(libdir-libosp)/*.so					\
 	    $(libdir-libosp)/*.a $(libdir-libosp)/*.la
 
 #	 install Debian-std docs
-	dh_installdocs -p$(pkg-libosp) NEWS AUTHORS README
+	dh_installdocs -p$(pkg-libosp)
 #	 optionally, install upstream ChangeLog
 	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg-libosp) ChangeLog
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg-libosp)
@@ -219,11 +239,13 @@ install-libosp-dev:	$(install-common) debian/$(pkg-libosp).README.Debian
 	$(MAKE) install SUBDIRS="lib generic include"			\
 	    prefix=$(SRCDIR)/$(prefix-libosp-dev)/usr $(am_inst_flags)	\
 	    pkgdocdir=$(docdir-libosp-dev)
+#	 remove the extra docs installed from top-level Makefile
+	cd $(docdir-libosp-dev) && rm -f $(DOCS_TOO_MUCH)
 
 	rm -f $(libdir-libosp-dev)/*.so.*
 
 #	 install Debian-std docs
-	dh_installdocs -p$(pkg-libosp-dev) NEWS AUTHORS README
+	dh_installdocs -p$(pkg-libosp-dev)
 #	 optionally, install upstream ChangeLog
 	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg-libosp-dev) ChangeLog
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg-libosp-dev)
@@ -241,15 +263,8 @@ binary-arch:	$(install-common) install-opensp install-libosp		\
 	dh_compress -a
 	dh_fixperms -a
 
-#	 we don't use dh_shlibsdeps because it wants to use it's
-#	 own wierd substvars file
-	cd $(prefix-libosp)/usr/lib && LD_LIBRARY_PATH=.		\
-	  dpkg-shlibdeps -pshlibs-$(pkg-libosp) -O lib*.so.*.*	 	\
-	  >> $(SRCDIR)/debian/substvars
-	LD_LIBRARY_PATH=$(prefix-libosp)/usr/lib			\
-	  dpkg-shlibdeps -pshlibs-$(pkg-osp) $(bindir-osp)/*
-
-	dh_gencontrol -a -- -Tdebian/substvars
+	dh_shlibdeps -l $(prefix-libosp)/usr/lib
+	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a
 

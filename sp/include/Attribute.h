@@ -249,9 +249,13 @@ public:
   const Vector<StringC> *getTokens() const;
   virtual AttributeDefinition *copy() const = 0;
   void setDeclaredValue(DeclaredValue *);
+  void setSpecified(Boolean implicit);
+  Boolean isSpecified(Boolean &implicit);
 private:
   virtual void buildDesc(AttributeDefinitionDesc &) const = 0;
   virtual AttributeValue *checkValue(AttributeValue *, AttributeContext &) const;
+  PackedBoolean implicit_;
+  PackedBoolean all_;
   StringC name_;
   CopyOwner<DeclaredValue> declaredValue_;
 };

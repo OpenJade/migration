@@ -110,9 +110,11 @@
 #ifdef SP_MULTI_BYTE
 #include "EUCJPCodingSystem.h"
 #include "Fixed2CodingSystem.h"
+#include "Fixed4CodingSystem.h"
 #include "SJISCodingSystem.h"
 #include "UnicodeCodingSystem.h"
 #include "UTF8CodingSystem.h"
+#include "UTF16CodingSystem.h"
 #ifdef WIN32
 #include "Win32CodingSystem.h"
 #endif

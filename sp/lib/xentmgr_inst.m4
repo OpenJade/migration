@@ -74,6 +74,7 @@ __instantiate(ConstPtr<CodingSystemKit>)
 __instantiate(Ptr<CodingSystemKit>)
 __instantiate(CharMap<Char>)
 #ifdef SP_MULTI_BYTE
+__instantiate(CharMapPlane<Char>)
 __instantiate(CharMapPage<Char>)
 __instantiate(CharMapColumn<Char>)
 #endif
@@ -81,6 +82,19 @@ __instantiate(CharMapResource<Char>)
 __instantiate(Ptr<CharMapResource<Char> >)
 __instantiate(ConstPtr<CharMapResource<Char> >)
 __instantiate(Owner<CharsetRegistry::Iter>)
+#ifdef SP_MULTI_BYTE
+__instantiate(CharMap<unsigned char>)
+__instantiate(CharMapPlane<unsigned char>)
+__instantiate(CharMapPage<unsigned char>)
+__instantiate(CharMapColumn<unsigned char>)
+__instantiate(CharMapResource<unsigned char>)
+__instantiate(Ptr<CharMapResource<unsigned char> >)
+__instantiate(ConstPtr<CharMapResource<unsigned char> >)
+__instantiate(String<unsigned short>)
+__instantiate(Vector<String<unsigned short> >)
+__instantiate(Ptr<CharMapResource<bool> >)
+__instantiate(Ptr<CharMapResource<unsigned short> >)
+#endif
 
 #ifdef SP_NAMESPACE
 }

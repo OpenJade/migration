@@ -27,20 +27,22 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove
 
 EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
-	InterpreterMessages.msg InterpreterMessages.rc \
-	DssslAppMessages.msg DssslAppMessages.rc \
+	InterpreterMessages.msg InterpreterMessages.rc InterpreterMessages.po \
+	DssslAppMessages.msg DssslAppMessages.rc DssslAppMessages.po \
 	style.dsp 
 
 BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
-	InterpreterMessages.h DssslAppMessages.h 
+	InterpreterMessages.h InterpreterMessages.cxx InterpreterMessages.rc \
+	InterpreterMessages.po DssslAppMessages.h DssslAppMessages.rc \
+	DssslAppMessages.po
 
 MSGGENFLAGS = -l xModule 
 
-SUFFIXES = .m4 .msg 
+SUFFIXES = .m4 .msg .rc .po
 
 .m4.cxx:
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
-%.h %.cxx %.rc: %.msg
+%.h %.cxx %.rc %.po: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
 

@@ -18,31 +18,31 @@ openjade_LDADD = $(top_builddir)/style/libostyle.la \
 
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove -I$(top_srcdir)/style
 
-EXTRA_DIST = JadeMessages.msg JadeMessages.rc \
-	HtmlMessages.msg HtmlMessages.rc \
-	RtfMessages.msg RtfMessages.rc \
-	TeXMessages.msg TeXMessages.rc \
-	MifMessages.msg MifMessages.rc \
+EXTRA_DIST = JadeMessages.msg JadeMessages.rc JadeMessages.po \
+	HtmlMessages.msg HtmlMessages.rc HtmlMessages.po \
+	RtfMessages.msg RtfMessages.rc RtfMessages.po \
+	TeXMessages.msg TeXMessages.rc TeXMessages.po \
+	MifMessages.msg MifMessages.rc MifMessages.po \
 	HtmlFOTBuilder_inst.m4 RtfFOTBuilder_inst.m4 \
 	TeXFOTBuilder_inst.m4 TransformFOTBuilder_inst.m4 \
 	MifFOTBuilder_inst.m4 jade.dsp jade.rc \
 	RtfOle.cxx RtfOle.h
 
-BUILT_SOURCES = JadeMessages.h JadeMessages.rc \
-	HtmlMessages.h HtmlMessages.rc \
-	RtfMessages.h RtfMessages.rc \
-	TeXMessages.h TeXMessages.rc \
-	MifMessages.h MifMessages.rc \
+BUILT_SOURCES = JadeMessages.h JadeMessages.rc JadeMessages.po \
+	HtmlMessages.h HtmlMessages.rc HtmlMessages.po \
+	RtfMessages.h RtfMessages.rc RtfMessages.po \
+	TeXMessages.h TeXMessages.rc TeXMessages.po \
+	MifMessages.h MifMessages.rc MifMessages.po \
 	HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx \
 	TeXFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx \
 	MifFOTBuilder_inst.cxx
 
 MSGGENFLAGS = -l xModule
 
-SUFFIXES = .msg .m4
+SUFFIXES = .msg .m4 .rc .po
 
 .m4.cxx:
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
-%.h %.cxx %.rc: %.msg
+%.h %.cxx %.rc %.po: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

@@ -15,13 +15,7 @@ EXTRA_DIST = grove_inst.m4 spgrove.dsp
 
 BUILT_SOURCES = grove_inst.cxx
 
-MSGGENFLAGS = -l xModule
-
-SUFFIXES = .m4 .msg
+SUFFIXES = .m4 
 
 .m4.cxx:
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
-
-%.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
-

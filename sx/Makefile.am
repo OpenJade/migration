@@ -7,7 +7,7 @@ EXTRA_DIST = XmlOutputMessages.msg SxMessages.msg sx_inst.m4
 
 osx_LDADD = $(top_builddir)/lib/libosp.la
 
-INCLUDES = $(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = XmlOutputMessages.h SxMessages.h sx_inst.cxx
 

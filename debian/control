@@ -3,6 +3,7 @@ Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
 Standards-Version: 3.1.1
+Build-Depends: debhelper, automake, libtool
 
 Package: opensp
 Architecture: any

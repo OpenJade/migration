@@ -77,7 +77,7 @@ ChangeLog:
 config.status:	ChangeLog
 	automake --add-missing
 	autoreconf
-	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
+	CFLAGS="-O2 -g --pipe" CXXFLAGS="-O2 -g --pipe" 		\
 	   ./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
 	   --enable-http --enable-shared				\
@@ -86,7 +86,7 @@ config.status:	ChangeLog
 
 build:	config.status
 	$(checkdir)
-	$(MAKE) SUBDIRS="grove spgrove style" CXXFLAGS="-O2 --pipe -D_REENTRANT"
+	$(MAKE) SUBDIRS="grove spgrove style" CXXFLAGS="-O2 -g --pipe -D_REENTRANT"
 	$(MAKE)
 	touch build
 
@@ -151,7 +151,7 @@ binary-arch:	build debian/copyright debian/substvars 		\
 	$(make_directory) $(libdir-openjade)/unicode
 	$(install_file) unicode/catalog unicode/demo.sgm unicode/unicode.syn \
 	    $(libdir-openjade)/unicode
-	$(install_file) unicode/unicode.sd $(libdir-openjade)/unicode/unicode.decl
+	$(install_file) unicode/unicode.sd $(libdir-openjade)/unicode/
 	$(install_script) unicode/gensyntax.pl $(libdir-openjade)/unicode
 
 #	 install man pages

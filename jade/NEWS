@@ -1,4 +1,4 @@
-Changes in OpenJade 1.4
+Changes in OpenJade 1.4-devel
 
 * The "media", "title" and "alternate" attributes in stylesheet PIs are 
   supported according to the HTML 4.0 specification.

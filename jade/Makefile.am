@@ -17,3 +17,11 @@ BUILT_SOURCES = config.h msggen.pl
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
 EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak jade-generate.mak
+
+dist-hook:
+	if test -f $(top_srcdir)/update-changelog; then \
+	  cd $(top_srcdir); \
+	  ./update-changelog; \
+	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
+        fi
+	

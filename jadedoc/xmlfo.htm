@@ -1,0 +1,553 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
+<title>Jade MIF backend</title>
+</head>
+
+<body background="../Arts/Background.gif">
+
+<p align="left"><font face="Geneva, Arial"><img
+src="../Arts/DSSSLTitle.gif" alt="OpenJade title" vspace="10"
+width="750" height="60"> </font></p>
+
+<p align="left">&nbsp; </p>
+<div align="left">
+
+<table border="0">
+    <tr>
+        <td><img src="../Arts/space.gif" width="145" height="10"></td>
+        <td><h1><font face="Arial">OpenJade XML Flow Object tree</font></h1>
+        <h1><font face="Arial">Backend</font></h1>
+        <h3><font face="Arial">Created by James Clark</font><font
+        face="Geneva, Arial"><br>
+        </font></h3>
+        <p><font face="Arial">The DTD for the XML generated is in
+        <code>dsssl/fot.dtd</code>. </font></p>
+        <p><font face="Arial">Characteristics declared with <code>declare-characteristic</code>
+        are not reported. </font></p>
+        <p><font face="Arial">Flow objects of classes declared
+        with <code>declare-flow-object</code> are not reported. </font></p>
+        <h3><font face="Arial">DTD</font></h3>
+        <hr>
+        <p>&lt;!-- Typical use:<br>
+        <br>
+        &lt;!DOCTYPE fot PUBLIC &quot;-//James Clark//DTD DSSSL
+        Flow Object Tree//EN&quot; &quot;fot.dtd&quot;&gt;<br>
+        <br>
+        --&gt;<br>
+        &lt;!ENTITY % length-spec &quot;CDATA&quot;&gt;<br>
+        &lt;!-- represents length-spec or #f; #f is represented
+        by empty value --&gt;<br>
+        &lt;!ENTITY % opt-length-spec &quot;CDATA&quot;&gt; <br>
+        &lt;!ENTITY % length &quot;NMTOKEN&quot;&gt;<br>
+        &lt;!ENTITY % enum &quot;NMTOKEN&quot;&gt;<br>
+        &lt;!ENTITY % enum-or-boolean &quot;NMTOKEN&quot;&gt;<br>
+        &lt;!ENTITY % boolean &quot;(true|false)&quot;&gt;<br>
+        <br>
+        &lt;!ENTITY % flow &quot;<br>
+        (paragraph<br>
+        |sequence<br>
+        |display-group<br>
+        |line-field<br>
+        |link<br>
+        |scroll<br>
+        |marginalia<br>
+        |leader<br>
+        |sideline<br>
+        |box<br>
+        |score<br>
+        |table-row<br>
+        |math-sequence<br>
+        |unmath<br>
+        |subscript<br>
+        |superscript<br>
+        |grid<br>
+        |grid-cell<br>
+        |paragraph-break<br>
+        |external-graphic<br>
+        |rule<br>
+        |alignment-point<br>
+        |table-column<br>
+        |character<br>
+        |simple-page-sequence<br>
+        |fraction<br>
+        |script<br>
+        |mark<br>
+        |fence<br>
+        |radical<br>
+        |math-operator<br>
+        |table<br>
+        |table-part<br>
+        |table-cell<br>
+        |multi-mode<br>
+        |page-number<br>
+        |text<br>
+        |sdata<br>
+        |a<br>
+        |define-glyph-subst-table)*&quot;&gt;<br>
+        <br>
+        &lt;!ELEMENT fot %flow;&gt;<br>
+        &lt;!ELEMENT text (#PCDATA)&gt;<br>
+        &lt;!ELEMENT sdata EMPTY&gt;<br>
+        &lt;!ATTLIST sdata name CDATA #REQUIRED text CDATA #REQUIRED&gt;<br>
+        <br>
+        &lt;!ELEMENT paragraph %flow;&gt;<br>
+        &lt;!ELEMENT sequence %flow;&gt;<br>
+        &lt;!ELEMENT display-group %flow;&gt;<br>
+        &lt;!ELEMENT line-field %flow;&gt;<br>
+        &lt;!ELEMENT link %flow;&gt;<br>
+        &lt;!ELEMENT scroll %flow;&gt;<br>
+        &lt;!ELEMENT marginalia %flow;&gt;<br>
+        &lt;!ELEMENT leader %flow;&gt;<br>
+        &lt;!ELEMENT sideline %flow;&gt;<br>
+        &lt;!ELEMENT box %flow;&gt;<br>
+        &lt;!ELEMENT score %flow;&gt;<br>
+        &lt;!ELEMENT table-row %flow;&gt;<br>
+        &lt;!ELEMENT math-sequence %flow;&gt;<br>
+        &lt;!ELEMENT unmath %flow;&gt;<br>
+        &lt;!ELEMENT subscript %flow;&gt;<br>
+        &lt;!ELEMENT superscript %flow;&gt;<br>
+        &lt;!ELEMENT grid %flow;&gt;<br>
+        &lt;!ELEMENT grid-cell %flow;&gt;<br>
+        &lt;!ELEMENT paragraph-break EMPTY&gt;<br>
+        &lt;!ELEMENT external-graphic EMPTY&gt;<br>
+        &lt;!ELEMENT rule EMPTY&gt;<br>
+        &lt;!ELEMENT alignment-point EMPTY&gt;<br>
+        &lt;!ELEMENT table-column EMPTY&gt;<br>
+        &lt;!ELEMENT character EMPTY&gt;<br>
+        <br>
+        &lt;!ELEMENT page-number EMPTY&gt;<br>
+        &lt;!ATTLIST page-number ref CDATA #IMPLIED&gt;<br>
+        <br>
+        &lt;!ELEMENT define-glyph-subst-table (glyph-subst*)&gt;<br>
+        &lt;!ATTLIST define-glyph-subst-table id ID #REQUIRED&gt;<br>
+        <br>
+        &lt;!ELEMENT glyph-subst EMPTY&gt;<br>
+        &lt;!ATTLIST glyph-subst old CDATA #REQUIRED new CDATA #REQUIRED&gt;<br>
+        <br>
+        &lt;!ELEMENT a EMPTY&gt;<br>
+        &lt;!ATTLIST a<br>
+        name CDATA #REQUIRED<br>
+        &gt;<br>
+        <br>
+        &lt;!ELEMENT simple-page-sequence<br>
+        ((simple-page-sequence.right-header<br>
+        |simple-page-sequence.center-header<br>
+        |simple-page-sequence.left-header<br>
+        |simple-page-sequence.right-footer<br>
+        |simple-page-sequence.center-footer<br>
+        |simple-page-sequence.left-footer)*,<br>
+        %flow;)<br>
+        &gt;<br>
+        <br>
+        &lt;!ELEMENT simple-page-sequence.left-header %flow;&gt;<br>
+        &lt;!ELEMENT simple-page-sequence.right-header %flow;&gt;<br>
+        &lt;!ELEMENT simple-page-sequence.center-header %flow;&gt;<br>
+        &lt;!ELEMENT simple-page-sequence.left-footer %flow;&gt;<br>
+        &lt;!ELEMENT simple-page-sequence.right-footer %flow;&gt;<br>
+        &lt;!ELEMENT simple-page-sequence.center-footer %flow;&gt;<br>
+        <br>
+        &lt;!ENTITY % hf &quot;<br>
+        front %boolean; #IMPLIED<br>
+        first %boolean; #IMPLIED<br>
+        &quot;&gt;<br>
+        <br>
+        &lt;!ATTLIST simple-page-sequence.right-header %hf;&gt;<br>
+        &lt;!ATTLIST simple-page-sequence.center-header %hf;&gt;<br>
+        &lt;!ATTLIST simple-page-sequence.left-footer %hf;&gt;<br>
+        &lt;!ATTLIST simple-page-sequence.right-footer %hf;&gt;<br>
+        &lt;!ATTLIST simple-page-sequence.center-footer %hf;&gt;<br>
+        <br>
+        &lt;!ELEMENT table<br>
+        (table.before-row-border, table.after-row-border,<br>
+        table.before-column-border, table.after-column-border,<br>
+        %flow;)&gt;<br>
+        <br>
+        &lt;!ELEMENT table.before-row-border EMPTY&gt;<br>
+        &lt;!ELEMENT table.after-row-border EMPTY&gt;<br>
+        &lt;!ELEMENT table.before-column-border EMPTY&gt;<br>
+        &lt;!ELEMENT table.after-column-border EMPTY&gt;<br>
+        <br>
+        &lt;!ELEMENT table-part<br>
+        (table-part.principal, table-part.header, table-part.footer)<br>
+        &gt;<br>
+        <br>
+        &lt;!ELEMENT table-part.header %flow;&gt;<br>
+        &lt;!ELEMENT table-part.footer %flow;&gt;<br>
+        &lt;!ELEMENT table-part.principal %flow;&gt;<br>
+        <br>
+        &lt;!ELEMENT table-cell<br>
+        (table-cell.before-row-border, table-cell.after-row-border,<br>
+        table-cell.before-column-border, table-cell.after-column-border,<br>
+        %flow;)&gt;<br>
+        <br>
+        &lt;!ELEMENT table-cell.before-row-border EMPTY&gt;<br>
+        &lt;!ELEMENT table-cell.after-row-border EMPTY&gt;<br>
+        &lt;!ELEMENT table-cell.before-column-border EMPTY&gt;<br>
+        &lt;!ELEMENT table-cell.after-column-border EMPTY&gt;<br>
+        <br>
+        &lt;!ELEMENT fraction<br>
+        (fraction.fraction-bar, fraction.numerator, fraction.denominator)&gt;<br>
+        &lt;!ELEMENT fraction.numerator %flow;&gt;<br>
+        &lt;!ELEMENT fraction.denominator %flow;&gt;<br>
+        &lt;!ELEMENT fraction.fraction-bar EMPTY&gt;<br>
+        <br>
+        &lt;!ELEMENT script (script.principal,<br>
+        script.pre-sup, script.pre-sub,<br>
+        script.post-sup, script.post-sub,<br>
+        script.mid-sup, script.mid-sub)&gt;<br>
+        <br>
+        &lt;!ELEMENT script.principal %flow;&gt;<br>
+        &lt;!ELEMENT script.pre-sup %flow;&gt;<br>
+        &lt;!ELEMENT script.pre-sub %flow;&gt;<br>
+        &lt;!ELEMENT script.post-sup %flow;&gt;<br>
+        &lt;!ELEMENT script.post-sub %flow;&gt;<br>
+        &lt;!ELEMENT script.mid-sup %flow;&gt;<br>
+        &lt;!ELEMENT script.mid-sub %flow;&gt;<br>
+        <br>
+        &lt;!ELEMENT mark (mark.principal, mark.over-mark, mark.under-mark)&gt;<br>
+        &lt;!ELEMENT mark.principal %flow;&gt;<br>
+        &lt;!ELEMENT mark.over-mark %flow;&gt;<br>
+        &lt;!ELEMENT mark.under-mark %flow;&gt;<br>
+        <br>
+        &lt;!ELEMENT fence (fence.principal, fence.open, fence.close)&gt;<br>
+        &lt;!ELEMENT fence.principal %flow;&gt;<br>
+        &lt;!ELEMENT fence.open %flow;&gt;<br>
+        &lt;!ELEMENT fence.close %flow;&gt;<br>
+        <br>
+        &lt;!ELEMENT radical (radical.radical?, radical.principal,
+        radical.degree)&gt;<br>
+        &lt;!ELEMENT radical.principal %flow;&gt;<br>
+        &lt;!ELEMENT radical.degree %flow;&gt;<br>
+        &lt;!ELEMENT radical.radical EMPTY&gt;<br>
+        <br>
+        &lt;!ELEMENT math-operator (math-operator.principal, math-operator.operator,<br>
+        math-operator.lower-limit, math-operator.upper-limit)&gt;<br>
+        &lt;!ELEMENT math-operator.principal %flow;&gt;<br>
+        &lt;!ELEMENT math-operator.operator %flow;&gt;<br>
+        &lt;!ELEMENT math-operator.lower-limit %flow;&gt;<br>
+        &lt;!ELEMENT math-operator.upper-limit %flow;&gt;<br>
+        <br>
+        &lt;!ELEMENT multi-mode (multi-mode.mode, multi-mode.mode+)&gt;<br>
+        &lt;!ELEMENT multi-mode.mode %flow;&gt;<br>
+        &lt;!ATTLIST multi-mode.mode<br>
+        name CDATA #IMPLIED<br>
+        desc CDATA #IMPLIED<br>
+        &gt;<br>
+        <br>
+        &lt;!ENTITY % inherited-characteristics &quot;<br>
+        font-size %length; #IMPLIED<br>
+        font-family-name CDATA #IMPLIED<br>
+        font-weight %enum-or-boolean; #IMPLIED<br>
+        font-posture %enum-or-boolean; #IMPLIED<br>
+        start-indent %length-spec; #IMPLIED<br>
+        end-indent %length-spec; #IMPLIED<br>
+        first-line-start-indent %length-spec; #IMPLIED<br>
+        last-line-end-indent %length-spec; #IMPLIED<br>
+        line-spacing %length-spec; #IMPLIED<br>
+        min-pre-line-spacing %opt-length-spec; #IMPLIED<br>
+        min-post-line-spacing %opt-length-spec; #IMPLIED<br>
+        min-leading %opt-length-spec; #IMPLIED<br>
+        field-width %length-spec; #IMPLIED<br>
+        lines %enum; #IMPLIED<br>
+        quadding %enum; #IMPLIED<br>
+        display-alignment %enum; #IMPLIED<br>
+        field-align %enum; #IMPLIED<br>
+        marginalia-side %enum; #IMPLIED<br>
+        principal-mode-simultaneous %boolean; #IMPLIED<br>
+        marginalia-sep %length-spec; #IMPLIED<br>
+        marginalia-keep-with-previous %boolean; #IMPLIED<br>
+        grid-equidistant-rows %boolean; #IMPLIED<br>
+        grid-equidistant-columns %boolean; #IMPLIED<br>
+        color CDATA #IMPLIED<br>
+        background-color CDATA #IMPLIED<br>
+        page-width %length; #IMPLIED<br>
+        page-height %length; #IMPLIED<br>
+        left-margin %length; #IMPLIED<br>
+        right-margin %length; #IMPLIED<br>
+        top-margin %length; #IMPLIED<br>
+        bottom-margin %length; #IMPLIED<br>
+        header-margin %length; #IMPLIED<br>
+        footer-margin %length; #IMPLIED<br>
+        border-present %boolean; #IMPLIED<br>
+        hyphenate %boolean; #IMPLIED<br>
+        kern %boolean; #IMPLIED<br>
+        ligature %boolean; #IMPLIED<br>
+        score-spaces %boolean; #IMPLIED<br>
+        float-out-marginalia %boolean; #IMPLIED<br>
+        float-out-sidelines %boolean; #IMPLIED<br>
+        float-out-line-numbers %boolean; #IMPLIED<br>
+        cell-background %boolean; #IMPLIED<br>
+        span-weak %boolean; #IMPLIED<br>
+        ignore-record-end %boolean; #IMPLIED<br>
+        numbered-lines %boolean; #IMPLIED<br>
+        hanging-punct %boolean; #IMPLIED<br>
+        box-open-end %boolean; #IMPLIED<br>
+        truncate-leader %boolean; #IMPLIED<br>
+        align-leader %boolean; #IMPLIED<br>
+        table-part-omit-middle-header %boolean; #IMPLIED<br>
+        table-part-omit-middle-footer %boolean; #IMPLIED<br>
+        border-omit-at-break %boolean; #IMPLIED<br>
+        line-join %enum; #IMPLIED<br>
+        line-cap %enum; #IMPLIED<br>
+        line-number-side %enum; #IMPLIED<br>
+        kern-mode %enum; #IMPLIED<br>
+        input-whitespace-treatment %enum; #IMPLIED<br>
+        filling-direction %enum; #IMPLIED<br>
+        writing-mode %enum; #IMPLIED<br>
+        last-line-quadding %enum; #IMPLIED<br>
+        math-display-mode %enum; #IMPLIED<br>
+        script-pre-align %enum; #IMPLIED<br>
+        script-post-align %enum; #IMPLIED<br>
+        script-mid-sup-align %enum; #IMPLIED<br>
+        script-mid-sub-align %enum; #IMPLIED<br>
+        numerator-align %enum; #IMPLIED<br>
+        denominator-align %enum; #IMPLIED<br>
+        grid-position-cell-type %enum; #IMPLIED<br>
+        grid-column-alignment %enum; #IMPLIED<br>
+        grid-row-Alignment %enum; #IMPLIED<br>
+        box-type %enum; #IMPLIED<br>
+        glyph-alignment-mode %enum; #IMPLIED<br>
+        box-border-alignment %enum; #IMPLIED<br>
+        cell-row-alignment %enum; #IMPLIED<br>
+        border-alignment %enum; #IMPLIED<br>
+        sideline-side %enum; #IMPLIED<br>
+        hyphenation-keep %enum-or-boolean; #IMPLIED<br>
+        font-structure %enum-or-boolean; #IMPLIED<br>
+        font-proportionate-width %enum-or-boolean; #IMPLIED<br>
+        cell-crossed %enum-or-boolean; #IMPLIED<br>
+        position-point-shift %length-spec; #IMPLIED<br>
+        start-margin %length-spec; #IMPLIED<br>
+        end-margin %length-spec; #IMPLIED<br>
+        sideline-sep %length-spec; #IMPLIED<br>
+        asis-wrap-indent %length-spec; #IMPLIED<br>
+        line-number-sep %length-spec; #IMPLIED<br>
+        last-line-justify-limit %length-spec; #IMPLIED<br>
+        justify-glyph-space-max-add %length-spec; #IMPLIED<br>
+        justify-glyph-space-max-remove %length-spec; #IMPLIED<br>
+        table-corner-radius %length-spec; #IMPLIED<br>
+        box-corner-radius %length-spec; #IMPLIED<br>
+        line-thickness %length; #IMPLIED<br>
+        cell-before-row-margin %length; #IMPLIED<br>
+        cell-after-row-margin %length; #IMPLIED<br>
+        cell-before-column-margin %length; #IMPLIED<br>
+        cell-after-column-margin %length; #IMPLIED<br>
+        line-sep %length; #IMPLIED<br>
+        box-size-before %length; #IMPLIED<br>
+        box-size-after %length; #IMPLIED<br>
+        country NMTOKEN #IMPLIED<br>
+        language NMTOKEN #IMPLIED<br>
+        expand-tabs NMTOKEN #IMPLIED<br>
+        hyphenation-ladder-count NMTOKEN #IMPLIED<br>
+        layer NMTOKEN #IMPLIED<br>
+        background-layer NMTOKEN #IMPLIED<br>
+        border-priority NMTOKEN #IMPLIED<br>
+        line-repeat NMTOKEN #IMPLIED<br>
+        span NMTOKEN #IMPLIED<br>
+        min-leader-repeat NMTOKEN #IMPLIED<br>
+        hyphenation-remain-char-count NMTOKEN #IMPLIED<br>
+        hyphenation-push-char-count NMTOKEN #IMPLIED<br>
+        widow-count NMTOKEN #IMPLIED<br>
+        orphan-count NMTOKEN #IMPLIED<br>
+        background-tile CDATA #IMPLIED<br>
+        line-breaking-method CDATA #IMPLIED<br>
+        line-composition-method CDATA #IMPLIED<br>
+        implicit-bidi-method CDATA #IMPLIED<br>
+        glyph-subst-method CDATA #IMPLIED<br>
+        glyph-reorder-method CDATA #IMPLIED<br>
+        hyphenation-method CDATA #IMPLIED<br>
+        table-auto-width-method CDATA #IMPLIED<br>
+        font-name CDATA #IMPLIED<br>
+        escapement-space-before CDATA #IMPLIED<br>
+        escapement-space-after CDATA #IMPLIED<br>
+        glyph-subst-table NMTOKENS #IMPLIED<br>
+        &quot;&gt;<br>
+        <br>
+        &lt;!ENTITY % display-nic &quot;<br>
+        position-preference %enum-or-boolean; #IMPLIED<br>
+        keep-with-next %boolean; 'false'<br>
+        keep-with-previous %boolean; 'false'<br>
+        may-violate-keep-before %boolean; 'false'<br>
+        may-violate-keep-after %boolean; 'false'<br>
+        keep %enum-or-boolean; #IMPLIED<br>
+        break-before %enum-or-boolean; #IMPLIED<br>
+        break-after %enum-or-boolean; #IMPLIED<br>
+        space-before CDATA #IMPLIED<br>
+        space-before-conditional %boolean; #IMPLIED<br>
+        space-before-priority NMTOKEN #IMPLIED<br>
+        space-after CDATA #IMPLIED<br>
+        space-after-conditional %boolean; #IMPLIED<br>
+        space-after-priority NMTOKEN #IMPLIED<br>
+        &quot;&gt;<br>
+        <br>
+        &lt;!ENTITY % inline-nic &quot;<br>
+        break-before-priority NMTOKEN #IMPLIED<br>
+        break-after-priority NMTOKEN #IMPLIED<br>
+        &quot;&gt;<br>
+        <br>
+        &lt;!ATTLIST sequence %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST line-field %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST simple-page-sequence %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST fraction %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST fraction.fraction-bar %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST math-sequence %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST unmath %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST subscript %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST superscript %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST script %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST mark %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST fence %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST radical %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST math-operator %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST sideline %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST scroll %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST marginalia %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST multi-mode %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table-row %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table.before-row-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table.after-row-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table.before-column-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table.after-column-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table-cell.before-row-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table-cell.after-row-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table-cell.before-column-border %inherited-characteristics;&gt;<br>
+        &lt;!ATTLIST table-cell.after-column-border %inherited-characteristics;&gt;<br>
+        <br>
+        &lt;!ATTLIST table-column<br>
+        column-number NMTOKEN #REQUIRED<br>
+        n-columns-spanned NMTOKEN #IMPLIED<br>
+        width %length-spec; #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST table<br>
+        width %length-spec; #IMPLIED<br>
+        minimum-width %boolean; &quot;false&quot;<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!-- column-number of 0 has a special meaning: it
+        identifies a dummy cell that<br>
+        can be used to fill out the row if it later proves
+        necessary to do so --&gt;<br>
+        &lt;!ATTLIST table-cell<br>
+        column-number NMTOKEN #REQUIRED<br>
+        n-columns-spanned NMTOKEN #IMPLIED<br>
+        n-rows-spanned NMTOKEN #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST link<br>
+        destination CDATA #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST box<br>
+        display %boolean; &quot;false&quot;<br>
+        %display-nic;<br>
+        %inline-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST score<br>
+        type (before|through|after|char) #IMPLIED<br>
+        type.length-spec %length-spec; #IMPLIED<br>
+        char CDATA #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST leader<br>
+        length %length-spec; #IMPLIED<br>
+        %inherited-characteristics;<br>
+        %inline-nic;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST rule<br>
+        orientation (horizontal|vertical|escapement|line-progression)<br>
+        #REQUIRED<br>
+        length %length-spec; #IMPLIED<br>
+        %display-nic;<br>
+        %inline-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST external-graphic<br>
+        display %boolean; &quot;false&quot;<br>
+        scale %enum; #IMPLIED<br>
+        scale-x NMTOKEN #IMPLIED<br>
+        scale-y NMTOKEN #IMPLIED<br>
+        max-width %length-spec; #IMPLIED<br>
+        max-height %length-spec; #IMPLIED<br>
+        entity-system-id CDATA #REQUIRED<br>
+        notation-system-id CDATA #REQUIRED<br>
+        escapement-direction %enum; #IMPLIED<br>
+        position-point-x %length-spec; #IMPLIED<br>
+        position-point-y %length-spec; #IMPLIED<br>
+        %inline-nic;<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST display-group<br>
+        coalesce-id CDATA #IMPLIED<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST paragraph<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST paragraph-break<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST table-part<br>
+        %display-nic;<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ENTITY % character-c &quot;<br>
+        char CDATA #IMPLIED<br>
+        glyph-id CDATA #IMPLIED<br>
+        drop-after-line-break %boolean; #IMPLIED<br>
+        drop-unless-before-line-break %boolean; #IMPLIED<br>
+        punct %boolean; #IMPLIED<br>
+        space %boolean; #IMPLIED<br>
+        input-tab %boolean; #IMPLIED<br>
+        input-whitespace %boolean; #IMPLIED<br>
+        record-end %boolean; #IMPLIED<br>
+        break-before-priority NMTOKEN #IMPLIED<br>
+        break-after-priority NMTOKEN #IMPLIED<br>
+        math-font-posture %enum-or-boolean; #IMPLIED<br>
+        math-class %enum; #IMPLIED<br>
+        script CDATA #IMPLIED<br>
+        %inherited-characteristics;&quot;&gt;<br>
+        <br>
+        &lt;!ATTLIST character %character-c;&gt;<br>
+        &lt;!ATTLIST radical.radical %character-c;&gt;<br>
+        <br>
+        &lt;!ATTLIST grid<br>
+        grid-n-columns NMTOKEN #IMPLIED<br>
+        grid-n-rows NMTOKEN #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        <br>
+        &lt;!ATTLIST grid-cell<br>
+        column-number NMTOKEN #IMPLIED<br>
+        row-number NMTOKEN #IMPLIED<br>
+        %inherited-characteristics;<br>
+        &gt;<br>
+        </p>
+        </td>
+    </tr>
+</table>
+</div>
+</body>
+</html>

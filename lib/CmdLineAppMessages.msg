@@ -26,3 +26,5 @@ I1+hHelp++Show this help text.
 +file++FILE
 +noArg++NOTHING
 I0+tryHelpOptionForInfo++Try the "--help" option for more information.
++someArg++ARG
+I1+undocOption++Undocumented option (check the application's manual).

@@ -58,6 +58,9 @@ protected:
   virtual void changeOptionRegistration(AppChar oldc, AppChar newc);
   virtual void registerUsage(const MessageType1 &u);
   virtual void registerInfo(const MessageType0 &i, bool pre = 0);
+  // This is for backwards compability. Note that the second argument is the */
+  // argument name and not the long option name as above.
+  virtual void registerOption(AppChar c, const AppChar* argName =0);
   virtual int init(int argc, AppChar **argv);
   void resetCodingSystemKit();
   static Boolean stringMatches(const AppChar *s, const char *key);

@@ -91,6 +91,32 @@ typedef ConstPtr<SelectElementsNodeListObj::PatternSet> Dummy_3;
 #endif
 #endif
 #endif
+#ifdef __DECCXX
+#pragma define_template Vector<ELObj*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ELObj*>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<ELObj*>;
+#else
+typedef Vector<ELObj*> Dummy_4;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<InsnPtr>
+#else
+#ifdef __xlC__
+#pragma define(Vector<InsnPtr>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<InsnPtr>;
+#else
+typedef Vector<InsnPtr> Dummy_5;
+#endif
+#endif
+#endif
 
 #ifdef SP_NAMESPACE
 }

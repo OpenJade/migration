@@ -71,6 +71,7 @@ public:
   ParserState::entityCatalog;
   ParserState::baseDtd;
   ParserState::options;
+  ParserState::instantiateDtd;
 private:
   Parser(const Parser &);	// undefined
   void operator=(const Parser &); // undefined
@@ -394,6 +395,8 @@ private:
   Boolean parseTagNameGroup(Boolean &active);
   void parseGroupStartTag();
   void parseGroupEndTag();
+  StartElementEvent *doParseStartTag(Boolean &netEnabling);
+  EndElementEvent *doParseEndTag();
   Boolean skipAttributeSpec();
   Boolean lookingAtStartTag(StringC &gi);
   void implyDtd(const StringC &gi);
@@ -402,6 +405,7 @@ private:
   void addCommonAttributes(Dtd &dtd);
   Boolean parseAfdrDecl();
   void setSdOverrides(Sd &sd);
+  StringC sysid_;
 };
 
 #ifdef SP_NAMESPACE

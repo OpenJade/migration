@@ -258,10 +258,11 @@ Boolean Parser::parseParam(const AllowedParams &allow,
 
 void Parser::paramInvalidToken(Token token, const AllowedParams &allow)
 {
-  message(ParserMessages::paramInvalidToken,
-	  TokenMessageArg(token, allow.mainMode(),
-			  syntaxPointer(), sdPointer()),
-	  AllowedParamsMessageArg(allow, syntaxPointer()));
+  if (!allow.silent())
+    message(ParserMessages::paramInvalidToken,
+	    TokenMessageArg(token, allow.mainMode(),
+			    syntaxPointer(), sdPointer()),
+	    AllowedParamsMessageArg(allow, syntaxPointer()));
 }
 
 Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
@@ -317,6 +318,8 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       }
       if (sd().datatag())
 	message(ParserMessages::datatagNotImplemented);
+      if (!defDtd().isBase())
+	message(ParserMessages::datatagBaseDtd);
       if (currentMarkup())
 	currentMarkup()->addDelim(Syntax::dDTGO);
       return parseDataTagGroup(nestingLevel + 1, declInputLevel, gt);
@@ -596,6 +599,14 @@ Boolean Parser::parseTagNameGroup(Boolean &active)
   if (!parseNameGroup(inputLevel(), parm))
     return 0;
   active = 0;
+  for (size_t i = 0; i < parm.nameTokenVector.size(); i++) {
+    Ptr<Dtd> dtd = lookupDtd(parm.nameTokenVector[i].name).pointer();
+    if (!dtd.isNull()) {
+      instantiateDtd(dtd);
+      if (currentDtdPointer() == dtd)
+	active = 1;
+    }
+  }
   return 1;
 }
 

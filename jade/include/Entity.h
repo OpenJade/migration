@@ -35,7 +35,7 @@ class SubdocEntity;
 class InternalEntity;
 class Notation;
 
-class Entity : public EntityDecl {
+class SP_API Entity : public EntityDecl {
 public:
   Entity(const StringC &name, DeclType declType, DataType dataType,
 	 const Location &defLocation);
@@ -76,6 +76,7 @@ public:
   void setDefaulted();
   Boolean defaulted() const;
 protected:
+  virtual void checkRef(ParserState &) const;
   static void checkEntlvl(ParserState &);
   Boolean checkNotOpen(ParserState &) const;
 private:
@@ -86,7 +87,7 @@ private:
   PackedBoolean defaulted_;
 };
 
-class InternalEntity : public Entity {
+class SP_API InternalEntity : public Entity {
 public:
   InternalEntity(const StringC &, DeclType declType, DataType dataType,
 		 const Location &, Text &);
@@ -94,6 +95,7 @@ public:
   const Text &text() const;
   const InternalEntity *asInternalEntity() const;
 protected:
+  void checkRef(ParserState &) const;
   Text text_;
 };
 
@@ -113,7 +115,7 @@ public:
   Entity *copy() const;
 };
 
-class InternalDataEntity : public InternalEntity {
+class SP_API InternalDataEntity : public InternalEntity {
 public:
   InternalDataEntity(const StringC &, DataType, const Location &, Text &);
   void declReference(ParserState &,
@@ -121,7 +123,7 @@ public:
   Boolean isDataOrSubdoc() const;
 };
 
-class InternalCdataEntity : public InternalDataEntity {
+class SP_API InternalCdataEntity : public InternalDataEntity {
 public:
   InternalCdataEntity(const StringC &, const Location &, Text &);
   void normalReference(ParserState &,
@@ -134,7 +136,15 @@ public:
   Boolean isCharacterData() const;
 };
 
-class InternalSdataEntity : public InternalDataEntity {
+class SP_API PredefinedEntity : public InternalCdataEntity {
+public:
+  PredefinedEntity(const StringC &s, const Location &l, Text &t)
+   : InternalCdataEntity(s,l,t) { }
+protected:
+  void checkRef(ParserState &) const;
+};
+
+class SP_API InternalSdataEntity : public InternalDataEntity {
 public:
   InternalSdataEntity(const StringC &, const Location &, Text &);
   void normalReference(ParserState &,
@@ -147,7 +157,7 @@ public:
   Boolean isCharacterData() const;
 };
 
-class InternalTextEntity : public InternalEntity {
+class SP_API InternalTextEntity : public InternalEntity {
 public:
   enum Bracketed {
     none,
@@ -169,7 +179,7 @@ private:
   Bracketed bracketed_;
 };
 
-class ExternalEntity : public Entity {
+class SP_API ExternalEntity : public Entity {
 public:
   ExternalEntity(const StringC &, DeclType, DataType, const Location &,
 		 const ExternalId &);
@@ -179,11 +189,13 @@ public:
   const StringC *systemIdPointer() const;
   const StringC *effectiveSystemIdPointer() const;
   const StringC *publicIdPointer() const;
+protected:
+  void checkRef(ParserState &) const;
 private:
   ExternalId externalId_;
 };
 
-class ExternalTextEntity : public ExternalEntity {
+class SP_API ExternalTextEntity : public ExternalEntity {
 public:
   ExternalTextEntity(const StringC &, DeclType, const Location &,
 		     const ExternalId &);
@@ -197,9 +209,9 @@ private:
 		    Boolean) const;
 };
 
-class ExternalNonTextEntity : public ExternalEntity {
+class SP_API ExternalNonTextEntity : public ExternalEntity {
 public:
-  ExternalNonTextEntity(const StringC &, DataType,
+  ExternalNonTextEntity(const StringC &, DeclType, DataType,
 			const Location &, const ExternalId &);
   Boolean isDataOrSubdoc() const;
   void litReference(Text &, ParserState &,
@@ -210,14 +222,16 @@ public:
   void normalReference(ParserState &,
 		       const Ptr<EntityOrigin> &,
 		       Boolean) const;
+  void dsReference(ParserState &,
+		   const Ptr<EntityOrigin> &) const;
   Boolean isCharacterData() const;
 };
 
-class ExternalDataEntity : public ExternalNonTextEntity {
+class SP_API ExternalDataEntity : public ExternalNonTextEntity {
 public:
   ExternalDataEntity(const StringC &, DataType, const Location &,
 		     const ExternalId &, const ConstPtr<Notation> &,
-		     AttributeList &);
+		     AttributeList &, DeclType = generalEntity);
   const AttributeList &attributes() const;
   const Notation *notation() const;
   const ExternalDataEntity *asExternalDataEntity() const;
@@ -230,7 +244,7 @@ private:
   AttributeList attributes_;
 };
 
-class SubdocEntity : public ExternalNonTextEntity {
+class SP_API SubdocEntity : public ExternalNonTextEntity {
 public:
   SubdocEntity(const StringC &, const Location &, const ExternalId &);
   const SubdocEntity *asSubdocEntity() const;
@@ -240,7 +254,7 @@ public:
 private:
 };
 
-class IgnoredEntity : public Entity {
+class SP_API IgnoredEntity : public Entity {
 public:
   IgnoredEntity(const StringC &, DeclType declType);
   Entity *copy() const;
@@ -328,6 +342,7 @@ const Notation *ExternalDataEntity::notation() const
 {
   return notation_.pointer();
 }
+
 
 #ifdef SP_NAMESPACE
 }

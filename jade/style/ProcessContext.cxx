@@ -13,10 +13,52 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class RootValidator : public ProcessContext::Validator {
+public:
+  RootValidator()
+    : s_(sNone) { }
+  bool isValid(const FlowObj &, ProcessContext &);
+  bool charsValid(size_t, const Location &, ProcessContext &);
+private:
+  enum {
+    sNone,
+    sScroll,
+    sPaging
+  };
+  int s_;
+};
+
+class NoPrincipalPortValidator : public ProcessContext::Validator {
+public:
+  NoPrincipalPortValidator() : errorFlag_(false) { }
+  bool isValid(const FlowObj &fo, ProcessContext &context) {
+    return charsValid(1, fo.location(), context);
+  }
+  bool charsValid(size_t, const Location &loc, ProcessContext &context) {
+    if (!errorFlag_) {
+      Interpreter &interp = *context.vm().interp;
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::noPrincipalPort);
+      errorFlag_ = true;
+    }
+    return false;
+  }
+private:
+  bool errorFlag_;
+};
+
 ProcessContext::ProcessContext(Interpreter &interp, FOTBuilder &fotb)
-: Collector::DynamicRoot(interp), vm_(interp), flowObjLevel_(0), havePageType_(0), connectableStackLevel_(0)
+: Collector::DynamicRoot(interp), vm_(interp), flowObjLevel_(0),
+  havePageType_(0), connectableStackLevel_(0)
 {
   connectionStack_.insert(new Connection(&fotb));
+  validatorStack_.push_back(new RootValidator);
+}
+
+ProcessContext::~ProcessContext()
+{
+  ASSERT(validatorStack_.size() == 1);
+  ASSERT(invalidLevels_.size() == 0);
 }
 
 void ProcessContext::process(const NodePtr &node)
@@ -27,7 +69,7 @@ void ProcessContext::process(const NodePtr &node)
     currentStyleStack().push(style, vm(), currentFOTBuilder());
     currentFOTBuilder().startSequence();
   }
-  processNode(node, interp.initialProcessingMode());
+  processNode(node, interp.initialProcessingMode(), Location());
   if (style) {
     currentFOTBuilder().endSequence();
     currentStyleStack().pop();
@@ -36,6 +78,7 @@ void ProcessContext::process(const NodePtr &node)
 
 void ProcessContext::processNodeSafe(const NodePtr &nodePtr,
 				     const ProcessingMode *processingMode,
+				     const Location &loc,
 				     bool chunk)
 {
   unsigned long elementIndex;
@@ -56,21 +99,22 @@ void ProcessContext::processNodeSafe(const NodePtr &nodePtr,
     e.elementIndex = elementIndex;
     e.groveIndex = groveIndex;
     e.processingMode = processingMode;
-    processNode(nodePtr, processingMode, chunk);
+    processNode(nodePtr, processingMode, loc, chunk);
     nodeStack_.resize(nodeStack_.size() - 1);
   }
   else
-    processNode(nodePtr, processingMode, chunk);
+    processNode(nodePtr, processingMode, loc, chunk);
 }
 
 void ProcessContext::processNode(const NodePtr &nodePtr,
 				 const ProcessingMode *processingMode,
+				 const Location &loc,
 				 bool chunk)
 {
   ASSERT(processingMode != 0);
   GroveString str;
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
-    currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
+    charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1, loc);
   else {
     EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
     ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
@@ -86,7 +130,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
 	  currentStyleStack().pushEnd(vm(), currentFOTBuilder());
 	  currentFOTBuilder().startSequence();
 	}
-        processChildren(processingMode);
+        processChildren(processingMode, loc);
 	break;
       }
       if (!matchSpecificity_.isStyle()) {
@@ -103,7 +147,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
 	  ELObj *obj = vm().eval(insn.pointer());
 	  if (vm_.interp->isError(obj)) {
 	    if (processingMode->name().size() == 0)
-	      processChildren(processingMode);
+	      processChildren(processingMode, loc);
 	  }
 	  else {
 	    ELObjDynamicRoot protect(*vm_.interp, obj);
@@ -133,7 +177,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   }
 }
 
-void ProcessContext::nextMatch(StyleObj *overridingStyle)
+void ProcessContext::nextMatch(StyleObj *overridingStyle, const Location &loc)
 {
   ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
   StyleObj *saveOverridingStyle = vm().overridingStyle;
@@ -152,7 +196,7 @@ void ProcessContext::nextMatch(StyleObj *overridingStyle)
     else {
       ELObj *obj = vm().eval(insn.pointer());
       if (vm_.interp->isError(obj)) 
-	processChildren(vm().processingMode);
+	processChildren(vm().processingMode, loc);
       else {
 	ELObjDynamicRoot protect(*vm_.interp, obj);
 	((SosofoObj *)obj)->process(*this);
@@ -160,46 +204,39 @@ void ProcessContext::nextMatch(StyleObj *overridingStyle)
     }
   }
   else
-    processChildren(vm().processingMode);
+    processChildren(vm().processingMode, loc);
   vm().overridingStyle = saveOverridingStyle;
   matchSpecificity_ = saveSpecificity;
 }
 
-void ProcessContext::processChildren(const ProcessingMode *processingMode)
+void ProcessContext::processChildren(const ProcessingMode *processingMode,
+				     const Location &loc)
 {
   if (vm().currentNode.assignFirstChild() == accessOK) {
     do {
-      processNode(vm().currentNode, processingMode);
+      processNode(vm().currentNode, processingMode, loc);
     } while (vm().currentNode.assignNextChunkSibling() == accessOK);
   }
   else if (vm().currentNode->getDocumentElement(vm().currentNode) == accessOK)
-    processNode(vm().currentNode, processingMode);
+    processNode(vm().currentNode, processingMode, loc);
 }
 
 inline
-bool isWhiteSpace(Char c)
+bool isWhiteSpace(Char c, Interpreter &interp)
 {
-  switch (c) {
-  case '\f':
-  case '\r':
-  case '\n':
-  case '\t':
-  case ' ':
-    return 1;
-  }
-  return 0;
+  return interp.isInputWhitespace().getValue(c);
 }
 
 static
-bool onlyWhiteSpaceFollows(const NodePtr &node, const SdataMapper &mapper)
+bool onlyWhiteSpaceFollows(const NodePtr &node, Interpreter &interp)
 {
   NodePtr tem;
   if (node->nextChunkSibling(tem) == accessOK) {
     do {
       GroveString str;
-      if (tem->charChunk(mapper, str) == accessOK) {
+      if (tem->charChunk(interp, str) == accessOK) {
 	for (size_t i = 0; i < str.size(); i++)
-	  if (!isWhiteSpace(str[i]))
+	  if (!isWhiteSpace(str[i], interp))
 	    return 0;
       }
       else if (tem->getGi(str) == accessOK)
@@ -209,7 +246,8 @@ bool onlyWhiteSpaceFollows(const NodePtr &node, const SdataMapper &mapper)
   return 1;
 }
 
-void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
+void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode,
+					 const Location &loc)
 {
   if (vm().currentNode.assignFirstChild() == accessOK) {
     bool atStart = 1;
@@ -221,7 +259,7 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 	  const Char *s = str.data();
 	  size_t n = str.size();
 	  for (; n > 0; n--, s++) {
-	    if (!isWhiteSpace(*s))
+	    if (!isWhiteSpace(*s, *vm().interp))
 	      break;
 	  }
 	  if (n == 0)
@@ -236,28 +274,66 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 	  }
   	}
 	if (str.size()) {
-	  if (isWhiteSpace(str[str.size() - 1])
+	  if (isWhiteSpace(str[str.size() - 1], *vm().interp)
 	      && onlyWhiteSpaceFollows(curNode, *vm().interp)) {
 	    for (size_t n = str.size() - 1; n > 0; n--) {
-	      if (!isWhiteSpace(str[n - 1])) {
-		currentFOTBuilder().charactersFromNode(curNode, str.data(), n);
+	      if (!isWhiteSpace(str[n - 1], *vm().interp)) {
+		charactersFromNode(curNode, str.data(), n, loc);
 		return;
 	      }
 	    }
 	    return;
 	  }
-	  currentFOTBuilder().charactersFromNode(curNode, str.data(), str.size());
+	  charactersFromNode(curNode, str.data(), str.size(), loc);
 	}
       }
       else {
 	if (atStart && vm().currentNode->getGi(str) == accessOK)
 	  atStart = 0;
-	processNode(vm().currentNode, processingMode);
+	processNode(vm().currentNode, processingMode, loc);
       }
     } while (vm().currentNode.assignNextChunkSibling() == accessOK);
   }
   else if (vm().currentNode->getDocumentElement(vm().currentNode) == accessOK)
-    processNode(vm().currentNode, processingMode);
+    processNode(vm().currentNode, processingMode, loc);
+}
+
+void ProcessContext::characters(const Char *ch, size_t n, const Location &loc)
+{
+  if (validatorStack_.back()->charsValid(n, loc, *this)) {
+    Vector<size_t> dep;
+    if (vm().interp->fotbDescr().wantCharPropertyNICs
+	|| currentStyleStack().actual(vm().interp->charMapC(),
+				      *vm().interp, dep)->asFunction()) {
+      Vector<FOTBuilder::CharacterNIC> v(n);
+      // FIXME. Assumes Vector<T>::iterator is T*.
+      // FIXME. Location is not correct.
+      FlowObj::fixCharNICs(ch, n, v.begin(), loc, *this);
+      currentFOTBuilder().characters(v);
+    }
+    else
+      currentFOTBuilder().characters(ch, n);
+  }
+}
+
+void ProcessContext::charactersFromNode(const NodePtr &nd,
+					const Char *ch, size_t n,
+					const Location &loc)
+{
+  if (validatorStack_.back()->charsValid(n, loc, *this)) {
+    Vector<size_t> dep;
+    if (vm().interp->fotbDescr().wantCharPropertyNICs
+	|| currentStyleStack().actual(vm().interp->charMapC(),
+				      *vm().interp, dep)->asFunction()) {
+      Vector<FOTBuilder::CharacterNIC> v(n);
+      // FIXME. See prev. function.
+      // FIXME. Location is not correct.
+      FlowObj::fixCharNICs(ch, n, v.begin(), loc, *this);
+      currentFOTBuilder().characters(v);
+    }
+    else
+      currentFOTBuilder().charactersFromNode(nd, ch, n);
+  }
 }
 
 void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
@@ -297,12 +373,14 @@ void ProcessContext::endConnection()
     Port *port = connectionStack_.head()->port;
     if (port && --(port->connected) == 0) {
       while (!port->saveQueue.empty()) {
-	SaveFOTBuilder *saved = port->saveQueue.get();
+	NodeSaveFOTBuilder *saved = port->saveQueue.get();
 	saved->emit(*port->fotb);
 	delete saved;
       }
     }
     delete connectionStack_.get();
+    ASSERT(validatorStack_.size() > 1);
+    validatorStack_.resize(validatorStack_.size() - 1);
   }
 }
 
@@ -318,7 +396,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     Connection *c = new Connection(conn->styleStack, &port, connLevel);
     if (port.connected) {
       port.connected++;
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       port.saveQueue.append(save);
@@ -328,6 +406,8 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
       port.connected = 1;
     }
     connectionStack_.insert(c);
+    ASSERT(port.validator.pointer() != 0);
+    validatorStack_.push_back(port.validator);
     currentFOTBuilder().startNode(vm().currentNode,
 				  vm().processingMode->name());
   }
@@ -337,7 +417,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
       c->fotb = &currentFOTBuilder();
     }
     else {
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       if (conn->flowObjLevel >= principalPortSaveQueues_.size())
@@ -345,6 +425,8 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
       principalPortSaveQueues_[conn->flowObjLevel].append(save);
     }
     connectionStack_.insert(c);
+    ASSERT(conn->principalPortValidator != 0);
+    validatorStack_.push_back(conn->principalPortValidator);
     currentFOTBuilder().startNode(vm().currentNode,
 				  vm().processingMode->name());
   }
@@ -354,44 +436,109 @@ void ProcessContext::endFlowObj()
 {
   flowObjLevel_--;
   if (flowObjLevel_ < principalPortSaveQueues_.size()) {
-    IQueue<SaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
+    IQueue<NodeSaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
     while (!saveQueue.empty()) {
-      SaveFOTBuilder *saved = saveQueue.get();
+      NodeSaveFOTBuilder *saved = saveQueue.get();
       saved->emit(currentFOTBuilder());
       delete saved;
     }
   }
 }
 
-
-ProcessContext::Connection::Connection(const StyleStack &s, Port *p, unsigned connLevel)
+ProcessContext::Connection::Connection(const StyleStack &s, Port *p,
+				       unsigned connLevel)
 : styleStack(s), port(p), nBadFollow(0), connectableLevel(connLevel)
 {
 }
 
-ProcessContext::Connection::Connection(FOTBuilder *f)
-: fotb(f), port(0), nBadFollow(0), connectableLevel(0)
+ProcessContext::Connection::Connection(FOTBuilder *f, 
+				       const StyleStack &s)
+: fotb(f), port(0), nBadFollow(0), connectableLevel(0), 
+  styleStack(s)
 {
 }
 
-void ProcessContext::pushPorts(bool,
-			       const Vector<SymbolObj *> &labels,
-			       const Vector<FOTBuilder *> &fotbs)
+void ProcessContext::validate(const FlowObj &fo)
 {
+  if (!validatorStack_.back()->isValid(fo, *this)) {
+    // Ensure that the FOTBuilder gets the ICs correct.
+    FOTBuilder &fotb = currentFOTBuilder();
+    fotb.startSequence();
+    fotb.endSequence();
+    invalidLevels_.resize(invalidLevels_.size() + 1);
+    invalidLevels_.back() = flowObjLevel_;
+    // FIXME: Is this the right thing to do? (i.e. how about the style stack?)
+    pushPseudoPort(&ignoreFotb_, new Validator);
+  }
+}
+
+void ProcessContext::endValidate()
+{
+  ASSERT(invalidLevels_.size() == 0 || flowObjLevel_ >= invalidLevels_.back());
+  if (invalidLevels_.size() > 0 && invalidLevels_.back() == flowObjLevel_) {
+    invalidLevels_.resize(invalidLevels_.size() - 1);
+    popPseudoPort();
+  }
+}
+
+void ProcessContext::pushPorts(bool hasPrincipalPort,
+			       const Vector<SymbolObj *> &labels,
+			       const Vector<FOTBuilder *> &fotbs,
+			       const Vector<Validator *> validators,
+			       Validator *principalPortValidator)
+{
+  ASSERT(!hasPrincipalPort || principalPortValidator!=0);
   Connectable *c = new Connectable(labels.size(), currentStyleStack(), flowObjLevel_);
   connectableStack_.insert(c);
   for (size_t i = 0; i < labels.size(); i++) {
     c->ports[i].labels.push_back(labels[i]);
     c->ports[i].fotb = fotbs[i];
+    c->ports[i].validator = validators[i];
   }
   connectableStackLevel_++;
   // FIXME deal with !hasPrincipalPort
+  // Doing so now.
+  if (hasPrincipalPort) {
+    c->principalPortValidator = principalPortValidator;
+    pushPrincipalPort(principalPortValidator);
+  }
+  else {
+    Validator *v(new NoPrincipalPortValidator);
+    c->principalPortValidator = v;
+    pushPrincipalPort(v);
+  }
 }
 
 void ProcessContext::popPorts()
 {
+  popPrincipalPort();
   connectableStackLevel_--;
   delete connectableStack_.get();
+}
+
+void ProcessContext::pushPrincipalPort(Validator *validator)
+{
+  validatorStack_.push_back(validator);
+}
+
+void ProcessContext::popPrincipalPort()
+{
+  ASSERT(validatorStack_.size() > 1);
+  validatorStack_.resize(validatorStack_.size() - 1);
+}
+
+void ProcessContext::pushPseudoPort(FOTBuilder* principalPort,
+				       Validator *validator)
+{
+  connectionStack_.insert(new Connection(principalPort));
+  validatorStack_.push_back(validator);
+}
+
+void ProcessContext::popPseudoPort()
+{
+  ASSERT(validatorStack_.size() > 1);
+  validatorStack_.resize(validatorStack_.size() - 1);
+  delete connectionStack_.get();
 }
 
 void ProcessContext::startDiscardLabeled(SymbolObj *label)
@@ -401,6 +548,7 @@ void ProcessContext::startDiscardLabeled(SymbolObj *label)
   connectableStack_.insert(c);
   c->ports[0].labels.push_back(label);
   c->ports[0].fotb = &ignoreFotb_;
+  c->ports[0].validator = new Validator;
 }
 
 void ProcessContext::endDiscardLabeled()
@@ -412,8 +560,12 @@ void ProcessContext::endDiscardLabeled()
 void ProcessContext::startMapContent(ELObj *contentMap, const Location &loc)
 {
   bool badFlag = 0;
-  if (!connectableStack_.head() || connectableStack_.head()->flowObjLevel != flowObjLevel_)
-    connectableStack_.insert(new Connectable(0, currentStyleStack(), flowObjLevel_));
+  if (!connectableStack_.head()
+      || connectableStack_.head()->flowObjLevel != flowObjLevel_) {
+    connectableStack_.insert(new Connectable(0, currentStyleStack(),
+					     flowObjLevel_));
+    connectableStack_.head()->principalPortValidator = validatorStack_.back();
+  }
   Connectable &conn = *connectableStack_.head();
   Vector<SymbolObj *> portNames(conn.ports.size());
   for (size_t i = 0; i < conn.ports.size(); i++) {
@@ -508,6 +660,63 @@ void ProcessContext::trace(Collector &c) const
         c.trace(styles[i][j]);
   }
 }
+
+bool ProcessContext::Validator::isValid(const FlowObj &fo,
+					ProcessContext &)
+{
+  return true;
+}
+
+bool ProcessContext::Validator::charsValid(size_t n, const Location &loc,
+					   ProcessContext &)
+{
+  return true;
+}
+
+bool RootValidator::isValid(const FlowObj &fo, ProcessContext &context)
+{
+  FlowObj::AcceptFlags af(fo.acceptFlags(context));
+  if (af & FlowObj::afAlways)
+    return true;
+  switch (s_) {
+  case sNone:
+    if (af & FlowObj::afScroll)
+      s_ = sScroll;
+    else if (af & FlowObj::afPaging)
+      s_ = sPaging;
+    else
+      break;
+    return true;
+  case sScroll:
+    if (af & FlowObj::afScroll) {
+      s_ = sScroll;
+      return true;
+    }
+    break;
+  case sPaging:
+    if (af & FlowObj::afPaging) {
+      s_ = sPaging;
+      return true;
+    }
+    break;
+  default:
+    CANNOT_HAPPEN();
+  }
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::badTopLevelFlowObj);
+  return false;
+}
+
+bool RootValidator::charsValid(size_t, const Location &loc,
+			       ProcessContext &context)
+{
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::badTopLevelFlowObj);
+  return false;
+}
+
 SosofoObj *SosofoObj::asSosofo()
 {
   return this;
@@ -555,7 +764,7 @@ void LiteralSosofoObj::process(ProcessContext &context)
   const Char *s;
   size_t n;
   if (str_->stringData(s, n))
-    context.currentFOTBuilder().characters(s, n);
+    context.characters(s, n, loc_);
 }
 
 void LiteralSosofoObj::traceSubObjects(Collector &c) const
@@ -566,25 +775,25 @@ void LiteralSosofoObj::traceSubObjects(Collector &c) const
 void ProcessChildrenSosofoObj::process(ProcessContext &context)
 {
   NodePtr node(context.vm().currentNode);
-  context.processChildren(mode_);
+  context.processChildren(mode_, loc_);
   context.vm().currentNode = node;
 }
 
 void ProcessChildrenTrimSosofoObj::process(ProcessContext &context)
 {
   NodePtr node(context.vm().currentNode);
-  context.processChildrenTrim(mode_);
+  context.processChildrenTrim(mode_, loc_);
   context.vm().currentNode = node;
 }
 
-NextMatchSosofoObj::NextMatchSosofoObj(StyleObj *style)
-: style_(style)
+NextMatchSosofoObj::NextMatchSosofoObj(StyleObj *style, const Location &loc)
+: style_(style), loc_(loc)
 {
 }
 
 void NextMatchSosofoObj::process(ProcessContext &context)
 {
-  context.nextMatch(style_);
+  context.nextMatch(style_, loc_);
 }
 
 void EmptySosofoObj::process(ProcessContext &)
@@ -593,8 +802,9 @@ void EmptySosofoObj::process(ProcessContext &)
 }
 
 ProcessNodeListSosofoObj::ProcessNodeListSosofoObj(NodeListObj *nodeList,
-						   const ProcessingMode *mode)
-: nodeList_(nodeList), mode_(mode)
+						   const ProcessingMode *mode,
+						   const Location &loc)
+: nodeList_(nodeList), mode_(mode), loc_(loc)
 {
   hasSubObjects_ = 1;
 }
@@ -611,7 +821,7 @@ void ProcessNodeListSosofoObj::process(ProcessContext &context)
     bool chunk;
     nl = nl->nodeListChunkRest(context.vm(), interp, chunk);
     protect = nl;
-    context.processNodeSafe(node, mode_, chunk);
+    context.processNodeSafe(node, mode_, loc_, chunk);
   }
 }
 
@@ -620,29 +830,33 @@ void ProcessNodeListSosofoObj::traceSubObjects(Collector &c) const
   c.trace(nodeList_);
 }
 
-ProcessNodeSosofoObj::ProcessNodeSosofoObj(const NodePtr &node, const ProcessingMode *mode)
-: node_(node), mode_(mode)
+ProcessNodeSosofoObj::ProcessNodeSosofoObj(const NodePtr &node,
+					   const ProcessingMode *mode,
+					   const Location &loc)
+: node_(node), mode_(mode), loc_(loc)
 {
 }
 
 void ProcessNodeSosofoObj::process(ProcessContext &context)
 {
-  context.processNode(node_, mode_);
+  context.processNode(node_, mode_, loc_);
 }
 
 void CurrentNodePageNumberSosofoObj::process(ProcessContext &context)
 {
+  // FIXME. Validate.
   context.currentFOTBuilder().currentNodePageNumber(node_);
 }
 
 void PageNumberSosofoObj::process(ProcessContext &context)
 {
+  // FIXME. Validate.
   context.currentFOTBuilder().pageNumber();
 }
 
 SetNonInheritedCsSosofoObj
-::SetNonInheritedCsSosofoObj(FlowObj *flowObj, const InsnPtr &code, ELObj **display)
-: flowObj_(flowObj), code_(code), display_(display)
+::SetNonInheritedCsSosofoObj(FlowObj *flowObj, const InsnPtr &code, ELObj **display, const NodePtr &node)
+: flowObj_(flowObj), code_(code), display_(display), node_(node)
 {
   hasSubObjects_ = 1;
 }
@@ -655,6 +869,7 @@ SetNonInheritedCsSosofoObj::~SetNonInheritedCsSosofoObj()
 ELObj *SetNonInheritedCsSosofoObj::resolve(ProcessContext &context)
 {
   VM &vm = context.vm();
+  EvalContext::CurrentNodeSetter cns(node_, 0, vm);
   StyleStack *saveStyleStack = vm.styleStack;
   vm.styleStack = &context.currentStyleStack();
   unsigned saveSpecLevel = vm.specLevel;
@@ -677,7 +892,16 @@ void SetNonInheritedCsSosofoObj::process(ProcessContext &context)
   ELObj *obj = resolve(context);
   if (obj) {
     ELObjDynamicRoot protect(*context.vm().interp, obj);
+    context.validate(*(FlowObj *)obj);
     ((FlowObj *)obj)->processInner(context);
+    context.endValidate();
+  }
+  else {
+    // Ensure that the FOTBuilder gets the inherited charics right by inserting
+    // a harmless sequence FO.
+    FOTBuilder &fotb = context.currentFOTBuilder();
+    fotb.startSequence();
+    fotb.endSequence();
   }
   flowObj_->popStyle(context, flags);
   context.endFlowObj();

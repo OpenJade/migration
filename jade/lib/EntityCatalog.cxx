@@ -19,6 +19,7 @@ EntityCatalog::~EntityCatalog()
 
 Boolean EntityCatalog::sgmlDecl(const CharsetInfo &,
 				Messenger &,
+				const StringC &,
 				StringC &) const
 {
   return 0;

@@ -174,7 +174,9 @@ void Parser::doInit()
   }
   else {
     currentInput()->ungetToken();
-    if (entityCatalog().sgmlDecl(initCharset, messenger(), systemId)) {
+    if (subdocLevel() > 0)
+      return; // will use parent Sd 
+    if (entityCatalog().sgmlDecl(initCharset, messenger(), sysid_, systemId)) {
       InputSource *in = entityManager().open(systemId,
 					     sd().docCharset(),
 					     InputSourceOrigin::make(),
@@ -204,7 +206,7 @@ void Parser::doInit()
     }
     Syntax *syntaxp = new Syntax(sd());
     CharSwitcher switcher;
-    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher, 0)) {
+    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher, 1)) {
       giveUp();
       return;
     }
@@ -791,8 +793,9 @@ Boolean Parser::sdParseSgmlDeclRef(SdBuilder &sdBuilder, SdParam &parm,
     if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
       return 0;
     const MessageType1 *err;
+    const MessageType1 *err1;
     PublicId::TextClass textClass;
-    if (!id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    if (id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(), *err, id.publicId()->string());
     else if (id.publicId()->getTextClass(textClass)
 	     && textClass != PublicId::SD)
@@ -895,7 +898,8 @@ Boolean Parser::sdParseCharset(SdBuilder &sdBuilder,
     Boolean found;
     PublicId::TextClass textClass;
     const MessageType1 *err;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    const MessageType1 *err1;
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());
@@ -1118,7 +1122,8 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
     PublicId id;
     PublicId::TextClass textClass;
     const MessageType1 *err;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    const MessageType1 *err1;
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());
@@ -1145,9 +1150,12 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
   int i;
   for (i = 0; i < Sd::nCapacity; i++)
     capacitySpecified[i] = 0;
-  if (!parseSdParam(AllowedSdParams(SdParam::capacityName), parm))
+  int final = pushed ? int(SdParam::eE) : SdParam::reservedName + Sd::rSCOPE;
+  if (!parseSdParam(sdBuilder.www 
+                    ? AllowedSdParams(SdParam::capacityName, final)
+                    : AllowedSdParams(SdParam::capacityName), parm))
     return 0;
-  do {
+   while (parm.type == SdParam::capacityName) {
     Sd::Capacity capacityIndex = parm.capacityIndex;
     if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
       return 0;
@@ -1159,11 +1167,10 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
     else if (options().warnSgmlDecl)
       message(ParserMessages::duplicateCapacity,
 	      StringMessageArg(sd().capacityName(i)));
-    int final = pushed ? int(SdParam::eE) : SdParam::reservedName + Sd::rSCOPE;
     if (!parseSdParam(AllowedSdParams(SdParam::capacityName, final),
 		      parm))
       return 0;
-  } while (parm.type == SdParam::capacityName);
+  } 
   Number totalcap = sdBuilder.sd->capacity(0);
   for (i = 1; i < Sd::nCapacity; i++)
     if (sdBuilder.sd->capacity(i) > totalcap)
@@ -1237,8 +1244,9 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
       return 0;
     PublicId id;
     const MessageType1 *err;
+    const MessageType1 *err1;
     PublicId::TextClass textClass;
-    if (!id.init(parm.literalText, sd().internalCharset(), syntax().space(), err))
+    if (id.init(parm.literalText, sd().internalCharset(), syntax().space(), err, err1) != PublicId::fpi)
       sdBuilder.addFormalError(currentLocation(),
 			       *err,
 			       id.string());
@@ -2248,7 +2256,8 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
       none,
       boolean,
       number,
-      netenabl
+      netenabl,
+      implyelt
     } arg;
   };
   static FeatureInfo features[] = {
@@ -2272,7 +2281,7 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
     { Sd::rIMPLYDEF, FeatureInfo::none },
     { Sd::rATTLIST, FeatureInfo::boolean },
     { Sd::rDOCTYPE, FeatureInfo::boolean },
-    { Sd::rELEMENT, FeatureInfo::boolean },
+    { Sd::rELEMENT, FeatureInfo::implyelt },
     { Sd::rENTITY, FeatureInfo::boolean },
     { Sd::rNOTATION, FeatureInfo::boolean },
     { Sd::rLINK, FeatureInfo::none },
@@ -2314,7 +2323,7 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
       if (parm.type == SdParam::reservedName + features[i].name)
 	requireWWW(sdBuilder);
       else {
-	booleanFeature += 6;
+	booleanFeature += 5;
 	i += 7;
       }
       break;
@@ -2332,7 +2341,7 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
 	return 0;
       break;
     }
-    switch (features[i].arg) {
+    switch (features[i].arg) {      
     case FeatureInfo::number:
       if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
 					SdParam::reservedName + Sd::rYES),
@@ -2363,6 +2372,24 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
 	break;
       case SdParam::reservedName + Sd::rALL:
 	sdBuilder.sd->setStartTagNetEnable(Sd::netEnableAll);
+	break;
+      }
+      break;
+    case FeatureInfo::implyelt:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
+					SdParam::reservedName + Sd::rYES,
+					SdParam::reservedName + Sd::rANYOTHER),
+			parm))
+	return 0;
+      switch (parm.type) {
+      case SdParam::reservedName + Sd::rNO:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementNo);
+	break;
+      case SdParam::reservedName + Sd::rYES:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementYes);
+	break;
+      case SdParam::reservedName + Sd::rANYOTHER:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementAnyother);
 	break;
       }
       break;
@@ -3195,13 +3222,17 @@ Boolean Parser::stringToNumber(const Char *s, size_t length,
 			       unsigned long &result)
 {
   unsigned long n = 0;
-  for (; length > 0; length--, s++) {
-    int val = sd().digitWeight(*s);
-    if (n <= ULONG_MAX/10 && (n *= 10) <= ULONG_MAX - val)
-      n += val;
-    else
-      return 0;
-  }
+  if (length < 10) 
+    for (; length > 0; length--, s++) 
+      n = 10*n + sd().digitWeight(*s);
+  else 
+    for (; length > 0; length--, s++) {
+      int val = sd().digitWeight(*s);
+      if (n <= ULONG_MAX/10 && (n *= 10) <= ULONG_MAX - val)
+        n += val;
+      else
+        return 0;
+    }
   result = n;
   return 1;
 }

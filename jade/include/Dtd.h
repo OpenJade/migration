@@ -57,7 +57,6 @@ public:
   ElementType *lookupElementType(const StringC &);
   ElementType *removeElementType(const StringC &);
   ElementType *insertElementType(ElementType *);
-  ElementType *insertUndefinedElementType(ElementType *);
   size_t nElementTypeIndex() const;
   size_t allocElementTypeIndex();
   ConstElementTypeIter elementTypeIter() const;
@@ -94,6 +93,8 @@ public:
   size_t nAttributeDefinitionList() const;
   const ElementType *documentElementType() const;
   Boolean isBase() const;
+  Boolean isInstantiated() const;
+  void instantiate();
 
   Ptr<AttributeDefinitionList> &implicitElementAttributeDef();
   void setImplicitElementAttributeDef(const Ptr<AttributeDefinitionList> &);
@@ -107,7 +108,6 @@ private:
   ConstPtr<Entity> defaultEntity_;
   ConstPtr<StringResource<Char> > name_;
   NamedTable<ElementType> elementTypeTable_;
-  NamedTable<ElementType> undefinedElementTypeTable_;
   NamedTable<RankStem> rankStemTable_;
   NamedTable<ShortReferenceMap> shortReferenceMapTable_;
   NamedResourceTable<Notation> notationTable_;
@@ -119,6 +119,7 @@ private:
   Vector<StringC> shortrefs_;
   HashTable<StringC,int> shortrefTable_;
   Boolean isBase_;
+  Boolean isInstantitated_;
   Ptr<AttributeDefinitionList> implicitElementAttributeDef_;
   Ptr<AttributeDefinitionList> implicitNotationAttributeDef_;
 };
@@ -153,7 +154,8 @@ inline
 Ptr<Entity>
 Dtd::insertEntity(const Ptr<Entity> &entity, Boolean replace)
 {
-  return (entity->declType() == Entity::parameterEntity
+  return ((entity->declType() == Entity::parameterEntity 
+	   || entity->declType() == Entity::doctype)
 	  ? &parameterEntityTable_
 	  : &generalEntityTable_)->insert(entity, replace);
 }
@@ -257,33 +259,19 @@ size_t Dtd::nAttributeDefinitionList() const
 inline
 const ElementType *Dtd::lookupElementType(const StringC &name) const
 {
-  const ElementType *e = elementTypeTable_.lookup(name);
-  if (e)
-    return e;
-  else
-    return undefinedElementTypeTable_.lookup(name);
+  return elementTypeTable_.lookup(name);
 }
 
 inline
 ElementType *Dtd::lookupElementType(const StringC &name)
 {
-  ElementType *e = elementTypeTable_.lookup(name);
-  if (e)
-    return e;
-  else
-    return undefinedElementTypeTable_.lookup(name);
+  return elementTypeTable_.lookup(name);
 }
 
 inline
 ElementType *Dtd::insertElementType(ElementType *e)
 {
   return elementTypeTable_.insert(e);
-}
-
-inline
-ElementType *Dtd::insertUndefinedElementType(ElementType *e)
-{
-  return undefinedElementTypeTable_.insert(e);
 }
 
 inline
@@ -458,6 +446,18 @@ inline
 void Dtd::setImplicitNotationAttributeDef(const Ptr<AttributeDefinitionList> &def)
 {
   implicitNotationAttributeDef_ = def;
+}
+
+inline 
+Boolean Dtd::isInstantiated() const
+{
+  return isInstantitated_;
+}
+
+inline 
+void Dtd::instantiate() 
+{
+  isInstantitated_ = 1;
 }
 
 #ifdef SP_NAMESPACE

@@ -44,6 +44,7 @@ void Sd::setDocCharsetDesc(const UnivCharsetDesc &desc)
 const char *const Sd::reservedName_[] = {
   "ALL",
   "ANY",
+  "ANYOTHER",
   "APPINFO",
   "ATTLIST",
   "ATTRIB",

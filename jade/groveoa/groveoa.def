@@ -1,6 +1,6 @@
 ; groveoa.def : Declares the module parameters.
 
-LIBRARY      "groveoa.DLL"
+LIBRARY      "ogroveoa.DLL"
 
 EXPORTS
 	DllCanUnloadNow     @1 PRIVATE

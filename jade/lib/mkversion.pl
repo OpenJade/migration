@@ -1,7 +1,11 @@
 #! /usr/bin/perl
 
-$version = <>;
-chop $version;
+while (<>) {
+  if ( /.*SP.*/ ) {
+    chomp();
+    s/^[^0-9]*//;
 print <<END;
-#define SP_VERSION SP_T("$version")
+#define SP_VERSION SP_T("$_")
 END
+}
+}

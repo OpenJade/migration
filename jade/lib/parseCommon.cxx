@@ -483,8 +483,8 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
       if (haveApplicableDtd()) {
 	if (!isParameter) {
 	  entity = createUndefinedEntity(name, startLocation);
-	  message(ParserMessages::entityUndefined,
-		  StringMessageArg(name));
+	  if (!sd().implydefEntity())
+	    message(ParserMessages::entityUndefined, StringMessageArg(name));
 	}
 	else 
 	  message(ParserMessages::parameterEntityUndefined,

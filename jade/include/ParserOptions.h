@@ -79,6 +79,7 @@ struct Warnings {
   PackedBoolean warnInternalSubsetPsParamEntityRef;
   PackedBoolean warnInternalSubsetTsParamEntityRef;
   PackedBoolean warnInternalSubsetLiteralParamEntityRef;
+  PackedBoolean warnImmediateRecursion;
 };
 
 struct SP_API ParserOptions : public Warnings {
@@ -123,6 +124,14 @@ struct SP_API ParserOptions : public Warnings {
   // These override what was specified in the SGML declaration.
   PackedBoolean noUnclosedTag;
   PackedBoolean noNet;
+  PackedBoolean fullyDeclared;
+  PackedBoolean fullyTagged;
+  PackedBoolean amplyTagged;
+  PackedBoolean amplyTaggedAnyother;
+  PackedBoolean valid; 
+  PackedBoolean entityRef;
+  PackedBoolean externalEntityRef;
+  PackedBoolean integral;
   Vector<StringC> includes;
 };
 

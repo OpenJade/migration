@@ -13,6 +13,7 @@
 #ifdef JADE_MIF
 #include "MifFOTBuilder.h"
 #endif
+#include "TextFOTBuilder.h"
 #include "OutputCharStream.h"
 #include "macros.h"
 #include "sptchar.h"
@@ -31,7 +32,7 @@ public:
   enum { u = 72000 };
   JadeApp();
   void processOption(AppChar opt, const AppChar *arg);
-  FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&);
+  FOTBuilder *makeFOTBuilder(const FOTBuilder::Description *&);
 private:
   enum OutputType { fotType, rtfType,
 #ifdef JADE_HTML
@@ -41,7 +42,7 @@ private:
 #ifdef JADE_MIF
                     mifType,
 #endif
-                    sgmlType, xmlType };
+                    sgmlType, xmlType, txtType };
   static const AppChar *const outputTypeNames[];
   OutputType outputType_;
   String<AppChar> outputFilename_;
@@ -60,17 +61,22 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
   SP_T("mif"),
 #endif
   SP_T("sgml"),
-  SP_T("xml")
+  SP_T("xml"),
+  SP_T("txt"),
 };
 
 JadeApp::JadeApp()
 : DssslApp(u), outputType_(fotType)
 {
   registerOption('t',
-#ifdef JADE_MIF
-                 SP_T("(fot|rtf|tex|mif|sgml|xml)")
+#if defined(JADE_MIF) && defined(JADE_HTML)
+                 SP_T("(fot|rtf|html|tex|mif|sgml|xml|txt)")
+#elif defined(JADE_MIF)
+                 SP_T("(fot|rtf|tex|mif|sgml|xml|txt)")
+#elif defined(JADE_HTML)
+                 SP_T("(fot|rtf|html|tex|sgml|xml|txt)")
 #else
-                 SP_T("(fot|rtf|tex|sgml|xml)")
+                 SP_T("(fot|rtf|tex|sgml|xml|txt)")
 #endif
 		 );
   registerOption('o', SP_T("output_file"));
@@ -122,7 +128,7 @@ void JadeApp::processOption(AppChar opt, const AppChar *arg)
   }
 }
 
-FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
+FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Description *&descr)
 {
   if (outputFilename_.size() == 0) {
     if (defaultOutputBasename_.size() != 0) {
@@ -160,23 +166,26 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
   switch (outputType_) {
   case rtfType:
     unitsPerInch_ = 20*72; // twips
-    return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts);
+    return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, descr);
   case texType:
-    return makeTeXFOTBuilder(&outputFile_, this, exts);
+    return makeTeXFOTBuilder(&outputFile_, this, descr);
 #ifdef JADE_HTML
   case htmlType:
-    return makeHtmlFOTBuilder(outputFilename_, this, exts);
+    return makeHtmlFOTBuilder(outputFilename_, this, descr);
 #endif /* JADE_HTML */
 #ifdef JADE_MIF
   case mifType:
-    return makeMifFOTBuilder(outputFilename_, entityManager(), systemCharset(), this, exts);
+    return makeMifFOTBuilder(outputFilename_, entityManager(), systemCharset(), this, descr);
 #endif /* JADE_MIF */
   case fotType:
-    return makeSgmlFOTBuilder(new RecordOutputCharStream(new EncodeOutputCharStream(&outputFile_,
-						         outputCodingSystem_)));
+    return makeSgmlFOTBuilder(new RecordOutputCharStream(
+                                  new EncodeOutputCharStream(&outputFile_,
+                                      outputCodingSystem_)), descr);
   case sgmlType:
   case xmlType:
-    return makeTransformFOTBuilder(this, outputType_ == xmlType, exts);
+    return makeTransformFOTBuilder(this, outputType_ == xmlType, outputOptions_, descr);
+  case txtType:
+    return makeTextFOTBuilder(&outputFile_, this, descr);
   default:
     break;
   }

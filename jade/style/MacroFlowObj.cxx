@@ -19,26 +19,26 @@ MacroFlowObj::MacroFlowObj(Vector<const Identifier *> &nics,
 			   NCVector<Owner<Expression> > &inits,
 			   const Identifier *contentsId,
 			   Owner<Expression> &body)
-: def_(new Definition(nics, inits, contentsId, body))
+: sp_(new S(new Definition(nics, inits, contentsId, body)))
 {
-  size_t n = def_->nics().size();
-  charicVals_ = new ELObj *[n];
+  size_t n = sp_->def_->nics().size();
+  sp_->charicVals_ = new ELObj *[n];
   for (size_t i = 0; i < n; i++)
-    charicVals_[i] = 0;
+    sp_->charicVals_[i] = 0;
 }
 
 MacroFlowObj::MacroFlowObj(const MacroFlowObj &obj)
-: CompoundFlowObj(obj), def_(obj.def_)
+: CompoundFlowObj(obj), sp_(new S(obj.sp_->def_.pointer()))
 {
-  size_t n = def_->nics().size();
-  charicVals_ = new ELObj *[n];
+  size_t n = sp_->def_->nics().size();
+  sp_->charicVals_ = new ELObj *[n];
   for (size_t i = 0; i < n; i++)
-    charicVals_[i] = obj.charicVals_[i];
+    sp_->charicVals_[i] = obj.sp_->charicVals_[i];
 }
 
 MacroFlowObj::~MacroFlowObj()
 {
-  delete [] charicVals_;
+  delete [] sp_->charicVals_;
 }
 
 FlowObj *MacroFlowObj::copy(Collector &c) const
@@ -48,7 +48,7 @@ FlowObj *MacroFlowObj::copy(Collector &c) const
 
 CompoundFlowObj *MacroFlowObj::asCompoundFlowObj()
 {
-  if (def_->isCompound())
+  if (sp_->def_->isCompound())
     return this;
   else
     return 0;
@@ -56,7 +56,7 @@ CompoundFlowObj *MacroFlowObj::asCompoundFlowObj()
 
 bool MacroFlowObj::hasNonInheritedC(const Identifier *id) const
 {
-  const Vector<const Identifier *> &nics = def_->nics();
+  const Vector<const Identifier *> &nics = sp_->def_->nics();
   for (size_t i = 0; i < nics.size(); i++)
     if (nics[i] == id)
       return 1;
@@ -65,10 +65,10 @@ bool MacroFlowObj::hasNonInheritedC(const Identifier *id) const
 
 void MacroFlowObj::setNonInheritedC(const Identifier *id, ELObj *obj, const Location &, Interpreter &)
 {
-  const Vector<const Identifier *> &nics = def_->nics();
+  const Vector<const Identifier *> &nics = sp_->def_->nics();
   for (size_t i = 0;; i++) {
     if (nics[i] == id) {
-      charicVals_[i] = obj;
+      sp_->charicVals_[i] = obj;
       return;
     }
   }
@@ -76,9 +76,9 @@ void MacroFlowObj::setNonInheritedC(const Identifier *id, ELObj *obj, const Loca
 
 void MacroFlowObj::traceSubObjects(Collector &c) const
 {
-  size_t n = def_->nics().size();
+  size_t n = sp_->def_->nics().size();
   for (size_t i = 0; i < n; i++)
-    c.trace(charicVals_[i]);
+    c.trace(sp_->charicVals_[i]);
   CompoundFlowObj::traceSubObjects(c);
 }
 
@@ -89,14 +89,14 @@ public:
 
 void MacroFlowObj::unpack(VM &vm)
 {
-  size_t n = def_->nics().size();
-  vm.needStack(n + 1 + def_->isCompound());
+  size_t n = sp_->def_->nics().size();
+  vm.needStack(n + 1 + sp_->def_->isCompound());
   for (size_t i = 0; i < n; i++)
-    *vm.sp++ = charicVals_[i];
-  if (def_->isCompound()) {
+    *vm.sp++ = sp_->charicVals_[i];
+  if (sp_->def_->isCompound()) {
     ELObj *tem = content();
     if (!tem)
-      tem = new (*vm.interp) ProcessChildrenSosofoObj(vm.interp->initialProcessingMode());
+      tem = new (*vm.interp) ProcessChildrenSosofoObj(vm.interp->initialProcessingMode(), location());
     *vm.sp++ = tem;
   }
 }
@@ -105,7 +105,7 @@ void MacroFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSequence();
-  def_->process(context, this);
+  sp_->def_->process(context, this);
   fotb.endSequence();
 }
 

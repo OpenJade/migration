@@ -12,6 +12,7 @@
 #include "TokenMessageArg.h"
 #include "token.h"
 #include "macros.h"
+#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -1218,11 +1219,15 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
     Param::reservedName + Syntax::rNUTOKEN,
     Param::reservedName + Syntax::rNUTOKENS,
     Param::reservedName + Syntax::rNOTATION,
-    Param::nameTokenGroup
+    Param::nameTokenGroup,
+    Param::reservedName + Syntax::rDATA
     };
   static AllowedParams allowDeclaredValue(declaredValues,
-					  SIZEOF(declaredValues));
-  if (!parseParam(allowDeclaredValue, declInputLevel, parm))
+					  SIZEOF(declaredValues) - 1);
+  static AllowedParams allowDeclaredValueData(declaredValues,
+					      SIZEOF(declaredValues));
+  if (!parseParam(sd().www() ? allowDeclaredValueData : allowDeclaredValue, 
+                  declInputLevel, parm))
     return 0;
   enum { asDataAttribute = 01, asLinkAttribute = 02 };
   unsigned allowedFlags = asDataAttribute|asLinkAttribute;
@@ -1312,6 +1317,38 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
       for (size_t i = 0; i < group.size(); i++)
 	parm.nameTokenVector[i].name.swap(group[i]);
       declaredValue = new NameTokenGroupDeclaredValue(group);
+    }
+    break;
+  case Param::reservedName + Syntax::rDATA:
+    {
+      if (!parseParam(allowName, declInputLevel, parm))
+        return 0;
+      Ptr<Notation> notation(lookupCreateNotation(parm.token));
+      static AllowedParams allowDsoSilentValue(Param::dso, Param::silent);
+      AttributeList attributes(notation->attributeDef());
+      if (parseParam(allowDsoSilentValue, declInputLevel, parm)
+          && parm.type == Param::dso) {
+        if (attributes.size() == 0)
+          message(ParserMessages::notationNoAttributes,
+                  StringMessageArg(notation->name()));
+        Boolean netEnabling;
+        Ptr<AttributeDefinitionList> newAttDef;
+        if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+          return 0;
+        if (!newAttDef.isNull()) {
+          newAttDef->setIndex(defDtd().allocAttributeDefinitionListIndex());
+          notation->setAttributeDef(newAttDef);
+        }
+        if (attributes.nSpec() == 0)
+          message(ParserMessages::emptyDataAttributeSpec);
+      }
+      else {
+        attributes.finish(*this);
+        // unget the first token of the default value
+        currentInput()->ungetToken();
+      }
+      ConstPtr<Notation> nt(notation.pointer());
+      declaredValue = new DataDeclaredValue(nt, attributes);
     }
     break;
   default:
@@ -1452,16 +1489,30 @@ Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
     static AllowedParams allowMinimumLiteral(Param::minimumLiteral);
     if (!parseParam(allowMinimumLiteral, declInputLevel, parm))
       return 0;
-    const MessageType1 *err;
-    if (id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(),
-		      err)) {
-      PublicId::TextClass textClass;
-      if (sd().formal() && id.publicId()->getTextClass(textClass) && textClass == PublicId::SD)
-	message(ParserMessages::wwwRequired);
+    const MessageType1 *fpierr;
+    const MessageType1 *urnerr;
+    switch (id.setPublic(parm.literalText, sd().internalCharset(), 
+                         syntax().space(), fpierr, urnerr)) {
+    case PublicId::fpi: 
+      {
+        PublicId::TextClass textClass;
+        if (sd().formal() && id.publicId()->getTextClass(textClass) && textClass == PublicId::SD)
+  	  message(ParserMessages::wwwRequired);
+        if (sd().urn() && !sd().formal()) 
+          message(*urnerr, StringMessageArg(*id.publicIdString()));
+      }
+      break;
+    case PublicId::urn:
+      if (sd().formal() && !sd().urn()) 
+        message(*fpierr, StringMessageArg(*id.publicIdString()));
+      break;
+    case PublicId::informal:
+      if (sd().formal())
+        message(*fpierr, StringMessageArg(*id.publicIdString()));
+      if (sd().urn())
+        message(*urnerr, StringMessageArg(*id.publicIdString()));
+      break;
     }
-    else if (sd().formal())
-      message(*err,
-	      StringMessageArg(*id.publicIdString()));
   }
   if (!parseParam(sysidAllow, declInputLevel, parm))
     return 0;
@@ -1545,6 +1596,8 @@ Boolean Parser::parseEntityDecl()
     declType = Entity::generalEntity;
     if (parm.type == Param::entityName)
       parm.token.swap(name);
+    else if (sd().implydefEntity())
+      message(ParserMessages::implydefEntityDefault);
     else if (options().warnDefaultEntityDecl)
       message(ParserMessages::defaultEntityDecl);
   }
@@ -1757,10 +1810,13 @@ Boolean Parser::parseExternalEntity(StringC &name,
     }
     else
       attributes.finish(*this);
-    entity = new ExternalDataEntity(name, dataType, markupLocation(), id, notation,
-				    attributes);
+    entity = new ExternalDataEntity(name, dataType, markupLocation(), id, 
+				    notation, attributes, 
+				    declType == Entity::parameterEntity 
+				    ? Entity::parameterEntity
+				    : Entity::generalEntity);
   }
-  if (declType == Entity::parameterEntity) {
+  if (declType == Entity::parameterEntity && !sd().www()) {
     message(ParserMessages::externalParameterDataSubdocEntity,
 	    StringMessageArg(name));
     return 1;
@@ -2021,9 +2077,17 @@ Boolean Parser::parseDoctypeDeclStart()
     message(ParserMessages::dtdAfterLpd);
   unsigned declInputLevel = inputLevel();
   Param parm;
-  
-  if (!parseParam(allowName, declInputLevel, parm))
+  static AllowedParams
+    allowImpliedName(Param::indicatedReservedName + Syntax::rIMPLIED,
+		     Param::name);
+  if (!parseParam(allowImpliedName, declInputLevel, parm))
     return 0;
+  if (parm.type == Param::indicatedReservedName + Syntax::rIMPLIED) {
+    if (sd().concur() > 0 || sd().explicitLink() > 0)
+      message(ParserMessages::impliedDoctypeConcurLink);
+    message(ParserMessages::sorryImpliedDoctype);
+    return 0;
+  }
   StringC name;
   parm.token.swap(name);
   if (!lookupDtd(name).isNull())
@@ -2036,26 +2100,73 @@ Boolean Parser::parseDoctypeDeclStart()
   if (!parseParam(allowPublicSystemDsoMdc, declInputLevel, parm))
     return 0;
   ConstPtr<Entity> entity;
+  StringC notation;
+  EntityDecl::DataType data;
+  ExternalId id;
   if (parm.type == Param::reservedName + Syntax::rPUBLIC
       || parm.type == Param::reservedName + Syntax::rSYSTEM) {
     static AllowedParams allowSystemIdentifierDsoMdc(Param::systemIdentifier,
 						     Param::dso, Param::mdc);
-    ExternalId id;
-    if (!parseExternalId(allowSystemIdentifierDsoMdc, allowDsoMdc,
+    static AllowedParams
+      allowSystemIdentifierDsoMdcData(Param::systemIdentifier,
+                                      Param::dso, Param::mdc,
+                                      Param::reservedName + Syntax::rCDATA,
+                                      Param::reservedName + Syntax::rSDATA,
+                                      Param::reservedName + Syntax::rNDATA);
+    static AllowedParams allowDsoMdcData(Param::dso, Param::mdc,
+                                         Param::reservedName + Syntax::rCDATA,
+                                         Param::reservedName + Syntax::rSDATA,
+                                         Param::reservedName + Syntax::rNDATA);
+    if (!parseExternalId(sd().www() ? allowSystemIdentifierDsoMdcData : 
+                                      allowSystemIdentifierDsoMdc, 
+                         sd().www() ? allowDsoMdcData : allowDsoMdc,
 			 1, declInputLevel, parm, id))
       return 0;
+    switch (parm.type) {
+    case Param::reservedName + Syntax::rCDATA:
+      data = Entity::cdata;
+      break; 
+    case Param::reservedName + Syntax::rSDATA:
+      data = Entity::sdata;
+      break; 
+    case Param::reservedName + Syntax::rNDATA:
+      data = Entity::ndata;
+      break; 
+    default:
+      data = Entity::sgmlText;
+      break;
+    }
+    if (data == Entity::sgmlText) {
+      Ptr<Entity> tem
+	= new ExternalTextEntity(name, Entity::doctype, markupLocation(), id);
+      tem->generateSystemId(*this);
+      entity = tem;
+    }
+#if 0
+      eventHandler()
+        .externalEntityDecl(new (eventAllocator())
+  			    ExternalEntityDeclEvent(entity, 0));
+#endif
+    else {
+      // external subset uses some DTD notation
+      if (!parseParam(allowName, declInputLevel, parm))
+        return 0;
+      parm.token.swap(notation);
+      if (!parseParam(allowDsoMdc, declInputLevel, parm))
+        return 0;
+    }
+  }
+  else 
+  // no external subset specified
+  if (sd().implydefDoctype()) {
+    // FIXME this fails for #IMPLIED, since name isn't yet known
     Ptr<Entity> tem
       = new ExternalTextEntity(name, Entity::doctype, markupLocation(), id);
     tem->generateSystemId(*this);
     entity = tem;
-#if 0
-    eventHandler()
-      .externalEntityDecl(new (eventAllocator())
-			  ExternalEntityDeclEvent(entity, 0));
-#endif
   }
   else if (parm.type == Param::mdc) {
-    if (!sd().implydefElement()) {
+    if (sd().implydefElement() == Sd::implydefElementNo) {
       message(ParserMessages::noDtdSubset);
       enableImplydef();
     }
@@ -2068,6 +2179,25 @@ Boolean Parser::parseDoctypeDeclStart()
 					markupLocation(),
 					currentMarkup()));
   startDtd(name);
+  if (notation.size() > 0) {
+    // FIXME this case has the wrong entity in the event 
+    // this should be fixed by moving startDtd() call and this code up
+    ConstPtr<Notation> nt(lookupCreateNotation(notation)); 
+    
+    AttributeList attrs(nt->attributeDef());
+    attrs.finish(*this); 
+    Ptr<Entity> tem 
+      = new ExternalDataEntity(name, data, markupLocation(), id, nt, attrs, 
+			       Entity::doctype);
+    tem->generateSystemId(*this);
+    // FIXME This is a hack; we need the entity to have the doctype name to
+    // have generateSytemId() work properly, but have an empty name to add
+    // it as a parameter entity, which is needed to check the notation
+    StringC entname;
+    tem->setName(entname);
+    defDtd().insertEntity(tem);
+    entity = tem;
+  }
   if (parm.type == Param::mdc) {
     // unget the mdc
     currentInput()->ungetToken();
@@ -2102,7 +2232,12 @@ void Parser::implyDtd(const StringC &gi)
     currentMarkup()->addName(gi.data(), gi.size());
   }
 #endif
-  if (sd().implydefElement() && !sd().implydefDoctype()) {
+  if (sd().concur() > 0 || sd().explicitLink() > 0
+      || (sd().implydefElement() == Sd::implydefElementNo
+          && !sd().implydefDoctype()))
+    message(ParserMessages::omittedProlog);
+
+  if ((sd().implydefElement() != Sd::implydefElementNo) && !sd().implydefDoctype()) {
     eventHandler().startDtd(new (eventAllocator())
 				  StartDtdEvent(gi, ConstPtr<Entity>(), 0,
 					markupLocation(),
@@ -2215,7 +2350,7 @@ void Parser::checkDtd(Dtd &dtd)
   while ((p = elementIter.next()) != 0) {
     if (p->definition() == 0) {
       if (p->name() == dtd.name()) {
-	if (validate() && !implydefElement())
+	if (validate() && (implydefElement() == Sd::implydefElementNo))
 	  message(ParserMessages::documentElementUndefined);
       }
       else if (options().warnUndefinedElement)
@@ -2223,8 +2358,9 @@ void Parser::checkDtd(Dtd &dtd)
       if (def.isNull())
 	def = new ElementDefinition(currentLocation(),
 				    size_t(ElementDefinition::undefinedIndex),
-				    0,
-				    ElementDefinition::any);
+				    ElementDefinition::omitEnd,
+				    ElementDefinition::any,
+                                    (implydefElement() != Sd::implydefElementAnyother));
       p->setElementDefinition(def, i++);
     }
     const ShortReferenceMap *map = p->map();
@@ -2284,35 +2420,64 @@ void Parser::checkDtd(Dtd &dtd)
       }
     }
   }
-  if (!validate())
-    return;
-  Dtd::ConstEntityIter entityIter(((const Dtd &)dtd).generalEntityIter());
-  for (;;) {
-    ConstPtr<Entity> entity(entityIter.next());
-    if (entity.isNull())
-      break;
-    const ExternalDataEntity *external = entity->asExternalDataEntity();
-    if (external) {
-      const Notation *notation = external->notation();
-      if (!notation->defined()) {
-	setNextLocation(external->defLocation());
-	message(ParserMessages::entityNotationUndefined,
+  Dtd::ConstEntityIter gEntityIter(((const Dtd &)dtd).generalEntityIter());
+  Dtd::ConstEntityIter pEntityIter(((const Dtd &)dtd).parameterEntityIter());
+  for (i = 0; i < (sd().www() ? 2 : 1); i++) {
+    for (;;) {
+      ConstPtr<Entity> entity(i == 0 ? gEntityIter.next() : pEntityIter.next());
+      if (entity.isNull())
+	break;
+      const ExternalDataEntity *external = entity->asExternalDataEntity();
+      if (external) {
+	Notation *notation = (Notation *)external->notation();
+	if (!notation->defined()) {
+	  if (sd().implydefNotation()) {
+	    ExternalId id;
+	    notation->setExternalId(id, Location());
+	    notation->generateSystemId(*this);
+	  } 
+	  else if (validate()) {
+	    setNextLocation(external->defLocation());
+	    switch (external->declType()) {
+	    case Entity::parameterEntity:
+	    message(ParserMessages::parameterEntityNotationUndefined,
+		    StringMessageArg(notation->name()),
+		    StringMessageArg(external->name()));
+	      break;
+	    case Entity::doctype:
+	      message(ParserMessages::dsEntityNotationUndefined,
+		      StringMessageArg(notation->name()));
+	      break;
+	    default:
+	      message(ParserMessages::entityNotationUndefined,
 		StringMessageArg(notation->name()),
 		StringMessageArg(external->name()));
+	      break;
+	    }
+	  }
+	}
       }
     }
   }
   Dtd::NotationIter notationIter(dtd.notationIter());
   for (;;) {
-    ConstPtr<Notation> notation(notationIter.next());
+    Ptr<Notation> notation(notationIter.next());
     if (notation.isNull())
       break;
-    if (!notation->defined() && !notation->attributeDef().isNull())
-      message(ParserMessages::attlistNotationUndefined,
-	      StringMessageArg(notation->name()));
+    if (!notation->defined() && !notation->attributeDef().isNull()) {
+	if (sd().implydefNotation()) {
+	  ExternalId id;
+	  notation->setExternalId(id, Location());
+	  notation->generateSystemId(*this);				       
+	} 
+	else if (validate())
+	  message(ParserMessages::attlistNotationUndefined,
+		  StringMessageArg(notation->name()));
+    }
   }
 }
 
+#if 0
 void Parser::addCommonAttributes(Dtd &dtd)
 {
   Ptr<AttributeDefinitionList> commonAdl[2];
@@ -2377,6 +2542,116 @@ void Parser::addCommonAttributes(Dtd &dtd)
       dtd.setImplicitNotationAttributeDef(n->attributeDef());
   }
 }
+#else
+void Parser::addCommonAttributes(Dtd &dtd)
+{
+  // These are #implicit, #all, #notation #implicit, #notation #all
+  Ptr<AttributeDefinitionList> commonAdl[4];
+  {
+    ElementType *e = lookupCreateElement(syntax()
+                                       .rniReservedName(Syntax::rIMPLICIT));
+    commonAdl[0] = e->attributeDef();
+    e = dtd.removeElementType(syntax().rniReservedName(Syntax::rALL));
+    if (e) 
+      commonAdl[1] = e->attributeDef();
+    delete e;
+  }
+  {
+    Ptr<Notation> nt 
+      = lookupCreateNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    commonAdl[2] = nt->attributeDef();
+    nt = dtd.removeNotation(syntax().rniReservedName(Syntax::rALL));
+    if (!nt.isNull()) 
+      commonAdl[3] = nt->attributeDef();
+  }
+  Dtd::ElementTypeIter elementIter(dtd.elementTypeIter());
+  Dtd::ElementTypeIter element2Iter(dtd.elementTypeIter());
+  Dtd::NotationIter notationIter(dtd.notationIter());
+  Dtd::NotationIter notation2Iter(dtd.notationIter());
+  Vector<PackedBoolean> done1Adl(dtd.nAttributeDefinitionList(),
+				PackedBoolean(0));
+  Vector<PackedBoolean> done2Adl(dtd.nAttributeDefinitionList(),
+				PackedBoolean(0));
+  // we do 2 passes over element types and notations,
+  // first merging #implicit attributes for implicit element types/notations
+  // next merging #all attributes for all element types/notations 
+  for (int i = 0; i < 4; i++) {
+    if (!commonAdl[i].isNull()) {
+      if (i % 2) 
+        done1Adl[commonAdl[i]->index()] = 1;
+      else
+        done2Adl[commonAdl[i]->index()] = 1;
+      for (;;) {
+        Boolean skip;
+	Attributed *a;
+        switch (i) {
+        case 0: 
+          {
+            ElementType *e = elementIter.next();
+            a = e;
+            skip = (e && e->definition()); // don't merge #implicit 
+                                           // attributes if e is defined
+          }
+          break;
+        case 1:
+	  a = element2Iter.next();
+          skip = 0;                        // always merge #all attributes
+          break;
+        case 2: 
+          {
+	    Notation *nt = notationIter.next().pointer();
+            a = nt;
+            skip = (nt && nt->defined());  // don't merge #implicit 
+                                           // attributes if nt is defined
+          }
+          break;
+        case 3:
+	  a = notation2Iter.next().pointer();
+          skip = 0;                        // always merge #all attributes
+          break;
+        default:
+          CANNOT_HAPPEN();
+        }
+        if (!a)
+          break;
+	Ptr<AttributeDefinitionList> adl = a->attributeDef();
+	if (adl.isNull()) {
+          if (!skip)
+	    a->setAttributeDef(commonAdl[i]);
+        }
+	else if (((i % 2) && !done1Adl[adl->index()])
+               ||(!(i % 2) && !done2Adl[adl->index()])) {
+          if (i % 2)
+	    done1Adl[adl->index()] = 1;
+          else 
+	    done2Adl[adl->index()] = 1;
+          if (!skip)
+	    for (size_t j = 0; j < commonAdl[i]->size(); j++) {
+	      unsigned tem;
+	      if (!adl->attributeIndex(commonAdl[i]->def(j)->name(),
+	  			       tem))
+	        adl->append(commonAdl[i]->def(j)->copy());
+	    }
+	}
+      }
+    }
+  }
+  {
+    ElementType *e = dtd.removeElementType(syntax()
+					   .rniReservedName(Syntax::rIMPLICIT));
+    if (e)
+      dtd.setImplicitElementAttributeDef(e->attributeDef());
+    delete e;
+  }
+  {
+    Ptr<Notation> n
+      = dtd.removeNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    if (!n.isNull())
+      dtd.setImplicitNotationAttributeDef(n->attributeDef());
+  }
+}
+
+#endif
 
 Boolean Parser::maybeStatusKeyword(const Entity &entity)
 {

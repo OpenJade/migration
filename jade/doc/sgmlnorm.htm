@@ -1,18 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>SGMLNORM</TITLE>
+<TITLE>OSGMLNORM</TITLE>
 </HEAD>
 <BODY>
-<H1>SGMLNORM</H1>
+<H1>OSGMLNORM</H1>
 <H4>
-An SGML System Conforming to
-International Standard ISO 8879 --<BR>
+An SGML System Conforming to International Standard ISO 8879 --
 Standard Generalized Markup Language
+</H4>
+<H4>
+An SGML Extended Facilities system conforming to
+Annex A of International Standard ISO/IEC 10744 --
+Hypermedia/Time-based Structuring Language
 </H4>
 <H2>SYNOPSIS</H2>
 <P>
-<SAMP>sgmlnorm</SAMP>
+<SAMP>osgmlnorm</SAMP>
 [
 <SAMP>-Cdemnv</SAMP>
 ]
@@ -35,7 +39,7 @@ Standard Generalized Markup Language
 
 <H2>DESCRIPTION</H2>
 <P>
-Sgmlnorm prints on the standard output a <I>normalized</I> document instance
+Osgmlnorm prints on the standard output a <I>normalized</I> document instance
 for the SGML document contained in the concatenation of the entities
 with <A HREF="sysid.htm">system identifiers</A>
 <SAMP><VAR>sysid...</VAR></SAMP>.
@@ -45,7 +49,7 @@ and prolog, it will have the same ESIS as the original SGML document,
 with the following exceptions:
 <UL>
 <LI>
-The output of sgmlnorm does not protect against the recognition of
+The output of osgmlnorm does not protect against the recognition of
 short reference delimiters, so any <SAMP>USEMAP</SAMP> declarations
 must be removed from the DTD.
 <LI>
@@ -71,7 +75,7 @@ If the declared value of an attribute was a name token group,
 and a value was specified that was the same as the name of
 the attribute, then the attribute name and value indicator will be
 omitted.
-For example, with HTML sgmlnorm would output <CODE>&lt;DL COMPACT&gt;</CODE>
+For example, with HTML osgmlnorm would output <CODE>&lt;DL COMPACT&gt;</CODE>
 rather than <CODE>&lt;DL COMPACT="COMPACT"&gt;</CODE>
 </UL>
 <P>
@@ -91,7 +95,7 @@ Use the catalog entry file
 <DT>
 <SAMP>-C</SAMP>
 <DD>
-This has the same effect as in <A HREF="nsgmls#optC">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls#optC">onsgmls</A>.
 <DT>
 <SAMP>-d</SAMP>
 <DD>
@@ -106,7 +110,7 @@ with respect to this DTD.
 Search
 <SAMP><VAR>directory</VAR></SAMP>
 for files specified in system identifiers.
-This has the same effect as in <A HREF="nsgmls.htm#optD">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optD">onsgmls</A>.
 <DT>
 <SAMP>-e</SAMP>
 <DD>
@@ -114,7 +118,7 @@ Describe open entities in error messages.
 <DT>
 <SAMP>-i<VAR>name</VAR></SAMP>
 <DD>
-This has the same effect as in <A HREF="nsgmls.htm#opti">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 <DT>
 <SAMP>-m</SAMP>
 <DD>
@@ -139,7 +143,7 @@ Print the version number.
 <DD>
 Control warnings and errors according to
 <SAMP><VAR>type</VAR></SAMP>.
-This has the same effect as in <A HREF="nsgmls.htm#optw">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optw">onsgmls</A>.
 </DL>
 <P>
 <ADDRESS>

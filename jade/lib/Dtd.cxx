@@ -18,7 +18,8 @@ Dtd::Dtd(const StringC &name, Boolean isBase)
   nElementDefinition_(0),
   nAttributeDefinitionList_(0),
   nElementType_(0),
-  isBase_(isBase)
+  isBase_(isBase),
+  isInstantitated_(0)
 {
   documentElementType_ = new ElementType(name, allocElementTypeIndex());
   insertElementType(documentElementType_);

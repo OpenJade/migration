@@ -1,10 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>Nsgmls Output Format</TITLE>
+<TITLE>Onsgmls Output Format</TITLE>
 </HEAD>
 <BODY>
-<H1>Nsgmls Output Format</H1>
+<H1>Onsgmls Output Format</H1>
 <P>
 The output is a series of lines.
 Lines can be arbitrarily long.
@@ -159,6 +159,18 @@ option is specified.
 Otherwise
 <CODE>TOKEN</CODE>
 will be used for ID values.
+
+<DT>
+<CODE>DATA <VAR>nname</VAR> <VAR>data</VAR></CODE>
+<DD>
+The attribute is character data with an associated notation.
+The definition of the notation and any applicable attributes of the notation
+will be given using subsequent <CODE>D<VAR>name</VAR> <VAR>val</VAR></CODE> 
+lines. This is used for attributes whose declared value is <CODE>DATA</CODE>. 
+It will be output only if the <CODE>-odata-attribute</CODE>
+option is specified. Otherwise <CODE>CDATA</CODE> will be used for DATA values.
+<DT>
+
 </DL>
 <DT>
 <CODE>D<VAR>ename</VAR> <VAR>name</VAR> <VAR>val</VAR></CODE>

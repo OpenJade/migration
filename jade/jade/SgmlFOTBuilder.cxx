@@ -72,6 +72,9 @@ public:
   void setGridColumnAlignment(Symbol);
   void setGridRowAlignment(Symbol);
   void setBoxType(Symbol);
+  void setSideBySideOverlapControl(Symbol sym);
+  void setSideBySidePreAlign(Symbol sym);
+  void setSideBySidePostAlign(Symbol sym);
   void setGlyphAlignmentMode(Symbol);
   void setBoxBorderAlignment(Symbol);
   void setCellRowAlignment(Symbol);
@@ -150,6 +153,8 @@ public:
   void setGridEquidistantColumns(bool);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
+  void setInlineSpaceSpace(const OptInlineSpace &);
+  void setCharMap(Symbol);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
 
   void paragraphBreak(const ParagraphNIC &);
@@ -160,8 +165,8 @@ public:
   void rule(const RuleNIC &);
   void alignmentPoint();
 
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   void pageNumber();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
@@ -186,6 +191,10 @@ public:
   void endSideline();
   void startBox(const BoxNIC &);
   void endBox();
+  void startSideBySide(const DisplayNIC&);
+  void endSideBySide();
+  void startSideBySideItem();
+  void endSideBySideItem();
   void startParagraph(const ParagraphNIC &);
   void endParagraph();
   void startSequence();
@@ -306,6 +315,7 @@ private:
   void integerC(const char *, long);
   void publicIdC(const char *, PublicId);
   void inlineSpaceC(const char *name, const InlineSpace &);
+  void optInlineSpaceC(const char*, const OptInlineSpace &);
   void displaySpaceNIC(const char *name, const DisplaySpace &);
   void flushPendingElements();
   void outputElementName(unsigned long groveIndex, const Char *, size_t);
@@ -506,8 +516,25 @@ OutputCharStream &operator<<(OutputCharStream &os,
   return os;
 }
 
-FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os)
+FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os, 
+	                       const FOTBuilder::Description *&descr)
 {
+  static const FOTBuilder::Feature features[] = {
+    { "sideline", 0},
+    { "side-by-side", 0},
+    { "table", 0},
+    { "math", 0},
+    { "simple-page", 0},
+    { "online", 0},
+    { 0, 0}
+  };
+  static FOTBuilder::Description description = {
+    0,  // Extension
+    features,
+    false
+  };
+  descr = &description;
+
   return new SgmlFOTBuilder(os);
 }
 
@@ -870,6 +897,21 @@ void SgmlFOTBuilder::setGridRowAlignment(Symbol sym)
 void SgmlFOTBuilder::setBoxType(Symbol sym)
 {
   symbolC("box-type", sym);
+}
+
+void SgmlFOTBuilder::setSideBySideOverlapControl(Symbol sym)
+{
+  symbolC("side-by-side-overlap-control", sym);
+}
+
+void SgmlFOTBuilder::setSideBySidePreAlign(Symbol sym)
+{
+  symbolC("side-by-side-pre-align", sym);
+}
+
+void SgmlFOTBuilder::setSideBySidePostAlign(Symbol sym)
+{
+  symbolC("side-by-side-post-align", sym);
 }
 
 void SgmlFOTBuilder::setGlyphAlignmentMode(Symbol sym)
@@ -1319,6 +1361,16 @@ void SgmlFOTBuilder::setEscapementSpaceAfter(const InlineSpace &is)
   inlineSpaceC("escapement-space-after", is);
 }
 
+void SgmlFOTBuilder::setInlineSpaceSpace(const OptInlineSpace &s)
+{
+  optInlineSpaceC("inline-space-space", s);
+}
+
+void SgmlFOTBuilder::setCharMap(Symbol sym)
+{
+  symbolC("char-map", sym);
+}
+
 void SgmlFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
 {
   if (tables.size() == 0) {
@@ -1359,6 +1411,14 @@ void SgmlFOTBuilder::inlineSpaceC(const char *s, const InlineSpace &is)
         || is.max.displaySizeFactor != is.nominal.displaySizeFactor)
       ics_ << ',' << is.min << ',' << is.max;
   }
+}
+
+void SgmlFOTBuilder::optInlineSpaceC(const char *ch, const OptInlineSpace &ois)
+{
+  if (ois.hasSpace)
+    inlineSpaceC(ch, ois.space);
+  else
+    ics_ << ' ' << ch << "=" << quot << falseString << quot;
 }
 
 void SgmlFOTBuilder::displayNIC(const DisplayNIC &nic)
@@ -1613,14 +1673,14 @@ void SgmlFOTBuilder::endScore()
   endFlow("score");
 }
 
-void SgmlFOTBuilder::startSimplePageSequence()
+void SgmlFOTBuilder::startSimplePageSequenceSerial()
 {
   startSimpleFlowObj("simple-page-sequence");
   suppressAnchors_ = 1;
   curOs_ = &hfs_;
 }
  
-void SgmlFOTBuilder::endSimplePageSequence()
+void SgmlFOTBuilder::endSimplePageSequenceSerial()
 {
   endFlow("simple-page-sequence");
 }
@@ -2100,6 +2160,33 @@ void SgmlFOTBuilder::startBox(const BoxNIC &nic)
 void SgmlFOTBuilder::endBox()
 {
   endFlow("box");
+}
+
+void SgmlFOTBuilder::startSideBySide(const DisplayNIC& nic)
+{
+  flushPendingElements();
+  os() << "<side-by-side";
+  displayNIC(nic);
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endSideBySide()
+{
+  endFlow("side-by-side");
+}
+
+void SgmlFOTBuilder::startSideBySideItem()
+{
+  os() << "<side-by-side-item";
+  flushPendingElements();
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endSideBySideItem()
+{
+  endFlow("side-by-side-item");
 }
 
 void SgmlFOTBuilder::alignmentPoint()

@@ -420,7 +420,30 @@ E1+sdTextClass++public text class of formal public identifier of SGML declaratio
 E0+sgmlDeclRefRequiresWww++SGML declaration reference was used but minimum literal was not "ISO 8879:1986 (WWW)"
 W0+pcdataGroupMemberOccurrenceIndicator++member of model group containing #PCDATA has occurrence indicator
 W0+pcdataGroupMemberModelGroup++member of model group containing #PCDATA is a model group
+E0+entityRefNone++reference to non-predefined entity
+E0+entityRefInternal++reference to external entity
+E0+implydefEntityDefault++declaration of default entity conflicts with IMPLYDEF ENTITY YES
+E0+sorryActiveDoctypes++Parsing with respect to more than one active doctype not supported
+E0+activeDocLink+7.1+Cannot have active doctypes and link types at the same time
 # message fragments
+# This isn't formally a quantity error, but we'll treat it as one.
+Q1+concurrentInstances+7.2.1+number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)
+E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document type
+E0+emptyStartTagBaseDtd+7.4.1.1+element not in the base document type can't have an empty start-tag
+E0+emptyEndTagBaseDtd+7.5.1.1+element not in base document type can't have an empty end-tag
+W0+immediateRecursion++immediately recursive element
+E1+urnMissingField++invalid universal resource name %1: missing : 
+E1+urnMissingPrefix++invalid universal resource name %1: missing urn: prefix 
+E1+urnInvalidNid++invalid universal resource name %1: invalid namespace identifier  
+E1+urnInvalidNss++invalid universal resource name %1: invalid namespace specific string 
+E1+urnExtraField++invalid universal resource name %1: extra field
+E0+omittedProlog++prolog can't be omitted unless CONCUR NO and LINK EXPLICIT NO and either IMPLYDEF ELEMENT YES or IMPLYDEF DOCTYPE YES
+E0+impliedDocumentElement++can't determine name of #IMPLIED document element
+E0+impliedDoctypeConcurLink++can't use #IMPLICIT doctype unless CONCUR NO and LINK EXPLICIT NO
+E0+sorryImpliedDoctype++Sorry, #IMPLICIT doctypes not implemented
+W0+dtdDataEntityReference++reference to DTD data entity ignored
+E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefined
+E1+dsEntityNotationUndefined++notation %1 for external subset undefined
 =1000
 +delimStart++delimiter 
 +delimEnd++

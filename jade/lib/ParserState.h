@@ -84,6 +84,7 @@ public:
   const Lpd &activeLpd(size_t i) const;
   ComplexLpd &defComplexLpd();
   Ptr<Dtd> lookupDtd(const StringC &name);
+  unsigned instantiateDtd(Ptr<Dtd> &dtd);
   Ptr<Dtd> baseDtd();
   void activateLinkType(const StringC &);
   void allLinkTypesActivated();
@@ -141,6 +142,7 @@ public:
   void pushInput(InputSource *);
   Boolean referenceDsEntity(const Location &);
   void setDsEntity(const ConstPtr<Entity> &);
+  const ConstPtr<Entity> &dsEntity() const;
   Boolean eventQueueEmpty() const;
   Event *eventQueueGet();
   EventHandler &eventHandler();
@@ -183,7 +185,7 @@ public:
   IdTableIter idTableIter();
   const ParserOptions &options() const;
   void enableImplydef();
-  Boolean implydefElement();
+  Sd::ImplydefElement implydefElement();
   Boolean implydefAttlist();
   void keepMessages();
   void releaseKeptMessages();
@@ -277,6 +279,7 @@ private:
   ConstPtr<Dtd> currentDtdConst_;
   Vector<Ptr<Dtd> > dtd_;
   Ptr<Dtd> pass1Dtd_;
+  unsigned instantiatedDtds_;
   ConstPtr<Syntax> syntax_;
   Vector<StringC> currentRank_;
   NamedTable<Id> idTable_;
@@ -287,7 +290,7 @@ private:
   Markup markup_;
   Location markupLocation_;
   Boolean hadAfdrDecl_;
-  Boolean implydefElement_;
+  Sd::ImplydefElement implydefElement_;
   Boolean implydefAttlist_;
   const volatile sig_atomic_t *cancelPtr_;
   static sig_atomic_t dummyCancel_;
@@ -695,7 +698,7 @@ const ParserOptions &ParserState::options() const
 }
 
 inline
-Boolean ParserState::implydefElement()
+Sd::ImplydefElement ParserState::implydefElement()
 {
   return implydefElement_;
 }
@@ -709,7 +712,7 @@ Boolean ParserState::implydefAttlist()
 inline
 void ParserState::enableImplydef()
 {
-  implydefElement_ = 1;
+  implydefElement_ = Sd::implydefElementYes;
   implydefAttlist_ = 1;
 }
 
@@ -835,6 +838,13 @@ Boolean ParserState::hadAfdrDecl() const
 {
   return hadAfdrDecl_;
 }
+
+inline
+const ConstPtr<Entity> &ParserState::dsEntity() const
+{
+  return dsEntity_;
+}
+
 
 #ifdef SP_NAMESPACE
 }

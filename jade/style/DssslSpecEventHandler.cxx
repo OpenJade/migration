@@ -7,6 +7,7 @@
 #include "InternalInputSource.h"
 #include "FOTBuilder.h"
 #include "macros.h"
+#include "Node.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -19,21 +20,18 @@ public:
   TextInputSourceOrigin(Text &text);
   Boolean defLocation(Offset off, const Origin *&, Index &) const;
   const Text &text() const { return text_; }
-  void noteCharRef(Index, const NamedCharRef &) {
-    CANNOT_HAPPEN();
-  }
-  void setExternalInfo(ExternalInfo *) {
-    CANNOT_HAPPEN();
-  }
-  InputSourceOrigin *copy() const { return new TextInputSourceOrigin(*this); }
-  const Location &parent() const { return refLocation_; }
+  void noteCharRef(Index, const NamedCharRef &);
+  void setExternalInfo(ExternalInfo *);
+  InputSourceOrigin *copy() const;
+  const Location &parent() const;
 private:
   Text text_;
   Location refLocation_;
 };
 
 DssslSpecEventHandler::DssslSpecEventHandler(Messenger &mgr)
-: mgr_(&mgr), gatheringBody_(0)
+: mgr_(&mgr), gatheringBody_(0), currentPart_(0), currentDoc_(0), 
+currentDecl_(0)
 {
 }
 
@@ -57,6 +55,8 @@ void DssslSpecEventHandler::load(SgmlParser &specParser,
       syn->generalSubstTable()->subst(normId);
     tem = doc->refPart(normId)->resolve(*this);
   }
+  if (tem && tem->partial()) 
+    mgr_->message(InterpreterMessages::partialSpec);
   resolveParts(tem, parts);
 }
 
@@ -70,11 +70,14 @@ DssslSpecEventHandler::Doc *DssslSpecEventHandler::findDoc(const StringC &sysid)
   return doc;
 }
 
-void DssslSpecEventHandler::resolveParts(Part *part,
-					 Vector<Part *> &parts)
+void DssslSpecEventHandler::resolveParts(Part *part, Vector<Part *> &parts)
 {
   if (!part)
     return;
+  if (parts.size() > 0 && parts[0]->style() != part->style()) {
+    mgr_->message(InterpreterMessages::mixedLanguages);
+    return;
+  }
   parts.push_back(part);
   if (part->setMark()) {
     mgr_->message(InterpreterMessages::useLoop);
@@ -133,13 +136,52 @@ static struct {
 } mappingTable[] = {
   { "STYLE-SPECIFICATION",
     &DssslSpecEventHandler::styleSpecificationStart,
-    &DssslSpecEventHandler::styleSpecificationEnd },
+    &DssslSpecEventHandler::specificationEnd },
   { "STYLE-SPECIFICATION-BODY",
-    &DssslSpecEventHandler::styleSpecificationBodyStart,
-    &DssslSpecEventHandler::styleSpecificationBodyEnd },
+    &DssslSpecEventHandler::specificationBodyStart,
+    &DssslSpecEventHandler::specificationBodyEnd },
+  { "TRANSFORMATION-SPECIFICATION",
+    &DssslSpecEventHandler::transformSpecificationStart,
+    &DssslSpecEventHandler::specificationEnd },
+  { "TRANSFORMATION-SPECIFICATION-BODY",
+    &DssslSpecEventHandler::specificationBodyStart,
+    &DssslSpecEventHandler::specificationBodyEnd },
   { "EXTERNAL-SPECIFICATION",
     &DssslSpecEventHandler::externalSpecificationStart,
     &DssslSpecEventHandler::externalSpecificationEnd },
+  { "FEATURES", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "BASESET-ENCODING", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "LITERAL-DESCRIBED-CHAR", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "ADD-NAME-CHARS",
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "ADD-SEPARATOR-CHARS",
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "STANDARD-CHARS", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "OTHER-CHARS", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "COMBINE-CHAR", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "MAP-SDATA-ENTITY", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "CHAR-REPERTOIRE", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
+  { "SGML-GROVE-PLAN", 
+    &DssslSpecEventHandler::declarationStart,
+    &DssslSpecEventHandler::declarationEnd },
 };
 
 void DssslSpecEventHandler::endProlog(EndPrologEvent *event)
@@ -251,6 +293,16 @@ void DssslSpecEventHandler::externalSpecificationEnd(const EndElementEvent &)
 
 void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &event)
 {
+  specificationStart(event, 1);
+}
+
+void DssslSpecEventHandler::transformSpecificationStart(const StartElementEvent &event)
+{
+  specificationStart(event, 0);
+}
+
+void DssslSpecEventHandler::specificationStart(const StartElementEvent &event, bool isStyle)
+{
   StringC empty;
   const StringC *idP = attributeString(event, "ID");
   if (!idP)
@@ -258,7 +310,9 @@ void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &eve
   PartHeader *header = currentDoc_->refPart(*idP);
   // FIXME give an error (or ignore) if header has part already
   const Text *useP = attributeText(event, "USE");
-  header->setPart(currentPart_ = new Part);
+  const StringC *partialP = attributeString(event, "PARTIAL");
+  bool isPartial = (partialP && *partialP == "PARTIAL");
+  header->setPart(currentPart_ = new Part(currentDoc_, isPartial, isStyle));
   if (useP) {
     const StringC &use = useP->string();
     size_t i = 0;
@@ -275,15 +329,14 @@ void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &eve
       i = j + 1;
     }
   }
-  // FIXME Give warning if selected part is incomplete
 }
 
-void DssslSpecEventHandler::styleSpecificationEnd(const EndElementEvent &event)
+void DssslSpecEventHandler::specificationEnd(const EndElementEvent &event)
 {
   currentPart_ = 0;
 }
 
-void DssslSpecEventHandler::styleSpecificationBodyStart(const StartElementEvent &event)
+void DssslSpecEventHandler::specificationBodyStart(const StartElementEvent &event)
 {
   if (currentPart_) {
     currentBody_.clear();
@@ -295,13 +348,67 @@ void DssslSpecEventHandler::styleSpecificationBodyStart(const StartElementEvent 
   }
 }
 
-void DssslSpecEventHandler::styleSpecificationBodyEnd(const EndElementEvent &event)
+void DssslSpecEventHandler::specificationBodyEnd(const EndElementEvent &event)
 {
   if (gatheringBody_) {
     if (currentPart_)
       currentPart_->append(new ImmediateBodyElement(currentBody_));
     gatheringBody_ = 0;
   }
+}
+
+void DssslSpecEventHandler::declarationStart(const StartElementEvent &event)
+{
+   if (currentPart_ || currentDoc_) {
+     currentBody_.clear();
+     gatheringBody_ = 1;
+     DssslSpecEventHandler::DeclarationElement::Type type;
+     if (event.name() == "FEATURES")
+       type = DssslSpecEventHandler::DeclarationElement::features;
+     else if (event.name() == "BASESET-ENCODING")
+       type = DssslSpecEventHandler::DeclarationElement::basesetEncoding;
+     else if (event.name() == "LITERAL-DESCRIBED-CHAR")
+       type = DssslSpecEventHandler::DeclarationElement::literalDescribedChar;
+     else if (event.name() == "ADD-NAME-CHARS")
+       type = DssslSpecEventHandler::DeclarationElement::addNameChars;
+     else if (event.name() == "ADD-SEPARATOR-CHARS")
+       type = DssslSpecEventHandler::DeclarationElement::addSeparatorChars;
+     else if (event.name() == "STANDARD-CHARS")
+       type = DssslSpecEventHandler::DeclarationElement::standardChars;
+     else if (event.name() == "OTHER-CHARS")
+       type = DssslSpecEventHandler::DeclarationElement::otherChars;
+     else if (event.name() == "COMBINE-CHAR")
+       type = DssslSpecEventHandler::DeclarationElement::combineChar;
+     else if (event.name() == "MAP-SDATA-ENTITY")
+       type = DssslSpecEventHandler::DeclarationElement::mapSdataEntity;
+     else if (event.name() == "CHAR-REPERTOIRE")
+       type = DssslSpecEventHandler::DeclarationElement::charRepertoire;
+     else if (event.name() == "SGML-GROVE-PLAN")
+       type = DssslSpecEventHandler::DeclarationElement::sgmlGrovePlan;
+     currentDecl_ = new DeclarationElement(type);
+     const StringC *str; 
+     if (str = attributeString(event, "NAME"))
+        currentDecl_->setName(*str);
+     if (str = attributeString(event, "TEXT"))
+        currentDecl_->setText(*str);
+     if (str = attributeString(event, "MODADD"))
+        currentDecl_->setModadd(*str);
+     if (str = attributeString(event, "DESC"))
+        currentDecl_->setDesc(*str);
+   }
+}
+
+void DssslSpecEventHandler::declarationEnd(const EndElementEvent &event) 
+{ 
+   if (gatheringBody_ && currentDecl_) { 
+     currentDecl_->setContent(currentBody_);
+     if (currentPart_) 
+	currentPart_->append(currentDecl_); 
+     else 
+       currentDoc_->append(currentDecl_); 
+     gatheringBody_ = 0; 
+     currentDecl_ = 0;
+   } 
 }
 
 TextInputSourceOrigin::TextInputSourceOrigin(Text &text)
@@ -312,6 +419,26 @@ TextInputSourceOrigin::TextInputSourceOrigin(Text &text)
 Boolean TextInputSourceOrigin::defLocation(Offset off, const Origin *&origin, Index &index) const
 {
   return text_.charLocation(off, origin, index);
+}
+
+void TextInputSourceOrigin::noteCharRef(Index, const NamedCharRef &)
+{
+  CANNOT_HAPPEN();
+}
+
+void TextInputSourceOrigin::setExternalInfo(ExternalInfo *)
+{
+  CANNOT_HAPPEN();
+}
+
+InputSourceOrigin *TextInputSourceOrigin::copy() const
+{
+  return new TextInputSourceOrigin(*this);
+}
+
+const Location &TextInputSourceOrigin::parent() const
+{
+  return refLocation_;
 }
 
 DssslSpecEventHandler::Doc::Doc()
@@ -381,6 +508,12 @@ DssslSpecEventHandler::Doc::refPart(const StringC &id, const Location &refLoc)
   return header;
 }
 
+void
+DssslSpecEventHandler::Doc::append(DeclarationElement *decl)
+{
+  declarations_.append(decl);
+}
+
 DssslSpecEventHandler::BodyElement::~BodyElement()
 {
 }
@@ -395,6 +528,30 @@ void DssslSpecEventHandler
 {
   TextInputSourceOrigin *origin = new TextInputSourceOrigin(text_);
   in = new InternalInputSource(origin->text().string(), origin);
+}
+
+DssslSpecEventHandler::DeclarationElement::DeclarationElement(Type type) 
+ : type_(type)
+{
+}
+
+void DssslSpecEventHandler
+::DeclarationElement::setContent(Text &content) 
+{
+  content_.swap(content);
+}
+
+void DssslSpecEventHandler
+::DeclarationElement::makeInputSource(DssslSpecEventHandler &, Owner<InputSource> &in)
+{
+  TextInputSourceOrigin *origin = new TextInputSourceOrigin(content_);
+  in = new InternalInputSource(origin->text().string(), origin);
+}
+
+DssslSpecEventHandler::DeclarationElement::Type 
+DssslSpecEventHandler::DeclarationElement::type() const 
+{ 
+  return type_; 
 }
 
 DssslSpecEventHandler
@@ -469,9 +626,19 @@ DssslSpecEventHandler::ExternalFirstPart::resolve(DssslSpecEventHandler &eh)
   return doc_->resolveFirstPart(eh);
 }
 
-DssslSpecEventHandler::Part::Part()
-: mark_(0)
+DssslSpecEventHandler::Part::Part(Doc *doc, bool partial, bool style)
+: mark_(0), doc_(doc), partial_(partial), style_(style)
 {
+}
+
+bool DssslSpecEventHandler::Part::partial()
+{
+  return partial_;
+}
+
+bool DssslSpecEventHandler::Part::style()
+{
+  return style_;
 }
 
 DssslSpecEventHandler::Part *
@@ -483,6 +650,16 @@ DssslSpecEventHandler::Part::resolve(DssslSpecEventHandler &)
 void DssslSpecEventHandler::Part::append(BodyElement *element)
 {
   bodyElements_.append(element);
+}
+
+void DssslSpecEventHandler::Part::append(DeclarationElement *element)
+{
+  declarations_.append(element);
+}
+
+DssslSpecEventHandler::Doc *DssslSpecEventHandler::Part::doc()
+{
+  return doc_;
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -8,19 +8,11 @@
 #define SP_POSIX_FILENAMES
 
 #ifdef __GNUG__
+// Ideally, this should be set in configure.in, I think
 // It's not missing, but it pulls in libg++
 #define SP_NEW_H_MISSING
 // set_new_handler() has to be declared extern "C"
 #define SP_SET_NEW_HANDLER_EXTERN_C
-#ifndef SP_MANUAL_INST
-#define SP_MANUAL_INST
-#endif
-#ifndef SP_ANSI_CLASS_INST
-#define SP_ANSI_CLASS_INST
-#endif
-#ifndef SP_HAVE_BOOL
-#define SP_HAVE_BOOL
-#endif
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 7)
 #define SP_ANSI_FOR_SCOPE
 #endif
@@ -37,7 +29,7 @@
 #define SP_STAT_BLKSIZE
 #endif
 
-#ifdef __MACH__
+#if (defined __MACH__) && (! defined __GNU__)
 #define SP_MUTEX_MACH
 #endif
 
@@ -292,6 +284,10 @@
 #define SP_NAMESPACE_SCOPE SP_NAMESPACE::
 #else
 #define SP_NAMESPACE_SCOPE
+#endif
+
+#ifndef DEFAULT_SCHEME_BUILTINS
+#define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
 #endif
 
 #endif /* not config_INCLUDED */

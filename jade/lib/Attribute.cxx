@@ -83,9 +83,9 @@ Boolean CdataDeclaredValue::tokenized() const
   return 0;
 }
 
-AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &context,
-					      const StringC &,
-					      unsigned &specLength) const
+void CdataDeclaredValue::checkNormalizedLength(Text &text, 
+                                               AttributeContext &context,
+                                               unsigned &specLength) const
 {
   const Syntax &syntax = context.attributeSyntax();
   size_t normsep = syntax.normsep();
@@ -99,6 +99,13 @@ AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &cont
     context.message(ParserMessages::normalizedAttributeValueLength,
 		    NumberMessageArg(litlen),
 		    NumberMessageArg(normalizedLength));
+}
+
+AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &context,
+					      const StringC &,
+					      unsigned &specLength) const
+{
+  checkNormalizedLength(text, context, specLength);
   return new CdataAttributeValue(text);
 }
 
@@ -110,6 +117,27 @@ void CdataDeclaredValue::buildDesc(AttributeDefinitionDesc &desc) const
 DeclaredValue *CdataDeclaredValue::copy() const
 {
   return new CdataDeclaredValue(*this);
+}
+
+DataDeclaredValue::DataDeclaredValue(const ConstPtr<Notation> &nt,
+                                     AttributeList &attributes)
+: notation_(nt)
+{
+  attributes.swap(attributes_);
+}
+
+AttributeValue *DataDeclaredValue::makeValue(Text &text,
+                                             AttributeContext &context,
+                                             const StringC &,
+                                             unsigned &specLength) const
+{
+  checkNormalizedLength(text, context, specLength);
+  return new DataAttributeValue(text, notation_, attributes_);
+}
+
+DeclaredValue *DataDeclaredValue::copy() const
+{
+  return new DataDeclaredValue(*this);
 }
 
 TokenizedDeclaredValue::TokenizedDeclaredValue(TokenType type,
@@ -1059,6 +1087,28 @@ Boolean CdataAttributeValue::recoverUnquoted(const StringC &str,
   return 0;
 }
 
+const Notation *CdataAttributeValue::notation() const
+{
+  return 0;
+}
+
+DataAttributeValue::DataAttributeValue(Text &text,
+                                       const ConstPtr<Notation> &nt,
+                                       const AttributeList &attributes)
+: CdataAttributeValue(text), notation_(nt), attributes_(&attributes)
+{
+}
+
+const AttributeList &DataAttributeValue::attributes() const
+{
+  return *attributes_;
+}
+
+const Notation *DataAttributeValue::notation() const
+{
+  return notation_.pointer();
+}
+
 Attribute::Attribute()
 : specIndexPlus_(0)
 {
@@ -1140,12 +1190,14 @@ void AttributeList::finish(AttributeContext &context)
     if (!vec_[i].specified()) {
       ConstPtr<AttributeValue> value
 	= def(i)->makeMissingValue(context);
-      vec_[i].setValue(value);
-      if (!value.isNull())
-	vec_[i].setSemantics(def(i)->makeSemantics(value.pointer(),
-						   context,
-						   nIdrefs_,
-						   nEntityNames_));
+      if (!conref_ || def_->notationIndex() != i) {
+	vec_[i].setValue(value);
+        if (!value.isNull())
+      	  vec_[i].setSemantics(def(i)->makeSemantics(value.pointer(),
+						     context,
+						     nIdrefs_,
+						     nEntityNames_));
+      }
     }
   const Syntax &syntax = context.attributeSyntax();
   if (nIdrefs_ > syntax.grpcnt())

@@ -73,7 +73,8 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
   currentMarkup_(0),
   cancelPtr_(&dummyCancel_),
   finalPhase_(finalPhase),
-  hadAfdrDecl_(0)
+  hadAfdrDecl_(0),
+  instantiatedDtds_(0)
 {
 }
 
@@ -216,7 +217,7 @@ void ParserState::startDtd(const StringC &name)
     Text text;
     text.addChar(instanceSyntax_->entityChar(i), Location());
     Entity *entity
-      = new InternalCdataEntity(instanceSyntax_->entityName(i),
+      = new PredefinedEntity(instanceSyntax_->entityName(i),
 				Location(),
 				text);
     defDtd_->insertEntity(entity);
@@ -417,8 +418,26 @@ void ParserState::startInstance()
   if (!instanceSyntax_.isNull())
     syntax_ = instanceSyntax_;
   currentMode_ = econMode;
-  currentDtd_ = dtd_[0];
-  currentDtdConst_ = dtd_[0];
+
+  currentDtd_.clear();
+  for (size_t i = 0; i < dtd_.size(); i++) {
+    if (shouldActivateLink(dtd_[i]->name())) {
+      if (nActiveLink() > 0) {
+	message(ParserMessages::activeDocLink);
+	break;
+      }
+      else if (!currentDtd_.isNull()) {
+	message(ParserMessages::sorryActiveDoctypes);
+	break;
+      }
+      else 
+	currentDtd_ = dtd_[i];
+    }  
+  }  
+  if (currentDtd_.isNull())
+    currentDtd_ = dtd_[0];
+  currentDtdConst_ = currentDtd_;
+
   startContent(currentDtd());
   inInstance_ = 1;
   if (sd().rank())
@@ -528,9 +547,11 @@ ParserState::lookupEntity(Boolean isParameter,
 
 ConstPtr<Entity> ParserState::createUndefinedEntity(const StringC &name, const Location &loc)
 {
-  Text text;
-  Ptr<Entity> entity(new InternalCdataEntity(name, loc, text));
+  ExternalId extid;
+  Ptr<Entity> entity(new ExternalTextEntity(name, EntityDecl::generalEntity, 
+					    loc, extid));
   undefinedEntityTable_.insert(entity);
+  entity->generateSystemId(*this);
   return entity;
 }
 
@@ -753,8 +774,19 @@ ConstPtr<Notation> ParserState::getAttributeNotation(const StringC &name,
 						     const Location &)
 {
   ConstPtr<Notation> notation;
-  if (haveCurrentDtd())
+  if (haveCurrentDtd()) {
     notation = currentDtd().lookupNotation(name);
+    if (notation.isNull() && sd().implydefNotation()) {
+      Ptr<Notation> nt = new Notation(name, 
+				      currentDtd().namePointer(), 
+				      currentDtd().isBase());
+      ExternalId id;
+      nt->setExternalId(id, Location());
+      nt->generateSystemId(*this);				       
+      currentDtdNonConst().insertNotation(nt);
+      notation = currentDtd().lookupNotation(name);      
+    }
+  }
   else if (resultAttributeSpecMode_) {
     const Dtd *resultDtd = defComplexLpd().resultDtd().pointer();
     if (!resultDtd)
@@ -817,6 +849,18 @@ ConstPtr<AttributeValue> ParserState::getCurrentAttribute(size_t i) const
 const Syntax &ParserState::attributeSyntax() const
 {
   return syntax();
+}
+
+unsigned ParserState::instantiateDtd(Ptr<Dtd> &dtd)
+{
+  if (!dtd->isInstantiated()) {
+    dtd->instantiate();
+    if (instantiatedDtds_ == sd().concur())
+      message(ParserMessages::concurrentInstances,
+              NumberMessageArg(sd().concur()));
+    instantiatedDtds_++;
+  }
+  return instantiatedDtds_;
 }
 
 #ifdef SP_NAMESPACE

@@ -50,6 +50,7 @@ void AllowedParams::init()
   for (int i = 0; i < Syntax::nNames; i++)
     reservedNames_[i] = 0;
   mainMode_ = mdMode;
+  silent_ = 0;
   mdc_ = 0;
   rni_ = 0;
   dso_ = 0;
@@ -68,6 +69,9 @@ void AllowedParams::allow(Param::Type p)
 {
   switch (p) {
   case Param::invalid:
+    break;
+  case Param::silent:
+    silent_ = 1;
     break;
   case Param::dso:
     dso_ = 1;

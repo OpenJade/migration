@@ -1,5 +1,9 @@
-PROG=nsgmls
+PROG=onsgmls
 OBJS=nsgmls.o SgmlsEventHandler.o RastEventHandler.o StringSet.o nsgmls_inst.o
 INCLUDE=
-XLIBS=../lib/libsp.a
-GENSRCS=nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h
+XLIBS=../lib/libosp.a
+GENSRCS=nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h \
+        NsgmlsMessages.rc RastEventHandlerMessages.rc
+
+nsgmls.o: NsgmlsMessages.h
+RastEventHandler.o: RastEventHandlerMessages.h

@@ -1,11 +1,14 @@
-LIB=sp
+LTVERSION=0:0:0
+LIB=osp
 INCLUDE=-I$(srcdir)/../generic
+DEPLIBS=-lm
 MSGGENFLAGS=-l
 COMMON_OBJS=Allocator.o Link.o IListBase.o TypeId.o assert.o
 ENTMGR_OBJS=CharsetInfo.o EntityCatalog.o EntityDecl.o EntityManager.o \
  Hash.o InputSource.o Location.o Message.o MessageArg.o \
  UnivCharsetDesc.o entmgr_inst.o
-XENTMGR_OBJS=LiteralStorage.o URLStorage.o RewindStorageObject.o \
+XENTMGR_OBJS=DtdDeclEventHandler.o \
+  LiteralStorage.o URLStorage.o RewindStorageObject.o \
   ErrnoMessageArg.o OffsetOrderedList.o DescriptorManager.o \
   ExtendEntityManager.o PosixStorage.o StdioStorage.o NotationStorage.o \
   StorageManager.o CodingSystem.o IdentityCodingSystem.o \
@@ -41,9 +44,40 @@ GENSRCS=version.h entmgr_inst.cxx \
   ParserMessages.h parser_inst.cxx app_inst.cxx \
   ParserAppMessages.h CmdLineAppMessages.h \
   ArcEngineMessages.h arc_inst.cxx MessageReporterMessages.h \
-  MessageFormatterMessages.h
+  MessageFormatterMessages.h \
+  ArcEngineMessages.cxx MessageFormatterMessages.cxx PosixStorageMessages.cxx \
+  CatalogMessages.cxx MessageReporterMessages.cxx StdioStorageMessages.cxx \
+  CmdLineAppMessages.cxx ParserAppMessages.cxx URLStorageMessages.cxx \
+  EntityManagerMessages.cxx ParserMessages.cxx \
+  URLStorageMessages.rc EntityManagerMessages.rc PosixStorageMessages.rc \
+  StdioStorageMessages.rc CatalogMessages.rc ParserMessages.rc \
+  MessageFormatterMessages.rc MessageReporterMessages.rc CmdLineAppMessages.rc \
+  ParserAppMessages.rc ArcEngineMessages.rc
 
 $(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@
 	$(PERL) -w $(srcdir)/mkversion.pl $(srcdir)/../VERSION >$@
 	chmod -w $@
+
+URLStorage.o: URLStorageMessages.h
+URLStorage.lo: URLStorageMessages.h
+PosixStorage.o: PosixStorageMessages.h
+PosixStorage.lo: PosixStorageMessages.h
+StdioStorage.o: StdioStorageMessages.h
+StdioStorage.lo: StdioStorageMessages.h
+SOEntityCatalog.o: CatalogMessages.h
+SOEntityCatalog.lo: CatalogMessages.h
+ExtendEntityManager.o: EntityManagerMessages.h
+ExtendEntityManager.lo: EntityManagerMessages.h
+ParserState.o: ParserMessages.h
+ParserState.lo: ParserMessages.h
+MessageFormatter.o: MessageFormatterMessages.h
+MessageFormatter.lo: MessageFormatterMessages.h
+MessageReporter.o: MessageReporterMessages.h
+MessageReporter.lo: MessageReporterMessages.h
+CmdLineApp.o: version.h CmdLineAppMessages.h
+CmdLineApp.lo: version.h CmdLineAppMessages.h
+ParserApp.o: ParserAppMessages.h
+ParserApp.lo: ParserAppMessages.h
+ArcEngine.o: ArcEngineMessages.h
+ArcEngine.lo: ArcEngineMessages.h

@@ -1,20 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>SX</TITLE>
+<TITLE>OSX</TITLE>
 </HEAD>
 <BODY>
-<H1>SX</H1>
+<H1>OSX</H1>
 <H4>
-An SGML System Conforming to
-International Standard ISO 8879 --<BR>
+An SGML System Conforming to International Standard ISO 8879 --
 Standard Generalized Markup Language
+</H4>
+<H4>
+An SGML Extended Facilities system conforming to
+Annex A of International Standard ISO/IEC 10744 --
+Hypermedia/Time-based Structuring Language
 </H4>
 <H2>
 SYNOPSIS
 </H2>
 <P>
-<CODE>sx</CODE>
+<CODE>osx</CODE>
 [
 <CODE>-Cehilprvx</CODE>
 ]
@@ -39,11 +43,11 @@ SYNOPSIS
 <CODE><VAR>sysid...</VAR></CODE>
 <H2>DESCRIPTION</H2>
 <P>
-SX converts SGML to XML.
-SX parses and validates the SGML document contained in
+Osx converts SGML to XML.
+Osx parses and validates the SGML document contained in
 <CODE><VAR>sysid...</VAR></CODE>
 and writes an equivalent XML document to the standard output.
-SX will warn about SGML constructs which have no XML equivalent.
+Osx will warn about SGML constructs which have no XML equivalent.
 <P>
 The following options are available:
 <DL>
@@ -51,7 +55,7 @@ The following options are available:
 <CODE>-b<VAR>encoding</VAR></CODE>
 <DD>
 Use <A HREF="charset.htm#encodings"><CODE><VAR>encoding</VAR></CODE></A> for output.
-By default SX uses UTF-8.
+By default osx uses UTF-8.
 <DT>
 <CODE>-c<VAR>file</VAR></CODE>
 <DD>
@@ -60,14 +64,14 @@ Use the catalog entry file
 <DT>
 <CODE>-C</CODE>
 <DD>
-This has the same effect as in <A HREF="nsgmls.htm#optC">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optC">onsgmls</A>.
 <DT>
 <CODE>-D<VAR>directory</VAR></CODE>
 <DD>
 Search
 <CODE><VAR>directory</VAR></CODE>
 for files specified in system identifiers.
-This has the same effect as in <A HREF="nsgmls.htm#optD">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optD">onsgmls</A>.
 <DT>
 <CODE>-e</CODE>
 <DD>
@@ -82,7 +86,7 @@ of stderr.
 <DT>
 <CODE>-i<VAR>name</VAR></CODE>
 <DD>
-This has the same effect as in <A HREF="nsgmls.htm#opti">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 <DT>
 <CODE>-v</CODE>
 <DD>
@@ -92,7 +96,7 @@ Print the version number.
 <DD>
 Control warnings and errors according to
 <CODE><VAR>type</VAR></CODE>.
-This has the same effect as in <A HREF="nsgmls.htm#optw">nsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optw">onsgmls</A>.
 <DT>
 <CODE>-x<VAR>xml_output_option</VAR></CODE>
 <DD>
@@ -103,7 +107,7 @@ Control the XML output according to the value of
 <CODE>no-nl-in-tag</CODE>
 <DD>
 Don't use newlines inside start-tags.
-Usually SX uses newlines inside start-tags so as to reduce the
+Usually osx uses newlines inside start-tags so as to reduce the
 probability of excessively long lines.
 <DT>
 <CODE>id</CODE>
@@ -118,7 +122,7 @@ Output declarations for notations.
 <DD>
 Output declarations for external data entities.
 XML requires these to be NDATA.
-SX will warn about CDATA and SDATA external data entities and
+Osx will warn about CDATA and SDATA external data entities and
 output them as NDATA entities.
 <DT>
 <CODE>cdata</CODE>

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>SP - Catalogs</TITLE>
+<TITLE>OpenSP - Catalogs</TITLE>
 </HEAD>
 <BODY>
 <H1>Catalogs</H1>
@@ -88,6 +88,13 @@ not support this extension.
 This specifies that if the document does not contain an SGML declaration,
 the SGML declaration in <SAMP><VAR>sysid</VAR></SAMP> should be implied.
 <DT>
+<A NAME="dtddecl"><SAMP>DTDDECL <VAR>pubid</VAR> <VAR>sysid</VAR></SAMP></A>
+<DD>
+This specifies that if the document does not contain an SGML declaration
+and uses a doctype declaration with public identifier 
+<SAMP><VAR>pubid</VAR></SAMP>, the SGML declaration in 
+<SAMP><VAR>sysid</VAR></SAMP> should be implied.
+<DT>
 <SAMP>DOCUMENT <VAR>sysid</VAR></SAMP>
 <DD>
 This specifies that the document entity is <SAMP><VAR>sysid</VAR></SAMP>.
@@ -118,6 +125,15 @@ using a catalog whose system identfier is
 <SAMP><VAR>sysid</VAR></SAMP>.  For more details, see <A
 HREF="http://www.entmp.org/fpi-urn/delegate.html">A Proposal for
 Delegating SGML Open Catalogs</A>.
+<DT>
+<SAMP>SGML <VAR>name</VAR> <VAR>sysid</VAR></SAMP>
+<DD>
+This specifies that the SGML declaration body in <SAMP><VAR>sysid</VAR></SAMP>
+should be used when the document starts with a reference to an SGML
+declaration named <SAMP><VAR>name</VAR></SAMP>. This is an OpenSP-specific 
+extension of the SGML Open catalog format. SGML declaration references 
+are defined in 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K of ISO 8879</A>.
 </DL>
 <P>
 The delimiters can be omitted from the <SAMP><VAR>sysid</VAR></SAMP>
@@ -158,9 +174,11 @@ specificity is (most specific first):
 <SAMP>DELEGATE</SAMP> entries ordered by the length of the prefix,
 longest first;
 <LI>
-<SAMP>ENTITY</SAMP>, <SAMP>DOCTYPE</SAMP>, <SAMP>LINKTYPE</SAMP> and
-<SAMP>NOTATION</SAMP> entries.
+<SAMP>ENTITY</SAMP>, <SAMP>DOCTYPE</SAMP>, <SAMP>LINKTYPE</SAMP>,
+<SAMP>NOTATION</SAMP> and <SAMP>SGML</SAMP> entries.
 </UL>
+<P>For the purpose of implying an SGML declaration, <SAMP>DTDDECL</SAMP>
+entries are more specific than <SAMP>SGMLDECL</SAMP> entries.
 <P>
 <ADDRESS>
 James Clark<BR>

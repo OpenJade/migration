@@ -316,9 +316,11 @@ int CmdLineApp::init(int, AppChar **argv)
   if (progName)
     setProgramName(convertInput(progName));
   MessageTable::instance()->registerMessageDomain(MessageFragment::libModule,
-                                                  "sp", SP_LOCALE_DIR);
+                                                  SP_MESSAGE_DOMAIN, 
+                                                  SP_LOCALE_DIR);
   MessageTable::instance()->registerMessageDomain(MessageFragment::appModule,
-                                                  "sp", SP_LOCALE_DIR);
+                                                  SP_MESSAGE_DOMAIN, 
+                                                  SP_LOCALE_DIR);
   return 0;
 }
 

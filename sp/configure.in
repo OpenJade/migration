@@ -37,10 +37,9 @@ AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale)
-dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
-dnl rely on PACKAGE and VERSION substitutions.
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
+SP_MESSAGE_DOMAIN=sp
+AC_DEFINE_UNQUOTED(SP_MESSAGE_DOMAIN, "$SP_MESSAGE_DOMAIN", [Message domain])
+AC_SUBST(SP_MESSAGE_DOMAIN) 
 
 dnl Checks for header files.
 AC_HEADER_STDC

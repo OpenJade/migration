@@ -2113,7 +2113,7 @@ void unparseSoi(const StringC &soi,
 	|| univ < 32
 	|| univ == 36		// $
 	|| univ == 96		// `
-#ifndef MSDOS_FILENAMES
+#ifndef SP_MSDOS_FILENAMES
 	|| univ == 92		// backslash
 #endif
 	|| univ == 94		// ^

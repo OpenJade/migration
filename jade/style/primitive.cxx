@@ -3696,6 +3696,7 @@ DEFPRIMITIVE(Data, argc, argv, context, interp, loc)
   ELObjDynamicRoot protect(interp, s);
   bool chunkComplete = nl->chunkComplete();
   for (;;) {
+    ELObjDynamicRoot protect(interp, nl);
     NodePtr nd = nl->nodeListFirst(interp);
     if (!nd)
       break;

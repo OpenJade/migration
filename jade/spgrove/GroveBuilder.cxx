@@ -414,6 +414,7 @@ public:
   virtual bool same2(const DefaultEntityNode *) const;
   const GroveImpl *grove() const { return grove_; }
   AccessResult nextSibling(NodePtr &ptr) const;
+  AccessResult nextChunkSibling(NodePtr &ptr) const;
   AccessResult follow(NodeListPtr &ptr) const;
   AccessResult children(NodeListPtr &) const;
   AccessResult getOrigin(NodePtr &ptr) const;
@@ -5217,6 +5218,50 @@ bool BaseNode::same2(const DefaultEntityNode *) const
 AccessResult BaseNode::nextSibling(NodePtr &ptr) const
 {
   return nextChunkSibling(ptr);
+}
+
+class NodalPropertyValue : public PropertyValue {
+public:
+NodePtr nd;
+NodeListPtr nl;
+NamedNodeListPtr nnl;
+void set(const NodePtr &x) { nd = x; }
+void set(const NodeListPtr &x) { nl = x; }
+void set(const NamedNodeListPtr &x) { nnl = x; }
+void set(bool) { CANNOT_HAPPEN(); }
+void set(GroveChar) { CANNOT_HAPPEN(); }
+void set(GroveString) { CANNOT_HAPPEN(); }
+void set(ComponentName::Id) { CANNOT_HAPPEN(); }
+void set(const GroveStringListPtr &) { CANNOT_HAPPEN(); }
+void set(const ComponentName::Id *) { CANNOT_HAPPEN(); }
+void set(long) { CANNOT_HAPPEN(); }
+};
+
+AccessResult BaseNode::nextChunkSibling(NodePtr &ptr) const
+{
+  NodePtr origin;
+  ComponentName::Id id;
+  NodalPropertyValue pv;
+  SdataMapper sm;
+  NodeListPtr nl;
+  if (getOrigin(origin) != accessOK
+      || getOriginToSubnodeRelPropertyName(id) != accessOK
+      || origin->property(id, sm, pv) != accessOK)
+    return accessNull;
+  if (pv.nd)
+    return accessNull;
+  nl = pv.nl  ? pv.nl : pv.nnl->nodeList();
+  for (;;) {
+    NodePtr nd;
+    if (nl->first(nd) != accessOK
+       || nl->rest(nl) != accessOK)
+      return accessNull;
+    if (*nd == *ptr)
+      break;
+  }
+  if (nl->first(ptr) != accessOK)
+    return accessNull;
+  return accessOK;
 }
 
 AccessResult BaseNode::follow(NodeListPtr &ptr) const

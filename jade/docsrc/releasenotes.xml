@@ -3,8 +3,8 @@
 ]>
 <book>
 <bookinfo>
-	<title>Release Notes 1.3.1</title>
-	<subtitle>OpenJade</subtitle>
+	<title>OpenJade 1.3.1</title>
+	<subtitle>Release Notes</subtitle>
 	<corpauthor>OpenJade Project</corpauthor>
         <edition>Release 1.3.1</edition>
         <pubdate>January 2002</pubdate>
@@ -14,6 +14,32 @@
         </copyright>
 </bookinfo>
 
+<preface><title>Acknowledgements</title>
+<para>It goes without saying that the release of OpenJade 1.3.1 is the work of many people and it would be impossible to name everyone who has made some contribution. However, I would particularly like to thank for their patches, testing
+and feedback:
+Karl Eichwalder (SuSE),
+Markus Hoenika,
+Francis J. Lacoste,
+Kogul&eacute Ryo,
+Leigh Smith (Fink Project), 
+Tim Waugh (Red Hat),
+and
+Didier PH Martin.
+</para>
+<para>I would also like to thank sourceforge.net for their great gift of providing CVS, email and the compile farm which have made the task of getting this
+release ready much easier.</para>
+<para>Finally, I must thank my employers, LOOK Systems, for their generosity in
+allowing me to work on this release, even though I spent much more time
+on it than I said I would.</para>
+<para>
+<address>
+<firstname>Ian</firstname> <surname>Castle</surname> <email>ian.castle@looksystems.co.uk</email>
+<state>Yorkshire</state>
+<country>England</country>
+<otheraddr>January 2002</otheraddr>
+</address>
+</para>
+</preface>
 <chapter><title>OpenJade 1.3.1 Release Notes</title>
 
 <para>OpenJade is a suite of tools for validating, processing and applying DSSSL (Document Style Semantics and Specification Language) style sheets to SGML and XML documents.</para>
@@ -21,7 +47,7 @@
 and extend James Clark's Jade, as well as the related SP suite of SGML/XML processing tools. OpenJade and OpenSP are distributed under the same license as Jade.</para>
 
 <sect1><title>Applications of OpenJade</title>
-<para>Many different projects, organisations and companies make use of OpenJade to publish documentation. The SGML/XML backend enables the generation of "world wide web ready" documents while the TeX backend allows high quality "ready for press" output to be obtained. The FreeBSD Handbook (second edition) ISBN: 1571763031 is one such example of a book created using OpenJade.</para>
+<para>Many different projects, organizations and companies make use of OpenJade to publish documentation. The SGML/XML backend enables the generation of "world wide web ready" documents while the TeX backend allows high quality "ready for press" output to be obtained. The FreeBSD Handbook (second edition) ISBN: 1571763031 is one such example of a book created using OpenJade.</para>
 <para>The OpenSP (and SP) library has been used for the basis of a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the SP library.</para>
 </sect1>
 
@@ -46,7 +72,7 @@ available</para>
 <para>The following table details known successful builds</para>
 <table id="platforms" frame="topbot"><title>Platforms on which OpenJade is known to build</title>
 <tgroup cols="4" align="left" colsep="0" rowsep="0">
-<colspec colname="c1" colwidth="1*" />
+<colspec align="left" colname="c1" colwidth="1*" />
 <colspec colname="c2" colwidth="2*" />
 <colspec colname="c3" colwidth="2*" />
 <colspec colname="c4" colwidth="3*" />
@@ -60,69 +86,60 @@ available</para>
 </thead>
 <tbody>
 <row>
-   <entry>i386</entry>
-   <entry>RedHat Linux 6.2</entry>
+   <entry align="left" morerows="7">i386</entry>
+   <entry>Red Hat Linux 6.2</entry>
    <entry>egcs++, gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>i386</entry>
-   <entry>RedHat Linux 7.2</entry>
+   <entry>Red Hat Linux 7.2</entry>
    <entry>Red Hat gcc 2.96</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>SuSE Linux 7.3</entry>
    <entry>gcc 2.95.3, gcc 3.0</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>Mandrake Linux 8.0, 8.1</entry>
    <entry>Red Hat gcc 2.96</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>Debian GNU/Linux 2.2</entry>
    <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>FreeBSD 4.4</entry>
    <entry>gcc 2.95.3</entry>
    <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
 the default <command>make</command> program.</emphasis></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>Microsoft Win32</entry>
    <entry>Visual C++ 6.0</entry>
    <entry><emphasis>It is likely that VC++ 4.2 and 5.0 will also work, see
 build.htm for further details.</emphasis></entry>
 </row>
 <row>
-   <entry>i386</entry>
    <entry>Cygwin 1.3.6 Win32</entry>
    <entry>gcc 2.95.3</entry>
    <entry><emphasis>Executables and Libraries must be built statically. Later versions of Cygwin should also work.</emphasis></entry>
 </row>
 <row>
-   <entry>Alpha AXP</entry>
+   <entry morerows="2">Alpha AXP</entry>
    <entry>SuSE Linux 7.3</entry>
    <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>Alpha AXP</entry>
    <entry>Debian GNU/Linux 2.2</entry>
    <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>Alpha AXP</entry>
    <entry>Digital UNIX 4.0D</entry>
    <entry>gcc 2.95.3</entry>
    <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
@@ -130,31 +147,29 @@ the default <command>make</command> program.</emphasis></entry>
 </row>
 <row>
    <entry>ia64</entry>
-   <entry>Suse Linux 7.3</entry>
+   <entry>SuSE Linux 7.3</entry>
    <entry>gcc 3.0</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>PPC</entry>
+   <entry morerows="1">PPC</entry>
    <entry>SuSE Linux 7.3</entry>
    <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>PPC</entry>
    <entry>Mac OS X 10.1 (Darwin 1.4)</entry>
    <entry>gcc 2.95.3</entry>
    <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
 the default <command>make</command> program.</emphasis></entry>
 </row>
 <row>
-   <entry>Sparc</entry>
+   <entry morerows="1">Sparc</entry>
    <entry>SuSE Linux 7.3</entry>
    <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 <row>
-   <entry>Sparc</entry>
    <entry>Solaris (SunOS 5.8)</entry>
    <entry>gcc 2.95.3</entry>
    <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
@@ -171,8 +186,8 @@ the default <command>make</command> program. Use configure options <command>--en
 </table>
 <para>Please report any successful builds not mentioned above to <email>openjade-devel@lists.sourceforge.net</email>, including any diffs/patches you have used.</para>
 </sect1>
-<sect1><title>Building OpenJade from source</title>
-<para>OpenJade requres 40Mb to 50Mb of disk space to build. An installation
+<sect1><title>Building OpenJade from Source</title>
+<para>OpenJade requires 40Mb to 50Mb of disk space to build. An installation
 will require around 15Mb to 20Mb depending on architecture.</para>
 <para>OpenJade makes use of the GNU software configuration tools (autoconf, libtool, automake etc).
 The GNU C++ compiler and make utility should also be used.
@@ -238,19 +253,19 @@ In addition to the standard options, the following table describes options speci
 <para>Please refer to the system documentation for details on building on the Win32 platform.</para>
 </sect1>
 <sect1><title>Binary Distributions</title>
-<para>Although the OpenJade project does not make binary distributions available, OpenJade has been a key part of many software distributions, including the major Linux distributions as well as FreeBSD. Expect pre-compiled and packaged versions of the latest version of OpenJade to be available from your distributor in due course.</para>
+<para>Although the OpenJade project does not make binary distributions available, OpenJade has been a part of many software distributions, including the major Linux distributions as well as FreeBSD. Expect pre-compiled and packaged versions of the latest version of OpenJade to be available from your distributor in due course.</para>
 </sect1>
 <sect1><title>Installation</title>
 <para>In addition to the OpenJade executables and libraries you will also need various DTDs and stylesheets.
 Some DTDs and associated files (entity definitions) are available in the <filename>pubtext</filename> directory of the distribution.
 However, more authoritative sources should be referenced to ensure that up-to-date versions are used. If you wish to process XML files, then suitable SGML declarations for valid XML documents should be used. Again, a sample set of declarations (<filename>xml.dcl</filename>) is provided in the <filename>pubtext</filename>, but more complete or recent versions may be available from other sources.</para>
 <para>OpenJade supports the standard SGML catalog facility; it is
-recommended that you set up and use such a catlog system.
+recommended that you set up and use such a catalog system.
 Generally speaking
 you will create your own DSSSL stylesheets for use with OpenJade, however, users
 of the OASIS DocBook DTD should be aware that extensive, and modular, stylesheets are available from the DocBook project at http://docbook.sourceforge.net.</para>
 <para>If you wish to make use of the TeX backend you will require an up to
-date distribution of latex such as tetex, TeXlive or fpTeX. In addition you
+date distribution of laTeX such as teTeX, TeXlive or fpTeX. In addition you
 will also require the jadetex package, available from http://jadetex.sourceforge.net.</para>
 </sect1>
 <sect1><title>Support</title>
@@ -261,55 +276,39 @@ Instead, you should look to the community for support.
 Once part of the community, you, in turn, will be able to play your part in
 helping those that come after you. Here are some pointers to obtaining help:</para>
 
+<itemizedlist>
+<listitem>
 <para>If you obtained your OpenJade tools in binary form from your operating system distributor and you have a build related problem -
 such as openjade crashing, then your first port of call should be your distributor.</para>
+</listitem>
 
+<listitem>
 <para>If you have a problem with the usage of openjade and tools, or general queries about DSSSL then you should try the DSSSL mailing list, see http://www.mulberrytech.com/dsssl/dssslist/ for details.</para>
+</listitem>
 
+<listitem>
 <para>If you are using the DocBook DTD and especially if you are also using the Modular DocBook DSSSL stylesheets, then the docbook-apps mailing list is the place to go.
 See http://www.oasis-open.org/docbook/mailinglist/ for details.</para>
+</listitem>
 
-<para>If you have a patch or bug fix for OpenJade, or are trying to use the OpenSP API then the openjade-devel mailling list is the appropriate forum.</para>
+<listitem>
+<para>If you have a patch or bug fix for OpenJade, or are trying to use the OpenSP API then the openjade-devel mailing list is the appropriate forum.</para>
+</listitem>
 
-<para>Please however, choose only one mailing list to post to, as cross-posting is generally frowned upon.
-The various mailling lists are archived and searchable.
+</itemizedlist>
+
+<para>Please choose only one mailing list to post to, as cross-posting is generally frowned upon.
+The various mailing lists are archived and searchable.
 It is always worth searching for your problem first, as it is often the case that someone has had the same problem before.</para>
+
 </sect1>
 <sect1><title>Version 1.3.1</title>
 <formalpara><title>Released January 2002.</title>
-<para>This release is primarily a maintenance release. It delivers two key advantages over the OpenJade 1.3 release: Support for contemporary platforms (operating systems and compilters) and incorporates the various patches and improvements, especially to the TeX backend which have been extensively used over the last few years. Probably the biggest benefit to TeX backend users are the enhanced table support and improved two sided output support (in conjuction with improvements to the companion jadetex package).</para>
+<para>This release is primarily a maintenance release. It delivers two key advantages over the OpenJade 1.3 release: Support for contemporary platforms (operating systems and compilers) and incorporates the various patches and improvements, especially to the TeX backend, which have been extensively used over the last few years. Probably the biggest benefit to TeX backend users are the enhanced table support and improved two sided output support (in conjunction with improvements to the companion jadetex package).</para>
 </formalpara>
-<para>The following table details the major improvments in Openjade 1.3.1</para>
+<para>The following table details the major improvements in Openjade 1.3.1</para>
 
 <table id="openjade131fixes" frame="topbot"><title>Changes for release 1.3.1</title>
-<tgroup cols="2" align="left" colsep="0" rowsep="0">
-<colspec colname="c1" colwidth="1*" />
-<colspec colname="c2" colwidth="3*" />
-<thead>
-<row rowsep="1">
-	<entry>Item 1</entry>
-	<entry>Short description of issue</entry>
-</row>
-</thead>
-<tbody>
-<row>
-	<entry><para>References</para></entry>
-	<entry><para>External Reference</para></entry>
-</row>
-<row>
-	<entry><para>Category</para></entry>
-	<entry><para>Software Bug</para></entry>
-</row>
-<row>
-<entry><para>Problem</para></entry>
-<entry><para>Description of Problem</para></entry>
-</row>
-<row>
-<entry><para>Resolution</para></entry>
-<entry><para>Description of Resolution</para></entry>
-</row>
-</tbody>
-</tgroup>
 <tgroup cols="2" align="left" colsep="0" rowsep="0">
 <colspec colname="c1" colwidth="1*" />
 <colspec colname="c2" colwidth="3*" />
@@ -326,7 +325,7 @@ It is always worth searching for your problem first, as it is often the case tha
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -337,7 +336,7 @@ It is always worth searching for your problem first, as it is often the case tha
 <entry><para>OpenJade 1.3.1 has been enhanced to support Mac OS X/Darwin 1.4. The
 autoconf configuration system has been upgraded and also includes specific
 platform support. Some minor code alterations to improve code portability (C++
-style changes)</para></entry>
+style changes). Note that the POSIX locale feature is not available on this platform.</para></entry>
 </row>
 </tbody>
 </tgroup>
@@ -357,7 +356,7 @@ style changes)</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Documentation Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -383,11 +382,11 @@ man jade is synonymous with man openjade).</para></entry>
 <tbody>
 <row>
 	<entry><para>References</para></entry>
-	<entry><para>Various sourceforge problem reports, SuSE Linux 7.3, Redhat 7.2, Redhat Bugzilla #46212</para></entry>
+	<entry><para>Various sourceforge problem reports, SuSE Linux 7.3, Red Hat 7.2, Red Hat Bugzilla #46212</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -428,7 +427,7 @@ improve reliability.</para></entry>
 <entry><para>Since OpenJade 1.3 was released, a second edition of the XML 1.0 specification
 has been release (REC-xml-20001006). This specification introduced the concept
 of Byte Order Marks to increase the sophistication of the detection of
-the character encoding system. OpenJade 1.3 would not recognise these, and rejected
+the character encoding system. OpenJade 1.3 would not recognize these, and rejected
 any XML file which included these as invalid.</para></entry>
 </row>
 <row>
@@ -473,7 +472,7 @@ any XML file which included these as invalid.</para></entry>
 <thead>
 <row rowsep="1">
 	<entry>Item 6</entry>
-	<entry>JadeTeX is now distributed independantly</entry>
+	<entry>Jadetex is now distributed independently</entry>
 </row>
 </thead>
 <tbody>
@@ -483,11 +482,11 @@ any XML file which included these as invalid.</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
-<entry><para>OpenJade 1.3 shipped with JadeTeX 2.7. JadeTeX is developed and released
+<entry><para>OpenJade 1.3 shipped with Jadetex 2.7. Jadetex is developed and released
 separate from OpenJade.</para></entry>
 </row>
 <row>
@@ -512,7 +511,7 @@ separate from OpenJade.</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -531,14 +530,14 @@ available under FreeBSD.</para></entry>
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 7</entry>
+	<entry>Item 8</entry>
 	<entry>Allow non alpha numeric characters in Table of Contents</entry>
 </row>
 </thead>
 <tbody>
 <row>
 	<entry><para>References</para></entry>
-	<entry><para>Red Hat bugzilla #31525</para></entry>
+	<entry><para>Red Hat Bugzilla #31525</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
@@ -561,7 +560,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 8</entry>
+	<entry>Item 9</entry>
 	<entry>Support for latest Win32 build environments</entry>
 </row>
 </thead>
@@ -572,7 +571,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -589,7 +588,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 9</entry>
+	<entry>Item 10</entry>
 	<entry>Enhancements for Software Packaging</entry>
 </row>
 </thead>
@@ -600,7 +599,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -608,7 +607,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 </row>
 <row>
 <entry><para>Resolution</para></entry>
-<entry><para>Enhance Makefiles to ensure that packages are easy to build (including addition of DESTDIR environment variable). It should now be possible to build RPM packages and BSD ports without resorting to patches.</para></entry>
+<entry><para>Enhance Makefiles to ensure that packages are easy to build (including addition of <varname>DESTDIR</varname> environment variable). It should now be possible to build RPM packages and BSD ports without resorting to patches.</para></entry>
 </row>
 </tbody>
 </tgroup>
@@ -617,18 +616,18 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 10</entry>
+	<entry>Item 11</entry>
 	<entry>Support for newer GNU C++ compilers</entry>
 </row>
 </thead>
 <tbody>
 <row>
 	<entry><para>References</para></entry>
-	<entry><para>SuSE Linux 7.3 (Andreas Schwab), RedHat Linux 7.2, Connectiva Linux</para></entry>
+	<entry><para>SuSE Linux 7.3 (Andreas Schwab), Red Hat Linux 7.2, Connectiva Linux</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -645,18 +644,19 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 11</entry>
+	<entry>Item 12</entry>
 	<entry>Support for jadetex 3.4 and greater macros for two sided support</entry>
 </row>
 </thead>
 <tbody>
 <row>
 	<entry><para>References</para></entry>
-	<entry><para>SourceForge patch #439755</para></entry>
+	<entry><para>Sourceforge patch #439755,
+	http://iNdev.iNsu.COM/openjade/ (Francis J. Lacoste)</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
-	<entry><para>Enhancement</para></entry>
+	<entry><para>Software Bug</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
@@ -664,9 +664,11 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 </row>
 <row>
 <entry><para>Resolution</para></entry>
-<entry><para>Enhance the TeX backend two sided output support and bring into line with advances in the jadetex latex front end. Two extension characteristics are introduced to allow control of two-side and two-side-start-on right
+<entry><para>Enhance the TeX backend two sided output support and bring into line with advances in the jadetex latex front end. Two extension characteristics are introduced to allow control of <function>two-side</function> and <function>two-side-start-on-right</function>. This also fixes the "blank page at the end of the document" problem. The following new characteristics are available:
 <screen>
-(declare blah blah0)
+  "UNREGISTERED::OpenJade//Characteristic::page-two-side?"
+
+  "UNREGISTERED::OpenJade//Characteristic::two-side-start-on-right?"
 </screen></para></entry>
 </row>
 </tbody>
@@ -676,14 +678,14 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 <colspec colname="c2" colwidth="3*" />
 <thead>
 <row rowsep="1">
-	<entry>Item 12</entry>
+	<entry>Item 13</entry>
 	<entry>Prevent incorrect generation of ligatures in the TeX Backend</entry>
 </row>
 </thead>
 <tbody>
 <row>
 	<entry><para>References</para></entry>
-	<entry><para>Red Hat bugzilla #11497, #11779</para></entry>
+	<entry><para>Red Hat Bugzilla #11497, #11779</para></entry>
 </row>
 <row>
 	<entry><para>Category</para></entry>
@@ -719,7 +721,7 @@ Certain non alpha-numeric characters (such as $) do not appear correctly in the 
 </row>
 <row>
 <entry><para>Problem</para></entry>
-<entry><para>OpenJade 1.3 does not support the (time<=?) comparison</para></entry>
+<entry><para>OpenJade 1.3 does not support the <function>(time<=?)</function> comparison</para></entry>
 </row>
 <row>
 <entry><para>Resolution</para></entry>
@@ -735,7 +737,7 @@ Also partial formats (such as YY-MM-DD, YYYY-MM or HH:MM) are now supported</par
 <thead>
 <row rowsep="1">
 	<entry>Item 15</entry>
-	<entry>Improvements in handling sosofo-append</entry>
+	<entry>Improvements in handling <function>sosofo-append</function></entry>
 </row>
 </thead>
 <tbody>
@@ -754,14 +756,14 @@ handling large lists of sosofo</para></entry>
 </row>
 <row>
 <entry><para>Resolution</para></entry>
-<entry><para>The fix optimizes sosofo-append to reduce its memory and stack
+<entry><para>The fix optimizes <function>sosofo-append</function> to reduce its memory and stack
 	usage when using it to build long list of sosofo :
 <screen>
-	     (let loop ( (res (empty-sosofo))
-			 (nl  (node-list-rest (children (current-node)))))
-		(loop (sosofo-append res (process-node-list
-	(node-list-first nl)))
-		      (node-list-rest nl)))
+    (let loop ( (res (empty-sosofo))
+        (nl  (node-list-rest (children (current-node)))))
+	    (loop (sosofo-append res (process-node-list
+        (node-list-first nl)))
+            (node-list-rest nl)))
 </screen></para></entry>
 </row>
 </tbody>
@@ -791,19 +793,30 @@ handling large lists of sosofo</para></entry>
 </row>
 <row>
 <entry><para>Resolution</para></entry>
-<entry><para>Support for tables in the TeX backend has been improved with:
-
-	     o	Support for nested tables.
-	     o	cell-after-column-margin: and cell-before-column-margin:
-	wasn't
-		really working.
-	     o	Row spanning was broken. This patch only supports
-		'start row alignment though.
-	     o	Paragraphs in cell spanning multiple column are now
-	working.
-	     o	Support for the row-alignment: characteristic.
-	     o	Support for cell-background? and background-color
-	properties</para></entry>
+<entry><para>Support for tables in the TeX backend has been improved with:</para>
+<itemizedlist>
+  <listitem>
+	     <para>Support for nested tables.</para>
+  </listitem>
+  <listitem>
+	     <para><function>cell-after-column-margin:</function> and <function>cell-before-column-margin:</function> wasn't really working.</para>
+  </listitem>
+  <listitem>
+	     <para>Row spanning was broken. This fix only supports
+		<function>'start</function> row alignment though.</para>
+  </listitem>
+  <listitem>
+	     <para>Paragraphs in cell spanning multiple column are now
+	working.</para>
+  </listitem>
+  <listitem>
+	     <para>Support for the <function>row-alignment:</function> characteristic.</para>
+   </listitem>
+   <listitem>
+	     <para>Support for <function>cell-background?</function> and <function>background-color</function> properties</para>
+  </listitem>
+  </itemizedlist>
+</entry>
 </row>
 </tbody>
 </tgroup>
@@ -813,7 +826,7 @@ handling large lists of sosofo</para></entry>
 <thead>
 <row rowsep="1">
 	<entry>Item 17</entry>
-	<entry>Support for 'asis and 'asis-wrap</entry>
+	<entry>Support for <function>'asis</function> and <function>'asis-wrap</function></entry>
 </row>
 </thead>
 <tbody>
@@ -827,13 +840,13 @@ handling large lists of sosofo</para></entry>
 </row>
 <row>
 <entry><para>Problem</para></entry>
-<entry><para>The lines: characteristic in the paragraph flow object does not
-support the 'asis and 'asis-wrap values.</para></entry>
+<entry><para>The <function>lines:</function> characteristic in the paragraph flow object does not
+support the <function>'asis</function> and <function>'asis-wrap</function> values.</para></entry>
 </row>
 <row>
 <entry><para>Resolution</para></entry>
 <entry><para>
-	  This adds support for the 'asis and 'asis-wrap values for the
+	  This adds support for the <function>'asis</function> and <function>'asis-wrap</function> values for the
 	  paragraph's lines: characteristic.
 </para></entry>
 </row>
@@ -843,8 +856,8 @@ support the 'asis and 'asis-wrap values.</para></entry>
 </sect1>
 <sect1>
   <title>Version 1.3</title>
-  <formalpara><title>Released October 1999</title><para></para></formalpara>
-<para>Changes in OpenJade 1.3</para>
+  <formalpara><title>Released October 1999</title>
+<para>Version 1.3 added many improvements to increase the scope of the implementation of DSSSL. Changes include:</para></formalpara>
 
 <itemizedlist>
   <listitem>
@@ -853,21 +866,21 @@ support the 'asis and 'asis-wrap values.</para></entry>
 
   <listitem>
     <para>
-Jade can bind variables to arbitrary values on the command line. 
+Jade can bind variables to arbitrary values on the command line with the <option>-V</option> option. 
     </para>
   </listitem>
 
   <listitem>
     <para>
-The prlabs1 module of the SGML property set is supported.
+The <function>prlabs1</function> module of the SGML property set is supported.
     </para>
   </listitem>
 
   <listitem>
     <para>
-Style sheet extensions.dsl lists all known
+Style sheet <filename>extensions.dsl</filename> lists all known
   external procedures ready for easy inclusion
-  as an external-specification.
+  as an <function>external-specification</function>.
     </para>
   </listitem>
 
@@ -877,7 +890,7 @@ External procedure with public identifier
 <screen>
   "UNREGISTERED::OpenJade//Procedure::expt"
 </screen>
-  allows to form integral powers of quantities.
+  to provide integral powers of quantities.
     </para>
   </listitem>
 
@@ -887,13 +900,13 @@ External procedure with public identifier
 <screen>
   "UNREGISTERED::OpenJade//Procedure::sgml-parse"
 </screen>
-  allows to parse wrt. an architecture.
+  allows to parse w.r.t. an architecture.
     </para>
   </listitem>
 
   <listitem>
     <para>
-Jade supports force! for inherited characteristics.
+Jade supports <function>force!</function> for inherited characteristics.
     </para>
   </listitem>
 
@@ -905,7 +918,7 @@ Jade supports character properties.
 
   <listitem>
     <para>
-Jade supports special-query-expressions.
+Jade supports <function>special-query-expressions</function>.
     </para>
   </listitem>
 
@@ -941,20 +954,40 @@ External procedure with public identifier
   <listitem>
     <para>
 Language-dependent procedures of the expression language:
-  language?, current-language, declare-default-language, 
-  with-language, define-language, char&lt;?, char>?, char&lt;=?,
-  char>=?, char-ci=?, char-ci&lt;?, char-ci>?, char-ci&lt;=?,
-  char-ci&lt;=?, char-upcase, char-downcase, string-ci=?,
-  string-equiv?, string&lt;?, string>?, string&lt;=?, string>=?,
-  string-ci&lt;?, string-ci>?, string-ci&lt;=?, string-ci>=?.
+<function>language?,</function>
+<function>current-language,</function>
+<function>declare-default-language,</function>
+<function>with-language,</function>
+<function>define-language,</function>
+<function>char&lt;?,</function>
+<function>char>?,</function>
+<function>char&lt;=?,</function>
+<function>char>=?,</function>
+<function>char-ci=?,</function>
+<function>char-ci&lt;?,</function>
+<function>char-ci>?,</function>
+<function>char-ci&lt;=?,</function>
+<function>char-ci&lt;=?,</function>
+<function>char-upcase,</function>
+<function>char-downcase,</function>
+<function>string-ci=?,</function>
+<function>string-equiv?,</function>
+<function>string&lt;?,</function>
+<function>string>?,</function>
+<function>string&lt;=?,</function>
+<function>string>=?,</function>
+<function>string-ci&lt;?,</function>
+<function>string-ci>?,</function>
+<function>string-ci&lt;=?,</function>
+<function>string-ci>=?.</function>
     </para>
   </listitem>
 
   <listitem>
     <para>
-The style-sheet.dtd derived from the dsssl architecture
-  has been extended (in a backwards compatible way) to
-  include the delaration element type forms supported by
+The style-sheet.dtd derived from the DSSSL architecture
+  has been extended (in a backward compatible way) to
+  include the declaration element type forms supported by
   Jade. The public identifier for the dtd is 
 <screen>
   "-//OpenJade//DTD DSSSL Style Sheet//EN" 
@@ -964,9 +997,9 @@ The style-sheet.dtd derived from the dsssl architecture
   
   <listitem>
     <para>
-char-repertoire, add-name-chars and add-separator-chars
+<function>char-repertoire</function>, <function>add-name-chars</function> and <function>add-separator-chars</function>
   declaration element type forms are supported. When given
-  the -s cmdline flag, Jade doesn't use its builtin 
+  the <option>-s</option> command line flag, Jade doesn't use its built in 
   character repertoire.
     </para>
   </listitem>
@@ -974,56 +1007,138 @@ char-repertoire, add-name-chars and add-separator-chars
   <listitem>
     <para>
 Most of the derived procedures in the query language:
-  current-root, node-list-reduce, node-list-contains?,
-  node-list-remove-duplicates, node-list-union, 
-  node-list-intersection, node-list-difference, 
-  node-list-symmetric-difference, node-list-union-map,
-  node-list-some?, node-list-every?, node-list-filter,
-  node-list->list, node-list-tail, node-list-head,
-  node-list-sublist, node-list-count, node-list-last,
-  node-list-property, origin, origin-to-subnode-rel,
-  tree-root, grove-root, source, subtree, subgrove,
-  ancestors, grove-root-path, rsiblings, ipreced,
-  ifollow, grove-before?, sort-in-tree-order, tree-before?,
-  tree-before, property-lookup, select-by-property, 
-  select-by-null-property, select-by-missing-property,
-  attribute, referent, q-element, q-class, q-sdata.
+<function>current-root</function>,
+<function>node-list-reduce</function>,
+<function>node-list-contains?</function>,
+<function>node-list-remove-duplicates</function>,
+<function>node-list-union</function>, 
+<function>node-list-intersection</function>,
+<function>node-list-difference</function>, 
+<function>node-list-symmetric-difference</function>,
+<function>node-list-union-map</function>,
+<function>node-list-some?</function>,
+<function>node-list-every?</function>,
+<function>node-list-filter</function>,
+<function>node-list->list</function>,
+<function>node-list-tail</function>,
+<function>node-list-head</function>,
+<function>node-list-sublist</function>,
+<function>node-list-count</function>,
+<function>node-list-last</function>,
+<function>node-list-property</function>,
+<function>origin</function>,
+<function>origin-to-subnode-rel</function>,
+<function>tree-root</function>,
+<function>grove-root</function>,
+<function>source</function>,
+<function>subtree</function>,
+<function>subgrove</function>,
+<function>ancestors</function>,
+<function>grove-root-path</function>,
+<function>rsiblings</function>,
+<function>ipreced</function>,
+<function>ifollow</function>,
+<function>grove-before?</function>,
+<function>sort-in-tree-order</function>,
+<function>tree-before?</function>,
+<function>tree-before</function>,
+<function>property-lookup</function>,
+<function>select-by-property</function>, 
+<function>select-by-null-property</function>,
+<function>select-by-missing-property</function>,
+<function>attribute</function>,
+<function>referent</function>,
+<function>q-element</function>,
+<function>q-class</function>,
+<function>q-sdata</function>.
     </para>
   </listitem>
 </itemizedlist>
 </sect1>
 <sect1><title>Version 1.2.2</title>
-<formalpara><title>Released xxxx</title>
+<formalpara><title>Released June 1999</title>
 <para>The first release of OpenJade.</para>
 </formalpara>
 
-<!--
-  
-Changes in OpenJade 1.2.2 
+<para>Changes in OpenJade 1.2.2</para>
 
-* The HTML and MIF backends are now enabled by default.
+<itemizedlist>
+  <listitem>
+    <para>
+The HTML and MIF backends are now enabled by default.
+    </para>
+  </listitem>
 
-* The TeX backend has support for PDF bookmarks. This is
+  <listitem>
+    <para>
+The TeX backend has support for PDF bookmarks. This is
   supported by the new version of jadetex which is included.
+    </para>
+  </listitem>
 
-* Predefined character names line-feed and carriage-return 
+  <listitem>
+    <para>
+Predefined character names <function>line-feed</function> and <function>carriage-return</function> 
   for the character numbers 10 and 13.
+    </para>
+  </listitem>
 
-* standard-chars and map-sdata-entity declaration element
-  type forms are supported.
+  <listitem>
+    <para>
+standard-chars and map-sdata-entity declaration element
+type forms are supported.
+    </para>
+  </listitem>
 
-* Style language additions: map-constructor.
+  <listitem>
+    <para>
+Style language additions: map-constructor.
+    </para>
+  </listitem>
  
-* + and - return a length-spec if any of there arguments
-  is a length-spec.
+  <listitem>
+    <para>
+<function>+</function> and <function>-</function> return a <function>length-spec</function> if any of there arguments
+  is a <function>length-spec</function>.
+    </para>
+  </listitem>
 
-* Most of the non-core expression language:
-  c...r, assoc, keyword->string, string->keyword, exact?, inexact?,
-  zero?, positive?, negative?, odd?, even?, exp, log, sin, cos,
-  tan, asin, acos, atan, expt, exact->inexact, inexact->exact,
-  quantity->number, string->list, list->string, map, time<?,
-  time>?, time<=?, time>=?.
--->
+  <listitem>
+    <para>
+Most of the DSSSL non-core expression language:
+<function>c...r</function>,
+<function>assoc</function>,
+<function>keyword->string</function>,
+<function>string->keyword</function>,
+<function>exact?</function>,
+<function>inexact?</function>,
+<function>zero?</function>,
+<function>positive?</function>,
+<function>negative?</function>,
+<function>odd?</function>,
+<function>even?</function>,
+<function>exp</function>,
+<function>log</function>,
+<function>sin</function>,
+<function>cos</function>,
+<function>tan</function>,
+<function>asin</function>,
+<function>acos</function>,
+<function>atan</function>,
+<function>expt</function>,
+<function>exact->inexact</function>,
+<function>inexact->exact</function>,
+<function>quantity->number</function>,
+<function>string->list</function>,
+<function>list->string</function>,
+<function>map</function>,
+<function>time&lt;?</function>,
+<function>time>?</function>,
+<function>time&lt;=?</function>,
+<function>time&gt;=?</function>.
+    </para>
+  </listitem>
+  </itemizedlist>
 </sect1>
 
 <sect1><title>Jade Version 1.2.1</title>

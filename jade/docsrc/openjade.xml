@@ -83,7 +83,7 @@ openjade [-vCegG2s] [-b encoding] [-f error_file] [-c catalog_sysid] [-D dir] [-
                                                                               
      <para>1. If the -d option is specified, it will use the argument as the       
          system identifier.                                                   </para>
-     <para>2. Otherwise, it will look for processing instructions in the prologue of 
+     <para>2. Otherwise, it will look for processing instructions in the prolog of 
          the document. Two kinds of processing instruction are recognized:    </para>
 <para>
               &lt;?stylesheet href="sysid" type="text/dsssl"&gt;                    </para>
@@ -104,7 +104,7 @@ openjade [-vCegG2s] [-b encoding] [-f error_file] [-c catalog_sysid] [-D dir] [-
                  any whitespace.                                              </para>
                                                                               
 <para>         Although the processing instruction is only recognized in the        
-         prologue, it need not occur in the document entity. For example, it    
+         prolog, it need not occur in the document entity. For example, it    
          could occur in a DTD. The system identifier will be interpreted      
          relative to where the the processing instruction occurs.             </para>
                                                                               

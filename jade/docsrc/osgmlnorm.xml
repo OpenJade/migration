@@ -65,7 +65,7 @@
    with system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg>.</para>
    
    <para>When the normalized instance is prefixed with the original SGML
-   declaration and prologue, it will have the same ESIS as the original
+   declaration and prolog, it will have the same ESIS as the original
    SGML document, with the following exceptions:</para>
 <para>* The output of osgmlnorm does not protect against the recognition of
        short reference delimiters, so any USEMAP declarations must be

@@ -21,6 +21,12 @@ Changes in OpenSP 1.5pre7
   syntax.  See http://www.ornl.gov/sgml/wg8/document/1985.htm for
   details.  Patch contributed by Peter Newcomb of Epremis Corp.
 
+* Adds the architecture public id to the information passed to
+  implementations of ArcDirector.  This is especially important when
+  using the PI-based architecture use declaration syntax, since there
+  may be no Notation object from which to get the information.  Patch
+  contributed by Peter Newcomb of Epremis Corp.
+
 Changes in OpenSP 1.5pre6
 
 * RPM spec file updates and corrections from Terje Bless

@@ -11,10 +11,14 @@ dnl  autoconf script around SP made by Henry Thompson.
 dnl
 
 dnl Initialization
-AC_INIT(dsssl)
+AC_INIT
+AC_CONFIG_SRCDIR([dsssl])
 AM_INIT_AUTOMAKE(OpenJade, 1.4devel, no-define)
+AC_PREREQ(2.52)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
+
+AH_TEMPLATE([SIZEOF_WCHAR_T],[size of wchar_t])
 
 dnl Use different names than usually to avoid conflicts.
 AC_DEFINE_UNQUOTED(OPENJADE_PACKAGE, "$PACKAGE", [Package name])
@@ -184,7 +188,6 @@ AC_CHECK_FUNCS(setlocale)
 dnl Checks for system services.
 
 dnl Package options.
-AC_ARG_PROGRAM
 AC_DEFINE_UNQUOTED(DEFAULT_SCHEME_BUILTINS,"$prefix/share/$PACKAGE/builtins.dsl",
                    [set this to the location of builtins.dsl])
 AC_DEFINE(SP_MULTI_BYTE,1,

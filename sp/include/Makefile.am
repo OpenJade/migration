@@ -36,3 +36,5 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 ## we still include it in the distribution
 EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old \
 	.cvsignore
+
+MAINTAINERCLEANFILES = Makefile.in

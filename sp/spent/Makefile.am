@@ -11,7 +11,9 @@ INCLUDES = -I$(top_srcdir)/include
 EXTRA_DIST = spent.dsp SpentMessages.msg SpentMessages.rc \
 	.cvsignore
 
-BUILT_SOURCES = SpentMessages.rc
+BUILT_SOURCES = SpentMessages.rc SpentMessages.h
+
+MAINTAINERCLEANFILES = Makefile.in
 
 MSGGENFLAGS = -l appModule
 

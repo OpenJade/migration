@@ -10,6 +10,8 @@ EXTRA_DIST = sgmlnorm.dsp SgmlnormMessages.msg SgmlnormMessages.rc \
 
 BUILT_SOURCES = SgmlnormMessages.h SgmlnormMessages.rc
 
+MAINTAINERCLEANFILES = Makefile.in
+
 osgmlnorm_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic

@@ -15,6 +15,8 @@ INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = spam_inst.cxx SpamMessages.h SpamMessages.rc 
 
+MAINTAINERCLEANFILES = Makefile.in
+
 MSGGENFLAGS = -l appModule
 
 spam.o: SpamMessages.h

@@ -4,13 +4,14 @@
 * remove the empty delimEnd message by changing the code to use
   I1+delim++delimiter %1 instead.
 
-* fix the problem with non-ASCII in osx's usage() message and
-  also in eg. onsgmls --bctf=utf-8 --help. 
-
 * Link the OpenSP docs from the web page.
 
 Things which are missing and need a lot of work
 ===============================================
+
+* Check the win32 port.
+
+* Support i18n on win32.
 
 * query: leads to current-node not being an element node.
 

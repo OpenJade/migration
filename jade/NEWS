@@ -1,11 +1,21 @@
 Changes in OpenJade 1.4
 
-* --help option.
+* A new external procedure with public identifier
+  "UNREGISTERED::OpenJade//Procedure::uri-ref-address" returns an address
+  object to the supplied URI. This allows hyperlinks to resources of the WWW
+  in documents.
+
+* The command line option --help gives a summary of the usage and all
+  supported command line options.
 
 * Separate cmdline options for the two SGML parsers used for the document and
   the style-sheet.
 
-* Long cmdline options.
+* GNU-style long command line options are now supported in addition to the
+  short ones.
+
+* OpenJade is internationalized. Translations for many messages are available
+  in German and Swedish.
 
 * The standard flow objects check that their content is valid.
 

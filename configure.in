@@ -20,10 +20,6 @@ dnl Since config.h gets included by user programs, we use special names
 dnl for PACKAGE and VERSION.
 AC_DEFINE_UNQUOTED(SP_PACKAGE, "$PACKAGE", [Package name])
 AC_DEFINE_UNQUOTED(SP_VERSION, "$VERSION", [Package version])
-dnl But intl/Makefile.in and po/Makefile.in from GNU gettext still
-dnl rely on PACKAGE and VERSION substitutions.
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
 
 dnl Check for programs.
 AC_PROG_CC
@@ -47,6 +43,10 @@ else
 fi
 AC_DEFINE_UNQUOTED(SP_LOCALE_DIR, "$SP_LOCALE_DIR")
 AC_SUBST(SP_LOCALE_DIR)
+dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
+dnl rely on PACKAGE and VERSION substitutions.
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 
 dnl Checks for header files.
 AC_HEADER_STDC

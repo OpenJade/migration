@@ -50,8 +50,8 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\opent.exe"
-# SUBTRACT LINK32 /profile
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib osp14pre1.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\ospcat.exe" /libpath:"..\lib\release"
+# SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "spcat - Win32 Debug"
 
@@ -75,7 +75,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\dbgbin\ospcat.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib osp14pre1d.lib /nologo /subsystem:console /debug /machine:I386 /out:"..\dbgbin\ospcat.exe" /libpath:"..\lib\debug"
 
 !ENDIF 
 
@@ -89,6 +89,37 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=.\spcat.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\SpcatMessages.msg
+
+!IF  "$(CFG)" == "spcat - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpcatMessages.msg
+InputName=SpcatMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "spcat - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\SpcatMessages.msg
+InputName=SpcatMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l appModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "Header Files"

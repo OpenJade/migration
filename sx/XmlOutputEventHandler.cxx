@@ -1089,11 +1089,24 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 
 	  strcpy (filePath, outputDir_);
 
-	  if (originalFilePath[0] != '/')
-	    strcat (filePath, "/");
+	  // Drop the scheme if there is one (so
+	  // "http://www.bar.com/foo" becomes
+	  // "output_dir/www.bar.com/foo")
 
-	  strcat(filePath,
-		 outputCodingSystem->convertOut(*systemIdPointer).data());
+	  char *scheme = strchr(originalFilePath, ':');
+	  if (scheme != NULL)
+            // drop initial colon
+            originalFilePath = scheme + 1;
+
+          // drop initial slashes (there may be multiple)
+          while (strncmp(originalFilePath, "/", 1) == 0) {
+            originalFilePath++;
+          }
+
+          // replace exactly one initial slash before prepending
+          // output directory
+          strcat (filePath, "/");
+          strcat(filePath, originalFilePath);
 
 	  // Make the necessary directories
 	  char *dirs = strdup (filePath);

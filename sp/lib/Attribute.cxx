@@ -573,8 +573,19 @@ DeclaredValue *IdrefDeclaredValue::copy() const
 
 AttributeDefinition::AttributeDefinition(const StringC &name,
 					 DeclaredValue *value)
-: name_(name), declaredValue_(value)
+: name_(name), declaredValue_(value), implicit_(0), all_(0)
 {
+}
+
+void AttributeDefinition::setSpecified(Boolean implicit)
+{
+  (implicit ? implicit_ : all_) = 1;
+}
+
+Boolean AttributeDefinition::isSpecified(Boolean &implicit)
+{
+  implicit = implicit_;
+  return implicit_ || all_;
 }
 
 AttributeDefinition::~AttributeDefinition()

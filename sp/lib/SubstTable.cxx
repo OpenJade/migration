@@ -75,7 +75,7 @@ int comparePairs(const void *p1, const void *p2)
 
 void SubstTable::sort() const
 {
-  qsort(&map_[0], map_.size(), sizeof(map_[0]), comparePairs);  
+  qsort((void *)&map_[0], map_.size(), sizeof(map_[0]), comparePairs);  
 }
 
 StringC SubstTable::inverse(Char c) const

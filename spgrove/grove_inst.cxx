@@ -6,11 +6,8 @@ namespace SP_NAMESPACE {
 #ifdef SP_NAMESPACE
 }
 #endif
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
-
-// Copyright (c) 1996 James Clark
-// See the file COPYING for copying permission.
 
 #include "config.h"
 
@@ -23,6 +20,7 @@ namespace SP_NAMESPACE {
 
 #include "Hash.h"
 #include "StringC.h"
+#include "Node.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {

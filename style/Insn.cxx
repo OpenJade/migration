@@ -43,6 +43,7 @@ void VM::init()
   csp = 0;
   cslim = 0;
   csbase = 0;
+  closureLoc.clear();
 }
 
 VM::~VM()
@@ -93,8 +94,10 @@ void VM::pushFrame(const Insn *next, int argsPushed)
     size_t newSize = csbase ? (cslim - csbase)*2 : 8;
     ControlStackEntry *newBase = new ControlStackEntry[newSize];
     cslim = newBase + newSize;
-    memcpy(newBase, csbase, (csp - csbase)*sizeof(ControlStackEntry));
-    csp = newBase + (csp - csbase);
+    ControlStackEntry *newP = newBase;
+    for (const ControlStackEntry *oldP = csbase; oldP < csp; oldP++)
+      *newP++ = *oldP;
+    csp = newP;
     if (csbase)
       delete [] csbase;
     csbase = newBase;
@@ -103,6 +106,7 @@ void VM::pushFrame(const Insn *next, int argsPushed)
   csp->protectClosure = protectClosure;
   csp->next = next;
   csp->frameSize = sp - frame - argsPushed;
+  csp->closureLoc = closureLoc;
   csp++;
 }
 
@@ -113,6 +117,7 @@ const Insn *VM::popFrame()
   closure = csp->closure;
   protectClosure = csp->protectClosure;
   frame = sp - csp->frameSize;
+  closureLoc = csp->closureLoc;
   return csp->next;
 }
 
@@ -125,6 +130,7 @@ ELObj *VM::eval(const Insn *insn, ELObj **display, ELObj *arg)
   }
   closure = display;
   protectClosure = 0;
+  closureLoc.clear();
   // The inner loop.
   while (insn)
     insn = insn->execute(*this);
@@ -136,9 +142,36 @@ ELObj *VM::eval(const Insn *insn, ELObj **display, ELObj *arg)
     result = *sp;
     ASSERT(result != 0);
   }
-  else
+  else {
+    if (interp->debugMode())
+      stackTrace();
     result = interp->makeError();
+  }
   return result;
+}
+
+void VM::stackTrace()
+{
+  unsigned long count = 0;
+  if (protectClosure) {
+    interp->setNextLocation(closureLoc);
+    interp->message(InterpreterMessages::stackTrace);
+    count++;
+  }
+  ControlStackEntry *lim = csbase;
+  if (csp != csbase && !csbase->protectClosure)
+    lim++;
+  for (ControlStackEntry *p = csp; p != lim; p--) {
+    interp->setNextLocation(p[-1].closureLoc);
+    count++;
+    if (count == 5 && p - lim > 7) {
+      interp->message(InterpreterMessages::stackTraceEllipsis,
+		      NumberMessageArg(p - (lim + 6)));
+      p = lim + 6;
+    }
+    else
+      interp->message(InterpreterMessages::stackTrace);
+  }
 }
 
 Insn::~Insn()
@@ -273,6 +306,57 @@ PopInsn::PopInsn(InsnPtr next)
 
 const Insn *PopInsn::execute(VM &vm) const
 {
+  --vm.sp;
+  return next_.pointer();
+}
+
+ConsInsn::ConsInsn(InsnPtr next)
+: next_(next)
+{
+}
+
+const Insn *ConsInsn::execute(VM &vm) const
+{
+  vm.sp[-2] = vm.interp->makePair(vm.sp[-1], vm.sp[-2]);
+  --vm.sp;
+  return next_.pointer();
+}
+
+AppendInsn:: AppendInsn(const Location &loc, InsnPtr next)
+: loc_(loc), next_(next)
+{
+}
+
+const Insn *AppendInsn::execute(VM &vm) const
+{
+  ELObj *&source = vm.sp[-1];
+  if (!source->isNil()) {
+    PairObj *pair = source->asPair();
+    if (!pair) {
+      vm.interp->setNextLocation(loc_);
+      vm.interp->message(InterpreterMessages::spliceNotList);
+      vm.sp = 0;
+      return 0;
+    }
+    source = pair->cdr();
+    PairObj *tail = vm.interp->makePair(pair->car(), 0);
+    ELObjDynamicRoot head(*vm.interp, tail);
+    while (!source->isNil()) {
+      pair = source->asPair();
+      if (!pair) {
+	vm.interp->setNextLocation(loc_);
+        vm.interp->message(InterpreterMessages::spliceNotList);
+	vm.sp = 0;
+	return 0;
+      }
+      PairObj *newTail = vm.interp->makePair(pair->car(), 0);
+      tail->setCdr(newTail);
+      tail = newTail;
+      source = pair->cdr();
+    }
+    tail->setCdr(vm.sp[-2]);
+    vm.sp[-2] = head;
+  }
   --vm.sp;
   return next_.pointer();
 }
@@ -652,17 +736,18 @@ ClosureObj::ClosureObj(const Signature *sig, InsnPtr code, ELObj **display)
   hasSubObjects_ = 1;
 }
 
-const Insn *ClosureObj::call(VM &vm, const Location &, const Insn *next)
+const Insn *ClosureObj::call(VM &vm, const Location &loc, const Insn *next)
 {
   vm.needStack(1);
   vm.pushFrame(next, vm.nActualArgs);
   vm.frame = vm.sp - vm.nActualArgs;
   vm.closure = display_;
   vm.protectClosure = this;
+  vm.closureLoc = loc;
   return code_.pointer();
 }
 
-const Insn *ClosureObj::tailCall(VM &vm, const Location &, int nCallerArgs)
+const Insn *ClosureObj::tailCall(VM &vm, const Location &loc, int nCallerArgs)
 {
   vm.needStack(1);
   int nArgs = vm.nActualArgs;
@@ -678,6 +763,7 @@ const Insn *ClosureObj::tailCall(VM &vm, const Location &, int nCallerArgs)
     vm.frame = vm.sp - nArgs;
   vm.closure = display_;
   vm.protectClosure = this;
+  vm.closureLoc = loc;
   return code_.pointer();
 }
 

@@ -112,6 +112,23 @@ private:
   InsnPtr next_;
 };
 
+class ConsInsn : public Insn {
+public:
+  ConsInsn(InsnPtr next);
+  const Insn *execute(VM &) const;
+private:
+  InsnPtr next_;
+};
+
+class AppendInsn : public Insn {
+public:
+  AppendInsn(const Location &, InsnPtr next);
+  const Insn *execute(VM &) const;
+private:
+  Location loc_;
+  InsnPtr next_;
+};
+
 class ApplyBaseInsn : public Insn {
 public:
   ApplyBaseInsn(int nArgs, const Location &);

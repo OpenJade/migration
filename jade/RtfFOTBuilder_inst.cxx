@@ -205,6 +205,19 @@ typedef Vector<Vector<String<char> > > Dummy_13;
 #endif
 #endif
 #endif
+#ifdef __DECCXX
+#pragma define_template Vector<Vector<char> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<Vector<char> >)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<Vector<char> >;
+#else
+typedef Vector<Vector<char> > Dummy_14;
+#endif
+#endif
+#endif
 
 #ifdef DSSSL_NAMESPACE
 }

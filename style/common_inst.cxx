@@ -27,11 +27,14 @@ namespace SP_NAMESPACE {
 #include "HashTableItemBase.h"
 #include "SubstTable.h"
 #include "ISet.h"
+#include "Owner.h"
 #undef SP_DEFINE_TEMPLATES
 
 #include "types.h"
 #include "Entity.h"
 #include "Syntax.h"
+#include "ExtendEntityManager.h"
+#include "Event.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -424,6 +427,71 @@ typedef HashTableItem<StringC, int> Dummy_28;
 template class HashTable<StringC,int>;
 #else
 typedef HashTable<StringC,int> Dummy_29;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<PackedBoolean>
+#else
+#ifdef __xlC__
+#pragma define(Vector<PackedBoolean>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<PackedBoolean>;
+#else
+typedef Vector<PackedBoolean> Dummy_30;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Owner<EventHandler>
+#else
+#ifdef __xlC__
+#pragma define(Owner<EventHandler>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Owner<EventHandler>;
+#else
+typedef Owner<EventHandler> Dummy_31;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<EntityManager>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<EntityManager>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<EntityManager>;
+#else
+typedef Ptr<EntityManager> Dummy_32;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<ExtendEntityManager>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<ExtendEntityManager>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<ExtendEntityManager>;
+#else
+typedef Ptr<ExtendEntityManager> Dummy_33;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<StorageObjectSpec>
+#else
+#ifdef __xlC__
+#pragma define(Vector<StorageObjectSpec>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<StorageObjectSpec>;
+#else
+typedef Vector<StorageObjectSpec> Dummy_34;
 #endif
 #endif
 #endif

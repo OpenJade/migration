@@ -14,10 +14,11 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 StyleEngine::StyleEngine(Messenger &mgr,
-			 const NodePtr &root,
+			 GroveManager &groveManager,
 			 int unitsPerInch,
+			 bool debugMode,
 			 const FOTBuilder::Extension *extensionTable)
-: interpreter_(new Interpreter(root, &mgr, unitsPerInch, extensionTable))
+: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, debugMode, extensionTable))
 {
 }
 
@@ -53,10 +54,10 @@ StyleEngine::~StyleEngine()
   delete interpreter_;
 }
 
-void StyleEngine::process(FOTBuilder &fotb)
+void StyleEngine::process(const NodePtr &node, FOTBuilder &fotb)
 {
   ProcessContext context(*interpreter_, fotb);
-  context.process(*interpreter_);
+  context.process(node);
 }
 
 #ifdef DSSSL_NAMESPACE

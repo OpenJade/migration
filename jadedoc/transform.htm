@@ -137,6 +137,18 @@ It differs from normal data characters in the <CODE>&amp;</CODE>,
 <CODE>&lt;</CODE> and <CODE>&gt;</CODE> will not be escaped.
 </DL>
 <P>
+There is also the following characteristic:
+<DL>
+<DT>
+<CODE>preserve-sdata?</CODE>
+<DD>
+This is an inherited boolean characteristic that applies to character
+flow objects.  When true, if the current-node for the character flow object
+was an sdata node, then the character will be output as a reference
+to an entity with the same name.
+The initial value is #f.
+</DL>
+<P>
 Each of these flow object classes must be declared using
 <CODE>declare-flow-object-class</CODE> in any DSSSL specification that
 makes use of it.
@@ -156,6 +168,9 @@ A suitable set of declarations is:
   "UNREGISTERED::James Clark//Flow Object Class::entity-ref")
 (declare-flow-object-class formatting-instruction
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
+(declare-characteristic preserve-sdata?
+  "UNREGISTERED::James Clark//Characteristic::preserve-sdata?"
+  #f)
 </PRE>
 <P>
 Here's a simple example that does the identity transformation:

@@ -183,6 +183,7 @@ public:
   void endElement();
   void emptyElement(const ElementNIC &);
   void characters(const Char *s, size_t n);
+  void charactersFromNode(const NodePtr &, const Char *, size_t);
   void processingInstruction(const StringC &);
   void documentType(const DocumentTypeNIC &);
   void formattingInstruction(const StringC &);
@@ -192,12 +193,27 @@ public:
   void extension(const ExtensionFlowObj &fo, const NodePtr &);
   void startExtensionSerial(const CompoundExtensionFlowObj &fo, const NodePtr &nd);
   void endExtensionSerial(const CompoundExtensionFlowObj &fo);
+  void start();
+  void end();
+  void setPreserveSdata(bool);
 private:
   TransformFOTBuilder(const TransformFOTBuilder &);
   void operator=(const TransformFOTBuilder &);
 
   OutputCharStream &os() { return *os_; }
   void attributes(const Vector<StringC> &atts);
+  void flushPendingRe() {
+    if (state_ == statePendingRe) {
+      os() << RE;
+      state_ = stateMiddle;
+    }
+  }
+  void flushPendingReCharRef() {
+    if (state_ == statePendingRe) {
+      os() << "&#13;";
+      state_ = stateMiddle;
+    }
+  }
 
   CmdLineApp *app_;
   OutputCharStream *os_;
@@ -214,6 +230,15 @@ private:
   };
   IList<OpenFile> openFileStack_;
   bool xml_;
+  enum ReState {
+    stateMiddle,
+    stateStartOfElement,
+    statePendingRe
+  };
+  ReState state_;
+  bool preserveSdata_;
+  // Really Vector<bool>
+  StringC preserveSdataStack_;
 };
 
 FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
@@ -275,6 +300,14 @@ FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
       0,
       &documentType
     },
+    {
+      "UNREGISTERED::James Clark//Characteristic::preserve-sdata?",
+      (void (FOTBuilder::*)(bool))&TransformFOTBuilder::setPreserveSdata,
+      0,
+      0,
+      0,
+      0
+    },
     { 0 }
   };
   ext = extensions;
@@ -290,11 +323,14 @@ void outputNumericCharRef(OutputCharStream &os, Char c)
 TransformFOTBuilder::TransformFOTBuilder(CmdLineApp *app, bool xml)
 : app_(app),
   xml_(xml),
-  topOs_(new RecordOutputCharStream(app->makeStdOut()))
+  topOs_(new RecordOutputCharStream(app->makeStdOut())),
+  state_(stateMiddle),
+  preserveSdata_(0)
 {
   undefGi_ = app_->systemCharset().execToDesc("#UNDEF");
   topOs_->setEscaper(outputNumericCharRef);
   os_ = topOs_.pointer();
+  preserveSdataStack_ += 0;
 }
 
 TransformFOTBuilder::~TransformFOTBuilder()
@@ -311,6 +347,7 @@ static bool contains(const StringC &str, Char c)
 
 void TransformFOTBuilder::documentType(const DocumentTypeNIC &nic)
 {
+  flushPendingRe();
   if (nic.name.size()) {
     os() << "<!DOCTYPE " << nic.name;
     if (nic.publicId.size())
@@ -354,20 +391,20 @@ void TransformFOTBuilder::attributes(const Vector<StringC> &atts)
 
 void TransformFOTBuilder::startElement(const ElementNIC &nic)
 {
+  flushPendingRe();
   os() << "<";
   const StringC &s = nic.gi.size() == 0 ? undefGi_ : nic.gi;
   os() << s;
   attributes(nic.attributes);
-  if (xml_)
-    os() << RE << '>';
-  else
-    os() << '>' << RE;
+  os() << RE << '>';
   openElements_.push_back(s);
   start();
+  state_ = stateStartOfElement;
 }
 
 void TransformFOTBuilder::emptyElement(const ElementNIC &nic)
 {
+  flushPendingRe();
   os() << "<";
   const StringC &s = nic.gi.size() == 0 ? undefGi_ : nic.gi;
   os() << s;
@@ -377,22 +414,22 @@ void TransformFOTBuilder::emptyElement(const ElementNIC &nic)
   else
     os() << '>';
   atomic();
+  state_ = stateMiddle;
 }
  
 void TransformFOTBuilder::endElement()
 {
-  if (!xml_)
-    os() << RE;
+  flushPendingReCharRef();
   os() << "</" << openElements_.back();
-  if (xml_)
-    os() << RE;
-  os() << '>';
+  os() << RE << '>';
   openElements_.resize(openElements_.size() - 1);
   end();
+  state_ = stateMiddle;
 }
 
 void TransformFOTBuilder::processingInstruction(const StringC &s)
 {
+  flushPendingReCharRef();
   os() << "<?" << s;
   if (xml_)
     os() << "?>";
@@ -403,16 +440,19 @@ void TransformFOTBuilder::processingInstruction(const StringC &s)
 
 void TransformFOTBuilder::formattingInstruction(const StringC &s)
 {
+  flushPendingRe();
   os() << s;
 }
 
 void TransformFOTBuilder::entityRef(const StringC &s)
 {
+  flushPendingRe();
   os() << "&" << s << ";";
 }
 
 void TransformFOTBuilder::startEntity(const StringC &systemId)
 {
+  flushPendingRe();
   OpenFile *ofp = new OpenFile;
   openFileStack_.insert(ofp);
   ofp->systemId = systemId;
@@ -443,6 +483,7 @@ void TransformFOTBuilder::startEntity(const StringC &systemId)
 
 void TransformFOTBuilder::endEntity()
 {
+  flushPendingRe();
   OpenFile &of = *openFileStack_.head();
   if (of.os) {
     errno = 0;
@@ -456,8 +497,41 @@ void TransformFOTBuilder::endEntity()
   delete openFileStack_.get();
 }
 
+inline
+OutputCharStream &operator<<(OutputCharStream &os, GroveString &str)
+{
+  return os.write(str.data(), str.size());
+}
+
+void TransformFOTBuilder::charactersFromNode(const NodePtr &nd, const Char *s, size_t n)
+{
+  GroveString name;
+  if (preserveSdata_ && n == 1 && nd->getEntityName(name) == accessOK)
+    os() << "&" << name << ';';
+  else
+    TransformFOTBuilder::characters(s, n);
+}
+
 void TransformFOTBuilder::characters(const Char *s, size_t n)
 {
+  if (n == 0)
+    return;
+  flushPendingRe();
+  if (state_ == stateStartOfElement && *s == RE) {
+    s++;
+    n--;
+    os() << "&#13;";
+    if (n == 0) {
+      state_ = stateMiddle;
+      return;
+    }
+  }
+  if (s[n - 1] == RE) {
+    n--;
+    state_ = statePendingRe;
+  }
+  else
+    state_ = stateMiddle;
   for (; n > 0; n--, s++) {
     switch (*s) {
     case '&':
@@ -498,6 +572,22 @@ void TransformFOTBuilder::startExtensionSerial(const CompoundExtensionFlowObj &f
 void TransformFOTBuilder::endExtensionSerial(const CompoundExtensionFlowObj &fo)
 {
   ((const TransformCompoundExtensionFlowObj &)fo).end(*this);
+}
+
+void TransformFOTBuilder::setPreserveSdata(bool b)
+{
+  preserveSdata_ = b;
+}
+
+void TransformFOTBuilder::start()
+{
+  preserveSdataStack_ += Char(preserveSdata_);
+}
+
+void TransformFOTBuilder::end()
+{
+  preserveSdataStack_.resize(preserveSdataStack_.size() - 1);
+  preserveSdata_ = bool(preserveSdataStack_[preserveSdataStack_.size() - 1]);
 }
 
 TransformFOTBuilder::OpenFile::~OpenFile()

@@ -1,0 +1,110 @@
+lib_LTLIBRARIES= libosp.la
+
+libosp_la_LDFLAGS = --version-info 0:0:0 -lm 
+
+SUFFIXES = .msg .m4
+
+.m4.cxx: 
+	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
+
+%.h %.cxx %.rc: %.msg
+	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
+
+$(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
+	rm -f $@
+	$(PERL) -w $(srcdir)/mkversion.pl $(srcdir)/../VERSION >$@
+
+libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
+	ArcEngineMessages.h ArcProcessor.h Attribute.cxx \
+	Big5CodingSystem.cxx CatalogEntry.h CatalogMessages.h \
+	CharsetDecl.cxx CharsetInfo.cxx CharsetRegistry.cxx CmdLineApp.cxx \
+	CmdLineAppMessages.h CodingSystem.cxx CodingSystemKit.cxx \
+	ConsoleOutput.cxx ContentState.cxx ContentToken.cxx \
+	DescriptorManager.cxx Dtd.cxx DtdDeclEventHandler.cxx \
+	DtdDeclEventHandler.h EUCJPCodingSystem.cxx ElementType.cxx \
+	Entity.cxx EntityApp.cxx EntityCatalog.cxx EntityDecl.cxx \
+	EntityManager.cxx EntityManagerMessages.h EquivClass.h \
+	ErrnoMessageArg.cxx ErrorCountEventHandler.cxx Event.cxx \
+	EventGenerator.cxx EventQueue.h ExtendEntityManager.cxx \
+	ExternalId.cxx Fixed2CodingSystem.cxx GenericEventHandler.cxx \
+	Group.cxx Group.h Hash.cxx IListBase.cxx Id.cxx Id.h \
+	IdentityCodingSystem.cxx InputSource.cxx InternalInputSource.cxx \
+	Link.cxx LinkProcess.cxx LiteralStorage.cxx Location.cxx Lpd.cxx \
+	LpdEntityRef.h Markup.cxx MarkupScan.h Message.cxx MessageArg.cxx \
+	MessageEventHandler.cxx MessageFormatter.cxx MessageFormatterMessages.h \
+	MessageReporter.cxx MessageReporterMessages.h \
+	MessageTable.cxx ModeInfo.cxx \
+	ModeInfo.h Mutex.h NameToken.h Notation.cxx NotationStorage.cxx \
+	NumericCharRefOrigin.cxx NumericCharRefOrigin.h OffsetOrderedList.cxx \
+	OffsetOrderedList.h OpenElement.cxx OutputByteStream.cxx \
+	OutputCharStream.cxx OutputState.cxx OutputState.h Param.cxx Param.h \
+	Parser.cxx Parser.h ParserApp.cxx ParserAppMessages.h \
+	ParserEventGeneratorKit.cxx ParserMessages.h ParserMessages.cxx \
+	ParserOptions.cxx ParserState.cxx ParserState.h Partition.cxx \
+	Partition.h PosixStorage.cxx PosixStorageMessages.h Priority.h \
+	Recognizer.cxx Recognizer.h RewindStorageObject.cxx \
+	SGMLApplication.cxx SJISCodingSystem.cxx SOEntityCatalog.cxx Sd.cxx \
+	SdFormalError.h SdText.cxx SearchResultMessageArg.cxx SgmlParser.cxx \
+	ShortReferenceMap.cxx SrInfo.h StdioStorage.cxx StdioStorageMessages.h \
+	StorageManager.cxx StorageObjectPosition.h \
+	StringVectorMessageArg.cxx StringVectorMessageArg.h Syntax.cxx \
+	Text.cxx TokenMessageArg.cxx TokenMessageArg.h \
+	TranslateCodingSystem.cxx Trie.h TrieBuilder.cxx TrieBuilder.h \
+	TypeId.cxx URLStorage.cxx URLStorageMessages.h \
+	UTF8CodingSystem.cxx Undo.cxx Undo.h UnicodeCodingSystem.cxx \
+	UnivCharsetDesc.cxx Win32CodingSystem.cxx WinApp.cxx \
+	WinInetStorage.cxx WinInetStorageMessages.h XMLCodingSystem.cxx \
+	assert.cxx big5.h events.h gb2312.h iso646-jis.h iso8859-2.h \
+	iso8859-3.h iso8859-4.h iso8859-5.h iso8859-6.h iso8859-7.h \
+	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
+	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
+	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
+	splibpch.h token.h version.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
+	parser_inst.cxx xentmgr_inst.cxx
+
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
+
+EXTRA_DIST = ArcEngineMessages.msg CatalogMessages.msg CmdLineAppMessages.msg \
+	EntityManagerMessages.msg MessageFormatterMessages.msg \
+	MessageReporterMessages.msg ParserAppMessages.msg \
+	ParserMessages.msg PosixStorageMessages.msg StdioStorageMessages.msg \
+	URLStorageMessages.msg WinInetStorageMessages.msg \
+	app_inst.m4 arc_inst.m4 entmgr_inst.m4 parser_inst.m4 xentmgr_inst.m4
+
+MSGGENFLAGS = -l
+
+BUILT_SOURCES = version.h ArcEngineMessages.h ArcEngineMessages.rc \
+	CatalogMessages.h CatalogMessages.rc CmdLineAppMessages.h \
+	CmdLineAppMessages.rc EntityManagerMessages.h \
+	EntityManagerMessages.rc MessageFormatterMessages.h \
+	MessageFormatterMessages.rc MessageReporterMessages.h \
+	MessageReporterMessages.rc ParserAppMessages.h ParserAppMessages.rc \
+	ParserMessages.cxx ParserMessages.h ParserMessages.rc \
+	PosixStorageMessages.h PosixStorageMessages.rc StdioStorageMessages.h \
+	StdioStorageMessages.rc URLStorageMessages.h URLStorageMessages.rc \
+	WinInetStorageMessages.h WinInetStorageMessages.rc app_inst.cxx \
+	arc_inst.cxx entmgr_inst.cxx parser_inst.cxx xentmgr_inst.cxx
+
+URLStorage.o: URLStorageMessages.h
+URLStorage.lo: URLStorageMessages.h
+PosixStorage.o: PosixStorageMessages.h
+PosixStorage.lo: PosixStorageMessages.h
+StdioStorage.o: StdioStorageMessages.h
+StdioStorage.lo: StdioStorageMessages.h
+SOEntityCatalog.o: CatalogMessages.h
+SOEntityCatalog.lo: CatalogMessages.h
+ExtendEntityManager.o: EntityManagerMessages.h
+ExtendEntityManager.lo: EntityManagerMessages.h
+ParserState.o: ParserMessages.h
+ParserState.lo: ParserMessages.h
+MessageFormatter.o: MessageFormatterMessages.h
+MessageFormatter.lo: MessageFormatterMessages.h
+MessageReporter.o: MessageReporterMessages.h
+MessageReporter.lo: MessageReporterMessages.h
+CmdLineApp.o: version.h CmdLineAppMessages.h
+CmdLineApp.lo: version.h CmdLineAppMessages.h
+ParserApp.o: ParserAppMessages.h
+ParserApp.lo: ParserAppMessages.h
+ArcEngine.o: ArcEngineMessages.h
+ArcEngine.lo: ArcEngineMessages.h
+

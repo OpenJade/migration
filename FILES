@@ -44,6 +44,8 @@ pubtext/html.dtd
 pubtext/HTML32.dcl
 pubtext/HTML32.dtd
 pubtext/HTML32.soc
+pubtext/xml.dcl
+pubtext/xml.soc
 include/Allocator.h
 include/ArcEngine.h
 include/Attribute.h
@@ -110,6 +112,7 @@ include/Message.h
 include/MessageArg.h
 include/MessageBuilder.h
 include/MessageEventHandler.h
+include/MessageFormatter.h
 include/MessageReporter.h
 include/MessageTable.h
 include/Mode.h
@@ -123,6 +126,7 @@ include/Notation.h
 include/OpenElement.h
 include/Options.cxx
 include/Options.h
+include/OutputByteStream.h
 include/OutputCharStream.h
 include/Owner.cxx
 include/Owner.h
@@ -243,6 +247,10 @@ lib/MarkupScan.h
 lib/Message.cxx
 lib/MessageArg.cxx
 lib/MessageEventHandler.cxx
+lib/MessageFormatter.cxx
+lib/MessageFormatterMessages.h
+lib/MessageFormatterMessages.msg
+lib/MessageFormatterMessages.rc
 lib/MessageReporter.cxx
 lib/MessageReporterMessages.h
 lib/MessageReporterMessages.msg
@@ -250,6 +258,7 @@ lib/MessageReporterMessages.rc
 lib/MessageTable.cxx
 lib/ModeInfo.cxx
 lib/ModeInfo.h
+lib/Mutex.h
 lib/NameToken.h
 lib/Notation.cxx
 lib/NumericCharRefOrigin.cxx
@@ -257,6 +266,7 @@ lib/NumericCharRefOrigin.h
 lib/OffsetOrderedList.cxx
 lib/OffsetOrderedList.h
 lib/OpenElement.cxx
+lib/OutputByteStream.cxx
 lib/OutputCharStream.cxx
 lib/OutputState.cxx
 lib/OutputState.h
@@ -407,8 +417,6 @@ spam/spam_inst.cxx
 spam/spam_inst.m4
 spent/Makefile.sub
 spent/spent.cxx
-spent/spent_inst.cxx
-spent/spent_inst.m4
 sp-generate.mak
 sunfix.sh
 unicode/catalog

@@ -8,14 +8,17 @@ PERL=perl
 GENSRCS=\
 style/style_inst.cxx \
 style/FlowObj_inst.cxx \
+style/primitive_inst.cxx \
 style/common_inst.cxx \
 spgrove/grove_inst.cxx \
 jade/HtmlFOTBuilder_inst.cxx \
 jade/RtfFOTBuilder_inst.cxx \
+jade/TransformFOTBuilder_inst.cxx \
 jade/JadeMessages.h \
 jade/HtmlMessages.h \
 jade/RtfMessages.h \
 jade/DssslAppMessages.h \
+jade/TeXMessages.h \
 style/InterpreterMessages.h
 
 .SUFFIXES: .m4 .msg

@@ -11,8 +11,6 @@
 #include "Fixed2CodingSystem.h"
 #include "macros.h"
 
-#include <iostream.h>
-
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -29,8 +27,8 @@ class Fixed2Encoder : public Encoder {
 public:
   Fixed2Encoder();
   ~Fixed2Encoder();
-  void output(Char *, size_t, streambuf *);
-  void output(const Char *, size_t, streambuf *);
+  void output(Char *, size_t, OutputByteStream *);
+  void output(const Char *, size_t, OutputByteStream *);
 private:
   void allocBuf(size_t);
   char *buf_;
@@ -99,9 +97,7 @@ void Fixed2Encoder::allocBuf(size_t n)
   }
 }
 
-// FIXME handle errors from streambuf::sputn
-
-void Fixed2Encoder::output(Char *s, size_t n, streambuf *sb)
+void Fixed2Encoder::output(Char *s, size_t n, OutputByteStream *sb)
 {
 #ifdef SP_BIG_ENDIAN
   if (sizeof(Char) == 2) {
@@ -119,7 +115,7 @@ void Fixed2Encoder::output(Char *s, size_t n, streambuf *sb)
   sb->sputn((char *)s, n*2);
 }
 
-void Fixed2Encoder::output(const Char *s, size_t n, streambuf *sb)
+void Fixed2Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
 #ifdef SP_BIG_ENDIAN
   if (sizeof(Char) == 2) {

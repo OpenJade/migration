@@ -89,7 +89,6 @@ E0+attributeSpecEntityEnd++entity end not allowed in attribute specification lis
 E1+externalParameterDataSubdocEntity++external parameter entity %1 cannot be CDATA, SDATA, NDATA or SUBDOC
 W1+duplicateEntityDeclaration++duplicate declaration of entity %1
 W1+duplicateParameterEntityDeclaration++duplicate declaration of parameter entity %1
-E1+noDtdSubset++DTD %1 has neither internal nor external subset
 E0+piEntityReference+10.5.3p9+a reference to a PI entity is allowed only in a context where a processing instruction could occur
 E0+internalDataEntityReference+10.5.3p9+a reference to a CDATA or SDATA entity is allowed only in a context where a data character could occur
 E0+externalNonTextEntityReference+9.4p0+a reference to a subdocument entity or external data entity is allowed only in a context where a data character could occur
@@ -188,7 +187,9 @@ X1+missingId++reference to non-existent ID %1
 W1+dtdUndefinedElement++generic identifier %1 used in DTD but not defined
 E1+elementNotFinishedDocumentEnd++%1 not finished but document ended
 E0+subdocGiveUp++cannot continue with subdocument because of previous errors
-E0+noDtd++could not find document type declaration
+E0+noDtd++no document type declaration; will parse without validation
+E0+noDtdSubset++no internal or external document type declaration subset; will parse without validation
+E0+notSgml++this is not an SGML document
 Q1+taglen+7.4.2p1+length of start-tag before interpretation of literals must not exceed TAGLEN (%1)
 E0+groupParameterEntityNotEnded+10.1.3p7+a parameter entity referenced in a token separator must end in the same group
 E1+invalidSgmlChar+13.1.2p3+the following character numbers are shunned characters that are not significant and so should have been declared UNUSED: %1
@@ -353,6 +354,56 @@ E2+numericCharRefUnknownDesc++cannot convert character reference to number %1 be
 E3+numericCharRefUnknownBase++cannot convert character reference to number %1 because character %2 from baseset %3 unknown
 E1+numericCharRefBadInternal++character reference to number %1 cannot be converted because of problem with internal character set
 E1+numericCharRefNoInternal++cannot convert character reference to number %1 because character not in internal character set
+
+W0+netStartTagEndTag++end-tag for element with net-enabling start-tag
+W0+cdataContent++CDATA declared content
+W0+rcdataContent++RCDATA declared content
+W0+inclusion++inclusion
+W0+exclusion++exclusion
+W0+numberDeclaredValue++NUMBER or NUMBERS declared value
+W0+nameDeclaredValue++NAME or NAMES declared value
+W0+nutokenDeclaredValue++NUTOKEN or NUTOKENS declared value
+W0+conrefAttribute++conref attribute
+W0+currentAttribute++current attribute
+W0+tempMarkedSection++TEMP marked section
+W0+instanceIncludeMarkedSection++included marked section in the instance
+W0+instanceIgnoreMarkedSection++ignored marked section in the instance
+W0+rcdataMarkedSection++RCDATA marked section
+W0+piEntity++processing instruction entity
+W0+bracketEntity++bracketed text entity
+W0+internalCdataEntity++internal CDATA entity
+W0+internalSdataEntity++internal SDATA entity
+W0+externalCdataEntity++external CDATA entity
+W0+externalSdataEntity++external SDATA entity
+W0+dataAttributes++attribute definition list declaration for notation
+W0+rank++rank stem
+W0+missingSystemId++no system id specified
+W0+psComment++comment in parameter separator
+W0+namedCharRef++named character reference
+W0+andGroup++and group
+W0+attributeValueNotLiteral++attribute value not a literal
+W0+missingAttributeName++attribute name missing
+W0+elementGroupDecl++element declaration for group of element types
+W0+attlistGroupDecl++attribute definition list declaration for group of element types
+W0+emptyCommentDecl++empty comment declaration
+W0+commentDeclS++s separator in comment declaration
+W0+commentDeclMultiple++multiple comments in comment declaration
+W0+missingStatusKeyword++no status keyword
+W0+multipleStatusKeyword++multiple status keywords
+W0+instanceParamEntityRef++parameter entity reference in document instance
+W0+current++current attribute
+W0+minimizationParam++element type minimization parameter
+W0+refc++reference not terminated by refc delimiter
+W0+pcdataNotFirstInGroup++#PCDATA not first in model group
+W0+pcdataInSeqGroup++#PCDATA in seq group
+W0+pcdataInNestedModelGroup++#PCDATA in nested model group
+W0+pcdataGroupNotRep++#PCDATA in model group that is not repeatable
+W0+nameGroupNotOr++name group or name token group used connector other than OR
+W0+piMissingName++processing instruction does not start with name
+W0+statusKeywordSpecS++s separator in status keyword specification
+W0+externalDataEntityRef++reference to external data entity
+W0+attributeValueExternalEntityRef++reference to external entity in attribute value
+
 # message fragments
 =1000
 +delimStart++delimiter 

@@ -6,7 +6,6 @@
 #ifdef SP_MULTI_BYTE
 
 #include "SJISCodingSystem.h"
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -22,7 +21,7 @@ private:
 class SJISEncoder : public RecoveringEncoder {
 public:
   SJISEncoder();
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 };
 
 Decoder *SJISCodingSystem::makeDecoder() const
@@ -106,9 +105,7 @@ SJISEncoder::SJISEncoder()
 {
 }
 
-// FIXME handle errors from streambuf::sputc
-
-void SJISEncoder::output(const Char *s, size_t n, streambuf *sb)
+void SJISEncoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   for (; n > 0; s++, n--) {
     Char c = *s;

@@ -5,6 +5,7 @@
 #include "CatalogMessages.rc"
 #include "CmdLineAppMessages.rc"
 #include "EntityManagerMessages.rc"
+#include "MessageFormatterMessages.rc"
 #include "MessageReporterMessages.rc"
 #include "ParserAppMessages.rc"
 #include "ParserMessages.rc"

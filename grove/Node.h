@@ -51,6 +51,104 @@ enum AccessResult {
   accessNotInClass		// property is not defined for class
 };
 
+struct GROVE_API ComponentName {
+  enum Id {
+    noId = -1,
+    idAllPropertyNames,
+    idApplicationInfo,
+    idAttributeAssignment,
+    idAttributes,
+    idAttributeValueToken,
+    idCdata,
+    idChar,
+    idChildrenPropertyName,
+    idClassName,
+    idContent,
+    idDataChar,
+    idDataPropertyName,
+    idDataSepPropertyName,
+    idDefaulted,
+    idDefaultedEntities,
+    idDocumentElement,
+    idDocumentType,
+    idDoctypesAndLinktypes,
+    idElement,
+    idElements,
+    idEntities,
+    idEntity,
+    idEntityName,
+    idEntityType,
+    idEpilog,
+    idExternalData,
+    idExternalId,
+    idGeneralEntities,
+    idGeneratedSystemId,
+    idGi,
+    idGoverningDoctype,
+    idGoverning,
+    idGroveRoot,
+    idId,
+    idImplied,
+    idIncluded,
+    idMustOmitEndTag,
+    idName,
+    idNdata,
+    idNotation,
+    idNotationName,
+    idNotations,
+    idOrigin,
+    idOriginToSubnodeRelPropertyName,
+    idParent,
+    idPi,
+    idProlog,
+    idPublicId,
+    idReferent,
+    idSdata,
+    idSgmlConstants,
+    idSgmlDocument,
+    idSubdocument,
+    idSubnodePropertyNames,
+    idSystemData,
+    idSystemId,
+    idText,
+    idToken,
+    idTokenSep,
+    idTreeRoot,
+    idValue
+  };
+  enum { nIds = idValue + 1 };
+  static const char *rcsName(Id);
+  static const char *sdqlName(Id);
+};
+
+struct GROVE_API ClassDef {
+  ComponentName::Id className;
+  const ComponentName::Id *allPropertyNames;
+  const ComponentName::Id *subnodePropertyNames;
+  ComponentName::Id childrenPropertyName;
+  ComponentName::Id dataPropertyName;
+  ComponentName::Id dataSepPropertyName;
+
+  static const ClassDef sgmlDocument;
+  static const ClassDef sgmlConstants;
+  static const ClassDef dataChar;
+  static const ClassDef element;
+  static const ClassDef attributeAssignment;
+  static const ClassDef attributeValueToken;
+  static const ClassDef pi;
+  static const ClassDef sdata;
+  static const ClassDef documentType;
+  static const ClassDef entity;
+  static const ClassDef notation;
+  static const ClassDef externalId;
+  static const ClassDef externalData;
+  static const ClassDef subdocument;
+  static const ClassDef nonSgml;
+  static const ClassDef message;
+};
+
+class PropertyValue;
+
 class GROVE_API Node {
 public:
   // property values
@@ -60,12 +158,22 @@ public:
   virtual AccessResult getOrigin(NodePtr &) const;
   virtual AccessResult getParent(NodePtr &) const;
   virtual AccessResult getGroveRoot(NodePtr &) const;
+  virtual AccessResult getTreeRoot(NodePtr &) const;
+  virtual AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const = 0;
+  AccessResult getClassName(ComponentName::Id &) const;
+  AccessResult getChildrenPropertyName(ComponentName::Id &) const;
+  AccessResult getDataPropertyName(ComponentName::Id &) const;
+  AccessResult getDataSepPropertyName(ComponentName::Id &) const;
+  AccessResult getSubnodePropertyNames(const ComponentName::Id *&) const;
+  AccessResult getAllPropertyNames(const ComponentName::Id *&) const;
 
   // this allows you to apply some operation to a node
   // according to its grove class
   virtual void accept(NodeVisitor &) = 0;
+  virtual const ClassDef &classDef() const = 0;
   // not formally properties
-  virtual AccessResult children(NodeListPtr &) const;
+  virtual AccessResult children(NodeListPtr &) const = 0;
+  virtual AccessResult follow(NodeListPtr &) const = 0;
   // return accessNull if there isn't a first or next
   // result accessNotInClass if datatype of otsnr is not node-list or named-node-list
   virtual AccessResult nextSibling(NodePtr &) const;
@@ -103,7 +211,17 @@ public:
   // Implementation will usually need to call sameGrove().
   virtual bool operator==(const Node &node) const = 0;
   bool operator!=(const Node &node) const { return !(*this == node); }
+  // Does this chunk contains nd?
+  virtual bool chunkContains(const Node &nd) const;
   bool sameGrove(const Node &node) const;
+  typedef const char *IID;
+  virtual bool queryInterface(IID, const void *&) const;
+  // Property on SGML document giving list of parser messages.
+  virtual AccessResult getMessages(NodeListPtr &) const;
+  // Property of message.
+  enum Severity { info, warning, error };
+  virtual AccessResult getSeverity(Severity &) const;
+  AccessResult property(ComponentName::Id, const SdataMapper &, PropertyValue &) const;
 private:
   // Used to implement sameGrove().
   virtual const void *groveUniqueId() const = 0;
@@ -206,11 +324,20 @@ public:
   // Use this when you don't care about the order.
   // May be much more efficient than nodeList().
   virtual NodeListPtr nodeListNoOrder() const;
-  // The node must be of a class that occurs in the list.
-  // This is not enforced.
-  // Returns the value of the name property for that node.
-  // If accessNotInClass is returned the node is not in the list.
-  virtual AccessResult nodeName(const NodePtr &, GroveString &) const = 0;
+  enum Type {
+    elements,
+    attributes,
+    entities,
+    notations,
+    doctypesAndLinktypes
+  };
+  virtual Type type() const = 0;
+  // If the node is of a class that occurs in the list,
+  // return the value of the property that serves as the name
+  // property for nodes of that class in the named node list.
+  // Return accessNotInClass if the node is not of a class
+  // that occurs in the list.
+  AccessResult nodeName(const NodePtr &, GroveString &) const;
   virtual void release() = 0;
   virtual void addRef() = 0;
 protected:
@@ -359,7 +486,22 @@ public:
   virtual void notation(Node &);
   virtual void externalId(Node &);
   virtual void externalData(Node &);
-  virtual void subdoc(Node &);
+  virtual void subdocument(Node &);
+  virtual void nonSgml(Node &);
+  virtual void message(Node &);
+};
+
+class GROVE_API PropertyValue {
+public:
+  virtual ~PropertyValue() { }
+  virtual void set(const NodePtr &) = 0;
+  virtual void set(const NodeListPtr &) = 0;
+  virtual void set(const NamedNodeListPtr &) = 0;
+  virtual void set(bool) = 0;
+  virtual void set(GroveChar) = 0;
+  virtual void set(GroveString) = 0;
+  virtual void set(ComponentName::Id) = 0;
+  virtual void set(const ComponentName::Id *) = 0;
 };
 
 inline
@@ -376,6 +518,57 @@ inline
 bool Node::sameGrove(const Node &node) const
 {
   return groveUniqueId() == node.groveUniqueId();
+}
+
+inline
+AccessResult Node::getClassName(ComponentName::Id &name) const
+{
+  name = classDef().className;
+  return accessOK;
+}
+
+inline
+AccessResult Node::getChildrenPropertyName(ComponentName::Id &name) const
+{
+  const ClassDef &def = classDef();
+  if (def.childrenPropertyName == ComponentName::noId)
+    return accessNull;
+  name = def.childrenPropertyName;
+  return accessOK;
+}
+
+inline
+AccessResult Node::getDataPropertyName(ComponentName::Id &name) const
+{
+  const ClassDef &def = classDef();
+  if (def.dataPropertyName == ComponentName::noId)
+    return accessNull;
+  name = def.dataPropertyName;
+  return accessOK;
+}
+
+inline
+AccessResult Node::getDataSepPropertyName(ComponentName::Id &name) const
+{
+  const ClassDef &def = classDef();
+  if (def.dataSepPropertyName == ComponentName::noId)
+    return accessNull;
+  name = def.dataSepPropertyName;
+  return accessOK;
+}
+
+inline
+AccessResult Node::getSubnodePropertyNames(const ComponentName::Id *&names) const
+{
+  names = classDef().subnodePropertyNames;
+  return accessOK;
+}
+
+inline
+AccessResult Node::getAllPropertyNames(const ComponentName::Id *&names) const
+{
+   names = classDef().allPropertyNames;
+   return accessOK;
 }
 
 #ifdef GROVE_NAMESPACE

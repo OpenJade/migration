@@ -14,7 +14,8 @@ namespace SP_NAMESPACE {
 
 Boolean Parser::parseAttributeSpec(Boolean inDecl,
 				   AttributeList &atts,
-				   Boolean &netEnabling)
+				   Boolean &netEnabling,
+				   Ptr<AttributeDefinitionList> &newAttDef)
 
 {
   unsigned specLength = 0;
@@ -39,7 +40,7 @@ Boolean Parser::parseAttributeSpec(Boolean inDecl,
 	if (curParm == AttributeParameter::vi) {
 	  specLength += text.size() + syntax().normsep();
 	  if (!parseAttributeValueSpec(inDecl, text.string(), atts,	
-				       specLength))
+				       specLength, newAttDef))
 	    return 0;
 	  // setup for next attribute
 	  if (!parseAttributeParameter(inDecl, 0, curParm, netEnabling))
@@ -107,6 +108,8 @@ Boolean Parser::handleAttributeNameToken(Text &text,
   else {
     if (!sd().shorttag())
       message(ParserMessages::attributeNameShorttag);
+    else if (options().warnMissingAttributeName)
+      message(ParserMessages::missingAttributeName);
     atts.setSpec(index, *this);
     atts.setValueToken(index, text, *this, specLength);
   }
@@ -116,7 +119,8 @@ Boolean Parser::handleAttributeNameToken(Text &text,
 Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
 					const StringC &name,
 					AttributeList &atts,
-					unsigned &specLength)
+					unsigned &specLength,
+					Ptr<AttributeDefinitionList> &newAttDef)
 {
   Mode mode = inDecl ? asMode : tagMode;
   Markup *markup = currentMarkup();
@@ -135,13 +139,18 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
     }
   }
   unsigned index;
-  Boolean valid = atts.attributeIndex(name, index);
-  if (!valid) {
-    message(ParserMessages::noSuchAttribute, StringMessageArg(name));
-    atts.noteInvalidSpec();
+  if (!atts.attributeIndex(name, index)) {
+    if (validate())
+      message(ParserMessages::noSuchAttribute, StringMessageArg(name));
+    if (newAttDef.isNull())
+      newAttDef = new AttributeDefinitionList(atts.def());
+    newAttDef
+      ->append(new ImpliedAttributeDefinition(name,
+					      new CdataDeclaredValue));
+    atts.changeDef(newAttDef);
+    index = atts.size() - 1;
   }
-  else
-    atts.setSpec(index, *this);
+  atts.setSpec(index, *this);
   Text text;
   switch (token) {
   case tokenUnrecognized:
@@ -172,6 +181,8 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   case tokenLcUcNmchar:
     if (!sd().shorttag())
       message(ParserMessages::attributeValueShorttag);
+    if (options().warnAttributeValueNotLiteral)
+      message(ParserMessages::attributeValueNotLiteral);
     extendNameToken(syntax().litlen() >= syntax().normsep()
 		    ? syntax().litlen() - syntax().normsep()
 		    : 0,
@@ -186,7 +197,7 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   case tokenLita:
     Boolean lita;
     lita = (token == tokenLita);
-    if (!((valid ? atts.tokenized(index) : 1)
+    if (!(atts.tokenized(index)
 	  ? parseTokenizedAttributeValueLiteral(lita, text)
 	  : parseAttributeValueLiteral(lita, text)))
       return 0;
@@ -196,10 +207,7 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   default:
       CANNOT_HAPPEN();
   }
-  if (valid)
-    return atts.setValue(index, text, *this, specLength);
-  else
-    return !AttributeValue::handleAsUnterminated(text, *this);
+  return atts.setValue(index, text, *this, specLength);
 }
 
 

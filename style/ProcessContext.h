@@ -32,7 +32,7 @@ public:
   FOTBuilder &currentFOTBuilder();
   StyleStack &currentStyleStack();
   void process(Interpreter &);
-  void processNode(const NodePtr &, const ProcessingMode *);
+  void processNode(const NodePtr &, const ProcessingMode *, bool chunk = 1);
   void nextMatch(StyleObj *);
   void processChildren(const ProcessingMode *);
   void processChildrenTrim(const ProcessingMode *);
@@ -83,6 +83,8 @@ private:
     unsigned connected;
   };
   // A flow object with a port that can be connected to.
+  struct Connectable;
+  friend struct Connectable;
   struct Connectable : public Link {
     Connectable(int nPorts, const StyleStack &, unsigned);
     NCVector<Port> ports;
@@ -92,6 +94,8 @@ private:
   };
   // An connection between a flow object and its flow parent
   // made with label:.
+  struct Connection;
+  friend struct Connection;
   struct Connection : public Link {
     Connection(FOTBuilder *);
     Connection(const StyleStack &, Port *);

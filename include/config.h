@@ -32,6 +32,10 @@
 #define SP_STAT_BLKSIZE
 #endif
 
+#ifdef __MACH__
+#define SP_MUTEX_MACH
+#endif
+
 #ifdef __EMX__
 // EMX 0.9a for OS/2
 #undef SP_POSIX_FILENAMES
@@ -64,7 +68,6 @@
 #define SP_FANCY_NEW_HANDLER
 
 #define SP_HAVE_SETMODE
-#define SP_HAVE_IOS_BINARY
 #define SP_DLLEXPORT __declspec(dllexport)
 #define SP_DLLIMPORT __declspec(dllimport)
 
@@ -99,6 +102,12 @@
 #define SP_PCH
 // Don't compile in message text.
 #define SP_NO_MESSAGE_TEXT
+#ifdef _MT
+// Use Win32 critical section facilities
+#define SP_MUTEX_WIN32
+// Use the new Standard C++ library
+#define SP_ANSI_LIB
+#endif /* _MT */
 #endif /* _MSC_VER */
 
 #ifdef __WATCOMC__
@@ -113,7 +122,6 @@
 // Cannot handle T::~T in template.
 #define SP_QUAL_TEMPLATE_DTOR_BROKEN
 #define SP_HAVE_SETMODE
-#define SP_HAVE_IOS_BINARY
 #define _setmode setmode
 #if __WATCOMC__ < 1050
 #define _O_BINARY O_BINARY
@@ -126,7 +134,6 @@
 #define SP_ANSI_FOR_SCOPE
 #define SP_HAVE_RTTI
 #define SP_HAVE_SETMODE
-#define SP_HAVE_IOS_BINARY
 #undef SP_INCLUDE_UNISTD_H
 #define SP_INCLUDE_IO_H
 #undef SP_POSIX_FILENAMES
@@ -182,8 +189,6 @@
 // Metrowerks for some platform (MacOS in this case)
 
 #pragma mpwc_newline off
-#define SP_HAVE_IOS_BINARY
-#define SP_ANSI_IOSTREAMS
 #define SP_DEFINE_TEMPLATES
 // #define SP_USE_DLL -- __declspec doesn't work with classes (yet)
 #ifdef SP_USE_DLL

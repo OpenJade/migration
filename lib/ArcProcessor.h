@@ -64,7 +64,7 @@ public:
 			 Allocator &);
   // Return true if its architectural.
   Boolean processData();
-  const ConstPtr<Dtd> &dtdPointer() const { return metaDtd_; }
+  ConstPtr<Dtd> dtdPointer() const { return metaDtd_; }
   Boolean valid() const { return valid_; }
   void checkIdrefs();
   const StringC &name() const { return name_; }
@@ -159,7 +159,7 @@ private:
   StringC name_;
   Messenger *mgr_;
   ConstPtr<Dtd> docDtd_;
-  ConstPtr<Dtd> metaDtd_;
+  Ptr<Dtd> metaDtd_;
   ConstPtr<Syntax> docSyntax_;
   ConstPtr<Syntax> metaSyntax_;
   ConstPtr<Sd> docSd_;

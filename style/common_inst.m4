@@ -56,6 +56,9 @@ __instantiate(SubstTable<Char>)
 __instantiate(Ptr<Syntax>)
 __instantiate(ConstPtr<Syntax>)
 __instantiate(ISet<Char>)
+__instantiate(Vector<TextItem>)
+__instantiate(`HashTableItem<StringC, int>')
+__instantiate(`HashTable<StringC,int>')
 
 #ifdef SP_NAMESPACE
 }

@@ -51,6 +51,15 @@ public:
   void setWritingMode(Symbol);
   void setLastLineQuadding(Symbol);
   void setMathDisplayMode(Symbol);
+  void setScriptPreAlign(Symbol);
+  void setScriptPostAlign(Symbol);
+  void setScriptMidSupAlign(Symbol);
+  void setScriptMidSubAlign(Symbol);
+  void setNumeratorAlign(Symbol);
+  void setDenominatorAlign(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowAlignment(Symbol);
   void setBoxType(Symbol);
   void setGlyphAlignmentMode(Symbol);
   void setBoxBorderAlignment(Symbol);
@@ -127,6 +136,8 @@ public:
   void setBorderOmitAtBreak(bool);
   void setPrincipalModeSimultaneous(bool);
   void setMarginaliaKeepWithPrevious(bool);
+  void setGridEquidistantRows(bool);
+  void setGridEquidistantColumns(bool);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
@@ -193,12 +204,65 @@ public:
   void tableCellAfterRowBorder();
   void tableCellBeforeColumnBorder();
   void tableCellAfterColumnBorder();
+  void startMathSequence();
+  void endMathSequence();
   void startFractionSerial();
   void endFractionSerial();
   void startFractionNumerator();
   void endFractionNumerator();
   void startFractionDenominator();
   void endFractionDenominator();
+  void fractionBar();
+  void startUnmath();
+  void endUnmath();
+  void startSuperscript();
+  void endSuperscript();
+  void startSubscript();
+  void endSubscript();
+  void startScriptSerial();
+  void endScriptSerial();
+  void startScriptPreSup();
+  void endScriptPreSup();
+  void startScriptPreSub();
+  void endScriptPreSub();
+  void startScriptPostSup();
+  void endScriptPostSup();
+  void startScriptPostSub();
+  void endScriptPostSub();
+  void startScriptMidSup();
+  void endScriptMidSup();
+  void startScriptMidSub();
+  void endScriptMidSub();
+  void startMarkSerial();
+  void endMarkSerial();
+  void startMarkOver();
+  void endMarkOver();
+  void startMarkUnder();
+  void endMarkUnder();
+  void startFenceSerial();
+  void endFenceSerial();
+  void startFenceOpen();
+  void endFenceOpen();
+  void startFenceClose();
+  void endFenceClose();
+  void startRadicalSerial();
+  void endRadicalSerial();
+  void startRadicalDegree();
+  void endRadicalDegree();
+  void radicalRadical(const CharacterNIC &);
+  void radicalRadicalDefaulted();
+  void startMathOperatorSerial();
+  void endMathOperatorSerial();
+  void startMathOperatorOperator();
+  void endMathOperatorOperator();
+  void startMathOperatorLowerLimit();
+  void endMathOperatorLowerLimit();
+  void startMathOperatorUpperLimit();
+  void endMathOperatorUpperLimit();
+  void startGrid(const GridNIC &);
+  void endGrid();
+  void startGridCell(const GridCellNIC &);
+  void endGridCell();
   void startNode(const NodePtr &, const StringC &, RuleType);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
@@ -207,7 +271,9 @@ private:
   void outputIcs();
   void startSimpleFlowObj(const char *name);
   void simpleFlowObj(const char *name);
+  void startPortFlow(const char *name);
   void endFlow(const char *name);
+  void characterNIC(const CharacterNIC &nic);
   void displayNIC(const DisplayNIC &nic);
   void inlineNIC(const InlineNIC &nic);
   void boolC(const char *, bool);
@@ -379,9 +445,8 @@ void SgmlFOTBuilder::characters(const Char *s, size_t n)
   os() << RE << "</chars>" << RE;
 }
 
-void SgmlFOTBuilder::character(const CharacterNIC &nic)
+void SgmlFOTBuilder::characterNIC(const CharacterNIC &nic)
 {
-  os() << "<character";
   if (nic.specifiedC) {
     if (nic.specifiedC & (1 << CharacterNIC::cChar))
       os() << " char=\"&#" << (unsigned long)nic.ch << ";\"";
@@ -418,6 +483,12 @@ void SgmlFOTBuilder::character(const CharacterNIC &nic)
   }
   if (nic.stretchFactor != 1.0)
     os() << " stretch-factor=" << nic.stretchFactor;
+}
+
+void SgmlFOTBuilder::character(const CharacterNIC &nic)
+{
+  os() << "<character";
+  characterNIC(nic);
   outputIcs();
   os() << '>' << RE;
 }
@@ -630,6 +701,51 @@ void SgmlFOTBuilder::setLastLineQuadding(Symbol sym)
 void SgmlFOTBuilder::setMathDisplayMode(Symbol sym)
 {
   symbolC("math-display-mode", sym);
+}
+
+void SgmlFOTBuilder::setScriptPreAlign(Symbol sym)
+{
+  symbolC("script-pre-align", sym);
+}
+
+void SgmlFOTBuilder::setScriptPostAlign(Symbol sym)
+{
+  symbolC("script-post-align", sym);
+}
+
+void SgmlFOTBuilder::setScriptMidSupAlign(Symbol sym)
+{
+  symbolC("script-mid-sup-align", sym);
+}
+
+void SgmlFOTBuilder::setScriptMidSubAlign(Symbol sym)
+{
+  symbolC("script-mid-sub-align", sym);
+}
+
+void SgmlFOTBuilder::setNumeratorAlign(Symbol sym)
+{
+  symbolC("numerator-align", sym);
+}
+
+void SgmlFOTBuilder::setDenominatorAlign(Symbol sym)
+{
+  symbolC("denominator-align", sym);
+}
+
+void SgmlFOTBuilder::setGridPositionCellType(Symbol sym)
+{
+  symbolC("grid-position-cell-type", sym);
+}
+
+void SgmlFOTBuilder::setGridColumnAlignment(Symbol sym)
+{
+  symbolC("grid-column-alignment", sym);
+}
+
+void SgmlFOTBuilder::setGridRowAlignment(Symbol sym)
+{
+  symbolC("grid-row-alignment", sym);
 }
 
 void SgmlFOTBuilder::setBoxType(Symbol sym)
@@ -1048,6 +1164,16 @@ void SgmlFOTBuilder::setMarginaliaKeepWithPrevious(bool b)
   boolC("marginalia-keep-with-previous", b);
 }
 
+void SgmlFOTBuilder::setGridEquidistantRows(bool b)
+{
+  boolC("grid-equidistant-rows", b);
+}
+
+void SgmlFOTBuilder::setGridEquidistantColumns(bool b)
+{
+  boolC("grid-equidistant-columns", b);
+}
+
 void SgmlFOTBuilder::boolC(const char *s, bool b)
 {
   ics_ << ' ' << s << (b ? "=1" : "=0");
@@ -1194,6 +1320,11 @@ void SgmlFOTBuilder::startSimpleFlowObj(const char *name)
   os() << '<' << name;
   outputIcs();
   os() << ">" << RE;
+}
+
+void SgmlFOTBuilder::startPortFlow(const char *name)
+{
+  os() << "<" << name << ">" << RE;
 }
 
 void SgmlFOTBuilder::endFlow(const char *name)
@@ -1391,6 +1522,16 @@ void SgmlFOTBuilder::pageNumber()
   os() << "<page-number>";
 }
 
+void SgmlFOTBuilder::startMathSequence()
+{
+  startSimpleFlowObj("math-sequence");
+}
+
+void SgmlFOTBuilder::endMathSequence()
+{
+  endFlow("math-sequence");
+}
+
 void SgmlFOTBuilder::startFractionSerial()
 {
   startSimpleFlowObj("fraction");
@@ -1403,7 +1544,7 @@ void SgmlFOTBuilder::endFractionSerial()
 
 void SgmlFOTBuilder::startFractionNumerator()
 {
-  os() << "<fraction.numerator>" << RE;
+  startPortFlow("fraction.numerator");
 }
 
 void SgmlFOTBuilder::endFractionNumerator()
@@ -1413,12 +1554,292 @@ void SgmlFOTBuilder::endFractionNumerator()
 
 void SgmlFOTBuilder::startFractionDenominator()
 {
-  os() << "<fraction.denominator>" << RE;
+  startPortFlow("fraction.denominator");
 }
 
 void SgmlFOTBuilder::endFractionDenominator()
 {
   endFlow("fraction.denominator");
+}
+
+void SgmlFOTBuilder::fractionBar()
+{
+  simpleFlowObj("fraction.fraction-bar");
+}
+
+void SgmlFOTBuilder::startUnmath()
+{
+  startSimpleFlowObj("unmath");
+}
+
+void SgmlFOTBuilder::endUnmath()
+{
+  endFlow("unmath");
+}
+
+void SgmlFOTBuilder::startSuperscript()
+{
+  startSimpleFlowObj("superscript");
+}
+
+void SgmlFOTBuilder::endSuperscript()
+{
+  endFlow("superscript");
+}
+
+void SgmlFOTBuilder::startSubscript()
+{
+  startSimpleFlowObj("subscript");
+}
+
+void SgmlFOTBuilder::endSubscript()
+{
+  endFlow("subscript");
+}
+
+void SgmlFOTBuilder::startScriptSerial()
+{
+  startSimpleFlowObj("script");
+  startPortFlow("script.principal");
+}
+
+void SgmlFOTBuilder::endScriptSerial()
+{
+  endFlow("script");
+}
+
+void SgmlFOTBuilder::startScriptPreSup()
+{
+  endFlow("script.principal");
+  startPortFlow("script.pre-sup");
+}
+
+void SgmlFOTBuilder::endScriptPreSup()
+{
+  endFlow("script.pre-sup");
+}
+
+void SgmlFOTBuilder::startScriptPreSub()
+{
+  startPortFlow("script.pre-sub");
+}
+
+void SgmlFOTBuilder::endScriptPreSub()
+{
+  endFlow("script.pre-sub");
+}
+
+void SgmlFOTBuilder::startScriptPostSup()
+{
+  startPortFlow("script.post-sup");
+}
+
+void SgmlFOTBuilder::endScriptPostSup()
+{
+  endFlow("script.post-sup");
+}
+
+void SgmlFOTBuilder::startScriptPostSub()
+{
+  startPortFlow("script.post-sub");
+}
+
+void SgmlFOTBuilder::endScriptPostSub()
+{
+  endFlow("script.post-sub");
+}
+
+void SgmlFOTBuilder::startScriptMidSup()
+{
+  startPortFlow("script.mid-sup");
+}
+
+void SgmlFOTBuilder::endScriptMidSup()
+{
+  endFlow("script.mid-sup");
+}
+
+void SgmlFOTBuilder::startScriptMidSub()
+{
+  startPortFlow("script.mid-sub");
+}
+
+void SgmlFOTBuilder::endScriptMidSub()
+{
+  endFlow("script.mid-sub");
+}
+
+void SgmlFOTBuilder::startMarkSerial()
+{
+  startSimpleFlowObj("mark");
+  startPortFlow("mark.principal");
+}
+
+void SgmlFOTBuilder::endMarkSerial()
+{
+  endFlow("mark");
+}
+
+void SgmlFOTBuilder::startMarkOver()
+{
+  endFlow("mark.principal");
+  startPortFlow("mark.over-mark");
+}
+
+void SgmlFOTBuilder::endMarkOver()
+{
+  endFlow("mark.over-mark");
+}
+
+void SgmlFOTBuilder::startMarkUnder()
+{
+  startPortFlow("mark.under-mark");
+}
+
+void SgmlFOTBuilder::endMarkUnder()
+{
+  endFlow("mark.under-mark");
+}
+
+void SgmlFOTBuilder::startFenceSerial()
+{
+  startSimpleFlowObj("fence");
+  startPortFlow("fence.principal");
+}
+
+void SgmlFOTBuilder::endFenceSerial()
+{
+  endFlow("fence");
+}
+
+void SgmlFOTBuilder::startFenceOpen()
+{
+  endFlow("fence.principal");
+  startPortFlow("fence.open");
+}
+
+void SgmlFOTBuilder::endFenceOpen()
+{
+  endFlow("fence.open");
+}
+
+void SgmlFOTBuilder::startFenceClose()
+{
+  startPortFlow("fence.close");
+}
+
+void SgmlFOTBuilder::endFenceClose()
+{
+  endFlow("fence.close");
+}
+
+void SgmlFOTBuilder::startRadicalSerial()
+{
+  startSimpleFlowObj("radical");
+}
+
+void SgmlFOTBuilder::endRadicalSerial()
+{
+  endFlow("radical");
+}
+
+void SgmlFOTBuilder::startRadicalDegree()
+{
+  endFlow("radical.principal");
+  startPortFlow("radical.degree");
+}
+
+void SgmlFOTBuilder::endRadicalDegree()
+{
+  endFlow("radical.degree");
+}
+
+void SgmlFOTBuilder::radicalRadical(const CharacterNIC &nic)
+{
+  os() << "<radical.radical";
+  characterNIC(nic);
+  outputIcs();
+  os() << '>' << RE;
+  startPortFlow("radical.principal");
+}
+
+void SgmlFOTBuilder::radicalRadicalDefaulted()
+{
+  startPortFlow("radical.principal");
+}
+
+void SgmlFOTBuilder::startMathOperatorSerial()
+{
+  startSimpleFlowObj("math-operator");
+  startPortFlow("math-operator.principal");
+}
+
+void SgmlFOTBuilder::endMathOperatorSerial()
+{
+  endFlow("math-operator");
+}
+
+void SgmlFOTBuilder::startMathOperatorOperator()
+{
+  endFlow("math-operator.principal");
+  startPortFlow("math-operator.operator");
+}
+
+void SgmlFOTBuilder::endMathOperatorOperator()
+{
+  endFlow("math-operator.operator");
+}
+
+void SgmlFOTBuilder::startMathOperatorLowerLimit()
+{
+  startPortFlow("math-operator.lower-limit");
+}
+
+void SgmlFOTBuilder::endMathOperatorLowerLimit()
+{
+  endFlow("math-operator.lower-limit");
+}
+
+void SgmlFOTBuilder::startMathOperatorUpperLimit()
+{
+  startPortFlow("math-operator.upper-limit");
+}
+
+void SgmlFOTBuilder::endMathOperatorUpperLimit()
+{
+  endFlow("math-operator.upper-limit");
+}
+
+void SgmlFOTBuilder::startGrid(const GridNIC &nic)
+{
+  os() << "<grid";
+  if (nic.nColumns)
+    os() << " grid-n-columns=" << (unsigned long)nic.nColumns;
+  if (nic.nRows)
+    os() << " grid-n-rows=" << (unsigned long)nic.nRows;
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endGrid()
+{
+  endFlow("grid");
+}
+
+void SgmlFOTBuilder::startGridCell(const GridCellNIC &nic)
+{
+  os() << "<grid-cell";
+  if (nic.columnNumber)
+    os() << " column-number=" << (unsigned long)nic.columnNumber;
+  if (nic.rowNumber)
+    os() << " row-number=" << (unsigned long)nic.rowNumber;
+  outputIcs();
+  os() << '>' << RE;
+}
+
+void SgmlFOTBuilder::endGridCell()
+{
+  endFlow("grid-cell");
 }
 
 void SgmlFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
@@ -1585,7 +2006,7 @@ void SgmlFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
   displayNIC(nic);
   outputIcs();
   os() << '>' << RE;
-  os() << "<table-part.principal>" << RE;
+  startPortFlow("table-part.principal");
 }
 
 void SgmlFOTBuilder::endTablePartSerial()

@@ -72,7 +72,7 @@ public:
     iso8859_6,
     iso8859_7,
     iso8859_8,
-    iso8859_9,
+    iso8859_9
   };
   struct Entry {
     const char *name;

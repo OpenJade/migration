@@ -1,5 +1,7 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file COPYING for copying permission.
+
+// FIXME location for SgmlDocument node.
 
 #include "config.h"
 #include "Boolean.h"
@@ -10,10 +12,13 @@
 #include "Event.h"
 #include "GroveBuilder.h"
 #include "ErrorCountEventHandler.h"
+#include "OutputCharStream.h"
+#include "MessageFormatter.h"
 #include "Dtd.h"
 #include "Syntax.h"
 #include "Attribute.h"
 #include "Vector.h"
+#include "LocNode.h"
 #include "threads.h"
 #include "macros.h"
 
@@ -32,11 +37,7 @@ namespace SP_NAMESPACE {
 using namespace GROVE_NAMESPACE;
 #endif
 
-#ifndef SP_ThreadLocalStorage
-#define SP_ThreadLocalStorage
-#endif
-
-SP_ThreadLocalStorage static bool blockingAccess = 1;
+static bool blockingAccess = 1;
 
 size_t initialBlockSize = 8192;
 unsigned maxBlocksPerSize = 20;
@@ -59,6 +60,7 @@ class NotationNode;
 class ExternalIdNode;
 class DocumentTypeNode;
 class SgmlConstantsNode;
+class MessageNode;
 
 struct Chunk {
   // second arg never null
@@ -75,10 +77,15 @@ struct Chunk {
     const;
   virtual AccessResult getFirstSibling(const GroveImpl *, const Chunk *&) const;
   virtual const StringC *id() const;
+  virtual Boolean getLocOrigin(const Origin *&) const;
   ParentChunk *origin;
 };
 
-struct ParentChunk : Chunk {
+struct LocChunk : public Chunk {
+  Index locIndex;
+};
+
+struct ParentChunk : public LocChunk {
   ParentChunk() : nextSibling(0) { }
   Chunk *nextSibling;
 };
@@ -110,6 +117,37 @@ const AttributeDefinitionList *ElementChunk::attDefList() const
   return type->attributeDefTemp();
 }
 
+class LocOriginChunk : public Chunk {
+public:
+  LocOriginChunk(const Origin *lo) : locOrigin(lo) { }
+  AccessResult setNodePtrFirst(NodePtr &ptr, const BaseNode *) const;
+  AccessResult setNodePtrFirst(NodePtr &ptr, const ElementNode *node) const;
+  AccessResult setNodePtrFirst(NodePtr &ptr, const DataNode *node) const;
+  const Chunk *after() const;
+  AccessResult getFollowing(const GroveImpl *,
+                            const Chunk *&, unsigned long &nNodes)
+    const;
+  Boolean getLocOrigin(const Origin *&) const;
+private:
+  const Origin *locOrigin;
+};
+
+class MessageItem {
+public:
+  MessageItem(Node::Severity severity, const StringC &text, const Location &loc)
+    : severity_(severity), text_(text), loc_(loc), next_(0) { }
+  Node::Severity severity() const { return severity_; }
+  const Location &loc() const { return loc_; }
+  const StringC &text() const { return text_; }
+  const MessageItem *next() const { return next_; }
+  MessageItem **nextP() { return &next_; }
+private:
+  Node::Severity severity_;
+  StringC text_;
+  Location loc_;
+  MessageItem *next_;
+};
+
 // multiple threads using const interface.
 
 class GroveImpl {
@@ -129,10 +167,10 @@ public:
   // Return 0 if not yet available.
   Boolean getAppinfo(const StringC *&) const;
   const SubstTable<Char> *generalSubstTable() const {
-    return syntax_->generalSubstTable();
+    return syntax_.isNull() ? 0 : syntax_->generalSubstTable();
   }
   const SubstTable<Char> *entitySubstTable() const {
-    return syntax_->entitySubstTable();
+    return syntax_.isNull() ? 0 : syntax_->entitySubstTable();
   }
   // Be careful not to change ref counts while accessing DTD.
   const Dtd *governingDtd() const { return dtd_.pointer(); }
@@ -145,10 +183,16 @@ public:
   ElementIter elementIter() const;
   Boolean complete() const { return complete_; }
   const void *completeLimit() const { return completeLimit_; }
+  const void *completeLimitWithLocChunkAfter() const {
+    return completeLimitWithLocChunkAfter_;
+  }
+  const Origin *currentLocOrigin() const { return currentLocOrigin_; }
   Boolean hasDefaultEntity() const { return hasDefaultEntity_; }
   Boolean maybeMoreSiblings(const ParentChunk *chunk) const;
   // return zero for timeout
   Boolean waitForMoreNodes() const;
+  AccessResult proxifyLocation(const Location &, Location &) const;
+  const MessageItem *messageList() const { return messageList_; }
   // non-const interface
   void *allocChunk(size_t);
   void appendSibling(Chunk *);
@@ -174,6 +218,8 @@ public:
   void addDefaultedEntity(const ConstPtr<Entity> &);
   void setComplete();
   Boolean haveRootOrigin();
+  void setLocOrigin(const ConstPtr<Origin> &);
+  void appendMessage(MessageItem *);
 private:
   GroveImpl(const GroveImpl &);
   void operator=(const GroveImpl &);
@@ -186,6 +232,7 @@ private:
   void finishDocumentElement();
   void finishProlog();
   void addBarrier();
+  void storeLocOrigin(const ConstPtr<Origin> &);
 
   struct BlockHeader {
     BlockHeader() : next(0) { }
@@ -199,14 +246,17 @@ private:
   ConstPtr<Syntax> syntax_;
   ConstPtr<AttributeValue> impliedAttributeValue_;
   Vector<ConstPtr<AttributeValue> > values_;
+  Vector<ConstPtr<Origin> > origins_;
   NamedResourceTable<Entity> defaultedEntityTable_;
   PointerTable<ElementChunk *,StringC,Hash,ElementChunk> idTable_;
   Boolean hasDefaultEntity_;
   Boolean haveAppinfo_;
   StringC appinfo_;
+  const Origin *currentLocOrigin_;
 
   Boolean complete_;
   const void *completeLimit_;
+  const void *completeLimitWithLocChunkAfter_;
   // pointer to first free byte in current block
   char *freePtr_;
   // free bytes in current block
@@ -227,6 +277,10 @@ private:
   unsigned pulseStep_;
   unsigned long nEvents_;
   unsigned long nElements_;
+  enum { maxChunksWithoutLocOrigin = 100 };
+  unsigned nChunksSinceLocOrigin_;
+  MessageItem *messageList_;
+  MessageItem **messageListTailP_;
 };
 
 class GroveImplPtr {
@@ -241,9 +295,17 @@ private:
   const GroveImpl *grove_;
 };
 
+class GroveImplProxyOrigin : public ProxyOrigin {
+public:
+  GroveImplProxyOrigin(const GroveImpl *grove, const Origin *origin)
+    : grove_(grove), ProxyOrigin(origin) { }
+private:
+  GroveImplPtr grove_;
+};
+
 class GroveBuilderEventHandler : public ErrorCountEventHandler {
 public:
-  GroveBuilderEventHandler(Messenger *mgr);
+  GroveBuilderEventHandler(Messenger *mgr, MessageFormatter *msgFmt_);
   ~GroveBuilderEventHandler();
   void appinfo(AppinfoEvent *);
   void startElement(StartElementEvent *);
@@ -262,6 +324,7 @@ public:
 private:
   GroveImpl *grove_;
   Messenger *mgr_;
+  MessageFormatter *msgFmt_;
 };
 
 inline
@@ -291,7 +354,7 @@ size_t roundUp(size_t n)
 
 // All nodes in this grove must be derived from BaseNode.
 
-class BaseNode : public Node {
+class BaseNode : public Node, public LocNode {
 public:
   BaseNode(const GroveImpl *grove);
   virtual ~BaseNode();
@@ -313,11 +376,22 @@ public:
   virtual bool same2(const ExternalIdNode *) const;
   virtual bool same2(const DocumentTypeNode *) const;
   virtual bool same2(const SgmlConstantsNode *) const;
+  virtual bool same2(const MessageNode *) const;
   const GroveImpl *grove() const { return grove_; }
   AccessResult nextSibling(NodePtr &ptr) const;
+  AccessResult follow(NodeListPtr &ptr) const;
   AccessResult children(NodeListPtr &) const;
   AccessResult getOrigin(NodePtr &ptr) const;
   AccessResult getGroveRoot(NodePtr &ptr) const;
+  AccessResult getLocation(Location &) const;
+  bool queryInterface(IID, const void *&) const;
+  bool chunkContains(const Node &) const;
+  bool inChunk(const DataNode *node) const;
+  bool inChunk(const CdataAttributeValueNode *) const;
+protected:
+  static unsigned long secondHash(unsigned long n) {
+    return n * 1001;
+  }
 private:
   unsigned refCount_;
   GroveImplPtr grove_;
@@ -349,23 +423,26 @@ struct ForwardingChunk : Chunk {
 
 class ChunkNode : public BaseNode {
 public:
-  ChunkNode(const GroveImpl *grove, const Chunk *chunk);
-  const Chunk *chunk() const { return chunk_; }
+  ChunkNode(const GroveImpl *grove, const LocChunk *chunk);
+  const LocChunk *chunk() const { return chunk_; }
   bool same(const BaseNode &node) const;
   bool same2(const ChunkNode *node) const;
   unsigned long hash() const;
   AccessResult getParent(NodePtr &ptr) const;
+  AccessResult getTreeRoot(NodePtr &ptr) const;
   AccessResult getOrigin(NodePtr &) const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const;
   AccessResult nextChunkSibling(NodePtr &ptr) const;
   AccessResult firstSibling(NodePtr &) const;
   AccessResult siblingsIndex(unsigned long &) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
+  AccessResult getLocation(Location &) const;
 protected:
-  const Chunk *chunk_;		// never null
+  const LocChunk *chunk_;		// never null
 };
 
 inline
-ChunkNode::ChunkNode(const GroveImpl *grove, const Chunk *chunk)
+ChunkNode::ChunkNode(const GroveImpl *grove, const LocChunk *chunk)
 : BaseNode(grove), chunk_(chunk)
 {
 }
@@ -386,6 +463,7 @@ public:
   SgmlDocumentNode(const GroveImpl *grove,
 		   const SgmlDocumentChunk *chunk);
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const { return ClassDef::sgmlDocument; }
   AccessResult getDocumentElement(NodePtr &ptr) const;
   AccessResult getElements(NamedNodeListPtr &ptr) const;
   AccessResult getEntities(NamedNodeListPtr &ptr) const;
@@ -396,9 +474,11 @@ public:
   AccessResult getEpilog(NodeListPtr &ptr) const;
   AccessResult getSgmlConstants(NodePtr &) const;
   AccessResult getApplicationInfo(GroveString &str) const;
+  AccessResult getMessages(NodeListPtr &ptr) const;
   AccessResult nextChunkSibling(NodePtr &) const { return accessNotInClass; }
   AccessResult firstSibling(NodePtr &) const { return accessNotInClass; }
   AccessResult siblingsIndex(unsigned long &) const { return accessNotInClass; }
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const { return accessNull; }
 private:
   const SgmlDocumentChunk *chunk() const {
     return (const SgmlDocumentChunk *)ChunkNode::chunk();
@@ -415,12 +495,16 @@ SgmlDocumentNode::SgmlDocumentNode(const GroveImpl *grove,
 // array of pointers to attribute values stored after chunk
 
 class AttElementChunk : private ElementChunk {
+protected:
+  AttElementChunk(size_t n) : nAtts(n) { }
   friend class ElementNode;
+private:
   const AttributeValue *
     attributeValue(size_t attIndex, const GroveImpl &) const;
   Boolean mustOmitEndTag() const;
   const Chunk *after() const;
   const StringC *id() const;
+  size_t nAtts;
 };
 
 class IncludedElementChunk : public ElementChunk {
@@ -429,6 +513,7 @@ class IncludedElementChunk : public ElementChunk {
 };
 
 class IncludedAttElementChunk : public AttElementChunk {
+  IncludedAttElementChunk(size_t n) : AttElementChunk(n) { }
   friend class ElementNode;
   Boolean included() const;
 };
@@ -449,6 +534,7 @@ public:
   AccessResult getIncluded(bool &) const;
   AccessResult elementIndex(unsigned long &) const;
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const { return ClassDef::element; }
   static void add(GroveImpl &grove, const StartElementEvent &event);
 private:
   static
@@ -461,7 +547,7 @@ private:
   void reuseFor(const ElementChunk *chunk) { chunk_ = chunk; }
 };
 
-class CharsChunk : public Chunk {
+class CharsChunk : public LocChunk {
 public:
   const Chunk *after() const {
     return (const Chunk *)((char *)this + allocSize(size));
@@ -494,8 +580,13 @@ public:
   AccessResult siblingsIndex(unsigned long &) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
+  bool chunkContains(const Node &) const;
+  bool inChunk(const DataNode *node) const;
   AccessResult getNonSgml(unsigned long &) const;
+  AccessResult getLocation(Location &) const;
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const { return ClassDef::dataChar; }
+  unsigned long hash() const;
   static void add(GroveImpl &grove, const DataEvent &event);
 private:
   const DataChunk *chunk() const {
@@ -533,6 +624,7 @@ public:
   AccessResult getEntityName(GroveString &) const{ return accessNull; }
   AccessResult getEntity(NodePtr &) const { return accessNull; }
   void accept(NodeVisitor &visitor) { visitor.pi(*this); }
+  const ClassDef &classDef() const { return ClassDef::pi; }
   static void add(GroveImpl &grove, const PiEvent &);
 private:
   const PiChunk *chunk() const {
@@ -540,7 +632,7 @@ private:
   }
 };
 
-class EntityRefChunk : public Chunk {
+class EntityRefChunk : public LocChunk {
 public:
   const Entity *entity;
   const Chunk *after() const { return this + 1; }
@@ -572,6 +664,7 @@ public:
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
   AccessResult getSystemData(GroveString &str) const;
   void accept(NodeVisitor &visitor) { visitor.sdata(*this); }
+  const ClassDef &classDef() const { return ClassDef::sdata; }
   static void add(GroveImpl &grove, const SdataEntityEvent &event);
 private:
   Char c_;
@@ -579,7 +672,7 @@ private:
 
 class NonSgmlNode;
 
-class NonSgmlChunk : public Chunk {
+class NonSgmlChunk : public LocChunk {
 public:
   Char c;
   AccessResult setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const;
@@ -592,7 +685,8 @@ public:
     : ChunkNode(grove, chunk) { }
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
   AccessResult getNonSgml(unsigned long &) const;
-  void accept(NodeVisitor &visitor) { visitor.sdata(*this); }
+  void accept(NodeVisitor &visitor) { visitor.nonSgml(*this); }
+  const ClassDef &classDef() const { return ClassDef::nonSgml; }
   static void add(GroveImpl &grove, const NonSgmlCharEvent &event);
 protected:
   const NonSgmlChunk *chunk() const {
@@ -612,6 +706,7 @@ public:
   ExternalDataNode(const GroveImpl *grove, const ExternalDataChunk *chunk)
     : EntityRefNode(grove, chunk) { }
   void accept(NodeVisitor &visitor) { visitor.externalData(*this); }
+  const ClassDef &classDef() const { return ClassDef::externalData; }
   static void add(GroveImpl &grove, const ExternalDataEntityEvent &event);
 };
 
@@ -624,7 +719,8 @@ class SubdocNode : public EntityRefNode {
 public:
   SubdocNode(const GroveImpl *grove, const SubdocChunk *chunk)
     : EntityRefNode(grove, chunk) { }
-  void accept(NodeVisitor &visitor) { visitor.subdoc(*this); }
+  void accept(NodeVisitor &visitor) { visitor.subdocument(*this); }
+  const ClassDef &classDef() const { return ClassDef::subdocument; }
   static void add(GroveImpl &grove, const SubdocEntityEvent &event);
 };
 
@@ -639,7 +735,8 @@ public:
     : EntityRefNode(grove, chunk) { }
   AccessResult getSystemData(GroveString &) const;
   void accept(NodeVisitor &visitor) { visitor.pi(*this); }
-  static void add(GroveImpl &grove,  const Entity *);
+  const ClassDef &classDef() const { return ClassDef::pi; }
+  static void add(GroveImpl &grove,  const Entity *, const Location &);
 };
 
 struct AttributeOrigin {
@@ -725,8 +822,14 @@ public:
   AccessResult getTokenSep(Char &) const;
   AccessResult tokens(GroveString &) const;
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const { return ClassDef::attributeAssignment; }
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idAttributes;
+    return accessOK;
+  }
   bool same(const BaseNode &node) const;
   bool same2(const AttributeAsgnNode *node) const;
+  unsigned long hash() const;
 private:
   size_t attIndex_;
 };
@@ -760,9 +863,16 @@ public:
   AccessResult getEntity(NodePtr &ptr) const;
   AccessResult getNotation(NodePtr &ptr) const;
   AccessResult getReferent(NodePtr &ptr) const;
+  AccessResult getLocation(Location &) const;
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const { return ClassDef::attributeValueToken; }
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idValue;
+    return accessOK;
+  }
   bool same(const BaseNode &node) const;
   bool same2(const AttributeValueTokenNode *node) const;
+  unsigned long hash() const;
 private:
   const TokenizedAttributeValue *value_;
   size_t attIndex_;
@@ -800,6 +910,8 @@ public:
 			  size_t charIndex);
   AccessResult getParent(NodePtr &ptr) const;
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
+  bool chunkContains(const Node &) const;
+  bool inChunk(const CdataAttributeValueNode *) const;
   AccessResult getEntity(NodePtr &) const;
   AccessResult getEntityName(GroveString &) const;
   AccessResult getSystemData(GroveString &str) const;
@@ -807,7 +919,13 @@ public:
   AccessResult nextChunkSibling(NodePtr &ptr) const;
   AccessResult firstSibling(NodePtr &) const;
   AccessResult siblingsIndex(unsigned long &) const;
+  AccessResult getLocation(Location &) const;
   void accept(NodeVisitor &visitor);
+  const ClassDef &classDef() const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idValue;
+    return accessOK;
+  }
   bool same(const BaseNode &node) const;
   bool same2(const CdataAttributeValueNode *node) const;
 private:
@@ -844,6 +962,7 @@ class EntityNode : public BaseNode {
 public:
   EntityNode(const GroveImpl *grove, const Entity *entity);
   AccessResult getOrigin(NodePtr &ptr) const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const;
   AccessResult getName(GroveString &str) const;
   AccessResult getExternalId(NodePtr &ptr) const;
   AccessResult getNotation(NodePtr &) const;
@@ -853,9 +972,12 @@ public:
   AccessResult getDefaulted(bool &) const;
   AccessResult getAttributes(NamedNodeListPtr &) const;
   AccessResult attributeRef(unsigned long i, NodePtr &ptr) const;
+  AccessResult getLocation(Location &) const;
   bool same(const BaseNode &) const;
   bool same2(const EntityNode *) const;
   void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::entity; }
+  unsigned long hash() const;
 private:
   const Entity *entity_;
 };
@@ -864,11 +986,18 @@ class NotationNode : public BaseNode {
 public:
   NotationNode(const GroveImpl *grove, const Notation *notation);
   AccessResult getOrigin(NodePtr &ptr) const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idNotations;
+    return accessOK;
+  }
   AccessResult getName(GroveString &str) const;
   AccessResult getExternalId(NodePtr &ptr) const;
   bool same(const BaseNode &) const;
   bool same2(const NotationNode *) const;
+  AccessResult getLocation(Location &) const;
   void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::notation; }
+  unsigned long hash() const;
 private:
   const Notation *notation_;
 };
@@ -881,6 +1010,11 @@ public:
   AccessResult getSystemId(GroveString &) const;
   AccessResult getGeneratedSystemId(GroveString &) const;
   void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::externalId; }
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idExternalId;
+    return accessOK;
+  }
   bool same(const BaseNode &) const;
   bool same2(const ExternalIdNode *) const;
 };
@@ -891,6 +1025,7 @@ public:
 		       const ExternalEntity *entity);
   const ExternalId &externalId() const;
   AccessResult getOrigin(NodePtr &ptr) const;
+  unsigned long hash() const;
 private:
   const ExternalEntity *entity_;
 };
@@ -901,6 +1036,7 @@ public:
 			 const Notation *notation);
   const ExternalId &externalId() const;
   AccessResult getOrigin(NodePtr &ptr) const;
+  unsigned long hash() const;
 private:
   const Notation *notation_;
 };
@@ -913,8 +1049,13 @@ public:
   AccessResult getGeneralEntities(NamedNodeListPtr &) const;
   AccessResult getNotations(NamedNodeListPtr &) const;
   AccessResult getOrigin(NodePtr &) const;
-  AccessResult nextSibling(NodePtr &) const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idDoctypesAndLinktypes;
+    return accessOK;
+  }
+  AccessResult nextChunkSibling(NodePtr &) const;
   void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::documentType; }
   bool same(const BaseNode &) const;
   bool same2(const DocumentTypeNode *) const;
 private:
@@ -926,8 +1067,33 @@ public:
   SgmlConstantsNode(const GroveImpl *);
   AccessResult getOrigin(NodePtr &) const;
   void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::sgmlConstants; }
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::idSgmlConstants;
+    return accessOK;
+  }
   bool same(const BaseNode &) const;
   bool same2(const SgmlConstantsNode *) const;
+};
+
+class MessageNode : public BaseNode {
+public:
+  MessageNode(const GroveImpl *, const MessageItem *);
+  AccessResult getOrigin(NodePtr &) const;
+  AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const {
+    name = ComponentName::noId;
+    return accessOK;
+  }
+  AccessResult nextChunkSibling(NodePtr &) const;
+  void accept(NodeVisitor &);
+  const ClassDef &classDef() const { return ClassDef::message; }
+  bool same(const BaseNode &) const;
+  bool same2(const MessageNode *) const;
+  AccessResult getLocation(Location &) const;
+  AccessResult getText(GroveString &) const;
+  AccessResult getSeverity(Severity &) const;
+private:
+  const MessageItem *item_;
 };
 
 class BaseNodeList : public NodeList {
@@ -958,24 +1124,46 @@ public:
     return accessOK;
   }
   AccessResult rest(NodeListPtr &ptr) const {
-    if (canReuse(ptr))
-      return ((SiblingNodeList *)this)->first_.assignNextSibling();
-    NodePtr next;
-    AccessResult ret = first_->nextSibling(next);
-    if (ret != accessOK)
-      return ret;
-    ptr.assign(new SiblingNodeList(next));
-    return accessOK;
+    AccessResult ret;
+    if (canReuse(ptr)) {
+      ret = ((SiblingNodeList *)this)->first_.assignNextSibling();
+      if (ret == accessOK)
+	return ret;
+    }
+    else {
+      NodePtr next;
+      ret = first_->nextSibling(next);
+      if (ret == accessOK) {
+	ptr.assign(new SiblingNodeList(next));
+	return ret;
+      }
+    }
+    if (ret == accessNull) {
+      ptr.assign(new BaseNodeList);
+      return accessOK;
+    }
+    return ret;
   }
   AccessResult chunkRest(NodeListPtr &ptr) const {
-    if (canReuse(ptr))
-      return ((SiblingNodeList *)this)->first_.assignNextChunkSibling();
-    NodePtr next;
-    AccessResult ret = first_->nextChunkSibling(next);
-    if (ret != accessOK)
-      return ret;
-    ptr.assign(new SiblingNodeList(next));
-    return accessOK;
+    AccessResult ret;
+    if (canReuse(ptr)) {
+      ret = ((SiblingNodeList *)this)->first_.assignNextChunkSibling();
+      if (ret == accessOK)
+	return ret;
+    }
+    else {
+      NodePtr next;
+      ret = first_->nextChunkSibling(next);
+      if (ret == accessOK) {
+	ptr.assign(new SiblingNodeList(next));
+	return ret;
+      }
+    }
+    if (ret == accessNull) {
+      ptr.assign(new BaseNodeList);
+      return accessOK;
+    }
+    return ret;
   }
   AccessResult ref(unsigned long i, NodePtr &ptr) const {
     if (i == 0) {
@@ -1004,14 +1192,13 @@ public:
     if (--refCount_ == 0) delete this;
   }
   size_t normalize(Char *s, size_t n) const {
-    for (size_t i = 0; i < n; i++)
-      substTable_->subst(s[i]);
+    if (substTable_) {
+      for (size_t i = 0; i < n; i++)
+	substTable_->subst(s[i]);
+    }
     return n;
   }
   const GroveImpl *grove() const { return grove_; }
-  AccessResult nodeName(const NodePtr &ptr, GroveString &str) const {
-    return ptr->getName(str);
-  }
   AccessResult namedNode(GroveString str, NodePtr &node) const {
     StringC tem(str.data(), str.size());
     normalize(&tem[0], tem.size());
@@ -1031,6 +1218,7 @@ public:
    : BaseNamedNodeList(grove, grove->generalSubstTable()) { }
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return attributes; }
 };
 
 class ElementAttributesNamedNodeList
@@ -1055,9 +1243,7 @@ public:
     : BaseNamedNodeList(grove, grove->generalSubstTable()) { }
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
-  AccessResult nodeName(const NodePtr &ptr, GroveString &str) const {
-    return ptr->getId(str);
-  }
+  Type type() const { return elements; }
 };
 
 class DocEntitiesNamedNodeList : public BaseNamedNodeList {
@@ -1066,6 +1252,7 @@ public:
    : BaseNamedNodeList(grove, grove->entitySubstTable()) { }
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return entities; }
 };
 
 class DefaultedEntitiesNamedNodeList : public BaseNamedNodeList {
@@ -1074,6 +1261,7 @@ public:
    : BaseNamedNodeList(grove, grove->entitySubstTable()) { }
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return entities; }
 };
 
 class GeneralEntitiesNamedNodeList : public BaseNamedNodeList {
@@ -1081,6 +1269,7 @@ public:
   GeneralEntitiesNamedNodeList(const GroveImpl *, const Dtd *);
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return entities; }
 private:
   const Dtd *dtd_;
 };
@@ -1090,6 +1279,7 @@ public:
   NotationsNamedNodeList(const GroveImpl *, const Dtd *);
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return notations; }
 private:
   const Dtd *dtd_;
 };
@@ -1099,6 +1289,7 @@ public:
   DoctypesAndLinktypesNamedNodeList(const GroveImpl *);
   NodeListPtr nodeList() const;
   AccessResult namedNodeU(const StringC &, NodePtr &) const;
+  Type type() const { return doctypesAndLinktypes; }
 };
 
 class ElementsNodeList : public BaseNodeList {
@@ -1230,7 +1421,9 @@ void GroveImpl::push(ElementChunk *chunk, Boolean hasId)
   // otherwise tailPtr_ would be beyond completeLimit_.
   origin_ = chunk;
   completeLimit_ = freePtr_;
-  if ((const Chunk *)chunk->origin == root_)
+  // Allow for the possibility of invalid documents with elements
+  // after the document element.
+  if ((const Chunk *)chunk->origin == root_ && root_->documentElement == 0)
     root_->documentElement = chunk;
   else if (tailPtr_) {
     *tailPtr_ = chunk;
@@ -1302,6 +1495,7 @@ Boolean GroveImpl::maybeMoreSiblings(const ParentChunk *chunk) const
 inline
 void *GroveImpl::allocChunk(size_t n)
 {
+  nChunksSinceLocOrigin_++;
   if (n <= nFree_) {
     void *p = freePtr_;
     freePtr_ += n;
@@ -1313,8 +1507,25 @@ void *GroveImpl::allocChunk(size_t n)
 }
 
 inline
+void GroveImpl::setLocOrigin(const ConstPtr<Origin> &locOrigin)
+{
+  if (locOrigin.pointer() != currentLocOrigin_
+      || nChunksSinceLocOrigin_ >= maxChunksWithoutLocOrigin)
+    storeLocOrigin(locOrigin);
+}
+
+inline
+void GroveImpl::appendMessage(MessageItem *item)
+{
+  *messageListTailP_ = item;
+  messageListTailP_ = item->nextP();
+  pulse();
+}
+
+inline
 void ElementNode::add(GroveImpl &grove, const StartElementEvent &event)
 {
+  grove.setLocOrigin(event.location().origin());
   ElementChunk *chunk;
   const AttributeList &atts = event.attributes();
   Boolean hasId;
@@ -1329,6 +1540,7 @@ void ElementNode::add(GroveImpl &grove, const StartElementEvent &event)
   else
     chunk = makeAttElementChunk(grove, event, hasId);
   chunk->type = event.elementType();
+  chunk->locIndex = event.location().index();
   grove.push(chunk, hasId);
 }
 
@@ -1362,6 +1574,8 @@ void DataNode::add(GroveImpl &grove, const DataEvent &event)
   if (dataLen) {
    DataChunk *chunk = grove.pendingData();
    if (chunk
+       && event.location().origin().pointer() == grove.currentLocOrigin()
+       && event.location().index() == chunk->locIndex + chunk->size
        && grove.tryExtend(CharsChunk::allocSize(chunk->size + dataLen)
                           - CharsChunk::allocSize(chunk->size))) {
      memcpy((Char *)(chunk + 1) + chunk->size,
@@ -1370,16 +1584,18 @@ void DataNode::add(GroveImpl &grove, const DataEvent &event)
      chunk->size += dataLen;
    }
    else {
+     grove.setLocOrigin(event.location().origin());
      chunk = new (grove.allocChunk(CharsChunk::allocSize(dataLen))) DataChunk;
      chunk->size = dataLen;
+     chunk->locIndex = event.location().index();
      memcpy(chunk + 1, event.data(), dataLen * sizeof(Char));
      grove.appendSibling(chunk);
    }
  }
 }
 
-GroveBuilderEventHandler::GroveBuilderEventHandler(Messenger *mgr)
-: mgr_(mgr), grove_(new GroveImpl)
+GroveBuilderEventHandler::GroveBuilderEventHandler(Messenger *mgr, MessageFormatter *msgFmt)
+: mgr_(mgr), grove_(new GroveImpl), msgFmt_(msgFmt)
 {
   grove_->addRef();
 }
@@ -1393,6 +1609,29 @@ GroveBuilderEventHandler::~GroveBuilderEventHandler()
 void GroveBuilderEventHandler::message(MessageEvent *event)
 {
   mgr_->dispatchMessage(event->message());
+  const Message &msg = event->message();
+  StrOutputCharStream os;
+  msgFmt_->formatMessage(*msg.type, msg.args, os);
+  StringC tem;
+  os.extractString(tem);
+  Node::Severity severity;
+  switch (msg.type->severity()) {
+  case MessageType::info:
+    severity = Node::info;
+    break;
+  case MessageType::warning:
+    severity = Node::warning;
+    break;
+  default:
+    severity = Node::error;
+    break;
+  }
+  grove_->appendMessage(new MessageItem(severity, tem, msg.loc));
+  if (!msg.auxLoc.origin().isNull()) {
+    msgFmt_->formatMessage(msg.type->auxFragment(), msg.args, os);
+    os.extractString(tem);
+    grove_->appendMessage(new MessageItem(Node::info, tem, msg.auxLoc));
+  }
   ErrorCountEventHandler::message(event);
 }
 
@@ -1475,9 +1714,10 @@ void GroveBuilderEventHandler::makeInitialRoot(NodePtr &root)
   root.assign(new SgmlDocumentNode(grove_, grove_->root()));
 }
 
-ErrorCountEventHandler *GroveBuilder::make(Messenger *mgr, NodePtr &root)
+ErrorCountEventHandler *GroveBuilder::make(Messenger *mgr, MessageFormatter *msgFmt,
+					   NodePtr &root)
 {
-  GroveBuilderEventHandler *eh = new GroveBuilderEventHandler(mgr);
+  GroveBuilderEventHandler *eh = new GroveBuilderEventHandler(mgr, msgFmt);
   eh->makeInitialRoot(root);
   return eh;
 }
@@ -1505,10 +1745,16 @@ GroveImpl::GroveImpl()
   nEvents_(0),
   haveAppinfo_(0),
   pendingData_(0),
-  nElements_(0)
+  nElements_(0),
+  currentLocOrigin_(0),
+  completeLimitWithLocChunkAfter_(0),
+  nChunksSinceLocOrigin_(0),
+  messageList_(0),
+  messageListTailP_(&messageList_)
 {
   root_ = new (allocChunk(sizeof(SgmlDocumentChunk))) SgmlDocumentChunk;
   root_->origin = 0;
+  root_->locIndex = 0;
   completeLimit_ = freePtr_;
   origin_ = root_;
   tailPtr_ = &root_->prolog;
@@ -1532,8 +1778,8 @@ void GroveImpl::setAppinfo(const StringC &appinfo)
 Boolean GroveImpl::getAppinfo(const StringC *&appinfo) const
 {
   if (!haveAppinfo_) {
-    if (complete_ || syntax_.isNull())
-      return 0;
+    if (!complete_ && syntax_.isNull())
+      return 0; // not available yet
     appinfo = 0;
   }
   else
@@ -1577,6 +1823,7 @@ void GroveImpl::setComplete()
   addBarrier();
   mutexPtr_ = 0;
   completeLimit_ = 0;
+  completeLimitWithLocChunkAfter_ = 0;
   if (pendingData_ && tailPtr_)
     *tailPtr_ = pendingData_;
   tailPtr_ = 0; 
@@ -1633,6 +1880,57 @@ void *GroveImpl::allocFinish(size_t n)
     (void)new (freePtr_) ForwardingChunk((const Chunk *)chunkStart, origin_);
   freePtr_ = chunkStart + n;
   return chunkStart;
+}
+
+AccessResult ChunkNode::getLocation(Location &loc) const
+{
+  const Origin *origin = grove()->currentLocOrigin();
+  for (const Chunk *p = chunk_->after(); p; p = p->after()) {
+    if (p == grove()->completeLimitWithLocChunkAfter()) {
+      while (!p->getLocOrigin(origin)) {
+	p = p->after();
+	ASSERT(p != 0);
+      }
+      break;
+    }
+    if (p == grove()->completeLimit() || p->getLocOrigin(origin))
+      break;
+  }
+  if (!origin)
+    return accessNull;
+  loc = Location(new GroveImplProxyOrigin(grove(), origin), chunk_->locIndex);
+  return accessOK;
+}
+
+void GroveImpl::storeLocOrigin(const ConstPtr<Origin> &locOrigin)
+{
+  LocOriginChunk *chunk
+    = new (allocChunk(sizeof(LocOriginChunk)))
+	  LocOriginChunk(currentLocOrigin_);
+  chunk->origin = origin_;
+  completeLimitWithLocChunkAfter_ = completeLimit_;
+  nChunksSinceLocOrigin_ = 0;
+  if (locOrigin.pointer() == currentLocOrigin_)
+    return;
+  if (currentLocOrigin_
+      && locOrigin == currentLocOrigin_->parent().origin()) {
+    // Don't need to store it.
+    currentLocOrigin_ = locOrigin.pointer();
+    return;
+  }
+  currentLocOrigin_ = locOrigin.pointer();
+  if (locOrigin.isNull())
+    return;
+  origins_.push_back(locOrigin);
+}
+
+AccessResult GroveImpl::proxifyLocation(const Location &loc, Location &ret) const
+{
+  if (loc.origin().isNull())
+    return accessNull;
+  ret = Location(new GroveImplProxyOrigin(this, loc.origin().pointer()),
+		 loc.index());
+  return accessOK;
 }
 
 NodeListPtr AttributesNamedNodeList::nodeList() const
@@ -1803,6 +2101,22 @@ AccessResult SgmlDocumentNode::getDoctypesAndLinktypes(NamedNodeListPtr &ptr) co
   return accessOK;
 }
 
+AccessResult SgmlDocumentNode::getMessages(NodeListPtr &ptr) const
+{
+  while (grove()->messageList() == 0) {
+    if (grove()->complete()) {
+      if (grove()->messageList())
+	break;
+      return accessNull;
+    }
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  }
+  NodePtr tem(new MessageNode(grove(), grove()->messageList()));
+  ptr.assign(new SiblingNodeList(tem));
+  return accessOK;
+}
+
 AccessResult
 SgmlDocumentChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const
 {
@@ -1815,7 +2129,7 @@ DocumentTypeNode::DocumentTypeNode(const GroveImpl *grove, const Dtd *dtd)
 {
 }
 
-AccessResult DocumentTypeNode::nextSibling(NodePtr &) const
+AccessResult DocumentTypeNode::nextChunkSibling(NodePtr &) const
 {
   return accessNull;
 }
@@ -1891,11 +2205,73 @@ bool SgmlConstantsNode::same2(const SgmlConstantsNode *) const
   return 1;
 }
 
+MessageNode::MessageNode(const GroveImpl *grove, const MessageItem *item)
+: BaseNode(grove), item_(item)
+{
+}
+
+AccessResult MessageNode::getOrigin(NodePtr &ptr) const
+{
+  ptr.assign(new SgmlDocumentNode(grove(), grove()->root()));
+  return accessOK;
+}
+
+AccessResult MessageNode::nextChunkSibling(NodePtr &ptr) const
+{
+  while (!item_->next()) {
+    if (grove()->complete()) {
+      if (item_->next())
+	break;
+      return accessNull;
+    }
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  }
+  const MessageItem *p = item_->next();
+  if (!p)
+    return accessNull;
+  ptr.assign(new MessageNode(grove(), p));
+  return accessOK;
+}
+
+void MessageNode::accept(NodeVisitor &visitor)
+{
+  visitor.message(*this);
+}
+
+bool MessageNode::same(const BaseNode &node) const
+{
+  return node.same2(this);
+}
+
+bool MessageNode::same2(const MessageNode *node) const
+{
+  return item_ == node->item_;
+}
+
+AccessResult MessageNode::getLocation(Location &loc) const
+{
+  return grove()->proxifyLocation(item_->loc(), loc);
+}
+
+AccessResult MessageNode::getText(GroveString &str) const
+{
+  setString(str, item_->text());
+  return accessOK;
+}
+
+AccessResult MessageNode::getSeverity(Severity &severity) const
+{
+  severity = item_->severity();
+  return accessOK;
+}
+
 AccessResult ElementNode::nextChunkSibling(NodePtr &ptr) const
 {
   while (!chunk()->nextSibling) {
     if (!grove()->maybeMoreSiblings(chunk())) {
-      if ((const Chunk *)chunk()->origin == grove()->root())
+      // Allow for the possibility of invalid documents with elements in the epilog.
+      if ((const Chunk *)chunk() == grove()->root()->documentElement)
 	return accessNotInClass;
       else
         return accessNull;
@@ -2001,16 +2377,19 @@ ElementNode::makeAttElementChunk(GroveImpl &grove,
 				 Boolean &hasId)
 {
   const AttributeList &atts = event.attributes();
+  size_t nAtts = atts.size();
+  while (nAtts > 0 && !atts.specified(nAtts - 1) && !atts.current(nAtts - 1))
+    nAtts--;
   ElementChunk *chunk;
   void *mem
-    = grove.allocChunk(sizeof(AttElementChunk) + atts.size() * sizeof(AttributeValue *));
+    = grove.allocChunk(sizeof(AttElementChunk) + nAtts * sizeof(AttributeValue *));
   if (event.included()) {
     // Workaround VC++ 4.1 bug.
-    AttElementChunk *tem = new (mem) IncludedAttElementChunk;
+    AttElementChunk *tem = new (mem) IncludedAttElementChunk(nAtts);
     chunk = tem;
   }
   else
-    chunk = new (mem) AttElementChunk;
+    chunk = new (mem) AttElementChunk(nAtts);
   const AttributeValue **values
     = (const AttributeValue **)(((AttElementChunk *)chunk) + 1);
   const AttributeDefinitionList *defList
@@ -2020,7 +2399,7 @@ ElementNode::makeAttElementChunk(GroveImpl &grove,
     hasId = 1;
   else
     hasId = 0;
-  for (size_t i = 0; i < atts.size(); i++) {
+  for (size_t i = 0; i < nAtts; i++) {
     if (atts.specified(i) || atts.current(i)) {
       grove.storeAttributeValue(atts.valuePointer(i));
       values[i] = atts.value(i);
@@ -2039,21 +2418,23 @@ ElementNode::makeAttElementChunk(GroveImpl &grove,
 const Chunk *AttElementChunk::after() const
 {
   return (const Chunk *)((char *)(this + 1)
-			 + (sizeof(const AttributeValue *)
-			    * attDefList()->size()));
+			 + (sizeof(const AttributeValue *) * nAtts));
 }
 
 const AttributeValue *
-AttElementChunk::attributeValue(size_t attIndex, const GroveImpl &)
+AttElementChunk::attributeValue(size_t attIndex, const GroveImpl &grove)
      const
 {
-  return ((const AttributeValue **)(this + 1))[attIndex];
+  if (attIndex < nAtts)
+    return ((const AttributeValue **)(this + 1))[attIndex];
+  else
+    return ElementChunk::attributeValue(attIndex, grove);
 }
 
 const StringC *AttElementChunk::id() const
 {
   size_t i = ElementChunk::attDefList()->idIndex();
-  if (i == size_t(-1))
+  if (i == size_t(-1) || i >= nAtts)
     return 0;
   const AttributeValue *av = ((const AttributeValue **)(this + 1))[i];
   if (!av)
@@ -2202,6 +2583,18 @@ bool DataNode::same2(const DataNode *node) const
   return chunk_ == node->chunk_ && index_ == node->index_;
 }
 
+bool DataNode::chunkContains(const Node &node) const
+{
+  if (!sameGrove(node))
+    return 0;
+  return ((const BaseNode &)node).inChunk(this);
+}
+
+bool DataNode::inChunk(const DataNode *node) const
+{
+  return chunk_ == node->chunk_ && index_ >= node->index_;
+}
+
 AccessResult DataNode::charChunk(const SdataMapper &, GroveString &str) const
 {
   str.assign(chunk()->data() + index_, chunk()->size - index_);
@@ -2211,6 +2604,11 @@ AccessResult DataNode::charChunk(const SdataMapper &, GroveString &str) const
 void DataNode::accept(NodeVisitor &visitor)
 {
   visitor.dataChar(*this);
+}
+
+unsigned long DataNode::hash() const
+{
+  return secondHash(ChunkNode::hash() + index_);
 }
 
 AccessResult DataNode::getNonSgml(unsigned long &) const
@@ -2247,6 +2645,14 @@ AccessResult DataNode::siblingsIndex(unsigned long &i) const
   AccessResult ret = ChunkNode::siblingsIndex(i);
   if (ret == accessOK)
     i += index_;
+  return ret;
+}
+
+AccessResult DataNode::getLocation(Location &loc) const
+{
+  AccessResult ret = ChunkNode::getLocation(loc);
+  if (ret == accessOK)
+    loc += index_;
   return ret;
 }
 
@@ -2303,8 +2709,9 @@ void PiNode::add(GroveImpl &grove, const PiEvent &event)
 {
   const Entity *entity = event.entity();
   if (entity)
-    PiEntityNode::add(grove, entity);
+    PiEntityNode::add(grove, entity, event.location());
   else {
+    grove.setLocOrigin(event.location().origin());
     size_t dataLen = event.dataLength();
     void *mem = grove.allocChunk(CharsChunk::allocSize(dataLen));
     PiChunk *chunk;
@@ -2317,6 +2724,7 @@ void PiNode::add(GroveImpl &grove, const PiEvent &event)
     else
       chunk = new (mem) PiChunk;
     chunk->size = dataLen;
+    chunk->locIndex = event.location().index();
     memcpy(chunk + 1, event.data(), dataLen * sizeof(Char));
     grove.appendSibling(chunk);
   }
@@ -2361,8 +2769,11 @@ AccessResult SdataNode::getSystemData(GroveString &str) const
 
 void SdataNode::add(GroveImpl &grove, const SdataEntityEvent &event)
 {
+  const Location &loc = event.location().origin()->parent();
+  grove.setLocOrigin(loc.origin());
   SdataChunk *chunk = new (grove.allocChunk(sizeof(SdataChunk))) SdataChunk;
   chunk->entity = event.entity();
+  chunk->locIndex = loc.index();
   grove.appendSibling(chunk);
 }
 
@@ -2393,15 +2804,19 @@ AccessResult NonSgmlNode::charChunk(const SdataMapper &, GroveString &) const
 
 void NonSgmlNode::add(GroveImpl &grove, const NonSgmlCharEvent &event)
 {
+  grove.setLocOrigin(event.location().origin());
   NonSgmlChunk *chunk = new (grove.allocChunk(sizeof(NonSgmlChunk))) NonSgmlChunk;
   chunk->c = event.character();
+  chunk->locIndex = event.location().index();
   grove.appendSibling(chunk);
 }
 
 void ExternalDataNode::add(GroveImpl &grove, const ExternalDataEntityEvent &event)
 {
+  grove.setLocOrigin(event.location().origin());
   ExternalDataChunk *chunk = new (grove.allocChunk(sizeof(ExternalDataChunk))) ExternalDataChunk;
   chunk->entity = event.entity();
+  chunk->locIndex = event.location().index();
   grove.appendSibling(chunk);
 }
 
@@ -2414,8 +2829,10 @@ AccessResult ExternalDataChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *no
 
 void SubdocNode::add(GroveImpl &grove, const SubdocEntityEvent &event)
 {
+  grove.setLocOrigin(event.location().origin());
   SubdocChunk *chunk = new (grove.allocChunk(sizeof(SubdocChunk))) SubdocChunk;
   chunk->entity = event.entity();
+  chunk->locIndex = event.location().index();
   grove.appendSibling(chunk);
 }
 
@@ -2432,10 +2849,14 @@ AccessResult PiEntityNode::getSystemData(GroveString &str) const
   return accessOK;
 }
 
-void PiEntityNode::add(GroveImpl &grove, const Entity *entity)
+void PiEntityNode::add(GroveImpl &grove, const Entity *entity,
+		       const Location &loc)
 {
+  // FIXME use parent?
+  grove.setLocOrigin(loc.origin());
   PiEntityChunk *chunk = new (grove.allocChunk(sizeof(PiEntityChunk))) PiEntityChunk;
   chunk->entity = entity;
+  chunk->locIndex = loc.index();
   grove.appendSibling(chunk);
 }
 
@@ -2445,7 +2866,6 @@ AccessResult PiEntityChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node)
   ptr.assign(new PiEntityNode(node->grove(), this));
   return accessOK;
 }
-
 
 AccessResult EntityRefNode::getEntity(NodePtr &ptr) const
 {
@@ -2689,6 +3109,12 @@ bool AttributeAsgnNode::same2(const AttributeAsgnNode *node)
 	  && attIndex_ == node->attIndex_);
 }
 
+unsigned long AttributeAsgnNode::hash() const
+{
+  unsigned long n = (unsigned long)attributeOriginId();
+  return secondHash(n + attIndex_);
+}
+
 ElementAttributeAsgnNode
 ::ElementAttributeAsgnNode(const GroveImpl *grove, size_t attIndex,
 			   const ElementChunk *chunk)
@@ -2748,7 +3174,7 @@ AccessResult CdataAttributeValueNode::getParent(NodePtr &ptr) const
 AccessResult CdataAttributeValueNode::charChunk(const SdataMapper &mapper, GroveString &str) const
 {
   if (iter_.type() == TextItem::sdata) {
-    const Entity *entity = iter_.location().origin()->asEntityOrigin()->entity().pointer();
+    const Entity *entity = iter_.location().origin()->asEntityOrigin()->entity();
     const StringC &name = entity->name();
     const StringC &text = entity->asInternalEntity()->string();
     Char *cp = (Char *)&c_;
@@ -2790,7 +3216,7 @@ AccessResult CdataAttributeValueNode::getEntity(NodePtr &ptr) const
   if (iter_.type() != TextItem::sdata)
     return accessNotInClass;
   const Entity *entity
-    = iter_.location().origin()->asEntityOrigin()->entity().pointer();
+    = iter_.location().origin()->asEntityOrigin()->entity();
   ptr.assign(new EntityNode(grove(), entity));
   return accessOK;
 }
@@ -2800,7 +3226,7 @@ AccessResult CdataAttributeValueNode::getEntityName(GroveString &str) const
   if (iter_.type() != TextItem::sdata)
     return accessNotInClass;
   const Entity *entity
-    = iter_.location().origin()->asEntityOrigin()->entity().pointer();
+    = iter_.location().origin()->asEntityOrigin()->entity();
   setString(str, entity->name());
   return accessOK;
 }
@@ -2864,6 +3290,14 @@ AccessResult CdataAttributeValueNode::nextSibling(NodePtr &ptr) const
   return CdataAttributeValueNode::nextChunkSibling(ptr);
 }
 
+AccessResult CdataAttributeValueNode::getLocation(Location &loc) const
+{
+  if (iter_.type() == TextItem::sdata)
+    return grove()->proxifyLocation(iter_.location().origin()->parent(), loc);
+  else
+    return grove()->proxifyLocation(iter_.location(), loc);
+}
+
 void CdataAttributeValueNode::accept(NodeVisitor &visitor)
 {
   if (iter_.type() == TextItem::sdata)
@@ -2871,7 +3305,15 @@ void CdataAttributeValueNode::accept(NodeVisitor &visitor)
   else
     visitor.dataChar(*this);
 }
- 
+
+const ClassDef &CdataAttributeValueNode::classDef() const
+{
+  if (iter_.type() == TextItem::sdata)
+    return ClassDef::sdata;
+  else
+    return ClassDef::dataChar;
+}
+
 bool CdataAttributeValueNode::same(const BaseNode &node) const
 {
   return node.same2(this);
@@ -2885,6 +3327,22 @@ bool CdataAttributeValueNode::same2(const CdataAttributeValueNode *node)
 	  && attIndex_ == node->attIndex_
 	  && charIndex_ == node->charIndex_
 	  && iter_.chars(tem) == node->iter_.chars(tem));
+}
+
+bool CdataAttributeValueNode::chunkContains(const Node &node) const
+{
+  if (!sameGrove(node))
+    return 0;
+  return ((const BaseNode &)node).inChunk(this);
+}
+
+bool CdataAttributeValueNode::inChunk(const CdataAttributeValueNode *node) const
+{
+  size_t tem;
+  return (attributeOriginId() == node->attributeOriginId()
+          && attIndex_ == node->attIndex_
+	  && iter_.chars(tem) == node->iter_.chars(tem)
+	  && charIndex_ >= node->charIndex_);
 }
 
 ElementCdataAttributeValueNode
@@ -3024,6 +3482,11 @@ void AttributeValueTokenNode::accept(NodeVisitor &visitor)
   visitor.attributeValueToken(*this);
 }
 
+unsigned long AttributeValueTokenNode::hash() const
+{
+  return secondHash(secondHash((unsigned long)attributeOriginId() + attIndex_) + tokenIndex_);
+}
+
 bool AttributeValueTokenNode::same(const BaseNode &node) const
 {
   return node.same2(this);
@@ -3034,6 +3497,18 @@ bool AttributeValueTokenNode::same2(const AttributeValueTokenNode *node) const
   return (attributeOriginId() == node->attributeOriginId()
 	  && attIndex_ == node->attIndex_
 	  && tokenIndex_ == node->tokenIndex_);
+}
+
+AccessResult AttributeValueTokenNode::getLocation(Location &loc) const
+{
+  const ConstPtr<Origin> *originP;
+  Index index;
+  if (!value_->tokenLocation(tokenIndex_, originP, index)
+      && originP->pointer()) {
+    loc = Location(new GroveImplProxyOrigin(grove(), originP->pointer()), index);
+    return accessOK;
+  }
+  return accessNull;
 }
 
 ElementAttributeValueTokenNode
@@ -3069,6 +3544,15 @@ AccessResult EntityNode::getOrigin(NodePtr &ptr) const
     ptr.assign(new SgmlDocumentNode(grove(), grove()->root()));
   else
     ptr.assign(new DocumentTypeNode(grove(), grove()->governingDtd()));
+  return accessOK;
+}
+
+AccessResult EntityNode::getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const
+{
+  if (entity_->defaulted() && grove()->lookupDefaultedEntity(entity_->name()))
+    name = ComponentName::idDefaultedEntities;
+  else
+    name = ComponentName::idGeneralEntities;
   return accessOK;
 }
 
@@ -3165,6 +3649,11 @@ AccessResult EntityNode::attributeRef(unsigned long i, NodePtr &ptr) const
   return accessOK;
 }
 
+AccessResult EntityNode::getLocation(Location &loc) const
+{
+  return grove()->proxifyLocation(entity_->defLocation(), loc);
+}
+
 bool EntityNode::same(const BaseNode &node) const
 {
   return node.same2(this);
@@ -3178,6 +3667,11 @@ bool EntityNode::same2(const EntityNode *node) const
 void EntityNode::accept(NodeVisitor &visitor)
 {
   visitor.entity(*this);
+}
+
+unsigned long EntityNode::hash() const
+{
+  return (unsigned long)entity_;
 }
 
 EntityAttributeOrigin
@@ -3422,7 +3916,7 @@ AccessResult EntitiesNodeList::chunkRest(NodeListPtr &ptr) const
 {
   if (canReuse(ptr)) {
     EntitiesNodeList *list = (EntitiesNodeList *)this;
-    if (list->iter_.next().isNull())
+    if (list->iter_.nextTemp() == 0)
       return accessNull;
     return accessOK;
   }
@@ -3551,6 +4045,11 @@ AccessResult NotationNode::getExternalId(NodePtr &ptr) const
   return accessOK;
 }
 
+AccessResult NotationNode::getLocation(Location &loc) const
+{
+  return grove()->proxifyLocation(notation_->defLocation(), loc);
+}
+
 bool NotationNode::same(const BaseNode &node) const
 {
   return node.same2(this);
@@ -3564,6 +4063,11 @@ bool NotationNode::same2(const NotationNode *node) const
 void NotationNode::accept(NodeVisitor &visitor)
 {
   visitor.notation(*this);
+}
+
+unsigned long NotationNode::hash() const
+{
+  return (unsigned long)notation_;
 }
 
 ExternalIdNode::ExternalIdNode(const GroveImpl *grove)
@@ -3630,6 +4134,11 @@ AccessResult EntityExternalIdNode::getOrigin(NodePtr &ptr) const
   return accessOK;
 }
 
+unsigned long EntityExternalIdNode::hash() const
+{
+  return secondHash((unsigned long)entity_);
+}
+
 NotationExternalIdNode::NotationExternalIdNode(const GroveImpl *grove,
 					       const Notation *notation)
 : ExternalIdNode(grove), notation_(notation)
@@ -3647,6 +4156,11 @@ AccessResult NotationExternalIdNode::getOrigin(NodePtr &ptr) const
   return accessOK;
 }
 
+unsigned long NotationExternalIdNode::hash() const
+{
+  return secondHash((unsigned long)notation_);
+}
+
 AccessResult ChunkNode::getParent(NodePtr &ptr) const
 {
   if (!chunk_->origin)
@@ -3660,11 +4174,38 @@ AccessResult ChunkNode::getParent(NodePtr &ptr) const
   return accessOK;
 }
 
+AccessResult ChunkNode::getTreeRoot(NodePtr &ptr) const
+{
+  if (chunk()->origin
+      && (const Chunk *)chunk()->origin != grove()->root()
+      // With invalid documents we might have elements in the epilog
+      && !grove()->root()->epilog
+      && grove()->root()->documentElement)
+    return grove()->root()->documentElement->setNodePtrFirst(ptr, this);
+  return Node::getTreeRoot(ptr);
+}
+
 AccessResult ChunkNode::getOrigin(NodePtr &ptr) const
 {
   if (!chunk_->origin)
     return accessNull;
   chunk_->origin->setNodePtrFirst(ptr, this);
+  return accessOK;
+}
+
+AccessResult ChunkNode::getOriginToSubnodeRelPropertyName(ComponentName::Id &name) const
+{
+  if ((const Chunk *)chunk()->origin != grove()->root())
+    name = ComponentName::idContent;
+  else if ((const Chunk *)chunk() == grove()->root()->documentElement)
+    name = ComponentName::idDocumentElement;
+  else {
+    const Chunk *tem;
+    if (chunk()->getFirstSibling(grove(), tem) == accessOK && tem == grove()->root()->prolog)
+      name = ComponentName::idProlog;
+    else
+      name = ComponentName::idEpilog;
+  }
   return accessOK;
 }
 
@@ -3709,6 +4250,23 @@ bool BaseNode::operator==(const Node &node) const
   if (!sameGrove(node))
     return 0;
   return same((const BaseNode &)node);
+}
+
+bool BaseNode::chunkContains(const Node &node) const
+{
+  if (!sameGrove(node))
+    return 0;
+  return same((const BaseNode &)node);
+}
+
+bool BaseNode::inChunk(const DataNode *) const
+{
+  return 0;
+}
+
+bool BaseNode::inChunk(const CdataAttributeValueNode *) const
+{
+  return 0;
 }
 
 bool BaseNode::same2(const ChunkNode *) const
@@ -3761,9 +4319,32 @@ bool BaseNode::same2(const SgmlConstantsNode *) const
   return 0;
 }
 
+bool BaseNode::same2(const MessageNode *) const
+{
+  return 0;
+}
+
 AccessResult BaseNode::nextSibling(NodePtr &ptr) const
 {
   return nextChunkSibling(ptr);
+}
+
+AccessResult BaseNode::follow(NodeListPtr &ptr) const
+{
+  NodePtr nd;
+  AccessResult ret = nextSibling(nd);
+  switch (ret) {
+  case accessOK:
+    ptr.assign(new SiblingNodeList(nd));
+    break;
+  case accessNull:
+    ptr.assign(new BaseNodeList);
+    ret = accessOK;
+    break;
+  default:
+    break;
+  }
+  return ret;
 }
 
 AccessResult BaseNode::children(NodeListPtr &ptr) const
@@ -3795,6 +4376,21 @@ AccessResult BaseNode::getGroveRoot(NodePtr &ptr) const
   return accessOK;
 }
 
+AccessResult BaseNode::getLocation(Location &) const
+{
+  return accessNull;
+}
+
+bool BaseNode::queryInterface(IID iid, const void *&p) const
+{
+  if (iid == LocNode::iid) {
+    const LocNode *ip = this;
+    p = ip;
+    return 1;
+  }
+  return 0;
+}
+
 AccessResult
 ForwardingChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const
 {
@@ -3806,6 +4402,17 @@ ForwardingChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const
 
 AccessResult
 ForwardingChunk::getFollowing(const GroveImpl *grove,
+                              const Chunk *&p, unsigned long &nNodes)
+    const
+{
+  AccessResult ret = Chunk::getFollowing(grove, p, nNodes);
+  if (ret == accessOK)
+    nNodes = 0;
+  return ret;
+}
+
+AccessResult
+LocOriginChunk::getFollowing(const GroveImpl *grove,
                              const Chunk *&p, unsigned long &nNodes)
     const
 {
@@ -3814,7 +4421,33 @@ ForwardingChunk::getFollowing(const GroveImpl *grove,
     nNodes = 0;
   return ret;
 }
-    
+
+AccessResult LocOriginChunk::setNodePtrFirst(NodePtr &ptr, const BaseNode *node) const
+{
+  return ((const Chunk *)(this + 1))->setNodePtrFirst(ptr, node);
+}
+
+AccessResult LocOriginChunk::setNodePtrFirst(NodePtr &ptr, const ElementNode *node) const
+{
+  return ((const Chunk *)(this + 1))->setNodePtrFirst(ptr, node);
+}
+
+AccessResult LocOriginChunk::setNodePtrFirst(NodePtr &ptr, const DataNode *node) const
+{
+  return ((const Chunk *)(this + 1))->setNodePtrFirst(ptr, node);
+}
+
+const Chunk *LocOriginChunk::after() const
+{
+  return this + 1;
+}
+
+Boolean LocOriginChunk::getLocOrigin(const Origin *&ret) const
+{
+  ret = locOrigin;
+  return 1;
+}
+
 AccessResult
 Chunk::setNodePtrFirst(NodePtr &ptr, const ElementNode *node) const
 {
@@ -3853,6 +4486,11 @@ AccessResult Chunk::getFirstSibling(const GroveImpl *grove,
     return accessNotInClass;
   p = origin->after();
   return accessOK;
+}
+
+Boolean Chunk::getLocOrigin(const Origin *&) const
+{
+  return 0;
 }
 
 #ifdef SP_NAMESPACE

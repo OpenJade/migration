@@ -13,10 +13,12 @@
 
 <!entity % simple-compound-flow-objects
  "paragraph|sequence|display-group|line-field|link|scroll|marginalia
-  |leader|sideline|box|score|table-row"
+  |leader|sideline|box|score|table-row|math-sequence|unmath|subscript
+  |superscript|grid|grid-cell"
 >
 <!entity % complex-compound-flow-objects
- "simple-page-sequence|fraction|table|table-part|table-cell|multi-mode"
+ "simple-page-sequence|fraction|script|mark|fence|radical|math-operator
+ |table|table-part|table-cell|multi-mode"
 >
 
 <!entity % atomic-flow-objects
@@ -95,8 +97,33 @@
 	   | table-cell.before-column-border
            | table-cell.after-column-border) - o empty>
 
-<!element fraction - - (fraction.numerator, fraction.denominator)>
+<!element fraction - - (fraction.fraction-bar, fraction.numerator, fraction.denominator)>
 <!element (fraction.numerator|fraction.denominator) - - %flow>
+<!element fraction.fraction-bar - o empty>
+
+<!entity % script-ports
+"script.principal,
+ script.pre-sup, script.pre-sub,
+ script.post-sup, script.post-sub,
+ script.mid-sup, script.mid-sub"
+ >
+<!element script - - (%script-ports)>
+<!element (%script-ports) - - %flow>
+
+<!element mark - - (mark.principal, mark.over-mark, mark.under-mark)>
+<!element (mark.principal|mark.over-mark|mark.under-mark) - - (%flow)>
+
+<!element fence - - (fence.principal, fence.open, fence.close)>
+<!element (fence.principal|fence.open|fence.close) - - (%flow)>
+
+<!element radical - - (radical.radical?, radical.principal, radical.degree)>
+<!element (radical.principal|radical.degree) - - (%flow)>
+<!element radical.radical - o empty>
+
+<!element math-operator - - (math-operator.principal, math-operator.operator,
+           math-operator.lower-limit, math-operator.upper-limit)>
+<!element (math-operator.principal|math-operator.operator
+           |math-operator.lower-limit|math-operator.upper-limit) - - (%flow)>
 
 <!element multi-mode - - (multi-mode.mode, multi-mode.mode+)>
 <!element multi-mode.mode - - %flow>
@@ -127,6 +154,8 @@ marginalia-side %enum #implied
 principal-mode-simultaneous %boolean #implied
 marginalia-sep %length-spec #implied
 marginalia-keep-with-previous %boolean #implied
+grid-equidistant-rows %boolean #implied
+grid-equidistant-columns %boolean #implied
 color.red number #implied
 color.green number #implied
 color.blue number #implied
@@ -170,6 +199,15 @@ filling-direction %enum #implied
 writing-mode %enum #implied
 last-line-quadding %enum #implied
 math-display-mode %enum #implied
+script-pre-align %enum #implied
+script-post-align %enum #implied
+script-mid-sup-align %enum #implied
+script-mid-sub-align %enum #implied
+numerator-align %enum #implied
+denominator-align %enum #implied
+grid-position-cell-type %enum #implied
+grid-column-alignment %enum #implied
+grid-row-Alignment %enum #implied
 box-type %enum #implied
 glyph-alignment-mode %enum #implied
 box-border-alignment %enum #implied
@@ -258,7 +296,9 @@ glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
 ">
 
 <!attlist
-  (sequence|line-field|simple-page-sequence|fraction
+  (sequence|line-field|simple-page-sequence|fraction|fraction.fraction-bar
+   |math-sequence|unmath|subscript|superscript
+   |script|mark|fence|radical|math-operator
    |sideline|scroll|marginalia|multi-mode
    |table-row
    |table.before-row-border
@@ -360,8 +400,8 @@ glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
   %inherited-characteristics
 >
 
-<!attlist character
-  char cdata #required
+<!attlist (character|radical.radical)
+  char cdata #implied
   glyph-id cdata #implied
   drop-after-line-break %boolean #implied
   drop-unless-before-line-break %boolean #implied
@@ -375,6 +415,18 @@ glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
   math-font-posture %enum-or-boolean #implied
   math-class %enum #implied
   script cdata #implied
+  %inherited-characteristics
+>
+
+<!attlist grid
+  grid-n-columns number #implied
+  grid-n-rows number #implied
+  %inherited-characteristics
+>
+
+<!attlist grid-cell
+  column-number number #implied
+  row-number number #implied
   %inherited-characteristics
 >
 

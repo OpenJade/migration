@@ -322,6 +322,7 @@ public:
 			  Boolean anyCurrent = 0,
 			  size_t idIndex = size_t(-1),
 			  size_t notationIndex = size_t(-1));
+  AttributeDefinitionList(const ConstPtr<AttributeDefinitionList> &);
   size_t size() const;
   AttributeDefinition *def(size_t);
   const AttributeDefinition *def(size_t) const;
@@ -331,6 +332,7 @@ public:
   size_t idIndex() const;
   size_t notationIndex() const;
   Boolean anyCurrent() const;
+  void setIndex(size_t);
   void append(AttributeDefinition *);
 private:
   Vector<CopyOwner<AttributeDefinition> > defs_;
@@ -338,6 +340,7 @@ private:
   size_t idIndex_;		// -1 if no ID attribute
   size_t notationIndex_;	// -1 if no notation attribute
   Boolean anyCurrent_;
+  ConstPtr<AttributeDefinitionList> prev_;
 };
 
 class AttributeSemantics {
@@ -422,6 +425,7 @@ public:
   StringC token(size_t) const;
   void token(size_t, const Char *&, size_t &) const;
   Location tokenLocation(size_t) const;
+  Boolean tokenLocation(size_t, const ConstPtr<Origin> *&, Index &) const;
   Boolean recoverUnquoted(const StringC &, const Location &,
 			  AttributeContext &, const StringC &);
 private:
@@ -489,6 +493,8 @@ public:
   const StringC *getId() const;	// null if none
   Boolean idIndex(unsigned &) const;
   void noteInvalidSpec();
+  void changeDef(const ConstPtr<AttributeDefinitionList> &);
+  const ConstPtr<AttributeDefinitionList> &def() const;
 private:
   const AttributeDefinition *def(size_t) const;
   PackedBoolean conref_;
@@ -620,6 +626,12 @@ size_t AttributeDefinitionList::index() const
 }
 
 inline
+void AttributeDefinitionList::setIndex(size_t index)
+{
+  index_ = index;
+}
+
+inline
 size_t AttributeDefinitionList::idIndex() const
 {
   return idIndex_;
@@ -679,10 +691,19 @@ StringC TokenizedAttributeValue::token(size_t i) const
   return StringC(ptr, len);
 }
 
+
 inline
 Location TokenizedAttributeValue::tokenLocation(size_t i) const
 {
   return text_.charLocation(i == 0 ? 0 : spaceIndex_[i - 1] + 1);
+}
+
+inline
+Boolean TokenizedAttributeValue::tokenLocation(size_t i,
+					       const ConstPtr<Origin> *&origin,
+					       Index &index) const
+{
+  return text_.charLocation(i == 0 ? 0 : spaceIndex_[i - 1] + 1, origin, index);
 }
 
 inline
@@ -743,6 +764,12 @@ inline
 const AttributeDefinition *AttributeList::def(size_t i) const
 {
   return def_->def(i);
+}
+
+inline
+const ConstPtr<AttributeDefinitionList> &AttributeList::def() const
+{
+  return def_;
 }
 
 inline

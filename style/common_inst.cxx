@@ -388,6 +388,45 @@ typedef ISet<Char> Dummy_26;
 #endif
 #endif
 #endif
+#ifdef __DECCXX
+#pragma define_template Vector<TextItem>
+#else
+#ifdef __xlC__
+#pragma define(Vector<TextItem>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<TextItem>;
+#else
+typedef Vector<TextItem> Dummy_27;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTableItem<StringC, int>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC, int>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTableItem<StringC, int>;
+#else
+typedef HashTableItem<StringC, int> Dummy_28;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTable<StringC,int>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,int>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTable<StringC,int>;
+#else
+typedef HashTable<StringC,int> Dummy_29;
+#endif
+#endif
+#endif
 
 #ifdef SP_NAMESPACE
 }

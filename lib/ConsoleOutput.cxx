@@ -54,7 +54,7 @@ void ConsoleOutputCharStream::flushBuf(Char c)
   if (WriteConsoleW(h_, &ch, 1, &nWritten, 0))
     return;
   char buf[2];
-  int nBytes = WideCharToMultiByte(CP_ACP, 0, &ch, 1, buf, 2, 0, 0);
+  int nBytes = WideCharToMultiByte(CP_OEMCP, 0, &ch, 1, buf, 2, 0, 0);
   if (nBytes)
     WriteConsoleA(h_, buf, nBytes, &nWritten, 0);
 }

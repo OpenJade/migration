@@ -237,6 +237,12 @@ Output an
 <SAMP>i</SAMP>
 command for included subelements.
 <DT>
+<SAMP>empty</SAMP>
+<DD>
+Output an <SAMP>e</SAMP> command for elements which are not allowed to
+have an end-tag, that is those with a declared content of empty or
+with a content reference attribute.
+<DT>
 <SAMP>notation-sysid</SAMP>
 <DD>
 Output an <SAMP>f</SAMP> command before an <SAMP>N</SAMP> command,
@@ -401,6 +407,12 @@ Do not give an error when a character that is not a significant
 character in the reference concrete syntax occurs in a literal in the
 SGML declaration.  This may be useful in conjunction with certain
 buggy test suites.
+<DT>
+<SAMP>no-valid</SAMP>
+<DD>
+Do not give errors for a missing DTD, for undefined element types or
+for undefined attributes.
+In future releases this option may suppress other errors.
 </DL>
 </DL>
 <P>

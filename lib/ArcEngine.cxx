@@ -125,7 +125,7 @@ private:
   unsigned gatheringContent_;
   Text content_;
   unsigned startAgain_;
-  Allocator allocator_;
+  Allocator alloc_;
   StringC appinfo_;
   const AttributeList *linkAttributes_;
   LinkProcess linkProcess_;
@@ -184,7 +184,7 @@ ArcEngineImpl::ArcEngineImpl(Messenger &mgr,
 : director_(&director), mgr_(&mgr), cancelPtr_(cancelPtr),
   parser_(parser), stage_(0),
   gatheringContent_(0), startAgain_(0), haveLinkProcess_(0),
-  allocator_(maxSize(sizes, SIZEOF(sizes)), 50),
+  alloc_(maxSize(sizes, SIZEOF(sizes)), 50),
   nullHandler_(mgr), docName_(docName)
 {
   eventHandler_ = director.arcEventHandler(notation, docName, table);
@@ -356,7 +356,7 @@ void ArcEngineImpl::startElement(StartElementEvent *event)
       if (!arcProcessors_[i].processStartElement(*event,
 						 linkAttributes_,
 						 contentP,
-						 allocator_)) {
+						 alloc_)) {
 	ASSERT(contentP == 0);
 	startAgain_ = i + 1;
 	gatheringContent_ = 1;
@@ -401,11 +401,11 @@ void ArcEngineImpl::data(DataEvent *event)
       if (arcProcessors_[i].valid() && arcProcessors_[i].processData()) {
 	if (entity)
 	  arcProcessors_[i].docHandler()
-	    .data(new (allocator_) CdataEntityEvent(entity->asInternalEntity(),
+	    .data(new (alloc_) CdataEntityEvent(entity->asInternalEntity(),
 						    event->location().origin()));
 	else
 	  arcProcessors_[i].docHandler()
-	    .data(new (allocator_) ImmediateDataEvent(event->type(),
+	    .data(new (alloc_) ImmediateDataEvent(event->type(),
 						      event->data(),
 						      event->dataLength(),
 						      event->location(),
@@ -429,7 +429,7 @@ void ArcEngineImpl::sdataEntity(SdataEntityEvent *event)
       if (arcProcessors_[i].valid() && arcProcessors_[i].processData()) {
 	const Entity *entity = event->entity();
 	arcProcessors_[i].docHandler()
-	  .sdataEntity(new (allocator_)
+	  .sdataEntity(new (alloc_)
 		       SdataEntityEvent(entity->asInternalEntity(),
 					event->location().origin()));
       }
@@ -454,12 +454,12 @@ void ArcEngineImpl::externalDataEntity(ExternalDataEntityEvent *event)
 	  if (oldOrigin->markup())
 	    markup = new Markup(*oldOrigin->markup());
 	  ConstPtr<EntityOrigin> newOrigin
-	    = new EntityOrigin(entity,
-			       oldOrigin->parent(),
-			       oldOrigin->refLength(),
-			       markup);
+	    = EntityOrigin::make(entity,
+				 oldOrigin->parent(),
+				 oldOrigin->refLength(),
+				 markup);
 	  arcProcessors_[i].docHandler()
-	    .externalDataEntity(new (allocator_)
+	    .externalDataEntity(new (alloc_)
 				ExternalDataEntityEvent(entity->asExternalDataEntity(),
 							newOrigin));
 	}
@@ -488,7 +488,7 @@ void ArcEngineImpl::endElement(EndElementEvent *event)
   currentLocation_ = event->location();
   for (size_t i = 0; i < arcProcessors_.size(); i++)
     if (arcProcessors_[i].valid())
-      arcProcessors_[i].processEndElement(*event, allocator_);
+      arcProcessors_[i].processEndElement(*event, alloc_);
   DelegateEventHandler::endElement(event);
   if (haveLinkProcess_)
     linkProcess_.endElement();
@@ -1054,7 +1054,7 @@ void ArcProcessor::processArcQuant(const Text &text)
 Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
 					  const AttributeList *linkAttributes,
 					  const Text *content,
-					  Allocator &allocator)
+					  Allocator &alloc)
 {
   unsigned suppressFlags = (openElementFlags_.size() > 0
 			    ? (openElementFlags_.back() & ~isArc)
@@ -1098,7 +1098,7 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
     suppressFlags = map.suppressFlags;
   }
   StartElementEvent *genEvent
-    = new (allocator) StartElementEvent(metaType,
+    = new (alloc) StartElementEvent(metaType,
 					metaDtd_,
 					&attributeList_,
 					event.location(),
@@ -1120,7 +1120,7 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
     Messenger::message(ArcEngineMessages::invalidElement,
 		       StringMessageArg(metaType->name()));
 		       
-  pushElement(new (allocator) OpenElement(metaType,
+  pushElement(new (alloc) OpenElement(metaType,
 					  0,
 					  genEvent->included(),
 					  0,
@@ -1133,7 +1133,7 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
 	|| !currentElement().tryTransitionPcdata())
       Messenger::message(ArcEngineMessages::invalidArcContent);
     else
-      emitArcContent(*arcContent->text(), docHandler(), allocator);
+      emitArcContent(*arcContent->text(), docHandler(), alloc);
     suppressFlags |= (suppressForm|suppressSupr|ignoreData);
   }
   suppressFlags &= ~recoverData;
@@ -1143,7 +1143,7 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
 
 void ArcProcessor::emitArcContent(const Text &text,
 				  EventHandler &handler,
-				  Allocator &allocator)
+				  Allocator &alloc)
 {
   TextIter iter(text);
   TextItem::Type type;
@@ -1156,21 +1156,21 @@ void ArcProcessor::emitArcContent(const Text &text,
     case TextItem::cdata:
       // +1 because first dataEvent is the non-architectural data.
       if (type == TextItem::data)
-	handler.data(new (allocator) ImmediateDataEvent(Event::characterData,
+	handler.data(new (alloc) ImmediateDataEvent(Event::characterData,
 							s,
 							n,
 							*loc,
 							0));
       else
 			  
-	handler.data(new (allocator)
+	handler.data(new (alloc)
 		     CdataEntityEvent(loc->origin()->asEntityOrigin()
 				      ->entity()->asInternalEntity(),
 				      loc->origin()));
       break;
     case TextItem::sdata:
 		     
-      handler.sdataEntity(new (allocator)
+      handler.sdataEntity(new (alloc)
 			  SdataEntityEvent(loc->origin()->asEntityOrigin()
 					   ->entity()->asInternalEntity(),
 					   loc->origin()));
@@ -1541,8 +1541,8 @@ ArcProcessor::considerForm(const AttributeList &atts,
   metaSyntax_->generalSubstTable()->subst(metaName);
   if (!isNotation) {
     const Attributed *metaAttributed = metaDtd_->lookupElementType(metaName);
-    if (!metaAttributed)
-      metaAttributed = lookupCreateUndefinedElement(metaName, Location());
+    if (!metaAttributed) // CONSTDTD
+      metaAttributed = lookupCreateUndefinedElement(metaName, Location(), *metaDtd_);
     if (metaName == supportAtts_[rArcSuprF]) {
       newSuppressFlags |= suppressForm;
       return metaAttributed;
@@ -1751,13 +1751,13 @@ void ArcProcessor::split(const Text &text,
 }
 
 void ArcProcessor::processEndElement(const EndElementEvent &event,
-				     Allocator &allocator)
+				     Allocator &alloc)
 {
   Boolean wasArc = (openElementFlags_.back() & isArc);
   openElementFlags_.resize(openElementFlags_.size() - 1);
   if (wasArc) {
     EndElementEvent *genEvent
-      = new (allocator) EndElementEvent(currentElement().type(),
+      = new (alloc) EndElementEvent(currentElement().type(),
 					metaDtd_,
 					event.location(),
 					0);

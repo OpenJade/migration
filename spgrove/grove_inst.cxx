@@ -56,6 +56,19 @@ typedef Vector<ElementChunk *> Dummy_1;
 #endif
 #endif
 #endif
+#ifdef __DECCXX
+#pragma define_template Vector<ConstPtr<Origin> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<Origin> >)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<ConstPtr<Origin> >;
+#else
+typedef Vector<ConstPtr<Origin> > Dummy_2;
+#endif
+#endif
+#endif
 
 #ifdef SP_NAMESPACE
 }

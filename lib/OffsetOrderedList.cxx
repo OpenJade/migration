@@ -35,6 +35,7 @@ void OffsetOrderedList::append(Offset offset)
 void OffsetOrderedList::addByte(unsigned char b)
 {
   if (blockUsed_ >= OffsetOrderedListBlock::size) {
+    Mutex::Lock lock(&mutex_);
     blocks_.resize(blocks_.size() + 1);
     Owner<OffsetOrderedListBlock> &last = blocks_.back();
     last = new OffsetOrderedListBlock;
@@ -49,13 +50,14 @@ void OffsetOrderedList::addByte(unsigned char b)
     }
     blockUsed_ = 0;
   }
-  blocks_.back()->bytes[blockUsed_++] = b;
+  blocks_.back()->bytes[blockUsed_] = b;
   if (b == 255)
     blocks_.back()->offset += 255;
   else {
     blocks_.back()->offset += b + 1;
     blocks_.back()->nextIndex += 1;
   }
+  blockUsed_++;
 }
 
 // Find the last offset <= off.
@@ -64,6 +66,7 @@ Boolean OffsetOrderedList::findPreceding(Offset off,
 					 size_t &foundIndex,
 					 Offset &foundOffset) const
 {
+  Mutex::Lock lock(&((OffsetOrderedList *)this)->mutex_);
   // Invariant:
   // blocks with index < i have offset <= off
   // blocks with index >= lim have offset > off

@@ -23,11 +23,13 @@ namespace SP_NAMESPACE {
 
 class Messenger;
 class ErrorCountEventHandler;
+class MessageFormatter;
 
 class SPGROVE_API GroveBuilder {
 public:
   static bool setBlocking(bool);
   static ErrorCountEventHandler *make(Messenger *,
+				      MessageFormatter *,
 #ifdef GROVE_NAMESPACE
 				      GROVE_NAMESPACE::
 #endif

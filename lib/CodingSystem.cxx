@@ -7,11 +7,7 @@
 
 #include "splib.h"
 #include "CodingSystem.h"
-#ifdef SP_SHORT_HEADERS
-#include <strstrea.h>
-#else
-#include <strstream.h>
-#endif
+
 #include <string.h>
 
 #ifdef SP_NAMESPACE
@@ -49,25 +45,13 @@ unsigned OutputCodingSystem::fixedBytesPerChar() const
 String<char> OutputCodingSystem::convertOut(const StringC &str) const
 {
   Encoder *encoder = makeEncoder();
-  strstreambuf stream;
-  StringC copy(str);
-  encoder->output(copy.data(), copy.size(), &stream);
+  StrOutputByteStream stream;
+  encoder->output(str.data(), str.size(), &stream);
   delete encoder;
-  char *s = stream.str();
-#ifdef SP_ANSI_IOSTREAMS
-  String<char> result(s, stream.pcount());
-#else
-  String<char> result(s, stream.out_waiting());
-#endif
+  String<char> result;
+  stream.extractString(result);
   result += '\0';
-  stream.freeze(0);
-#ifdef __lucid
-  // Workaround lcc bug (3.1p2 with -O -XF).
-  String<char> temp(result);
-  return temp;
-#else
   return result;
-#endif
 }
 
 Decoder::Decoder(unsigned minBytesPerChar)
@@ -92,16 +76,16 @@ Encoder::~Encoder()
 {
 }
 
-void Encoder::output(Char *s, size_t n, streambuf *sp)
+void Encoder::output(Char *s, size_t n, OutputByteStream *sp)
 {
   output((const Char *)s, n, sp);
 }
 
-void Encoder::startFile(streambuf *)
+void Encoder::startFile(OutputByteStream *)
 {
 }
 
-void Encoder::handleUnencodable(Char, streambuf *)
+void Encoder::handleUnencodable(Char, OutputByteStream *)
 {
 }
 
@@ -114,7 +98,7 @@ RecoveringEncoder::RecoveringEncoder()
 {
 }
 
-void RecoveringEncoder::handleUnencodable(Char c, streambuf *sbufp)
+void RecoveringEncoder::handleUnencodable(Char c, OutputByteStream *sbufp)
 {
   if (unencodableHandler_)
     unencodableHandler_->handleUnencodable(c, sbufp);

@@ -5,6 +5,7 @@
 #include "DssslSpecEventHandler.h"
 #include "InterpreterMessages.h"
 #include "InternalInputSource.h"
+#include "FOTBuilder.h"
 #include "macros.h"
 
 #ifdef DSSSL_NAMESPACE
@@ -16,10 +17,19 @@ namespace DSSSL_NAMESPACE {
 class TextInputSourceOrigin : public InputSourceOrigin {
 public:
   TextInputSourceOrigin(Text &text);
-  Boolean defLocation(Offset off, Location &loc) const;
+  Boolean defLocation(Offset off, const Origin *&, Index &) const;
   const Text &text() const { return text_; }
+  void noteCharRef(Index, const NamedCharRef &) {
+    CANNOT_HAPPEN();
+  }
+  void setExternalInfo(ExternalInfo *) {
+    CANNOT_HAPPEN();
+  }
+  InputSourceOrigin *copy() const { return new TextInputSourceOrigin(*this); }
+  const Location &parent() const { return refLocation_; }
 private:
   Text text_;
+  Location refLocation_;
 };
 
 DssslSpecEventHandler::DssslSpecEventHandler(Messenger &mgr)
@@ -131,15 +141,6 @@ static struct {
     &DssslSpecEventHandler::externalSpecificationStart,
     &DssslSpecEventHandler::externalSpecificationEnd },
 };
-
-static
-bool operator==(const StringC &str, const char *s)
-{
-  for (size_t i = 0; i < str.size(); i++)
-    if (s[i] == '\0' || s[i] != str[i])
-      return 0;
-  return s[str.size()] == '\0';
-}
 
 void DssslSpecEventHandler::endProlog(EndPrologEvent *event)
 {
@@ -308,10 +309,9 @@ TextInputSourceOrigin::TextInputSourceOrigin(Text &text)
   text_.swap(text);
 }
 
-Boolean TextInputSourceOrigin::defLocation(Offset off, Location &loc) const
+Boolean TextInputSourceOrigin::defLocation(Offset off, const Origin *&origin, Index &index) const
 {
-  loc = text_.charLocation(off);
-  return 1;
+  return text_.charLocation(off, origin, index);
 }
 
 DssslSpecEventHandler::Doc::Doc()
@@ -410,13 +410,13 @@ void DssslSpecEventHandler
   const InternalEntity *internal = entity_->asInternalEntity();
   if (internal) {
     in = new InternalInputSource(internal->string(),
-                                 new EntityOrigin(entity_));
+			         EntityOrigin::make(entity_, Location()));
     return;
   }
   const StringC &sysid
     = entity_->asExternalEntity()->externalId().effectiveSystemId();
   if (sysid.size())
-    in = eh.parser_->entityManager().open(sysid, *eh.charset_, new InputSourceOrigin,
+    in = eh.parser_->entityManager().open(sysid, *eh.charset_, InputSourceOrigin::make(),
 					  0, *eh.mgr_);
 }
 

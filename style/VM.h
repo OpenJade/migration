@@ -18,6 +18,7 @@ class Insn;
 class VM : public EvalContext, private Collector::DynamicRoot  {
 public:
   VM(Interpreter &);
+  VM(EvalContext &, Interpreter &);
   virtual ~VM();
   ELObj **sp;
   Interpreter *interp;
@@ -34,6 +35,8 @@ public:
   Vector<const ProcessingMode *> modeStack;
 private:
   void growStack(int);
+  void init();
+
   ELObj **slim;
   ELObj **sbase;
 

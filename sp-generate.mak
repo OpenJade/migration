@@ -13,6 +13,7 @@ lib\arc_inst.cxx \
 lib\ArcEngineMessages.h \
 lib\EntityManagerMessages.h \
 lib\CatalogMessages.h \
+lib\MessageFormatterMessages.h \
 lib\MessageReporterMessages.h \
 lib\PosixStorageMessages.h \
 lib\URLStorageMessages.h \
@@ -26,9 +27,7 @@ nsgmls\nsgmls_inst.cxx \
 nsgmls\RastEventHandlerMessages.h \
 nsgmls\NsgmlsMessages.h \
 spam\SpamMessages.h \
-spam\spam_inst.cxx \
-spent\spent_inst.cxx \
-
+spam\spam_inst.cxx
 
 .SUFFIXES: .m4 .msg
 

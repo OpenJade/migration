@@ -12,6 +12,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
+				    bool xml,
 				    const FOTBuilder::Extension *&);
 
 #ifdef DSSSL_NAMESPACE

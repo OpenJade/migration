@@ -59,6 +59,7 @@ public:
   void setExclusions(Vector<const ElementType *> &exclusions);
   void setRank(StringC &suffix, Vector<const RankStem *> &rankStems);
   Mode mode(Boolean netEnabled) const;
+  const Location &location() const;
 private:
   ElementDefinition(const ElementDefinition &);	// undefined
   void operator=(const ElementDefinition &);	// undefined
@@ -192,6 +193,12 @@ inline
 Boolean ElementDefinition::undefined() const
 {
   return index_ == size_t(undefinedIndex);
+}
+
+inline
+const Location &ElementDefinition::location() const
+{
+  return location_;
 }
 
 inline

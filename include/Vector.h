@@ -37,7 +37,8 @@ public:
   void assign(size_t, const T &);
   void push_back(const T &t) {
     reserve(size_ + 1);
-    (void)new (ptr_ + size_++) T(t);
+    (void)new (ptr_ + size_) T(t);
+    size_++;
   }
   void insert(const_iterator p, size_t n, const T &t);
   void insert(const_iterator p, const_iterator q1, const_iterator q2);

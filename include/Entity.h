@@ -257,40 +257,22 @@ private:
 
 class SP_API EntityOrigin : public InputSourceOrigin {
 public:
-  void *operator new(size_t sz, Allocator &alloc) {
-    return alloc.alloc(sz);
-  }
-  void *operator new(size_t sz) {
-    return Allocator::allocSimple(sz);
-  }
-  void operator delete(void *p) {
-    Allocator::free(p);
-  }
-  EntityOrigin();
-  EntityOrigin(const Location &refLocation);
-  EntityOrigin(const ConstPtr<Entity> &);
-  EntityOrigin(const ConstPtr<Entity> &,
-	       const Location &refLocation);
-  EntityOrigin(const ConstPtr<Entity> &,
-	       const Location &refLocation, Index refLength,
-	       Owner<Markup> &markup);
-  ~EntityOrigin();
-  InputSourceOrigin *copy() const;
-  const ConstPtr<Entity> &entity() const { return entity_; }
-  const StringC *entityName() const;
-  const EntityDecl *entityDecl() const;
-  const EntityOrigin *asEntityOrigin() const;
-  Boolean defLocation(Offset off, Location &loc) const;
-  Index refLength() const;
-  const Markup *markup() const;
-private:
-  EntityOrigin(const EntityOrigin &); // undefined
-  void operator=(const EntityOrigin &);	// undefined
-  ConstPtr<Entity> entity_;	// 0 for document entity
-  // total length of reference
-  // (characters that were replaced by the entity)
-  Index refLength_;
-  Owner<Markup> markup_;
+  static EntityOrigin *make(Allocator &, const ConstPtr<Entity> &);
+  static EntityOrigin *make(Allocator &,
+			    const ConstPtr<Entity> &,
+			    const Location &refLocation);
+  static EntityOrigin *make(Allocator &,
+			    const ConstPtr<Entity> &,
+			    const Location &refLocation,
+			    Index refLength,
+			    Owner<Markup> &markup);
+  static EntityOrigin *make(const ConstPtr<Entity> &,
+			    const Location &refLocation,
+			    Index refLength,
+			    Owner<Markup> &markup);
+  static EntityOrigin *make(const ConstPtr<Entity> &,
+			    const Location &refLocation);
+  static const size_t allocSize;
 };
 
 inline
@@ -345,12 +327,6 @@ inline
 const Notation *ExternalDataEntity::notation() const
 {
   return notation_.pointer();
-}
-
-inline
-const Markup *EntityOrigin::markup() const
-{
-  return markup_.pointer();
 }
 
 #ifdef SP_NAMESPACE

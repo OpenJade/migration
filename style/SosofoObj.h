@@ -22,6 +22,10 @@ public:
   virtual void process(ProcessContext &) = 0;
   SosofoObj *asSosofo();
   virtual bool tableBorderStyle(StyleObj *&);
+  virtual bool ruleStyle(ProcessContext &, StyleObj *&);
+  virtual bool isRule();
+  virtual bool characterStyle(ProcessContext &, StyleObj *&, FOTBuilder::CharacterNIC &);
+  virtual bool isCharacter();
 };
 
 class NextMatchSosofoObj : public SosofoObj {
@@ -167,7 +171,13 @@ public:
   ~SetNonInheritedCsSosofoObj();
   void process(ProcessContext &);
   void traceSubObjects(Collector &) const;
+  bool characterStyle(ProcessContext &, StyleObj *&, FOTBuilder::CharacterNIC &);
+  bool isCharacter();
+  bool ruleStyle(ProcessContext &, StyleObj *&);
+  bool isRule();
 private:
+  ELObj *resolve(ProcessContext &);
+
   FlowObj *flowObj_;
   ELObj **display_;
   InsnPtr code_;

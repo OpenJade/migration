@@ -6,7 +6,6 @@
 #ifdef SP_MULTI_BYTE
 
 #include "EUCJPCodingSystem.h"
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -22,7 +21,7 @@ private:
 class EUCJPEncoder : public Encoder {
 public:
   EUCJPEncoder() { }
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 };
 
 Decoder *EUCJPCodingSystem::makeDecoder() const
@@ -36,7 +35,7 @@ Encoder *EUCJPCodingSystem::makeEncoder() const
 }
 
 size_t EUCJPDecoder::decode(Char *to, const char *s,
-			   size_t slen, const char **rest)
+			    size_t slen, const char **rest)
 {
   Char *start = to;
   const unsigned char *us = (const unsigned char *)s;
@@ -78,9 +77,8 @@ size_t EUCJPDecoder::decode(Char *to, const char *s,
   return to - start;
 }
 
-// FIXME handle errors from streambuf::sputc
 
-void EUCJPEncoder::output(const Char *s, size_t n, streambuf *sb)
+void EUCJPEncoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   for (; n > 0; s++, n--) {
     Char c = *s;
@@ -92,12 +90,12 @@ void EUCJPEncoder::output(const Char *s, size_t n, streambuf *sb)
       sb->sputc((unsigned char)(c & 0xff));
     }
     else if (mask == 0x0080) {
-      sb->sputc(0x8e);
+      sb->sputc((unsigned char)0x8e);
       sb->sputc((unsigned char)(c & 0xff));
     }
     else {
       // mask == 0x8000
-      sb->sputc(0x8f);
+      sb->sputc((unsigned char)0x8f);
       sb->sputc((unsigned char)((c >> 8) & 0xff));
       sb->sputc((unsigned char)(c & 0x7f));
     }

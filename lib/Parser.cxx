@@ -82,7 +82,7 @@ Parser::Parser(const SgmlParser::Params &params)
   }
   Ptr<InputSourceOrigin> origin;
   if (params.origin.isNull())
-    origin = new InputSourceOrigin;
+    origin = InputSourceOrigin::make();
   else
     origin = params.origin;
   pushInput(entityManager().open(sysid,

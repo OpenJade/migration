@@ -21,10 +21,28 @@ namespace DSSSL_NAMESPACE {
 
 
 VM::VM(Interpreter &interpreter)
-: Collector::DynamicRoot(interpreter), interp(&interpreter),
-  slim(0), sbase(0), sp(0), closure(0), frame(0), protectClosure(0),
-  csp(0), cslim(0), csbase(0)
+: Collector::DynamicRoot(interpreter), interp(&interpreter)
 {
+  init();
+}
+
+VM::VM(EvalContext &context, Interpreter &interpreter)
+: EvalContext(context), Collector::DynamicRoot(interpreter), interp(&interpreter)
+{
+  init();
+}
+
+void VM::init()
+{
+  slim = 0;
+  sbase = 0;
+  sp = 0;
+  closure = 0;
+  frame = 0;
+  protectClosure = 0;
+  csp = 0;
+  cslim = 0;
+  csbase = 0;
 }
 
 VM::~VM()
@@ -474,11 +492,14 @@ ELObj *PrimitiveObj::argError(Interpreter &interp,
 			      unsigned index,
 			      ELObj *obj) const
 {
-  interp.setNextLocation(loc);
-  interp.message(msg,
-		 StringMessageArg(ident_->name()),
-		 OrdinalMessageArg(index + 1),
-		 ELObjMessageArg(obj, interp));
+  NodeListObj *nl = obj->asNodeList();
+  if (!nl || !nl->suppressError()) {
+    interp.setNextLocation(loc);
+    interp.message(msg,
+		   StringMessageArg(ident_->name()),
+		   OrdinalMessageArg(index + 1),
+		   ELObjMessageArg(obj, interp));
+  }
   return interp.makeError();
 }
 

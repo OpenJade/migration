@@ -10,9 +10,13 @@ provides some simple, non-standardized extensions to the DSSSL Style
 Language that allow it to be used for SGML transformations.
 <P>
 These extensions are used in conjunction with the SGML backend which
-is selected with the <SAMP>-t sgml</SAMP> option.
+is selected with the <SAMP>-t sgml</SAMP> or <SAMP>-t xml</SAMP> options.
 Unlike other backends,
 the SGML backend writes its output to the standard output.
+<P>
+The <SAMP>-t xml</SAMP> option makes empty elements and processing
+instructions use the XML syntax.  Note that the XML declaration is not
+automatically emitted.
 <P>
 The extensions consist of a collection of flow object classes that are used
 instead of the standard DSSSL-defined flow object classes:
@@ -40,7 +44,7 @@ This is a string-valued characteristic that specifies the element's
 generic identifier.
 It defaults to the generic identifier of the current node.
 <DT>
-<CODE>attribute</CODE>
+<CODE>attributes</CODE>
 <DD>
 This specifies the element's attributes as a list of lists each of
 which consists of exactly two strings, the first specifying the
@@ -91,6 +95,46 @@ If non-empty, this will be used as the public identifier in the
 doctype declaration.
 The default value is the empty string.
 </DL>
+<DT>
+<CODE>entity</CODE>
+<DD>
+This is an compound flow object that stores its content in a separate
+entity. It supports the following non-inherited characteristic:
+<DL>
+<DT>
+<CODE>system-id</CODE>
+<DD>
+The system identifier of the entity.
+For now this is treated as a filename not as an FSI.
+</DL>
+<P>
+Note that no entity reference or declaration is emitted.
+<DT>
+<CODE>entity-ref</CODE>
+<DD>
+This is an atomic flow object that results in an entity reference.
+It supports the following non-inherited characteristic:
+<DL>
+<DT>
+<CODE>name</CODE>
+<DD>
+The name of the entity.
+</DL>
+<DT>
+<CODE>formatting-instruction</CODE>
+<DD>
+This is an atomic flow object that inserts characters into the output
+without change.
+It supports the following non-inherited characteristic:
+<DL>
+<DT>
+<CODE>data</CODE>
+<DD>
+This is the string to be inserted.
+</DL>
+<P>
+It differs from normal data characters in the <CODE>&amp;</CODE>,
+<CODE>&lt;</CODE> and <CODE>&gt;</CODE> will not be escaped.
 </DL>
 <P>
 Each of these flow object classes must be declared using
@@ -106,6 +150,12 @@ A suitable set of declarations is:
   "UNREGISTERED::James Clark//Flow Object Class::document-type")
 (declare-flow-object-class processing-instruction
   "UNREGISTERED::James Clark//Flow Object Class::processing-instruction")
+(declare-flow-object-class entity
+  "UNREGISTERED::James Clark//Flow Object Class::entity")
+(declare-flow-object-class entity-ref
+  "UNREGISTERED::James Clark//Flow Object Class::entity-ref")
+(declare-flow-object-class formatting-instruction
+  "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 </PRE>
 <P>
 Here's a simple example that does the identity transformation:

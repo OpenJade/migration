@@ -39,8 +39,9 @@ public:
   Boolean afterDocumentElement() const;
   const ElementType *lastEndedElementType() const;
   Mode contentMode() const;
-  const ElementType *lookupCreateUndefinedElement(const StringC &,
-						  const Location &);
+  ElementType *lookupCreateUndefinedElement(const StringC &,
+					    const Location &,
+					    Dtd &);
   Boolean checkImplyLoop(unsigned);
   static const ShortReferenceMap theEmptyMap;
 private:
@@ -52,7 +53,6 @@ private:
   unsigned tagLevel_;
   unsigned netEnablingCount_;
   const ElementType *lastEndedElementType_;
-  NamedTable<ElementType> undefinedElementTypeTable_;
   ElementType documentElementContainer_;
 };
 

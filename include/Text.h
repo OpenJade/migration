@@ -74,6 +74,8 @@ public:
   void addCharsTokenize(const StringC &, const Location &loc, Char space);
   void tokenize(Char space, Text &text) const;
   Location charLocation(size_t i) const;
+  Boolean charLocation(size_t, const Origin *&, Index &) const;
+  Boolean charLocation(size_t i, const ConstPtr<Origin> *&, Index &) const;
   size_t size() const;
   Char lastChar() const;
   const StringC &string() const;
@@ -163,6 +165,29 @@ void Text::addCharsTokenize(const StringC &str, const Location &loc,
 			    Char space)
 {
   addCharsTokenize(str.data(), str.size(), loc, space);
+}
+
+inline
+Location Text::charLocation(size_t i) const
+{
+  const ConstPtr<Origin> *originP;
+  Index index;
+  if (charLocation(i, originP, index))
+    return Location(*originP, index);
+  else
+    return Location();
+}
+
+inline
+Boolean Text::charLocation(size_t i, const Origin *&origin, Index &index) const
+{
+  const ConstPtr<Origin> *originP;
+  if (charLocation(i, originP, index)) {
+    origin = originP->pointer();
+    return 1;
+  }
+  else
+    return 0;
 }
 
 inline

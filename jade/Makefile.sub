@@ -5,10 +5,13 @@ INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove -I$(srcdir)/../style
 XLIBS=../style/libstyle.a ../spgrove/libspgrove.a ../grove/libgrove.a \
   ../lib/libsp.a
 GENSRCS=JadeMessages.h DssslAppMessages.h HtmlMessages.h RtfMessages.h \
- HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx
+ TeXMessages.h \
+ HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx
 
 HtmlFOTBuilder.o: HtmlFOTBuilder_inst.cxx HtmlMessages.h
 RtfFOTBuilder.o: RtfFOTBuilder_inst.cxx RtfMessages.h
+TeXFOTBuilder.o: TeXMessages.h
+TransformFOTBuilder.o: TransformFOTBuilder_inst.cxx
 DssslApp.o: DssslAppMessages.h
 jade.o: JadeMessages.h
 

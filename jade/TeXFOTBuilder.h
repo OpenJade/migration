@@ -5,14 +5,15 @@
 #ifndef TeXFOTBuilder_INCLUDED
 #define TeXFOTBuilder_INCLUDED 1
 
-#include <iostream.h>
+#include "OutputByteStream.h"
 #include "FOTBuilder.h"
+#include "Message.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
 
-FOTBuilder *makeTeXFOTBuilder(streambuf *);
+FOTBuilder *makeTeXFOTBuilder(OutputByteStream *, Messenger *);
 
 #ifdef DSSSL_NAMESPACE
 }

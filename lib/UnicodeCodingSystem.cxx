@@ -16,7 +16,6 @@ extern "C" {
   void *memmove(void *, const void *, size_t);
 }
 #endif
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -43,9 +42,9 @@ class UnicodeEncoder : public Encoder {
 public:
   UnicodeEncoder();
   ~UnicodeEncoder();
-  void output(Char *, size_t, streambuf *);
-  void output(const Char *, size_t, streambuf *);
-  void startFile(streambuf *);
+  void output(Char *, size_t, OutputByteStream *);
+  void output(const Char *, size_t, OutputByteStream *);
+  void startFile(OutputByteStream *);
 private:
   void allocBuf(size_t);
   unsigned short *buf_;
@@ -148,9 +147,9 @@ Boolean UnicodeDecoder::convertOffset(unsigned long &n) const
 {
   if (subDecoder_)
     return subDecoder_->convertOffset(n);
-  n *= 2;
   if (hadByteOrderMark_)
     n += 1;
+  n *= 2;
   return true;
 }
 
@@ -172,15 +171,13 @@ void UnicodeEncoder::allocBuf(size_t n)
   }
 }
 
-void UnicodeEncoder::startFile(streambuf *sb)
+void UnicodeEncoder::startFile(OutputByteStream *sb)
 {
   const unsigned short n = byteOrderMark;
   sb->sputn((char *)&n, 2);
 }
 
-// FIXME handle errors from streambuf::sputn
-
-void UnicodeEncoder::output(Char *s, size_t n, streambuf *sb)
+void UnicodeEncoder::output(Char *s, size_t n, OutputByteStream *sb)
 {
   if (sizeof(Char) == 2) {
     sb->sputn((char *)s, n*2);
@@ -193,7 +190,7 @@ void UnicodeEncoder::output(Char *s, size_t n, streambuf *sb)
   sb->sputn((char *)s, n*2);
 }
 
-void UnicodeEncoder::output(const Char *s, size_t n, streambuf *sb)
+void UnicodeEncoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   if (sizeof(Char) == 2) {
     sb->sputn((char *)s, n*2);

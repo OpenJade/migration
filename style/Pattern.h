@@ -47,11 +47,12 @@ public:
 			       const NodePtr &nd,
 			       MatchContext &context);
   };
-  class NodeQualifier : public Qualifier {
+  class NodeQualifier : public Qualifier, private Collector::DynamicRoot {
   public:
     NodeQualifier(Owner<Expression> &, unsigned, ProcessingMode *, Interpreter *);
     bool satisfies(const NodePtr &, MatchContext &) const;
     void contributeSpecificity(int *) const;
+    void trace(Collector &) const;
   private:
     ProcessingMode *pm_;
     Interpreter *interp_;

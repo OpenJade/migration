@@ -173,7 +173,8 @@ void Pattern::ChildrenQualifier::contributeSpecificity(int *s) const
 
 Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &expr, unsigned priority,
                                       ProcessingMode *pm, Interpreter *interp)
-: priority_(priority), interp_(interp), pm_(pm), nl_(0)
+: priority_(priority), interp_(interp), pm_(pm), nl_(0),
+  Collector::DynamicRoot(*interp)
 {
   expr_.swap(expr);
 }
@@ -185,21 +186,22 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
   EvalContext ec;
   EvalContext::CurrentNodeSetter cns(root, pm_, ec);
 
-  ELObjDynamicRoot protect(*interp_, 0);
-
-  InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
-  VM vm(ec, *interp_);
-  ELObj *val = vm.eval(insn.pointer());
-  protect = val;
-  if (!val || !val->asNodeList()) { 
-    //FIXME: error
-    return 0;
+  if (!nl_) {
+    InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
+    VM vm(ec, *interp_);
+    ELObj *val = vm.eval(insn.pointer());
+    if (!val || !val->asNodeList()) {
+      //FIXME: error
+      return 0;
+    }
+    nl_ = val->asNodeList();
+    interp->makeReadOnly(nl_);
   }
-  NodeListObj *nl = val->asNodeList();
 
+  NodeListObj *nl = nl_;
   for (;;) {
-    protect = nl;
-    NodePtr nd = nl->nodeListFirst(ec, *interp_);
+    ELObjDynamicRoot protect(*interp_, nl);
+    NodePtr nd(nl->nodeListFirst(ec, *interp_));
     if (!nd)
       break;
     if (*nd == *m)  
@@ -212,6 +214,13 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
 void Pattern::NodeQualifier::contributeSpecificity(int *s) const
 {
   s[nodeSpecificity] += 1 + priority_;
+}
+
+void
+Pattern::NodeQualifier::trace(Collector &c) const
+{
+  if (nl_)
+    c.trace(nl_);
 }
 
 Pattern::IdQualifier::IdQualifier(const StringC &id)

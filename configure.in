@@ -40,6 +40,13 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de"
 AM_GNU_GETTEXT
+if test "x$prefix" = "xNONE"; then
+  SP_LOCALE_DIR=/usr/local/share/locale
+else
+  SP_LOCALE_DIR=$prefix/share/locale
+fi
+AC_DEFINE_UNQUOTED(SP_LOCALE_DIR, "$SP_LOCALE_DIR")
+AC_SUBST(SP_LOCALE_DIR)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -185,11 +192,7 @@ fi
 
 dnl Checks for library functions.
 AC_REPLACE_FUNCS(memmove memcmp strerror strtoul)
-AC_CHECK_FUNCS(setlocale gettext)
-if test "$ac_cv_have_gettext" = "no"
-then
-  AC_CHECK_LIB(intl,gettext,AC_DEFINE(HAVE_GETTEXT) LIBS="$LIBS -lintl")
-fi
+AC_CHECK_FUNCS(setlocale)
 
 dnl Checks for system services.
 ACX_CHECK_PATHNAME_STYLE_DOS

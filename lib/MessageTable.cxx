@@ -102,10 +102,6 @@ extern char *bindtextdomain(const char *, const char *);
 
 #include <stdlib.h>
 
-#ifndef MESSAGE_DOMAIN
-#define MESSAGE_DOMAIN "sp"
-#endif
-
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -121,13 +117,11 @@ public:
 };
 
 void GettextMessageTable::registerMessageDomain(unsigned char module, 
-                                                char *domain) const  
+                                                char *domain, char *dir) const  
 {
   if (module < MessageFragment::nModules) {
     messageDomain[module] = domain; 
-    // FIXME should use LOCALEDIR from config.h instead
-  const char *dir = getenv("TEXTDOMAINDIR");
-  if (dir)
+    if (dir)
       bindtextdomain(domain, dir);
   }
 }

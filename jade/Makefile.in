@@ -19,8 +19,8 @@ datadir=@datadir@
 LIBTOOL=@LIBTOOL@
 
 SP_LIBDIRS=lib $(XLIBDIRS)
-LIBDIRS=@LIBDIRS@
-PROGDIRS=@PROGDIRS@
+LIBDIRS=lib grove spgrove style
+PROGDIRS=spcat jade nsgmls spam sgmlnorm spent sx 
 dodirs=$(LIBDIRS) $(PROGDIRS)
 
 # Automatic template instantiation can cause compilers to generate

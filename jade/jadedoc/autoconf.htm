@@ -3,7 +3,7 @@
 <title>Jade autoconf support</title>
 <body bgcolor="#ffffff">
 <h1>Jade autoconf support</h1>
-<h4>Cees de Groot (<A href="mailto:cg@sgmltools.org">cg@sgmltools.org</A>)</h4>
+<h4>(originally by Cees de Groot <A href="mailto:cg@sgmltools.org">cg@sgmltools.org</A>)</h4>
 
 <p>With <code>./configure</code>, you'll have an alternate method to
 prepare the source distribution for building. This support is
@@ -12,16 +12,6 @@ operating system. If a build with autoconf doesn't work, you can
 always revert to the original Makefile which is saved by configure to
 <code>Makefile.dist</code>. <code>make mrproper</code> will undo
 everything that has been modified by <code>./configure</code>.</p>
-
-<p>Please note that the autoconf support is not James', but my
-responsibility: bother me with flames and patches, and I'll try tomake
-sure that the next release gets fixed where necessary. James cannot do
-more than forward everything to me, so please save his precious
-time.</p>
-
-<p>Check <A href="http://www.sgmltools.org/jade.html"
->http://www.sgmltools.org/jade.html</A> for updates to the Jade
-autoconf support.</p>
 
 <h2>Usage</h2>
 
@@ -39,19 +29,26 @@ autoconf support.</p>
 non-standard options.</dd>
 
 <dt><code>--enable-http</code></dt>
-
 <dd>This enables the built-in HTTP client so that you can use HTTP as
 a method for getting to system identifiers.</dd>
 
-<dt><code>--enable-default-catalog=<var>pathlist</var></code>
-
+<dt><code>--enable-default-catalog=<var>pathlist</var></code></dt>
 <dd>Provide the built-in definition for <code>SGML_CATALOG_FILES</code>.</dd>
+
+<dt><code>--enable-default-search-path=<var>pathlist</var></code>
+<dd>Provide a built-in definition for <code>SGML_SEARCH_PATH</code>.</dd>
+
+<dt><code>--disable-mif</code>
+<dd>Don't build the MIF backend.</dd>
+
+<dt><code>--disable-html</code>
+<dd>Don't build the HTML backend.</dd>
 
 </dl>
 
 <h2>Local defines</h2>
 
-<p>If you have some extra additions to Jade, you can set
+<p>If you have some extra additions to OpenJade, you can set
 CFLAGS/CXXFLAGS and/or LDFLAGS/LIBS at configure time:</p>
 
 <pre>
@@ -64,6 +61,8 @@ of LDFLAGS and LIBS.</p>
 <h2>Tested platforms</h2>
 
 <ul>
+<li>RedHat Linux 5.2 (egcs 1.0.3, glibc 2.0.7)</li>
+<li>RedHat Linux 6.0 (gcc 2.95.1, glibc 2.1.1)</li>
 <li>SuSE Linux 5.3 (gcc 2.7.2.1, libc 5.5.46)</li>
 <li>Solaris 2.6 (gcc 2.8.1)</li>
 </ul>

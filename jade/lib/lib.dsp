@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /Yu"splib.h" /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /D SP_HAVE_LOCALE=1 /Yu"splib.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\sp133.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\osp134.dll"
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\sp133d.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\osp134d.dll"
 
 !ENDIF 
 
@@ -113,7 +113,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -127,7 +127,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -153,7 +153,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -167,7 +167,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -401,7 +401,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -415,7 +415,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -687,7 +687,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -701,7 +701,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -751,6 +751,7 @@ SOURCE=.\ParserEventGeneratorKit.cxx
 # Begin Source File
 
 SOURCE=.\ParserMessages.cxx
+# SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
@@ -1089,7 +1090,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1103,7 +1104,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

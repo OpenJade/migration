@@ -92,6 +92,15 @@ public:
   const Insn *execute(VM &) const;
 };
 
+class SetImplicitCharInsn : public Insn {
+public:
+  SetImplicitCharInsn(const Location &, InsnPtr);
+  const Insn *execute(VM &) const;
+private:
+  Location loc_;
+  InsnPtr next_;
+};
+
 // sosofo with content is on top of the stack
 // flow object is next
 

@@ -369,6 +369,9 @@ void TransformFOTBuilder::documentType(const DocumentTypeNIC &nic)
     else 
       os() << " SYSTEM";
     if (nic.systemId.size()) {
+      if (nic.publicId.size()) {
+	os() << ' ';
+      }
       char quote = contains(nic.systemId, '"') ? '\'' : '"';
       os() << quote << nic.systemId << quote;
     }

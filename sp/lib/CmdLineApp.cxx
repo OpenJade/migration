@@ -196,8 +196,7 @@ void CmdLineApp::usage()
       args[1] = arg.copy(); 
     }
     StringC t;
-    for (const char *c = optArgs_[i].text(); *c != 0; c++)
-      t += *c;
+    getMessageText(optArgs_[i], t);
     StringMessageArg arg2(t);
     args[2] = arg2.copy(); 
     StrOutputCharStream ostr;
@@ -231,9 +230,9 @@ void CmdLineApp::usage()
       leftSide[i] += ' ';
     StrOutputCharStream ostr;
     Vector<CopyOwner<MessageArg> > args(1);
-    StringC t;
-    for (const char *c = optArgs_[i].text(); *c != 0; c++)
-      t += *c;
+    StringC t, t2;
+    if (getMessageText(optArgs_[i], t2))
+      t+=t2;
     StringMessageArg arg(t);
     args[0] = arg.copy(); 
     formatMessage(optDocs_[i], args, ostr, 1);

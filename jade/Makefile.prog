@@ -1,26 +1,19 @@
-# Generated automatically from Makefile.prog.in by configure.
-#
-#  Makefile.prog.in - Makerules for bilding programs
-#
-#  $Id$
-#
-#  Copyright (C) 1998 Cees A. de Groot
-#
-CLEANFILES=-r $(PROG) $(OBJS) core .libs Makefile.lt
+CLEANFILES=$(PROG)$(EXE) $(OBJS) core
 
-ALL_LIBS = $(XLIBS) $(LIBS)
-Makefile.lt:
-	echo 'LT_LIBS='`echo $(ALL_LIBS)|sed 's/\.a/.la/g'` >Makefile.lt
+all: $(PROG)$(EXE)
 
-all: $(PROG)
+pure: $(PROG).pure
 
-$(PROG): $(OBJS) $(COBJS) $(LT_LIBS)
-	$(LIBTOOL) --mode=link $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(LT_LIBS)
+$(PROG)$(EXE): $(OBJS) $(COBJS) $(XLIBS)
+	$(CXX) $(ALL_CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(XLIBS) $(LIBS)
 
-install: $(PROG)
-	-test -d $(bindir) || (mkdir $(bindir); chmod 755 $(bindir))
-	-rm -f $(bindir)/$(PROG)
-	$(LIBTOOL) --mode=install $(INSTALL) $(PROG) $(bindir)
+$(PROG).pure: $(OBJS) $(COBJS) $(XLIBS)
+	$(PURIFY) $(CXX) $(ALL_CXXFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(COBJS) $(XLIBS) $(LIBS)
+
+install: $(PROG)$(EXE)
+	-test -d $(bindir) || mkdir $(bindir)
+	-rm -f $(bindir)/$(PROG)$(EXE)
+	$(INSTALL) $(PROG)$(EXE) $(bindir)/$(PROG)$(EXE)
 
 depend: depend_src
 depend.temp: $(GENSRCS)

@@ -1,7 +1,9 @@
 LTVERSION=0:0:0
 LIB=ostyle
-DEPLIBS=-lm -L$(TOP)/grove/.libs -logrove -L$(TOP)/lib/.libs -losp 	\
-  -L$(TOP)/spgrove/.libs -lospgrove
+DEPLIBS=-lm \
+	-L$(TOP)/grove/.libs -logrove \
+	-L$(TOP)/spgrove/.libs -lospgrove \
+	$(LIBS)
 OBJS=InterpreterMessages.o \
   DocumentGenerator.o \
   TransformationMode.o \

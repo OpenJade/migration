@@ -31,6 +31,27 @@ class AttributeSemantics;
 class AttributeContext;
 class Syntax;
 
+ class SP_API AttributeValue : public Resource {
+ public:
+   enum Type {
+     implied,
+     cdata,
+     tokenized
+   };
+   AttributeValue();
+   virtual ~AttributeValue();
+   virtual AttributeSemantics *makeSemantics(const DeclaredValue *,
+                                             AttributeContext &,
+                                             const StringC &,
+                                             unsigned &,
+                                             unsigned &) const;
+   virtual Type info(const Text *&, const StringC *&) const = 0;
+   virtual const Text *text() const;
+   virtual Boolean recoverUnquoted(const StringC &, const Location &,
+                                   AttributeContext &, const StringC &);
+   static Boolean handleAsUnterminated(const Text &, AttributeContext &);
+ };
+
 class SP_API AttributeDefinitionDesc {
 public:
   AttributeDefinitionDesc() { }
@@ -378,27 +399,6 @@ public:
   AttributeSemantics *copy() const;
 private:
   ConstPtr<Notation> notation_;
-};
-
-class SP_API AttributeValue : public Resource {
-public:
-  enum Type {
-    implied,
-    cdata,
-    tokenized
-    };
-  AttributeValue();
-  virtual ~AttributeValue();
-  virtual AttributeSemantics *makeSemantics(const DeclaredValue *,
-					    AttributeContext &,
-					    const StringC &,
-					    unsigned &,
-					    unsigned &) const;
-  virtual Type info(const Text *&, const StringC *&) const = 0;
-  virtual const Text *text() const;
-  virtual Boolean recoverUnquoted(const StringC &, const Location &,
-				  AttributeContext &, const StringC &);
-  static Boolean handleAsUnterminated(const Text &, AttributeContext &);
 };
 
 class SP_API ImpliedAttributeValue : public AttributeValue {

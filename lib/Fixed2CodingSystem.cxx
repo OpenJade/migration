@@ -1,9 +1,6 @@
 // Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
-// This uses a big endian byte order irrespective of host byte order.
-// Nothing special is done with FEFF/FFFE.
-
 #include "splib.h"
 
 #ifdef SP_MULTI_BYTE
@@ -17,10 +14,12 @@ namespace SP_NAMESPACE {
 
 class Fixed2Decoder : public Decoder {
 public:
-  Fixed2Decoder();
+  Fixed2Decoder(Boolean lsbFirst);
   size_t decode(Char *to, const char *from, size_t fromLen,
 		const char **rest);
   Boolean convertOffset(unsigned long &offset) const;
+private:
+  Boolean lsbFirst_;
 };
 
 class Fixed2Encoder : public RecoveringEncoder {
@@ -29,9 +28,9 @@ public:
   void output(const Char *, size_t, OutputByteStream *);
 };
 
-Decoder *Fixed2CodingSystem::makeDecoder() const
+Decoder *Fixed2CodingSystem::makeDecoder(Boolean lsbFirst) const
 {
-  return new Fixed2Decoder;
+  return new Fixed2Decoder(lsbFirst);
 }
 
 Encoder *Fixed2CodingSystem::makeEncoder() const
@@ -44,24 +43,29 @@ unsigned Fixed2CodingSystem::fixedBytesPerChar() const
   return 2;
 }
 
-Fixed2Decoder::Fixed2Decoder()
-: Decoder(2)
+Fixed2Decoder::Fixed2Decoder(Boolean lsbFirst)
+: Decoder(2), lsbFirst_(lsbFirst)
 {
 }
 
 size_t Fixed2Decoder::decode(Char *to, const char *from, size_t fromLen,
 			   const char **rest)
 {
-#ifdef SP_BIG_ENDIAN
-  if (sizeof(Char) == 2 && from == (char *)to) {
+  if (sizeof(Char) == 2 && from == (char *)to
+      && 
+#ifndef SP_BIG_ENDIAN
+      !
+#endif
+       lsbFirst_) {
     *rest = from + (fromLen & ~1);
     return fromLen/2;
   }
-#endif
   fromLen &= ~1;
   *rest = from + fromLen;
   for (size_t n = fromLen; n > 0; n -= 2) {
-    *to++ = ((unsigned char)from[0] << 8) + (unsigned char)from[1];
+    *to++ = lsbFirst_ 
+             ? ((unsigned char)from[1] << 8) + (unsigned char)from[0] 
+             : ((unsigned char)from[0] << 8) + (unsigned char)from[1];
     from += 2;
   }
   return fromLen/2;

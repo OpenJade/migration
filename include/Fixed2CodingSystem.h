@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef Fixed2CodingSystem_INCLUDED
@@ -12,7 +12,7 @@ namespace SP_NAMESPACE {
 
 class SP_API Fixed2CodingSystem : public CodingSystem {
 public:
-  Decoder *makeDecoder() const;
+  Decoder *makeDecoder(Boolean lsbFirst) const;
   Encoder *makeEncoder() const;
   unsigned fixedBytesPerChar() const;
 };

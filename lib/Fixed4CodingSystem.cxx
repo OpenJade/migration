@@ -1,9 +1,6 @@
 // Copyright (c) 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
-// This uses a big endian byte order irrespective of host byte order.
-// Nothing special is done with FEFF/FFFE.
-
 #include "splib.h"
 
 #ifdef SP_MULTI_BYTE
@@ -18,13 +15,15 @@ namespace SP_NAMESPACE {
 
 class Fixed4Decoder : public Decoder {
 public:
-  Fixed4Decoder();
+  Fixed4Decoder(Boolean lsbFirst, Boolean lswFirst);
   size_t decode(Char *to, const char *from, size_t fromLen,
 		const char **rest);
   Boolean convertOffset(unsigned long &offset) const;
 private:
   // value for encoding error
   enum { invalid = 0xfffd };
+  Boolean lsbFirst_;
+  Boolean lswFirst_;
 };
 
 class Fixed4Encoder : public Encoder {
@@ -39,9 +38,9 @@ private:
   size_t bufSize_;
 };
 
-Decoder *Fixed4CodingSystem::makeDecoder() const
+Decoder *Fixed4CodingSystem::makeDecoder(Boolean lsbFirst, Boolean lswFirst) const
 {
-  return new Fixed4Decoder;
+  return new Fixed4Decoder(lsbFirst, lswFirst);
 }
 
 Encoder *Fixed4CodingSystem::makeEncoder() const
@@ -54,15 +53,18 @@ unsigned Fixed4CodingSystem::fixedBytesPerChar() const
   return 4;
 }
 
-Fixed4Decoder::Fixed4Decoder()
-: Decoder(4)
+Fixed4Decoder::Fixed4Decoder(Boolean lsbFirst, Boolean lswFirst)
+: Decoder(4), lsbFirst_(lsbFirst), lswFirst_(lswFirst)
 {
 }
 
 size_t Fixed4Decoder::decode(Char *to, const char *from, size_t fromLen,
 			   const char **rest)
 {
-#ifdef SP_BIG_ENDIAN
+#if 0
+  // FIXME for this optimization I need autoconf macros that tell
+  // me the byte order in 32bit words: 1234, 4321, 2143 or 3412.
+  // Look at the corresponding optimization in Fixed2Decoder.
   if (sizeof(Char) == 4 && from == (char *)to) {
     *rest = from + (fromLen & ~3);
     for (size_t n = 0; n < fromLen/4; n++)
@@ -73,11 +75,20 @@ size_t Fixed4Decoder::decode(Char *to, const char *from, size_t fromLen,
 #endif
   fromLen &= ~3;
   *rest = from + fromLen;
+  //  lsbFirst,  lswFirst: 0123
+  //  lsbFirst, !lswFirst: 2301
+  // !lsbFirst,  lswFirst: 1032
+  // !lsbFirst, !lswFirst: 3210   
+  size_t shift0 = 8*(!lsbFirst_ + 2*!lswFirst_); 
+  size_t shift1 = 8*(lsbFirst_ + 2*!lswFirst_); 
+  size_t shift2 = 8*(!lsbFirst_ + 2*lswFirst_); 
+  size_t shift3 = 8*(lsbFirst_ + 2*lswFirst_); 
   for (size_t n = fromLen; n > 0; n -= 4) {
-    Unsigned32 c = ((unsigned char)from[0] << 24) 
-                 + ((unsigned char)from[1] << 16) 
-                 + ((unsigned char)from[2] << 8) 
-                 + (unsigned char)from[3];
+    if (lsbFirst_
+    Unsigned32 c = ((unsigned char)from[0] << shift0) 
+                 + ((unsigned char)from[1] << shift1) 
+                 + ((unsigned char)from[2] << shift2) 
+	         + ((unsigned char)from[3] << shift3);
     *to++ = charMax < c ? invalid : c;
     from += 4;
   }

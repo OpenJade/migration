@@ -12,7 +12,7 @@ namespace SP_NAMESPACE {
 
 class SP_API Fixed4CodingSystem : public CodingSystem {
 public:
-  Decoder *makeDecoder() const;
+  Decoder *makeDecoder(Boolean lsbFirst, Boolean lswFirst) const;
   Encoder *makeEncoder() const;
   unsigned fixedBytesPerChar() const;
 };

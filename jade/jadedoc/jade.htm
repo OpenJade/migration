@@ -34,7 +34,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 1.2.
+The current version is 1.2.1.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -80,7 +80,7 @@ DSSSL specs.
 The source is in the style directory.
 <LI>
 A command-line application, <CODE>jade</CODE>, that combines the style
-engine with the spgrove grove interface and four backends:
+engine with the spgrove grove interface and five backends:
 <UL>
 <LI>
 A backend that generates an XML representation of the flow
@@ -115,72 +115,76 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew1_2.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew1_2_1.zip">binary distribution</A>.
 <P>
-Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_2.zip">Jade</A>.
-This package includes the sources for a compatible version of SP
-(which may be different from the latest released version of SP).
+Otherwise you will need to build it yourself from source. The
+Jade sources are available in two forms:
+
+<DL>
+<DT>
+<A HREF="ftp://ftp.jclark.com/pub/jade/jade1_2_1.zip">Windows
+distribution</A></DT>
+<DD>
+This is a ZIP file.  The sources use CR/LF delimited lines.  After
+getting this create a new directory and then unpack the sources file
+in this directory.  You must use an unzip that preserves long
+filenames, such as WinZip 6.1.  You should also make sure that your
+unzip preserves the case of filenames; this requires using a
+<SAMP>-U</SAMP> option with some versions of unzip. You should also
+ensure that the unzip preserves the directories. If you want to use
+this on Unix, you must unpack using <SAMP>unzip -a</SAMP> since the
+sources in the Windows distribution use CR/LF delimited lines.
+<DD>
+<DT>
+<A href="ftp://ftp.jclark.com/pub/jade/jade-1.2.1.tar.gz">Unix
+distribution</A></DT>
+<DD>
+This is a gzipped, tar file.  The sources use LF delimited
+lines. Unpack this using gunzip and tar.
+</DL>
+
 <p>
-Create a new directory and then unpack the sources file in this
-directory.  The files in sources zip file use CRLF delimited lines, so
-use <SAMP>unzip -a</SAMP> to unpack on Unix.  On Windows you must use
-an unzip that preserves long filenames, such as WinZip 6.1.  You
-should also make sure that your unzip preserves the case of filenames;
-this requires using a <SAMP>-U</SAMP> option with some versions of
-unzip.
+The distributions include the sources for a compatible version of SP
+(which may be different from the latest released version of SP).
 
 <h2><A NAME=building>Building Jade</A></h2>
 
 <h3><A NAME=building-win32>Win32</A></h3>
 <p>
-Only Microsoft Visual C++ 4.2b is supported.  It worked with 4.1 last
-time I tried, but it's only been tested with 4.2.
+Only Microsoft Visual C++ 6.0 is supported.  To build using the Visual
+Studio GUI, open the workspace <code>jade.dsw</code> and build the
+<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
+project.  To build on the command line, ensure that the directory
+containing <code>msdev</code> is in your path, typically by executing
+the command:
+<pre>
+path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;%path%
+</pre>
 <p>
-Open <CODE>SP.mak</CODE> as a makefile and build at least the
-<code>lib - UnicodeDebug</code> and <code>lib - UnicodeRelease</code>
-configurations.
-<P>
-Then open <CODE>jade.mak</CODE> as a makefile and build the jade
-configurations.
-<P>
-With the debug configuration the DLLs and EXEs end up in the
-lib\UnicodeDebug directory;
-with the release configuration they end up in the bin directory.
-<P>
-It has also been built with Visual C++ 5.0 Service Pack 2 by using
-the following procedure:
-<OL>
-<LI>
-Build SP using the documented procedure for Visual C++ 5.0
-<LI>
-Define <CODE>GROVE_NAMESPACE</CODE> and <CODE>DSSSL_NAMESPACE</CODE>
-to be the same as <CODE>SP_NAMESPACE</CODE> (under
-Project/Settings/C++/General/Preprocessor); this is necessary to work
-around bugs in the namespaces in Visual C++ 5.0
-<LI>
-Change the name of the lib file from
-<SAMP>lib\UnicodeDebug\sp130.lib</SAMP> to
-<SAMP>..\lib\UnicodeDebug\sp130.lib</SAMP>
-</OL>
+then run the command:
+<pre>
+msdev jade.dsw /make "all - Win32 Release"
+</pre>
 
 <h3><A NAME=building-unix>Unix</A></h3>
 <p>
-Only gcc 2.7.2 is supported (2.6.3 and 2.7.1 may also work; don't use 2.7.0).
+The following compilers should work:
+<ul>
+<li>egcs 1.0.2
+<li>gcc 2.8.1
+<li>gcc 2.7.2
+</ul>
+<p>Only the first has been tested by me.
 <p>
 If you use gcc 2.7.2 with -O on an x86 processor you must use
 -fno-strength-reduce. gcc 2.7.2.1 fixes this problem.
 <p>
-Building on Unix is tested irregularly, so be prepared
-to fix build glitches (typically the fix involves adding some template
-instantiations).
+Edit <code>Makefile</code>, then build with <code>make</code>.  Note
+that you must use -DSP_MULTI_BYTE. If you plan to do any development,
+also do <code>make depend</code>.
 <p>
-You'll need a Makefile that supports the <code>include</code> directive.
-<p>
-Build with <code>make -f Makefile.jade</code>.  Note that jade
-requires an SP compiled with <CODE>-DSP_MULTI_BYTE</CODE>.  If you
-plan to do any development, also do <code>make -f Makefile.jade
-depend</code>.
+Alternatively you can build using the <a
+HREF="autoconf.htm">experimental autoconf support</a>.
 
 <h2><A NAME=using>Using Jade</A></h2>
 <P>

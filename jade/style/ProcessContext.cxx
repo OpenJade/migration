@@ -315,7 +315,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
   Connectable *conn = iter.cur();
   if (portIndex != size_t(-1)) {
     Port &port = conn->ports[portIndex];
-    Connection *c = new Connection(conn->styleStack, &port, connLevel, portIndex);
+    Connection *c = new Connection(conn->styleStack, &port, connLevel);
     if (port.connected) {
       port.connected++;
       SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
@@ -332,7 +332,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
 				  vm().processingMode->name());
   }
   else {
-    Connection *c = new Connection(conn->styleStack, 0, connLevel, size_t(-1));
+    Connection *c = new Connection(conn->styleStack, 0, connLevel);
     if (conn->flowObjLevel == flowObjLevel_) {
       c->fotb = &currentFOTBuilder();
     }
@@ -364,13 +364,13 @@ void ProcessContext::endFlowObj()
 }
 
 
-ProcessContext::Connection::Connection(const StyleStack &s, Port *p, unsigned connLevel, size_t pi)
-: styleStack(s), port(p), nBadFollow(0), connectableLevel(connLevel), portIndex(pi)
+ProcessContext::Connection::Connection(const StyleStack &s, Port *p, unsigned connLevel)
+: styleStack(s), port(p), nBadFollow(0), connectableLevel(connLevel)
 {
 }
 
 ProcessContext::Connection::Connection(FOTBuilder *f)
-: fotb(f), port(0), nBadFollow(0), connectableLevel(0), portIndex(size_t(-1))
+: fotb(f), port(0), nBadFollow(0), connectableLevel(0)
 {
 }
 

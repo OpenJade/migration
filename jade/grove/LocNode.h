@@ -14,14 +14,16 @@ namespace SP_NAMESPACE {
 class Location;
 
 #ifdef GROVE_NAMESPACE
-using namespace GROVE_NAMESPACE;
+#define GROVE_NAMESPACE_SCOPE GROVE_NAMESPACE::
+#else
+#define GROVE_NAMESPACE_SCOPE
 #endif
 
 class GROVE_API LocNode {
 public:
-  virtual AccessResult getLocation(Location &) const = 0;
-  static const Node::IID iid;
-  static const LocNode *convert(const NodePtr &nd) {
+  virtual GROVE_NAMESPACE_SCOPE AccessResult getLocation(Location &) const = 0;
+  static const GROVE_NAMESPACE_SCOPE Node::IID iid;
+  static const LocNode *convert(const GROVE_NAMESPACE_SCOPE NodePtr &nd) {
     const void *p;
     if (nd && nd->queryInterface(iid, p))
       return (const LocNode *)p;
@@ -29,6 +31,8 @@ public:
       return 0;
   }
 };
+
+#undef GROVE_NAMESPACE_SCOPE
 
 #ifdef SP_NAMESPACE
 }

@@ -12,6 +12,7 @@
 #include "XcharMap.h"
 #include "types.h"
 #include "Vector.h"
+#include "Trie.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -19,7 +20,6 @@ namespace SP_NAMESPACE {
 
 class Messenger;
 class InputSource;
-class Trie;
 
 class Recognizer : public Resource {
 public:

@@ -18,8 +18,6 @@
 namespace SP_NAMESPACE {
 #endif
 
-class InternalEntity;
-
 struct SP_API TextItem {
   TextItem();
   enum Type {
@@ -65,8 +63,8 @@ public:
   void addNonSgmlChar(Char c, const Location &);
   void addEntityStart(const Location &);
   void addEntityEnd(const Location &);
-  void addCdata(const InternalEntity *, const ConstPtr<Origin> &);
-  void addSdata(const InternalEntity *, const ConstPtr<Origin> &);
+  void addCdata(const StringC &, const ConstPtr<Origin> &);
+  void addSdata(const StringC &, const ConstPtr<Origin> &);
   void addStartDelim(const Location &loc);
   void addEndDelim(const Location &loc, Boolean lita);
   void subst(const SubstTable<Char> &, Char space);

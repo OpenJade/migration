@@ -12,7 +12,7 @@ namespace DSSSL_NAMESPACE {
 
 const char *FOTBuilder::symbolName(Symbol sym)
 {
-  if (sym < 2 || sym >= nSymbols)
+  if (sym < 2 || sym >= int(nSymbols))
     return 0;
   // These must match the order in Symbol
   static const char *names[] = {

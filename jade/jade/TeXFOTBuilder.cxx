@@ -25,8 +25,8 @@ namespace DSSSL_NAMESPACE {
 
 // --------- TeXTmpOutputByteStream ------------------------------------------
 
-struct TeXTmpOutputByteStream : public TmpOutputByteStream2 {
-  TeXTmpOutputByteStream() : TmpOutputByteStream2() {}
+struct TeXTmpOutputByteStream : public TmpOutputByteStream {
+  TeXTmpOutputByteStream() : TmpOutputByteStream() {}
   void commit( OutputByteStream &os ) const;
 };
 
@@ -39,7 +39,7 @@ struct LengthInPoints {
 
 void TeXTmpOutputByteStream::commit( OutputByteStream &os ) const {
 
-  TmpOutputByteStream2::Iter iter( *this );
+  TmpOutputByteStream::Iter iter( *this );
   const char *s;
   size_t n;
 

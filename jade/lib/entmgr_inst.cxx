@@ -34,7 +34,6 @@ namespace SP_NAMESPACE {
 #include "Message.h"
 #include "NamedResource.h"
 #include "EntityManager.h"
-#include "CharsetRegistry.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -767,19 +766,6 @@ typedef Ptr<CharMapResource<Unsigned32> > Dummy_54;
 template class ConstPtr<CharMapResource<Unsigned32> >;
 #else
 typedef ConstPtr<CharMapResource<Unsigned32> > Dummy_55;
-#endif
-#endif
-#endif
-#ifdef __DECCXX
-#pragma define_template Owner<CharsetRegistry::Iter>
-#else
-#ifdef __xlC__
-#pragma define(Owner<CharsetRegistry::Iter>)
-#else
-#ifdef SP_ANSI_CLASS_INST
-template class Owner<CharsetRegistry::Iter>;
-#else
-typedef Owner<CharsetRegistry::Iter> Dummy_56;
 #endif
 #endif
 #endif

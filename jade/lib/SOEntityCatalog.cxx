@@ -467,7 +467,7 @@ Boolean SOEntityCatalog::lookup(const EntityDecl &entity,
       entityEntry = names_[tableIndex].lookup(name,
 					      entity.systemIdPointer() != 0);
     else
-      entityEntry = names_[tableIndex].lookup(entity.name(),
+      entityEntry = names_[tableIndex].lookup(name,
 					      syntax.upperSubstTable(),
 					      entity.systemIdPointer() != 0);
     // match for public id has priority over match for entity in same

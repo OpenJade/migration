@@ -275,3 +275,8 @@ Collector::DynamicRoot::~DynamicRoot()
 {
   unlink();
 }
+
+void Collector::unallocateObject(void *obj)
+{
+  ((Object *)obj)->moveAfter(freePtr_);
+}

@@ -18,14 +18,14 @@ CharMap<T>::CharMap()
 template<class T>
 CharMap<T>::CharMap(T dflt)
 {
-  for (size_t i = 0; i < (1 << level1bits); i++)
+  for (size_t i = 0; i < (1 << CharMapBits::level1); i++)
     pages_[i].value = dflt;
 }
 
 template<class T>
 void CharMap<T>::setAll(T val)
 {
-  for (size_t i = 0; i < (1 << level1bits); i++) {
+  for (size_t i = 0; i < (1 << CharMapBits::level1); i++) {
     pages_[i].value = val;
     delete [] pages_[i].values;
     pages_[i].values = 0;
@@ -35,34 +35,34 @@ void CharMap<T>::setAll(T val)
 template<class T>
 void CharMap<T>::swap(CharMap<T> &map)
 {
-  for (size_t i = 0; i < (1 << level1bits); i++)
+  for (size_t i = 0; i < (1 << CharMapBits::level1); i++)
     pages_[i].swap(map.pages_[i]);
 }
 
 template<class T>
 void CharMap<T>::setChar(Char c, T val)
 {
-  CharMapPage<T> &pg = pages_[c >> (level2bits + level3bits)];
+  CharMapPage<T> &pg = pages_[c >> (CharMapBits::level2 + CharMapBits::level3)];
   if (pg.values) {
-    CharMapColumn<T> &column = pg.values[(c >> level3bits) & ((1 << level2bits) - 1)];
+    CharMapColumn<T> &column = pg.values[(c >> CharMapBits::level3) & ((1 << CharMapBits::level2) - 1)];
     if (column.values)
-      column.values[c & ((1 << level3bits) - 1)] = val;
+      column.values[c & ((1 << CharMapBits::level3) - 1)] = val;
     else if (val != column.value) {
-      column.values = new T[1 << level3bits];
-      for (size_t i = 0; i < (1 << level3bits); i++)
+      column.values = new T[1 << CharMapBits::level3];
+      for (size_t i = 0; i < (1 << CharMapBits::level3); i++)
 	column.values[i] = column.value;
-      column.values[c & ((1 << level3bits) - 1)] = val;
+      column.values[c & ((1 << CharMapBits::level3) - 1)] = val;
     }
   }
   else if (val != pg.value) {
-    pg.values = new CharMapColumn<T>[1 << level2bits];
-    for (size_t i = 0; i < (1 << level2bits); i++)
+    pg.values = new CharMapColumn<T>[1 << CharMapBits::level2];
+    for (size_t i = 0; i < (1 << CharMapBits::level2); i++)
       pg.values[i].value = pg.value;
-    CharMapColumn<T> &column = pg.values[(c >> level3bits) & ((1 << level2bits) - 1)];
-    column.values = new T[1 << level3bits];
-    for (size_t i = 0; i < (1 << level3bits); i++)
+    CharMapColumn<T> &column = pg.values[(c >> CharMapBits::level3) & ((1 << CharMapBits::level2) - 1)];
+    column.values = new T[1 << CharMapBits::level3];
+    for (size_t i = 0; i < (1 << CharMapBits::level3); i++)
       column.values[i] = column.value;
-    column.values[c & ((1 << level3bits) - 1)] = val;
+    column.values[c & ((1 << CharMapBits::level3) - 1)] = val;
   }
 }
 
@@ -70,35 +70,35 @@ template<class T>
 void CharMap<T>::setRange(Char from, Char to, T val)
 {
   do {
-    if ((from & ((1 << level3bits) - 1)) == 0
-        && to - from >= (1 << level3bits) - 1) {
-      if ((from & ((1 << (level2bits + level3bits)) - 1)) == 0
-	  && to - from >= (1 << (level2bits + level3bits)) - 1) {
+    if ((from & ((1 << CharMapBits::level3) - 1)) == 0
+        && to - from >= (1 << CharMapBits::level3) - 1) {
+      if ((from & ((1 << (CharMapBits::level2 + CharMapBits::level3)) - 1)) == 0
+	  && to - from >= (1 << (CharMapBits::level2 + CharMapBits::level3)) - 1) {
 	// Set a complete page.
-	CharMapPage<T> &pg = pages_[from >> (level2bits + level3bits)];
+	CharMapPage<T> &pg = pages_[from >> (CharMapBits::level2 + CharMapBits::level3)];
 	pg.value = val;
 	delete pg.values;
 	pg.values = 0;
-	from += (1 << (level2bits + level3bits)) - 1;
+	from += (1 << (CharMapBits::level2 + CharMapBits::level3)) - 1;
       }
       else {
 	// Set a complete column.
-	CharMapPage<T> &pg = pages_[from >> (level2bits + level3bits)];
+	CharMapPage<T> &pg = pages_[from >> (CharMapBits::level2 + CharMapBits::level3)];
 	if (pg.values) {
-	  CharMapColumn<T> &column = pg.values[(from >> level3bits) & ((1 << level2bits) - 1)];
+	  CharMapColumn<T> &column = pg.values[(from >> CharMapBits::level3) & ((1 << CharMapBits::level2) - 1)];
 	  column.value = val;
 	  delete column.values;
 	  column.values = 0;
 	}
 	else if (val != pg.value) {
 	  // split the page
-	  pg.values = new CharMapColumn<T>[1 << level2bits];
-          for (size_t i = 0; i < (1 << level2bits); i++)
+	  pg.values = new CharMapColumn<T>[1 << CharMapBits::level2];
+          for (size_t i = 0; i < (1 << CharMapBits::level2); i++)
 	    pg.values[i].value = pg.value;
-	  CharMapColumn<T> &column = pg.values[(from >> level3bits) & ((1 << level2bits) - 1)];
+	  CharMapColumn<T> &column = pg.values[(from >> CharMapBits::level3) & ((1 << CharMapBits::level2) - 1)];
 	  column.value = val;
 	}
-	from += (1 << level2bits) - 1;
+	from += (1 << CharMapBits::level2) - 1;
       }
     }
     else
@@ -116,8 +116,8 @@ template<class T>
 CharMapPage<T>::CharMapPage(const CharMapPage<T> &pg)
 {
   if (pg.values) {
-    values = new CharMapColumn<T>[1 << level2bits];
-    for (size_t i = 0; i < (1 << level2bits); i++)
+    values = new CharMapColumn<T>[1 << CharMapBits::level2];
+    for (size_t i = 0; i < (1 << CharMapBits::level2); i++)
       values[i] = pg.values[i];
   }
   else {
@@ -131,8 +131,8 @@ void CharMapPage<T>::operator=(const CharMapPage<T> &pg)
 {
   if (pg.values) {
     if (!values)
-      values = new CharMapColumn<T>[1 << level2bits];
-    for (size_t i = 0; i < (1 << level2bits); i++)
+      values = new CharMapColumn<T>[1 << CharMapBits::level2];
+    for (size_t i = 0; i < (1 << CharMapBits::level2); i++)
       values[i] = pg.values[i];
   }
   else {
@@ -175,8 +175,8 @@ template<class T>
 CharMapColumn<T>::CharMapColumn(const CharMapColumn<T> &col)
 {
   if (col.values) {
-    values = new T[1 << level3bits];
-    for (size_t i = 0; i < (1 << level3bits); i++)
+    values = new T[1 << CharMapBits::level3];
+    for (size_t i = 0; i < (1 << CharMapBits::level3); i++)
       values[i] = col.values[i];
   }
   else {
@@ -190,8 +190,8 @@ void CharMapColumn<T>::operator=(const CharMapColumn<T> &col)
 {
   if (col.values) {
     if (!values)
-      values = new T[1 << level3bits];
-    for (size_t i = 0; i < (1 << level3bits); i++)
+      values = new T[1 << CharMapBits::level3];
+    for (size_t i = 0; i < (1 << CharMapBits::level3); i++)
       values[i] = col.values[i];
   }
   else {

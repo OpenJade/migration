@@ -32,17 +32,41 @@
 #include "ProcessContext.h"
 #include "SosofoObj.h"
 #include "DssslSpecEventHandler.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "DssslApp.h"
 #include "Pattern.h"
 #include "MacroFlowObj.h"
 
 #ifdef DSSSL_NAMESPACE
+class DSSSL_NAMESPACE::ProcessingMode;
+class DSSSL_NAMESPACE::SosofoObj;
+#else
+class ProcessingMode;
+class SosofoObj;
+#endif
+
+#if _MSC_VER >= 1100
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
+
+#ifdef DSSSL_NAMESPACE
+using namespace DSSSL_NAMESPACE;
+#endif
+
+#ifdef GROVE_NAMESPACE
+using namespace GROVE_NAMESPACE;
+#endif
+
+#else
+
+#ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
 
-class ProcessingMode;
-class SosofoObj;
+#endif
 
 __instantiate(Ptr<Insn>)
 __instantiate(Owner<Expression>)
@@ -143,7 +167,8 @@ __instantiate(SharedXcharMap<char>)
 __instantiate(Ptr<SharedXcharMap<char> >)
 __instantiate(ConstPtr<SharedXcharMap<char> >)
 #endif
-#ifdef DSSSL_NAMESPACE
+
+#ifdef SP_NAMESPACE
 }
 #endif
 

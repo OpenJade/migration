@@ -26,7 +26,6 @@
 #include "Message.h"
 #include "NamedResource.h"
 #include "EntityManager.h"
-#include "CharsetRegistry.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -90,7 +89,6 @@ __instantiate(CharMapColumn<Unsigned32>)
 __instantiate(CharMapResource<Unsigned32>)
 __instantiate(Ptr<CharMapResource<Unsigned32> >)
 __instantiate(ConstPtr<CharMapResource<Unsigned32> >)
-__instantiate(Owner<CharsetRegistry::Iter>)
 
 #ifdef SP_NAMESPACE
 }

@@ -13,7 +13,7 @@ all: lib$(LIB).la
 pure: all
 
 Makefile.lt:
-	echo 'LT_OBJS := '`echo $(OBJS)|sed 's/\.o/.lo/g'` >Makefile.lt
+	echo 'LT_OBJS='`echo $(OBJS)|sed 's/\.o/.lo/g'` >Makefile.lt
 
 lib$(LIB).la: $(LT_OBJS)
 	$(LIBTOOL) --mode=link $(CC) -o lib$(LIB).la $(LT_OBJS) \

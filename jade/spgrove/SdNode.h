@@ -15,16 +15,19 @@ namespace SP_NAMESPACE {
 #endif
 
 #ifdef GROVE_NAMESPACE
-using namespace GROVE_NAMESPACE;
+#define GROVE_NAMESPACE_SCOPE GROVE_NAMESPACE::
+#else
+#define GROVE_NAMESPACE_SCOPE
 #endif
 
 class SPGROVE_API SdNode {
 public:
-  virtual AccessResult getSd(ConstPtr<Sd> &sd,
-			     ConstPtr<Syntax> &prologSyntax,
-			     ConstPtr<Syntax> &instanceSyntax) const = 0;
-  static const Node::IID iid;
-  static const SdNode *convert(const NodePtr &nd) {
+  virtual GROVE_NAMESPACE_SCOPE AccessResult
+    getSd(ConstPtr<Sd> &sd,
+          ConstPtr<Syntax> &prologSyntax,
+	 ConstPtr<Syntax> &instanceSyntax) const = 0;
+  static const GROVE_NAMESPACE_SCOPE Node::IID iid;
+  static const SdNode *convert(const GROVE_NAMESPACE_SCOPE NodePtr &nd) {
     const void *p;
     if (nd && nd->queryInterface(iid, p))
       return (const SdNode *)p;
@@ -32,6 +35,8 @@ public:
       return 0;
   }
 };
+
+#undef GROVE_NAMESPACE_SCOPE
 
 #ifdef SP_NAMESPACE
 }

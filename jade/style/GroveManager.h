@@ -4,6 +4,7 @@
 #ifndef GroveManager_INCLUDED
 #define GroveManager_INCLUDED 1
 
+#include "Boolean.h"
 #include "Node.h"
 #include "StringC.h"
 #include "Vector.h"

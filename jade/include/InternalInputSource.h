@@ -26,6 +26,9 @@ public:
   void *operator new(size_t sz, Allocator &alloc) { return alloc.alloc(sz); }
   void *operator new(size_t sz) { return Allocator::allocSimple(sz); }
   void operator delete(void *p) { Allocator::free(p); }
+#ifdef SP_HAVE_PLACEMENT_OPERATOR_DELETE
+  void operator delete(void *p, Allocator &) { Allocator::free(p); }
+#endif
   InternalInputSource(const StringC &, InputSourceOrigin *);
   Xchar fill(Messenger &);
   void pushCharRef(Char ch, const NamedCharRef &);

@@ -52,6 +52,8 @@ struct SP_API TextItem {
 class SP_API Text {
 public:
   Text();
+// Dummy Destructor
+  ~Text();
   void clear();
   void swap(Text &to);
   void addChar(Char c, const Location &);

@@ -5809,9 +5809,9 @@ bool SubgroveNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &
   NodePtr nd1(nd);
   while (*s1 != *nd1) {
     nd = nd1; 
-    nd1->getOrigin(nd);
     s = s1;
-    s1->getOrigin(s); 
+    nd1->getOrigin(nd1);
+    s1->getOrigin(s1); 
   }
   // now s and nd are ancestors of start_ and ptr with common parent s1
   unsigned long i1, i2;
@@ -5915,9 +5915,9 @@ bool SubtreeNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &p
   NodePtr nd1(nd);
   while (*s1 != *nd1) {
     nd = nd1; 
-    nd1->getParent(nd);
     s = s1;
-    s1->getParent(s); 
+    nd1->getParent(nd1);
+    s1->getParent(s1); 
   }
   // now s and nd are ancestors of start_ and ptr with common parent s1
   unsigned long i1, i2;

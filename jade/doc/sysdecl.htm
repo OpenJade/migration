@@ -1,42 +1,40 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
-<HTML>
-<HEAD>
-<TITLE>SP - System declaration</TITLE>
-</HEAD>
-<BODY>
-<H1>SP System Declaration</H1>
-<P>
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.6 [en] (X11; I; Linux 2.2.5-15 i586) [Netscape]">
+   <title>SP - System declaration</title>
+</head>
+<body>
+
+<h1>
+SP System Declaration</h1>
 The system declaration for SP is as follows:
-<PRE>
-			&lt;!SYSTEM "ISO 8879:1986"
-				CHARSET
-BASESET  "ISO 646-1983//CHARSET
-	  International Reference Version (IRV)//ESC 2/5 4/0"
-DESCSET  0 128 0
-CAPACITY PUBLIC  "ISO 8879:1986//CAPACITY Reference//EN"
-			       FEATURES
-MINIMIZE DATATAG NO        OMITTAG  YES     RANK     YES   SHORTTAG YES
-LINK     SIMPLE  YES 65535 IMPLICIT YES     EXPLICIT YES 1
-OTHER    CONCUR  NO        SUBDOC   YES 100 FORMAL   YES
-SCOPE    DOCUMENT
-SYNTAX   PUBLIC  "ISO 8879:1986//SYNTAX Reference//EN"
-SYNTAX   PUBLIC  "ISO 8879:1986//SYNTAX Core//EN"
-			       VALIDATE
-	 GENERAL  YES      MODEL     YES     EXCLUDE  YES   CAPACITY NO
-	 NONSGML  YES      SGML      YES     FORMAL   YES
-				 SDIF
-	 PACK     NO       UNPACK   NO
-				 AFDR
-	 VALIDATE YES      CONSTRUCT YES&gt;
-</PRE>
-<P>
-The limit for the SUBDOC parameter is memory dependent.
-<P>
-Any legal concrete syntax may be used.
-<P>
-<ADDRESS>
-James Clark<BR>
-jjc@jclark.com
-</ADDRESS>
-</BODY>
-</HTML>
+<pre>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;!SYSTEM "ISO 8879:1986"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CHARSET
+BASESET&nbsp; "ISO 646-1983//CHARSET
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; International Reference Version (IRV)//ESC 2/5 4/0"
+DESCSET&nbsp; 0 128 0
+CAPACITY PUBLIC&nbsp; "ISO 8879:1986//CAPACITY Reference//EN"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; FEATURES
+MINIMIZE DATATAG NO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OMITTAG&nbsp; YES&nbsp;&nbsp;&nbsp;&nbsp; RANK&nbsp;&nbsp;&nbsp;&nbsp; YES&nbsp;&nbsp; SHORTTAG YES
+LINK&nbsp;&nbsp;&nbsp;&nbsp; SIMPLE&nbsp; YES 65535 IMPLICIT YES&nbsp;&nbsp;&nbsp;&nbsp; EXPLICIT YES 1
+OTHER&nbsp;&nbsp;&nbsp; CONCUR&nbsp; YES&nbsp;100&nbsp;&nbsp; SUBDOC&nbsp;&nbsp; YES 100 FORMAL&nbsp;&nbsp; YES
+SCOPE&nbsp;&nbsp;&nbsp; DOCUMENT
+SYNTAX&nbsp;&nbsp; PUBLIC&nbsp; "ISO 8879:1986//SYNTAX Reference//EN"
+SYNTAX&nbsp;&nbsp; PUBLIC&nbsp; "ISO 8879:1986//SYNTAX Core//EN"
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALIDATE
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; GENERAL&nbsp; YES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MODEL&nbsp;&nbsp;&nbsp;&nbsp; YES&nbsp;&nbsp;&nbsp;&nbsp; EXCLUDE&nbsp; YES&nbsp;&nbsp; CAPACITY NO
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; NONSGML&nbsp; YES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SGML&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; YES&nbsp;&nbsp;&nbsp;&nbsp; FORMAL&nbsp;&nbsp; YES
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; SDIF
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PACK&nbsp;&nbsp;&nbsp;&nbsp; NO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; UNPACK&nbsp;&nbsp; NO
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; AFDR
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; VALIDATE YES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CONSTRUCT YES></pre>
+The limits for the SUBDOC and CONCUR parameters are memory dependent.
+<p>Any legal concrete syntax may be used.
+<address>
+James Clark</address>
+
+<br>jjc@jclark.com
+</body>
+</html>

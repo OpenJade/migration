@@ -76,6 +76,11 @@ void SgmlParser::activateLinkType(const StringC &name)
   parser_->activateLinkType(name);
 }
 
+void SgmlParser::activateDocType(const StringC &name)
+{
+  parser_->activateDocType(name);
+}
+
 void SgmlParser::allLinkTypesActivated()
 {
   parser_->allLinkTypesActivated();

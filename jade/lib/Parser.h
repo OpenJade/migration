@@ -65,12 +65,14 @@ public:
   ParserState::sdPointer;
   ParserState::instanceSyntaxPointer;
   ParserState::prologSyntaxPointer;
+  ParserState::activateDocType;
   ParserState::activateLinkType;
   ParserState::allLinkTypesActivated;
   ParserState::entityManager;
   ParserState::entityCatalog;
   ParserState::baseDtd;
   ParserState::options;
+  ParserState::instantiateDtd;
 private:
   Parser(const Parser &);	// undefined
   void operator=(const Parser &); // undefined
@@ -394,6 +396,8 @@ private:
   Boolean parseTagNameGroup(Boolean &active);
   void parseGroupStartTag();
   void parseGroupEndTag();
+  void doParseStartTag();
+  EndElementEvent *doParseEndTag();
   Boolean skipAttributeSpec();
   Boolean lookingAtStartTag(StringC &gi);
   void implyDtd(const StringC &gi);

@@ -37,6 +37,7 @@ ParserApp::ParserApp(const char *requiredInternalCode)
   registerOption('g');
   registerOption('i', SP_T("entity"));
   registerOption('w', SP_T("warning_type"));
+  registerOption('x', SP_T("doc_type"));
 }
 
 void ParserApp::initParser(const StringC &sysid)
@@ -46,6 +47,8 @@ void ParserApp::initParser(const StringC &sysid)
   params.entityManager = entityManager().pointer();
   params.options = &options_;
   parser_.init(params);
+  for (size_t i = 0; i < activeDocTypes_.size(); i++) 
+    parser_.activateDocType(convertInput(activeDocTypes_[i]));
   if (arcNames_.size() > 0)
     parser_.activateLinkType(arcNames_[0]);
   for (size_t i = 0; i < activeLinkTypes_.size(); i++) 
@@ -129,6 +132,10 @@ void ParserApp::processOption(AppChar opt, const AppChar *arg)
     if (!enableWarning(arg))
       message(ParserAppMessages::unknownWarning,
 	      StringMessageArg(convertInput(arg)));
+    break;
+  case 'x':
+    // activate doctype
+    activeDocTypes_.push_back(arg);
     break;
   default:
     EntityApp::processOption(opt, arg);

@@ -206,7 +206,7 @@ void Parser::doInit()
     }
     Syntax *syntaxp = new Syntax(sd());
     CharSwitcher switcher;
-    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher, 0)) {
+    if (!setStandardSyntax(*syntaxp, refSyntax, sd().internalCharset(), switcher, 1)) {
       giveUp();
       return;
     }

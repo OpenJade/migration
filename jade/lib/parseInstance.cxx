@@ -425,12 +425,19 @@ void Parser::parseStartTag()
   InputSource *in = currentInput();
   Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
 			       in->currentLocation());
+  if (markup)
+    markup->addDelim(Syntax::dSTAGO);
+  doParseStartTag();
+}
+
+void Parser::doParseStartTag() 
+{
+  Markup *markup = currentMarkup();
+  InputSource *in = currentInput();
   in->discardInitial();
   extendNameToken(syntax().namelen(), ParserMessages::nameLength);
-  if (markup) {
-    markup->addDelim(Syntax::dSTAGO);
+  if (markup)
     markup->addName(in);
-  }
   StringC &name = nameBuffer();
   getCurrentToken(syntax().generalSubstTable(), name);
   ElementType *e = currentDtdNonConst().lookupElementType(name);
@@ -548,6 +555,7 @@ void Parser::parseEmptyStartTag()
 
 void Parser::parseGroupStartTag()
 {
+  InputSource *in = currentInput();
   if (startMarkup(eventsWanted().wantInstanceMarkup(), currentLocation())) {
     currentMarkup()->addDelim(Syntax::dSTAGO);
     currentMarkup()->addDelim(Syntax::dGRPO);
@@ -555,28 +563,32 @@ void Parser::parseGroupStartTag()
   Boolean active;
   if (!parseTagNameGroup(active))
     return;
-  InputSource *in = currentInput();
-  // Location startLocation = in->currentLocation();
   in->startToken();
+  // Location startLocation = in->currentLocation();
   Xchar c = in->tokenChar(messenger());
   if (!syntax().isNameStartCharacter(c)) {
     message(ParserMessages::startTagMissingName);
     return;
   }
-  in->discardInitial();
-  extendNameToken(syntax().namelen(), ParserMessages::nameLength);
-  if (currentMarkup())
-    currentMarkup()->addName(currentInput());
-  skipAttributeSpec();
-  if (currentMarkup())
-    eventHandler().ignoredMarkup(new (eventAllocator())
-				 IgnoredMarkupEvent(markupLocation(),
-						    currentMarkup()));
-  noteMarkup();
+  if (active)
+    doParseStartTag();
+  else {
+    in->discardInitial();
+    extendNameToken(syntax().namelen(), ParserMessages::nameLength);
+    if (currentMarkup())
+      currentMarkup()->addName(currentInput());
+    skipAttributeSpec();  
+    if (currentMarkup())
+      eventHandler().ignoredMarkup(new (eventAllocator())
+				   IgnoredMarkupEvent(markupLocation(),
+						      currentMarkup()));
+    noteMarkup();
+  }
 }
 
 void Parser::parseGroupEndTag()
 {
+  InputSource *in = currentInput();
   if (startMarkup(eventsWanted().wantInstanceMarkup(), currentLocation())) {
     currentMarkup()->addDelim(Syntax::dSTAGO);
     currentMarkup()->addDelim(Syntax::dGRPO);
@@ -584,24 +596,27 @@ void Parser::parseGroupEndTag()
   Boolean active;
   if (!parseTagNameGroup(active))
     return;
-  InputSource *in = currentInput();
-  // Location startLocation = in->currentLocation();
   in->startToken();
+  // Location startLocation = in->currentLocation();
   Xchar c = in->tokenChar(messenger());
   if (!syntax().isNameStartCharacter(c)) {
     message(ParserMessages::endTagMissingName);
     return;
   }
-  in->discardInitial();
-  extendNameToken(syntax().namelen(), ParserMessages::nameLength);
-  if (currentMarkup())
-    currentMarkup()->addName(currentInput());
-  parseEndTagClose();
-  if (currentMarkup())
-    eventHandler().ignoredMarkup(new (eventAllocator())
-				 IgnoredMarkupEvent(markupLocation(),
-						    currentMarkup()));
-  noteMarkup();
+  if (active)
+    acceptEndTag(doParseEndTag());
+  else {
+    in->discardInitial();
+    extendNameToken(syntax().namelen(), ParserMessages::nameLength);
+    if (currentMarkup())
+      currentMarkup()->addName(currentInput());
+    parseEndTagClose();
+    if (currentMarkup())
+      eventHandler().ignoredMarkup(new (eventAllocator())
+				   IgnoredMarkupEvent(markupLocation(),
+						      currentMarkup()));
+    noteMarkup();
+  }
 }
 
 void Parser::acceptPcdata(const Location &startLocation)
@@ -994,12 +1009,18 @@ EndElementEvent *Parser::parseEndTag()
 {
   Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
 			       currentLocation());
-  currentInput()->discardInitial();
-  extendNameToken(syntax().namelen(), ParserMessages::nameLength);
-  if (markup) {
+  if (markup) 
     markup->addDelim(Syntax::dETAGO);
+  return doParseEndTag();
+}
+
+EndElementEvent *Parser::doParseEndTag()
+{
+ Markup *markup = currentMarkup();
+ currentInput()->discardInitial();
+ extendNameToken(syntax().namelen(), ParserMessages::nameLength);
+ if (markup)
     markup->addName(currentInput());
-  }
   StringC &name = nameBuffer();
   getCurrentToken(syntax().generalSubstTable(), name);
   const ElementType *e = currentDtd().lookupElementType(name);

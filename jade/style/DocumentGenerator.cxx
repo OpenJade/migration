@@ -77,12 +77,15 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     NamedNodeListPtr atts;
     GroveChar ch = ' ';
     GroveString sep(&ch, 1);
-    if (ptr->getAttributes(atts) == accessOK) {
+    NodePtr nd;
+    if (ptr->getAttributes(atts) == accessOK
+        && atts->nodeList()->first(nd) == accessOK) {
       os() << " ";
       emit(atts->nodeList(), sep);
     }
     os() << ">"; 
     NodeListPtr content;
+    sep.assign(0, 0);
     if (ptr->getContent(content) == accessOK)
       emit(content, sep);
     bool mustOmitEndTag;

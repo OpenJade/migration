@@ -19,7 +19,8 @@ BUILT_SOURCES = config.h msggen.pl
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
 EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
-	build-win32.bat sp-generate.mak .cvsignore all 
+	build-win32.bat sp-generate.mak .cvsignore all \
+	@PACKAGE@-@VERSION@.spec
 
 dist-hook:
 	if test -f $(top_srcdir)/update-changelog; then \

@@ -1,0 +1,48 @@
+# Copyright (C) 2000 Matthias Clasen
+# See the file COPYING for copying permissions.
+#########################################################################
+Summary: An SGML system
+Name: @PACKAGE@
+Version: @VERSION@
+Release: 1
+BuildRoot: /tmp/@PACKAGE@-@VERSION@-buildroot
+Copyright: Copyright 1997 James Clark
+Group: Applications/Text
+Source: http://download.sourceforge.net/openjade/@PACKAGE@-@VERSION@.tar.gz
+URL: http://openjade.sourceforge.net
+Vendor: The OpenJade team <jade-devel@infomansol.com>
+Packager: Matthias Clasen <clasen@mathematik.uni-freiburg.de>
+
+#########################################################################
+%description
+This package contains a SGML system based on James Clarks SP.
+
+#########################################################################
+%prep
+# unpack source .tar.gz package
+%setup
+
+#########################################################################
+%build
+# configure build system according to rpm settings
+./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} --bindir=%{_bindir} --sbindir=%{_sbindir} --libexecdir=%{_libexecdir} --datadir=%{_datadir} --sysconfdir=%{_sysconfdir} --sharedstatedir=%{_sharedstatedir} --localstatedir=%{_localstatedir} --libdir=%{_libdir} --includedir=%{_includedir} --oldincludedir=%{_oldincludedir} --infodir=%{_infodir} --mandir=%{_mandir}
+# compile and link
+make CFLAGS="${RPM_OPT_FLAGS}"
+
+#########################################################################
+%install
+# install all files
+make "DESTDIR=${RPM_BUILD_ROOT}" install
+# make list of installed files
+find "${RPM_BUILD_ROOT}" -type f -print | sed "s/$(echo ${RPM_BUILD_ROOT} | sed 's/\//\\\//g')//" | sed 's/^\(.*\/doc\/.*\)$/%doc \1/' | grep . > @PACKAGE@-@VERSION@.files
+
+#########################################################################
+%files -f @PACKAGE@-@VERSION@.files
+
+#########################################################################
+%clean
+test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
+
+
+
+

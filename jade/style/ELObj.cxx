@@ -94,6 +94,11 @@ SosofoObj *ELObj::asSosofo()
   return 0;
 }
 
+AppendSosofoObj *ELObj::asAppendSosofo()
+{
+  return 0;
+}
+
 ColorObj *ELObj::asColor()
 {
   return 0;
@@ -120,6 +125,11 @@ InlineSpaceObj *ELObj::asInlineSpace()
 }
 
 GlyphSubstTableObj *ELObj::asGlyphSubstTable()
+{
+  return 0;
+}
+
+LanguageObj *ELObj::asLanguage()
 {
   return 0;
 }
@@ -213,8 +223,18 @@ ErrorObj::ErrorObj()
 {
 }
 
+void ErrorObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#<error>";
+}
+
 UnspecifiedObj::UnspecifiedObj()
 {
+}
+
+void UnspecifiedObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#v";
 }
 
 NilObj::NilObj()

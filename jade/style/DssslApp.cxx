@@ -13,12 +13,15 @@
 #include "InputSource.h"
 #include "jade_version.h"
 #include "ArcEngine.h"
+#include "Entity.h"
 
 #include <ctype.h>
 #include <string.h>
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
 #include <locale.h>
+#endif
 #endif
 
 #ifdef DSSSL_NAMESPACE
@@ -27,20 +30,24 @@ namespace DSSSL_NAMESPACE {
 
 DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
-  dssslSpecOption_(0), debugMode_(0), dsssl2_(0)
+  dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
+  strictMode_(0)
 {
   registerOption('G');
   registerOption('2');
   registerOption('d', SP_T("dsssl_spec"));
-  registerOption('V', SP_T("variable"));
+  registerOption('V', SP_T("variable[=value]"));
+  registerOption('s');
 }
 
 int DssslApp::init(int argc, AppChar **argv)
 {
   int ret = GroveApp::init(argc, argv);
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
   // Since we use strtod(), must have C numeric
   setlocale(LC_NUMERIC, "C");
+#endif
 #endif
   return ret;
 }
@@ -97,6 +104,9 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'V':
     defineVars_.push_back(convertInput(arg));
+    break;
+  case 's':
+    strictMode_ = 1;
     break;
   case 'v':
     message(DssslAppMessages::versionInfo,
@@ -330,7 +340,8 @@ void DssslApp::processGrove()
   Owner<FOTBuilder> fotb(makeFOTBuilder(extensions));
   if (!fotb)
     return;
-  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, dsssl2_, extensions);
+  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
+                 dsssl2_, strictMode_, extensions);
   for (size_t i = 0; i < defineVars_.size(); i++)
     se.defineVariable(defineVars_[i]);
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this);
@@ -379,6 +390,22 @@ bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
   else
     parser.parseAll(*eh, eceh->cancelPtr());
   return 1;
+}
+
+void DssslApp::mapSysid(StringC &sysid)
+{
+ // map a sysid according to SYSTEM catalog entries. 
+  ConstPtr<EntityCatalog> 
+     catalog(entityManager()->makeCatalog(sysid, systemCharset(), *this));
+  Text txt;
+  Location loc;
+  txt.addChars(sysid, loc);
+  ExternalId extid;
+  extid.setSystem(txt);
+  StringC name;
+  ExternalTextEntity ent(name, EntityDecl::generalEntity, loc, extid);
+  catalog->lookup(ent, *(parser().instanceSyntax()), systemCharset(), 
+                  *this, sysid); 
 }
 
 bool DssslApp::readEntity(const StringC &sysid, StringC &contents) 

@@ -29,7 +29,9 @@
 #define SP_NO_STD_NAMESPACE
 #undef SP_NEW_H_MISSING
 #endif
-
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 9)
+#undef SP_NO_STD_NAMESPACE
+#endif
 #endif /* __GNUG__ */
 
 #if defined(sun) || defined(__sun)
@@ -37,7 +39,7 @@
 #define SP_STAT_BLKSIZE
 #endif
 
-#ifdef __MACH__
+#if (defined __MACH__) && (! defined __GNU__)
 #define SP_MUTEX_MACH
 #endif
 
@@ -292,6 +294,10 @@
 #define SP_NAMESPACE_SCOPE SP_NAMESPACE::
 #else
 #define SP_NAMESPACE_SCOPE
+#endif
+
+#ifndef DEFAULT_SCHEME_BUILTINS
+#define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
 #endif
 
 #endif /* not config_INCLUDED */

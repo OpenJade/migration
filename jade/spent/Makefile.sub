@@ -1,4 +1,4 @@
-PROG=spent
+PROG=ospent
 OBJS=spent.o
 INCLUDE=
-XLIBS=../lib/libsp.a
+XLIBS=../lib/libosp.a

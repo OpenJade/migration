@@ -5,9 +5,10 @@
 #
 #  Copyright (C) 1998 Cees A. de Groot
 #
-LTVERSION=@LTVERSION@
 
 CLEANFILES=-r lib$(LIB).la $(OBJS) $(COBJS) $(LT_OBJS) core .libs Makefile.lt
+
+LIB_THREADS=@LIB_THREADS@
 
 all: lib$(LIB).la
 pure: all
@@ -17,10 +18,10 @@ Makefile.lt:
 
 lib$(LIB).la: $(LT_OBJS)
 	$(LIBTOOL) --mode=link $(CC) -o lib$(LIB).la $(LT_OBJS) \
-	    -rpath $(libdir) -version-info $(LTVERSION)
+	    -rpath $(libdir) -version-info $(LTVERSION) $(DEPLIBS)
 
 install:
-	$(LIBTOOL) --mode=install $(INSTALL) lib$(LIB).la $(libdir)
+	$(LIBTOOL) --mode=install $(INSTALL) lib$(LIB).la $(DESTDIR)$(libdir)
 
 install-man:
 depend: depend_src

@@ -79,10 +79,9 @@ ChangeLog:
 	rm -r OpenSP-$(UPSTREAM_VERSION)
 
 config.status:	ChangeLog
+	aclocal
 	autoheader
 	automake --add-missing
-	aclocal
-#	libtoolize --force --copy
 	autoconf
 	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
 	   ./configure --prefix=/usr --sysconfdir=/etc			\

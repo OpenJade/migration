@@ -22,8 +22,6 @@
 #include "SdNode.h"
 #include "threads.h"
 #include <OpenSP/macros.h>
-#include <assert.h>
-#include <stdio.h>
 
 #ifdef _MSC_VER
 #pragma warning ( disable : 4250 ) // inherits via dominance
@@ -1784,7 +1782,7 @@ public:
   AccessResult chunkRest(NodeListPtr &) const;
 protected:
   GroveImplPtr grove_;
-  const RankStem rankStem_;
+  const RankStem &rankStem_;
   Dtd::ConstElementTypeIter iter_;
 };
 
@@ -5808,7 +5806,7 @@ RankStemElementTypesNodeList::RankStemElementTypesNodeList(const GroveImpl *grov
                                            const RankStem &rankStem,
                                            const Dtd::ConstElementTypeIter &iter)
 
- : grove_(grove), rankStem_(rankStem.name(), rankStem.index()), iter_(iter) 
+ : grove_(grove), rankStem_(rankStem), iter_(iter) 
 {
 }
 
@@ -5818,7 +5816,7 @@ AccessResult RankStemElementTypesNodeList::first(NodePtr &ptr) const
   for (;;) {
     Dtd::ConstElementTypeIter tem(iter_);
     const ElementType *elementType = tem.next();
-    if (elementType == NULL)
+    if (elementType == 0)
       return accessNull;
     if (elementType->isRankedElement()
         && elementType->rankedElementRankStem() == &rankStem_) {
@@ -5956,7 +5954,7 @@ AccessResult ContentTokenNodeBase::getLocation(Location &loc) const
 
 AccessResult ElementTokenNode::getGi(GroveString &str) const
 {
-  assert(elementToken_.elementType() != 0);
+  ASSERT(elementToken_.elementType() != 0);
   setString(str, elementToken_.elementType()->name());
   return accessOK;
 }
@@ -6081,7 +6079,7 @@ AccessResult ModelGroupNode::getContentTokens(NodeListPtr &ptr) const
 
 void ModelGroupNode::makeNode(NodePtr &ptr, unsigned contentTokenIdx)
 {
-  assert( contentTokenIdx < modelGroup_.nMembers());
+  ASSERT( contentTokenIdx < modelGroup_.nMembers());
   const ContentToken &contentToken = modelGroup_.member(contentTokenIdx);
   const ModelGroup *asModelGroup = contentToken.asModelGroup();
   if (asModelGroup != 0)

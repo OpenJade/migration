@@ -24,7 +24,7 @@ DEBUG=
 # Add -DSP_HAVE_GETTEXT if you gettext() and friends (eg Solaris 2.3).
 # Add -DSP_HAVE_SOCKET if you have sockets and you want support for HTTP
 # Add -DSP_DECLARE_H_ERRNO if you have sockets, but netdb.h doesn't declare h_errno
-#   (reportedly HPUX and Ultrix)
+#   (reportedly HPUX, Ultrix and Solaris 5.4)
 # Add -DSGML_CATALOG_FILES_DEFAULT=\"/usr/local/lib/sgml/catalog\"
 #   (for example) to change the value used if the SGML_CATALOG_FILES
 #   environment variable is unset.  SP now automatically searches for a file
@@ -32,7 +32,7 @@ DEBUG=
 # Add -Dsig_atomic_t=int on SunOS 4.1.x with g++ (or any other platform
 #  which doesn't appropriately define sig_atomic_t).
 XDEFINES=
-DEFINES=-DSP_HAVE_BOOL -DSP_ANSI_CLASS_INST $(XDEFINES)
+DEFINES=-DSP_HAVE_BOOL -DSP_ANSI_CLASS_INST -DSP_MULTI_BYTE $(XDEFINES)
 CXXFLAGS=-ansi $(DEBUG) $(WARN)
 LDFLAGS=
 CC=gcc

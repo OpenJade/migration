@@ -1,3 +1,123 @@
+2001-01-18  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+        Version 3.2
+	* jadetex.dtx: make a DisplayGroup set a link
+
+2001-01-17  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+
+	* jadetex.dtx: make twoside the default again (can still be turned off)
+
+2001-01-10  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+
+	* jadetex.dtx: remove Babel dependency, and pick up alternate code
+	from mlnames.sty (shared with PassiveTeX)
+
+2001-01-09  Sebastian Rahtz  <sebastian.rahtz@oucs.ox.ac.uk>
+
+       * fix Norwegian language support (from Tore Morkemo <tore@bibsyst.no>)
+       * loads of patches from 	 http://indev.insu.com/openjade/ , 
+	communicated by Thomas Andre Berger <thomasbe@osc.no> (not sure who 
+	did the work).
+      
+      * twoside optional characteristic
+       JadeTeX turns on the twoside LaTeX
+	 feature by default. Make it optional  by using an extension 
+	 characteristics (needs patched openjade)
+
+      * cell-*-row-margin support
+       JadeTeX support for the 
+	 cell-before-row-margin and cell-after-row-margin
+	wasn't working properly. 
+
+      
+      * Sequence in table support
+       
+	JadeTeX wasn't handling sequence in table cells 
+	 properly. If you used a sequence to typeset a word in italic, the rest
+	of the cell was also typeset in italic.
+      
+      * multipar removal
+       This patch removes the unused multipar macro from 
+	 JadeTex.
+
+      * Better table support
+       Those patches makes the support for tables in the TeX
+	 backend a lot better (needs openjade patch too)
+	
+	
+	 Support for nested tables.
+	 cell-after-column-margin: and cell-before-column-margin:
+                 wasn't really working.
+	 Row spanning was broken. This patch only supports 'start
+	 row alignment though.
+	 Paragraphs in cell spanning multiple column are now working.
+	 Support for the row-alignment: characteristic.
+	 Support for cell-background? and background-color properties
+      
+       * Trailing page bug fix
+       JadeTeX was always outputting an extra blank page. 
+	 This patch solves this problem.
+      
+       * Support for 'asis and 'asis-wrap
+       Those patches adds support for the 'asis and
+	 'asis-wrap values for the paragraph's lines:
+	characteristic.
+
+       * Support for 'background-color box's characteristic
+       This patch adds support for the 'background-color
+	characteristic of the box sosofo object.
+	
+       * Support for more fonts with long name
+       This patch adds  windows like alias for the fonts Monospace821, 
+	 Humanist521 and NewsGothic.
+	
+	
+2000-06-20  Sebastian Rahtz  <sebastian.rahtz@oucs.ox.ac.uk>
+
+	* release 2.20
+	   added special case of listitem-content-mode to allow element
+	   labelling 
+
+	 (missed out changes 2.11 to 2.19 :-})
+
+2000-04-14  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+
+	* jadetex.dtx: added ifmmode test for 183 in dsssl.def.
+	 \displaygroup now does setupics in a table cell
+
+2000-03-26  Sebastian Rahtz  <sebastian.rahtz@oucs.ox.ac.uk>
+
+	* jadetex.dtx: fixes by Simon Pepping
+ 	   a) to indentation after display math
+	   b) to treatment of left and right in fences
+	   c) to the way multiple columns are worked out
+	* monkeying around with tables, trying (not 100% successfully)
+	  to solve the outstanding errors
+	* clean error in reading ucharacters.sty
+	* manually set up characters 32-126
+
+1999-12-30  Sebastian Rahtz  <sebastian.rahtz@oucs.ox.ac.uk>
+
+	* jadetex.dtx: math mode should be display by default, not inline
+	(Matthias Clasen)
+
+1999-12-17  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+        RELEASE 2.10
+	* jadetex.dtx: used u*sty instead of u*tex
+	* note dependence on PassiveTeX package
+
+1999-12-17  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+        RELEASE 2.9
+	* jadetex.dtx: defined \Entity
+
+1999-12-09  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+        RELEASE 2.8
+	* jadetex.dtx: new entitiy scheme, and shared code with PassiveTeX
+
+1999-11-25  Sebastian Rahtz  <sebastian.rahtz@computing-services.oxford.ac.uk>
+
+	* jadetex.dtx: support for PageBalanceColumns (choose multicols*
+	and multicols)
+
 1999-06-29  Sebastian Rahtz  <sebastian.rahtz@oucs.ox.ac.uk>
 
         RELEASE 2.7

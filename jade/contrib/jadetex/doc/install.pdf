@@ -1,0 +1,1424 @@
+%PDF-1.3
+1 0 obj
+<< /S /GoTo /D (0.1.1) >>
+endobj
+4 0 obj
+(Introduction)
+endobj
+5 0 obj
+<< /S /GoTo /D (0.2.1) >>
+endobj
+8 0 obj
+(Increasing TeX capacities)
+endobj
+9 0 obj
+<< /S /GoTo /D (0.3.1) >>
+endobj
+12 0 obj
+(Creating the format files)
+endobj
+13 0 obj
+<< /S /GoTo /D (0.4.1) >>
+endobj
+16 0 obj
+(Testing the installation)
+endobj
+17 0 obj
+<< /S /GoTo /D (0.5.1) >>
+endobj
+20 0 obj
+(Frequently Asked Questions)
+endobj
+21 0 obj
+<< /S /GoTo /D [22 0 R  /Fit ] >>
+endobj
+24 0 obj <<
+/Length 5472      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 466.25 0 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -317.31 -65.904 cm
+BT
+/F32 24.79 Tf 0 0 Td[(Installing)-278(JadeT)60(eX)]TJ/F32 17.215 Tf -6.085 -33.14 Td[(Frank)-278(Atanasso)15(w)-278(Christoph)]TJ/F32 11.955 Tf 50.173 -12.951 Td[(Ne)15(xt)-278(Solution)-278(Co.,)-278(Ltd.)]TJ/F32 17.215 Tf -19.702 -33.14 Td[(Sebastian)-278(P)-278(Q)-278(Rahtz)]TJ/F32 11.955 Tf -25.637 -12.951 Td[(Oxf)20(or)20(d)-278(Univer)15(sity)-278(Computing)-278(Ser)-10(vices)]TJ/F32 17.215 Tf 46.949 -33.14 Td[(Simon)-278(P)30(epping)]TJ/F32 11.955 Tf 2.73 -12.951 Td[(Else)15(vier)-278(Science)-278(B.V)120(.)]TJ/F32 17.215 Tf -197.368 -45.255 Td[(Intr)20(oduction)]TJ/F35 9.963 Tf 47.82 -21.559 Td[(This)-250(documents)-250(is)-250(based)-250(on)-249(a)-250(note)-250(by)-250(FC)-250(describing)-250(his)-250(e)15(xperience)-250(installing)-249(JadeT)70(eX)-250(with)-250(OpenJade)]TJ 0 -12.951 Td[(1.3)-250(and)-250(teT)70(eX)-250(1.06)-250(\050on)-250(Unix\051.)-250(I)1(t)-250(has)-250(since)-250(been)-250(e)15(xpanded)-250(and)-250(check)10(ed)-250(by)-250(SR)-250(and)-250(SP)111(.)-249(It)-250(is)-250(aimed)-250(to)]TJ 0 -12.951 Td[(people)-250(who)-250(ha)20(v)15(e)-250(perhaps)-250(som)1(e)-250(e)15(xperience)-250(using)-250(T)70(eX)-250(and)-250(LaT)70(eX,)-250(enough)-250(to)-250(write)-250(up)-249(technical)-250(reports)]TJ 0 -12.952 Td[(using)-250(simple)-250(macros,)-250(b)20(ut)-250(k)1(no)25(w)-250(little)-250(or)-250(nothing)-250(about)-250(format)-250(\002les)-250(or)-250(the)-250(parti)1(culars)-250(of)-250(the)-250(T)70(eX)]TJ 0 -12.951 Td[(distrib)20(ution)-250(structure,)-250(and)-249(consequently)-250(ha)20(v)15(e)-250(a)-250(rough)-250(time)-250(with)-250(JadeT)70(eX)]TJ/F36 9.963 Tf 288.734 0 Td[(\274)]TJ/F35 9.963 Tf -288.734 -17.933 Td[(This)-250(document)-250(relates)-250(to)-250(J)1(adeT)70(eX)-250(v)15(ersion)-250(2.11)-250(or)-250(later)55(.)]TJ 0 -17.933 Td[(T)80(o)-240(use)-240(JadeT)70(eX,)-240(you)-240(\002rst)-240(of)-240(all)-241(sh)1(ould)-241(com)1(pile)-241(and)-240(install)-240(OpenJa)1(de.)-241(The)-240(resulting)]TJ/F41 9.963 Tf 332.501 0 Td[(openjade)]TJ/F35 9.963 Tf 41.137 0 Td[(e)15(x)15(ecutable,)]TJ -373.638 -12.951 Td[(used)-247(with)-247(the)]TJ/F43 8.966 Tf 55.529 0 Td[(-t)-600(tex)]TJ/F35 9.963 Tf 34.738 0 Td[(\003ag,)-247(will)-247(format)-246(an)-247(SGML/XML)-247(\002le)-247(and)-247(yiel)1(d)-247(a)-247(T)70(eX)-247(output)-247(\002le.)-247(Using)]TJ/F41 9.963 Tf 286.421 0 Td[(jadetex)]TJ/F35 9.963 Tf 33.443 0 Td[(or)]TJ/F41 9.963 Tf -410.131 -12.951 Td[(pdfjadetex)]TJ/F35 9.963 Tf 45.379 0 Td[(,)-250(you)-250(can)-250(transform)-250(this)-250(into)-249(D)40(VI)-250(or)-250(PDF;)-250(from)-250(D)40(VI,)-250(you)-250(can)-250(use)-250(a)-250(program)-250(lik)10(e)]TJ/F41 9.963 Tf 323.115 0 Td[(dvips)]TJ/F35 9.963 Tf 25.195 0 Td[(to)-250(get)]TJ -393.689 -12.952 Td[(PostScript)-250(output.)-250(This)-250(not)1(e)-250(describes)-250(ho)25(w)-250(to)-250(b)20(uild)-250(and)-250(install)-250(the)-250(former)-250(tw)11(o)-250(programs,)]TJ/F41 9.963 Tf 353.659 0 Td[(jadetex)]TJ/F35 9.963 Tf 33.474 0 Td[(and)]TJ/F41 9.963 Tf -387.133 -12.951 Td[(pdfjadetex)]TJ/F35 9.963 Tf 45.379 0 Td[(.)]TJ/F32 17.215 Tf -93.199 -50.236 Td[(Increasing)-278(T)60(eX)-278(capacities)]TJ/F35 9.963 Tf 47.82 -21.559 Td[(The)-250(T)70(eX)-250(output)-250(\002le)-250(uses)-250(a)-250(m)1(acro)-250(package,)-250(JadeT)70(eX,)-250(b)20(uilt)-250(on)-250(top)-250(of)-250(LaT)70(eX,)-250(just)-250(as)-249(LaT)70(eX)-250(is)-250(a)-250(macro)]TJ 0 -12.951 Td[(package)-250(sitting)-250(on)-250(top)-250(of)-250(pl)1(ain)-250(T)70(eX.)-250(It)-250(is)-250(probably)-250(possible)-250(to)-250(just)-250(stick)-250(an)]TJ/F43 8.966 Tf 296.504 0 Td[(\134input)]TJ/F35 9.963 Tf 34.769 0 Td[(at)-250(the)-250(top)-250(of)-250(your)]TJ/F43 8.966 Tf -331.273 -12.951 Td[(.tex)]TJ/F35 9.963 Tf 24.01 0 Td[(\002le)-250(and)-250(use)-250(the)-250(JadeT)70(eX)-250(m)1(acros)-250(this)-250(w)10(ay)65(,)-250(b)20(ut)-250(that)-250(w)10(ould)-250(be)-250(slo)25(w)-250(since)-250(T)70(eX)-250(w)10(o)1(uld)-250(need)-250(to)-250(parse)]TJ -24.01 -12.952 Td[(and)-250(compile)-250(the)-250(macro)-250(de\002)1(nitions)-250(e)25(v)15(ery)-250(time)-250(you)-250(format)-250(your)]TJ/F43 8.966 Tf 249.74 0 Td[(.tex)]TJ/F35 9.963 Tf 24.01 0 Td[(\002le.)-250(So)-250(what)-250(we)-250(do)-250(instead)-249(is)-250(to)-250(use)]TJ -273.75 -12.951 Td[(T)70(eX)-250(\050actually)65(,)]TJ/F41 9.963 Tf 58.689 0 Td[(initex)]TJ/F35 9.963 Tf 23.801 0 Td[(\051)-250(to)-250(read)-250(in)-250(the)-250(LaT)70(eX)-250(for)1(mat,)-250(follo)25(wed)-250(by)-250(the)-250(JadeT)70(eX)-250(package,)-250(once,)-250(and)-250(dum)1(p)]TJ -82.49 -12.952 Td[(the)-250(compiled)-250(image)-250(to)-250(wha)1(t)-250(is)-250(called)-250(a)-250(\223format)-250(\002le.\224)-250(This)-250(is)-250(the)-250(same)-250(w)10(ay)-249(that)-250(LaT)70(eX)-250(is)-250(usually)]TJ 0 -12.951 Td[(emplo)10(yed.)-240(Once)-241(the)-240(format)-240(\002le)-241(is)-240(b)20(uilt)-241(and)-240(installed,)-240(it)-241(is)-240(easy)-241(to)-240(arrange)-241(f)1(or)-241(T)70(eX)-240(to)-241(read)-240(it)-241(in)-240(quickly)-240(and)]TJ 0 -12.951 Td[(automatically)-250(when)-250(you)-250(pr)1(ocess)-250(a)]TJ/F43 8.966 Tf 137.513 0 Td[(.tex)]TJ/F35 9.963 Tf 24.009 0 Td[(\002le.)]TJ
+ET
+1 0 0 1 -148.94 -555.762 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(1)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+22 0 obj <<
+/Type /Page
+/Contents 24 0 R
+/Resources 23 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+25 0 obj <<
+/D [22 0 R /XYZ 71.731 705.352 null]
+>> endobj
+26 0 obj <<
+/D [22 0 R /XYZ 71.731 657.532 null]
+>> endobj
+27 0 obj <<
+/D [22 0 R /XYZ 71.731 657.532 null]
+>> endobj
+29 0 obj <<
+/D [22 0 R /XYZ 71.731 491.063 null]
+>> endobj
+2 0 obj <<
+/D [22 0 R /XYZ 171.803 455.92 null]
+>> endobj
+30 0 obj <<
+/D [22 0 R /XYZ 71.731 447.098 null]
+>> endobj
+34 0 obj <<
+/D [22 0 R /XYZ 71.731 375.418 null]
+>> endobj
+35 0 obj <<
+/D [22 0 R /XYZ 71.731 359.542 null]
+>> endobj
+36 0 obj <<
+/D [22 0 R /XYZ 452.052 346.69 null]
+>> endobj
+38 0 obj <<
+/D [22 0 R /XYZ 175.08 333.739 null]
+>> endobj
+40 0 obj <<
+/D [22 0 R /XYZ 288.558 333.739 null]
+>> endobj
+41 0 obj <<
+/D [22 0 R /XYZ 496.239 333.739 null]
+>> endobj
+42 0 obj <<
+/D [22 0 R /XYZ 119.551 320.788 null]
+>> endobj
+43 0 obj <<
+/D [22 0 R /XYZ 279.768 320.788 null]
+>> endobj
+44 0 obj <<
+/D [22 0 R /XYZ 310.353 320.788 null]
+>> endobj
+45 0 obj <<
+/D [22 0 R /XYZ 355.743 320.788 null]
+>> endobj
+46 0 obj <<
+/D [22 0 R /XYZ 488.045 320.788 null]
+>> endobj
+47 0 obj <<
+/D [22 0 R /XYZ 473.21 307.836 null]
+>> endobj
+48 0 obj <<
+/D [22 0 R /XYZ 119.551 294.885 null]
+>> endobj
+49 0 obj <<
+/D [22 0 R /XYZ 71.731 277.919 null]
+>> endobj
+6 0 obj <<
+/D [22 0 R /XYZ 281.205 244.65 null]
+>> endobj
+50 0 obj <<
+/D [22 0 R /XYZ 71.731 232.212 null]
+>> endobj
+51 0 obj <<
+/D [22 0 R /XYZ 416.055 210.139 null]
+>> endobj
+52 0 obj <<
+/D [22 0 R /XYZ 119.551 197.188 null]
+>> endobj
+53 0 obj <<
+/D [22 0 R /XYZ 369.291 184.236 null]
+>> endobj
+54 0 obj <<
+/D [22 0 R /XYZ 178.24 171.285 null]
+>> endobj
+55 0 obj <<
+/D [22 0 R /XYZ 275.056 158.334 null]
+>> endobj
+56 0 obj <<
+/D [22 0 R /XYZ 257.064 132.431 null]
+>> endobj
+23 0 obj <<
+/Font << /F32 28 0 R /F32 28 0 R /F32 28 0 R /F35 31 0 R /F36 33 0 R /F41 37 0 R /F43 39 0 R /F44 57 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+61 0 obj <<
+/Length 6022      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -418.43 -57.783 cm
+BT
+/F35 9.963 Tf 0 0 Td[(But,)-250(as)-250(e)25(v)15(er)40(,)-250(there)-250(are)-250(compl)1(ications,)-250(relating)-250(to)-250(T)70(eX')55(s)-250(capacity)-250(restrictions.)-249(T)70(eX)-250(is)-250(designed)-250(to)-250(use)-250(a)]TJ 0 -12.951 Td[(\002x)15(ed)-250(amount)-250(of)-250(resources)-250(to)-249(process)-250(documents;)-250(for)-250(e)15(xample,)-250(there)-250(is)-250(a)-250(maxim)1(um)-250(number)-250(of)-250(strings)-250(that)]TJ 0 -12.952 Td[(can)-250(be)-250(allocated,)-250(and)-250(a)-250(max)1(imum)-250(stack)-250(size.)-250(If)-250(a)-250(processing)-250(run)-250(e)15(xceeds)-250(the)-250(de)1(f)10(ault)-250(limits,)-250(T)70(eX)-250(will)]TJ 0 -12.951 Td[(complain)-250(and)-250(refuse)-250(to)-250(cont)1(inue.)-250(Unfortunately)65(,)-250(OpenJade')55(s)-250(T)70(eX)-250(back)10(end)-250(tends)-250(to)-249(e)15(xceed)-250(these)-250(def)10(ault)]TJ 0 -12.951 Td[(limits.)]TJ 0 -17.933 Td[(F)15(ortunately)65(,)-250(though,)-250(there)-250(is)-249(no)-250(need)-250(to)-250(recompile)-250(your)-250(T)70(eX)-250(binary)65(.)-250(If)-250(you)-250(are)-250(using)-249(teT)70(eX)-250(\050or)-250(an)15(y)-250(other)]TJ 0 -12.951 Td[(W)80(eb2c-based)-250(distrib)20(ution\051)-250(t)1(here)-250(will)-250(be)-250(a)-250(\002le)-250(called)]TJ/F43 8.966 Tf 208.176 0 Td[(texmf.cnf)]TJ/F35 9.963 Tf 50.909 0 Td[(in)-250(your)-250(installation)-250(which)-249(sets)-250(the)]TJ -259.085 -12.952 Td[(capacity)-250(parameters)-250(and)-250(is)-249(consulted)-250(e)25(v)15(ery)-250(time)-250(T)70(eX)-250(is)-250(run.)-250(By)-250(adding)-250(the)-250(righ)1(t)-250(parameter)-250(settings)-250(here,)]TJ 0 -12.951 Td[(you)-250(can)-250(ensure)-250(that)-250(JadeT)70(eX)-249(will)-250(be)-250(unlik)10(ely)-250(to)-250(run)-250(out)-250(of)-250(memory)65(.)]TJ 0 -17.933 Td[(Where)-250(is)]TJ/F43 8.966 Tf 38.177 0 Td[(texmf.cnf)]TJ/F35 9.963 Tf 48.418 0 Td[(?)-250(Y)110(ou)-250(can)-250(\002nd)-250(it)-250(in)-250(the)]TJ/F43 8.966 Tf 92.711 0 Td[(web2c)]TJ/F35 9.963 Tf 29.39 0 Td[(directory)-250(under)-250(your)]TJ/F43 8.966 Tf 84.382 0 Td[(texmf)]TJ/F35 9.963 Tf 29.39 0 Td[(tree...)-250(which)-250(be)15(gs)-250(the)]TJ -322.468 -12.951 Td[(question,)-250(where)-250(is)]TJ/F43 8.966 Tf 74.709 0 Td[(texmf)]TJ/F35 9.963 Tf 26.899 0 Td[(?)-250(The)-250(most)-250(straightforw)10(ar)1(d)-250(w)10(ay)-250(to)-250(\002nd)-250(it)-250(is)-250(to)-250(mak)10(e)-250(sure)-250(all)-250(the)-250(T)70(eX)]TJ -101.608 -12.952 Td[(e)15(x)15(ecutables)-250(are)-250(in)-250(your)-250(P)92(A)111(TH)1(;)-250(then)-250(do:)]TJ/F43 8.07 Tf 0 -21.618 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(kpsewhich)-600(-expand-var)-600('$TE)-1(XMFMAIN')]TJ/F43 8.966 Tf -10.222 -11.657 Td[(/usr/share/texmf/web2c/t)-1(exmf.cnf)]TJ/F35 9.963 Tf 0 -22.914 Td[(and)-250(it)-250(will)-250(respond)-250(with)-250(th)1(e)-250(location)-250(of)-250(your)-250(te)15(xmf)-250(tree.)-250(As)-250(you)-250(can)-250(see,)-250(it)-250(is)-250(a)1(lso)-250(kno)25(wn)-250(as)]TJ/F52 9.963 Tf 0 -12.951 Td[($TEXMFMAIN)]TJ/F35 9.963 Tf 60.892 0 Td[(,)-250(which)-250(is)-250(ho)25(w)-250(I)-250(shall)-250(ref)1(er)-250(to)-250(it)-250(in)-250(the)-250(sequel.)]TJ -60.892 -17.933 Td[(If)-250(for)-250(some)-250(reason)]TJ/F41 9.963 Tf 75.247 0 Td[(kpsewhich)]TJ/F35 9.963 Tf 47.332 0 Td[(is)-250(not)-250(in)-250(your)-250(P)92(A)111(TH,)-250(and)-250(yo)1(u)-250(don')18(t)-250(kno)25(w)-250(where)-250(it)-250(is,)-250(here)-250(are)-250(some)-250(lik)10(ely)]TJ -122.579 -12.951 Td[(locations:)]TJ/F43 8.966 Tf 2.989 -26.999 Td[(/usr/share/texmf)]TJ 0 -12.951 Td[(/usr/local/share/texmf)]TJ 0 -12.952 Td[(/usr/local/teTeX/texmf)]TJ 0 -12.951 Td[(/usr/local/lib/teTeX/texm)-1(f)]TJ 0 -12.951 Td[(/usr/local/lib/texmf)]TJ 0 -12.952 Td[(/usr/lib/texmf)]TJ 0 -12.951 Td[(/usr/lib/teTeX/texmf)]TJ/F35 9.963 Tf -2.989 -26.8 Td[(In)-244(a)-245(minute)-244(we)-244(are)-245(go)1(ing)-245(to)-244(modify)]TJ/F43 8.966 Tf 142.883 0 Td[(texmf.cnf)]TJ/F35 9.963 Tf 50.853 0 Td[(to)-244(increase)-244(the)-245(capacities,)-244(then)-244(b)20(uild)-244(the)-245(JadeT)70(eX)-244(format)]TJ -193.736 -12.951 Td[(\002le)-250(and)-250(install)-250(the)-250(JadeT)70(eX)-249(e)15(x)15(ecutable\050s\051.)-250(But)-250(before)-250(we)-250(go)-250(further)40(,)-250(check)-250(if)-250(you)-249(ha)20(v)15(e)-250(an)-250(e)15(x)15(ecutable)]TJ 0 -12.951 Td[(named)]TJ/F41 9.963 Tf 29.051 0 Td[(hugelatex)]TJ/F35 9.963 Tf 40.956 0 Td[(:)]TJ/F43 8.07 Tf -70.007 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(which)-600(hugelatex)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(If)-250(you)-250(are)-250(using)-250(teT)70(eX,)-250(the)-250(a)1(nswer)-250(is:)-250(probably)-250(not.)]TJ/F41 9.963 Tf 0 -17.933 Td[(hugelatex)]TJ/F35 9.963 Tf 43.447 0 Td[(is)-250(a)-250(v)15(ersion)-250(of)-250(late)15(x)-250(with)-249(greater)-250(capacity)-250(settings)-250(than)-250(the)-250(usual)-250(one,)-250(whic)1(h)-250(is)-250(named)-250(simply)]TJ/F41 9.963 Tf -43.447 -12.951 Td[(latex)]TJ/F35 9.963 Tf 20.473 0 Td[(.)-250(Y)110(ou)-250(need)-250(to)-250(b)20(uild)-250(your)-250(form)1(at)-250(\002le)-250(using)]TJ/F41 9.963 Tf 166.952 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.447 0 Td[(rather)-250(than)]TJ/F41 9.963 Tf 45.369 0 Td[(latex)]TJ/F35 9.963 Tf 20.473 0 Td[(,)-250(so)-250(that)-250(JadeT)70(eX)-250(inherits)-249(the)]TJ -296.714 -12.952 Td[(`huge')-241(settings.)-242(In)-241(addition,)-241(if)-242(you)-241(mak)10(e)-242(an)15(y)-241(changes)-241(to)-242(the)-241(literate)-242(source)-241(of)-241(the)-242(JadeT)70(eX)-241(macro)-242(pa)1(ckage)]TJ 0 -12.951 Td[(\050see)-250(belo)25(w\051,)-250(a)-250(normal)]TJ/F41 9.963 Tf 88.557 0 Td[(latex)]TJ/F35 9.963 Tf 22.964 0 Td[(will)-250(not)-250(do.)]TJ
+ET
+1 0 0 1 -47.82 -563.883 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(2)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+60 0 obj <<
+/Type /Page
+/Contents 61 0 R
+/Resources 59 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+62 0 obj <<
+/D [60 0 R /XYZ 71.731 705.352 null]
+>> endobj
+63 0 obj <<
+/D [60 0 R /XYZ 71.731 717.307 null]
+>> endobj
+64 0 obj <<
+/D [60 0 R /XYZ 71.731 657.532 null]
+>> endobj
+65 0 obj <<
+/D [60 0 R /XYZ 71.731 590.683 null]
+>> endobj
+66 0 obj <<
+/D [60 0 R /XYZ 327.727 564.88 null]
+>> endobj
+67 0 obj <<
+/D [60 0 R /XYZ 71.731 531.839 null]
+>> endobj
+68 0 obj <<
+/D [60 0 R /XYZ 157.728 521.044 null]
+>> endobj
+69 0 obj <<
+/D [60 0 R /XYZ 298.857 521.044 null]
+>> endobj
+70 0 obj <<
+/D [60 0 R /XYZ 412.629 521.044 null]
+>> endobj
+71 0 obj <<
+/D [60 0 R /XYZ 194.26 508.093 null]
+>> endobj
+72 0 obj <<
+/D [60 0 R /XYZ 213.866 495.141 null]
+>> endobj
+73 0 obj <<
+/D [60 0 R /XYZ 71.731 483.022 null]
+>> endobj
+74 0 obj <<
+/D [60 0 R /XYZ 71.731 483.022 null]
+>> endobj
+75 0 obj <<
+/D [60 0 R /XYZ 129.773 473.523 null]
+>> endobj
+77 0 obj <<
+/D [60 0 R /XYZ 119.551 426.001 null]
+>> endobj
+79 0 obj <<
+/D [60 0 R /XYZ 71.731 418.863 null]
+>> endobj
+80 0 obj <<
+/D [60 0 R /XYZ 194.798 408.068 null]
+>> endobj
+81 0 obj <<
+/D [60 0 R /XYZ 297.482 408.068 null]
+>> endobj
+82 0 obj <<
+/D [60 0 R /XYZ 119.551 377.184 null]
+>> endobj
+83 0 obj <<
+/D [60 0 R /XYZ 71.731 377.184 null]
+>> endobj
+84 0 obj <<
+/D [60 0 R /XYZ 71.731 276.562 null]
+>> endobj
+85 0 obj <<
+/D [60 0 R /XYZ 262.434 263.611 null]
+>> endobj
+86 0 obj <<
+/D [60 0 R /XYZ 148.602 237.708 null]
+>> endobj
+87 0 obj <<
+/D [60 0 R /XYZ 71.731 225.723 null]
+>> endobj
+88 0 obj <<
+/D [60 0 R /XYZ 71.731 225.723 null]
+>> endobj
+89 0 obj <<
+/D [60 0 R /XYZ 129.773 216.089 null]
+>> endobj
+90 0 obj <<
+/D [60 0 R /XYZ 71.731 186.037 null]
+>> endobj
+91 0 obj <<
+/D [60 0 R /XYZ 71.731 186.037 null]
+>> endobj
+92 0 obj <<
+/D [60 0 R /XYZ 119.551 162.291 null]
+>> endobj
+93 0 obj <<
+/D [60 0 R /XYZ 306.976 162.291 null]
+>> endobj
+94 0 obj <<
+/D [60 0 R /XYZ 395.792 162.291 null]
+>> endobj
+95 0 obj <<
+/D [60 0 R /XYZ 208.108 136.388 null]
+>> endobj
+59 0 obj <<
+/Font << /F44 57 0 R /F35 31 0 R /F43 39 0 R /F43 39 0 R /F51 76 0 R /F52 78 0 R /F41 37 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+98 0 obj <<
+/Length 4515      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -418.43 -57.783 cm
+BT
+/F35 9.963 Tf 0 0 Td[(First)-250(we)-250(need)-250(to)-250(update)-250(te)15(xm)1(f.cnf)-250(to)-250(ensure)-250(that)]TJ/F41 9.963 Tf 192.426 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.447 0 Td[(really)-250(is)-250(\223huge\224.)-250(First,)-249(mak)10(e)-250(a)-250(backup:)]TJ/F43 8.07 Tf -235.873 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(cp)-600(texmf.cnf)-600(texmf.cnf.ori)-1(g)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(Then)-250(tak)10(e)-250(a)-250(look)-250(at)-250(the)-250(top)-250(o)1(f)-250(the)-250(\002le.)-250(It)-250(will)-250(probably)-250(say:)]TJ/F43 8.966 Tf 0 -21.618 Td[(%)-600(original)-600(texmf.cnf)-600(-)-600(r)-1(untime)-600(path)-600(configuration)-600(file)-600(for)-600(kpathsea.)]TJ 0 -11.657 Td[(%)-600(\050If)-600(you)-600(change)-600(or)-600(dele)-1(te)-600(`original')-600(on)-600(the)-600(previous)-600(line,)-600(the)]TJ 0 -11.656 Td[(%)-600(distribution)-600(won't)-600(ins)-1(tall)-600(its)-600(version)-600(over)-600(yours.\051)]TJ/F35 9.963 Tf 0 -22.914 Td[(If)-250(it)-250(says)]TJ/F43 8.966 Tf 0 -21.619 Td[(%)-600(TeX)-600(Live)-600(texmf.cnf)]TJ/F35 9.963 Tf 0 -22.914 Td[(then)-250(you)-250(can)-250(skip)-250(all)-250(this)-250(a)1(nd)-250(proceed)-250(to)-250(the)-250(ne)15(xt)-250(section,)-250(as)-250(T)70(eX)-250(Li)25(v)15(e)-250(is)-250(already)-249(set)-250(up)-250(for)-250(JadeT)70(eX)]TJ 0 -17.933 Td[(If)-250(you)-250(ha)20(v)15(e)-250(an)-250(`original',)-250(foll)1(o)25(w)-250(those)-250(directions)-250(and)-250(delete)-250(the)-250(string)]TJ/F43 8.966 Tf 278.582 0 Td[(original)]TJ/F35 9.963 Tf 45.529 0 Td[(to)-250(ensure)-250(that)-250(future)]TJ -324.111 -12.951 Td[(upgrades)-250(w)10(on')18(t)-250(obliterate)-250(y)1(our)-250(changes.)]TJ 0 -17.933 Td[(In)-250(the)-250(latter)-250(half)-250(of)-250(the)-250(\002le)1(,)-250(you)-250(will)-250(\002nd)-250(the)-250(capacity)-250(settings,)-250(which)-250(look)-250(som)1(ething)-250(lik)10(e)-250(this:)]TJ/F43 8.966 Tf 0 -21.618 Td[(pool_size)-600(=)-600(125000)]TJ 0 -11.657 Td[(pool_size.context)-600(=)-600(7500)-1(00)]TJ/F35 9.963 Tf 0 -22.914 Td[(Here,)]TJ/F43 8.966 Tf 24.339 0 Td[(pool_size)]TJ/F35 9.963 Tf 50.909 0 Td[(is)-250(the)-250(name)-250(of)-250(the)-250(param)1(eter)-250(in)-250(both)-250(cases,)-250(b)20(ut)-250(the)-250(second)-250(one)-250(is)-250(quali\002ed)-249(with)]TJ/F43 8.966 Tf -75.248 -12.951 Td[(.context)]TJ/F35 9.963 Tf 43.039 0 Td[(,)-250(which)-250(indicates)-250(that)-250(t)1(his)-250(setting)-250(will)-250(be)-250(preferred)-250(when)-250(using)-250(the)-250(ConT)70(eX)1(t)-250(macro)-250(package.)]TJ -43.039 -12.951 Td[(W)80(e)-250(need)-250(to)-250(mak)10(e)-250(similar)-250(a)1(ccomodations)-250(not)-250(only)-250(for)]TJ/F41 9.963 Tf 212.989 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.446 0 Td[(b)20(ut)-250(also)]TJ/F41 9.963 Tf 33.564 0 Td[(jadetex)]TJ/F35 9.963 Tf 33.474 0 Td[(and)]TJ/F41 9.963 Tf 16.877 0 Td[(pdfjadetex)]TJ/F35 9.963 Tf 45.379 0 Td[(.)]TJ -385.729 -12.952 Td[(Unfortunately)65(,)-250(we)-250(don')18(t)-250(kno)25(w)-249(the)-250(minimal)-250(required)-250(v)25(alues)-250(for)-250(e)25(v)15(ery)-250(parameter)-250(a)1(nd)-250(some)-250(of)-250(these)-250(v)25(alues)]TJ 0 -12.951 Td[(are)-250(probably)-250(ridiculously)-250(hi)1(gh,)-250(b)20(ut)-250(no)-250(matter)-250(...)]TJ/F43 8.966 Tf 0 -21.619 Td[(%)-600(hugelatex)-600(settings)]TJ 0 -11.656 Td[(main_memory.hugelatex)-600(=)-601(1100000)]TJ 0 -11.657 Td[(param_size.hugelatex)-600(=)-600(1)-1(500)]TJ 0 -11.656 Td[(stack_size.hugelatex)-600(=)-600(1)-1(500)]TJ 0 -11.656 Td[(hash_extra.hugelatex)-600(=)-600(1)-1(5000)]TJ 0 -11.656 Td[(string_vacancies.hugelat)-1(ex)-600(=)-600(45000)]TJ 0 -11.657 Td[(pool_free.hugelatex)-600(=)-600(47)-1(500)]TJ 0 -11.656 Td[(nest_size.hugelatex)-600(=)-600(50)-1(0)]TJ 0 -11.656 Td[(save_size.hugelatex)-600(=)-600(50)-1(00)]TJ 0 -11.656 Td[(pool_size.hugelatex)-600(=)-600(50)-1(0000)]TJ 0 -11.657 Td[(max_strings.hugelatex)-600(=)-601(55000)]TJ 0 -11.656 Td[(font_mem_size.hugelatex=)-601(400000)]TJ 0 -23.312 Td[(%)-600(jadetex)-600(&)-600(pdfjadetex)]TJ 0 -11.657 Td[(main_memory.jadetex)-600(=)-600(15)-1(00000)]TJ 0 -11.656 Td[(param_size.jadetex)-600(=)-600(150)-1(0)]TJ
+ET
+1 0 0 1 -47.82 -563.883 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(3)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+97 0 obj <<
+/Type /Page
+/Contents 98 0 R
+/Resources 96 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+99 0 obj <<
+/D [97 0 R /XYZ 71.731 705.352 null]
+>> endobj
+100 0 obj <<
+/D [97 0 R /XYZ 71.731 657.532 null]
+>> endobj
+101 0 obj <<
+/D [97 0 R /XYZ 311.977 647.569 null]
+>> endobj
+102 0 obj <<
+/D [97 0 R /XYZ 389.734 647.569 null]
+>> endobj
+103 0 obj <<
+/D [97 0 R /XYZ 129.773 625.95 null]
+>> endobj
+104 0 obj <<
+/D [97 0 R /XYZ 71.731 590.917 null]
+>> endobj
+105 0 obj <<
+/D [97 0 R /XYZ 71.731 523.072 null]
+>> endobj
+106 0 obj <<
+/D [97 0 R /XYZ 71.731 483.52 null]
+>> endobj
+107 0 obj <<
+/D [97 0 R /XYZ 398.133 472.726 null]
+>> endobj
+108 0 obj <<
+/D [97 0 R /XYZ 71.731 452.636 null]
+>> endobj
+109 0 obj <<
+/D [97 0 R /XYZ 71.731 429.722 null]
+>> endobj
+110 0 obj <<
+/D [97 0 R /XYZ 143.89 385.652 null]
+>> endobj
+111 0 obj <<
+/D [97 0 R /XYZ 119.551 372.701 null]
+>> endobj
+112 0 obj <<
+/D [97 0 R /XYZ 332.54 359.75 null]
+>> endobj
+113 0 obj <<
+/D [97 0 R /XYZ 409.55 359.75 null]
+>> endobj
+114 0 obj <<
+/D [97 0 R /XYZ 459.901 359.75 null]
+>> endobj
+115 0 obj <<
+/D [97 0 R /XYZ 71.731 321.727 null]
+>> endobj
+96 0 obj <<
+/Font << /F44 57 0 R /F35 31 0 R /F41 37 0 R /F43 39 0 R /F51 76 0 R /F43 39 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+118 0 obj <<
+/Length 3817      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -418.43 -57.783 cm
+BT
+/F43 8.966 Tf 0 0 Td[(stack_size.jadetex)-600(=)-600(150)-1(0)]TJ 0 -11.656 Td[(hash_extra.jadetex)-600(=)-600(500)-1(00)]TJ 0 -11.656 Td[(string_vacancies.jadetex)-601(=)-600(45000)]TJ 0 -11.657 Td[(pool_free.jadetex)-600(=)-600(4750)-1(0)]TJ 0 -11.656 Td[(nest_size.jadetex)-600(=)-600(500)]TJ 0 -11.656 Td[(save_size.jadetex)-600(=)-600(5000)]TJ 0 -11.656 Td[(pool_size.jadetex)-600(=)-600(5000)-1(00)]TJ 0 -11.657 Td[(max_strings.jadetex)-600(=)-600(55)-1(000)]TJ 0 -23.312 Td[(main_memory.pdfjadetex)-600(=)-601(2500000)]TJ 0 -11.656 Td[(param_size.pdfjadetex)-600(=)-601(1500)]TJ 0 -11.656 Td[(stack_size.pdfjadetex)-600(=)-601(1500)]TJ 0 -11.657 Td[(hash_extra.pdfjadetex)-600(=)-601(50000)]TJ 0 -11.656 Td[(string_vacancies.pdfjade)-1(tex)-600(=)-600(45000)]TJ 0 -11.656 Td[(pool_free.pdfjadetex)-600(=)-600(4)-1(7500)]TJ 0 -11.656 Td[(nest_size.pdfjadetex)-600(=)-600(5)-1(00)]TJ 0 -11.657 Td[(save_size.pdfjadetex)-600(=)-600(5)-1(000)]TJ 0 -11.656 Td[(pool_size.pdfjadetex)-600(=)-600(5)-1(00000)]TJ 0 -11.656 Td[(max_strings.pdfjadetex)-600(=)-601(55000)]TJ/F35 9.963 Tf 0 -22.914 Td[(Add)-250(these)-250(to)-250(the)-250(end)-250(of)-250(the)-250(\002)1(le,)-250(or)-250(where)25(v)15(er)-250(mak)10(es)-250(you)-250(happ)10(y)65(.)]TJ 0 -17.933 Td[(No)25(w)-250(let')55(s)-250(b)20(uild)-250(some)-250(forma)1(t)-250(\002les.)-250(Under)]TJ/F52 8.966 Tf 165.029 0 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/tex/latex/config)]TJ/F35 9.963 Tf 91.457 0 Td[(,)-250(you)-250(will)-250(\002nd)-250(the)-250(\002les)]TJ -311.288 -12.951 Td[(necessary)-250(to)-250(reb)20(uild)]TJ/F41 9.963 Tf 81.972 0 Td[(latex)]TJ/F35 9.963 Tf 20.473 0 Td[(.)-250(Cop)10(y)-250(them)-250(some)25(where)-249(temporary)-250(and)-250(go)-250(there:)]TJ/F43 8.07 Tf -102.445 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(cp)-600(-R)-600(/usr/share/texmf/tex)-1(/latex/config)-600(/tmp)]TJ/F43 8.07 Tf -10.222 -11.656 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(cd)-600(/tmp/config)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(No)25(w)-250(do)-250(this:)]TJ/F43 8.07 Tf 0 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(tex)-600(-ini)-600(-progname=hugelat)-1(ex)-600(latex.ini)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(This)-250(will)-250(produce)-250(a)-250(\002le)]TJ/F43 8.966 Tf 94.913 0 Td[(latex.fmt)]TJ/F35 9.963 Tf 50.909 0 Td[(in)-250(the)-250(same)-250(directory)65(.)-250(Re)1(name)-250(this)-250(to)]TJ/F43 8.966 Tf 150.433 0 Td[(hugelatex.fmt)]TJ/F35 9.963 Tf 69.938 0 Td[(,)-250(then)]TJ -366.193 -12.952 Td[(become)-250(root)-250(and)-250(put)-250(it)-250(in)]TJ/F52 8.966 Tf 102.385 0 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/web2c)]TJ/F35 9.963 Tf 32.279 0 Td[(.)-250(This)-250(is)-250(where)-250(all)-250(the)-250(form)1(at)-250(\002les)-250(are)-250(k)10(ept.)-250(\050Y)110(ou)-250(can)]TJ -189.466 -12.951 Td[(delete)-250(the)-250(other)-250(copied)-250(\002le)1(s)-250(from)]TJ/F43 8.966 Tf 133.916 0 Td[(config)]TJ/F35 9.963 Tf 34.769 0 Td[(afterw)10(ards.\051)]TJ/F43 8.07 Tf -168.685 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(mv)-600(hugelatex.fmt)-600(/usr/shar)-1(e/texmf/web2c)]TJ/F35 9.963 Tf -10.222 -40.846 Td[(No)25(w)-250(just)-250(create)-250(a)-250(symboli)1(c)-250(link)-250(from)]TJ/F41 9.963 Tf 150.553 0 Td[(tex)]TJ/F35 9.963 Tf 15.213 0 Td[(to)]TJ/F41 9.963 Tf 10.242 0 Td[(hugelatex)]TJ/F35 9.963 Tf 40.955 0 Td[(:)]TJ/F43 8.07 Tf -216.963 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(ln)-600(-s)-600(/usr/bin/tex)-600(/usr/lo)-1(cal/bin/hugelatex)]TJ
+ET
+1 0 0 1 -47.82 -563.883 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(4)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+117 0 obj <<
+/Type /Page
+/Contents 118 0 R
+/Resources 116 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+119 0 obj <<
+/D [117 0 R /XYZ 71.731 705.352 null]
+>> endobj
+120 0 obj <<
+/D [117 0 R /XYZ 71.731 717.307 null]
+>> endobj
+121 0 obj <<
+/D [117 0 R /XYZ 71.731 407.705 null]
+>> endobj
+122 0 obj <<
+/D [117 0 R /XYZ 284.58 396.91 null]
+>> endobj
+123 0 obj <<
+/D [117 0 R /XYZ 284.58 396.91 null]
+>> endobj
+124 0 obj <<
+/D [117 0 R /XYZ 201.523 383.959 null]
+>> endobj
+125 0 obj <<
+/D [117 0 R /XYZ 71.731 371.839 null]
+>> endobj
+126 0 obj <<
+/D [117 0 R /XYZ 71.731 371.839 null]
+>> endobj
+127 0 obj <<
+/D [117 0 R /XYZ 129.773 362.34 null]
+>> endobj
+128 0 obj <<
+/D [117 0 R /XYZ 71.731 361.125 null]
+>> endobj
+129 0 obj <<
+/D [117 0 R /XYZ 129.773 350.684 null]
+>> endobj
+130 0 obj <<
+/D [117 0 R /XYZ 71.731 317.708 null]
+>> endobj
+131 0 obj <<
+/D [117 0 R /XYZ 71.731 317.708 null]
+>> endobj
+132 0 obj <<
+/D [117 0 R /XYZ 129.773 306.151 null]
+>> endobj
+133 0 obj <<
+/D [117 0 R /XYZ 214.464 283.237 null]
+>> endobj
+134 0 obj <<
+/D [117 0 R /XYZ 415.806 283.237 null]
+>> endobj
+135 0 obj <<
+/D [117 0 R /XYZ 221.936 270.286 null]
+>> endobj
+136 0 obj <<
+/D [117 0 R /XYZ 221.936 270.286 null]
+>> endobj
+137 0 obj <<
+/D [117 0 R /XYZ 253.467 257.334 null]
+>> endobj
+138 0 obj <<
+/D [117 0 R /XYZ 71.731 245.215 null]
+>> endobj
+139 0 obj <<
+/D [117 0 R /XYZ 71.731 245.215 null]
+>> endobj
+140 0 obj <<
+/D [117 0 R /XYZ 129.773 235.715 null]
+>> endobj
+141 0 obj <<
+/D [117 0 R /XYZ 71.731 207.82 null]
+>> endobj
+142 0 obj <<
+/D [117 0 R /XYZ 270.104 194.869 null]
+>> endobj
+143 0 obj <<
+/D [117 0 R /XYZ 295.559 194.869 null]
+>> endobj
+144 0 obj <<
+/D [117 0 R /XYZ 71.731 182.749 null]
+>> endobj
+145 0 obj <<
+/D [117 0 R /XYZ 71.731 182.749 null]
+>> endobj
+146 0 obj <<
+/D [117 0 R /XYZ 129.773 173.25 null]
+>> endobj
+116 0 obj <<
+/Font << /F44 57 0 R /F43 39 0 R /F35 31 0 R /F52 78 0 R /F41 37 0 R /F43 39 0 R /F51 76 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+149 0 obj <<
+/Length 4744      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -418.43 -57.783 cm
+BT
+/F35 9.963 Tf 0 0 Td[(When)]TJ/F41 9.963 Tf 26.281 0 Td[(tex)]TJ/F35 9.963 Tf 15.213 0 Td[(is)-250(in)40(v)20(ok)10(ed,)-250(it)-250(looks)-250(at)-250(the)-250(na)1(me)]TJ/F52 9.963 Tf 126.046 0 Td[(X)]TJ/F35 9.963 Tf 9.215 0 Td[(it)-250(w)10(as)-250(in)40(v)20(ok)10(ed)-250(with,)-250(then)-250(loa)1(ds)-250(the)-250(format)-250(\002le)]TJ/F52 8.966 Tf 184.605 0 Td[(X)]TJ/F43 8.966 Tf 6.053 0 Td[(.fmt)]TJ/F35 9.963 Tf 24.01 0 Td[(from)]TJ/F52 8.966 Tf -391.423 -12.951 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/web2c)]TJ/F35 9.963 Tf 34.77 0 Td[(before)-250(it)-250(starts)-250(processi)1(ng)-250(the)-250(document.)-250(So)-250(creating)-250(this)-250(symbolic)-250(link)-250(is)-249(all)-250(that)]TJ -89.572 -12.952 Td[(is)-250(needed)-250(to)-250(create)-250(the)]TJ/F41 9.963 Tf 91.018 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.446 0 Td[(e)15(x)15(ecutable.)]TJ/F32 17.215 Tf -182.284 -50.235 Td[(Creating)-278(the)-278(f)20(ormat)-278(\002les)]TJ/F35 9.963 Tf 47.82 -21.559 Td[(Ne)15(xt,)-250(tak)10(e)-250(a)-250(look)-250(at)-250(your)-250(Ope)1(nJade)-250(distrib)20(ution.)-250(Under)-250(the)-250(directory)]TJ/F43 8.966 Tf 273.75 0 Td[(dsssl)]TJ/F35 9.963 Tf 29.39 0 Td[(you)-250(will)-250(\002nd)-250(the)-250(\002les)]TJ -303.14 -12.951 Td[(necessary)-250(to)-250(b)20(uild)-250(jadete)15(x)-250(a)1(nd)-250(pdfjadete)15(x,)-250(including)-250(a)-250(Mak)10(e\002le.)-250(If)-250(you)-250(don')18(t)-250(ha)20(v)15(e,)-249(and)-250(ne)15(glected)-250(to)]TJ 0 -12.952 Td[(b)20(uild,)-250(a)]TJ/F41 9.963 Tf 32.179 0 Td[(hugelatex)]TJ/F35 9.963 Tf 40.956 0 Td[(,)-250(then)-250(you)-250(will)-250(\002rst)-250(need)-250(to)-249(edit)-250(the)-250(Mak)10(e\002le)-250(and)-250(replace)]TJ/F41 9.963 Tf 227.623 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.447 0 Td[(with)]TJ/F41 9.963 Tf 20.204 0 Td[(latex)]TJ/F35 9.963 Tf 20.473 0 Td[(.)]TJ -384.882 -12.951 Td[(Otherwise,)-250(become)-250(root)-250(and)-249(just)-250(do:)]TJ/F43 8.07 Tf 0 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(make)-1200(install)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(This)-250(creates)]TJ/F43 8.966 Tf 50.351 0 Td[(jadetex.fmt)]TJ/F35 9.963 Tf 61.668 0 Td[(and)]TJ/F43 8.966 Tf 16.877 0 Td[(pdfjadetex.fmt)]TJ/F35 9.963 Tf 75.317 0 Td[(,)-250(puts)-250(them)-250(in)]TJ/F52 8.966 Tf 56.736 0 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/web2c)]TJ/F35 9.963 Tf 34.77 0 Td[(for)-250(you)-250(\050using)]TJ/F41 9.963 Tf -350.521 -12.951 Td[(kpsewhich)]TJ/F35 9.963 Tf 47.332 0 Td[(to)-250(\002nd)]TJ/F52 9.963 Tf 28.234 0 Td[($TEXMFMAIN)]TJ/F35 9.963 Tf 60.891 0 Td[(\051,)-250(and)-250(installs)-250(a)-250(fe)25(w)-250(other)-250(a)1(uxiliary)-250(\002les)-250(under)]TJ/F52 8.966 Tf -136.457 -12.952 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/tex/jadetex)]TJ/F35 9.963 Tf 64.558 0 Td[(.)]TJ -119.36 -17.932 Td[(All)-250(that')55(s)-250(left)-250(to)-250(do)-250(is)-250(to)-250(c)1(reate)-250(the)-250(links:)]TJ/F43 8.07 Tf 0 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(ln)-600(-s)-600(/usr/bin/tex)-600(/usr/bi)-1(n/jadetex)]TJ/F43 8.07 Tf -10.222 -11.657 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(ln)-600(-s)-600(/usr/bin/pdftex)-600(/usr)-1(/bin/pdfjadetex)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(\050changing)-250(the)-250(location)-250(of)-250(th)1(e)-250(binary)-250(directory)-250(to)-250(where)25(v)15(er)-250(your)-250(T)70(eX)-250(is\051)-250(and)-250(run)]TJ/F41 9.963 Tf 318.183 0 Td[(mktexlsr)]TJ/F35 9.963 Tf 40.119 0 Td[(so)-250(that)-250(your)]TJ -358.302 -12.951 Td[(T)70(eX)-250(distrib)20(ution)-250(becomes)-250(a)16(w)10(are)-250(of)-250(the)-250(ne)25(wly)-250(installed)-250(\002les)-250(in)]TJ/F52 8.966 Tf 248.744 0 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/tex/jadetex.)]TJ/F43 8.07 Tf -303.546 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(mktexlsr)]TJ/F32 17.215 Tf -58.042 -73.149 Td[(T)60(esting)-278(the)-278(installation)]TJ/F35 9.963 Tf 47.82 -21.559 Td[(Finally)65(,)-250(test)-250(your)-250(installa)1(tion)-250(using)-250(the)-250(demonstration)-250(\002les)-250(in)-250(that)-250(director)1(y:)]TJ/F43 8.07 Tf 0 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(openjade)-600(-t)-600(tex)-600(-d)-600(demo.ds)-1(l)-600(demo.sgm)]TJ/F43 8.07 Tf -10.222 -11.656 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(jadetex)-600(demo.tex)]TJ/F43 8.07 Tf -10.222 -11.657 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(pdfjadetex)-600(demo.tex)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(Y)110(ou')50(re)-250(done!)]TJ
+ET
+1 0 0 1 -47.82 -563.883 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(5)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+148 0 obj <<
+/Type /Page
+/Contents 149 0 R
+/Resources 147 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+150 0 obj <<
+/D [148 0 R /XYZ 71.731 705.352 null]
+>> endobj
+151 0 obj <<
+/D [148 0 R /XYZ 145.832 647.569 null]
+>> endobj
+152 0 obj <<
+/D [148 0 R /XYZ 287.091 647.569 null]
+>> endobj
+153 0 obj <<
+/D [148 0 R /XYZ 480.911 647.569 null]
+>> endobj
+154 0 obj <<
+/D [148 0 R /XYZ 480.911 647.569 null]
+>> endobj
+155 0 obj <<
+/D [148 0 R /XYZ 119.551 634.618 null]
+>> endobj
+156 0 obj <<
+/D [148 0 R /XYZ 119.551 634.618 null]
+>> endobj
+157 0 obj <<
+/D [148 0 R /XYZ 210.569 621.666 null]
+>> endobj
+10 0 obj <<
+/D [148 0 R /XYZ 269.395 571.431 null]
+>> endobj
+158 0 obj <<
+/D [148 0 R /XYZ 71.731 558.993 null]
+>> endobj
+159 0 obj <<
+/D [148 0 R /XYZ 393.301 549.872 null]
+>> endobj
+160 0 obj <<
+/D [148 0 R /XYZ 151.73 523.969 null]
+>> endobj
+161 0 obj <<
+/D [148 0 R /XYZ 420.309 523.969 null]
+>> endobj
+162 0 obj <<
+/D [148 0 R /XYZ 483.96 523.969 null]
+>> endobj
+163 0 obj <<
+/D [148 0 R /XYZ 71.731 498.898 null]
+>> endobj
+164 0 obj <<
+/D [148 0 R /XYZ 71.731 498.898 null]
+>> endobj
+165 0 obj <<
+/D [148 0 R /XYZ 129.773 489.399 null]
+>> endobj
+166 0 obj <<
+/D [148 0 R /XYZ 169.902 466.485 null]
+>> endobj
+167 0 obj <<
+/D [148 0 R /XYZ 248.447 466.485 null]
+>> endobj
+168 0 obj <<
+/D [148 0 R /XYZ 380.5 466.485 null]
+>> endobj
+169 0 obj <<
+/D [148 0 R /XYZ 380.5 466.485 null]
+>> endobj
+170 0 obj <<
+/D [148 0 R /XYZ 119.551 453.534 null]
+>> endobj
+171 0 obj <<
+/D [148 0 R /XYZ 195.117 453.534 null]
+>> endobj
+172 0 obj <<
+/D [148 0 R /XYZ 119.551 440.582 null]
+>> endobj
+173 0 obj <<
+/D [148 0 R /XYZ 119.551 440.582 null]
+>> endobj
+174 0 obj <<
+/D [148 0 R /XYZ 71.731 434.193 null]
+>> endobj
+175 0 obj <<
+/D [148 0 R /XYZ 71.731 412.587 null]
+>> endobj
+176 0 obj <<
+/D [148 0 R /XYZ 71.731 412.587 null]
+>> endobj
+177 0 obj <<
+/D [148 0 R /XYZ 129.773 401.031 null]
+>> endobj
+178 0 obj <<
+/D [148 0 R /XYZ 71.731 399.816 null]
+>> endobj
+179 0 obj <<
+/D [148 0 R /XYZ 129.773 389.374 null]
+>> endobj
+180 0 obj <<
+/D [148 0 R /XYZ 437.734 366.46 null]
+>> endobj
+181 0 obj <<
+/D [148 0 R /XYZ 368.295 353.509 null]
+>> endobj
+182 0 obj <<
+/D [148 0 R /XYZ 368.295 353.509 null]
+>> endobj
+183 0 obj <<
+/D [148 0 R /XYZ 71.731 341.39 null]
+>> endobj
+184 0 obj <<
+/D [148 0 R /XYZ 71.731 341.39 null]
+>> endobj
+185 0 obj <<
+/D [148 0 R /XYZ 129.773 331.89 null]
+>> endobj
+186 0 obj <<
+/D [148 0 R /XYZ 71.731 294.032 null]
+>> endobj
+14 0 obj <<
+/D [148 0 R /XYZ 258.188 258.741 null]
+>> endobj
+187 0 obj <<
+/D [148 0 R /XYZ 71.731 246.303 null]
+>> endobj
+188 0 obj <<
+/D [148 0 R /XYZ 71.731 225.062 null]
+>> endobj
+189 0 obj <<
+/D [148 0 R /XYZ 71.731 225.062 null]
+>> endobj
+190 0 obj <<
+/D [148 0 R /XYZ 124.393 215.563 null]
+>> endobj
+191 0 obj <<
+/D [148 0 R /XYZ 71.731 214.348 null]
+>> endobj
+192 0 obj <<
+/D [148 0 R /XYZ 129.773 203.907 null]
+>> endobj
+193 0 obj <<
+/D [148 0 R /XYZ 71.731 202.692 null]
+>> endobj
+194 0 obj <<
+/D [148 0 R /XYZ 129.773 192.25 null]
+>> endobj
+195 0 obj <<
+/D [148 0 R /XYZ 71.731 154.293 null]
+>> endobj
+147 0 obj <<
+/Font << /F44 57 0 R /F35 31 0 R /F41 37 0 R /F52 78 0 R /F52 78 0 R /F43 39 0 R /F32 28 0 R /F43 39 0 R /F51 76 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+198 0 obj <<
+/Length 4167      
+>>
+stream
+1 0 0 1 71.731 704.356 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.886 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.886 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -466.25 -59.383 cm
+BT
+/F32 17.215 Tf 0 0 Td[(Frequentl)15(y)-278(Asked)-278(Questions)]TJ/F41 9.963 Tf 47.82 -30.167 Td[(1.)]TJ/F35 9.963 Tf 9.963 0 Td[(I)-250(installed)-250(JadeT)70(eX,)-250(b)20(ut)-250(w)1(hen)-250(I)-250(run)-250(it,)-250(it)-250(complains)-250(that)-250(a)-250(\002le)-250(named)]TJ/F43 8.966 Tf 273.042 0 Td[(unicode.sty)]TJ/F35 9.963 Tf 61.668 0 Td[(\050or)]TJ/F43 8.966 Tf 14.107 0 Td[(dsssl.def)]TJ/F35 9.963 Tf 48.419 0 Td[(,)]TJ -407.199 -12.951 Td[(etc\051)-250(can')18(t)-250(be)-250(found.)-250(What)-250(did)-249(I)-250(do)-250(wrong?)]TJ 0 -17.933 Td[(Y)110(ou)-250(didn')18(t)-250(run)-250(the)]TJ/F41 9.963 Tf 75.098 0 Td[(mktexlsr)]TJ/F35 9.963 Tf 37.628 0 Td[(,)-250(so)]TJ/F41 9.963 Tf 16.329 0 Td[(kpathsea)]TJ/F35 9.963 Tf 40.687 0 Td[(doesn')18(t)-250(kno)25(w)-250(about)-250(the)-250(ne)26(wly)-250(installed)-250(\002les.)]TJ/F41 9.963 Tf -169.742 -22.914 Td[(2.)]TJ/F35 9.963 Tf 9.963 0 Td[(I)-250(don')18(t)-250(lik)10(e)-250(JadeT)70(eX')55(s)-250(def)10(a)1(ult)-250(beha)20(vior)-250(in)-250(some)-250(situations.)-250(Ho)25(w)-250(do)-250(I)-250(modify)-250(i)1(t?)]TJ -9.963 -17.932 Td[(If)-250(for)-250(some)-250(reason)-250(you)-250(w)10(ant)-249(to)-250(modify)-250(the)-250(JadeT)70(eX)-250(macro)-250(package,)-250(modify)-250(the)-250(\002)1(le)]TJ/F43 8.966 Tf 333.984 0 Td[(jadetex.dtx)]TJ/F35 9.963 Tf 59.178 0 Td[(.)-250(This)]TJ -393.162 -12.952 Td[(is)-250(the)-250(literate)-250(source)-250(for)-250(t)1(he)-250(format)-250(\002le)-250(and)-250(other)-250(\002les)-250(installed)-250(under)]TJ/F52 8.966 Tf 275.861 0 Td[($TEXMFMAIN)]TJ/F43 8.966 Tf 54.802 0 Td[(/tex/jadetex)]TJ/F35 9.963 Tf 64.558 0 Td[(.)]TJ -395.221 -17.932 Td[(T)80(o)-250(format)-250(it,)-250(use)]TJ/F41 9.963 Tf 68.104 0 Td[(hugelatex)]TJ/F35 9.963 Tf 40.956 0 Td[(:)]TJ/F43 8.07 Tf -109.06 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(hugelatex)-600(jadetex.dtx)]TJ/F35 9.963 Tf -10.222 -22.914 Td[(Y)110(ou)-250(will)-250(get)-250(tons)-250(of)-250(o)15(v)15(erfull)-249(hbox)15(es)-250(b)20(ut)-250(if)-250(you)-250(are)-250(using)]TJ/F41 9.963 Tf 225.163 0 Td[(hugelatex)]TJ/F35 9.963 Tf 43.447 0 Td[(rather)-250(than)]TJ/F41 9.963 Tf 45.369 0 Td[(latex)]TJ/F35 9.963 Tf 20.473 0 Td[(,)-250(it)-250(will)-250(w)10(ork.)]TJ -334.452 -17.933 Td[(F)15(ormatting)-250(the)-250(batch)-250(\002le)]TJ/F43 8.966 Tf 100.582 0 Td[(jadetex.ins)]TJ/F35 9.963 Tf 61.668 0 Td[(will)-250(produce)-250(stripped)-250(sour)1(ces)-250(\050)]TJ/F43 8.966 Tf 122.847 0 Td[(dsssl.def)]TJ/F35 9.963 Tf 50.909 0 Td[(and)]TJ/F43 8.966 Tf 16.877 0 Td[(jadetex.ltx)]TJ/F35 9.963 Tf 59.178 0 Td[(\051,)]TJ -412.061 -12.951 Td[(which)-250(can)-250(be)-250(compiled)-250(into)-249(format)-250(\002les)-250(as)-250(before:)]TJ/F43 8.07 Tf 0 -21.619 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(hugelatex)-600(jadetex.ins)]TJ/F43 8.07 Tf -10.222 -11.656 Td[($)]TJ/F51 8.966 Tf 10.222 0 Td[(make)-600(-f)-600(Makefile.jadetex)]TJ/F41 9.963 Tf -10.222 -63.761 Td[(3.)]TJ/F35 9.963 Tf 9.963 0 Td[(What)-250(fonts)-250(can)-250(I)-250(use?)]TJ -9.963 -17.933 Td[(F)15(ollo)25(wing)-250(is)-250(the)-250(names)-250(of)-250(t)1(he)-250(font)-250(f)10(amilies)-250(supported)-250(at)-250(the)-250(time)-250(of)-250(writing)1(.)-250(Of)-250(course)-250(you)-250(must)-250(actually)]TJ 0 -12.951 Td[(ha)20(v)15(e)-250(these)-250(fonts)-250(installed)-250(t)1(o)-250(format)-250(the)-250(document)-250(\050b)20(ut)-250(not)-250(to)-250(produce)-250(the)-250(T)70(eX)-250(ou)1(tput\051.)]TJ 2.989 -26.999 Td[(Arial)]TJ 0 -12.951 Td[(Helv)15(etica)]TJ 0 -12.951 Td[(P)15(alatino)]TJ 0 -12.952 Td[(Bookman)]TJ 0 -12.951 Td[(Courier)]TJ 0 -12.952 Td[(Symbol)]TJ 0 -12.951 Td[(W)40(ingdings)]TJ 0 -12.951 Td[(W)40(ingDings)]TJ 0 -12.952 Td[(LucidaSans)]TJ 0 -12.951 Td[(LucidaBright)]TJ 0 -12.952 Td[(Sa)20(v)20(o)10(y)]TJ 0 -12.951 Td[(A)40(Caslon)]TJ
+ET
+1 0 0 1 0 -561.287 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.059 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(6)]TJ
+ET
+1 0 0 1 5.191 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+197 0 obj <<
+/Type /Page
+/Contents 198 0 R
+/Resources 196 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 58 0 R
+>> endobj
+199 0 obj <<
+/D [197 0 R /XYZ 71.731 704.356 null]
+>> endobj
+18 0 obj <<
+/D [197 0 R /XYZ 304.894 644.973 null]
+>> endobj
+200 0 obj <<
+/D [197 0 R /XYZ 71.731 632.802 null]
+>> endobj
+201 0 obj <<
+/D [197 0 R /XYZ 71.731 632.802 null]
+>> endobj
+202 0 obj <<
+/D [197 0 R /XYZ 402.556 614.806 null]
+>> endobj
+203 0 obj <<
+/D [197 0 R /XYZ 478.331 614.806 null]
+>> endobj
+204 0 obj <<
+/D [197 0 R /XYZ 71.731 597.208 null]
+>> endobj
+205 0 obj <<
+/D [197 0 R /XYZ 194.649 583.922 null]
+>> endobj
+206 0 obj <<
+/D [197 0 R /XYZ 248.606 583.922 null]
+>> endobj
+207 0 obj <<
+/D [197 0 R /XYZ 71.731 581.766 null]
+>> endobj
+208 0 obj <<
+/D [197 0 R /XYZ 71.731 556.361 null]
+>> endobj
+209 0 obj <<
+/D [197 0 R /XYZ 453.535 543.076 null]
+>> endobj
+210 0 obj <<
+/D [197 0 R /XYZ 395.412 530.124 null]
+>> endobj
+211 0 obj <<
+/D [197 0 R /XYZ 395.412 530.124 null]
+>> endobj
+212 0 obj <<
+/D [197 0 R /XYZ 71.731 523.735 null]
+>> endobj
+213 0 obj <<
+/D [197 0 R /XYZ 187.655 512.192 null]
+>> endobj
+214 0 obj <<
+/D [197 0 R /XYZ 71.731 500.207 null]
+>> endobj
+215 0 obj <<
+/D [197 0 R /XYZ 71.731 500.207 null]
+>> endobj
+216 0 obj <<
+/D [197 0 R /XYZ 129.773 490.573 null]
+>> endobj
+217 0 obj <<
+/D [197 0 R /XYZ 344.714 467.659 null]
+>> endobj
+218 0 obj <<
+/D [197 0 R /XYZ 433.53 467.659 null]
+>> endobj
+219 0 obj <<
+/D [197 0 R /XYZ 71.731 460.521 null]
+>> endobj
+220 0 obj <<
+/D [197 0 R /XYZ 220.133 449.726 null]
+>> endobj
+221 0 obj <<
+/D [197 0 R /XYZ 404.649 449.726 null]
+>> endobj
+222 0 obj <<
+/D [197 0 R /XYZ 472.434 449.726 null]
+>> endobj
+223 0 obj <<
+/D [197 0 R /XYZ 71.731 424.655 null]
+>> endobj
+224 0 obj <<
+/D [197 0 R /XYZ 71.731 424.655 null]
+>> endobj
+225 0 obj <<
+/D [197 0 R /XYZ 129.773 415.156 null]
+>> endobj
+226 0 obj <<
+/D [197 0 R /XYZ 71.731 413.941 null]
+>> endobj
+227 0 obj <<
+/D [197 0 R /XYZ 129.773 403.5 null]
+>> endobj
+228 0 obj <<
+/D [197 0 R /XYZ 122.042 362.653 null]
+>> endobj
+229 0 obj <<
+/D [197 0 R /XYZ 71.731 337.129 null]
+>> endobj
+230 0 obj <<
+/D [197 0 R /XYZ 119.551 290.922 null]
+>> endobj
+231 0 obj <<
+/D [197 0 R /XYZ 71.731 290.922 null]
+>> endobj
+196 0 obj <<
+/Font << /F44 57 0 R /F32 28 0 R /F41 37 0 R /F35 31 0 R /F43 39 0 R /F52 78 0 R /F43 39 0 R /F51 76 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+234 0 obj <<
+/Length 2836      
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -415.441 -57.783 cm
+BT
+/F35 9.963 Tf 0 0 Td[(Caslon)]TJ 0 -12.951 Td[(F)15(ormata)]TJ 0 -12.952 Td[(FranklinGothic)]TJ 0 -12.951 Td[(OCRAbyBT)]TJ 0 -12.951 Td[(A)40(Garamond)]TJ 0 -12.952 Td[(A)74(v)25(ant-Garde)]TJ 0 -12.951 Td[(Courier)20(-Ne)25(w)]TJ 0 -12.951 Td[(Ne)25(w-Century-Schoolbook)]TJ 0 -12.952 Td[(T)35(imes-Roman)]TJ 0 -12.951 Td[(T)35(rade-Gothic)]TJ 0 -12.952 Td[(T)35(imes-Ne)25(w-Roman)]TJ 0 -12.951 Td[(T)35(imes-NR-MT)]TJ 0 -12.951 Td[(Courier)20(-Ne)25(w)]TJ 0 -12.952 Td[(Zapf-Dingbats)]TJ 0 -12.951 Td[(Gill-Sans)]TJ 0 -12.952 Td[(iso-serif)]TJ 0 -12.951 Td[(iso-sanserif)]TJ 0 -12.951 Td[(iso-monocase)]TJ 0 -12.952 Td[(LetterGothic12PitchBT)]TJ 0 -12.951 Td[(Monospace821)]TJ 0 -12.951 Td[(OCRB10PitchBT)]TJ 0 -12.952 Td[(OCR-A)]TJ 0 -12.951 Td[(OCR-B-10PitchBT)]TJ 0 -12.952 Td[(Computer)20(-Modern-T)80(ype)25(wri)1(ter)]TJ 0 -12.951 Td[(Computer)20(-Modern-Sans)]TJ 0 -12.951 Td[(Computer)20(-Modern)]TJ 0 -12.952 Td[(Computer)20(-Modern-Caps-A)1(nd-Small-Caps)]TJ/F41 9.963 Tf -2.989 -44.732 Td[(4.)]TJ/F35 9.963 Tf 9.963 0 Td[(Wh)5(y)-250(doesn')18(t)-250(h)5(yphenation)-250(w)11(ork?)]TJ -9.963 -17.933 Td[(Remember)-250(that)-250(your)-250(te)15(xt)-250(m)1(ust)-250(be)-250(fully)-250(justi\002ed)-250(\050)]TJ/F43 8.966 Tf 194.667 0 Td[(quadding:)-600(#t)]TJ/F35 9.963 Tf 64.558 0 Td[(\051,)-250(h)5(yphenation)-250(must)-250(be)-250(on,)]TJ/F43 8.966 Tf -259.225 -12.951 Td[(hyphenation?:)-600(#t)]TJ/F35 9.963 Tf 86.077 0 Td[(,)-250(and)-250(a)-250(current)-250(language)-250(mu)1(st)-250(be)-250(selected)-250(\050e.g.,)]TJ/F43 8.966 Tf 188.959 0 Td[(language:)-600('EN)]TJ/F35 9.963 Tf 69.937 0 Td[(\051)-250(for)-250(JadeT)70(eX)-250(to)]TJ -344.973 -12.951 Td[(perform)-250(h)5(yphenation.)]TJ/F41 9.963 Tf 0 -22.914 Td[(5.)]TJ/F35 9.963 Tf 9.963 0 Td[(I'm)-250(using)-250(Norman)-250(W)80(alsh)1(')55(s)-250(DocBook)-250(stylesheets)-250(and)-250(my)-250(footnotes)-250(are)-250(comi)1(ng)-250(up)-250(at)-250(the)-250(end)-250(of)-250(the)]TJ -9.963 -12.952 Td[(document)-250(rather)-250(than)-250(at)-250(the)-249(foot)-250(of)-250(each)-250(page.)-250(Wh)5(y?)]TJ 0 -17.932 Td[(The)-250(DocBook)-250(stylesheets)-250(n)1(eed)-250(to)-250(be)-250(made)-250(a)15(w)10(are)-250(that)-250(you)-250(are)-250(using)-250(the)-250(T)70(eX)-250(back)11(end.)-250(Add)]TJ/F43 8.966 Tf 363.334 0 Td[(-V)]TJ -363.334 -12.952 Td[(tex-backend)]TJ/F35 9.963 Tf 61.669 0 Td[(to)-250(your)]TJ/F41 9.963 Tf 30.993 0 Td[(openjade)]TJ/F35 9.963 Tf 41.235 0 Td[(command-line.)]TJ
+ET
+1 0 0 1 -50.809 -563.883 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 460.9 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(7)]TJ
+ET
+1 0 0 1 5.35 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+233 0 obj <<
+/Type /Page
+/Contents 234 0 R
+/Resources 232 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 245 0 R
+>> endobj
+235 0 obj <<
+/D [233 0 R /XYZ 71.731 705.352 null]
+>> endobj
+236 0 obj <<
+/D [233 0 R /XYZ 122.042 289.015 null]
+>> endobj
+237 0 obj <<
+/D [233 0 R /XYZ 71.731 261.454 null]
+>> endobj
+238 0 obj <<
+/D [233 0 R /XYZ 314.218 248.168 null]
+>> endobj
+239 0 obj <<
+/D [233 0 R /XYZ 119.551 235.217 null]
+>> endobj
+240 0 obj <<
+/D [233 0 R /XYZ 394.587 235.217 null]
+>> endobj
+241 0 obj <<
+/D [233 0 R /XYZ 71.731 220.109 null]
+>> endobj
+242 0 obj <<
+/D [233 0 R /XYZ 71.731 181.753 null]
+>> endobj
+243 0 obj <<
+/D [233 0 R /XYZ 482.885 168.468 null]
+>> endobj
+244 0 obj <<
+/D [233 0 R /XYZ 212.213 155.516 null]
+>> endobj
+232 0 obj <<
+/Font << /F44 57 0 R /F35 31 0 R /F41 37 0 R /F43 39 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+248 0 obj <<
+/Length 322       
+>>
+stream
+1 0 0 1 71.731 705.352 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 391.531 3.587 cm
+BT
+/F44 9.963 Tf 0 0 Td[(Installing)-250(J)35(adeT)92(eX)]TJ
+ET
+1 0 0 1 74.719 -3.587 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 -466.25 -621.666 cm
+1 1 1 1 k 1 1 1 1 K
+1 0 0 1 461.268 0 cm
+BT
+/F44 9.963 Tf 0 0 Td[(8)]TJ
+ET
+1 0 0 1 4.982 0 cm
+1 1 1 1 k 1 1 1 1 K
+endstream
+endobj
+247 0 obj <<
+/Type /Page
+/Contents 248 0 R
+/Resources 246 0 R
+/MediaBox [0 0 609.711 789.038]
+/Parent 245 0 R
+>> endobj
+249 0 obj <<
+/D [247 0 R /XYZ 71.731 705.352 null]
+>> endobj
+246 0 obj <<
+/Font << /F44 57 0 R >>
+/ProcSet [ /PDF /Text ]
+>> endobj
+250 0 obj <<
+/Type /Encoding
+/Differences [ 0 /.notdef 1/dotaccent/fi/fl/fraction/hungarumlaut/Lslash/lslash/ogonek/ring 10/.notdef 11/breve/minus 13/.notdef 14/Zcaron/zcaron/caron/dotlessi/dotlessj/ff/ffi/ffl 22/.notdef 30/grave/quotesingle/space/exclam/quotedbl/numbersign/dollar/percent/ampersand/quoteright/parenleft/parenright/asterisk/plus/comma/hyphen/period/slash/zero/one/two/three/four/five/six/seven/eight/nine/colon/semicolon/less/equal/greater/question/at/A/B/C/D/E/F/G/H/I/J/K/L/M/N/O/P/Q/R/S/T/U/V/W/X/Y/Z/bracketleft/backslash/bracketright/asciicircum/underscore/quoteleft/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z/braceleft/bar/braceright/asciitilde 127/.notdef 130/quotesinglbase/florin/quotedblbase/ellipsis/dagger/daggerdbl/circumflex/perthousand/Scaron/guilsinglleft/OE 141/.notdef 147/quotedblleft/quotedblright/bullet/endash/emdash/tilde/trademark/scaron/guilsinglright/oe 157/.notdef 159/Ydieresis 160/.notdef 161/exclamdown/cent/sterling/currency/yen/brokenbar/section/dieresis/copyright/ordfeminine/guillemotleft/logicalnot/hyphen/registered/macron/degree/plusminus/twosuperior/threesuperior/acute/mu/paragraph/periodcentered/cedilla/onesuperior/ordmasculine/guillemotright/onequarter/onehalf/threequarters/questiondown/Agrave/Aacute/Acircumflex/Atilde/Adieresis/Aring/AE/Ccedilla/Egrave/Eacute/Ecircumflex/Edieresis/Igrave/Iacute/Icircumflex/Idieresis/Eth/Ntilde/Ograve/Oacute/Ocircumflex/Otilde/Odieresis/multiply/Oslash/Ugrave/Uacute/Ucircumflex/Udieresis/Yacute/Thorn/germandbls/agrave/aacute/acircumflex/atilde/adieresis/aring/ae/ccedilla/egrave/eacute/ecircumflex/edieresis/igrave/iacute/icircumflex/idieresis/eth/ntilde/ograve/oacute/ocircumflex/otilde/odieresis/divide/oslash/ugrave/uacute/ucircumflex/udieresis/yacute/thorn/ydieresis]
+>> endobj
+78 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Courier-Oblique
+>> endobj
+76 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Courier-Bold
+>> endobj
+57 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Times-Italic
+>> endobj
+39 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Courier
+>> endobj
+37 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Times-Bold
+>> endobj
+32 0 obj <<
+/Length1 1356
+/Length2 2736
+/Length3 543
+/Length 4635      
+>>
+stream
+%!PS-AdobeFont-1.0: Math1 001.000
+%%CreationDate: 9/17/96 at 3:58 PM
+%%VMusage: 1024 34241
+%
+% Mathematica typeface design by Andre Kuzniarek, with Gregg Snyder and Stephen Wolfram. Copyright 1996 Wolfram Research, Inc. [http://www.wolfram.com]. All rights reserved. [Font version 1.0]
+% ADL: 800 200 0
+%%EndComments
+FontDirectory/Math1 known{/Math1 findfont dup/UniqueID known{dup
+/UniqueID get 4089600 eq exch/FontType get 1 eq and}{pop false}ifelse
+{save true}{false}ifelse}{false}ifelse
+20 dict begin
+/FontInfo 16 dict dup begin
+/version (001.000) readonly def
+/FullName (Math1) readonly def
+/FamilyName (Math1) readonly def
+/Weight (Medium) readonly def
+/ItalicAngle 0 def
+/isFixedPitch false def
+/UnderlinePosition -133 def
+/UnderlineThickness 20 def
+/Notice (Mathematica typeface design by Andre Kuzniarek, with Gregg Snyder and Stephen Wolfram. copyright 1996 Wolfram Research, Inc. [http://www.wolfram.com]. All rights reserved. [Font version 1.0]) readonly def
+/em 1000 def
+/ascent 800 def
+/descent 200 def
+end readonly def
+/FontName /FDCECB+Math1 def
+/Encoding 256 array
+0 1 255 {1 index exch /.notdef put} for
+dup 188 /ordmasculine put
+readonly def
+/PaintType 0 def
+/FontType 1 def
+/StrokeWidth 0 def
+/FontMatrix[0.001 0 0 0.001 0 0]readonly def
+/UniqueID 4089600 def
+/FontBBox{-120 -220 1544 923}readonly def
+currentdict end
+currentfile eexec
+Ÿ÷oc;Ñj≤é‹.ËŒlg6 Hgñﬁc¿˚NoˆqH∏\zœ∆fK≈ÕêE\=¬¶m⁄;‹Øπ€1j
+^÷cg√»‡	#∆”_≠ôπhk®@‡”∏ÆÔıÈº`U\µÆk_ OKóÛ¸˚Î¥&óä„ùjúbë&≤1–A Êi®æ¸æâ"DkO›©˘n
+MìêE´≠ﬁáãÛÆ©·Àfˆæ1¡™ö_…Uõª±ja*ip+jfî·«mj-3”=˝ â¥¢çZnI[‰‡˛ˇ≠ıˆïx˘≈–ßùÀ-k}xë@ØcÉe=ä&∂#ÉíÜˇäyë0∏l. —å„ø¯;dRl”êˆıHf8Û•´)çlﬁp¿˛’ÿ…ox<,
+x≤tÄê|C"ëˆ¨“d∞ÀbÎï∞ôπ™ˆ‘ò∑OQD±è.,ÉUƒØFüÇ.·˘≤‡(ç¶ñ0Ú4´=£º}¸’ÑxﬁÍ æM¡ÄóÖ9¬_:*&ãNó∏i◊∞"ŸÕ't©¬πî}˜—uÎ%ñ’éÍWyË˘=¯¬6Eá∏?9ÈÛCz<;ÿ"•& ‘JïXz“@ﬁ‰w‚R‡‚?™‹˘ËT’Á\û°R¡wyôyb√S…Na
+#êŸMWçé#mÂª/ôg=¢öÂ˙)ÄH„é5ﬂRºÚ∆>CäG€}ú!`ïl¯N≥ÑˆR¯]OæœÁKO£Û -´z›ıeU*Öâ˙f¿ñ	∆òà3‘ èA≈bﬁ„}¯ˇ‘òÎ{ˇ){|·ÅÎ¯1¶Çèü6Pöß5Ô%ˆJ◊_t–ª∆∏Ú≤±VP`å¡W∞:,)OÇÂÛñﬁéÈ—ä5ËGBoÓòŒ-Áˆs∫E&Ü6UÙÒª¬«¥‚N´™±÷µ◊å¢{b£˜NXU
+ÖÆöªàƒGnÿo#^∫È∆|¢Âd‹~˙…i G¡ÒÂ„˙l@F|¿¯íqìêŸ¨∑iz>^pÛòË†ØUõêo|¯cÁã±µ_˚nu„∆`ª˝úÀ°∫qodb…Fÿ”fNÉõæMªK∑õÏ)°`h“Jü·”8¥T)(é˙;XO8é¯(ùœÁ`çãÀ“ÎÎ ∫sÀd3˜cÄ>§@ëº7Jãç⁄˛Ú[_¶#ÚSs€⁄ÍŸ†¯H}¸ú»áZ NAzõªiùÉ5
+≤ü?”±õÆÈB?∑<≈C¶]hbWÓmK£‡˘+*Ü'!ﬁø±Që∂c≠jÏ=ﬁÅﬁÀ€ß“+ı'xÍ6nêz™ﬁ/Ø®ÑGnõîs}∞ø%¸˛D~:Ú¨ÿÖò#˛JrÈyƒ∆Ûbw+ﬂÏ]û°LE!O_ŒÅz
+ZÔWÓw^bj¨‹Hc|€S“@3Ë|.œQC‘ÓÍµºãyK≠€…]+KõùW˜`7G˜w›“D£@∑Ω¨\5J\Ä∞ΩbG<!¯Y)¨Œıö©∏gﬂ‚wczv5}òIDıœxKËP
+¡∑Ó+\)'4ãz"
+>_ó∞õøÌäâ7˛ñ®2ûg†»`ßˆáFê9ä-Q|
+sìí⁄gh—5é9◊§FiârTú¶}ÓõÜ
+áÅzJêÊ≤˜Ó3üŒ≥÷MMb≥‰ß¸ıHÃ<5H}ù∫¥æCTÉá÷Lò_°P∆öä¶˛ÒñÀ≤pÙ¸ÕO?õÔ`?≤ká¬Õ.¡ªN˜±»Ÿˇgá–~Â!S]ç…ıæ&Ç˙w!”5¶≤ C∫oÈ+¨â ˇô[•˝¯‘˛»˛+T…,æ…Ø 2Qÿ…ÅYûå√VòW 5D ;$·ONøD=Å« 3î‹CáJ
+‰ ⁄Aﬂ˜™k D¡›T<íLÒ5|Pk&-ËeºªY%l£π$ ﬁy`(XŸ>¶√$÷R(÷V¥±}=≠˚Ï¢S˝Ø
+#ŸÌ—d∞ù%_} nı
+=ŸÅN’ bŒCCmŸπIF/&§…óDEÅﬁ/ˇ'≤dØhÃ3 ìnq
+œ'CÇCŸ~æ:o@´Êƒv‰Pˇı]wƒ`P¶ùΩµQ»ß‰Q•üò.0	"§)πW?
+∑ñ∆=zÔ"ñ<◊›]ÜiqïÓÎQëß˜?ÿ˝5dΩ'Uü‡áFU¢< D&œGY!Ô6YÛæzö÷J*†OOÛD—ªÅ;XS∑’∆«˘N«‹ôX©óìÓ–^ ∞Y?I≥˛†µsàπ¸Åz;	_p©ˆ¯ŸÇ£√˝∂ª¿ß„€√Çm˛]ù(me™ß—xºåq}»ÀçÃ‚X
+O0ï$Qú;‰›∆å:d™BLnS%rπÚ@	KeñT`†º∆uÌ aÏ}∏¢◊ÀZ”R°;ôãrâ@)≥Yn∂8qÈu"Exd!Ù±)<£4÷£Ì:!»´rp¡pæ…ã•+ÎÅ¨Æo]]sxu:ÇÓä+ÜPòa“Pë\ŒÃ…Ñ˜"ÂJ˙¿3≤ˇ—Ù>a>±9t—i`Æœ±Ÿ‚RÇM‡‚%◊‘$f«s€œ.—å‚%hπFh>X5
+ﬂ/’˘û{ ÊÇz∑¥∑|éòì∂œ©ør1ßDÏØ·∆r‡UJh~p†‹¡y˘£;ï†ùBùJcªrè–YC˘
+.-aI®«ã„h©:Î,dïËQ!‡ÒWíÏÌ~∆πé&ıÍ|Q…}˝æ˙ìâç¢à≈ÏìW÷Çùãë@ån9éÖãﬁ‡˚›º‘|™\Mtè^"¸6á©3`ï›◊6IJ
+ä›…7” yÊNû—øCb∞E”áØò=ªáe‡ÑLò
+∞
+u$gMaÅ*' D\ÕybﬁR=ÉRπ1ÍONç-UäÄmª”±üN≤ÓÊ∏≈$“êKË3‡ıLˇû
+Ö:A,>g§Â≤Æ›iÍÔè0,˙7ıøÔC©&6—æ∫¢{˝9h^I6ë®Z	NÅ™ÌÊÿ“•„°âV”<Ì§H>§ ªgÙ√ãh;«9w˙cõ?m-÷≥ùhn
+ØênOmq∫,•åœ¯ƒ—K˚A?ƒ§≥è‹UÑlõæcN4? ¸*Ω% Qcd'‘m´]©µ¶ÆnÜ.lOÈ‘¶ ªîKè hBüŸ¨cÖ”®TÉ(ge¸«∞5àõ*Ö:Œ¬ozD≈–“?QçÏ‹ìäﬁﬁSﬂrH'tkÕ_⁄VW¯ﬁMQå 2HùëM÷7„™/nç>ÖOûEÆTi1Jœ¯ëaáViˆ ."∂å*-‹°ê÷˚ï˘Øt√L;@w¢ú2ô 8ÄaKD◊rQÜx√%˜s–ãE\ç‚\¸ êA‘ÒG;∑sO±∂‰ŒLâw‹}Ü^˜Ìh€ctÜÙ«¬,N´PÔÕßøxè¿plÂ˜±o‘N{X‘HÃ!◊úx™w0*2Ø®1¯ƒ/Ûä¢ÍL˝»~?Õ8∫ëÚﬂª’]F1"»Á=ê´Ã›∏“[„œ,Æ¢∫ﬁ»œ—xjåE˜Q&¡vÓÉP”XtÓG~ì÷r ﬂÛ1ÕDÃ∂FÈa≠5˘çCﬁ¨+ySﬁha»g≤Ç1P∂lﬂßH8ù0]¢øæüNz^Q1·xãpdŒ‘D¯©{Å5:^ób‰È¬•#πÑ„#Ïë:ÖŸñ;!ƒ ∂bs?Ó?0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000
+cleartomark{restore}if
+endstream
+endobj
+33 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 251 0 R
+/FirstChar 188
+/LastChar 188
+/Widths 252 0 R
+/BaseFont /FDCECB+Math1
+/FontDescriptor 253 0 R
+>> endobj
+253 0 obj <<
+/Ascent 452
+/CapHeight 677
+/Descent -209
+/FontName /FDCECB+Math1
+/ItalicAngle 0
+/StemV 74
+/XHeight 679
+/FontBBox [-120 -220 1544 923]
+/Flags 4
+/CharSet (/ordmasculine)
+/FontFile 32 0 R
+>> endobj
+252 0 obj
+[1000 ]
+endobj
+251 0 obj <<
+/Type /Encoding
+/Differences [ 0 /.notdef 188/ordmasculine 189/.notdef]
+>> endobj
+31 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Times-Roman
+>> endobj
+28 0 obj <<
+/Type /Font
+/Subtype /Type1
+/Encoding 250 0 R
+/BaseFont /Helvetica-Bold
+>> endobj
+58 0 obj <<
+/Type /Pages
+/Count 6
+/Parent 254 0 R
+/Kids [22 0 R 60 0 R 97 0 R 117 0 R 148 0 R 197 0 R]
+>> endobj
+245 0 obj <<
+/Type /Pages
+/Count 2
+/Parent 254 0 R
+/Kids [233 0 R 247 0 R]
+>> endobj
+254 0 obj <<
+/Type /Pages
+/Count 8
+/Kids [58 0 R 245 0 R]
+>> endobj
+255 0 obj <<
+/Type /Outlines
+/First 3 0 R
+/Last 19 0 R
+/Count 5
+>> endobj
+19 0 obj <<
+/Title 20 0 R
+/A 17 0 R
+/Parent 255 0 R
+/Prev 15 0 R
+>> endobj
+15 0 obj <<
+/Title 16 0 R
+/A 13 0 R
+/Parent 255 0 R
+/Prev 11 0 R
+/Next 19 0 R
+>> endobj
+11 0 obj <<
+/Title 12 0 R
+/A 9 0 R
+/Parent 255 0 R
+/Prev 7 0 R
+/Next 15 0 R
+>> endobj
+7 0 obj <<
+/Title 8 0 R
+/A 5 0 R
+/Parent 255 0 R
+/Prev 3 0 R
+/Next 11 0 R
+>> endobj
+3 0 obj <<
+/Title 4 0 R
+/A 1 0 R
+/Parent 255 0 R
+/Next 7 0 R
+>> endobj
+256 0 obj <<
+/Names [(0) 27 0 R (0.1.1) 2 0 R (0.2.1) 6 0 R (0.3.1) 10 0 R (0.4.1) 14 0 R (0.5.1) 18 0 R (100) 100 0 R (101) 101 0 R (102) 102 0 R (103) 63 0 R (105) 103 0 R (106) 104 0 R (107) 105 0 R (108) 106 0 R (109) 107 0 R (110) 108 0 R (111) 109 0 R (112) 110 0 R (113) 111 0 R (114) 112 0 R (115) 113 0 R (116) 114 0 R (117) 115 0 R (118) 121 0 R (119) 122 0 R (120) 123 0 R (121) 124 0 R (122) 125 0 R (123) 126 0 R (124) 127 0 R (125) 128 0 R (126) 129 0 R (127) 130 0 R (128) 131 0 R (129) 132 0 R (130) 133 0 R (131) 134 0 R (132) 135 0 R (133) 136 0 R (134) 137 0 R (135) 138 0 R (136) 139 0 R (137) 140 0 R (138) 141 0 R (139) 142 0 R (140) 143 0 R (141) 144 0 R (142) 145 0 R (143) 146 0 R (144) 151 0 R (145) 152 0 R (146) 153 0 R (147) 154 0 R (148) 155 0 R (149) 156 0 R (150) 157 0 R (151) 120 0 R (153) 158 0 R (154) 159 0 R (155) 160 0 R (156) 161 0 R (157) 162 0 R (158) 163 0 R (159) 164 0 R (160) 165 0 R (161) 166 0 R (162) 167 0 R (163) 168 0 R (164) 169 0 R (165) 170 0 R (166) 171 0 R (167) 172 0 R (168) 173 0 R (169) 174 0 R (170) 175 0 R (171) 176 0 R (172) 177 0 R (173) 178 0 R (174) 179 0 R (175) 180 0 R (176) 181 0 R (177) 182 0 R (178) 183 0 R (179) 184 0 R (180) 185 0 R (181) 186 0 R (183) 187 0 R (184) 188 0 R (185) 189 0 R (186) 190 0 R (187) 191 0 R (188) 192 0 R (189) 193 0 R (190) 194 0 R (191) 195 0 R (193) 200 0 R (195) 201 0 R (197) 202 0 R (198) 203 0 R (199) 204 0 R (201) 205 0 R (202) 206 0 R (204) 207 0 R (206) 208 0 R (208) 209 0 R (209) 210 0 R (210) 211 0 R (211) 212 0 R (212) 213 0 R (213) 214 0 R (214) 215 0 R (215) 216 0 R (216) 217 0 R (217) 218 0 R (218) 219 0 R (219) 220 0 R (220) 221 0 R (221) 222 0 R (222) 223 0 R (223) 224 0 R (224) 225 0 R (225) 226 0 R (226) 227 0 R (228) 228 0 R (230) 229 0 R (232) 230 0 R (273) 236 0 R (275) 237 0 R (277) 238 0 R (278) 239 0 R (279) 240 0 R (281) 241 0 R (283) 242 0 R (285) 243 0 R (286) 244 0 R (32) 29 0 R (34) 30 0 R (35) 34 0 R (36) 35 0 R (37) 36 0 R (38) 38 0 R (39) 40 0 R (40) 41 0 R (41) 42 0 R (42) 43 0 R (43) 44 0 R (44) 45 0 R (45) 46 0 R (46) 47 0 R (47) 48 0 R (48) 49 0 R (50) 50 0 R (51) 51 0 R (52) 52 0 R (53) 53 0 R (54) 54 0 R (55) 55 0 R (56) 56 0 R (57) 64 0 R (58) 65 0 R (59) 66 0 R (60) 67 0 R (61) 68 0 R (62) 69 0 R (63) 70 0 R (64) 71 0 R (65) 72 0 R (66) 73 0 R (67) 74 0 R (68) 75 0 R (69) 77 0 R (70) 79 0 R (71) 80 0 R (72) 81 0 R (73) 82 0 R (88) 84 0 R (89) 85 0 R (90) 86 0 R (91) 87 0 R (92) 88 0 R (93) 89 0 R (94) 90 0 R (95) 91 0 R (96) 92 0 R (97) 93 0 R (98) 94 0 R (99) 95 0 R (Doc-Start) 26 0 R (page.1) 25 0 R (page.2) 62 0 R (page.3) 99 0 R (page.4) 119 0 R (page.5) 150 0 R (page.6) 199 0 R (page.7) 235 0 R (page.8) 249 0 R (table.1) 83 0 R (table.2) 231 0 R]
+/Limits [(0) (table.2)]
+>> endobj
+257 0 obj <<
+/Kids [256 0 R]
+>> endobj
+258 0 obj <<
+/Dests 257 0 R
+>> endobj
+259 0 obj <<
+/Type /Catalog
+/Pages 254 0 R
+/Outlines 255 0 R
+/Names 258 0 R
+ /PageMode /UseOutlines /URI << /Base () >>  /ViewerPreferences << >> 
+/OpenAction 21 0 R
+>> endobj
+260 0 obj <<
+/Producer (pdfTeX-0.14f)
+ /Author () /Title () /Subject () /Creator (LaTeX with hyperref package) /Producer (pdfTeX14.f) /Keywords () 
+/Creator (TeX)
+/CreationDate (D:20000407115200)
+>> endobj
+xref
+0 261
+0000000000 65535 f 
+0000000009 00000 n 
+0000006353 00000 n 
+0000055191 00000 n 
+0000000050 00000 n 
+0000000080 00000 n 
+0000007304 00000 n 
+0000055107 00000 n 
+0000000121 00000 n 
+0000000164 00000 n 
+0000033286 00000 n 
+0000055021 00000 n 
+0000000205 00000 n 
+0000000249 00000 n 
+0000035125 00000 n 
+0000054933 00000 n 
+0000000291 00000 n 
+0000000334 00000 n 
+0000040310 00000 n 
+0000054858 00000 n 
+0000000376 00000 n 
+0000000421 00000 n 
+0000006001 00000 n 
+0000007780 00000 n 
+0000000471 00000 n 
+0000006117 00000 n 
+0000006176 00000 n 
+0000006235 00000 n 
+0000054424 00000 n 
+0000006294 00000 n 
+0000006411 00000 n 
+0000054333 00000 n 
+0000049110 00000 n 
+0000053844 00000 n 
+0000006470 00000 n 
+0000006529 00000 n 
+0000006588 00000 n 
+0000049020 00000 n 
+0000006647 00000 n 
+0000048933 00000 n 
+0000006706 00000 n 
+0000006766 00000 n 
+0000006826 00000 n 
+0000006886 00000 n 
+0000006946 00000 n 
+0000007006 00000 n 
+0000007066 00000 n 
+0000007126 00000 n 
+0000007185 00000 n 
+0000007245 00000 n 
+0000007362 00000 n 
+0000007421 00000 n 
+0000007481 00000 n 
+0000007541 00000 n 
+0000007601 00000 n 
+0000007660 00000 n 
+0000007720 00000 n 
+0000048841 00000 n 
+0000054518 00000 n 
+0000016034 00000 n 
+0000014014 00000 n 
+0000007934 00000 n 
+0000014130 00000 n 
+0000014189 00000 n 
+0000014248 00000 n 
+0000014307 00000 n 
+0000014366 00000 n 
+0000014425 00000 n 
+0000014484 00000 n 
+0000014544 00000 n 
+0000014604 00000 n 
+0000014664 00000 n 
+0000014723 00000 n 
+0000014783 00000 n 
+0000014842 00000 n 
+0000014901 00000 n 
+0000048749 00000 n 
+0000014961 00000 n 
+0000048654 00000 n 
+0000015021 00000 n 
+0000015080 00000 n 
+0000015140 00000 n 
+0000015200 00000 n 
+0000015260 00000 n 
+0000015319 00000 n 
+0000015378 00000 n 
+0000015438 00000 n 
+0000015498 00000 n 
+0000015557 00000 n 
+0000015616 00000 n 
+0000015676 00000 n 
+0000015735 00000 n 
+0000015794 00000 n 
+0000015854 00000 n 
+0000015914 00000 n 
+0000015974 00000 n 
+0000021885 00000 n 
+0000020749 00000 n 
+0000016176 00000 n 
+0000020865 00000 n 
+0000020924 00000 n 
+0000020984 00000 n 
+0000021045 00000 n 
+0000021106 00000 n 
+0000021166 00000 n 
+0000021226 00000 n 
+0000021286 00000 n 
+0000021345 00000 n 
+0000021406 00000 n 
+0000021466 00000 n 
+0000021526 00000 n 
+0000021586 00000 n 
+0000021647 00000 n 
+0000021706 00000 n 
+0000021765 00000 n 
+0000021825 00000 n 
+0000027726 00000 n 
+0000025891 00000 n 
+0000022015 00000 n 
+0000026010 00000 n 
+0000026071 00000 n 
+0000026132 00000 n 
+0000026193 00000 n 
+0000026253 00000 n 
+0000026313 00000 n 
+0000026375 00000 n 
+0000026436 00000 n 
+0000026497 00000 n 
+0000026558 00000 n 
+0000026619 00000 n 
+0000026681 00000 n 
+0000026742 00000 n 
+0000026803 00000 n 
+0000026865 00000 n 
+0000026927 00000 n 
+0000026989 00000 n 
+0000027051 00000 n 
+0000027113 00000 n 
+0000027175 00000 n 
+0000027236 00000 n 
+0000027297 00000 n 
+0000027359 00000 n 
+0000027419 00000 n 
+0000027481 00000 n 
+0000027543 00000 n 
+0000027604 00000 n 
+0000027665 00000 n 
+0000035737 00000 n 
+0000032672 00000 n 
+0000027869 00000 n 
+0000032791 00000 n 
+0000032852 00000 n 
+0000032914 00000 n 
+0000032976 00000 n 
+0000033038 00000 n 
+0000033100 00000 n 
+0000033162 00000 n 
+0000033224 00000 n 
+0000033347 00000 n 
+0000033408 00000 n 
+0000033470 00000 n 
+0000033531 00000 n 
+0000033593 00000 n 
+0000033654 00000 n 
+0000033715 00000 n 
+0000033776 00000 n 
+0000033838 00000 n 
+0000033900 00000 n 
+0000033962 00000 n 
+0000034022 00000 n 
+0000034082 00000 n 
+0000034144 00000 n 
+0000034206 00000 n 
+0000034268 00000 n 
+0000034330 00000 n 
+0000034391 00000 n 
+0000034452 00000 n 
+0000034513 00000 n 
+0000034575 00000 n 
+0000034636 00000 n 
+0000034698 00000 n 
+0000034759 00000 n 
+0000034821 00000 n 
+0000034883 00000 n 
+0000034943 00000 n 
+0000035003 00000 n 
+0000035064 00000 n 
+0000035186 00000 n 
+0000035247 00000 n 
+0000035308 00000 n 
+0000035369 00000 n 
+0000035431 00000 n 
+0000035492 00000 n 
+0000035554 00000 n 
+0000035615 00000 n 
+0000035676 00000 n 
+0000042338 00000 n 
+0000040130 00000 n 
+0000035904 00000 n 
+0000040249 00000 n 
+0000040371 00000 n 
+0000040432 00000 n 
+0000040493 00000 n 
+0000040555 00000 n 
+0000040617 00000 n 
+0000040678 00000 n 
+0000040740 00000 n 
+0000040802 00000 n 
+0000040863 00000 n 
+0000040924 00000 n 
+0000040986 00000 n 
+0000041048 00000 n 
+0000041110 00000 n 
+0000041171 00000 n 
+0000041233 00000 n 
+0000041294 00000 n 
+0000041355 00000 n 
+0000041417 00000 n 
+0000041479 00000 n 
+0000041540 00000 n 
+0000041601 00000 n 
+0000041663 00000 n 
+0000041725 00000 n 
+0000041787 00000 n 
+0000041848 00000 n 
+0000041909 00000 n 
+0000041971 00000 n 
+0000042032 00000 n 
+0000042092 00000 n 
+0000042154 00000 n 
+0000042215 00000 n 
+0000042277 00000 n 
+0000046124 00000 n 
+0000045388 00000 n 
+0000042493 00000 n 
+0000045508 00000 n 
+0000045569 00000 n 
+0000045631 00000 n 
+0000045692 00000 n 
+0000045754 00000 n 
+0000045816 00000 n 
+0000045878 00000 n 
+0000045939 00000 n 
+0000046000 00000 n 
+0000046062 00000 n 
+0000054631 00000 n 
+0000046793 00000 n 
+0000046612 00000 n 
+0000046231 00000 n 
+0000046732 00000 n 
+0000046864 00000 n 
+0000054238 00000 n 
+0000054213 00000 n 
+0000054005 00000 n 
+0000054716 00000 n 
+0000054784 00000 n 
+0000055262 00000 n 
+0000058018 00000 n 
+0000058057 00000 n 
+0000058095 00000 n 
+0000058271 00000 n 
+trailer
+<<
+/Size 261
+/Root 259 0 R
+/Info 260 0 R
+>>
+startxref
+58477
+%%EOF

@@ -31,4 +31,4 @@ clean:
 	-rm -f *.out *.aux *.log *.dvi *.tex
 
 realclean: clean
-	-rm -f *.html *.pdf
+	-rm -f *.html *.pdf *.1

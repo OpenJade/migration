@@ -1,0 +1,14 @@
+PROG=jade
+OBJS=jade.o DssslApp.o SgmlFOTBuilder.o RtfFOTBuilder.o HtmlFOTBuilder.o \
+  TeXFOTBuilder.o
+INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove -I$(srcdir)/../style
+XLIBS=../style/libstyle.a ../spgrove/libspgrove.a ../grove/libgrove.a \
+  ../lib/libsp.a
+GENSRCS=JadeMessages.h DssslAppMessages.h HtmlMessages,h \
+ HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx
+
+HtmlFOTBuilder.o: HtmlFOTBuilder_inst.cxx HtmlMessages.h
+RtfFOTBuilder.o: RtfFOTBuilder_inst.cxx
+DssslApp.o: DssslAppMessages.h
+jade.o: JadeMessages.h
+

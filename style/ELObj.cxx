@@ -1065,6 +1065,21 @@ bool NodeListObj::suppressError()
   return 0;
 }
 
+bool NodeListObj::contains(EvalContext &ec, Interpreter &in, const NodePtr &ptr)
+{
+  NodeListObj *nl = this;
+  for (;;) {
+    ELObjDynamicRoot protect(in, nl);
+    NodePtr nd(nl->nodeListFirst(ec, in));
+    if (!nd)
+      return 0;
+    if (*nd == *ptr)  
+      return 1;
+    nl = nl->nodeListRest(ec, in); 
+  }
+  return 0;
+}
+
 NamedNodeListObj *NamedNodeListObj::asNamedNodeList()
 {
   return this;

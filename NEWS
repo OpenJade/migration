@@ -1,5 +1,8 @@
 Changes in OpenSP 1.5pre1
 
+* More of Annex K supported: Common data attributes can now be
+  specified in external entity declarations.
+  
 * The architecture engine supports #MAPTOKEN.
 
 * The multibyte version of OpenSP now uses 32bit chars and supports

@@ -112,6 +112,9 @@ void ParserEventGeneratorKit::setOption(Option opt)
   case restrictFileReading:
     impl_->processOption('R', 0);
     break;
+  case showErrorNumbers:
+    impl_->processOption('n', 0);
+    break;
   }
 }
 

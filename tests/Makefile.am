@@ -7,7 +7,7 @@
 SHOWSTOPPERS = catalog-2 \
 af-7 af-8 af-9 af-10 af-11
 
-TESTS = onsgmls-1 \
+TESTS = onsgmls-1 onsgmls-2 \
 osnorm-1 \
 catalog-1 \
 af-1 af-2 af-3 af-4 af-5 af-6 af-12 af-13 af-14 af-15 af-16 \

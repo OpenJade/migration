@@ -35,7 +35,7 @@ class SubdocEntity;
 class InternalEntity;
 class Notation;
 
-class Entity : public EntityDecl {
+class SP_API Entity : public EntityDecl {
 public:
   Entity(const StringC &name, DeclType declType, DataType dataType,
 	 const Location &defLocation);
@@ -86,7 +86,7 @@ private:
   PackedBoolean defaulted_;
 };
 
-class InternalEntity : public Entity {
+class SP_API InternalEntity : public Entity {
 public:
   InternalEntity(const StringC &, DeclType declType, DataType dataType,
 		 const Location &, Text &);
@@ -113,7 +113,7 @@ public:
   Entity *copy() const;
 };
 
-class InternalDataEntity : public InternalEntity {
+class SP_API InternalDataEntity : public InternalEntity {
 public:
   InternalDataEntity(const StringC &, DataType, const Location &, Text &);
   void declReference(ParserState &,
@@ -121,7 +121,7 @@ public:
   Boolean isDataOrSubdoc() const;
 };
 
-class InternalCdataEntity : public InternalDataEntity {
+class SP_API InternalCdataEntity : public InternalDataEntity {
 public:
   InternalCdataEntity(const StringC &, const Location &, Text &);
   void normalReference(ParserState &,
@@ -134,7 +134,7 @@ public:
   Boolean isCharacterData() const;
 };
 
-class InternalSdataEntity : public InternalDataEntity {
+class SP_API InternalSdataEntity : public InternalDataEntity {
 public:
   InternalSdataEntity(const StringC &, const Location &, Text &);
   void normalReference(ParserState &,
@@ -147,7 +147,7 @@ public:
   Boolean isCharacterData() const;
 };
 
-class InternalTextEntity : public InternalEntity {
+class SP_API InternalTextEntity : public InternalEntity {
 public:
   enum Bracketed {
     none,
@@ -169,7 +169,7 @@ private:
   Bracketed bracketed_;
 };
 
-class ExternalEntity : public Entity {
+class SP_API ExternalEntity : public Entity {
 public:
   ExternalEntity(const StringC &, DeclType, DataType, const Location &,
 		 const ExternalId &);
@@ -183,7 +183,7 @@ private:
   ExternalId externalId_;
 };
 
-class ExternalTextEntity : public ExternalEntity {
+class SP_API ExternalTextEntity : public ExternalEntity {
 public:
   ExternalTextEntity(const StringC &, DeclType, const Location &,
 		     const ExternalId &);
@@ -197,7 +197,7 @@ private:
 		    Boolean) const;
 };
 
-class ExternalNonTextEntity : public ExternalEntity {
+class SP_API ExternalNonTextEntity : public ExternalEntity {
 public:
   ExternalNonTextEntity(const StringC &, DataType,
 			const Location &, const ExternalId &);
@@ -213,7 +213,7 @@ public:
   Boolean isCharacterData() const;
 };
 
-class ExternalDataEntity : public ExternalNonTextEntity {
+class SP_API ExternalDataEntity : public ExternalNonTextEntity {
 public:
   ExternalDataEntity(const StringC &, DataType, const Location &,
 		     const ExternalId &, const ConstPtr<Notation> &,
@@ -230,7 +230,7 @@ private:
   AttributeList attributes_;
 };
 
-class SubdocEntity : public ExternalNonTextEntity {
+class SP_API SubdocEntity : public ExternalNonTextEntity {
 public:
   SubdocEntity(const StringC &, const Location &, const ExternalId &);
   const SubdocEntity *asSubdocEntity() const;
@@ -240,7 +240,7 @@ public:
 private:
 };
 
-class IgnoredEntity : public Entity {
+class SP_API IgnoredEntity : public Entity {
 public:
   IgnoredEntity(const StringC &, DeclType declType);
   Entity *copy() const;

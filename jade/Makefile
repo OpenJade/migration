@@ -32,8 +32,7 @@ DEBUG=
 #   called "catalog" in the same directory as the document entity.
 # Add -Dsig_atomic_t=int on SunOS 4.1.x with g++ (or any other platform
 #  which doesn't appropriately define sig_atomic_t).
-# Add -DJADE_MIF to include the Jade MIF backend
-XDEFINES=
+XDEFINES=-DJADE_MIF -DJADE_HTML
 DEFINES=-DSP_HAVE_BOOL -DSP_ANSI_CLASS_INST -DSP_MULTI_BYTE $(XDEFINES)
 CXXFLAGS=-ansi $(DEBUG) $(WARN)
 # Flag to pass to CXX to make it output list of dependencies as a Makefile.
@@ -123,7 +122,9 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/../Makefile.comm -f $$srcdir/Makefile.sub \
 	        -f $$srcdir/../Makefile.prog -f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): lib
+$(PROGDIRS): $(SP_LIBDIRS)
+
+$(JADE_PROGDIRS): $(JADE_LIBDIRS)
 
 # GNU tar
 TAR=tar

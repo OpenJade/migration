@@ -3,6 +3,7 @@
 
 #include "stylelib.h"
 #include "ELObj.h"
+#include "EvalContext.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
 #include <OpenSP/macros.h>
@@ -1100,7 +1101,7 @@ bool NodeListObj::contains(EvalContext &context, Interpreter &interp, ComponentN
     if (cls == id)
       return 1;
     bool chunk;
-    nl->nodeListChunkRest(context, interp, chunk);
+    nl = nl->nodeListChunkRest(context, interp, chunk);
   }
   return 0;
 }

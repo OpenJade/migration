@@ -115,7 +115,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   GroveString str;
 
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) {
-    if (!processingMode->hasQuery()) {
+    if (!processingMode->hasCharRules()) {
       currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
       return;
     }

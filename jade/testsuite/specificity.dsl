@@ -12,24 +12,26 @@
 
 ;; test specificity rules
 
+(define (doc-root) (node-property 'docelem (current-root))) 
+
 (mode test-mode
 
 (query 
-  (q-element 'A (node-property 'docelem (current-root))) 
+  (q-element 'A (doc-root))
   (make paragraph (literal "query (priority 1) matching " (gi (current-node))))
   1)
   
 (query 
   (node-list 
-    (q-element 'A (node-property 'docelem (current-root))) 
-    (q-element 'B (node-property 'docelem (current-root)))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)))
   (make paragraph (literal "query (priority 0) matching " (gi (current-node)))))
   
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root))) 
   (make paragraph (literal "query (priority -1) matching " (gi (current-node))))
   -1)
   
@@ -48,37 +50,37 @@
 
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root))) 
   (make paragraph (literal "initial mode query (priority 1) matching " (gi (current-node))))
   1)
   
 
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root)) 
-    (q-element 'G (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root)) 
+    (q-element 'G (doc-root))) 
   (make paragraph (literal "initial mode query (priority 0) matching " (gi (current-node)))))
   
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root)) 
-    (q-element 'G (current-root)) 
-    (q-element 'H (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root)) 
+    (q-element 'G (doc-root)) 
+    (q-element 'H (doc-root))) 
   (make paragraph (literal "initial mode query (priority -1) matching " (gi (current-node))))
   -1)
   
@@ -107,52 +109,52 @@
 
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root)) 
-    (q-element 'G (current-root)) 
-    (q-element 'H (current-root)) 
-    (q-element 'I (current-root)) 
-    (q-element 'J (current-root)) 
-    (q-element 'K (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root)) 
+    (q-element 'G (doc-root)) 
+    (q-element 'H (doc-root)) 
+    (q-element 'I (doc-root)) 
+    (q-element 'J (doc-root)) 
+    (q-element 'K (doc-root))) 
   (make paragraph (literal "part 2 initial mode query (priority 1) matching " (gi (current-node))))
   1)
   
 
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root)) 
-    (q-element 'G (current-root)) 
-    (q-element 'H (current-root)) 
-    (q-element 'I (current-root)) 
-    (q-element 'J (current-root)) 
-    (q-element 'K (current-root)) 
-    (q-element 'L (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root)) 
+    (q-element 'G (doc-root)) 
+    (q-element 'H (doc-root)) 
+    (q-element 'I (doc-root)) 
+    (q-element 'J (doc-root)) 
+    (q-element 'K (doc-root)) 
+    (q-element 'L (doc-root))) 
   (make paragraph (literal "part 2 initial mode query (priority 0) matching " (gi (current-node)))))
   
 (query 
   (node-list 
-    (q-element 'A (current-root)) 
-    (q-element 'B (current-root)) 
-    (q-element 'C (current-root)) 
-    (q-element 'D (current-root)) 
-    (q-element 'E (current-root)) 
-    (q-element 'F (current-root)) 
-    (q-element 'G (current-root)) 
-    (q-element 'H (current-root)) 
-    (q-element 'I (current-root)) 
-    (q-element 'J (current-root)) 
-    (q-element 'K (current-root)) 
-    (q-element 'L (current-root)) 
-    (q-element 'M (current-root))) 
+    (q-element 'A (doc-root)) 
+    (q-element 'B (doc-root)) 
+    (q-element 'C (doc-root)) 
+    (q-element 'D (doc-root)) 
+    (q-element 'E (doc-root)) 
+    (q-element 'F (doc-root)) 
+    (q-element 'G (doc-root)) 
+    (q-element 'H (doc-root)) 
+    (q-element 'I (doc-root)) 
+    (q-element 'J (doc-root)) 
+    (q-element 'K (doc-root)) 
+    (q-element 'L (doc-root)) 
+    (q-element 'M (doc-root))) 
   (make paragraph (literal "part 2 initial mode query (priority -1) matching " (gi (current-node))))
   -1)
   

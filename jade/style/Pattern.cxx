@@ -12,12 +12,11 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 Pattern::Pattern()
-: trivial_(0)
 {
 }
 
 Pattern::Pattern(IList<Element> &ancestors)
-: trivial_(computeTrivial(ancestors))
+: MatchBase(computeTrivial(ancestors))
 {
   ancestors_.swap(ancestors);
 }

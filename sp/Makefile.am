@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-AUTOMAKE_OPTIONS = dist-zip check-news
+AUTOMAKE_OPTIONS = check-news
 
 ## FIXME: all is missing since a .am with only EXTRA_DIST doesn't work.
 SUBDIRS = pubtext doc \
@@ -28,3 +28,8 @@ dist-hook:
 	  ./update-changelog; \
 	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
 	fi
+
+dist-zip: dist-dir
+	-chmod -R a+r $(distdir)
+	zip -rql $(distdir).zip $(distdir)
+	-rm -rf $(distdir)

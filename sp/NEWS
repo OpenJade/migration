@@ -5,6 +5,13 @@ Changes in OpenSP 1.5pre7
 
 * Japanese Translation from SATO Satoru
 
+* Changed the way in which MessageFragments identify the module within
+  which their text resides (libModule, appModule, xModule) in order to
+  support Windows applications that use DLLs that use SP's DLL, where
+  the intervening DLLs also define messages to be used with the SP
+  message handling infrastructure.  Patch contributed by Peter Newcomb
+  of Epremis Corp.
+
 Changes in OpenSP 1.5pre6
 
 * RPM spec file updates and corrections from Terje Bless

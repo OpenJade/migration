@@ -10,3 +10,6 @@ Autoconf support for SP.
 Matthias Clasen:
 spcat, DTDDECL, CONCUR, improved support of Annex K, 
 autoconf & automake setup.
+
+Peter Newcomb, Epremis Corp.:
+MessageModule

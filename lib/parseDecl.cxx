@@ -186,7 +186,7 @@ void Parser::endProlog()
       else 
 	lpd = (ComplexLpd *)&activeLpd(i);
     eventHandler().endProlog(new (eventAllocator())
-			     EndPrologEvent(baseDtd(),
+			     EndPrologEvent(currentDtdPointer(),
 					    lpd,
 					    simpleLinkNames,
 					    simpleLinkAtts,

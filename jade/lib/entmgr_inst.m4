@@ -61,7 +61,9 @@ __instantiate(`RangeMapIter<WideChar,UnivChar>')
 __instantiate(`RangeMap<WideChar,UnivChar>')
 __instantiate(Vector<InputSourceOriginNamedCharRef>)
 __instantiate(Vector<StringC>)
+#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(Vector<String<EquivCode> >)
+#endif
 __instantiate(Owner<ExternalInfo>)
 __instantiate(ISet<Char>)
 __instantiate(Vector<ISetRange<Char> >)
@@ -71,16 +73,24 @@ __instantiate(ISetIter<WideChar>)
 __instantiate(Vector<ISetRange<WideChar> >)
 __instantiate(SubstTable<Char>)
 __instantiate(SharedXcharMap<PackedBoolean>)
+#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(SharedXcharMap<unsigned char>)
+#endif
 __instantiate(SharedXcharMap<EquivCode>)
+#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(String<EquivCode>)
+#endif
 __instantiate(String<SyntaxChar>)
 __instantiate(XcharMap<PackedBoolean>)
+#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(XcharMap<unsigned char>)
+#endif
 __instantiate(XcharMap<EquivCode>)
 __instantiate(Vector<char>)
+#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(Vector<PackedBoolean>)
 __instantiate(SubstTable<Char>)
+#endif
 __instantiate(CharMap<Unsigned32>)
 #ifdef SP_MULTI_BYTE
 __instantiate(CharMapPage<Unsigned32>)

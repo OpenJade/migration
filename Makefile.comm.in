@@ -52,7 +52,7 @@ CXXDEPGENFLAGS=-MM
 
 .m4.cxx:
 	rm -f $@
-	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
+	$(PERL) $(srcdir)/../instmac.pl $< >$@
 	chmod -w $@
 
 %.h %.cxx %.rc: %.msg

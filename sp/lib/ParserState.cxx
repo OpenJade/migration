@@ -198,7 +198,7 @@ void ParserState::startDtd(const StringC &name)
   defLpd_.clear();
   for (size_t i = 0; i < options().includes.size(); i++) {
     StringC name = options().includes[i];
-    const SubstTable<Char> *subst = syntax().entitySubstTable();
+    const SubstTable *subst = syntax().entitySubstTable();
     for (size_t j = 0; j < name.size(); j++)
       subst->subst(name[j]);
     Text text;
@@ -655,7 +655,7 @@ void ParserState::setCurrentRank(const RankStem *stem, const StringC &suffix)
   currentRank_[stem->index()] = suffix;
 }
 
-void ParserState::getCurrentToken(const SubstTable<Char> *subst,
+void ParserState::getCurrentToken(const SubstTable *subst,
 				  StringC &str) const
 {
   InputSource *in = currentInput();

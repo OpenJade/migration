@@ -27,13 +27,13 @@ static void refineBySet(IList<EquivClass> *, const ISet<Char> &, unsigned);
 
 #if _MSC_VER == 900
 // Work around MSVC 2.0 bug.
-typedef SubstTable<Char> _msvc_dummy;
+typedef SubstTable _msvc_dummy;
 #endif
 
 Partition::Partition(const ISet<Char> &chars,
 		     const ISet<Char> **sets,
 		     int nSets,
-		     const SubstTable<Char> &subst)
+		     const SubstTable &subst)
 : map_(0)			// eE gets code 0
 {
   IList<EquivClass> classes;

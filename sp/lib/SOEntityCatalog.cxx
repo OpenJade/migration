@@ -118,7 +118,7 @@ private:
     Table();
     const CatalogEntry *lookup(const StringC &, Boolean overrideOnly) const;
     const CatalogEntry *lookup(const StringC &key,
-			       const SubstTable<Char> &substTable,
+			       const SubstTable &substTable,
 			       Boolean overrideOnly) const;
     void insert(const StringC &, const CatalogEntry &, Boolean override);
     size_t count() const;
@@ -237,7 +237,7 @@ private:
   StringC dtddeclKey_;
   StringC sgmlKey_;
   XcharMap<unsigned char> categoryTable_;
-  SubstTable<Char> substTable_;
+  SubstTable substTable_;
   Boolean override_;
 };
 
@@ -757,7 +757,7 @@ const CatalogEntry *SOEntityCatalog::Table::lookup(const StringC &key,
 
 const CatalogEntry *
 SOEntityCatalog::Table::lookup(const StringC &name,
-			       const SubstTable<Char> &substTable,
+			       const SubstTable &substTable,
 			       Boolean overrideOnly) const
 {
   HashTableIter<StringC,CatalogEntry> iter1(overrideEntries_);

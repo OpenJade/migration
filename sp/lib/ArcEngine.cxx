@@ -86,7 +86,7 @@ public:
 		const volatile sig_atomic_t *cancelPtr,
 		const Notation *,
 		const Vector<StringC> &name,
-		const SubstTable<Char> *table);
+		const SubstTable *table);
   ~ArcEngineImpl();
   void sgmlDecl(SgmlDeclEvent *);
   void appinfo(AppinfoEvent *);
@@ -148,7 +148,7 @@ void ArcEngine::parseAll(SgmlParser &parser,
 EventHandler *
 SelectOneArcDirector::arcEventHandler(const Notation *,
 				      const Vector<StringC> &name,
-				      const SubstTable<Char> *table)
+				      const SubstTable *table)
 {
   if (name.size() != select_.size())
     return 0;
@@ -177,7 +177,7 @@ ArcEngineImpl::ArcEngineImpl(Messenger &mgr,
 			     const volatile sig_atomic_t *cancelPtr,
 			     const Notation *notation,
 			     const Vector<StringC> &docName,
-			     const SubstTable<Char> *table)
+			     const SubstTable *table)
 
 : director_(&director), mgr_(&mgr), cancelPtr_(cancelPtr),
   parser_(parser), stage_(0),

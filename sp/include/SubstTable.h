@@ -1,30 +1,29 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef SubstTable_INCLUDED
 #define SubstTable_INCLUDED
 
 #include <limits.h>
-#include "StringOf.h"
+#include "StringC.h"
 #include "Boolean.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
-template<class T>
 class SubstTable {
 public:
   SubstTable();
-  void addSubst(T from, T to);
-  void subst(T &c) const { if (table_.size() > 0) c = table_[c]; }
-  void subst(String<T> &) const;
-  T operator[](T c) const { return table_.size() > 0 ? table_[c] : c; }
-  String<T> inverse(T) const;
-  void inverseTable(SubstTable<T> &) const;
+  void addSubst(Char from, Char to);
+  void subst(Char &c) const { if (table_.size() > 0) c = table_[c]; }
+  void subst(StringC &) const;
+  Char operator[](Char c) const { return table_.size() > 0 ? table_[c] : c; }
+  StringC inverse(Char c) const;
+  void inverseTable(SubstTable &) const;
 private:
-  String<T> table_;
-  mutable String<T> pairs_;
+  StringC table_;
+  mutable StringC pairs_;
   mutable Boolean pairsValid_;
 };
 
@@ -33,7 +32,3 @@ private:
 #endif
 
 #endif /* SubstTable_INCLUDED */
-
-#ifdef SP_DEFINE_TEMPLATES
-#include "SubstTable.cxx"
-#endif

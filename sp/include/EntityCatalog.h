@@ -24,7 +24,7 @@ public:
   public:
     virtual Boolean namecaseGeneral() const = 0;
     virtual Boolean namecaseEntity() const = 0;
-    virtual const SubstTable<Char> &upperSubstTable() const = 0;
+    virtual const SubstTable &upperSubstTable() const = 0;
     virtual const StringC &peroDelim() const = 0;
   };
   virtual ~EntityCatalog();

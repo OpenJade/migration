@@ -110,7 +110,7 @@ private:
   ConstPtr<Syntax> syntax_;
   ConstPtr<Syntax> instanceSyntax_;
   ConstPtr<Sd> sd_;
-  SubstTable<Char> lowerSubst_;
+  SubstTable lowerSubst_;
   unsigned normalizeFlags_;
   StringC outputEntity_;
   Vector<StringC> elementTypeOrigNames_;

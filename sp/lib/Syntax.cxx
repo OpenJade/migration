@@ -417,7 +417,7 @@ StringC Syntax::rniReservedName(ReservedName i) const
   return result;
 }
 
-const SubstTable<Char> &Syntax::upperSubstTable() const
+const SubstTable &Syntax::upperSubstTable() const
 {
   return upperSubst_;
 }

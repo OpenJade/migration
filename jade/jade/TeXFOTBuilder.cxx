@@ -386,6 +386,7 @@ public:
   void setPageColumnSep(Length);
   void setPageBalanceColumns(bool);
   void setPageTwoSide(bool);
+  void setTwoSideStartOnRight(bool);
   void setGridRowSep(Length);
   void setGridColumnSep(Length);
   void setSubscriptDepth(Length);
@@ -1926,6 +1927,12 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
     {
       "UNREGISTERED::OpenJade//Characteristic::page-two-side?",
       (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setPageTwoSide,
+      0,
+      0
+    },
+    {
+      "UNREGISTERED::OpenJade//Characteristic::two-side-start-on-right?",
+      (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setTwoSideStartOnRight,
       0,
       0
     },
@@ -4744,6 +4751,11 @@ void TeXFOTBuilder::setPageBalanceColumns(bool flag)
 void TeXFOTBuilder::setPageTwoSide(bool flag)
 {
   set("PageTwoSide",flag);
+}
+
+void TeXFOTBuilder::setTwoSideStartOnRight(bool flag)
+{
+  set("TwoSideStartOnRight",flag);
 }
 
 void TeXFOTBuilder::setSubscriptDepth(Length w)

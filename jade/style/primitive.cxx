@@ -3551,7 +3551,8 @@ DEFPRIMITIVE(NodeListFirst, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  return new (interp) NodePtrNodeListObj(nl->nodeListFirst(interp));
+  NodePtr nd = nl->nodeListFirst(interp);
+  return new (interp) NodePtrNodeListObj(nd);
 }
 
 DEFPRIMITIVE(NodeListRest, argc, argv, context, interp, loc)

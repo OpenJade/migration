@@ -55,13 +55,13 @@ public:
 		    const StringC &filenameStr,
 		    const OutputCodingSystem *,
 		    CmdLineApp *,
-		    Messenger *messenger);
+		    ::Messenger *messenger);
   ~XRastEventHandler();
   void message(MessageEvent *);
   void truncateOutput();
   void allLinkTypesActivated();
 private:
-  Messenger *messenger_;
+  ::Messenger *messenger_;
   // file_ must come before os_ so it gets inited first
   FileOutputByteStream file_;
   EncodeOutputCharStream os_;
@@ -132,6 +132,11 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
 	{ SP_T("nonsgml"), SgmlsEventHandler::outputNonSgml },
 	{ SP_T("empty"), SgmlsEventHandler::outputEmpty },
 	{ SP_T("data-attribute"), SgmlsEventHandler::outputDataAtt },
+        { SP_T("comment"), SgmlsEventHandler::outputComment },
+        { SP_T("omitted"), (SgmlsEventHandler::outputTagOmission |
+                            SgmlsEventHandler::outputAttributeOmission ) },
+        { SP_T("tagomit"), SgmlsEventHandler::outputTagOmission },
+        { SP_T("attromit"), SgmlsEventHandler::outputAttributeOmission },
       };
       Boolean found = 0;
       for (size_t i = 0; i < SIZEOF(outputOptions); i++)
@@ -166,6 +171,12 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
     ParserApp::processOption(opt, arg);
     break;
   }
+  if (outputFlags_ & SgmlsEventHandler::outputComment) {
+    options_.eventsWanted.addCommentDecls();
+    options_.eventsWanted.addPrologMarkup();
+  }
+  if (outputFlags_ & SgmlsEventHandler::outputTagOmission)
+    options_.eventsWanted.addInstanceMarkup();
 }
 
 int NsgmlsApp::processArguments(int argc, AppChar **argv)
@@ -228,7 +239,7 @@ XRastEventHandler::XRastEventHandler(SgmlParser *parser,
 				     const StringC &filenameStr,
 				     const OutputCodingSystem *codingSystem,
 				     CmdLineApp *app,
-				     Messenger *messenger)
+				     ::Messenger *messenger)
 : RastEventHandler(parser, messenger),
   messenger_(messenger),
   filename_(filename),

@@ -53,7 +53,10 @@ public:
     outputNotationSysid = 020,
     outputNonSgml = 040,
     outputEmpty = 0100,
-    outputDataAtt = 0200
+    outputDataAtt = 0200,
+    outputComment = 0400,
+    outputTagOmission = 01000,
+    outputAttributeOmission = 02000,
     };
       
   SgmlsEventHandler(const SgmlParser *,
@@ -65,6 +68,7 @@ public:
   void startElement(StartElementEvent *);
   void endElement(EndElementEvent *);
   void pi(PiEvent *);
+  void commentDecl(CommentDeclEvent *);
   void sdataEntity(SdataEntityEvent *);
   void externalDataEntity(ExternalDataEntityEvent *);
   void subdocEntity(SubdocEntityEvent *);
@@ -109,6 +113,7 @@ private:
   Messenger *messenger_;
   Location currentLocation_;
   OutputCharStream *os_;
+  Boolean inDocument_;
   Boolean haveData_;
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> syntax_;
@@ -123,6 +128,9 @@ private:
   PackedBoolean outputNonSgml_;
   PackedBoolean outputEmpty_;
   PackedBoolean outputDataAtt_;
+  PackedBoolean outputComment_;
+  PackedBoolean outputTagOmission_;
+  PackedBoolean outputAttributeOmission_;
 };
 
 inline

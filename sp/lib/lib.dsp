@@ -955,10 +955,6 @@ SOURCE=.\StorageManager.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\StringVectorMessageArg.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\Syntax.cxx
 # End Source File
 # Begin Source File
@@ -1830,10 +1826,6 @@ SOURCE=..\include\StringOf.h
 # Begin Source File
 
 SOURCE=..\include\StringResource.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\StringVectorMessageArg.h
 # End Source File
 # Begin Source File
 

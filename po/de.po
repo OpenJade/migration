@@ -615,8 +615,7 @@ msgid "length of name token must not exceed NAMELEN (%1)"
 msgstr "Die Länge eines Namenstokens darf NAMELEN (%1) nicht überschreiten"
 
 msgid "an attribute value literal can occur in an attribute specification list only after a VI delimiter"
-msgstr "Ein Attributwertliteral kann in einer Attributspezifikationsliste nur
-nach einem VI Begrenzer vorkommen"
+msgstr "Ein Attributwertliteral kann in einer Attributspezifikationsliste nur nach einem VI Begrenzer vorkommen"
 
 msgid "duplicate specification of attribute %1"
 msgstr "Doppelte Spezifikation von Attribut %1"

@@ -11,7 +11,7 @@ Changes in OpenSP 1.5pre6
 
 * A few minor documentation improvements, thanks to Terje Bless
 
-* require autoconf 2.52
+* require autoconf 2.52; fix some autoconf problems for the new version
 
 Changes in OpenSP 1.5pre5
 

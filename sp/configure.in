@@ -29,7 +29,6 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
-AC_PROG_RANLIB
 AC_PROG_MAKE_SET
 AC_PATH_PROGS(PERL, perl, perl)
 AM_PROG_LIBTOOL
@@ -66,7 +65,9 @@ fi
 AC_CHECK_SIZEOF(size_t)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(wchar_t,,stdio.h wchar.h)
+AC_CHECK_SIZEOF(wchar_t,,[
+  #include <stdio.h>
+  #include <wchar.h>])
 AC_CXX_BOOL
 if test "$ac_cv_cxx_bool" = yes; then
   AC_CHECK_SIZEOF(bool)

@@ -1,9 +1,19 @@
 // Copyright (C) 1999 Matthias Clasen, Peter Nilsson
 // See the file COPYING for copying permissions.
 
+
 #include <OpenSP/config.h>
 
 @TOP@
+
+/* these are needed for GNU gettext */
+#undef ENABLE_NLS
+#undef HAVE_CATGETS
+#undef HAVE_GETTEXT
+#undef HAVE_LC_MESSAGES
+#undef HAVE_STPCPY
+
+#undef OPENJADE_LOCALE_DIR
 
 /* set this to the location of builtins.dsl */
 #define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
@@ -25,9 +35,6 @@
 
 /* define this if  set_new_handler() has to be declared extern "C" */
 #undef SP_SET_NEW_HANDLER_EXTERN_C 
-
-/* ??? */
-#undef SP_ANSI_LIB       
 
 /* define this to build a multi-byte version */
 #undef SP_MULTI_BYTE

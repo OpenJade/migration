@@ -179,14 +179,6 @@
 			  #f))
 		    #t))
 
-(define (node-list-filter proc nl)
-  (node-list-reduce nl
-		    (lambda (result snl)
-		      (if (proc snl)
-			  (node-list result snl)
-			  result))
-		    (empty-node-list)))
-
 (define (node-list->list nl)
   (reverse (node-list-reduce nl
 			     (lambda (result snl)
@@ -238,18 +230,6 @@
 
 (define (source nl)
   (node-list-property 'source nl))
-
-(define (subgrove nl)
-  (node-list-map
-   (lambda (snl)
-     (node-list snl
-		(subgrove 
-		 (apply node-list
-			(map (lambda (name)
-			       (node-property name snl))
-			     (node-property 'subnode-property-names 
-					    snl))))))
-   nl))
 
 (define (ancestors nl)
   (node-list-map (lambda (snl)

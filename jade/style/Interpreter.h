@@ -53,10 +53,15 @@ public:
     keyArrow,
     keySet,
     keyBegin,
+    keyThereExists,
+    keyForAll,
+    keySelectEach,
+    keyUnionForEach,
     keyMake,
     keyStyle,
     keyWithMode,
     keyDefineUnit,
+    keyQuery,
     keyElement,
     keyDefault,
     keyRoot,
@@ -157,12 +162,32 @@ public:
     keyDeclareFlowObjectMacro,
     keyOrElement,
     keyPositionPreference,
+    keyCollate,
+    keyToupper,
+    keyTolower,
+    keySymbol,
+    keyOrder,
+    keyForward,
+    keyBackward,
+    keyWhitePoint,
+    keyBlackPoint,
+    keyRange,
+    keyRangeAbc,
+    keyRangeLmn,
+    keyRangeA,
+    keyDecodeAbc,
+    keyDecodeLmn,
+    keyDecodeA, 
+    keyMatrixAbc,
+    keyMatrixLmn,
+    keyMatrixA,
     keyArchitecture
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
   // Return 0 is value can't yet be computed.
   ELObj *computeValue(bool force, Interpreter &) const;
+  ELObj *computeBuiltinValue(bool force, Interpreter &) const;
   bool syntacticKey(SyntacticKey &) const;
   void setSyntacticKey(SyntacticKey);
   bool defined(unsigned &, Location &) const;
@@ -194,6 +219,9 @@ private:
   ConstPtr<InheritedC> inheritedC_;
   unsigned inheritedCPart_;
   Location inheritedCLoc_;
+  void maybeSaveBuiltin();
+  Identifier *builtin_;
+  static bool preferBuiltin_;
 };
 
 class Unit : public Named {
@@ -239,6 +267,11 @@ private:
   ELObj *obj_;
 };
 
+struct CharPart {
+  Char c;
+  unsigned defPart;
+};
+
 class Interpreter : 
   public Collector,
   public Pattern::MatchContext,
@@ -267,9 +300,10 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, const FOTBuilder::Extension *);
+	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
   void defineVariable(const StringC &);
   void endPart();
+  void dEndPart();
   FalseObj *makeFalse();
   TrueObj *makeTrue();
   NilObj *makeNil();
@@ -336,7 +370,12 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool strictMode() const;
   void setNodeLocation(const NodePtr &);
+  void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
+  ELObj *defaultLanguage() const;
+  bool defaultLanguageSet(unsigned &,Location &) const;
+  void compileDefaultLanguage();
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
@@ -350,14 +389,21 @@ public:
   bool convertCharName(const StringC &str, Char &c) const;
   enum LexCategory {
     lexLetter,			// a - z A - Z
-    lexOtherNameStart,		// 
+    lexOtherNameStart,		// !$%&*/<=>?~_^:
+    lexAddNameStart,
     lexDigit,			// 0-9
     lexOtherNumberStart,	// -+.
+    lexOther,
     lexDelimiter,		// ;()"
     lexWhiteSpace,
-    lexOther
+    lexAddWhiteSpace
   };
   LexCategory lexCategory(Xchar);
+  void addStandardChar(const StringC &, const StringC &);
+  void addSdataEntity(const StringC &, const StringC &, const StringC &);
+  void addNameChar(const StringC &);
+  void addSeparatorChar(const StringC &);
+  void setCharRepertoire(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -365,8 +411,9 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *s, PrimitiveObj *value);
-  void installXPrimitive(const char *s, PrimitiveObj *value);
+  void installPrimitive(const char *, PrimitiveObj *);
+  void installXPrimitive(const char *, const char *, PrimitiveObj *);
+  void installBuiltins();
   void installUnits();
   void installCharNames();
   void installInheritedCs();
@@ -407,6 +454,7 @@ private:
   Messenger *messenger_;
   const FOTBuilder::Extension *extensionTable_;
   unsigned partIndex_;
+  unsigned dPartIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
   GroveManager *groveManager_;
@@ -414,7 +462,9 @@ private:
   NamedTable<ProcessingMode> processingModeTable_;
   SymbolObj *portNames_[nPortNames];
   ELObj *cValueSymbols_[FOTBuilder::nSymbols];
-  HashTable<StringC,Char> namedCharTable_;
+  HashTable<StringC, CharPart> namedCharTable_;
+  HashTable<StringC, CharPart> sdataEntityNameTable_;
+  HashTable<StringC, CharPart> sdataEntityTextTable_;
   Vector<const Identifier *> initialValueNames_;
   NCVector<Owner<Expression> > initialValueValues_;
   size_t currentPartFirstInitialValue_;
@@ -437,13 +487,17 @@ private:
     OwnerTable<String<char>, String<char>, StringSet, StringSet> table_;
   };
   StringSet publicIds_;
-  HashTable<StringC,Char> sdataEntityNameTable_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool strictMode_;
+  ELObj *defaultLanguage_;
+  Owner<Expression> defaultLanguageDef_;
+  unsigned defaultLanguageDefPart_;
+  Location defaultLanguageDefLoc_;
   friend class Identifier;
 };
 
@@ -638,6 +692,12 @@ inline
 bool Interpreter::dsssl2() const
 {
   return dsssl2_;
+}
+
+inline
+bool Interpreter::strictMode() const
+{
+  return strictMode_;
 }
 
 inline

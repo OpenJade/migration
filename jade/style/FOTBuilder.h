@@ -202,6 +202,11 @@ public:
     LengthSpec min;
     LengthSpec max;
   };
+  struct OptInlineSpace {
+    OptInlineSpace() : hasSpace(0) { }
+    bool hasSpace;
+    InlineSpace space;
+  };
   // non-inherited characteristics for all displayed flow objects
   struct DisplayNIC {
     DisplayNIC();
@@ -480,8 +485,6 @@ public:
   virtual void endGridCell();
 
   // Simple page
-  virtual void startSimplePageSequence();
-  virtual void endSimplePageSequence();
   // Headers and footers are treated like a separate port.
   // There are 24 different parts to the headers and footers
   // numbered 0 to 027; the numbers are computed by or'ing the
@@ -503,9 +506,10 @@ public:
     // number of different HF calls
     nHF = 030
   };
-  virtual void startSimplePageSequenceHeaderFooter(unsigned);
-  virtual void endSimplePageSequenceHeaderFooter(unsigned);
-  virtual void endAllSimplePageSequenceHeaderFooter();
+  virtual void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
+  virtual void endSimplePageSequenceHeaderFooter();
+  virtual void endSimplePageSequence();
+
   // page-number sosofo
   virtual void pageNumber();
   // Inherited characteristics
@@ -633,6 +637,7 @@ public:
   virtual void setCountry(Letter2);
   virtual void setEscapementSpaceBefore(const InlineSpace &);
   virtual void setEscapementSpaceAfter(const InlineSpace &);
+  virtual void setInlineSpaceSpace(const OptInlineSpace &);
   // For simple page sequence
   virtual void setPageWidth(Length);
   virtual void setPageHeight(Length);
@@ -743,12 +748,9 @@ public:
   void endSideline();
   void startBox(const BoxNIC &);
   void endBox();
-  void startSimplePageSequence();
+  void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
+  void endSimplePageSequenceHeaderFooter();
   void endSimplePageSequence();
-  // Headers and footers are treated like a separate port.
-  void startSimplePageSequenceHeaderFooter(unsigned);
-  void endSimplePageSequenceHeaderFooter(unsigned);
-  void endAllSimplePageSequenceHeaderFooter();
   // page-number sosofo
   void pageNumber();
   // math
@@ -1189,6 +1191,12 @@ private:
 // Would like to make this a member of SaveFOTBuilder, but can't because
 // it has members that are instances of SaveFOTBuilder.
 
+struct StartSimplePageSequenceCall : SaveFOTBuilder::Call {
+  StartSimplePageSequenceCall(FOTBuilder* headerFooter[FOTBuilder::nHF]);
+  void emit(FOTBuilder&);
+  SaveFOTBuilder headerFooter[FOTBuilder::nHF];
+};
+
 struct StartFractionCall : SaveFOTBuilder::Call {
   StartFractionCall(FOTBuilder *&numerator, FOTBuilder *&denominator);
   void emit(FOTBuilder &);
@@ -1277,6 +1285,9 @@ class STYLE_API SerialFOTBuilder : public FOTBuilder {
 public:
   SerialFOTBuilder();
   // Instead of overriding these
+  void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
+  void endSimplePageSequenceHeaderFooter();
+  void endSimplePageSequence();
   void startTablePart(const TablePartNIC &,
                       FOTBuilder *&header, FOTBuilder *&footer);
   void endTablePart();
@@ -1308,6 +1319,11 @@ public:
 		      Vector<FOTBuilder *> &ports);
   void endExtension(const CompoundExtensionFlowObj &);
   // Override these
+  virtual void startSimplePageSequenceSerial();
+  virtual void endSimplePageSequenceSerial();
+  virtual void startSimplePageSequenceHeaderFooter(unsigned);
+  virtual void endSimplePageSequenceHeaderFooter(unsigned);
+  virtual void endAllSimplePageSequenceHeaderFooter();
   virtual void startFractionSerial();
   virtual void endFractionSerial();
   virtual void startFractionNumerator();

@@ -14,7 +14,7 @@ E0+oddKeyArgs++odd number of keyword/value arguments
 E0+missingArg++missing argument for function call
 E1+syntacticKeywordAsVariable++syntactic keyword %1 used as variable
 E1+undefinedVariableReference++reference to undefined variable %1
-E0+badCharName++no character with that name
+E1+badCharName++no character with name %1
 E1+keywordNotAllowedCall++syntactic keyword %1 not valid in call position
 E1+symbolRequired++symbol required (got %1)
 E1+unknownTopLevelForm++unknown top level form %1
@@ -85,11 +85,13 @@ E0+sosofoContext++this context requires a sosofo
 E0+styleContext++this context requires a style object
 E0+notInCharacteristicValue++procedure can only be used in evaluation of characteristic value
 E1+expressionNotImplemented++sorry, %1 expression not implemented
-E0+RGBColorArgCount++Device RGB color requires three arguments
-E0+RGBColorArgType++arguments for Device RGB color must be numbers
-E0+RGBColorArgRange++arguments for Device RGB color must be in the range 0 to 1
+E1+colorArgCount++%1 color requires three arguments
+E1+colorArgType++arguments for %1 color must be numbers
+E1+colorArgRange++arguments for %1 color must be in the range 0 to 1
+E1+colorProcResType++result of procedure in %1 color must be a number
 E1+unknownColorSpaceFamily++unknown color-space family %1
-E0+deviceRGBColorSpaceNoArgs++Device RGB Color Space Family does not take any arguments
+E1+colorSpaceNoArgs++%1 color-space family does not take any arguments
+E1+colorSpaceArgError++invalid parameters for %1 color-space family
 E1+notABuiltinInheritedC++%1 is not a pre-defined inherited characteristic
 E1+invalidNumberFormat++invalid number format %1
 E1+invalidPublicIdChar++invalid character %1 in public identifier
@@ -124,4 +126,27 @@ E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here
 E1+undefinedMode++mode %1 not defined
-
+E1+duplicateCharName++duplicate character name %1
+E1+duplicateSdataEntityName++duplicate SDATA entity name %1
+E1+duplicateSdataEntityText++duplicate SDATA entity text %1
+W0+unsupportedDeclaration++unsupported declaration will be ignored
+W1+unsupportedCharRepertoire++unsupported character repertoire %1 will be ignored
+E0+badDeclaration++error in declaration element
+E1+duplicateDeclaration++duplicate declaration element (%1)
+E1+invalidIdentifier++%1 is not a valid identifier
+E0+badLanguageDefinition++error in language definition
+E0+noCurrentLanguage++no current language
+E3+notALanguage++%2 argument for primitive %1 of wrong type: %3 not a language
+E3+notAPositiveInteger++%2 argument for primitive %1 of wrong type: %3 not a po
+E3+notAnInteger++%2 argument for primitive %1 of wrong type: %3 not an integer
+E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
+E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
+E3+notACharList++%2 argument for primitive %1 of wrong type: %3 not a list of characters
+E3+lengthError++%2 argument for primitive %1 has wrong length
+W1+noExactRepresentation++quantity %1 can't be represented exactly
+E0+duplicateDefLangDecl++default language already declared in this part+first declaration was here
+E1+defLangDeclRequiresLanguage++%1 not a language as required in a default-language-declaration
+E1+invalidUnitName++%1 is not a valid unit name
+E1+invalidCharName++%1 is not a valid character name
+E1+invalidCharNumber++%1 is not a valid character number
+E0+returnNotSosofo++value returned by procedure was not a sosofo

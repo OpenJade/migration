@@ -1,6 +1,10 @@
 LIB=style
-OBJS=Collector.o \
+DEPLIBS=-lm -L$(TOP)/grove/.libs -lgrove -L$(TOP)/lib/.libs -lsp 	\
+  -L$(TOP)/spgrove/.libs -lspgrove
+OBJS=LangObj.o \
+  Collector.o \
   DssslApp.o \
+  InterpreterMessages.o \
   DssslSpecEventHandler.o \
   ELObj.o \
   ELObjMessageArg.o \
@@ -10,7 +14,6 @@ OBJS=Collector.o \
   InheritedC.o \
   Insn.o \
   Interpreter.o \
-  InterpreterMessages.o \
   NumberCache.o \
   ProcessContext.o \
   ProcessingMode.o \
@@ -30,3 +33,8 @@ GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 FlowObj.o: FlowObj_inst.cxx
 primitive.o: primitive_inst.cxx
 DssslApp.o: DssslAppMessages.h
+FlowObj.lo: FlowObj_inst.cxx
+primitive.lo: primitive_inst.cxx
+DssslApp.lo: DssslAppMessages.h
+InterpreterMessages.o: InterpreterMessages.h
+InterpreterMessages.lo: InterpreterMessages.h

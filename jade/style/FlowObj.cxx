@@ -745,18 +745,19 @@ void SimplePageSequenceFlowObj::traceSubObjects(Collector &c) const
 void SimplePageSequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
-  fotb.startSimplePageSequence();
+  FOTBuilder* hf_fotb[FOTBuilder::nHF];
+  fotb.startSimplePageSequence(hf_fotb);
   for (int i = 0; i < (1 << nPageTypeBits); i++) {
     context.setPageType(i);
     for (int j = 0; j < HeaderFooter::nParts; j++) {
-      fotb.startSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
-      if (hf_->part[j])
+      if (hf_->part[j]) {
+        context.pushPrincipalPort(hf_fotb[i | (j << nPageTypeBits)]);
 	hf_->part[j]->process(context);
-      fotb.endSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
+        context.popPrincipalPort();
     }
   }
-  fotb.endAllSimplePageSequenceHeaderFooter();
-  context.clearPageType();
+  }
+  fotb.endSimplePageSequenceHeaderFooter();
   CompoundFlowObj::processInner(context);
   fotb.endSimplePageSequence();
 }

@@ -249,3 +249,7 @@
 #if defined(HAVE_NEW) && defined(HAVE_CASSERT)
 #define SP_ANSI_LIB 1
 #endif /* HAVE_NEW && HAVE_CASSERT */
+
+#ifndef HAVE_MUTABLE
+#define mutable 
+#endif /* HAVE_MUTABLE */

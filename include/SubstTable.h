@@ -4,9 +4,9 @@
 #ifndef SubstTable_INCLUDED
 #define SubstTable_INCLUDED
 
-#include <limits.h>
+#include "types.h"
 #include "StringC.h"
-#include "Boolean.h"
+#include "Vector.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -16,16 +16,46 @@ class SubstTable {
 public:
   SubstTable();
   void addSubst(Char from, Char to);
-  void subst(Char &c) const { if (table_.size() > 0) c = table_[c]; }
+  void subst(Char &) const;
   void subst(StringC &) const;
-  Char operator[](Char c) const { return table_.size() > 0 ? table_[c] : c; }
-  StringC inverse(Char c) const;
+  Char operator[](Char from) const;
+  void sort() const;
+  Char at(Char from) const;
+  StringC inverse(Char to) const;
   void inverseTable(SubstTable &) const;
 private:
-  StringC table_;
-  mutable StringC pairs_;
-  mutable Boolean pairsValid_;
+  struct Pair {
+    Pair() {}
+    Pair(Char f, Char t) : from(f), to(t) {}
+    Char from;
+    Char to;
+  };
+  Char lo_[256];
+  mutable Vector<Pair> map_; 
+  mutable bool isSorted_;
 };
+
+inline 
+void SubstTable::subst(Char &c) const
+{
+  c = operator[](c);
+}
+
+inline
+void SubstTable::subst(StringC &str) const
+{
+  for (size_t i = 0; i < str.size(); i++)
+    subst(str[i]);
+}
+
+inline
+Char SubstTable::operator[](Char t) const
+{
+  if (t < 256)
+    return lo_[t];
+  else 
+    return at(t);
+}
 
 #ifdef SP_NAMESPACE
 }

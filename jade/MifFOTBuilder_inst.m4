@@ -39,9 +39,6 @@ __instantiate(Vector<MifDoc::Frame>)
 __instantiate(Vector<MifDoc::Object*>)
 __instantiate(Vector<MifDoc::T_XY>)
 __instantiate(Vector<MifDoc::CrossRefInfo>)
-#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
-__instantiate(Vector<MifDoc::ElementSet::SgmlIdInfo*>)
-#endif
 __instantiate(`PointerTable<MifDoc::Ruling*, String<char>, StringHash, MifDoc::Ruling>')
 __instantiate(`PointerTableIter<MifDoc::Ruling*, String<char>, StringHash, MifDoc::Ruling>')
 __instantiate(Vector<MifDoc::Ruling*>)

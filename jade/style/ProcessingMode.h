@@ -83,8 +83,13 @@ public:
   };
 
   ProcessingMode(const StringC &, const ProcessingMode *initial = 0);
-  void addRule(bool matchesRoot, NCVector<Pattern> &, Owner<Expression> &expr,
-	       RuleType, const Location &, Interpreter &);
+  void addElementRule(NCVector<Pattern> &, Owner<Expression> &expr,
+		      RuleType, const Location &, Interpreter &);
+  void addRootRule(Owner<Expression> &expr,
+		   RuleType, const Location &, Interpreter &);
+  void addQueryRule(Owner<Expression> &query, Owner<Expression> &expr,
+		    Owner<Expression> &priority,
+		    RuleType, const Location &, Interpreter &);
   // Specificity gives specificity of last match; gets specificity of current match.
   const Rule *findMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
 			Specificity &) const;
@@ -92,7 +97,6 @@ public:
   bool defined() const;
   void setDefined();
   bool hasQuery() const;
-  void setQuery();
 
   struct ElementRules : public Named {
   public:
@@ -143,13 +147,7 @@ void ProcessingMode::setDefined()
 inline
 bool ProcessingMode::hasQuery() const
 {
-  return hasQuery_;
-}
-
-inline
-void ProcessingMode::setQuery()
-{
-  hasQuery_ = 1;
+  return hasQuery_ || (initial_ && initial_->hasQuery());
 }
 
 inline

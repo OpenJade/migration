@@ -49,7 +49,7 @@ public:
   };
   class NodeQualifier : public Qualifier, private Collector::DynamicRoot {
   public:
-    NodeQualifier(Owner<Expression> &, Owner<Expression> &, ProcessingMode *, Interpreter *, Location &);
+    NodeQualifier(Owner<Expression> &, Owner<Expression> &, ProcessingMode *, Interpreter *, const Location &);
     bool satisfies(const NodePtr &, MatchContext &) const;
     void contributeSpecificity(long *) const;
     void trace(Collector &) const;

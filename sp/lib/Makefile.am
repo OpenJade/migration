@@ -97,29 +97,6 @@ BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	app_inst.cxx arc_inst.cxx entmgr_inst.cxx parser_inst.cxx \
 	xentmgr_inst.cxx
 
-URLStorage.o: URLStorageMessages.h
-URLStorage.lo: URLStorageMessages.h
-PosixStorage.o: PosixStorageMessages.h
-PosixStorage.lo: PosixStorageMessages.h
-StdioStorage.o: StdioStorageMessages.h
-StdioStorage.lo: StdioStorageMessages.h
-SOEntityCatalog.o: CatalogMessages.h
-SOEntityCatalog.lo: CatalogMessages.h
-ExtendEntityManager.o: EntityManagerMessages.h
-ExtendEntityManager.lo: EntityManagerMessages.h
-ParserState.o: ParserMessages.h
-ParserState.lo: ParserMessages.h
-MessageFormatter.o: MessageFormatterMessages.h
-MessageFormatter.lo: MessageFormatterMessages.h
-MessageReporter.o: MessageReporterMessages.h
-MessageReporter.lo: MessageReporterMessages.h
-CmdLineApp.o: CmdLineAppMessages.h
-CmdLineApp.lo: CmdLineAppMessages.h
-ParserApp.o: ParserAppMessages.h
-ParserApp.lo: ParserAppMessages.h
-ArcEngine.o: ArcEngineMessages.h
-ArcEngine.lo: ArcEngineMessages.h
-
 SUFFIXES = .msg .m4 .rc
 
 .m4.cxx: 

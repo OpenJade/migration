@@ -1053,6 +1053,7 @@ private:
 class SaveFOTBuilder::Emitter::Mark {
 public:
 private:
+  typedef SaveFOTBuilder::Call Call;
   Mark(Call* where) : where_(where) {}
   Call* where_;
   friend class SaveFOTBuilder::Emitter;

@@ -1,10 +1,11 @@
 // TextFOTBuilder - a formatter for plain text output.
 // Copyright (c) 1999 Avi Kivity
 
+#include <stack>
+#include <algorithm>
 #include "config.h"
 #include "TextFOTBuilder.h"
 #include "macros.h"
-#include <stack>
 
 #undef   DBG_TEXT_BACKEND
 #ifndef  DBG_TEXT_BACKEND
@@ -523,14 +524,6 @@ Ordinate
 TextArea::MeasuredArea::width() const
 {
   return width_;
-}
-
-template <class T>
-inline
-const T&
-max(const T& v1, const T& v2)
-{
-  return v1 > v2 ? v1 : v2;
 }
 
 void 

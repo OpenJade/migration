@@ -4,12 +4,6 @@
 #ifndef DtdDeclEventHandler_INCLUDED
 #define DtdDeclEventHandler_INCLUDED 1
 
-#ifdef __GNUG__
-#pragma interface
-#endif
-
-// Must include Boolean.h before SGMLApplication.h.
-
 #include "Boolean.h"
 #include "Event.h"
 #include "ErrorCountEventHandler.h"
@@ -18,7 +12,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API DtdDeclEventHandler : public ErrorCountEventHandler {
+class DtdDeclEventHandler : public ErrorCountEventHandler {
  public:
   DtdDeclEventHandler(const StringC &pubid);
   void message(MessageEvent *);

@@ -685,7 +685,7 @@ while (insn)
 	</varlistentry>
       </variablelist>
     </sect2>
-    <sect2>
+    <sect2 id="GC">
       <title>Garbage collection</title>
 
       <para>
@@ -757,7 +757,7 @@ while (insn)
 	  destructor that must be called, you must declare an operator
 	  <function>new()</function>:
 <programlisting>	  
-void *operator new(size_t, Collector &lt;c) 
+void *operator new(size_t, Collector &amp;c) 
 {
   return c.allocateObject(1);
 }
@@ -869,7 +869,8 @@ return new (interp) NodePtrNodeListObj(nd);
 	<programlisting format="linespecific">
 PRIMITIVE(<replaceable>&lt;class name prefix></replaceable>,
 	  "<replaceable>&lt;primitive name></replaceable>", 
-          <replaceable>&lt;req. args></replaceable>, <replaceable>&lt;opt. args></replaceable>, <replaceable>&lt;rest arg></replaceable>)
+          <replaceable>&lt;req. args></replaceable>, <replaceable>&lt;opt. args></replaceable>, <replaceable>&lt;rest arg></replaceable>,
+	  <replaceable>&lt;feature></replaceable>)
 	</programlisting>
 	to <filename>style/primitive.h</filename> and a macro call of the form
 	<programlisting format="linespecific">
@@ -881,9 +882,18 @@ DEFPRIMITIVE(<replaceable>&lt;class name prefix></replaceable>, argc, argv,
 	<function>PrimitiveObj::primitiveCall()</function> as needed for the
 	function you want to add.</para>
 
-      <para>For a new external procedure, use XPRIMITIVE instead of PRIMITIVE.
-	The new procedure can be accessed using the public identifier</para>
+      <para>For procedures that are specific to the style language,
+	use SPRIMITIVE instead of PRIMITIVE. Likewise, procedures that
+	are specific to the experimental so-called DSSSL-2 option, are
+	declared with the PRIMITIVE2 macro.</para>
+
+      <para>External procedures found in Jade 1.2.1 use XPRIMITIVE instead of PRIMITIVE.
+	These procedures are accessed using a public identifier of the form:</para>
       <para>"UNREGISTERED::James Clark//Procedure::<replaceable>&lt;primitive name></replaceable>".</para>    
+      <para>External procedures added to OpenJade should be declared
+	using XXPRIMITIVE and are accessed using a public identifier
+	of the form:</para>
+      <para>"UNREGISTERED::OpenJade//Procedure::<replaceable>&lt;primitive name></replaceable>"</para>
       <example>
 	<title>The <function>sin</function> function</title>
 	<para>We can add the <function>sin</function> defined in clause
@@ -938,7 +948,8 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
       <title>Backends</title>
       <para>In order to create a completely new backend, you first
 	need to create a new subclass of
-      <classname>SerialFOTBuilder</classname> implementing the output 
+	<classname>FOTBuilder</classname> or
+	<classname>SerialFOTBuilder</classname> implementing the output 
 	format you are interested in. It is probably a good idea to
 	take an existing backend as a skeleton.</para>
       <para>TODO: More detail needed.</para>
@@ -961,6 +972,16 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
 	in the <function>Interpreter::installFlowObjs()</function> function
 	in <filename>style/FlowObj.cxx</filename>.</para>
       
+      <para>The FlowObj class has two members: one pointer and one
+	<classname>Owner</classname> (which takes up the same space as
+	a pointer). So, on a 32-bit machine for example, there is 8
+	bytes (two pointers) left for data members. The
+	<classname>CompoundFlowObj</classname> class adds one more data
+	member (a pointer), so you may have at most one pointer in a
+	subclass of that class. (See <xref linkend="gc"> for more
+	information.)
+      </para>
+
       <para>The <function>processInner()</function> of the new class
 	is responsible for calling the <classname>FOTBuilder</classname>
 	function (or pair of functions for nonatomic flow objects) associated
@@ -969,6 +990,27 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
 	class and provide default definitions there. These have to
 	be overridden by the backends (<classname>FOTBuilder</classname>
 	subclass) in order to implement the flow object in question.</para>
+
+      <para>For a compound flow object, this function also has to tell the
+	<classname>ProcessContext</classname> what ports this flow
+	object has and what content these prots accept. This is done
+	by calling
+	<function><classname>ProcessContext</classname>>::pushPorts()</function>
+	and
+	<function><classname>ProcessContext</classname>::popPorts()</function>
+	if the flow object has any named ports, or
+	<function><classname>ProcessContext</classname>::pushPrincipalPort()</function>
+	and
+	<function><classname>ProcessContext</classname>::popPrincipalPort()</function>
+	if the flow object has a single principal port. You also have
+	to provide subclasses of
+	<classname>ProcessContext::Validator</classname> for each port.</para>
+
+      <para>The <function>acceptFlags()</function>
+	<classname>FlowObj</classname> member function should return
+	flags describing the flow object (i.e. if it is inline or
+	display, for example). This information is used by the
+	validation mechanism.</para>
 
       <para>TODO: explain extension flow objects</para>
     </sect2>

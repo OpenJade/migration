@@ -75,7 +75,7 @@ static FileOutputByteStream standardError(2, 0);
 CmdLineApp::CmdLineApp(const char *requiredInternalCode)
 : errorFile_(0),
   outputCodingSystem_(0),
-  MessageReporter(0),
+  SP_REPORTER_CLASS(0),
   internalCharsetIsDocCharset_(1),
   codingSystem_(0),
   action_(normalAction)

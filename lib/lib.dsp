@@ -496,6 +496,14 @@ SOURCE=.\Fixed2CodingSystem.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\Fixed4CodingSystem.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\UTF16CodingSystem.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\GenericEventHandler.cxx
 # End Source File
 # Begin Source File
@@ -1314,6 +1322,14 @@ SOURCE=..\include\ExternalId.h
 # Begin Source File
 
 SOURCE=..\include\Fixed2CodingSystem.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\Fixed4CodingSystem.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\include\UTF16CodingSystem.h
 # End Source File
 # Begin Source File
 

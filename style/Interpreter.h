@@ -24,6 +24,8 @@
 #include "Node.h"
 #include "GroveManager.h"
 #include "Pattern.h"
+#include "CharMap.h"
+#include "TransformationMode.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -53,10 +55,15 @@ public:
     keyArrow,
     keySet,
     keyBegin,
+    keyThereExists,
+    keyForAll,
+    keySelectEach,
+    keyUnionForEach,
     keyMake,
     keyStyle,
     keyWithMode,
     keyDefineUnit,
+    keyQuery,
     keyElement,
     keyDefault,
     keyRoot,
@@ -157,28 +164,62 @@ public:
     keyDeclareFlowObjectMacro,
     keyOrElement,
     keyPositionPreference,
-    keyArchitecture
+    keyCollate,
+    keyToupper,
+    keyTolower,
+    keySymbol,
+    keyOrder,
+    keyForward,
+    keyBackward,
+    keyWhitePoint,
+    keyBlackPoint,
+    keyRange,
+    keyRangeAbc,
+    keyRangeLmn,
+    keyRangeA,
+    keyDecodeAbc,
+    keyDecodeLmn,
+    keyDecodeA, 
+    keyMatrixAbc,
+    keyMatrixLmn,
+    keyMatrixA,
+    keyArchitecture,
+    keyDefineTransliterationMap,
+    keyNode,
+    keySubgrove,
+    keyAdd,
+    keyRemove,
+    keySub,
+    keySortChildren,
+    keyOptional,
+    keyUnique,
+    keyProperty,
+    keyResultPath,
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
   // Return 0 is value can't yet be computed.
   ELObj *computeValue(bool force, Interpreter &) const;
+  ELObj *computeBuiltinValue(bool force, Interpreter &) const;
   bool syntacticKey(SyntacticKey &) const;
   void setSyntacticKey(SyntacticKey);
   bool defined(unsigned &, Location &) const;
-  void setDefinition(Owner<Expression> &, unsigned part,
-                     const Location &);
+  void setDefinition(Owner<Expression> &, unsigned part, const Location &);
+  void setBuiltinDefinition(Owner<Expression> &, unsigned part, const Location &);
   void setValue(ELObj *, unsigned defPart = unsigned(-1));
   bool evaluated() const;
   const ConstPtr<InheritedC> &inheritedC() const;
   bool inheritedCDefined(unsigned &, Location &) const;
+  bool charNICDefined(unsigned &, Location &) const;
+  void setCharNIC(unsigned, const Location &);
   void setInheritedC(const ConstPtr<InheritedC> &);
-  void setInheritedC(const ConstPtr<InheritedC> &, unsigned part,
-		     const Location &);
+  void setInheritedC(const ConstPtr<InheritedC> &, unsigned, const Location &);
   FlowObj *flowObj() const;
   bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
   void setFlowObj(FlowObj *, unsigned part, const Location &);
+  void setFeature(int);
+  bool requireFeature(Interpreter &, const Location &, bool fo = 0) const;
 private:
   unsigned defPart_;
   Owner<Expression> def_;
@@ -191,9 +232,16 @@ private:
   Location defLoc_;
   SyntacticKey syntacticKey_;
   bool beingComputed_;
+  bool charNIC_;
   ConstPtr<InheritedC> inheritedC_;
   unsigned inheritedCPart_;
   Location inheritedCLoc_;
+  void maybeSaveBuiltin();
+  Identifier *builtin_;
+  static bool preferBuiltin_;
+  friend class Interpreter;
+  // FIXME This should be Interpreter::Feature
+  int feature_;
 };
 
 class Unit : public Named {
@@ -239,6 +287,245 @@ private:
   ELObj *obj_;
 };
 
+struct CharPart {
+  Char c;
+  unsigned defPart;
+};
+
+struct ELObjPart {
+  ELObjPart();
+  ELObjPart(ELObj *x, unsigned y);
+  void operator=(const ELObjPart &);
+  bool operator==(const ELObjPart &) const;
+  bool operator!=(const ELObjPart &) const;
+  ELObj *obj;
+  unsigned defPart;
+};
+
+class CharPropValues {
+public:
+  virtual bool setDefault(const StringC &, const Location &,
+			  ELObj *, Interpreter &)=0;
+  virtual bool setValue(const StringC &,const StringC &,const Location &,
+			ELObj *, Interpreter &)=0;
+  virtual ELObj *value(Char, Interpreter &) const =0;
+  virtual ELObj *defaultValue(Interpreter &) const =0;
+};
+
+// These have to be in the header file, see Interpreter.
+
+class IntegerCharPropValues : public CharPropValues {
+public:
+  IntegerCharPropValues(long def=0)
+    : def_(def) {}
+  long getValue(Char) const;
+  void setRange(Char, Char, long);
+private:
+  IntegerCharPropValues(const IntegerCharPropValues &); // Undefined.
+  IntegerCharPropValues &operator=(const IntegerCharPropValues &); // Undefined
+  long def_;
+  struct ValT_ {
+    long l_;
+    bool hasValue_;
+    ValT_() : hasValue_(false) {}
+    ValT_(long l) : hasValue_(true), l_(l) {}
+    bool operator==(const ValT_ &v) const
+      { return (hasValue_==v.hasValue_) && (!hasValue_ || l_==v.l_); }
+    bool operator!=(const ValT_& v) const
+      { return !(*this == v); }
+  };
+  CharMap<ValT_> map_;
+
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
+class MaybeIntegerCharPropValues : public CharPropValues {
+public:
+  MaybeIntegerCharPropValues(bool defFalse=true, long def=0)
+    : defFalse_(defFalse), def_(def) {}
+  // Returns true and sets 2nd arg if not #f, otherwise returns false.
+  bool getValue(Char, long &) const;
+  void setRange(Char, Char, long);
+  void setValue(Char, long);
+private:
+  MaybeIntegerCharPropValues(const MaybeIntegerCharPropValues &); // Undefined.
+  MaybeIntegerCharPropValues &operator=(const MaybeIntegerCharPropValues &);
+  // Above undefined.
+  long def_;
+  bool defFalse_;
+  struct ValT_ {
+    long l_;
+    bool hasValue_;
+    bool isFalse_;
+    ValT_() : hasValue_(false) {}
+    ValT_(long l) : l_(l), hasValue_(true), isFalse_(false) {}
+    bool operator==(const ValT_ &v) const
+      { return (hasValue_==v.hasValue_)
+	&& (!hasValue_ || (isFalse_ && v.isFalse_) || l_==v.l_); }
+    bool operator!=(const ValT_& v) const
+      { return !(*this == v); }
+  };
+  CharMap<ValT_> map_;
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
+class BooleanCharPropValues : public CharPropValues {
+public:
+  BooleanCharPropValues(bool def=false)
+    : def_(def) {}
+  bool getValue(Char) const;
+  void setRange(Char, Char, bool);
+private:
+  BooleanCharPropValues(const BooleanCharPropValues &); // Undefined.
+  BooleanCharPropValues &operator=(const BooleanCharPropValues &); // Undefined.
+  bool def_;
+  struct ValT_ {
+    bool b_:1;
+    bool hasValue_:1;
+    ValT_() : hasValue_(false) {}
+    ValT_(bool b) : b_(b), hasValue_(true) {}
+    bool operator==(const ValT_ &v) const
+      { return (hasValue_==v.hasValue_) && (!hasValue_ || b_==v.b_); }
+    bool operator!=(const ValT_& v) const
+      { return !(*this == v); }
+  };
+  CharMap<ValT_> map_;
+
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
+class PublicIdCharPropValues : public CharPropValues {
+public:
+  PublicIdCharPropValues(FOTBuilder::PublicId def=0)
+    : def_(def) {}
+  FOTBuilder::PublicId getValue(Char) const;
+  void setRange(Char, Char, const FOTBuilder::PublicId);
+private:
+  PublicIdCharPropValues(const PublicIdCharPropValues &); // Undefined.
+  PublicIdCharPropValues &operator=(const PublicIdCharPropValues &); // Undefined.
+  FOTBuilder::PublicId def_;
+  struct ValT_ {
+    FOTBuilder::PublicId p_;
+    bool hasValue_;
+    ValT_() : hasValue_(false) {}
+    ValT_(FOTBuilder::PublicId p)
+      : hasValue_(true), p_(p) {}
+    bool operator==(const ValT_ &v) const
+      { return (hasValue_==v.hasValue_) && (!hasValue_ || p_==v.p_); }
+    bool operator!=(const ValT_& v) const
+      { return !(*this == v); }
+  };
+  CharMap<ValT_> map_;
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
+class SymbolCharPropValues : public CharPropValues {
+public:
+  SymbolCharPropValues(FOTBuilder::Symbol def=FOTBuilder::symbolFalse)
+    : def_(def) {}
+  FOTBuilder::Symbol getValue(Char) const;
+  void setRange(Char, Char, FOTBuilder::Symbol);
+private:
+  SymbolCharPropValues(const SymbolCharPropValues &); // Undefined.
+  SymbolCharPropValues &operator=(const SymbolCharPropValues &); // Undefined.
+  FOTBuilder::Symbol def_;
+  struct ValT_ {
+    FOTBuilder::Symbol s_;
+    bool hasValue_;
+    ValT_() : hasValue_(false) {}
+    ValT_(FOTBuilder::Symbol s)
+      : hasValue_(true), s_(s) {}
+    bool operator==(const ValT_ &v) const
+      { return (hasValue_==v.hasValue_) && (!hasValue_ || s_==v.s_); }
+    bool operator!=(const ValT_& v) const
+      { return !(*this == v); }
+  };
+  CharMap<ValT_> map_;
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
+class CharProp : public Named {
+public:
+  CharProp(const StringC& name);
+
+  // def is used if char doesn't have property. If def==0, property default
+  // value is used.
+  ELObj *value(Char ch,ELObj *def, const Location &, Interpreter &);
+
+  // Use only before compile is called.
+  // Set value for characters in string.
+  void setValue(StringC &,Owner<Expression> &,unsigned,const Location&);
+  void declare(Owner<Expression> &, unsigned, const Location&,
+	       CharPropValues * =0);
+  void declarePredefined(CharPropValues *);
+  bool hasAddedValue(Char,unsigned&,Location&) const;
+  bool declared(unsigned&,Location&) const;
+
+  void compile(Interpreter &);
+protected:
+  enum computedType_ {
+    notComputed,
+    beingComputed,
+    computedError,
+    computedOK
+  };
+
+  // Default value.
+  unsigned defPart_;
+  Location defLoc_;
+  Owner<Expression> defExpr_;
+  computedType_ defComputed_;
+
+  // Added properties.
+  struct addedProp_ {
+    StringC chars_;
+    unsigned part_;
+    Location loc_;
+    Owner<Expression> expr_;
+    computedType_ computed_;
+  };
+  // Have to store in NCVector because of Owner non-copyable.
+  NCVector<addedProp_> addedPropsVec_;
+  // We have to store indices, since NCVector isn't really NC (ofcourse).
+  Owner<CharMap<NCVector<addedProp_>::size_type> > addedProps_;
+  enum { noAddedVal_ = NCVector<addedProp_>::size_type(-1) };
+  CharPropValues *values_;
+  // True if errors when compiling any of the added values.
+  bool hadError_;
+
+  void compileDef_(Interpreter &);
+  void compileAdded_(addedProp_ &,Interpreter &);
+  const addedProp_ *added_(Char) const;
+private:
+  CharProp(const CharProp &); // Undefined.
+  CharProp &operator=(const CharProp &); // Undefined.
+};
+
 class Interpreter : 
   public Collector,
   public Pattern::MatchContext,
@@ -267,9 +554,10 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, const FOTBuilder::Extension *);
-  void defineVariable(const StringC &);
+	      bool dsssl2, bool style, bool strictMode, 
+	      const FOTBuilder::Description &);
   void endPart();
+  void dEndPart();
   FalseObj *makeFalse();
   TrueObj *makeTrue();
   NilObj *makeNil();
@@ -291,12 +579,15 @@ public:
   Identifier *lookup(const StringC &);
   Unit *lookupUnit(const StringC &);
   FunctionObj *lookupExternalProc(const StringC &);
+  CharProp *lookupCharProperty(const StringC &);
   int unitsPerInch() const;
   unsigned currentPartIndex() const;
+  const FOTBuilder::Description &fotbDescr() const;
   void compile();
   static StringC makeStringC(const char *);
   SymbolObj *portName(PortName);
   ELObj *cValueSymbol(FOTBuilder::Symbol);
+  void compileCharProperties();
   // Map of LexCategory
   XcharMap<char> lexCategory_;
   static void normalizeGeneralName(const NodePtr &, StringC &);
@@ -325,6 +616,7 @@ public:
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
   bool convertToPattern(ELObj *, const Location &, Pattern &);
+  const ConstPtr<InheritedC> &charMapC() const;
   const ConstPtr<InheritedC> &tableBorderC() const;
   const ConstPtr<InheritedC> &cellBeforeRowBorderC() const;
   const ConstPtr<InheritedC> &cellAfterRowBorderC() const;
@@ -336,28 +628,121 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool style() const;
+  bool strictMode() const;
   void setNodeLocation(const NodePtr &);
+  void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
+  ELObj *defaultLanguage() const;
+  bool defaultLanguageSet(unsigned &,Location &) const;
+  void compileDefaultLanguage();
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
+  TransformationMode *transformationMode();
   void addClassAttributeName(const StringC &name);
   void addIdAttributeName(const StringC &name);
   void installInitialValue(Identifier *, Owner<Expression> &);
   void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
+  CharPropValues *installExtensionCharNIC(Identifier *, const StringC &,
+					  const Location &);
   void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
   // Return 0 if an invalid number.
   ELObj *convertNumber(const StringC &, int radix = 10);
   bool convertCharName(const StringC &str, Char &c) const;
   enum LexCategory {
     lexLetter,			// a - z A - Z
-    lexOtherNameStart,		// 
+    lexOtherNameStart,		// !$%&*/<=>?~_^:
+    lexAddNameStart,
     lexDigit,			// 0-9
     lexOtherNumberStart,	// -+.
+    lexOther,
     lexDelimiter,		// ;()"
     lexWhiteSpace,
-    lexOther
+    lexAddWhiteSpace
   };
   LexCategory lexCategory(Xchar);
+  void addStandardChar(const StringC &, const StringC &);
+  void addSdataEntity(const StringC &, const StringC &, const StringC &);
+  void addNameChar(const StringC &);
+  void addSeparatorChar(const StringC &);
+  void setCharRepertoire(const StringC &);
+  enum Feature {
+    noFeature,
+    combineChar,
+    keyword,
+    multiSource,
+    multiResult,
+    regexp,
+    word,
+    hytime,
+    charset,
+    expression,
+    multiProcess,
+    query,
+    sideBySide,
+    sideline,
+    alignedColumn,
+    bidi,
+    vertical,
+    math,
+    table,
+    tableAutoWidth,
+    simplePage,
+    page,
+    multiColumn,
+    nestedColumnSet,
+    generalIndirect,
+    inlineNote,
+    glyphAnnotation,
+    emphasizingMark,
+    includedContainer,
+    actualCharacteristic,
+    online,
+    fontInfo,
+    crossReference
+  };
+  enum { nFeatures = crossReference + 1 };
+  enum Support {
+    notSupported,
+    partiallySupported,
+    supported
+  };
+  struct Status {
+    bool declared;
+    Support supported;
+    StringC rcsname;
+    StringC appname;
+  };
+  bool convertFeature(const StringC &, Feature &);
+  void explicitFeatures();
+  void declareFeature(const StringC &);
+  void declareFeature(const Feature &);
+  bool requireFeature(const Feature &, const Location &);
+  enum Module {
+    baseabs,
+    prlgabs0,
+    prlgabs1,
+    instabs,
+    basesds0,
+    basesds1,
+    instsds0,
+    subdcabs,
+    sdclabs,
+    sdclsds,
+    prlgsds,
+    instsds1,
+    dtgabs,
+    rankabs,
+    srabs,
+    srsds,
+    linkabs,
+    linksds,
+    subdcsds,
+    fpiabs
+  };
+  enum { nModules = fpiabs + 1 };
+  void explicitModules();
+  void addModule(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -365,8 +750,9 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *s, PrimitiveObj *value);
-  void installXPrimitive(const char *s, PrimitiveObj *value);
+  void installPrimitive(const char *, PrimitiveObj *, Feature f);
+  void installXPrimitive(const char *, const char *, PrimitiveObj *);
+  void installBuiltins();
   void installUnits();
   void installCharNames();
   void installInheritedCs();
@@ -375,6 +761,10 @@ private:
   void installFlowObjs();
   void installSdata();
   void installNodeProperties();
+  void installCharProperties();
+  void installFeatures(const FOTBuilder::Feature *);
+  void installModules();
+  void checkGrovePlan();
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -405,8 +795,9 @@ private:
   NamedTable<Unit> unitTable_;
   HashTable<StringC,FunctionObj *> externalProcTable_;
   Messenger *messenger_;
-  const FOTBuilder::Extension *extensionTable_;
+  const FOTBuilder::Description &fotbDescr_;
   unsigned partIndex_;
+  unsigned dPartIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
   GroveManager *groveManager_;
@@ -414,13 +805,16 @@ private:
   NamedTable<ProcessingMode> processingModeTable_;
   SymbolObj *portNames_[nPortNames];
   ELObj *cValueSymbols_[FOTBuilder::nSymbols];
-  HashTable<StringC,Char> namedCharTable_;
+  HashTable<StringC, CharPart> namedCharTable_;
+  HashTable<StringC, CharPart> sdataEntityNameTable_;
+  HashTable<StringC, CharPart> sdataEntityTextTable_;
   Vector<const Identifier *> initialValueNames_;
   NCVector<Owner<Expression> > initialValueValues_;
   size_t currentPartFirstInitialValue_;
   StyleObj *initialStyle_;
   StyleObj *borderTrueStyle_;
   StyleObj *borderFalseStyle_;
+  ConstPtr<InheritedC> charMapC_;
   ConstPtr<InheritedC> tableBorderC_;
   ConstPtr<InheritedC> cellBeforeRowBorderC_;
   ConstPtr<InheritedC> cellAfterRowBorderC_;
@@ -437,14 +831,48 @@ private:
     OwnerTable<String<char>, String<char>, StringSet, StringSet> table_;
   };
   StringSet publicIds_;
-  HashTable<StringC,Char> sdataEntityNameTable_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool style_;
+  bool strictMode_;
+  ELObj *defaultLanguage_;
+  Owner<Expression> defaultLanguageDef_;
+  unsigned defaultLanguageDefPart_;
+  Location defaultLanguageDefLoc_;
   friend class Identifier;
+  NamedTable<CharProp> charPropTable_;
+
+  // No access function, since this is not a character NIC.
+  MaybeIntegerCharPropValues numericEquivCPV_;
+#define CP(t, n) \
+private: t ## CharPropValues n ## CPV_; \
+public: const t ## CharPropValues &n () const \
+  { return n ## CPV_; }
+  CP(Boolean, isSpace);
+  CP(Boolean, isRecordEnd);
+  CP(Boolean, isBlank);
+  CP(Boolean, isInputTab);
+  CP(Boolean, isInputWhitespace);
+  CP(Boolean, isPunct);
+  CP(PublicId, script);
+  // FIXME! Shall not be PUblicId, but GlyphId.
+  CP(PublicId, glyphId);
+  CP(Boolean, isDropAfterLineBreak);
+  CP(Boolean, isDropUnlessBeforeLineBreak);
+  CP(Integer, breakBeforePriority);
+  CP(Integer, breakAfterPriority);
+  CP(Symbol, mathClass);
+  CP(Symbol, mathFontPosture);
+
+  Status feature_[nFeatures];
+  bool explicitFeatures_;
+  Status module_[nModules];
+  bool explicitModules_;
+  TransformationMode transformationMode_;
 };
 
 inline
@@ -550,6 +978,12 @@ unsigned Interpreter::currentPartIndex() const
 }
 
 inline
+const FOTBuilder::Description &Interpreter::fotbDescr() const
+{
+  return fotbDescr_;
+}
+
+inline
 KeywordObj *Interpreter::makeKeyword(const StringC &str)
 {
   return new (*this) KeywordObj(lookup(str));
@@ -577,6 +1011,12 @@ inline
 GroveManager *Interpreter::groveManager() const
 {
   return groveManager_;
+}
+
+inline
+const ConstPtr<InheritedC> &Interpreter::charMapC() const
+{
+  return charMapC_;
 }
 
 inline
@@ -638,6 +1078,18 @@ inline
 bool Interpreter::dsssl2() const
 {
   return dsssl2_;
+}
+
+inline
+bool Interpreter::style() const
+{
+  return style_;
+}
+
+inline
+bool Interpreter::strictMode() const
+{
+  return strictMode_;
 }
 
 inline
@@ -703,10 +1155,23 @@ bool Identifier::inheritedCDefined(unsigned &part, Location &loc) const
 }
 
 inline
-void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+bool Identifier::charNICDefined(unsigned &part, Location &loc) const
 {
-  inheritedC_ = ic;
-  inheritedCPart_ = unsigned(-1);
+  if (!charNIC_)
+    return 0;
+  part = inheritedCPart_;
+  loc = inheritedCLoc_;
+  return 1;
+}
+
+inline
+void Identifier::setCharNIC(unsigned part,
+			    const Location &loc)
+{
+  charNIC_ = 1;
+  inheritedC_ = ConstPtr<InheritedC>(0);
+  inheritedCPart_ = part;
+  inheritedCLoc_ = loc;
 }
 
 inline
@@ -716,6 +1181,14 @@ void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic, unsigned part,
   inheritedC_ = ic;
   inheritedCPart_ = part;
   inheritedCLoc_ = loc;
+}
+
+inline
+void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+{
+  inheritedC_ = ic;
+  inheritedCPart_ = unsigned(-1);
+  inheritedCLoc_ = Location();
 }
 
 inline
@@ -747,6 +1220,132 @@ void Identifier::setFlowObj(FlowObj *fo, unsigned part, const Location &loc)
   flowObj_ = fo;
   flowObjPart_ = part;
   flowObjLoc_ = loc;
+}
+
+inline
+ELObjPart::ELObjPart()
+: obj(0), defPart(0)
+{
+}
+
+inline
+ELObjPart::ELObjPart(ELObj *o, unsigned p)
+: obj(o), defPart(p)
+{
+}
+
+inline
+void ELObjPart::operator=(const ELObjPart &x)
+{
+  obj = x.obj;
+  defPart = x.defPart;
+}
+
+inline
+bool ELObjPart::operator==(const ELObjPart &x) const
+{
+  return defPart == x.defPart && obj && x.obj && ELObj::eqv(*obj, *x.obj);
+}
+
+inline
+bool ELObjPart::operator!=(const ELObjPart &x) const
+{
+  return !(*this == x);
+}
+
+inline
+long IntegerCharPropValues::getValue(Char ch) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.l_;
+  else
+    return def_;
+}
+
+inline
+void IntegerCharPropValues::setRange(Char from, Char to, long l)
+{
+  map_.setRange(from, to, l);
+}
+
+inline
+bool MaybeIntegerCharPropValues::getValue(Char ch, long &l) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_) {
+    if (!v.isFalse_)
+      l = v.l_;
+    return !v.isFalse_;
+  }
+  l = def_;
+  return true;
+}
+
+inline
+void MaybeIntegerCharPropValues::setRange(Char from, Char to, long l)
+{
+  map_.setRange(from, to, l);
+}
+
+inline
+void MaybeIntegerCharPropValues::setValue(Char ch, long l)
+{
+  map_.setChar(ch, l);
+}
+
+inline
+bool BooleanCharPropValues::getValue(Char ch) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.b_;
+  return def_;
+}
+
+inline
+void BooleanCharPropValues::setRange(Char from, Char to, bool b)
+{
+  map_.setRange(from, to, b);
+}
+
+inline
+FOTBuilder::PublicId PublicIdCharPropValues::getValue(Char ch) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.p_;
+  return def_;
+}
+
+inline
+void PublicIdCharPropValues::setRange(Char from, Char to,
+				 FOTBuilder::PublicId p)
+{
+  map_.setRange(from, to, p);
+}
+
+inline
+FOTBuilder::Symbol SymbolCharPropValues::getValue(Char ch) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.s_;
+  return def_;
+}
+
+inline
+void SymbolCharPropValues::setRange(Char from, Char to,
+				    FOTBuilder::Symbol s)
+{
+  map_.setRange(from, to, s);
+}
+
+inline
+CharProp::CharProp(const StringC &name)
+  : Named(name), defComputed_(notComputed), values_(0),
+    hadError_(false)
+{
 }
 
 #ifdef DSSSL_NAMESPACE

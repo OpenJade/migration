@@ -36,6 +36,7 @@ struct {
   { SP_T("expand-internal"), &XmlOutputEventHandler::Options::expInt },
   { SP_T("internal-decl"), &XmlOutputEventHandler::Options::intDecl },
   { SP_T("external-decl"), &XmlOutputEventHandler::Options::extDecl },
+  { SP_T("sdata-as-pis"), &XmlOutputEventHandler::Options::sdataAsPi },
 };
 
 class SxApp : public ParserApp {

@@ -1,3 +1,17 @@
+opensp (1.5pre4-1) unstable; urgency=low
+
+  * new upstream version, prerelease
+  * debian/copyright.Debian: update locations
+  * debian/libosp-dev.README: added
+  * debian/rules: crank up the lib depends to 1.5pre4-1;
+    lintian cleanups and minor stuff
+  * acconfig.h: patch for HAVE_BOOL problem
+  * README: updates, some URLs
+  * Makefile.am, */Makefile.am: 'maintainer-clean' is cleaner; this helps
+    the debian/rules clean target quite a bit
+
+ -- Adam Di Carlo <aph@debian.org>  Sat,  6 May 2000 00:17:29 -0400
+
 opensp (1.4-1) unstable; urgency=low
 
   * new upstream version, use pristine upstream source

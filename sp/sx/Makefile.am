@@ -6,7 +6,8 @@ osx_SOURCES = sx.cxx XmlOutputEventHandler.cxx XmlOutputEventHandler.h \
 	sx_inst.cxx XmlOutputMessages.h SxMessages.h
 
 EXTRA_DIST = XmlOutputMessages.msg XmlOutputMessages.rc \
-	SxMessages.msg SxMessages.rc sx_inst.m4 sx.rc sx.dsp
+	SxMessages.msg SxMessages.rc sx_inst.m4 sx.rc sx.dsp \
+	.cvsignore
 
 osx_LDADD = $(top_builddir)/lib/libosp.la
 
@@ -14,6 +15,8 @@ INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = XmlOutputMessages.h XmlOutputMessages.rc \
 	SxMessages.h SxMessages.rc sx_inst.cxx
+
+MAINTAINERCLEANFILES = Makefile.in
 
 MSGGENFLAGS = -l appModule
 

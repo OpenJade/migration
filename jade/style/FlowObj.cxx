@@ -1397,6 +1397,7 @@ void CharacterFlowObj::processInner(ProcessContext &context)
 bool FlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
                                        Interpreter &interp)
 {
+  printf("FlowObj::setImplicitChar\n");
   CANNOT_HAPPEN();
 }
 
@@ -1408,61 +1409,61 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
   if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
       && interp.convertCharC(obj, ident, loc, nic_->ch)) {
     nic_->valid = 1;
-
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("space?"), 
-                            nic_->ch, loc, 0),  
-        ident, loc, nic_->isSpace);
-
+			     interp.charProperty(interp.makeStringC("space?"), 
+						 nic_->ch, loc, 0),  
+			     ident, loc, nic_->isSpace);
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("record-end?"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->isRecordEnd);
-
+			     interp.charProperty(interp.makeStringC("record-end?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isRecordEnd);
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("input-tab?"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->isInputTab);
-
+			     interp.charProperty(interp.makeStringC("input-tab?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isInputTab);
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("input-whitespace?"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->isInputWhitespace);
-
+			     interp.charProperty(interp.makeStringC("input-whitespace?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isInputWhitespace);
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("punct?"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->isPunct);
-
+			     interp.charProperty(interp.makeStringC("punct?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isPunct);
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("drop-after-line-break?"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->isDropAfterLineBreak); 
-
+			     interp.charProperty(interp.makeStringC("drop-after-line-break?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isDropAfterLineBreak); 
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
       interp.convertBooleanC(
-        interp.charProperty(interp.makeStringC("drop-unless-before-line-break?"), 
-                             nic_->ch, loc, 0),
-        ident, loc, nic_->isDropUnlessBeforeLineBreak); 
-
+			     interp.charProperty(interp.makeStringC("drop-unless-before-line-break?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isDropUnlessBeforeLineBreak); 
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
       interp.convertIntegerC(
-        interp.charProperty(interp.makeStringC("break-before-priority"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->breakBeforePriority);  
-
+			     interp.charProperty(interp.makeStringC("break-before-priority"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->breakBeforePriority);  
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
       interp.convertIntegerC(
-        interp.charProperty(interp.makeStringC("break-after-priority"), 
-                            nic_->ch, loc, 0),
-        ident, loc, nic_->breakAfterPriority);  
-
+			     interp.charProperty(interp.makeStringC("break-after-priority"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->breakAfterPriority);  
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript))) {
       ELObj *prop = interp.charProperty(interp.makeStringC("script"), 
                                         nic_->ch, loc, 0);
@@ -1471,10 +1472,10 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
       else {
         StringC tem;
         if (interp.convertStringC(prop, ident, loc, tem))
-        nic_->script = interp.storePublicId(tem.data(), tem.size(), loc);
+	  nic_->script = interp.storePublicId(tem.data(), tem.size(), loc);
       }
     }
-
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId))) {
       ELObj *prop = interp.charProperty(interp.makeStringC("glyph-id"), 
                                         nic_->ch, loc, 0);
@@ -1486,7 +1487,7 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
           nic_->glyphId = *p;
       }
     }
-
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathFontPosture))) {
       ELObj *prop = interp.charProperty(interp.makeStringC("math-font-posture"), 
                                         nic_->ch, loc, 0);
@@ -1501,7 +1502,7 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
       };
       interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathFontPosture);
     }
-
+    
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass))) {
       ELObj *prop = interp.charProperty(interp.makeStringC("math-class"), 
                                         nic_->ch, loc, 0);
@@ -1518,7 +1519,7 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
       };
       interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathClass);
     }
-
+    
     return 1;
   }
   else 
@@ -1646,6 +1647,12 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       break;
     }
   }
+  else {
+    unsigned part;
+    Location loc;
+    if (ident->charNICDefined(part, loc))
+      return;
+  }
   CANNOT_HAPPEN();
 }
 
@@ -1673,7 +1680,11 @@ bool CharacterFlowObj::hasNonInheritedC(const Identifier *ident) const
     default:
       break;
     }
-  }
+  } 
+  unsigned part;
+  Location loc;
+  if (ident->charNICDefined(part, loc))
+    return 1;
   return 0;
 }
 

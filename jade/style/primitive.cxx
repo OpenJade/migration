@@ -4272,6 +4272,50 @@ DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAString, 0, argv[0]);
   StringC sysid(s, n);
+  static const Identifier::SyntacticKey keys[2] = {
+      Identifier::keyActive, Identifier::keyParent
+  };
+  int pos[2];
+  if (!decodeKeyArgs(argc - 1, argv + 1, keys, 2, interp, loc, pos))
+    return interp.makeError();
+  Vector<StringC> lists[2];
+  if (pos[0] >= 0) {
+    ELObj *obj = argv[pos[0] + 1];
+    while (!obj->isNil()) {
+      PairObj *pair = obj->asPair();
+      if (!pair)
+	return argError(interp, loc,
+			InterpreterMessages::notAList, pos[0] + 1, argv[pos[0] + 1]);
+      if (!pair->car()->stringData(s, n))
+	return argError(interp, loc,
+			InterpreterMessages::notAString, pos[0] + 1, pair->car());
+      lists[0].resize(lists[0].size() + 1);
+      lists[0].back().assign(s, n);
+      obj = pair->cdr();
+    }
+  }
+
+  NodePtr parent;
+  if (pos[1] >= 0) {
+    if (!argv[pos[1] + 1]->optSingletonNodeList(context, interp, parent) || !parent)
+      return argError(interp, loc,
+		      InterpreterMessages::notASingletonNode, pos[1] + 1, argv[pos[1] + 1]);
+  }
+
+  NodePtr nd;
+  if (!interp.groveManager()->load(sysid, lists[0], parent, nd, lists[1]))
+    return interp.makeEmptyNodeList();
+  return new (interp) NodePtrNodeListObj(nd);
+}
+
+DEFPRIMITIVE(XSgmlParse, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  StringC sysid(s, n);
   static const Identifier::SyntacticKey keys[3] = {
       Identifier::keyActive, Identifier::keyArchitecture, Identifier::keyParent
   };
@@ -4279,7 +4323,7 @@ DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
   if (!decodeKeyArgs(argc - 1, argv + 1, keys, 3, interp, loc, pos))
     return interp.makeError();
   Vector<StringC> lists[2];
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 3; i++) {
     if (pos[i] >= 0) {
       ELObj *obj = argv[pos[0] + 1];
       while (!obj->isNil()) {
@@ -4948,6 +4992,37 @@ DEFPRIMITIVE(Atan, argc, argv, context, interp, loc)
   // the semantics would parallel that of the C libraries
   // atan/atan2.
   return new (interp) RealObj(atan2(dResult, dResult2));
+}
+
+DEFPRIMITIVE(XExpt, argc, argv, context, interp, loc)
+{
+  long n1, n2;
+  double d1, d2;
+  int dim1, dim2;
+
+  ELObj::QuantityType q1 = argv[0]->quantityValue(n1, d1, dim1);
+  ELObj::QuantityType q2 = argv[0]->quantityValue(n2, d2, dim2);
+  if (q1 == ELObj::noQuantity) 
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  else if (dim1 != 0) {
+    if (!argv[1]->exactIntegerValue(n2))
+      return argError(interp, loc,
+  		      InterpreterMessages::notAnExactInteger, 1, argv[1]);
+    return new (interp) QuantityObj(pow(d1,n2), dim1*n2);
+  }
+  else {
+    if ((q2 == ELObj::noQuantity) || (dim2 != 0))
+      return argError(interp, loc,
+  		      InterpreterMessages::notANumber, 1, argv[1]);
+    double res = pow(d1, d2);
+    long tem;
+    if (argv[0]->exactIntegerValue(tem) &&
+        argv[1]->exactIntegerValue(tem) &&
+        fabs(res) < LONG_MAX)
+      return interp.makeInteger((long)res);
+    return new (interp) RealObj(res);
+  }
 }
 
 DEFPRIMITIVE(Expt, argc, argv, context, interp, loc)

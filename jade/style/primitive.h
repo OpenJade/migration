@@ -231,3 +231,5 @@ PRIMITIVE(StringLessOrEqual, "string<=?", 2, 0, 0)
 PRIMITIVE(MapConstructor, "map-constructor", 2, 0, 0)
 // more external procedures
 XXPRIMITIVE(Language, "language", 2, 0, 0)
+XXPRIMITIVE(XSgmlParse, "sgml-parse", 1, 0, 1)
+XXPRIMITIVE(XExpt, "expt", 2, 0, 0)

@@ -23,6 +23,10 @@
 #include "Vector.h"
 #include "StorageManager.h"
 #include "macros.h"
+#include "ParserOptions.h"
+#include "SgmlParser.h"
+#include "DtdDeclEventHandler.h"
+#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -63,7 +67,7 @@ public:
   SOEntityCatalog(Ptr<ExtendEntityManager> em);
   typedef EntityDecl::DeclType DeclType;
   Boolean document(const CharsetInfo &, Messenger &, StringC &) const;
-  Boolean sgmlDecl(const CharsetInfo &, Messenger &, StringC &) const;
+  Boolean sgmlDecl(const CharsetInfo &, Messenger &, const StringC &, StringC &) const;
   Boolean lookup(const EntityDecl &entity,
 		 const Syntax &,
 		 const CharsetInfo &,
@@ -78,6 +82,8 @@ public:
 		     Messenger &,
 		     UnivChar &) const;
   void addPublicId(StringC &publicId, StringC &systemId, const Location &,
+		   Boolean override);
+  void addDtdDecl(StringC &publicId, StringC &systemId, const Location &,
 		   Boolean override);
   void addDelegate(StringC &prefix, StringC &systemId, const Location &,
 		   Boolean override);
@@ -129,6 +135,9 @@ private:
 
   Table publicIds_;
   Table delegates_;
+  HashTable<StringC,CatalogEntry> dtdDecls_;
+  static StringC dtdDeclSpec_;
+  static Boolean dtdDeclRunning_;
   HashTable<StringC,CatalogEntry> systemIds_;
   Table names_[5];
   size_t catalogNumber_;
@@ -575,11 +584,43 @@ SOEntityCatalog::findBestPublicEntry(const StringC &publicId,
   return bestEntry;
 }
 
+
+Boolean SOEntityCatalog::dtdDeclRunning_ = 0;
+StringC SOEntityCatalog::dtdDeclSpec_;
+
 Boolean SOEntityCatalog::sgmlDecl(const CharsetInfo &charset,
 				  Messenger &mgr,
+				  const StringC &sysid,
 				  StringC &result) const
 
 {
+  if (dtdDeclRunning_) {
+    result = dtdDeclSpec_;
+    return 1;
+  }
+  HashTableIter<StringC,CatalogEntry> iter(dtdDecls_);
+  const StringC *key;
+  const CatalogEntry *entry;
+  while (iter.next(key, entry)) {
+    expandCatalogSystemId(entry->to, entry->loc, entry->baseNumber,
+                          0, charset, 0, mgr, dtdDeclSpec_);
+    ParserOptions options;
+    SgmlParser::Params params;
+    params.sysid = sysid;
+    params.entityType = SgmlParser::Params::document;
+    params.entityManager = em_.pointer(); 
+    params.options = &options;
+    SgmlParser parser(params);
+    DtdDeclEventHandler eh(*key);  
+    dtdDeclRunning_ = 1;
+    parser.parseAll(eh, eh.cancelPtr());
+    dtdDeclRunning_ = 0;
+    if (eh.match()) {
+      result = dtdDeclSpec_;
+      return 1; 
+    }
+  }
+
   return haveSgmlDecl_ && expandCatalogSystemId(sgmlDecl_, sgmlDeclLoc_,
 						sgmlDeclBaseNumber_,
 						0, charset, 0, mgr, result);
@@ -604,6 +645,17 @@ void SOEntityCatalog::addPublicId(StringC &publicId, StringC &systemId,
   entry.baseNumber = haveCurrentBase_ ? base_.size() : 0;
   systemId.swap(entry.to);
   publicIds_.insert(publicId, entry, override);
+}
+
+void SOEntityCatalog::addDtdDecl(StringC &publicId, StringC &systemId,
+				 const Location &loc, Boolean override)
+{
+  CatalogEntry entry;
+  entry.loc = loc;
+  entry.catalogNumber = catalogNumber_;
+  entry.baseNumber = haveCurrentBase_ ? base_.size() : 0;
+  systemId.swap(entry.to);
+  dtdDecls_.insert(publicId, entry);
 }
 
 void SOEntityCatalog::addDelegate(StringC &prefix, StringC &systemId,
@@ -983,13 +1035,15 @@ void CatalogParser::parseDelegate()
 
 void CatalogParser::parseDtddecl()
 {
-  message(CatalogMessages::dtddeclNotSupported);
   if (parseParam(minimumLiteral) != literalParam) {
     message(CatalogMessages::literalExpected);
     return;
   }
+  StringC publicId;
+  param_.swap(publicId);
   if (!parseArg())
     return;
+  catalog_->addDtdDecl(publicId, param_, paramLoc_, override_);
 }
 
 void CatalogParser::parseSystem()

@@ -25,7 +25,8 @@ Parser::Parser(const SgmlParser::Params &params)
 	      paramsSubdocLevel(params),
 	      params.entityType == SgmlParser::Params::dtd
 	      ? declSubsetPhase
-	      : contentPhase)
+	      : contentPhase),
+  sysid_(params.sysid)
 {
   Parser *parent = 0;
   if (params.parent)

@@ -7,7 +7,8 @@ COMMON_OBJS=Allocator.o Link.o IListBase.o TypeId.o assert.o
 ENTMGR_OBJS=CharsetInfo.o EntityCatalog.o EntityDecl.o EntityManager.o \
  Hash.o InputSource.o Location.o Message.o MessageArg.o \
  UnivCharsetDesc.o entmgr_inst.o
-XENTMGR_OBJS=LiteralStorage.o URLStorage.o RewindStorageObject.o \
+XENTMGR_OBJS=DtdDeclEventHandler.o \
+  LiteralStorage.o URLStorage.o RewindStorageObject.o \
   ErrnoMessageArg.o OffsetOrderedList.o DescriptorManager.o \
   ExtendEntityManager.o PosixStorage.o StdioStorage.o NotationStorage.o \
   StorageManager.o CodingSystem.o IdentityCodingSystem.o \

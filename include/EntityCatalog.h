@@ -30,6 +30,7 @@ public:
   virtual ~EntityCatalog();
   virtual Boolean sgmlDecl(const CharsetInfo &,
 			   Messenger &,
+			   const StringC &,
 			   StringC &) const;
   virtual Boolean lookup(const EntityDecl &,
 			 const Syntax &,

@@ -121,8 +121,9 @@ void SpcatApp::processOption(AppChar opt, const AppChar *arg)
   StringC ret;
   ConstPtr<EntityCatalog> cat = 
          entityManager()->makeCatalog(ret, systemCharset(), *this);
+  StringC sysid;
 
-  if ((type == EntityDecl::sgml && cat->sgmlDecl(systemCharset(), *this, ret)) 
+  if ((type == EntityDecl::sgml && cat->sgmlDecl(systemCharset(), *this, sysid, ret)) 
       || cat->lookup(ent, syntax, systemCharset(), *this, ret)) {
     lastFound_ = true;
     //FIXME should use makeStdOut(), but it didn't work for me.

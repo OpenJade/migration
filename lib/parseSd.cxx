@@ -176,7 +176,7 @@ void Parser::doInit()
     currentInput()->ungetToken();
     if (subdocLevel() > 0)
       return; // will use parent Sd 
-    if (entityCatalog().sgmlDecl(initCharset, messenger(), systemId)) {
+    if (entityCatalog().sgmlDecl(initCharset, messenger(), sysid_, systemId)) {
       InputSource *in = entityManager().open(systemId,
 					     sd().docCharset(),
 					     InputSourceOrigin::make(),

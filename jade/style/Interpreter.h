@@ -583,7 +583,7 @@ public:
   int unitsPerInch() const;
   unsigned currentPartIndex() const;
   const FOTBuilder::Description &fotbDescr() const;
-  void compile();
+  void compile(const NodePtr &);
   static StringC makeStringC(const char *);
   SymbolObj *portName(PortName);
   ELObj *cValueSymbol(FOTBuilder::Symbol);

@@ -90,8 +90,8 @@ public:
     int compareSpecificity(const Rule &) const;
     void trace(Collector &) const;
     bool matches(const NodePtr &) const;
+    void compile(const NodePtr &);
   private:
-    long priority() const;
     ProcessingMode *pm_;
     Interpreter *interp_;
     Owner<Expression> nlExpr_;
@@ -113,7 +113,7 @@ public:
   // Specificity gives specificity of last match; gets specificity of current match.
   const Rule *findMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
 			Specificity &) const;
-  void compile(Interpreter &);
+  void compile(Interpreter &, const NodePtr &);
   bool defined() const;
   void setDefined();
   bool hasQuery() const;

@@ -77,15 +77,17 @@ void ProcessingMode::GroveRules::sortRules(Vector<const ElementRule *> &v)
   qsort(&v[0], v.size(), sizeof(v[0]), ruleCompare);
 }
 
-void ProcessingMode::compile(Interpreter &interp)
+void ProcessingMode::compile(Interpreter &interp, const NodePtr &root)
 {
   for (int i = 0; i < nRuleType; i++) {
     for (size_t j = 0; j < rootRules_[i].size(); j++)
       rootRules_[i][j].action().compile(interp, RuleType(i));
+    for (size_t j = 0; j < queryRules_[i].size(); j++) {
+      queryRules_[i][j]->action().compile(interp, RuleType(i));
+      queryRules_[i][j]->compile(root);
+    }
     qsort(&(queryRules_[i][0]), queryRules_[i].size(), 
           sizeof(queryRules_[i][0]), ruleCompare);  
-    for (size_t j = 0; j < queryRules_[i].size(); j++)
-      queryRules_[i][j]->action().compile(interp, RuleType(i));
     for (IListIter<ElementRule> iter(elementRules_[i]); !iter.done(); iter.next())
       iter.cur()->action().compile(interp, RuleType(i));
   }
@@ -160,7 +162,7 @@ Collector::DynamicRoot(*interp)
   priorityExpr_.swap(priority);
 } 
 
-long ProcessingMode::QueryRule::priority() const
+void ProcessingMode::QueryRule::compile()
 {
   if (priorityExpr_) {
     InsnPtr insn = 
@@ -174,31 +176,16 @@ long ProcessingMode::QueryRule::priority() const
       interp_->message(InterpreterMessages::priorityNotNumber);
       return 0;
     }
-    if (!val->exactIntegerValue(
-#ifndef HAVE_MUTABLE
-                              ((QueryRule *)this)->
-#endif
-                              priority_)) {
+    if (!val->exactIntegerValue(priority_)) {
       interp_->setNextLocation(location());
       interp_->message(InterpreterMessages::sorryPriority);
       return 0;
     }
-#ifndef HAVE_MUTABLE
-    ((QueryRule *)this)->
-#endif
-      priorityExpr_.clear();
   }
-  return priority_;
-}
 
-bool ProcessingMode::QueryRule::matches(const NodePtr &nd) const
-{
-  NodePtr root;
-  //FIXME: what if nd happens not to be in the grove being processed ?
-  nd->getGroveRoot(root);
-  EvalContext ec;
-  EvalContext::CurrentNodeSetter cns(root, pm_, ec);
-  if (!nl_) {
+  {
+    EvalContext ec;
+    EvalContext::CurrentNodeSetter cns(root, pm_, ec);
     InsnPtr insn = nlExpr_->compile(*interp_, Environment(), 0, InsnPtr());
     VM vm(ec, *interp_);
     ELObj *val = vm.eval(insn.pointer());
@@ -207,16 +194,19 @@ bool ProcessingMode::QueryRule::matches(const NodePtr &nd) const
       interp_->message(InterpreterMessages::queryNotNodelist);
       return 0;
     }
-#ifndef HAVE_MUTABLE
-    ((QueryRule *)this)->
-#endif
     nl_ = val->asNodeList();
-    interp_->makeReadOnly(
-#ifndef HAVE_MUTABLE
-      ((QueryRule *)this)->
-#endif
-      nl_);
+    interp_->makeReadOnly(nl_);
   }
+}
+
+bool ProcessingMode::QueryRule::matches(const NodePtr &nd) const
+{
+  EvalContext ec;
+  NodePtr tem = nl_->nodeListFirst(ec, *interp_);
+  if (!tem)
+    return 0;
+  tem->getGroveRoot(tem);
+  EvalContext::CurrentNodeSetter cns(tem, pm_, ec);
   return nl_->contains(ec, *interp_, nd);
 }
 
@@ -225,11 +215,7 @@ int ProcessingMode::QueryRule::compareSpecificity(const Rule &r) const
   int result = Rule::compareSpecificity(r);
   if (result)
     return result;
-  long p1 = priority();
-  long p2 = ((const QueryRule &)r).priority();
-  if (p1 == p2)
-    return 0;
-  return p1 < p2 ? 1 : -1;
+  return ((const QueryRule &)r).priority_ - priority_; 
 }
 
 void
@@ -329,7 +315,7 @@ ProcessingMode::findElementMatch(const StringC &gi,
 	= *(initial_ && specificity.toInitial_ ? initial_ : this);
       for (;;) {
         if (specificity.query_) { 
-          const Vector<QueryRule *> &vec = queryRules_[specificity.ruleType_];
+          const Vector<QueryRule *> &vec = mode.queryRules_[specificity.ruleType_];
           ASSERT(specificity.nextRuleIndex_ <= vec.size());
           for (size_t &i = specificity.nextRuleIndex_; i < vec.size(); i++) {
 	    if (vec[i]->matches(node)) {
@@ -388,7 +374,7 @@ ProcessingMode::findRootMatch(const NodePtr &node,
       const ProcessingMode &mode = *(initial_ && specificity.toInitial_ ? initial_ : this);
       for (;;) {
         if (specificity.query_) {
-          const Vector<QueryRule *> &vec = queryRules_[specificity.ruleType_];
+          const Vector<QueryRule *> &vec = mode.queryRules_[specificity.ruleType_];
           ASSERT(specificity.nextRuleIndex_ <= vec.size());
           for (size_t &i = specificity.nextRuleIndex_; i < vec.size(); i++) {
 	    if (vec[i]->matches(node)) {
@@ -434,7 +420,7 @@ ProcessingMode::findQueryMatch(const NodePtr &node,
       const ProcessingMode &mode = *(initial_ && specificity.toInitial_ ? initial_ : this);
       for (;;) {
         if (specificity.query_) {
-          const Vector<QueryRule *> &vec = queryRules_[specificity.ruleType_];
+          const Vector<QueryRule *> &vec = mode.queryRules_[specificity.ruleType_];
           ASSERT(specificity.nextRuleIndex_ <= vec.size());
           for (size_t &i = specificity.nextRuleIndex_; i < vec.size(); i++) {
 	    if (vec[i]->matches(node)) {

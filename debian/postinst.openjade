@@ -1,0 +1,21 @@
+#!/bin/sh
+
+PACKAGE=openjade
+
+set -e
+
+case "$1" in
+    configure)
+	# install jade's proper catalog entries
+	install-sgmlcatalog --install /usr/lib/$PACKAGE/catalog $PACKAGE
+
+	# install doc-base stuff
+	if command -v install-docs >/dev/null 2>&1; then
+	    echo -n "Registering $PACKAGE documentation..."
+	    install-docs -i /usr/share/doc-base/$PACKAGE
+	    echo "done."
+	fi
+    ;;
+esac
+
+exit 0

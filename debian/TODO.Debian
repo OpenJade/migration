@@ -1,0 +1,13 @@
+jade-TODO (1.1-1) unstable; urgency=low
+
+  * fix /usr/lib/sgml/unicode (i.e., register or not)
+  * little perl script to morph the HTML pages to man pages (??)
+  * package a libsp1-dbg package, statically linking libsp1 and compiling
+    with debug symbols -- anyone want this?
+
+ -- Adam P. Harris <aph@debian.org>  Thu, 20 Aug 1998 14:13:41 -0400
+
+Local variables:
+mode: debian-changelog
+mode: auto-fill
+End:

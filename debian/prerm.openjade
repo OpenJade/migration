@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    remove|deconfigure|upgrade)
+	# remove jade catalog
+	install-sgmlcatalog --remove jade
+
+	# remove jade doc-base
+	if command -v install-docs >/dev/null 2>&1; then
+	    install-docs -r jade || true
+	fi
+    ;;
+esac
+
+exit 0

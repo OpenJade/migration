@@ -762,6 +762,7 @@ CatalogParser::CatalogParser(const CharsetInfo &charset)
   static const char ucletters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   // minimum data other than lcletter, ucletter
   static const char minChars[] = "0123456789-.'()+,/:=?";
+  static const char wwwMinChars[] = { 33, 35, 36, 37, 42, 59, 64, 95, 0 };
   static const char sChars[] = " \n\r\t";
   categoryTable_.setChar(0, nul);
   const char *p;
@@ -777,6 +778,12 @@ CatalogParser::CatalogParser(const CharsetInfo &charset)
     categoryTable_.setChar(charset.execToDesc(*p), s);
   for (p = minChars; *p; p++)
     categoryTable_.setChar(charset.execToDesc(*p), min);
+  for (p = wwwMinChars; *p; p++) {
+    WideChar c;
+    ISet<WideChar> set;
+    if (charset.univToDesc(*p, c, set) > 0 && c <= Char(-1))
+      categoryTable_.setChar(Char(c), min);
+  }
   categoryTable_.setChar(charset.execToDesc('\''), lita);
   categoryTable_.setChar(charset.execToDesc('"'), lit);
   minus_ = charset.execToDesc('-');

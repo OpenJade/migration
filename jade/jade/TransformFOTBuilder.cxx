@@ -177,7 +177,7 @@ public:
   private:
     DocumentTypeNIC nic_;
   };
-  TransformFOTBuilder(CmdLineApp *, bool xml);
+  TransformFOTBuilder(CmdLineApp *, bool xml, const Vector<StringC> &options);
   ~TransformFOTBuilder();
   void startElement(const ElementNIC &);
   void endElement();
@@ -237,12 +237,15 @@ private:
   };
   ReState state_;
   bool preserveSdata_;
+  char RE_[2];
+  char SP_[2];
   // Really Vector<bool>
   StringC preserveSdataStack_;
 };
 
 FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
 				    bool xml,
+				    const Vector<StringC> &options,
 				    const FOTBuilder::Extension *&ext)
 {
   static const TransformFOTBuilder::ProcessingInstructionFlowObj pi;
@@ -311,7 +314,7 @@ FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
     { 0 }
   };
   ext = extensions;
-  return new TransformFOTBuilder(app, xml);
+  return new TransformFOTBuilder(app, xml, options);
 }
 
 static
@@ -320,7 +323,8 @@ void outputNumericCharRef(OutputCharStream &os, Char c)
   os << "&#" << (unsigned long)c << ';';
 }
 
-TransformFOTBuilder::TransformFOTBuilder(CmdLineApp *app, bool xml)
+TransformFOTBuilder::TransformFOTBuilder(CmdLineApp *app, bool xml,
+					 const Vector<StringC> &options)
 : app_(app),
   xml_(xml),
   topOs_(new RecordOutputCharStream(app->makeStdOut())),
@@ -331,6 +335,16 @@ TransformFOTBuilder::TransformFOTBuilder(CmdLineApp *app, bool xml)
   topOs_->setEscaper(outputNumericCharRef);
   os_ = topOs_.pointer();
   preserveSdataStack_ += 0;
+  RE_[0] = RE;
+  RE_[1] = 0;
+  SP_[0] = RE;
+  SP_[1] = 0;
+  for (size_t i = 0; i < options.size(); i++) {
+    if (options[i] == app_->systemCharset().execToDesc("raw")) {
+      RE_[0] = 0;
+      SP_[0] = ' ';
+    }
+  }
 }
 
 TransformFOTBuilder::~TransformFOTBuilder()
@@ -355,6 +369,9 @@ void TransformFOTBuilder::documentType(const DocumentTypeNIC &nic)
     else 
       os() << " SYSTEM";
     if (nic.systemId.size()) {
+      if (nic.publicId.size()) {
+	os() << ' ';
+      }
       char quote = contains(nic.systemId, '"') ? '\'' : '"';
       os() << quote << nic.systemId << quote;
     }
@@ -366,7 +383,7 @@ void TransformFOTBuilder::documentType(const DocumentTypeNIC &nic)
 void TransformFOTBuilder::attributes(const Vector<StringC> &atts)
 {
   for (size_t i = 0; i < atts.size(); i += 2) {
-    os() << RE << atts[i] << '=';
+    os() << SP_ << atts[i] << '=';
     const StringC &s = atts[i + 1];
     if (!contains(s, '"'))
       os() << '"' << s << '"';
@@ -396,7 +413,7 @@ void TransformFOTBuilder::startElement(const ElementNIC &nic)
   const StringC &s = nic.gi.size() == 0 ? undefGi_ : nic.gi;
   os() << s;
   attributes(nic.attributes);
-  os() << RE << '>';
+  os() << RE_ << '>';
   openElements_.push_back(s);
   start();
   state_ = stateStartOfElement;
@@ -421,7 +438,7 @@ void TransformFOTBuilder::endElement()
 {
   flushPendingReCharRef();
   os() << "</" << openElements_.back();
-  os() << RE << '>';
+  os() << RE_ << '>';
   openElements_.resize(openElements_.size() - 1);
   end();
   state_ = stateMiddle;

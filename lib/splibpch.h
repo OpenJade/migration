@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 // Include all header files for systems that support pre-compiled headers.
@@ -144,7 +144,6 @@
 #include "SdFormalError.h"
 #include "SrInfo.h"
 #include "StorageObjectPosition.h"
-#include "StringVectorMessageArg.h"
 #include "TokenMessageArg.h"
 #include "Trie.h"
 #include "TrieBuilder.h"

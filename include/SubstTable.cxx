@@ -44,8 +44,14 @@ String<T> SubstTable<T>::inverse(T ch) const
     for (size_t i = 0; i < length; i++)
       if (p[i] != i) {
 	// FIXME use mutable if available
-	((SubstTable<T> *)this)->pairs_ += T(i);
-	((SubstTable<T> *)this)->pairs_ += p[i];
+#ifndef HAVE_MUTABLE
+	((SubstTable<T> *)this)->
+#endif
+	  pairs_ += T(i);
+#ifndef HAVE_MUTABLE
+	((SubstTable<T> *)this)->
+#endif
+	  pairs_ += p[i];
       }
     ((SubstTable<T> *)this)->pairsValid_ = 1;
   }

@@ -24,6 +24,11 @@ __instantiate(Vector<const CmdLineApp::AppChar *>)
 __instantiate(Owner<Encoder>)
 __instantiate(Options<CmdLineApp::AppChar>)
 __instantiate(Owner<EventHandler>)
+__instantiate(Vector<MessageFragment>)
+__instantiate(Vector<MessageType1>)
+__instantiate(LongOption<CmdLineApp::AppChar>)
+__instantiate(Vector<LongOption<CmdLineApp::AppChar> >)
+__instantiate(Owner<OutputCharStream>)
 
 #ifdef SP_NAMESPACE
 }

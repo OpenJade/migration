@@ -130,6 +130,10 @@
 #define SP_HAVE_BOOL
 #endif /* HAVE_BOOL */
 
+#ifdef HAVE_TYPENAME
+#define SP_HAVE_TYPENAME
+#endif /* HAVE_TYPENAME */
+
 #if (SIZEOF_BOOL == 1)
 #define SP_SIZEOF_BOOL_1
 #endif
@@ -200,10 +204,6 @@
 #define SP_HAVE_RTTI
 #endif /* HAVE_DYNAMIC_CAST */
 
-#ifdef HAVE_TYPENAME
-#define SP_HAVE_TYPENAME
-#endif /* HAVE_TYPENAME */
-
 #ifdef HAVE_PATHNAME_STYLE_DOS
 #define SP_MSDOS_FILENAMES 
 #else 
@@ -249,3 +249,7 @@
 #if defined(HAVE_NEW) && defined(HAVE_CASSERT)
 #define SP_ANSI_LIB 1
 #endif /* HAVE_NEW && HAVE_CASSERT */
+
+#ifndef HAVE_MUTABLE
+#define mutable 
+#endif /* HAVE_MUTABLE */

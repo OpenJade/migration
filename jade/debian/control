@@ -34,17 +34,3 @@ Description: OpenJade group's SP suite, developer support
  This contains include files and the static library for libosp1.
  This C++ library contains entity management functions, parsing functions,
  and other functions useful for SGML/XML/DSSSL development. 
-
-Package: openjade
-Architecture: any
-Depends: ${shlibs-openjade:Depends}, ${libosp1:ShlibVersion}, sgml-base
-Suggests: doc-base, sgml-data, opensp, jadetex
-Description: OpenJade group's DSSSL Engine
- OpenJade is an implementation of the DSSSL style language.
- It is a fork from James Clark's Jade implementation.
- .
- The openjade engine is a useful tool (in conjunction with a DSSSL style 
- sheet) for translating SGML documents into other formats.  OpenJade can 
- currently generate SGML, RTF, and TeX.  In conjunction with the "jadetex"
- TeX style, it can generate quite nice output.
-

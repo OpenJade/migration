@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# rules file for openjade
+# rules file for opensp
 #
 # The principle of these rules files are simplicity, robustness,
 # ease of maintenance, and readability through abstraction
@@ -9,8 +9,7 @@
 # 
 # This is derived almost entirely from the jade rules file
 
-pkg-sp		:= opensp
-pkg-jade	:= openjade
+pkg		:= opensp
 pkg-libsp1	:= libosp1
 pkg-libsp1-dev	:= libosp1-dev
 
@@ -19,15 +18,6 @@ default-catalogs	:= /usr/local/share/sgml/catalog:/usr/local/lib/sgml/catalog:/u
 default-sgml-path	:= /usr/local/share/sgml:/usr/local/lib/sgml:/usr/lib/sgml
 
 # directory abstraction
-prefix-jade	:= debian/$(pkg-jade)
-bindir-jade	:= $(prefix-jade)/usr/bin
-libdir-jade	:= $(prefix-jade)/usr/lib/$(pkg-jade)
-sgmldir-jade	:= $(prefix-jade)/usr/lib/sgml
-docdir-jade	:= $(prefix-jade)/usr/doc/$(pkg-jade)
-infodir-jade	:= $(prefix-jade)/usr/share/info
-sharedir-jade	:= $(prefix-jade)/usr/share
-mandir-jade	:= $(prefix-jade)/usr/share/man/man1
-
 prefix-sp	:= debian/tmp
 bindir-sp	:= $(prefix-sp)/usr/bin
 confdir-sp	:= $(prefix-sp)/etc
@@ -55,19 +45,13 @@ make_directory	:= install -d -o root -g root -m 755
 compress	:= gzip -9f
 
 # first version of package providing the right shlibs
-SHLIBS_PKGVER	:= 1.3.4-19991013-1
+SHLIBS_PKGVER	:= 1.4-pre1
 
 # determine our version numbers
 SRC_VERSION	:= $(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | sed 's/^Version: *//')
-# we don't have the sp vs jade split in version numbers with this pkg
-UPSTREAM_VERSION:= $(shell echo $(SRC_VERSION) | sed -e 's/^\(.*\)-[^-]*$$/\1/')
 
 # determine our top level
 SRCDIR		:= $(shell pwd)
-
-version-test:
-	@echo Debian version is $(SRC_VERSION)
-	@echo upstream version is $(UPSTREAM_VERSION)
 
 # stuff for snapshot/cvs building
 root_cmd		:= sudo
@@ -78,17 +62,18 @@ cvs_pure_src_dir	:= ..
 cvs_pure_src		:= $(pkg-jade)-upstream
 
 config.status:
-#	 fix permissions on autoconf stuff, just in case
-	chmod a+x configure config/config.guess config/config.sub
-	  CFLAGS="-O2 --pipe"						\
-	CXXFLAGS="-O2 --pipe -D_REENTRANT"				\
-	   ./configure --prefix=/usr --enable-html			\
+	autoheader
+	automake --add-missing
+	aclocal
+#	libtoolize --force --copy
+	autoconf
+	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
+	   ./configure --prefix=/usr --sysconfdir=/etc			\
+	   --mandir=/usr/share/man					\
 	   --enable-http --enable-static --enable-shared		\
 	   --enable-default-catalog=$(default-catalogs)			\
 	   --enable-default-search-path=$(default-sgml-path)
-	cp config/configure.in .
-	libtoolize --force --copy
-	rm -f configure.in
+
 
 build:	config.status
 	$(checkdir)
@@ -340,7 +325,6 @@ cvs-build:
 
 define checkdir
 	test -f debian/rules
-	test -f VERSION
 endef
 
 # Below here is fairly generic really

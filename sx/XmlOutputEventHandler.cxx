@@ -300,8 +300,11 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 	      // declaration file and output start of declaration
 	      os_ = intEnts_;
 
-	      os() << "<!ENTITY " << entity->name()
-		   << "  \"<?sdataEntity " << entity->name() << " ";
+	      if (options_.sdataAsPi)
+		os() << "<!ENTITY " << entity->name()
+		     << "  \"<?sdataEntity " << entity->name() << " ";
+	      else
+		os() << "<!ENTITY " << entity->name() << " ";
 	    } else { // we've seen it before; throw away expansion data
 	      os_ = nullOut_;
 	    }
@@ -310,7 +313,8 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 	  // We are expanding internal entities; expand this one as a PI,
 	  // since XML does not have SDATA entities
 	  else {
-	    os() << "<?sdataEntity " << entity->name() << " ";
+	    if (options_.sdataAsPi)
+	      os() << "<?sdataEntity " << entity->name() << " ";
 	  }
 
 	  // Now, no matter what, output the entity's data
@@ -318,11 +322,15 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 
 	  // If necessary, end entity decl and replace old output stream
 	  if (! options_.expInt) {
-	    os() << " ?>\">" << RE;
+	    if (options_.sdataAsPi)
+	      os() << " ?>\">" << RE;
+	    else
+	      os() << ">" << RE;
 	    os_->flush();
 	    os_ = outputStack_.get();
 	  } else {
-	    os() << " ?>";
+	    if (options_.sdataAsPi)
+	      os() << " ?>";
 	  }
 	}
 	break;
@@ -471,8 +479,12 @@ void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
       // declaration file and output start of declaration
       os_ = intEnts_;
 
-      os() << "<!ENTITY " << entity->name()
-	   << "  \"<?sdataEntity " << entity->name() << " ";
+      if (options_.sdataAsPi)
+	os() << "<!ENTITY " << entity->name()
+	     << "  \"<?sdataEntity " << entity->name() << " ";
+      else
+	os() << "<!ENTITY " << entity->name() << " ";
+
     } else { // we've seen it before; throw away expansion data
       os_ = nullOut_;
     }
@@ -481,7 +493,8 @@ void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
   // We are expanding internal entities; expand this one as a PI,
   // since XML does not have SDATA entities
   else {
-    os() << "<?sdataEntity " << entity->name() << " ";
+    if (options_.sdataAsPi)
+      os() << "<?sdataEntity " << entity->name() << " ";
   }
 
   // Now, no matter what, output the entity's data
@@ -489,11 +502,15 @@ void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
 
   // If necessary, end entity decl and replace old output stream
   if (! options_.expInt) {
-    os() << " ?>\">" << RE;
+    if (options_.sdataAsPi)
+      os() << " ?>\">" << RE;
+    else
+      os() << ">" << RE;
     os_->flush();
     os_ = outputStack_.get();
   } else {
-    os() << " ?>";
+    if (options_.sdataAsPi)
+      os() << " ?>";
   }
 
   delete event;

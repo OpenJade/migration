@@ -44,6 +44,7 @@ public:
     PackedBoolean expInt;
     PackedBoolean intDecl;
     PackedBoolean extDecl;
+    PackedBoolean sdataAsPi;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,

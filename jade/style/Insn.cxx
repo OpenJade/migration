@@ -1324,9 +1324,8 @@ const Insn *SetImplicitCharInsn::execute(VM &vm) const
     Char ch;
     AccessResult ret = vm.currentNode->getChar(*vm.interp, ch);
     if (ret == accessOK)
-      cp = &ch;
+      ((FlowObj *)vm.sp[-1])->setImplicitChar(ch);
   }
-  ((FlowObj *)vm.sp[-1])->setImplicitCharNICs(cp, loc_, *vm.interp);
   return next_.pointer();
 }
 

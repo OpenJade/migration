@@ -254,10 +254,14 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 
 void ProcessContext::characters(const Char *ch, size_t n)
 {
-  if (vm().interp->fotbDescr().wantCharPropertyNICs) {
+  Vector<size_t> dep;
+  if (vm().interp->fotbDescr().wantCharPropertyNICs
+      || currentStyleStack().actual(vm().interp->charMapC(),
+				    *vm().interp, dep)->asFunction()) {
     Vector<FOTBuilder::CharacterNIC> v(n);
     // FIXME. Assumes Vector<T>::iterator is T*.
-    FlowObj::setImplicitCharNICs(ch, n, v.begin(), *vm().interp);
+    // FIXME. Location
+    FlowObj::fixCharNICs(ch, n, v.begin(), Location(), *this);
     currentFOTBuilder().characters(v);
   }
   else
@@ -267,10 +271,14 @@ void ProcessContext::characters(const Char *ch, size_t n)
 void ProcessContext::charactersFromNode(const NodePtr &nd,
 					const Char *ch, size_t n)
 {
-  if (vm().interp->fotbDescr().wantCharPropertyNICs) {
+  Vector<size_t> dep;
+  if (vm().interp->fotbDescr().wantCharPropertyNICs
+      || currentStyleStack().actual(vm().interp->charMapC(),
+				    *vm().interp, dep)->asFunction()) {
     Vector<FOTBuilder::CharacterNIC> v(n);
     // FIXME. See prev. function.
-    FlowObj::setImplicitCharNICs(ch, n, v.begin(), *vm().interp);
+    // FIXME. Location.
+    FlowObj::fixCharNICs(ch, n, v.begin(), Location(), *this);
     currentFOTBuilder().characters(v);
   }
   else

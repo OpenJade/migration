@@ -5,6 +5,7 @@
 #include "ProcessContext.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
+#include "ELObjMessageArg.h"
 #include "SosofoObj.h"
 #include "macros.h"
 
@@ -1441,9 +1442,11 @@ public:
   FlowObj *copy(Collector &) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
-  void setImplicitCharNICs(const Char *, const Location &, Interpreter &);
+  void setImplicitChar(Char);
   bool hasNonInheritedC(const Identifier *) const;
-  bool characterStyle(ProcessContext &, StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
+  bool characterStyle(ProcessContext &context,
+		      StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
+    fixNICs_(context);
     style = style_;
     nic = *nic_;
     return 1;
@@ -1451,85 +1454,119 @@ public:
   bool isCharacter() { return 1; }
 private:
   Owner<FOTBuilder::CharacterNIC> nic_;
+  bool needFixNICs_;
+  void fixNICs_(ProcessContext &context) {
+    if (needFixNICs_) {
+      // FIXME. Location.
+      fixCharNICs(&nic_->ch, 1, nic_.pointer(), Location(), context);
+      needFixNICs_ = false;
+    }
+  }
 };
 
 CharacterFlowObj::CharacterFlowObj()
-: nic_(new FOTBuilder::CharacterNIC)
+: nic_(new FOTBuilder::CharacterNIC), needFixNICs_(false)
 {
 }
 
 CharacterFlowObj::CharacterFlowObj(const CharacterFlowObj &fo)
-: FlowObj(fo), nic_(new FOTBuilder::CharacterNIC(*fo.nic_))
+: FlowObj(fo), nic_(new FOTBuilder::CharacterNIC(*fo.nic_)),
+  needFixNICs_(fo.needFixNICs_)
 {
 }
 
 void CharacterFlowObj::processInner(ProcessContext &context)
 {
+  fixNICs_(context);
   context.currentFOTBuilder().character(*nic_);
 }
 
-void FlowObj::setImplicitCharNICs(const Char *ch, const Location &loc, 
-                                       Interpreter &interp)
+void FlowObj::setImplicitChar(Char)
 {
   CANNOT_HAPPEN();
 }
 
-void CharacterFlowObj::setImplicitCharNICs(const Char *ch, const Location &loc, 
-                                       Interpreter &interp)
+void CharacterFlowObj::setImplicitChar(Char ch)
 {
-  if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
-      && ch) {
-    nic_->ch = *ch;
-    nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+  if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))) {
+    nic_->ch = ch;
+    nic_->specifiedC |= FOTBuilder::CharacterNIC::cChar;
+    needFixNICs_ = true;
   }
-
-  if (nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
-    FlowObj::setImplicitCharNICs(&nic_->ch, 1, nic_.pointer(), interp);
 }
 
-void FlowObj::setImplicitCharNICs(const Char *ch, size_t n,
-				  FOTBuilder::CharacterNIC *nic,
-				  Interpreter &interp)
+void FlowObj::fixCharNICs(const Char *ch, size_t n,
+			  FOTBuilder::CharacterNIC *nic,
+			  const Location &loc,
+			  ProcessContext &context)
 {
+  ASSERT(ch);
+  ASSERT(nic);
+  Interpreter &interp = *context.vm().interp;
+  Vector<size_t> dep;
+  FunctionObj *func = context.currentStyleStack().
+    actual(interp.charMapC(), interp, dep)->asFunction();
+  if (func->nRequiredArgs()>1
+      || (func->nRequiredArgs() + func->nOptionalArgs()
+	  + func->restArg() ? 1 : 0) == 0)
+    func = 0;
+  InsnPtr insn(func != 0 ? func->makeCallInsn(1, interp, loc, InsnPtr()) : InsnPtr());
+  VM vm(interp);
+  ELObjDynamicRoot protect(interp);
   for (; n > 0; ++ch, ++nic, --n) {
-    // FIXME. Apply char-map.
+    if (!insn.isNull()) {
+      protect = interp.makeChar(*ch);
+      ELObj *res = vm.eval(insn.pointer(), 0, protect);
+      if (!res->charValue(nic->ch)) {
+	if (!interp.isError(res)) {
+	  interp.setNextLocation(loc);
+	  interp.message(InterpreterMessages::notACharInCharMap,
+			 ELObjMessageArg(protect, interp),
+			 ELObjMessageArg(res, interp));
+	}
+	nic->ch = *ch;
+      }
+    }
+    else
+      nic->ch = *ch;
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
-      nic->isSpace = interp.isSpace().getValue(*ch);
+      nic->isSpace = interp.isSpace().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
-      nic->isRecordEnd = interp.isRecordEnd().getValue(*ch);
+      nic->isRecordEnd = interp.isRecordEnd().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
-      nic->isInputTab = interp.isInputTab().getValue(*ch);
+      nic->isInputTab = interp.isInputTab().getValue(nic->ch);
     if (!(nic->specifiedC
 	  & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
-      nic->isInputWhitespace = interp.isInputWhitespace().getValue(*ch);
+      nic->isInputWhitespace = interp.isInputWhitespace().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
-      nic->isPunct = interp.isPunct().getValue(*ch);
+      nic->isPunct = interp.isPunct().getValue(nic->ch);
     if (!(nic->specifiedC
 	  & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
       nic->isDropAfterLineBreak =
-	interp.isDropAfterLineBreak().getValue(*ch);
+	interp.isDropAfterLineBreak().getValue(nic->ch);
     if (!(nic->specifiedC
 	  & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
       nic->isDropUnlessBeforeLineBreak =
-	interp.isDropUnlessBeforeLineBreak().getValue(*ch);
+	interp.isDropUnlessBeforeLineBreak().getValue(nic->ch);
     if (!(nic->specifiedC
 	  & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
       nic->breakBeforePriority =
-	interp.breakBeforePriority().getValue(*ch);
+	interp.breakBeforePriority().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
       nic->breakAfterPriority =
-	interp.breakAfterPriority().getValue(*ch);
+	interp.breakAfterPriority().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript)))
-      nic->script = interp.script().getValue(*ch);
+      nic->script = interp.script().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId)))
-      nic->glyphId = interp.glyphId().getValue(*ch);
+      nic->glyphId = interp.glyphId().getValue(nic->ch);
     if (!(nic->specifiedC
 	  & (1 << FOTBuilder::CharacterNIC::cMathFontPosture)))
-      nic->mathFontPosture = interp.mathFontPosture().getValue(*ch);
+      nic->mathFontPosture = interp.mathFontPosture().getValue(nic->ch);
     if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass)))
-      nic->mathClass = interp.mathClass().getValue(*ch);
+      nic->mathClass = interp.mathClass().getValue(nic->ch);
     nic->specifiedC |=
-      ((1 << FOTBuilder::CharacterNIC::cIsSpace) |
+      ((1 << FOTBuilder::CharacterNIC::cChar) |
+       (1 << FOTBuilder::CharacterNIC::cIsSpace) |
        (1 << FOTBuilder::CharacterNIC::cIsRecordEnd) |
        (1 << FOTBuilder::CharacterNIC::cIsInputTab) |
        (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace) |
@@ -1647,8 +1684,10 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       }
       return;
     case Identifier::keyChar:
-      if (interp.convertCharC(obj, ident, loc, nic_->ch))
+      if (interp.convertCharC(obj, ident, loc, nic_->ch)) {
 	nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+	needFixNICs_ = true;
+      }
       return;
     case Identifier::keyGlyphId:
       {

@@ -1102,7 +1102,6 @@ private:
   ELObj *value_;
 };
 
-
 IgnoredC::IgnoredC(const Identifier *ident, unsigned index, ELObj *value, Interpreter &interp)
 : InheritedC(ident, index), Collector::DynamicRoot(interp), value_(value)
 {

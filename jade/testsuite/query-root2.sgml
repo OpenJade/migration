@@ -1,5 +1,0 @@
-<!doctype b [
-<!element b - - (sub) >
-<!element sub - o empty >
-]>
-<b><sub></b>

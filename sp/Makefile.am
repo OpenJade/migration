@@ -10,8 +10,8 @@ SUBDIRS = pubtext doc \
 
 pkginclude_HEADERS = config.h
 
-BUILT_SOURCES = config.h
+BUILT_SOURCES = config.h msggen.pl
 
 ## Note that we include the windows-only aux files.
-EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
+EXTRA_DIST = instmac.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak

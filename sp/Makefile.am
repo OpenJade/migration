@@ -15,7 +15,7 @@ man1dir=$(mandir)/man1
 
 man_MANS = onsgmls.1 osgmlnorm.1 ospent.1 ospam.1 osx.1 ospcat.1
 
-pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog \
+pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS BUGS ChangeLog \
 	releasenotes.html releasenotes.pdf releasenotes.ps
 
 BUILT_SOURCES = config.h msggen.pl

@@ -1,5 +1,7 @@
 2003-10-10  Karl Eichwalder  <ke@suse.de>
 
+	* Makefile.am (pkgdoc_DATA): Add BUGS.
+
 	* BUGS: New file.
 
 	* tests/Makefile.am (TESTS_ENVIRONMENT): Add

@@ -1590,7 +1590,7 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
     unsigned toIndex = invalidAtt;
     metaSyntax_->generalSubstTable()->subst(tokens[i]);
     if (!isNotation && tokens[i] == rniArcCont_) {
-      if (attRenamed[contentPseudoAtt + 1]) {
+      if (attRenamed[0]) {
 	setNextLocation(rename.charLocation(tokensPos[i]));
 	Messenger::message(ArcEngineMessages::arcContDuplicate);
       } 
@@ -1621,7 +1621,7 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 	  Messenger::message(ArcEngineMessages::arcContInvalid,
 			     StringMessageArg(tokens[i + 1]));
 	}
-	else if (attSubstituted[contentPseudoAtt + 1]) {
+	else if (attSubstituted[0]) {
 	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
 	  Messenger::message(ArcEngineMessages::contentDuplicate);
 	} 

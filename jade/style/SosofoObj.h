@@ -115,6 +115,12 @@ public:
   virtual bool hasNonInheritedC(const Identifier *) const;
   virtual bool hasPseudoNonInheritedC(const Identifier *) const;
   virtual void setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &);
+  // Char * is 0 if no implicit character.
+  virtual void setImplicitChar(Char);
+  static void fixCharNICs(const Char *, size_t,
+				  FOTBuilder::CharacterNIC *,
+				  const Location &,
+				  ProcessContext &);
   void traceSubObjects(Collector &) const;
   void setStyle(StyleObj *);
   void process(ProcessContext &);
@@ -173,7 +179,7 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  SetNonInheritedCsSosofoObj(FlowObj *, const InsnPtr &, ELObj **);
+  SetNonInheritedCsSosofoObj(FlowObj *, const InsnPtr &, ELObj **, const NodePtr &);
   ~SetNonInheritedCsSosofoObj();
   void process(ProcessContext &);
   void traceSubObjects(Collector &) const;
@@ -187,6 +193,7 @@ private:
   FlowObj *flowObj_;
   ELObj **display_;
   InsnPtr code_;
+  NodePtr node_;
 };
 
 class Expression;

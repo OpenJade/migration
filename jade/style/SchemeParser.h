@@ -12,10 +12,18 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class LangObj;
+
 class SchemeParser : public Messenger {
 public:
   SchemeParser(Interpreter &, Owner<InputSource> &);
   void parse();
+  void parseStandardChars();
+  void parseMapSdataEntity(const StringC &name, const StringC &text);
+  void parseNameChars();
+  void parseSeparatorChars();
+  void parseFeatures();
+  void parseGrovePlan();
   bool parseExpression(Owner<Expression> &);
 private:
   SchemeParser(const SchemeParser &); // undefined
@@ -81,14 +89,29 @@ private:
   bool doMode();
   bool doDeclareInitialValue();
   bool doDeclareCharacteristic();
+  bool doDeclareCharCharacteristicAndProperty();
   bool doDeclareFlowObjectClass();
   bool doDeclareClassAttribute();
   bool doDeclareIdAttribute();
   bool doDeclareFlowObjectMacro();
+  bool doDeclareDefaultLanguage();
+  bool doDefineLanguage();
+  bool doCollate();
+  bool doMultiCollatingElement();
+  bool doCollatingSymbol();
+  bool doCollatingOrder();
+  bool doWeights();
+  bool doToupper();
+  bool doTolower();
+  bool doDeclareCharProperty();
+  bool doAddCharProperties();
   bool skipForm();
+  bool parseDefine(Identifier *&, Owner<Expression> &);
+  bool parseSpecialQuery(Owner<Expression> &expr, const char *query);
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);
   bool parseBegin(Owner<Expression> &expr);
+  bool parseBody(Owner<Expression> &expr);
   bool parseSet(Owner<Expression> &expr);
   bool parseLambda(Owner<Expression> &);
   bool parseLet(Owner<Expression> &);
@@ -125,12 +148,14 @@ private:
   void createQuasiquoteAbbreviation(const char *, Owner<Expression> &);
   bool parseRuleBody(Owner<Expression> &, ProcessingMode::RuleType &);
   bool getToken(unsigned, Token &);
-  bool isDelimiter(Xchar);
+  bool handleNumber(unsigned, Token &);
+  bool handleIdentifier(unsigned, Token &);
   void extendToken();
   bool scanString();
   void skipComment();
+  void skipIntertokenSpace();
+  bool peekDefine();
   bool tokenRecover(unsigned, Token &);
-  bool tokenIsNumber();
   bool scanString(unsigned, Token &);
   ELObj *convertAfiiGlyphId(const StringC &);
   Identifier *lookup(const StringC &str);
@@ -146,6 +171,7 @@ private:
   ProcessingMode *defMode_;
   const char *afiiPublicId_;
   bool dsssl2_;
+  LangObj *lang_;
 };
 
 inline

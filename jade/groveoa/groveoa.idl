@@ -8,6 +8,7 @@ import "oaidl.idl";
 interface Node;
 interface NodeList;
 interface NamedNodeList;
+interface StringList;
 
 interface ElementNode;
 interface AttributeAssignmentNode;
@@ -25,6 +26,12 @@ interface ExternalDataNode;
 interface SubdocNode;
 interface MessageNode;
 interface StoragePos;
+interface ElementTypeNode;
+interface AttributeDefNode;
+interface ModelGroupNode;
+interface ElementTokenNode;
+interface PcdataTokenNode;
+interface DefaultEntityNode;
 
 enum NodeClass {
 	nodeClassElement,
@@ -41,7 +48,13 @@ enum NodeClass {
 	nodeClassExternalId,
 	nodeClassExternalData,
 	nodeClassSubdoc,
-	nodeClassMessage
+	nodeClassMessage,
+	nodeClassElementType,
+	nodeClassAttributeDef,
+	nodeClassElementToken,
+	nodeClassPcdataToken,
+	nodeClassDefaultEntity,
+	nodeClassModelGroup
 };
 
 enum EntityType {
@@ -51,6 +64,54 @@ enum EntityType {
 	entityTypeNdata,
 	entityTypeSubdocument,
 	entityTypePi
+};
+
+enum ContentType {
+	contentTypeCdata,
+	contentTypeRcdata,
+	contentTypeEmpty,
+	contentTypeAny,
+	contentTypeModelGroup
+};
+
+enum DeclValueType {
+	declValueTypeCdata,
+	declValueTypeEntity,
+	declValueTypeEntities,
+	declValueTypeId,
+	declValueTypeIdref,
+	declValueTypeIdrefs,
+	declValueTypeName,
+	declValueTypeNames,
+	declValueTypeNmtoken,
+    declValueTypeNmtokens,
+	declValueTypeNumber,
+	declValueTypeNumbers,
+	declValueTypeNutoken,
+	declValueTypeNutokens,
+	declValueTypeNotation,
+	declValueTypeNmtkgrp
+};
+
+enum DefaultValueType {
+	defaultValueTypeValue,
+	defaultValueTypeFixed,
+	defaultValueTypeRequired,
+	defaultValueTypeCurrent,
+	defaultValueTypeConref,
+	defaultValueTypeImplied
+};
+
+enum Connector {
+	connectorAnd,
+	connectorOr,
+	connectorSeq
+};
+
+enum OccurIndicator {
+	occurIndicatorOpt,
+	occurIndicatorPlus,
+	occurIndicatorRep
 };
 
 enum Severity {
@@ -148,6 +209,8 @@ interface ElementNode : Node
 	HRESULT Included([out, retval] VARIANT_BOOL *);
 	[propget]
 	HRESULT MustOmitEndTag([out, retval] VARIANT_BOOL *);
+	[propget]
+	HRESULT ElementType([out, retval] ElementTypeNode **);
 }
 
 [
@@ -186,6 +249,8 @@ interface AttributeAssignmentNode : Node
 	HRESULT TokenSep([out, retval] long *);
 	[propget, id(DISPID_VALUE)]
 	HRESULT StringValue([out, retval] BSTR *);
+	[propget]
+	HRESULT AttributeDef([out, retval] AttributeDefNode **);
 }
 
 [
@@ -264,6 +329,12 @@ interface DocumentTypeNode : Node
 	HRESULT GeneralEntities([out, retval] NamedNodeList **);
 	[propget]
 	HRESULT Notations([out, retval] NamedNodeList **);
+	[propget]
+	HRESULT ElementTypes([out, retval] NamedNodeList **);
+	[propget]
+	HRESULT ParameterEntities([out, retval] NamedNodeList **);
+	[propget]
+	HRESULT DefaultEntity([out, retval] DefaultEntityNode **);
 }
 
 [
@@ -306,6 +377,8 @@ interface NotationNode : Node
 	HRESULT Name([out, retval] BSTR *);
 	[propget]
 	HRESULT ExternalId([out, retval] ExternalIdNode **);
+	[propget]
+	HRESULT AttributeDefs([out, retval] NamedNodeList **);
 }
 
 [
@@ -354,6 +427,122 @@ interface SubdocNode : Node
 	HRESULT Entity([out, retval] EntityNode **);
 	[propget]
 	HRESULT EntityName([out, retval] BSTR *);
+}
+
+[
+	object,
+	uuid(D833420F-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface ElementTypeNode : Node
+{
+	[propget]
+	HRESULT Gi([out, retval] BSTR *);
+	[propget]
+	HRESULT AttributeDefs([out, retval] NamedNodeList **);
+	[propget]
+	HRESULT ContentType([out, retval] enum ContentType *);
+	[propget]
+	HRESULT Exclusions([out, retval] StringList **);
+	[propget]
+	HRESULT Inclusions([out, retval] StringList **);
+	[propget]
+	HRESULT ModelGroup([out, retval] ModelGroupNode **);
+	[propget]
+	HRESULT OmitEndTag([out, retval] VARIANT_BOOL *);
+	[propget]
+	HRESULT OmitStartTag([out, retval] VARIANT_BOOL *);
+}
+
+[
+	object,
+	uuid(D8334210-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface AttributeDefNode : Node
+{
+	[propget]
+	HRESULT Name([out, retval] BSTR *);
+	[propget]
+	HRESULT DeclValueType([out, retval] enum DeclValueType *);
+	[propget]
+	HRESULT DefaultValueType([out, retval] enum DefaultValueType *);
+	[propget]
+	HRESULT Tokens([out, retval] StringList **);
+	[propget]
+	HRESULT CurrentAttributeIndex([out, retval] long *);
+	[propget]
+	HRESULT CurrentGroup([out, retval] NodeList **);
+	[propget]
+	HRESULT DefaultValue([out, retval] NodeList **);
+}
+
+[
+	object,
+	uuid(D8334211-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface ModelGroupNode : Node
+{
+	[propget]
+	HRESULT Connector([out, retval] enum Connector *);
+	[propget]
+	HRESULT OccurIndicator([out, retval] enum OccurIndicator *);
+	[propget]
+	HRESULT ContentTokens([out, retval] NodeList **);
+}
+
+[
+	object,
+	uuid(D8334212-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface ElementTokenNode : Node
+{
+	[propget]
+	HRESULT Gi([out, retval] BSTR *);
+	[propget]
+	HRESULT OccurIndicator([out, retval] enum OccurIndicator *);
+}
+
+[
+	object,
+	uuid(D8334213-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface PcdataTokenNode : Node
+{
+}
+
+[
+	object,
+	uuid(D8334214-9FD6-11d0-9083-0020AF41CFC2),
+	dual,
+	pointer_default(unique)
+]
+interface DefaultEntityNode : Node
+{
+	[propget]
+	HRESULT Name([out, retval] BSTR *);
+	[propget]
+	HRESULT Text([out, retval] BSTR *);
+	[propget]
+	HRESULT TextNull([out, retval] VARIANT_BOOL *);
+	[propget]
+	HRESULT Notation([out, retval] NotationNode **);
+	[propget]
+	HRESULT NotationName([out, retval] BSTR *);
+	[propget]
+	HRESULT EntityType([out, retval] enum EntityType *);
+	[propget]
+	HRESULT Attributes([out, retval] NamedNodeList **);
+	[propget]
+	HRESULT ExternalId([out, retval] ExternalIdNode **);
 }
 
 [
@@ -414,6 +603,24 @@ interface NodeList : IDispatch
 
 	[propget, restricted, id(DISPID_NEWENUM)]
 	HRESULT _NewEnum([out, retval] IUnknown **retval);	
+}
+
+[
+	object,
+	uuid(BA7A21C2-9FA9-11d0-9083-0020AF41CFC2),
+	dual
+]
+interface StringList : IDispatch
+{
+	HRESULT First([out, retval] BSTR *);
+	HRESULT Rest([out, retval] StringList **);
+
+	[propget, helpstring("Returns number of strings.")]
+	HRESULT Count([out, retval] long *retval);
+
+	[propget, id(DISPID_VALUE),
+	 helpstring("Given an index, return the string.  First string has index 1.")]
+	HRESULT Item([in] long index, [out, retval] BSTR *retval);
 }
 
 [
@@ -512,6 +719,10 @@ interface _GroveBuilder : IDispatch
 	HRESULT ValidateOnly([in] VARIANT_BOOL);
 
 	HRESULT parse([in] BSTR systemId, [out, retval] SgmlDocumentNode **);
+
+	HRESULT archParse([in] BSTR systemId,
+					  [in] BSTR archNames,
+					  [out, retval] SgmlDocumentNode **);
 }
 
 [
@@ -527,6 +738,7 @@ library GROVE
 	interface Node;
 	interface NodeList;
 	interface NamedNodeList;
+	interface StringList;
 
 	interface ElementNode;
 	interface AttributeAssignmentNode;
@@ -544,7 +756,13 @@ library GROVE
 	interface SubdocNode;
 	interface MessageNode;
 	interface StoragePos;
-
+	interface ElementTypeNode;
+	interface AttributeDefNode;
+	interface ModelGroupNode;
+	interface ElementTokenNode;
+	interface PcdataTokenNode;
+	interface DefaultEntityNode;
+	
 	[
 		uuid(557CE382-9EBD-11D0-9083-0020AF41CFC2)
 	]

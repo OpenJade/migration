@@ -394,6 +394,7 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
       const AttributeDefinitionList *adl = elementType->attributeDefTemp();
       if (adl) {
 	if (options_.attlist) {
+            maybeStartDoctype(doctypeStarted, dtd);
 	    os() << "<!ATTLIST " << generalName(elementType->name(), nameBuf_);
 	    for (size_t i = 0; i < adl->size(); i++) {
 	      const AttributeDefinition *def = adl->def(i);
@@ -660,6 +661,8 @@ void XmlOutputEventHandler::outputCdata(const Char *s, size_t n)
       else
 	nCdataEndMatched_++;
     }
+    else
+      nCdataEndMatched_ = 0;
     os().put(c);
   }
 }

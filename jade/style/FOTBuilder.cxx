@@ -5,6 +5,7 @@
 #include "FOTBuilder.h"
 #include "Owner.h"
 #include "macros.h"
+#include "IListIter.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -47,11 +48,14 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "spread-outside",
     "page-inside",
     "page-outside",
+    "initial",
+    "final",
     "wrap",
     "asis",
     "asis-wrap",
     "asis-truncate",
     "none",
+    "indent",
     "before",
     "through",
     "after",
@@ -119,6 +123,9 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "explicit",
     "row-major",
     "column-major",
+    "uppercase",
+    "lowercase",
+    "capitalize",
   };
   ASSERT(SIZEOF(names) == nSymbols - 2);
   return names[sym - 2];
@@ -151,6 +158,18 @@ void FOTBuilder::characters(const Char *, size_t)
 {
 }
   
+void FOTBuilder::characters(const Vector<CharacterNIC> &v)
+{
+  // This is really slow. A FOTBuilder should either override this or
+  // set Description::wantCharPropertyNICs=false.
+  Char s[v.size()];
+  size_t j(0);
+  for (size_t i = 0; i< v.size(); ++i)
+    if (v[i].specifiedC & (1 << CharacterNIC::cChar))
+      s[j++] = v[i].ch;
+  characters(s, j);
+}
+
 void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 {
   characters(s, n);
@@ -158,7 +177,7 @@ void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 
 void FOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & (1 << CharacterNIC::cChar))
+  if (nic.valid)
     characters(&nic.ch, 1);
   atomic();
 }
@@ -312,6 +331,26 @@ void FOTBuilder::endBox()
   end();
 }
 
+void FOTBuilder::startSideBySide(const DisplayNIC&)
+{
+  start();
+}
+
+void FOTBuilder::endSideBySide()
+{
+  end();
+}
+  
+void FOTBuilder::startSideBySideItem()
+{
+  start();
+}
+
+void FOTBuilder::endSideBySideItem()
+{
+  end();
+}
+
 void FOTBuilder::startSideline()
 {
 }
@@ -320,26 +359,20 @@ void FOTBuilder::endSideline()
 {
 }
 
-void FOTBuilder::startSimplePageSequence()
+void FOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[nHF])
 {
+  for ( unsigned i = 0; i < nHF; ++i )
+    headerFooter[i] = this;
   start();
+}
+
+void FOTBuilder::endSimplePageSequenceHeaderFooter()
+{
 }
 
 void FOTBuilder::endSimplePageSequence()
 {
   end();
-}
-
-void FOTBuilder::startSimplePageSequenceHeaderFooter(unsigned)
-{
-}
-
-void FOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
-{
-}
-
-void FOTBuilder::endAllSimplePageSequenceHeaderFooter()
-{
 }
 
 void FOTBuilder::pageNumber()
@@ -735,6 +768,18 @@ void FOTBuilder::setBoxSizeAfter(Length)
 {
 }
 
+void FOTBuilder::setSideBySideOverlapControl(Symbol)
+{
+}
+
+void FOTBuilder::setSideBySidePreAlign(Symbol)
+{
+}
+
+void FOTBuilder::setSideBySidePostAlign(Symbol)
+{
+}
+  
 void FOTBuilder::setPositionPointShift(const LengthSpec &)
 {
 }
@@ -1103,6 +1148,14 @@ void FOTBuilder::setEscapementSpaceAfter(const InlineSpace &)
 {
 }
 
+void FOTBuilder::setInlineSpaceSpace(const OptInlineSpace &)
+{
+}
+
+void FOTBuilder::setCharMap(Symbol)
+{
+}
+
 void FOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
 }
@@ -1184,8 +1237,7 @@ FOTBuilder::LeaderNIC::LeaderNIC()
 }
 
 FOTBuilder::CharacterNIC::CharacterNIC()
-: specifiedC(0),
-  stretchFactor(1.0)
+: valid(0), specifiedC(0), stretchFactor(1.0)
 {
 }
 
@@ -1232,17 +1284,52 @@ SaveFOTBuilder::SaveFOTBuilder()
 {
 }
 
-SaveFOTBuilder::SaveFOTBuilder(const NodePtr &currentNode,
+SaveFOTBuilder::SaveFOTBuilder(const SaveFOTBuilder& other)
+: calls_(0), tail_(&calls_)
+{
+  for (Call* call = other.calls_; call; call = call->next) {
+    *tail_ = call->clone();
+    tail_ = &(*tail_)->next;
+  }
+}
+
+NodeSaveFOTBuilder::NodeSaveFOTBuilder(const NodePtr &currentNode,
 			       const StringC &processingMode)
 : currentNode_(currentNode),
-  processingMode_(processingMode),
-  calls_(0), tail_(&calls_)
+  processingMode_(processingMode)
 {
+}
+
+void
+NodeSaveFOTBuilder::emit(FOTBuilder& fotb) const
+{
+  if (currentNode_)
+    fotb.startNode(currentNode_, processingMode_);
+  SaveFOTBuilder::emit(fotb);
+  if (currentNode_)
+    fotb.endNode();
 }
 
 SaveFOTBuilder::~SaveFOTBuilder()
 {
-  *tail_ = 0;
+  clear();
+}
+
+SaveFOTBuilder&
+SaveFOTBuilder::operator=(const SaveFOTBuilder& other)
+{
+  if (this != &other) {
+    clear();
+    for (Call* call = other.calls_; call; call = call->next) {
+      *tail_ = call->clone();
+      tail_ = &(*tail_)->next;
+    }
+  }
+  return *this;
+}
+
+void SaveFOTBuilder::clear()
+{
   while (calls_) {
     Call *tem = calls_;
     calls_ = calls_->next;
@@ -1250,15 +1337,15 @@ SaveFOTBuilder::~SaveFOTBuilder()
   }
 }
 
+
 SaveFOTBuilder *SaveFOTBuilder::asSaveFOTBuilder()
 {
   return this;
 }
 
-void SaveFOTBuilder::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::emit(FOTBuilder &fotb) const
 {
-  if (currentNode_)
-    fotb.startNode(currentNode_, processingMode_);
+#if 0
   SaveFOTBuilder *save = fotb.asSaveFOTBuilder();
   if (save) {
     if (calls_) {
@@ -1268,23 +1355,27 @@ void SaveFOTBuilder::emit(FOTBuilder &fotb)
       tail_ = &calls_;
     }
   }
-  else {
-    *tail_ = 0;
-    while (calls_) {
-      Call *tem = calls_;
-      calls_ = calls_->next;
+  else 
+#endif
+  {
+    for (const Call* tem = calls_; tem; tem = tem->next) 
       tem->emit(fotb);
-      delete tem;
-    }
-    tail_ = &calls_;
   }
-  if (currentNode_)
-    fotb.endNode();
 }
 
 #define NO_ARG_CALL(F) \
   void SaveFOTBuilder::F() { \
     *tail_ = new NoArgCall(&FOTBuilder::F); \
+     tail_ = &(*tail_)->next; }
+
+#define ONEARG_CALL(F, T) \
+  void SaveFOTBuilder::F(T a) { \
+    *tail_ = new OneArgCall<T>(&FOTBuilder::F, a); \
+     tail_ = &(*tail_)->next; }
+
+#define ONEREFARG_CALL(F, T) \
+  void SaveFOTBuilder::F(const T& a) { \
+    *tail_ = new OneRefArgCall<T>(&FOTBuilder::F, a); \
      tail_ = &(*tail_)->next; }
 
 NO_ARG_CALL(startSequence)
@@ -1302,12 +1393,14 @@ NO_ARG_CALL(endMarginalia)
 NO_ARG_CALL(endMultiMode)
 NO_ARG_CALL(endScore)
 NO_ARG_CALL(endBox)
+NO_ARG_CALL(endSideBySide);
+NO_ARG_CALL(startSideBySideItem);
+NO_ARG_CALL(endSideBySideItem);
 NO_ARG_CALL(startSideline)
 NO_ARG_CALL(endSideline)
 NO_ARG_CALL(endNode)
-NO_ARG_CALL(startSimplePageSequence)
+NO_ARG_CALL(endSimplePageSequenceHeaderFooter)
 NO_ARG_CALL(endSimplePageSequence)
-NO_ARG_CALL(endAllSimplePageSequenceHeaderFooter)
 NO_ARG_CALL(pageNumber)
 NO_ARG_CALL(endTable)
 NO_ARG_CALL(tableBeforeRowBorder)
@@ -1341,10 +1434,7 @@ NO_ARG_CALL(endMathOperator)
 NO_ARG_CALL(endGrid)
 NO_ARG_CALL(endGridCell)
 
-#define LENGTH_SPEC_ARG_CALL(F) \
-  void SaveFOTBuilder::F(const LengthSpec &lengthSpec) { \
-    *tail_ = new LengthSpecArgCall(&FOTBuilder::F, lengthSpec); \
-     tail_ = &(*tail_)->next; }
+#define LENGTH_SPEC_ARG_CALL(F) ONEREFARG_CALL(F, LengthSpec)
 
 LENGTH_SPEC_ARG_CALL(setStartIndent)
 LENGTH_SPEC_ARG_CALL(setEndIndent)
@@ -1365,20 +1455,13 @@ LENGTH_SPEC_ARG_CALL(setTableCornerRadius)
 LENGTH_SPEC_ARG_CALL(setBoxCornerRadius)
 LENGTH_SPEC_ARG_CALL(setMarginaliaSep)
 
-#define OPT_LENGTH_SPEC_ARG_CALL(F) \
-  void SaveFOTBuilder::F(const OptLengthSpec &optLengthSpec) { \
-    *tail_ = new OptLengthSpecArgCall(&FOTBuilder::F, optLengthSpec); \
-     tail_ = &(*tail_)->next; }
+#define OPT_LENGTH_SPEC_ARG_CALL(F) ONEREFARG_CALL(F, OptLengthSpec)
 
 OPT_LENGTH_SPEC_ARG_CALL(setMinPreLineSpacing)
 OPT_LENGTH_SPEC_ARG_CALL(setMinPostLineSpacing)
 OPT_LENGTH_SPEC_ARG_CALL(setMinLeading)
 
-#define LONG_ARG_CALL(F) \
-  void SaveFOTBuilder::F(long n) { \
-    *tail_ = new LongArgCall(&FOTBuilder::F, n); \
-     tail_ = &(*tail_)->next; }
-
+#define LONG_ARG_CALL(F) ONEARG_CALL(F, long)
 
 LONG_ARG_CALL(setFontSize)
 LONG_ARG_CALL(setPageWidth)
@@ -1410,10 +1493,7 @@ LONG_ARG_CALL(setOrphanCount)
 LONG_ARG_CALL(setExpandTabs)
 LONG_ARG_CALL(setHyphenationLadderCount)
 
-#define BOOL_ARG_CALL(F) \
-  void SaveFOTBuilder::F(bool b) { \
-    *tail_ = new BoolArgCall(&FOTBuilder::F, b); \
-     tail_ = &(*tail_)->next; }
+#define BOOL_ARG_CALL(F) ONEARG_CALL(F, bool)
 
 BOOL_ARG_CALL(setBorderPresent)
 BOOL_ARG_CALL(setInhibitLineBreaks)
@@ -1440,10 +1520,7 @@ BOOL_ARG_CALL(setMarginaliaKeepWithPrevious)
 BOOL_ARG_CALL(setGridEquidistantRows)
 BOOL_ARG_CALL(setGridEquidistantColumns)
 
-#define SYMBOL_ARG_CALL(F) \
-  void SaveFOTBuilder::F(Symbol sym) { \
-    *tail_ = new SymbolArgCall(&FOTBuilder::F, sym); \
-     tail_ = &(*tail_)->next; }
+#define SYMBOL_ARG_CALL(F) ONEARG_CALL(F, Symbol)
 
 SYMBOL_ARG_CALL(setFontWeight)
 SYMBOL_ARG_CALL(setFontPosture)
@@ -1470,6 +1547,9 @@ SYMBOL_ARG_CALL(setGridPositionCellType)
 SYMBOL_ARG_CALL(setGridColumnAlignment)
 SYMBOL_ARG_CALL(setGridRowAlignment)
 SYMBOL_ARG_CALL(setBoxType)
+SYMBOL_ARG_CALL(setSideBySideOverlapControl)
+SYMBOL_ARG_CALL(setSideBySidePreAlign)
+SYMBOL_ARG_CALL(setSideBySidePostAlign)
 SYMBOL_ARG_CALL(setGlyphAlignmentMode)
 SYMBOL_ARG_CALL(setBoxBorderAlignment)
 SYMBOL_ARG_CALL(setCellRowAlignment)
@@ -1481,10 +1561,7 @@ SYMBOL_ARG_CALL(setFontProportionateWidth)
 SYMBOL_ARG_CALL(setCellCrossed)
 SYMBOL_ARG_CALL(setMarginaliaSide)
 
-#define PUBLIC_ID_ARG_CALL(F) \
-  void SaveFOTBuilder::F(PublicId pubid) { \
-    *tail_ = new PublicIdArgCall(&FOTBuilder::F, pubid); \
-     tail_ = &(*tail_)->next; }
+#define PUBLIC_ID_ARG_CALL(F) ONEARG_CALL(F, PublicId)
 
 PUBLIC_ID_ARG_CALL(setBackgroundTile)
 PUBLIC_ID_ARG_CALL(setLineBreakingMethod)
@@ -1496,115 +1573,30 @@ PUBLIC_ID_ARG_CALL(setHyphenationMethod)
 PUBLIC_ID_ARG_CALL(setTableAutoWidthMethod)
 PUBLIC_ID_ARG_CALL(setFontName)
 
-#define UNSIGNED_ARG_CALL(F) \
-  void SaveFOTBuilder::F(unsigned n) { \
-    *tail_ = new UnsignedArgCall(&FOTBuilder::F, n); \
-     tail_ = &(*tail_)->next; }
+#define UNSIGNED_ARG_CALL(F) ONEARG_CALL(F, unsigned)
 
 UNSIGNED_ARG_CALL(setLanguage)
 UNSIGNED_ARG_CALL(setCountry)
-UNSIGNED_ARG_CALL(startSimplePageSequenceHeaderFooter)
-UNSIGNED_ARG_CALL(endSimplePageSequenceHeaderFooter)
 
-#define STRING_ARG_CALL(F) \
-  void SaveFOTBuilder::F(const StringC &str) { \
-    *tail_ = new StringArgCall(&FOTBuilder::F, str); \
-     tail_ = &(*tail_)->next; }
-
+#define STRING_ARG_CALL(F) ONEREFARG_CALL(F, StringC)
 
 STRING_ARG_CALL(setFontFamilyName)
 STRING_ARG_CALL(formattingInstruction)
 
-#define INLINE_SPACE_ARG_CALL(F) \
-  void SaveFOTBuilder::F(const InlineSpace &is) { \
-    *tail_ = new InlineSpaceArgCall(&FOTBuilder::F, is); \
-     tail_ = &(*tail_)->next; }
+#define INLINE_SPACE_ARG_CALL(F) ONEREFARG_CALL(F, InlineSpace)
 
 INLINE_SPACE_ARG_CALL(setEscapementSpaceBefore)
 INLINE_SPACE_ARG_CALL(setEscapementSpaceAfter)
+ONEREFARG_CALL(setInlineSpaceSpace, OptInlineSpace);
+SYMBOL_ARG_CALL(setCharMap);
 
 SaveFOTBuilder::Call::~Call()
 {
 }
 
-void SaveFOTBuilder::NoArgCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::NoArgCall::emit(FOTBuilder &fotb) const
 {
   (fotb.*func)();
-}
-
-void SaveFOTBuilder::LongArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::ExtensionLongArgCall::emit(FOTBuilder &fotb)
-{
-  fotb.extensionSet(func, arg);
-}
-
-void SaveFOTBuilder::BoolArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::ExtensionBoolArgCall::emit(FOTBuilder &fotb)
-{
-  fotb.extensionSet(func, arg);
-}
-
-void SaveFOTBuilder::SymbolArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::PublicIdArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::UnsignedArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::InlineSpaceArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::StringArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::ExtensionStringArgCall::emit(FOTBuilder &fotb)
-{
-  fotb.extensionSet(func, arg);
-}
-
-void SaveFOTBuilder::CharArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::LengthSpecArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::OptLengthSpecArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::NodePtrArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
-}
-
-void SaveFOTBuilder::DeviceRGBColorArgCall::emit(FOTBuilder &fotb)
-{
-  (fotb.*func)(arg);
 }
 
 void SaveFOTBuilder::charactersFromNode(const NodePtr &node, const Char *s, size_t n)
@@ -1619,27 +1611,20 @@ SaveFOTBuilder::CharactersFromNodeCall::CharactersFromNodeCall(const NodePtr &nd
 {
 }
 
-void SaveFOTBuilder::CharactersFromNodeCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::CharactersFromNodeCall::emit(FOTBuilder &fotb) const
 {
   fotb.charactersFromNode(node, data, size);
 }
 
-void SaveFOTBuilder::characters(const Char *s, size_t n)
+void SaveFOTBuilder::characters(const Char *s, size_t n) 
 {
   *tail_ = new CharactersCall(s, n);
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::CharacterCall::emit(FOTBuilder &fotb)
-{
-  fotb.character(arg);
-}
+ONEREFARG_CALL(characters, Vector<CharacterNIC>);
 
-void SaveFOTBuilder::character(const CharacterNIC &nic)
-{
-  *tail_ = new CharacterCall(nic);
-  tail_ = &(*tail_)->next;
-}
+ONEREFARG_CALL(character, CharacterNIC);
 
 SaveFOTBuilder::StartNodeCall::StartNodeCall(const NodePtr &nd,
 					     const StringC &m)
@@ -1647,7 +1632,7 @@ SaveFOTBuilder::StartNodeCall::StartNodeCall(const NodePtr &nd,
 {
 }
 
-void SaveFOTBuilder::StartNodeCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::StartNodeCall::emit(FOTBuilder &fotb) const
 {
   fotb.startNode(node, mode);
 }
@@ -1658,114 +1643,33 @@ void SaveFOTBuilder::startNode(const NodePtr &node, const StringC &mode)
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::currentNodePageNumber(const NodePtr &node)
+ONEREFARG_CALL(currentNodePageNumber, NodePtr)
+ONEREFARG_CALL(setColor, DeviceRGBColor)
+ONEREFARG_CALL(setBackgroundColor, DeviceRGBColor)
+NO_ARG_CALL(setBackgroundColor)
+ONEREFARG_CALL(startParagraph, ParagraphNIC)
+ONEREFARG_CALL(paragraphBreak, ParagraphNIC)
+ONEREFARG_CALL(startDisplayGroup, DisplayGroupNIC)
+ONEREFARG_CALL(externalGraphic, ExternalGraphicNIC)
+ONEREFARG_CALL(rule, RuleNIC)
+ONEREFARG_CALL(startLeader, LeaderNIC)
+ONEREFARG_CALL(startLink, Address)
+ONEARG_CALL(startScore, Symbol)
+ONEARG_CALL(startScore, Char)
+ONEREFARG_CALL(startScore, LengthSpec)
+ONEREFARG_CALL(startLineField, LineFieldNIC)
+ONEREFARG_CALL(startBox, BoxNIC)
+ONEREFARG_CALL(startSideBySide, DisplayNIC)
+typedef Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > VectorConstPtrFOTBuilderGlyphSubstTable;
+ONEREFARG_CALL(setGlyphSubstTable, VectorConstPtrFOTBuilderGlyphSubstTable)
+
+void SaveFOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[nHF])
 {
-  *tail_ = new NodePtrArgCall(&FOTBuilder::currentNodePageNumber, node);
+  *tail_ = new StartSimplePageSequenceCall(headerFooter);
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::setColor(const DeviceRGBColor &color)
-{
-  *tail_ = new DeviceRGBColorArgCall(&FOTBuilder::setColor, color);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::setBackgroundColor(const DeviceRGBColor &color)
-{
-  DeviceRGBColorArgCall::FuncPtr f = &FOTBuilder::setBackgroundColor;
-  *tail_ = new DeviceRGBColorArgCall(f, color);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::setBackgroundColor()
-{
-  NoArgCall::FuncPtr f = &FOTBuilder::setBackgroundColor;
-  *tail_ = new NoArgCall(f);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startParagraph(const ParagraphNIC &nic)
-
-{
-  *tail_ = new StartParagraphCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::paragraphBreak(const ParagraphNIC &nic)
-
-{
-  *tail_ = new ParagraphBreakCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
-{
-  *tail_ = new StartDisplayGroupCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
-{
-  *tail_ = new ExternalGraphicCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::rule(const RuleNIC &nic)
-{
-  *tail_ = new RuleCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startLeader(const LeaderNIC &nic)
-{
-  *tail_ = new StartLeaderCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startLink(const Address &addr)
-{
-  *tail_ = new StartLinkCall(addr);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startScore(Symbol type)
-{
-  SymbolArgCall::FuncPtr func = &FOTBuilder::startScore;
-  *tail_ = new SymbolArgCall(func, type);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startScore(Char c)
-{
-  CharArgCall::FuncPtr func = &FOTBuilder::startScore;
-  *tail_ = new CharArgCall(func, c);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startScore(const LengthSpec &len)
-{
-  LengthSpecArgCall::FuncPtr func = &FOTBuilder::startScore;
-  *tail_ = new LengthSpecArgCall(func, len);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startLineField(const LineFieldNIC &nic)
-{
-  *tail_ = new StartLineFieldCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startBox(const BoxNIC &nic)
-{
-  *tail_ = new StartBoxCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startTable(const TableNIC &nic)
-{
-  *tail_ = new StartTableCall(nic);
-  tail_ = &(*tail_)->next;
-}
+ONEREFARG_CALL(startTable, TableNIC)
 
 void SaveFOTBuilder::startTablePart(const TablePartNIC &nic, FOTBuilder *&header, FOTBuilder *&footer)
 {
@@ -1773,17 +1677,8 @@ void SaveFOTBuilder::startTablePart(const TablePartNIC &nic, FOTBuilder *&header
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::tableColumn(const TableColumnNIC &nic)
-{
-  *tail_ = new TableColumnCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startTableCell(const TableCellNIC &nic)
-{
-  *tail_ = new StartTableCellCall(nic);
-  tail_ = &(*tail_)->next;
-}
+ONEREFARG_CALL(tableColumn, TableColumnNIC)
+ONEREFARG_CALL(startTableCell, TableCellNIC)
 
 void SaveFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
@@ -1822,11 +1717,7 @@ void SaveFOTBuilder::startRadical(FOTBuilder *&degree)
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::radicalRadical(const CharacterNIC &nic)
-{
-  *tail_ = new RadicalRadicalCall(nic);
-  tail_ = &(*tail_)->next;
-}
+ONEREFARG_CALL(radicalRadical, CharacterNIC)
 
 void SaveFOTBuilder::startMathOperator(FOTBuilder *&oper,
 				       FOTBuilder *&lowerLimit,
@@ -1836,17 +1727,8 @@ void SaveFOTBuilder::startMathOperator(FOTBuilder *&oper,
   tail_ = &(*tail_)->next;
 }
  
-void SaveFOTBuilder::startGrid(const GridNIC &nic)
-{
-  *tail_ = new StartGridCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startGridCell(const GridCellNIC &nic)
-{
-  *tail_ = new StartGridCellCall(nic);
-  tail_ = &(*tail_)->next;
-}
+ONEREFARG_CALL(startGrid, GridNIC)
+ONEREFARG_CALL(startGridCell, GridCellNIC)
 
 void SaveFOTBuilder::startMultiMode(const MultiMode *principalMode,
 				    const Vector<MultiMode> &namedModes,
@@ -1856,26 +1738,23 @@ void SaveFOTBuilder::startMultiMode(const MultiMode *principalMode,
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
-{
-  *tail_ = new SetGlyphSubstTableCall(tables);
-  tail_ = &(*tail_)->next;
-}
-
 void SaveFOTBuilder::extensionSet(void (FOTBuilder::*func)(bool), bool arg)
 {
+  typedef OneArgCall<bool> ExtensionBoolArgCall;
   *tail_ = new ExtensionBoolArgCall(func, arg);
   tail_ = &(*tail_)->next;
 }
 
 void SaveFOTBuilder::extensionSet(void (FOTBuilder::*func)(const StringC &), const StringC &arg)
 {
+  typedef OneRefArgCall<StringC> ExtensionStringArgCall;
   *tail_ = new ExtensionStringArgCall(func, arg);
   tail_ = &(*tail_)->next;
 }
 
 void SaveFOTBuilder::extensionSet(void (FOTBuilder::*func)(long), long arg)
 {
+  typedef OneArgCall<long> ExtensionLongArgCall;
   *tail_ = new ExtensionLongArgCall(func, arg);
   tail_ = &(*tail_)->next;
 }
@@ -1905,9 +1784,23 @@ SaveFOTBuilder::CharactersCall::CharactersCall(const Char *s, size_t n)
 {
 }
 
-void SaveFOTBuilder::CharactersCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::CharactersCall::emit(FOTBuilder &fotb) const
 {
   fotb.characters(str.data(), str.size());
+}
+
+StartSimplePageSequenceCall::StartSimplePageSequenceCall(FOTBuilder* hf[FOTBuilder::nHF])
+{
+  for ( unsigned i = 0; i < FOTBuilder::nHF; ++i )
+    hf[i] = &headerFooter[i];
+}
+
+void StartSimplePageSequenceCall::emit(FOTBuilder& fotb) const
+{
+  FOTBuilder* hf[FOTBuilder::nHF];
+  fotb.startSimplePageSequence(hf);
+  for ( unsigned i = 0; i < FOTBuilder::nHF; ++i )
+    headerFooter[i].emit(*hf[i]);
 }
 
 StartFractionCall::StartFractionCall(FOTBuilder *&n, FOTBuilder *&d)
@@ -1916,7 +1809,7 @@ StartFractionCall::StartFractionCall(FOTBuilder *&n, FOTBuilder *&d)
   d = &denominator;
 }
 
-void StartFractionCall::emit(FOTBuilder &fotb)
+void StartFractionCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *n, *d;
   fotb.startFraction(n, d);
@@ -1939,7 +1832,7 @@ StartScriptCall::StartScriptCall(FOTBuilder *&p0,
   p5 = &midSub;
 }
 
-void StartScriptCall::emit(FOTBuilder &fotb)
+void StartScriptCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *v[6];
   fotb.startScript(v[0], v[1], v[2], v[3], v[4], v[5]);
@@ -1957,7 +1850,7 @@ StartMarkCall::StartMarkCall(FOTBuilder *&o, FOTBuilder *&u)
   u = &underMark;
 }
 
-void StartMarkCall::emit(FOTBuilder &fotb)
+void StartMarkCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *o, *u;
   fotb.startMark(o, u);
@@ -1971,7 +1864,7 @@ StartFenceCall::StartFenceCall(FOTBuilder *&o, FOTBuilder *&c)
   c = &close;
 }
 
-void StartFenceCall::emit(FOTBuilder &fotb)
+void StartFenceCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *o, *c;
   fotb.startFence(o, c);
@@ -1984,7 +1877,7 @@ StartRadicalCall::StartRadicalCall(FOTBuilder *&d)
   d = &degree;
 }
 
-void StartRadicalCall::emit(FOTBuilder &fotb)
+void StartRadicalCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *d;
   fotb.startRadical(d);
@@ -2000,7 +1893,7 @@ StartMathOperatorCall::StartMathOperatorCall(FOTBuilder *&o,
   u = &upperLimit;
 }
 
-void StartMathOperatorCall::emit(FOTBuilder &fotb)
+void StartMathOperatorCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *o, *l, *u;
   fotb.startMathOperator(o, l, u);
@@ -2026,29 +1919,25 @@ StartMultiModeCall::StartMultiModeCall(const FOTBuilder::MultiMode *pm,
   }
 }
 
-void StartMultiModeCall::emit(FOTBuilder &fotb)
+StartMultiModeCall::StartMultiModeCall(const StartMultiModeCall& other)
+: principalMode(other.principalMode)
+, hasPrincipalMode(other.hasPrincipalMode)
+, namedModes(other.namedModes)
+, ports()
+{
+  for (IListIter<SaveFOTBuilder> p(other.ports); !p.done(); p.next() )
+    ports.append(new SaveFOTBuilder(*p.cur()));
+}
+
+void StartMultiModeCall::emit(FOTBuilder &fotb) const
 {
   Vector<FOTBuilder *> v(namedModes.size());
   fotb.startMultiMode(hasPrincipalMode ? &principalMode : 0, namedModes, v);
+  IListIter<SaveFOTBuilder> p(ports);
   for (size_t i = 0; i < v.size(); i++) {
-    Owner<SaveFOTBuilder> tem(ports.get());
-    tem->emit(*v[i]);
+    p.cur()->emit(*v[i]);
+    p.next();
   }
-}
-
-void SaveFOTBuilder::StartTableCall::emit(FOTBuilder &fotb)
-{
-  fotb.startTable(arg);
-}
-
-void SaveFOTBuilder::TableColumnCall::emit(FOTBuilder &fotb)
-{
-  fotb.tableColumn(arg);
-}
-
-void SaveFOTBuilder::StartTableCellCall::emit(FOTBuilder &fotb)
-{
-  fotb.startTableCell(arg);
 }
 
 StartTablePartCall::StartTablePartCall(const SaveFOTBuilder::TablePartNIC &nic,
@@ -2059,7 +1948,7 @@ StartTablePartCall::StartTablePartCall(const SaveFOTBuilder::TablePartNIC &nic,
   f = &footer;
 }
 
-void StartTablePartCall::emit(FOTBuilder &fotb)
+void StartTablePartCall::emit(FOTBuilder &fotb) const
 {
   FOTBuilder *h, *f;
   fotb.startTablePart(arg, h, f);
@@ -2067,93 +1956,23 @@ void StartTablePartCall::emit(FOTBuilder &fotb)
   footer.emit(*f);
 }
 
-SaveFOTBuilder::StartParagraphCall::StartParagraphCall(const ParagraphNIC &nic)
-: arg(nic)
+SaveFOTBuilder::ExtensionCall::ExtensionCall(const ExtensionCall& other)
+: arg ( other.arg->copy()->asCompoundExtensionFlowObj() )
+, node ( other.node )
 {
 }
-
-void SaveFOTBuilder::StartParagraphCall::emit(FOTBuilder &fotb)
-{
-  fotb.startParagraph(arg);
-}
-
-SaveFOTBuilder::ParagraphBreakCall::ParagraphBreakCall(const ParagraphNIC &nic)
-: arg(nic)
-{
-}
-
-void SaveFOTBuilder::ParagraphBreakCall::emit(FOTBuilder &fotb)
-{
-  fotb.paragraphBreak(arg);
-}
-
-SaveFOTBuilder
-::StartDisplayGroupCall::StartDisplayGroupCall(const DisplayGroupNIC &nic)
-: arg(nic)
-{
-}
-
-void SaveFOTBuilder::StartDisplayGroupCall::emit(FOTBuilder &fotb)
-{
-  fotb.startDisplayGroup(arg);
-}
-
-void SaveFOTBuilder::ExternalGraphicCall::emit(FOTBuilder &fotb)
-{
-  fotb.externalGraphic(arg);
-}
-
-void SaveFOTBuilder::RuleCall::emit(FOTBuilder &fotb)
-{
-  fotb.rule(arg);
-}
-
-void SaveFOTBuilder::StartLeaderCall::emit(FOTBuilder &fotb)
-{
-  fotb.startLeader(arg);
-}
-
-void SaveFOTBuilder::StartBoxCall::emit(FOTBuilder &fotb)
-{
-  fotb.startBox(arg);
-}
-
-void SaveFOTBuilder::StartLineFieldCall::emit(FOTBuilder &fotb)
-{
-  fotb.startLineField(arg);
-}
-
-void SaveFOTBuilder::StartLinkCall::emit(FOTBuilder &fotb)
-{
-  fotb.startLink(arg);
-}
-
-void SaveFOTBuilder::SetGlyphSubstTableCall::emit(FOTBuilder &fotb)
-{
-  fotb.setGlyphSubstTable(arg);
-}
-
-void SaveFOTBuilder::StartGridCall::emit(FOTBuilder &fotb)
-{
-  fotb.startGrid(arg);
-}
-
-void SaveFOTBuilder::StartGridCellCall::emit(FOTBuilder &fotb)
-{
-  fotb.startGridCell(arg);
-}
-
-void SaveFOTBuilder::RadicalRadicalCall::emit(FOTBuilder &fotb)
-{
-  fotb.radicalRadical(arg);
-}
-
-void SaveFOTBuilder::ExtensionCall::emit(FOTBuilder &fotb)
+  
+void SaveFOTBuilder::ExtensionCall::emit(FOTBuilder &fotb) const
 {
   fotb.extension(*arg, node);
 }
 
-void SaveFOTBuilder::EndExtensionCall::emit(FOTBuilder &fotb)
+SaveFOTBuilder::EndExtensionCall::EndExtensionCall(const EndExtensionCall& other)
+: arg ( other.arg->copy()->asCompoundExtensionFlowObj() )
+{
+}
+  
+void SaveFOTBuilder::EndExtensionCall::emit(FOTBuilder &fotb) const
 {
   fotb.endExtension(*arg);
 }
@@ -2169,21 +1988,65 @@ StartExtensionCall::StartExtensionCall(const FOTBuilder::CompoundExtensionFlowOb
   }
 }
 
-void StartExtensionCall::emit(FOTBuilder &fotb)
+StartExtensionCall::StartExtensionCall(const StartExtensionCall& other)
+: ports()
+, node(other.node)
+, flowObj(other.flowObj->copy()->asCompoundExtensionFlowObj())
+{
+  for (IListIter<SaveFOTBuilder> p(other.ports); !p.done(); p.next() )
+    ports.append(new SaveFOTBuilder(*p.cur()));
+}
+
+void StartExtensionCall::emit(FOTBuilder &fotb) const
 {
   Vector<StringC> portNames;
   flowObj->portNames(portNames);
   Vector<FOTBuilder *> v(portNames.size());
   fotb.startExtension(*flowObj, node, v);
+  IListIter<SaveFOTBuilder> p(ports);
   for (size_t i = 0; i < v.size(); i++) {
-    Owner<SaveFOTBuilder> tem(ports.get());
-    tem->emit(*v[i]);
+    p.cur()->emit(*v[i]);
+    p.next();
   }
 }
 
 SerialFOTBuilder::SerialFOTBuilder()
 {
 }
+
+void SerialFOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[FOTBuilder::nHF])
+{
+  for ( unsigned i = 0; i < nHF; ++i ) {
+    save_.insert(new SaveFOTBuilder);
+    headerFooter[nHF-1-i] = save_.head();
+  }
+  startSimplePageSequenceSerial();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceHeaderFooter()
+{
+  Owner<SaveFOTBuilder> hf[nHF];  
+  for ( unsigned k = 0; k < nHF; ++k ) 
+    hf[k] = save_.get();
+  // output all 24 parts, but in same order as 1.2.1, for regression testing
+  // replace with single loop later.
+  // sorry about all those constants :(
+  for (int i = 0; i < (1 << 2); i++) {
+    for (int j = 0; j < 6; j++) {
+      unsigned k = i | (j << 2);
+      startSimplePageSequenceHeaderFooter(k);
+      hf[k]->emit(*this);
+      endSimplePageSequenceHeaderFooter(k);
+    }
+  }
+  endAllSimplePageSequenceHeaderFooter();
+}
+
+void SerialFOTBuilder::endSimplePageSequence()
+{
+  endSimplePageSequenceSerial();
+}
+
 
 void SerialFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
@@ -2376,6 +2239,30 @@ void SerialFOTBuilder::endMathOperator()
     endMathOperatorUpperLimit();
   }
   endMathOperatorSerial();
+}
+
+void SerialFOTBuilder::startSimplePageSequenceSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned)
+{
+  start();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
+{
+  end();
+}
+
+void SerialFOTBuilder::endAllSimplePageSequenceHeaderFooter()
+{
 }
 
 void SerialFOTBuilder::startFractionSerial()

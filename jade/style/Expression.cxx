@@ -233,6 +233,7 @@ InsnPtr VariableExpression::compile(Interpreter &interp,
 		   StringMessageArg(ident_->name()));
     return new ErrorInsn;
   }
+  ident_->requireFeature(interp, location());
   ELObj *val = ident_->computeValue(0, interp);
   if (!val)
     return new TopRefInsn(ident_, next);
@@ -252,7 +253,8 @@ void VariableExpression::optimize(Interpreter &interp, const Environment &env,
   isTop_ = 1;
   Location loc;
   unsigned part;
-  if (ident_->defined(part, loc)) {
+  if (ident_->defined(part, loc)) { 
+    ident_->requireFeature(interp, location());
     ELObj *obj = ident_->computeValue(0, interp);
     if (obj && !interp.isError(obj)) {
       interp.makePermanent(obj);
@@ -1118,30 +1120,66 @@ StyleExpression::StyleExpression(Vector<const Identifier *> &keys,
 InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
 				 int stackPos, const InsnPtr &next)
 {
-  // FIXME handle force!
   Vector<ConstPtr<InheritedC> > ics;
   Vector<ConstPtr<InheritedC> > forceIcs;
+  Vector<const Identifier *> forceKeys(keys_.size()); 
+  for (size_t i = 0; i < keys_.size(); i++) {
+    forceKeys[i] = 0; 
+    if (keys_[i]->name().size() > 6) {
+      StringC prefix(keys_[i]->name().data(), 6);  
+      if (prefix == interp.makeStringC("force!")) {
+        StringC name(keys_[i]->name().data() + 6, keys_[i]->name().size() - 6);
+        forceKeys[i] = interp.lookup(name);
+      }
+    } 
+  }
   bool hasUse = 0;
   size_t useIndex;
   BoundVarList boundVars;
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey sk;
-    if (maybeStyleKeyword(keys_[i])
+    if (forceKeys[i] 
+        && maybeStyleKeyword(forceKeys[i])
+        && !forceKeys[i]->inheritedC().isNull()) {
+      forceIcs.resize(forceIcs.size() + 1);
+      exprs_[i]->markBoundVars(boundVars, 0);
+    }
+    else if (maybeStyleKeyword(keys_[i])
 	&& !(keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse)
         && !keys_[i]->inheritedC().isNull()) {
       ics.resize(ics.size() + 1);
       exprs_[i]->markBoundVars(boundVars, 0);
-    }
+    } 
   }
   // FIXME optimize case where ics.size() == 0
   boundVars.removeUnused();
   BoundVarList noVars;
   Environment newEnv(noVars, boundVars);
   size_t j = 0;
+  size_t k = 0;
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey sk;
-    if (!maybeStyleKeyword(keys_[i]))
+    if (forceKeys[i] 
+        && maybeStyleKeyword(forceKeys[i])
+        && !forceKeys[i]->inheritedC().isNull()) {
+      exprs_[i]->optimize(interp, newEnv, exprs_[i]);
+      ELObj *val = exprs_[i]->constantValue();
+      if (val) {
+	interp.makePermanent(val);
+	forceIcs[k] = forceKeys[i]->inheritedC()->make(val, exprs_[i]->location(), interp);
+	if (forceIcs[k].isNull())
+	  forceIcs.resize(forceIcs.size() - 1);
+	else
+	  k++;
+      }
+      else {
+	forceIcs[k++] = new VarInheritedC(forceKeys[i]->inheritedC(),
+	     	          exprs_[i]->compile(interp, newEnv, 0, InsnPtr()),
+				     exprs_[i]->location());
+      }
+    }    
+    else if (!maybeStyleKeyword(keys_[i]))
       ;
     else if (keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse) {
       if (!hasUse) {
@@ -1230,6 +1268,7 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     flowObj = new (interp) SequenceFlowObj;
     interp.makePermanent(flowObj);
   }
+  foc_->requireFeature(interp, location(), 1);
   Owner<Expression> *contentMapExpr = 0;
   InsnPtr rest(next);
   for (size_t i = 0; i < keys_.size(); i++) {
@@ -1319,7 +1358,7 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
   FlowObj *flowObj = foc_->flowObj();
   if (!flowObj)
     return next;
-  bool gotOne = 0;
+  bool gotOne = flowObj->isCharacter();
   BoundVarList boundVars;
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
@@ -1340,8 +1379,10 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
 			          new SetNonInheritedCInsn(keys_[i],
 						           exprs_[i]->location(),
 						           code));
-  return compilePushVars(interp, env, stackPos, boundVars, 0,
-			 new SetNonInheritedCsSosofoInsn(code, boundVars.size(), next));
+  InsnPtr rest(new SetNonInheritedCsSosofoInsn(code, boundVars.size(), next));
+  if (flowObj->isCharacter()) 
+    rest = new SetImplicitCharInsn(Location(), rest); 
+  return compilePushVars(interp, env, stackPos, boundVars, 0, rest);
 }
 
 void MakeExpression::unknownStyleKeyword(const Identifier *ident, Interpreter &interp,

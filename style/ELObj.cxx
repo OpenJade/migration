@@ -218,8 +218,18 @@ ErrorObj::ErrorObj()
 {
 }
 
+void ErrorObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#<error>";
+}
+
 UnspecifiedObj::UnspecifiedObj()
 {
+}
+
+void UnspecifiedObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#v";
 }
 
 NilObj::NilObj()

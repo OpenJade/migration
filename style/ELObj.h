@@ -109,6 +109,7 @@ protected:
 
 class ErrorObj : public ELObj {
 public:
+  void print(Interpreter &, OutputCharStream &);
 private:
   ErrorObj();
   friend class Interpreter;
@@ -116,6 +117,7 @@ private:
 
 class UnspecifiedObj : public ELObj {
 public:
+  void print(Interpreter &, OutputCharStream &);
 private:
   UnspecifiedObj();
   friend class Interpreter;

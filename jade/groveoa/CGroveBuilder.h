@@ -28,6 +28,7 @@ END_COM_MAP()
 // IGroveBuilder
 public:
 	STDMETHOD(parse)(BSTR sysid, SgmlDocumentNode **root);
+	STDMETHOD(archParse)(BSTR sysid, BSTR archNames, SgmlDocumentNode **root);
 	STDMETHOD(get_ExtraCatalogs)(BSTR *);
 	STDMETHOD(put_ExtraCatalogs)(BSTR);
 	STDMETHOD(get_DefaultCatalogs)(BSTR *);

@@ -745,18 +745,19 @@ void SimplePageSequenceFlowObj::traceSubObjects(Collector &c) const
 void SimplePageSequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
-  fotb.startSimplePageSequence();
+  FOTBuilder* hf_fotb[FOTBuilder::nHF];
+  fotb.startSimplePageSequence(hf_fotb);
   for (int i = 0; i < (1 << nPageTypeBits); i++) {
     context.setPageType(i);
     for (int j = 0; j < HeaderFooter::nParts; j++) {
-      fotb.startSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
-      if (hf_->part[j])
+      if (hf_->part[j]) {
+        context.pushPrincipalPort(hf_fotb[i | (j << nPageTypeBits)]);
 	hf_->part[j]->process(context);
-      fotb.endSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
+        context.popPrincipalPort();
     }
   }
-  fotb.endAllSimplePageSequenceHeaderFooter();
-  context.clearPageType();
+  }
+  fotb.endSimplePageSequenceHeaderFooter();
   CompoundFlowObj::processInner(context);
   fotb.endSimplePageSequence();
 }
@@ -1277,6 +1278,79 @@ FlowObj *BoxFlowObj::copy(Collector &c) const
   return new (c) BoxFlowObj(*this);
 }
 
+class SideBySideFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SideBySideFlowObj();
+  SideBySideFlowObj(const SideBySideFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+protected:
+  Owner<FOTBuilder::DisplayNIC> nic_;
+};
+
+SideBySideFlowObj::SideBySideFlowObj()
+: nic_(new FOTBuilder::DisplayNIC)
+{
+}
+
+SideBySideFlowObj::SideBySideFlowObj(const SideBySideFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::DisplayNIC(*fo.nic_))
+{
+}
+
+void SideBySideFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySide(*nic_);
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySide();
+}
+
+bool SideBySideFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  return isDisplayNIC(ident);
+}
+
+void SideBySideFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+					   const Location &loc, Interpreter &interp)
+{
+  if (!setDisplayNIC(*nic_, ident, obj, loc, interp)) 
+    CANNOT_HAPPEN();
+}
+
+FlowObj *SideBySideFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideFlowObj(*this);
+}
+
+class SideBySideItemFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+};
+
+void SideBySideItemFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySideItem();
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySideItem();
+}
+
+FlowObj *SideBySideItemFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideItemFlowObj(*this);
+}
+
 class LeaderFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -1366,6 +1440,7 @@ public:
   FlowObj *copy(Collector &) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  bool setImplicitChar(ELObj *, const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
   bool characterStyle(ProcessContext &, StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
     style = style_;
@@ -1390,6 +1465,138 @@ CharacterFlowObj::CharacterFlowObj(const CharacterFlowObj &fo)
 void CharacterFlowObj::processInner(ProcessContext &context)
 {
   context.currentFOTBuilder().character(*nic_);
+}
+
+bool FlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
+                                       Interpreter &interp)
+{
+  CANNOT_HAPPEN();
+  return false;
+}
+
+
+bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
+                                       Interpreter &interp)
+{
+  Identifier *ident = interp.lookup(interp.makeStringC("char")); 
+  if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
+      && interp.convertCharC(obj, ident, loc, nic_->ch)) {
+    nic_->valid = 1;
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("space?"), 
+						 nic_->ch, loc, 0),  
+			     ident, loc, nic_->isSpace);
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("record-end?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isRecordEnd);
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("input-tab?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isInputTab);
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("input-whitespace?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isInputWhitespace);
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("punct?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isPunct);
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("drop-after-line-break?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isDropAfterLineBreak); 
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
+      interp.convertBooleanC(
+			     interp.charProperty(interp.makeStringC("drop-unless-before-line-break?"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->isDropUnlessBeforeLineBreak); 
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
+      interp.convertIntegerC(
+			     interp.charProperty(interp.makeStringC("break-before-priority"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->breakBeforePriority);  
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
+      interp.convertIntegerC(
+			     interp.charProperty(interp.makeStringC("break-after-priority"), 
+						 nic_->ch, loc, 0),
+			     ident, loc, nic_->breakAfterPriority);  
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("script"), 
+                                        nic_->ch, loc, 0);
+      if (prop == interp.makeFalse())
+        nic_->script = 0;
+      else {
+        StringC tem;
+        if (interp.convertStringC(prop, ident, loc, tem))
+	  nic_->script = interp.storePublicId(tem.data(), tem.size(), loc);
+      }
+    }
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("glyph-id"), 
+                                        nic_->ch, loc, 0);
+      if (prop == interp.makeFalse()) 
+        nic_->glyphId = FOTBuilder::GlyphId();
+      else {
+        const FOTBuilder::GlyphId *p = prop->glyphId();
+        if (p) 
+          nic_->glyphId = *p;
+      }
+    }
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathFontPosture))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("math-font-posture"), 
+                                        nic_->ch, loc, 0);
+      static FOTBuilder::Symbol vals[] = {
+        FOTBuilder::symbolFalse,
+        FOTBuilder::symbolNotApplicable,
+        FOTBuilder::symbolUpright,
+        FOTBuilder::symbolOblique,
+        FOTBuilder::symbolBackSlantedOblique,
+        FOTBuilder::symbolItalic,
+        FOTBuilder::symbolBackSlantedItalic,
+      };
+      interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathFontPosture);
+    }
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("math-class"), 
+                                        nic_->ch, loc, 0);
+      static FOTBuilder::Symbol vals[] = {
+        FOTBuilder::symbolOrdinary,
+        FOTBuilder::symbolOperator,
+        FOTBuilder::symbolBinary,
+        FOTBuilder::symbolRelation,
+        FOTBuilder::symbolOpening,
+        FOTBuilder::symbolClosing,
+        FOTBuilder::symbolPunctuation,
+        FOTBuilder::symbolInner,
+        FOTBuilder::symbolSpace,
+      };
+      interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathClass);
+    }
+    
+    return 1;
+  }
+  else 
+    return 0; 
 }
 
 void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
@@ -1448,8 +1655,13 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       }
       return;
     case Identifier::keyChar:
-      if (interp.convertCharC(obj, ident, loc, nic_->ch))
+      if (setImplicitChar(obj, loc, interp)) { 
         nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+        if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
+          nic_->isInputTab = 0;
+        if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace))) 
+          nic_->isInputWhitespace = 0;
+      }
       return;
     case Identifier::keyGlyphId:
       {
@@ -1508,6 +1720,12 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       break;
     }
   }
+  else {
+    unsigned part;
+    Location loc;
+    if (ident->charNICDefined(part, loc))
+      return;
+  }
   CANNOT_HAPPEN();
 }
 
@@ -1535,7 +1753,11 @@ bool CharacterFlowObj::hasNonInheritedC(const Identifier *ident) const
     default:
       break;
     }
-  }
+  } 
+  unsigned part;
+  Location loc;
+  if (ident->charNICDefined(part, loc))
+    return 1;
   return 0;
 }
 
@@ -2827,6 +3049,8 @@ void Interpreter::installFlowObjs()
   FLOW_OBJ(LeaderFlowObj, "leader");
   FLOW_OBJ(CharacterFlowObj, "character");
   FLOW_OBJ(BoxFlowObj, "box");
+  FLOW_OBJ(SideBySideFlowObj, "side-by-side");
+  FLOW_OBJ(SideBySideItemFlowObj, "side-by-side-item");
   FLOW_OBJ(AlignmentPointFlowObj, "alignment-point");
   FLOW_OBJ(SidelineFlowObj, "sideline");
   // simple-page

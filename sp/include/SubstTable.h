@@ -23,13 +23,13 @@ public:
   Char at(Char from) const;
   StringC inverse(Char to) const;
   void inverseTable(SubstTable &) const;
-private:
   struct Pair {
     Pair() {}
     Pair(Char f, Char t) : from(f), to(t) {}
     Char from;
     Char to;
   };
+private:
   Char lo_[256];
   mutable Vector<Pair> map_; 
   mutable bool isSorted_;

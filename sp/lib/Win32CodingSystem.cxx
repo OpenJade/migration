@@ -144,7 +144,7 @@ size_t MultiByteWin32Decoder::decode(Char *to, const char *from,
   tow.resize(fromLen);
   int count = MultiByteToWideChar(codePage_,
 				  MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-				  from, fromLen, tow.data(), fromLen);
+				  from, fromLen, (wchar_t *)tow.data(), fromLen);
   for (size_t i = 0; i < count; i++)
     to[i] = Char(tow[i]);
   if (count) {
@@ -179,7 +179,7 @@ Win32Encoder::~Win32Encoder()
 {
   delete [] buf_;
 }
-x
+
 void Win32Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   if (n == 0)
@@ -189,7 +189,8 @@ void Win32Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
     bufLen_ = n*2;
     buf_ = new char[bufLen_];
   }
-  String<wchar_t> ws(n);
+  String<wchar_t> ws;
+  ws.resize(n);
   for (size_t i = 0; i < n; i++)
     ws[i] = wchar_t(s[i]); 
   int nBytes = WideCharToMultiByte(codePage_,

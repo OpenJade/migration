@@ -211,7 +211,7 @@ Boolean WinApp::getRegistry(const char *name, StringC &value)
 	String<wchar_t> valuew;
 	for (size_t i = 0; i < value.size(); i++)
 	  valuew += wchar_t(value[i]);
-	if (MultiByteToWideChar(CP_ACP, 0, buf.data(), size - 1, valuew.data(), nChars) == nChars)
+	if (MultiByteToWideChar(CP_ACP, 0, buf.data(), size - 1, (wchar_t *)valuew.data(), nChars) == nChars)
 	  retval = 1;
 	else
 	  value.resize(0);

@@ -433,8 +433,8 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
   case 'v':
     // print the version number
     message(CmdLineAppMessages::versionInfo,
-	    StringMessageArg(convertInput(SP_PACKAGE)),
-	    StringMessageArg(convertInput(SP_VERSION)));
+	    StringMessageArg(codingSystem()->convertIn(SP_PACKAGE)),
+	    StringMessageArg(codingSystem()->convertIn(SP_VERSION)));
     break;
   case 'h':
     action_ = usageAction;

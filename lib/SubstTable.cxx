@@ -1,97 +1,112 @@
-// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
+// Copyright (c) 2000 Matthias Clasen
 // See the file COPYING for copying permission.
+
+#include "splib.h"
+#include "SubstTable.h"
+#include <stdlib.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
 SubstTable::SubstTable()
-: pairsValid_(1)
+: isSorted_(1)
 {
+  for (size_t i = 0; i < 256; i++)
+    lo_[i] = i;
 }
 
 void SubstTable::addSubst(Char from, Char to)
 {
-  if (table_.size() == 0) {
-    table_.resize(Char(-1) + 1);
-#if _MSC_VER == 1100
-    // Workaround for Visual C++ 5.0 bug.
-    Char n = 0;
-    int i = 0;
-    while (i < Char(-1) + 1)
-      table_[i++] = n++;
-#else
-    for (int i = 0; i < Char(-1) + 1; i++)
-      table_[i] = i;
-#endif
-  }
-  if (table_[from] != to)
-    pairsValid_ = 0;
-  table_[from] = to;
+  if (from < 256)
+    lo_[from] = to;
+  else { 
+    for (size_t i = 0; i < map_.size(); i++)
+      if (map_[i].from == from) {
+        map_[i].to = to;
+        return;
+      }
+    if (from != to) {
+      isSorted_ = isSorted_ && (map_.size() == 0 || map_.back().from < from);
+      map_.push_back(Pair(from, to));
+    }
+  }  
 }
 
-StringC SubstTable::inverse(Char ch) const
+Char SubstTable::at(Char t) const
 {
-  if (!pairsValid_) {
-    const Char *p = table_.data();
-    size_t length = table_.size();
-    for (size_t i = 0; i < length; i++)
-      if (p[i] != i) {
-	// FIXME use mutable if available
-#ifndef HAVE_MUTABLE
-	((SubstTable *)this)->
-#endif
-	  pairs_ += Char(i);
-#ifndef HAVE_MUTABLE
-	((SubstTable *)this)->
-#endif
-	  pairs_ += p[i];
-      }
+  if (!isSorted_) {
+    sort();
 #ifndef HAVE_MUTABLE
     ((SubstTable *)this)->
 #endif
-      pairsValid_ = 1;
+    isSorted_ = 1;
   }
-  const Char *p = pairs_.data();
-  if (!p)
-    return StringC(&ch, 1);
-  StringC result;
-  if (table_[ch] == ch)
-    result += ch;
-  for (size_t n = pairs_.size(); n > 0; n -= 2, p += 2)
-    if (p[1] == ch)
-      result += p[0];
-  return result;
-}
-
-void SubstTable::inverseTable(SubstTable &inv) const
-{
-  if (table_.size() == 0) {
-    inv.table_.resize(0);
-    inv.pairs_.resize(0);
-    inv.pairsValid_ = 1;
-  }
-  else {
-    if (inv.table_.size() == 0)
-      inv.table_.resize(Char(-1) + 1);
-    int i;
-    for (i = 0; i < Char(-1) + 1; i++)
-      inv.table_[i] = i;
-    inv.pairs_.resize(0);
-    inv.pairsValid_ = 0;
-    for (i = 0; i < Char(-1) + 1; i++)
-      if (table_[i] != i)
-	inv.table_[table_[i]] = i;
+  size_t min = 0;
+  size_t max = map_.size() - 1;
+  if (t < map_[min].from || t > map_[max].from)
+    return t;
+  if (t == map_[min].from)
+    return map_[min].to;
+  if (t == map_[max].from)
+    return map_[max].to;
+  for(;;) {
+    size_t mid = (min + max) / 2;
+    if (mid == min || mid == max)
+      return t;
+    if (t == map_[mid].from)
+      return map_[mid].to;
+    if (t < map_[mid].from)
+      max = mid;
+    else
+      min = mid;
   }
 }
 
-void SubstTable::subst(StringC &str) const
+extern "C" {
+
+static
+int comparePairs(const void *p1, const void *p2)
 {
-  for (size_t i = 0; i < str.size(); i++)
-    subst(str[i]);
+  return ((SubstTable::Pair *)p1)->from - ((SubstTable::Pair *)p2)->from;
+}
+
+}
+
+void SubstTable::sort() const
+{
+  qsort(&map_[0], map_.size(), sizeof(map_[0]), comparePairs);  
+}
+
+StringC SubstTable::inverse(Char c) const
+{
+  StringC res;
+  bool cSeen = (c < 256);
+  for (size_t i = 0; i < 256; i++) 
+    if (lo_[i] == c)
+      res += i;
+  for (size_t i = 0; i < map_.size(); i++) {
+    cSeen = cSeen || (map_[i].from == c);
+    if (map_[i].to == c)
+      res += map_[i].from;
+  }
+  if (!cSeen)
+    res += c;
+  return res;
+}
+
+void SubstTable::inverseTable(SubstTable &inverse) const
+{
+  for (size_t i = 0; i < 256; i++)
+    inverse.lo_[i] = i;
+  inverse.map_.resize(0);
+  inverse.isSorted_ = 1;
+  for (size_t i = 0; i < 256; i++)
+    inverse.addSubst(lo_[i], i);
+  for (size_t i = 0; i < map_.size(); i++)
+    inverse.addSubst(map_[i].to, map_[i].from);
 }
 
 #ifdef SP_NAMESPACE
 }
 #endif
-

@@ -43,7 +43,15 @@ GENSRCS=version.h entmgr_inst.cxx \
   ParserMessages.h parser_inst.cxx app_inst.cxx \
   ParserAppMessages.h CmdLineAppMessages.h \
   ArcEngineMessages.h arc_inst.cxx MessageReporterMessages.h \
-  MessageFormatterMessages.h
+  MessageFormatterMessages.h \
+  ArcEngineMessages.cxx MessageFormatterMessages.cxx PosixStorageMessages.cxx \
+  CatalogMessages.cxx MessageReporterMessages.cxx StdioStorageMessages.cxx \
+  CmdLineAppMessages.cxx ParserAppMessages.cxx URLStorageMessages.cxx \
+  EntityManagerMessages.cxx ParserMessages.cxx WinInetStorageMessages.msg \
+  URLStorageMessages.rc EntityManagerMessages.rc PosixStorageMessages.rc \
+  StdioStorageMessages.rc CatalogMessages.rc ParserMessages.rc \
+  MessageFormatterMessages.rc MessageReporterMessages.rc CmdLineAppMessages.rc \
+  ParserAppMessages.rc ArcEngineMessages.rc
 
 $(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@

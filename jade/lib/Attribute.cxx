@@ -83,9 +83,9 @@ Boolean CdataDeclaredValue::tokenized() const
   return 0;
 }
 
-AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &context,
-					      const StringC &,
-					      unsigned &specLength) const
+void CdataDeclaredValue::checkNormalizedLength(Text &text, 
+                                               AttributeContext &context,
+                                               unsigned &specLength) const
 {
   const Syntax &syntax = context.attributeSyntax();
   size_t normsep = syntax.normsep();
@@ -99,6 +99,13 @@ AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &cont
     context.message(ParserMessages::normalizedAttributeValueLength,
 		    NumberMessageArg(litlen),
 		    NumberMessageArg(normalizedLength));
+}
+
+AttributeValue *CdataDeclaredValue::makeValue(Text &text, AttributeContext &context,
+					      const StringC &,
+					      unsigned &specLength) const
+{
+  checkNormalizedLength(text, context, specLength);
   return new CdataAttributeValue(text);
 }
 
@@ -119,27 +126,12 @@ DataDeclaredValue::DataDeclaredValue(const ConstPtr<Notation> &nt,
   attributes.swap(attributes_);
 }
 
-
 AttributeValue *DataDeclaredValue::makeValue(Text &text,
                                              AttributeContext &context,
-                                             const StringC &str,
+                                             const StringC &,
                                              unsigned &specLength) const
 {
-  // FIXME should use private member function in CdataDeclaredValue
-  // to check this both here and in CdataDeclaredValue::makeValue()
-  const Syntax &syntax = context.attributeSyntax();
-  size_t normsep = syntax.normsep();
-  size_t normalizedLength = text.normalizedLength(normsep);
-  specLength += normalizedLength;
-  size_t litlen = syntax.litlen();
-  // A length error will already have been given if
-  // length > litlen - normsep.
-  if (litlen >= normsep && text.size() <= litlen - normsep
-      && normalizedLength > litlen)
-    context.message(ParserMessages::normalizedAttributeValueLength,
-		    NumberMessageArg(litlen),
-		    NumberMessageArg(normalizedLength));
-
+  checkNormalizedLength(text, context, specLength);
   return new DataAttributeValue(text, notation_, attributes_);
 }
 

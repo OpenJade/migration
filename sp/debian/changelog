@@ -1,3 +1,10 @@
+opensp (1.5pre5-3) unstable; urgency=low
+
+  * debian/control: fix missing build-depends on gettext
+    closes: #105961
+
+ -- Adam Di Carlo <aph@debian.org>  Mon, 30 Jul 2001 00:50:34 -0400
+
 opensp (1.5pre5-2) unstable; urgency=low
 
   * ship PO files in libosp package

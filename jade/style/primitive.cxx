@@ -672,40 +672,13 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
   long lResult;
   double dResult;
   bool usingD;
+  bool spec = 0;
   int dim;
   switch (argv[0]->quantityValue(lResult, dResult, dim)) {
   case ELObj::noQuantity:
-    {
-      const LengthSpec *lsp = argv[0]->lengthSpec();
-      if (!lsp)
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantityOrLengthSpec, 0, argv[0]);
-      LengthSpec ls(*lsp);
-      for (int i = 1; i < argc; i++) {
-	lsp = argv[i]->lengthSpec();
-	if (lsp)
-	  ls += *lsp;
-	else {
-	  switch (argv[i]->quantityValue(lResult, dResult, dim)) {
-	  case ELObj::noQuantity:
-            return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
-	  		    i, argv[i]);
-	  case ELObj::longQuantity:
-	    dResult = lResult;
-	    // fall through
-	  case ELObj::doubleQuantity:
-	    if (dim != 1) {
-	      interp.setNextLocation(loc);
-	      interp.message(InterpreterMessages::incompatibleDimensions);
-	      return interp.makeError();
-	    }
-	    ls += dResult;
-	    break;
-	  }
-	}
-      }
-      return new (interp) LengthSpecObj(ls);
-    }
+    dim = 1;
+    spec = 1;
+    break;
   case ELObj::longQuantity:
     usingD = 0;
     break;
@@ -715,14 +688,16 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
   default:
     CANNOT_HAPPEN();
   }
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; !spec && i < argc; i++) {
     long lResult2;
     double dResult2;
     int dim2;
     switch (argv[i]->quantityValue(lResult2, dResult2, dim2)) {
     case ELObj::noQuantity:
-      return argError(interp, loc, InterpreterMessages::notAQuantity,
-		      i, argv[i]);
+      // FIXME shouldn't quantityValue set dim to 1 for length-specs ?
+      dim2 = 1;
+      spec = 1;
+      break;
     case ELObj::longQuantity:
       if (!usingD) {
 	if (lResult2 < 0) {
@@ -758,6 +733,35 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
       return interp.makeError();
     }
   }
+
+  if (spec) {
+    LengthSpec ls;
+    for (int i = 0; i < argc; i++) {
+      const LengthSpec *lsp = argv[i]->lengthSpec();
+      if (lsp)
+	ls += *lsp;
+      else {
+	switch (argv[i]->quantityValue(lResult, dResult, dim)) {
+	case ELObj::noQuantity:
+	  return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
+			  i, argv[i]);
+	case ELObj::longQuantity:
+	  dResult = lResult;
+	  // fall through
+	case ELObj::doubleQuantity:
+	  if (dim != 1) {
+	    interp.setNextLocation(loc);
+	    interp.message(InterpreterMessages::incompatibleDimensions);
+	    return interp.makeError();
+	  }
+	  ls += dResult;
+	  break;
+	}
+      }
+    }
+    return new (interp) LengthSpecObj(ls);
+  }
+
   if (!usingD) {
     if (dim == 0)
       return interp.makeInteger(lResult);
@@ -777,41 +781,13 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
   long lResult;
   double dResult;
   bool usingD;
+  bool spec = 0;
   int dim;
   switch (argv[0]->quantityValue(lResult, dResult, dim)) {
   case ELObj::noQuantity:
-     {
-      const LengthSpec *lsp = argv[0]->lengthSpec();
-      if (!lsp)
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantityOrLengthSpec, 0, argv[0]);
-      LengthSpec ls(*lsp);
-      for (int i = 1; i < argc; i++) {
-	lsp = argv[i]->lengthSpec();
-	if (lsp)
-	  ls -= *lsp;
-	else {
-	  switch (argv[i]->quantityValue(lResult, dResult, dim)) {
-	  case ELObj::noQuantity:
-            return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
-	  		    i, argv[i]);
-	  case ELObj::longQuantity:
-	    dResult = lResult;
-	    // fall through
-	  case ELObj::doubleQuantity:
-	    if (dim != 1) {
-	      interp.setNextLocation(loc);
-	      interp.message(InterpreterMessages::incompatibleDimensions);
-	      return interp.makeError();
-	    }
-	    ls -= dResult;
-	    break;
-	  }
-	}
-      }
-      return new (interp) LengthSpecObj(ls);
-    }
- case ELObj::longQuantity:
+    spec = 1;
+    break;
+  case ELObj::longQuantity:
     usingD = 0;
     break;
   case ELObj::doubleQuantity:
@@ -827,15 +803,15 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
       lResult = -lResult;
   }
   else {
-    for (int i = 1; i < argc; i++) {
+    for (int i = 1; !spec && i < argc; i++) {
       long lResult2;
       double dResult2;
       int dim2;
       switch (argv[i]->quantityValue(lResult2, dResult2, dim2)) {
       case ELObj::noQuantity:
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantity, i,
-			argv[i]);
+        dim2 = dim;
+	spec = 1;
+	break;
       case ELObj::longQuantity:
 	if (!usingD) {
 	  if (lResult2 > 0) {
@@ -872,6 +848,42 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
       }
     }
   }
+
+  if (spec) {
+    LengthSpec ls;
+    for (int i = 0; i < argc; i++) {
+      const LengthSpec *lsp = argv[i]->lengthSpec();
+      if (lsp) {
+        if (i > 0 || argc == 1) 
+          ls -= *lsp;
+        else
+          ls += *lsp;
+      }
+      else {
+        switch (argv[i]->quantityValue(lResult, dResult, dim)) {
+        case ELObj::noQuantity:
+          return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
+        		  i, argv[i]);
+	case ELObj::longQuantity:
+	  dResult = lResult;
+	  // fall through
+	case ELObj::doubleQuantity:
+	  if (dim != 1) {
+	    interp.setNextLocation(loc);
+	    interp.message(InterpreterMessages::incompatibleDimensions);
+	    return interp.makeError();
+	  }
+          if (i > 0 || argc == 1) 
+	    ls -= dResult;
+          else 
+	    ls += dResult;
+	  break;
+	}
+      }
+    }
+    return new (interp) LengthSpecObj(ls);
+  }
+  
   if (!usingD) {
     if (dim == 0)
       return interp.makeInteger(lResult);
@@ -4385,6 +4397,628 @@ DEFPRIMITIVE(VectorFill, argc, argv, context, interp, loc)
   for (size_t i = 0; i < vec.size(); i++)
     vec[i] = argv[1];
   return interp.makeUnspecified();
+}
+
+#define DEFCAAR(NAME, PATH) \
+DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
+{ \
+  ELObj *e = argv[0]; \
+  PairObj *p; \
+  for (char *c = PATH; *c != 0; c++) { \
+    p = e->asPair(); \
+    if (!p) \
+      return argError(interp, loc, \
+                      InterpreterMessages::notAPair, 0, argv[0]); \
+    switch (*c) { \
+    case 'a': \
+       e = p->car(); \
+       break; \
+    case 'd': \
+       e = p->cdr(); \
+       break; \
+    default: \
+       CANNOT_HAPPEN(); \
+    } \
+  } \
+  return e; \
+}
+
+DEFCAAR(Caar, "aa")
+DEFCAAR(Cadr, "ad")
+DEFCAAR(Cdar, "da")
+DEFCAAR(Cddr, "dd")
+DEFCAAR(Caaar, "aaa")
+DEFCAAR(Caadr, "aad")
+DEFCAAR(Cadar, "ada")
+DEFCAAR(Caddr, "add")
+DEFCAAR(Cdaar, "daa")
+DEFCAAR(Cdadr, "dad")
+DEFCAAR(Cddar, "dda")
+DEFCAAR(Cdddr, "ddd")
+DEFCAAR(Caaaar, "aaaa")
+DEFCAAR(Caaadr, "aaad")
+DEFCAAR(Caadar, "aada")
+DEFCAAR(Caaddr, "aadd")
+DEFCAAR(Cadaar, "adaa")
+DEFCAAR(Cadadr, "adad")
+DEFCAAR(Caddar, "adda")
+DEFCAAR(Cadddr, "addd")
+DEFCAAR(Cdaaar, "daaa")
+DEFCAAR(Cdaadr, "daad")
+DEFCAAR(Cdadar, "dada")
+DEFCAAR(Cdaddr, "dadd")
+DEFCAAR(Cddaar, "ddaa")
+DEFCAAR(Cddadr, "ddad")
+DEFCAAR(Cdddar, "ddda")
+DEFCAAR(Cddddr, "dddd")
+
+DEFPRIMITIVE(Assoc, argc, argv, context, interp, loc)
+{
+  ELObj *list = argv[1];
+  for (;;) {
+    PairObj *pair = list->asPair();
+    if (pair) {
+      PairObj *car = pair->car()->asPair();
+      if (!car)
+        return argError(interp, loc,
+                        InterpreterMessages::notAnAlist, 1, argv[1]);
+      if (ELObj::equal(*car->car(), *argv[0]))
+        return car;
+      list = pair->cdr();
+    } else if (list->isNil())
+      break;
+    else
+      return argError(interp, loc,
+                      InterpreterMessages::notAList, 1, argv[1]);
+  }
+  return interp.makeFalse();
+}
+
+DEFPRIMITIVE(KeywordToString, argc, argv, context, interp, loc)
+{
+  KeywordObj *obj = argv[0]->asKeyword();
+  if (!obj)
+    return argError(interp, loc,
+		    InterpreterMessages::notAKeyword, 0, argv[0]);
+  return new (interp) StringObj(obj->identifier()->name());
+}
+
+DEFPRIMITIVE(StringToKeyword, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  return interp.makeKeyword(StringC(s, n));
+}
+
+DEFPRIMITIVE(IsExact, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity:     
+    return interp.makeFalse();
+  case ELObj::longQuantity:    
+    return interp.makeTrue();
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(IsInexact, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity:     
+    return interp.makeTrue();
+  case ELObj::longQuantity:    
+    return interp.makeFalse();
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+#define DEFNUMPRED(NAME, OP) \
+DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
+{ \
+  long n; \
+  double d; \
+  int dim; \
+  switch (argv[0]->quantityValue(n, d, dim)) { \
+  case ELObj::noQuantity: \
+    return argError(interp, loc, \
+		    InterpreterMessages::notAQuantity, 0, argv[0]); \
+  case ELObj::doubleQuantity: \
+    if (d OP 0.0) \
+      return interp.makeTrue(); \
+    else \
+      return interp.makeFalse(); \
+  case ELObj::longQuantity: \
+    if (n OP 0) \
+      return interp.makeTrue(); \
+    else \
+      return interp.makeFalse(); \
+  default: \
+    CANNOT_HAPPEN(); \
+  } \
+}
+
+DEFNUMPRED(IsZero, == )
+DEFNUMPRED(IsPositive, > )
+DEFNUMPRED(IsNegative, < )
+
+DEFPRIMITIVE(IsOdd, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+  case ELObj::doubleQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAnInteger, 0, argv[0]);
+  case ELObj::longQuantity:    
+    if (n % 2)
+      return interp.makeTrue();
+    else 
+      return interp.makeFalse();
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(IsEven, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+  case ELObj::doubleQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAnInteger, 0, argv[0]);
+  case ELObj::longQuantity:    
+    if (n % 2)
+      return interp.makeFalse();
+    else 
+      return interp.makeTrue();
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(Exp, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  return new (interp) RealObj(exp(d));
+}
+
+DEFPRIMITIVE(Log, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  if (d <= 0) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+  }
+  return new (interp) RealObj(log(d));
+}
+
+DEFPRIMITIVE(Sin, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+  return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  return new (interp) RealObj(sin(d));
+}
+
+DEFPRIMITIVE(Cos, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  return new (interp) RealObj(cos(d));
+}
+
+DEFPRIMITIVE(Tan, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  return new (interp) RealObj(tan(d));
+}
+
+DEFPRIMITIVE(Asin, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  if (d < -1 || d > 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+  }
+  return new (interp) RealObj(asin(d));
+}
+
+DEFPRIMITIVE(Acos, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  if (d < -1 || d > 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+   }
+  return new (interp) RealObj(acos(d));
+} 
+
+DEFPRIMITIVE(Atan, argc, argv, context, interp, loc)
+{
+  long lResult;
+  double dResult;
+  int dim;
+  ELObj::QuantityType type = 
+    argv[0]->quantityValue(lResult, dResult, dim);
+
+  if (argc == 1) {
+    if (type == ELObj::noQuantity || dim != 0)
+      return argError(interp, loc,
+		      InterpreterMessages::notANumber, 0, argv[0]);
+    if (type == ELObj::longQuantity) 
+      dResult = lResult;
+    return new (interp) RealObj(atan(dResult));
+  } 
+  
+  long lResult2;
+  double dResult2;
+  int dim2;
+  ELObj::QuantityType type2 = 
+    argv[1]->quantityValue(lResult2, dResult2, dim2);
+
+  switch (type) {
+  case ELObj::noQuantity:
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity: 
+    break;
+  case ELObj::longQuantity:
+    dResult = lResult;
+    break;
+  default:
+    CANNOT_HAPPEN();
+  }
+
+  switch (type2) {
+  case ELObj::noQuantity:
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 1, argv[1]);
+  case ELObj::doubleQuantity: 
+    break;
+  case ELObj::longQuantity:
+    dResult2 = lResult2;
+    break;
+  default:
+    CANNOT_HAPPEN();
+  }
+
+  if (dim != dim2) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::incompatibleDimensions);
+    return interp.makeError();
+  }
+  // FIXME: the standard is a bit vague about the range
+  // of atan with two arguments. The description sounds like
+  // it should be [0,2pi] or [-pi,pi], but then it says 
+  // the range is [-pi/2,pi/2]. I guess that the last sentence
+  // applies only to the one-argument version of atan, so that
+  // the semantics would parallel that of the C libraries
+  // atan/atan2.
+  return new (interp) RealObj(atan2(dResult, dResult2));
+}
+
+DEFPRIMITIVE(Expt, argc, argv, context, interp, loc)
+{
+  double d, d2;
+  if (!argv[0]->realValue(d)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  if (!argv[1]->realValue(d2)) 
+    return argError(interp, loc,
+		    InterpreterMessages::notANumber, 1, argv[1]);
+  double res = pow(d, d2);
+  long tem;
+  if (argv[0]->exactIntegerValue(tem) &&
+      argv[1]->exactIntegerValue(tem) &&
+      fabs(res) < LONG_MAX)
+    return interp.makeInteger((long)res);
+  return new (interp) RealObj(res);
+}
+
+DEFPRIMITIVE(ExactToInexact, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity:     
+    return argv[0]; 
+  case ELObj::longQuantity:    
+    argv[0]->realValue(d);
+    return new (interp) RealObj(d);
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(InexactToExact, argc, argv, context, interp, loc)
+{
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity:     
+   if (argv[0]->realValue(d) && modf(d, &d) == 0.0
+	&& fabs(d) < LONG_MAX && dim == 0) 
+      return interp.makeInteger((long)d);
+    // FIXME: report that no exact representation is possible
+  case ELObj::longQuantity:  // fall through
+    return argv[0]; 
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(QuantityToNumber, argc, argv, context, interp, loc)
+{
+  // FIXME this is wrong, but what exactly is the
+  // `number of the quantity' ???
+  long n;
+  double d;
+  int dim;
+  switch (argv[0]->quantityValue(n, d, dim)) {
+  case ELObj::noQuantity:     
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  case ELObj::doubleQuantity:     
+    if (dim == 0) 
+      return new (interp) RealObj(d);
+    else
+      return new (interp) RealObj(d * pow(0.0254/interp.unitsPerInch(), dim));
+  case ELObj::longQuantity:  
+    if (dim == 0)
+      return interp.makeInteger(n); 
+    else
+      return new (interp) RealObj(n * pow(0.0254/interp.unitsPerInch(), dim));
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
+DEFPRIMITIVE(StringToList, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+                    InterpreterMessages::notAString, 0, argv[0]);
+  ELObj *pair = interp.makeNil(); 
+  for (int i = n; i > 0; i--) 
+    pair = interp.makePair(interp.makeChar(s[i - 1]), pair);
+  return pair;
+}
+
+DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
+{
+  StringObj *obj = new (interp) StringObj;
+  ELObj *list = argv[0];
+  for (;;) {
+    PairObj *pair = list->asPair();
+    if (pair) {
+      Char c;
+      if (!pair->car()->charValue(c))
+        return argError(interp, loc,
+                        InterpreterMessages::notACharList, 0, list);
+      *obj += c;
+      list = pair->cdr();
+    } else if (list->isNil())
+      break;
+    else
+      return argError(interp, loc,
+                      InterpreterMessages::notAList, 0, list);
+  }
+  return obj;
+}
+          
+template <class T>
+class ArrayDeleter
+{ 
+public:
+  ArrayDeleter(T* array) : array_(array) {}
+  ~ArrayDeleter() { delete[] array_; }
+private:
+  ArrayDeleter(const ArrayDeleter&);   // no implementation
+  void operator=(const ArrayDeleter&); // no implementation
+  T* array_;
+};
+
+/* What we're effectively doing here is the C++ equivalent of 
+   (modulo error checking)
+   (define (map proc li_1 ... li_n)
+     (if (null? li_1) 
+        '()
+        (cons (proc (car li_1) ... (car li_n))
+              (map proc (cdr li_1) ... (cdr li_n)))) 
+*/    
+DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
+{
+   FunctionObj *func = argv[0]->asFunction();
+   // Check argv[0] is a procedure
+   if (!func) 
+      return argError(interp, loc,
+                 InterpreterMessages::notAProcedure, 0, argv[0]);
+   // Check that we have enough arguments 
+   if (func->nRequiredArgs() > argc - 1) { 
+     interp.setNextLocation(loc);
+     interp.message(InterpreterMessages::missingArg);
+     return interp.makeError();
+   }
+   // Check that we don't have too few arguments
+   if (!func->restArg() 
+       && func->nRequiredArgs() + func->nOptionalArgs() < argc - 1) {
+     interp.setNextLocation(loc);
+     interp.message(InterpreterMessages::tooManyArgs);
+     return interp.makeError();
+   }
+   // Split off the cars of the arguments and
+   // check that they are proper lists of the same length
+   ELObj** cars = new ELObj*[argc];
+   ArrayDeleter<ELObj*> cars_del(cars);
+   ELObj** cdrs = new ELObj*[argc];
+   ArrayDeleter<ELObj*> cdrs_del(cdrs);
+   bool hasSeenNil = 0;
+   bool hasSeenNonNil = 0;
+   for (unsigned i = 1; i < argc; i++) {
+     PairObj *pair = argv[i]->asPair();
+     if (pair) {
+       hasSeenNonNil = 1;
+       cars[i] = pair->car();
+       cdrs[i] = pair->cdr();
+     } else if (argv[i]->isNil()) 
+       hasSeenNil = 1;
+     else 
+       return argError(interp, loc,
+                  InterpreterMessages::notAList, i, argv[i]);
+   }
+   if (hasSeenNil && hasSeenNonNil)   
+     return argError(interp, loc,
+               InterpreterMessages::lengthError, 1, argv[1]);
+   // End the recursion
+   if (hasSeenNil) 
+     return interp.makeNil();
+
+   // Recurse
+   cdrs[0] = func;
+   ELObj **rargv = cdrs;
+   cars[0] = MapPrimitiveObj::primitiveCall(argc, rargv, context, interp, loc); 
+ 
+   // Prepend the result of applying func to the cars
+   InsnPtr* insns = new InsnPtr[argc + 2];
+   ArrayDeleter<InsnPtr> insns_del(insns);
+   insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
+   insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
+   for (unsigned i = 1; i <= argc; i++) 
+     insns[argc - i] = InsnPtr(new ConstantInsn(cars[argc - i], 
+                                                insns[argc - i + 1]));
+   VM vm(context, interp);
+   return vm.eval(insns[0].pointer());
+}
+
+static long timeConv(const Char *s, size_t n)
+{
+  char buf[100];
+  for (unsigned i = 0; i < n; i++) 
+    buf[i] = char(s[i]);
+  buf[n] = 0;
+  struct tm tim;
+  sscanf(buf, "%d-%d-%dT%d:%d:%d", 
+            &tim.tm_year,
+            &tim.tm_mon,
+            &tim.tm_mday,
+	    &tim.tm_hour,
+	    &tim.tm_min,
+	    &tim.tm_sec);
+  tim.tm_year -= 1900;
+  tim.tm_mon -= 1;
+  return long(mktime(&tim)); 
+}
+
+#define DEFTIMECOMP(NAME, OP) \
+DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
+{ \
+  const Char *s1, *s2; \
+  size_t n1, n2; \
+  if (!argv[0]->stringData(s1, n1)) \
+    return argError(interp, loc, \
+                    InterpreterMessages::notAString, 0, argv[0]); \
+  if (!argv[1]->stringData(s2, n2)) \
+    return argError(interp, loc, \
+                    InterpreterMessages::notAString, 1, argv[1]); \
+  if (timeConv(s1, n1) OP timeConv(s2, n2)) \
+    return interp.makeTrue(); \
+  else \
+    return interp.makeFalse(); \
+}
+
+DEFTIMECOMP(TimeLess, < )
+DEFTIMECOMP(TimeGreater, > )
+DEFTIMECOMP(TimeLessOrEqual, <= )
+DEFTIMECOMP(TimeGreaterOrEqual, >= )
+
+DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
+{
+  FunctionObj *func = argv[0]->asFunction();
+  if (!func)
+    return argError(interp, loc,
+		    InterpreterMessages::notAProcedure, 0, argv[0]);
+  if (func->totalArgs() > 0) {
+    interp.message(InterpreterMessages::tooManyArgs);
+    return interp.makeError();
+  }
+  NodeListObj *nl = argv[1]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 1, argv[1]);
+  AppendSosofoObj *obj = new (interp) AppendSosofoObj;
+  NodePtr nd;
+  ELObj *ret;
+  while (nd = nl->nodeListFirst(context, interp)) {
+    nl = nl->nodeListRest(context, interp);
+    {
+      EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
+      InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
+      VM vm(context, interp);
+      ret = vm.eval(insn.pointer());
+    }
+    if (interp.isError(ret)) {
+      return interp.makeError();
+    }
+    SosofoObj *sosofo = ret->asSosofo();
+    if (!sosofo) {
+      return interp.makeError();
+    }
+    obj->append(sosofo);
+  }
+  return obj;
 }
 
 void Interpreter::installPrimitives()

@@ -7,7 +7,7 @@ namespace SP_NAMESPACE {
 }
 #endif
 #include "config.h"
-
+#define OUTLINES
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
@@ -83,7 +83,21 @@ typedef Vector<TeXFOTBuilder::TablePart> Dummy_4;
 #endif
 #endif
 #endif
-
+#ifdef OUTLINES
+#ifdef __DECCXX
+#pragma define_template Vector<TeXFOTBuilder::ParHead>
+#else
+#ifdef __xlC__
+#pragma define(Vector<TeXFOTBuilder::ParHead>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<TeXFOTBuilder::ParHead>;
+#else
+typedef Vector<TeXFOTBuilder::ParHead> Dummy_5;
+#endif
+#endif
+#endif
+#endif
 #ifdef DSSSL_NAMESPACE
 }
 #endif

@@ -198,9 +198,10 @@ public:
   bool evaluated() const;
   const ConstPtr<InheritedC> &inheritedC() const;
   bool inheritedCDefined(unsigned &, Location &) const;
+  bool charNICDefined(unsigned &, Location &) const;
+  void setCharNIC(unsigned, const Location &);
   void setInheritedC(const ConstPtr<InheritedC> &);
-  void setInheritedC(const ConstPtr<InheritedC> &, unsigned part,
-		     const Location &);
+  void setInheritedC(const ConstPtr<InheritedC> &, unsigned, const Location &);
   FlowObj *flowObj() const;
   bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
@@ -217,6 +218,7 @@ private:
   Location defLoc_;
   SyntacticKey syntacticKey_;
   bool beingComputed_;
+  bool charNIC_;
   ConstPtr<InheritedC> inheritedC_;
   unsigned inheritedCPart_;
   Location inheritedCLoc_;
@@ -404,6 +406,7 @@ public:
   void addIdAttributeName(const StringC &name);
   void installInitialValue(Identifier *, Owner<Expression> &);
   void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
+  void installExtensionCharNIC(Identifier *, const StringC &, const Location &);
   void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
   // Return 0 if an invalid number.
   ELObj *convertNumber(const StringC &, int radix = 10);
@@ -786,10 +789,23 @@ bool Identifier::inheritedCDefined(unsigned &part, Location &loc) const
 }
 
 inline
-void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+bool Identifier::charNICDefined(unsigned &part, Location &loc) const
 {
-  inheritedC_ = ic;
-  inheritedCPart_ = unsigned(-1);
+  if (!charNIC_)
+    return 0;
+  part = inheritedCPart_;
+  loc = inheritedCLoc_;
+  return 1;
+}
+
+inline
+void Identifier::setCharNIC(unsigned part,
+			    const Location &loc)
+{
+  charNIC_ = 1;
+  inheritedC_ = ConstPtr<InheritedC>(0);
+  inheritedCPart_ = part;
+  inheritedCLoc_ = loc;
 }
 
 inline
@@ -799,6 +815,14 @@ void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic, unsigned part,
   inheritedC_ = ic;
   inheritedCPart_ = part;
   inheritedCLoc_ = loc;
+}
+
+inline
+void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+{
+  inheritedC_ = ic;
+  inheritedCPart_ = unsigned(-1);
+  inheritedCLoc_ = Location();
 }
 
 inline

@@ -151,6 +151,8 @@ E1+invalidCharName++%1 is not a valid character name
 E1+invalidCharNumber++%1 is not a valid character number
 E1+unknownCharProperty++unknown character property %1
 E0+badAddCharProperty++error in character property declaration
-E1+duplicateCharPropertyDecl++duplicate character property declaration %1+first declaration was here
+E1+duplicateCharPropertyDecl++duplicate definition for character property %1+first definition was here
 E2+duplicateAddCharProperty++duplicate character property declaration %1 for character %2
 E0+returnNotSosofo++value returned by procedure was not a sosofo
+
+

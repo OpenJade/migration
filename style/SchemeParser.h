@@ -87,6 +87,7 @@ private:
   bool doMode();
   bool doDeclareInitialValue();
   bool doDeclareCharacteristic();
+  bool doDeclareCharCharacteristicAndProperty();
   bool doDeclareFlowObjectClass();
   bool doDeclareClassAttribute();
   bool doDeclareIdAttribute();

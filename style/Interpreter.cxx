@@ -1750,7 +1750,7 @@ bool Identifier::preferBuiltin_ = 0;
 
 Identifier::Identifier(const StringC &name)
 : Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
-  flowObj_(0), builtin_(0), defPart_(0)
+  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0)
 {
 }
 
@@ -2358,6 +2358,13 @@ Interpreter::compileCharProperties()
     }
 }
 
+
+void Interpreter::installExtensionCharNIC(Identifier *ident,
+					  const StringC &pubid,
+					  const Location &loc)
+{
+  ident->setCharNIC(currentPartIndex(), loc);
+}
 
 #ifdef DSSSL_NAMESPACE
 }

@@ -186,12 +186,14 @@ void SchemeParser::parse()
             recovering = !doDefineLanguage();
             break;
 	  case Identifier::keyDeclareCharProperty:
-            recovering = doDeclareCharProperty();
+            recovering = !doDeclareCharProperty();
             break;
 	  case Identifier::keyAddCharProperties:
-            recovering = doAddCharProperties();
+            recovering = !doAddCharProperties();
             break;
 	  case Identifier::keyDeclareCharCharacteristicAndProperty:
+	    recovering = !doDeclareCharCharacteristicAndProperty();
+	    break;
 	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDefinePageModel:
 	  case Identifier::keyDefineColumnSetModel:
@@ -448,6 +450,48 @@ bool SchemeParser::doDeclareInitialValue()
   return 1;
 }
 
+bool SchemeParser::doDeclareCharCharacteristicAndProperty()
+{
+  Location loc(in_->currentLocation());
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Identifier *ident = lookup(currentToken_);
+  if (!getToken(allowString|(dsssl2() ? unsigned(allowFalse) : 0), tok))
+    return 0;
+  StringC pubid;
+  if (tok == tokenString)
+    pubid = currentToken_;
+  Owner<Expression> expr;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  Location defLoc;
+  unsigned defPart;
+  if (ident->inheritedCDefined(defPart, defLoc)) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::duplicateCharacteristic,
+		       StringMessageArg(ident->name()),
+		       defLoc);
+  } 
+  else if (ident->charNICDefined(defPart, defLoc)
+           && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex()) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::duplicateCharacteristic,
+		       StringMessageArg(ident->name()),
+		       defLoc);
+    }
+  }
+  else {
+    interp_->installExtensionCharNIC(ident, pubid, loc);
+    interp_->addCharProperty(ident, expr);
+  }
+  return 1;
+}
+
 bool SchemeParser::doDeclareCharacteristic()
 {
   Location loc(in_->currentLocation());
@@ -468,8 +512,14 @@ bool SchemeParser::doDeclareCharacteristic()
     return 0;
   Location defLoc;
   unsigned defPart;
-  if (ident->inheritedCDefined(defPart, defLoc)
-      && defPart <= interp_->currentPartIndex()) {
+  if (ident->charNICDefined(defPart, defLoc)) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::duplicateCharacteristic,
+		       StringMessageArg(ident->name()),
+		       defLoc);
+  } 
+  else if (ident->inheritedCDefined(defPart, defLoc)
+           && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
       interp_->setNextLocation(loc);
       interp_->message(InterpreterMessages::duplicateCharacteristic,
@@ -2395,38 +2445,32 @@ bool SchemeParser::doAddCharProperties()
 {
   NCVector<Owner<Expression> > exprs;
   Vector<const Identifier *> keys;
+  Token tok;
   for (;;) {
-    Owner<Expression> tem;
-    Identifier::SyntacticKey key;
-    Token tok;
-    if (!parseExpression(allowCloseParen, tem, key, tok))
+    if (!getToken(allowKeyword|allowOtherExpr, tok))
       return 0;
-    if (!tem)
+    if (tok!=tokenKeyword)
       break;
-    if (keys.size() == exprs.size()) {
-      const Identifier *k = tem->keyword();
-      if (k) {
-        tem.clear();
-        if (!parseExpression(0, tem, key, tok))
-          return 0;
-        keys.push_back(k);
-      }
-    }
+    keys.push_back(lookup(currentToken_));
     exprs.resize(exprs.size() + 1);
-    tem.swap(exprs.back());
- }
- for (size_t i = exprs.size() - 1; i >= keys.size(); i--) {
-   exprs[i]->optimize(*interp_, Environment(), exprs[i]);
-   ELObj *val = exprs[i]->constantValue();
-   Char c;
-   if (!val || !val->charValue(c)) {
-     interp_->setNextLocation(exprs[i]->location());
-     message(InterpreterMessages::badAddCharProperty);
-     continue;
-   }
-   for (size_t j = 0; j < keys.size(); j++) 
-     interp_->setCharProperty(keys[j], c, exprs[j]);
- }
+    Identifier::SyntacticKey key;
+    if (!parseExpression(0, exprs.back(), key, tok))
+      return 0;
+  }
+  
+  for(;;) {
+    if (tok!=tokenChar) {
+      message(InterpreterMessages::badAddCharProperty);
+      return 0;
+    }
+    for (size_t j = 0; j < keys.size(); j++) 
+      interp_->setCharProperty(keys[j], currentToken_[0], exprs[j]);
+    if(!getToken(allowOtherExpr|allowCloseParen, tok))
+      return 0;
+    if (tok==tokenCloseParen)
+      break;
+  }
+  return 1;
 }
 
 

@@ -47,6 +47,7 @@ protected:
 class SubtreeNodeListObj : public TreeNodeListObj {
 public:
   SubtreeNodeListObj(const NodePtr &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 protected:
   void advance(EvalContext &, Interpreter &);
   void chunkAdvance(EvalContext &, Interpreter &);
@@ -5838,6 +5839,52 @@ void SubtreeNodeListObj::chunkAdvance(EvalContext &, Interpreter &)
     }
     depth_--;
   }
+}
+
+bool SubtreeNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &ptr)
+{
+  if (!start_)
+    return 0;
+  NodePtr nd(ptr);
+
+  if (depth_ == 0) {
+    for(;;) {
+      if (*start_ == *nd)
+	return 1;
+      if (nd->getParent(nd) != accessOK)
+	return 0;
+    }
+  }
+
+  NodePtr startParent;
+  if (start_->getParent(startParent) == accessOK)
+    CANNOT_HAPPEN();
+  for(;;) {
+    if (*start_ == *nd)
+      return 1;
+    NodePtr parent;
+    if (nd->getParent(parent) != accessOK)
+      return 0;
+    if (*parent == *startParent) {
+      unsigned long i1, i2;
+      if (start_->siblingsIndex(i1) == accessOK
+	  && nd->siblingsIndex(i2) == accessOK)
+	return (i1 < i2);
+      NodePtr sibling;
+      if (start_->firstSibling(sibling) != accessOK)
+	return 0;
+      for (;;) {
+	if (*sibling == *start_)
+	  return 1;
+	if (*sibling == *nd)
+	  return 0;
+	if (sibling.assignNextSibling() != accessOK)
+	  return 0;
+      }
+    }
+    nd = parent;
+  }
+  return 0;
 }
 
 DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start,

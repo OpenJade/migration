@@ -1,3 +1,11 @@
+openjade (1.4devel1-2) unstable; urgency=low
+
+  * some upstream changes from cvs since the last release
+  * debian/rules: stop renaming unicode.sd to unicode.decl, based on a
+    related problem in jade; build with -g
+
+ -- Adam Di Carlo <aph@debian.org>  Wed, 18 Oct 2000 00:13:25 -0400
+
 openjade (1.4devel1-1) unstable; urgency=low
 
   * new package; upstream fork from James Clark's Jade package

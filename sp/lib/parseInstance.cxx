@@ -451,7 +451,7 @@ StartElementEvent *Parser::doParseStartTag(Boolean &netEnabling)
   else {
     in->ungetToken();
     Ptr<AttributeDefinitionList> newAttDef;
-    if (parseAttributeSpec(0, *attributes, netEnabling, newAttDef)) {
+    if (parseAttributeSpec(tagMode, *attributes, netEnabling, newAttDef)) {
       // The difference between the indices will be the difference
       // in offsets plus 1 for each named character reference.
       if (in->currentLocation().index() - markupLocation().index()

@@ -12,7 +12,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-Boolean Parser::parseAttributeSpec(Boolean inDecl,
+Boolean Parser::parseAttributeSpec(Mode mode,
 				   AttributeList &atts,
 				   Boolean &netEnabling,
 				   Ptr<AttributeDefinitionList> &newAttDef)
@@ -21,7 +21,7 @@ Boolean Parser::parseAttributeSpec(Boolean inDecl,
   unsigned specLength = 0;
   AttributeParameter::Type curParm;
 
-  if (!parseAttributeParameter(inDecl, 0, curParm, netEnabling))
+  if (!parseAttributeParameter(mode, 0, curParm, netEnabling))
     return 0;
   while (curParm != AttributeParameter::end) {
     switch (curParm) {
@@ -35,15 +35,15 @@ Boolean Parser::parseAttributeSpec(Boolean inDecl,
 	if (currentMarkup())
 	  nameMarkupIndex = currentMarkup()->size() - 1;
 	text.subst(*syntax().generalSubstTable(), syntax().space());
-	if (!parseAttributeParameter(inDecl, 1, curParm, netEnabling))
+	if (!parseAttributeParameter(mode == piPasMode ? asMode : mode, 1, curParm, netEnabling))
 	  return 0;
 	if (curParm == AttributeParameter::vi) {
 	  specLength += text.size() + syntax().normsep();
-	  if (!parseAttributeValueSpec(inDecl, text.string(), atts,	
+	  if (!parseAttributeValueSpec(mode == piPasMode ? asMode : mode, text.string(), atts,	
 				       specLength, newAttDef))
 	    return 0;
 	  // setup for next attribute
-	  if (!parseAttributeParameter(inDecl, 0, curParm, netEnabling))
+	  if (!parseAttributeParameter(mode, 0, curParm, netEnabling))
 	    return 0;
 	}
 	else {
@@ -63,7 +63,7 @@ Boolean Parser::parseAttributeSpec(Boolean inDecl,
 	text.subst(*syntax().generalSubstTable(), syntax().space());
 	if (!handleAttributeNameToken(text, atts, specLength))
 	  return 0;
-	if (!parseAttributeParameter(inDecl, 0, curParm, netEnabling))
+	if (!parseAttributeParameter(mode, 0, curParm, netEnabling))
 	  return 0;
       }
       break;
@@ -77,7 +77,7 @@ Boolean Parser::parseAttributeSpec(Boolean inDecl,
 		    StringMessageArg(currentToken()));
 	  return 0;
 	}
-	if (!parseAttributeParameter(inDecl, 0, curParm, netEnabling))
+	if (!parseAttributeParameter(mode, 0, curParm, netEnabling))
 	  return 0;
       }
       break;
@@ -121,13 +121,12 @@ Boolean Parser::handleAttributeNameToken(Text &text,
   return 1;
 }
 
-Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
+Boolean Parser::parseAttributeValueSpec(Mode mode,
 					const StringC &name,
 					AttributeList &atts,
 					unsigned &specLength,
 					Ptr<AttributeDefinitionList> &newAttDef)
 {
-  Mode mode = inDecl ? asMode : tagMode;
   Markup *markup = currentMarkup();
   Token token = getToken(mode);
   if (token == tokenS) {
@@ -207,8 +206,10 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
 		  currentLocation());
     break;
   case tokenEe:
-    message(ParserMessages::attributeSpecEntityEnd);
-    return 0;
+    if (mode != piPasMode) {
+      message(ParserMessages::attributeSpecEntityEnd);
+      return 0;
+    }
   case tokenTagc:
   case tokenDsc:
   case tokenVi:
@@ -249,15 +250,32 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
 }
 
 
-Boolean Parser::parseAttributeParameter(Boolean inDecl,
+Boolean Parser::parseAttributeParameter(Mode mode,
 					Boolean allowVi,
 					AttributeParameter::Type &result,
 					Boolean &netEnabling)
 {
-  Mode mode = inDecl ? asMode : tagMode;
   Token token = getToken(mode);
   Markup *markup = currentMarkup();
-  if (markup) {
+  if (mode == piPasMode) {
+    for (;;) {
+      switch (token) {
+      case tokenCom:
+        if (!parseComment(comMode))
+	  return 0;
+	if (options().warnPsComment)
+	  message(ParserMessages::psComment);
+	// fall through
+      case tokenS:
+        token = getToken(mode);
+	continue;
+      default:
+        break;
+      }
+      break;
+    }
+  }
+  else if (markup) {
     while (token == tokenS) {
       markup->addS(currentChar());
       token = getToken(mode);
@@ -275,8 +293,12 @@ Boolean Parser::parseAttributeParameter(Boolean inDecl,
     result = AttributeParameter::recoverUnquoted;
     break;
   case tokenEe:
-    message(ParserMessages::attributeSpecEntityEnd);
-    return 0;
+    if (mode != piPasMode) {
+      message(ParserMessages::attributeSpecEntityEnd);
+      return 0;
+    }
+    result = AttributeParameter::end;
+    break;
   case tokenEtago:
   case tokenStago:
     if (!sd().startTagUnclosed())
@@ -412,14 +434,14 @@ Boolean Parser::skipAttributeSpec()
 {
   AttributeParameter::Type parm;
   Boolean netEnabling;
-  if (!parseAttributeParameter(0, 0, parm, netEnabling))
+  if (!parseAttributeParameter(tagMode, 0, parm, netEnabling))
     return 0;
   while (parm != AttributeParameter::end) {
     if (parm == AttributeParameter::name) {
       size_t nameMarkupIndex = 0;
       if (currentMarkup())
 	nameMarkupIndex = currentMarkup()->size() - 1;
-      if (!parseAttributeParameter(0, 1, parm, netEnabling))
+      if (!parseAttributeParameter(tagMode, 1, parm, netEnabling))
 	return 0;
       if (parm == AttributeParameter::vi) {
 	Token token = getToken(tagMode);
@@ -476,7 +498,7 @@ Boolean Parser::skipAttributeSpec()
 	default:
 	  CANNOT_HAPPEN();
 	}
-	if (!parseAttributeParameter(0, 0, parm, netEnabling))
+	if (!parseAttributeParameter(tagMode, 0, parm, netEnabling))
 	  return 0;
       }
       else {
@@ -488,7 +510,7 @@ Boolean Parser::skipAttributeSpec()
     }
     else {
       // It's a name token.
-      if (!parseAttributeParameter(0, 0, parm, netEnabling))
+      if (!parseAttributeParameter(tagMode, 0, parm, netEnabling))
 	return 0;
       if (!sd().attributeOmitName())
 	message(ParserMessages::attributeNameShorttag);

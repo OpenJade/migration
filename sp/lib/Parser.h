@@ -72,6 +72,7 @@ public:
   ParserState::baseDtd;
   ParserState::options;
   ParserState::instantiateDtd;
+  friend class PiAttspecParser;
 private:
   Parser(const Parser &);	// undefined
   void operator=(const Parser &); // undefined
@@ -222,7 +223,7 @@ private:
   void pushElementCheck(const ElementType *, StartElementEvent *,
 			IList<Undo> &, IList<Event> &);
   void queueElementEvents(IList<Event> &);
-  Boolean parseAttributeSpec(Boolean inDeclaration,
+  Boolean parseAttributeSpec(Mode mode,
 			     AttributeList &,
 			     Boolean &netEnabling,
 			     Ptr<AttributeDefinitionList> &);
@@ -240,13 +241,13 @@ private:
       };
   };
 
-  Boolean parseAttributeParameter(Boolean inDecl,
+  Boolean parseAttributeParameter(Mode mode,
 				  Boolean allowVi,
 				  AttributeParameter::Type &result,
 				  Boolean &netEnabling);
   void extendUnquotedAttributeValue();
 
-  Boolean parseAttributeValueSpec(Boolean inDecl,
+  Boolean parseAttributeValueSpec(Mode mode,
 				  const StringC &name,
 				  AttributeList &atts,
 				  unsigned &specLength,

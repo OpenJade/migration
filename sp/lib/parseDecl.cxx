@@ -1347,7 +1347,7 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
                   StringMessageArg(notation->name()));
         Boolean netEnabling;
         Ptr<AttributeDefinitionList> newAttDef;
-        if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+        if (!parseAttributeSpec(asMode, attributes, netEnabling, newAttDef))
           return 0;
         if (!newAttDef.isNull()) {
           newAttDef->setIndex(defDtd().allocAttributeDefinitionListIndex());
@@ -1829,7 +1829,7 @@ Boolean Parser::parseExternalEntity(StringC &name,
 		StringMessageArg(notation->name()));
       Boolean netEnabling;
       Ptr<AttributeDefinitionList> newAttDef;
-      if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+      if (!parseAttributeSpec(asMode, attributes, netEnabling, newAttDef))
 	return 0;
       if (!newAttDef.isNull()) {
 	newAttDef->setIndex(defDtd().allocAttributeDefinitionListIndex());
@@ -3139,7 +3139,7 @@ Boolean Parser::parseLinkSet(Boolean idlink)
       if (parm.type == Param::dso) {
 	Boolean netEnabling;
 	Ptr<AttributeDefinitionList> newAttDef;
-	if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+	if (!parseAttributeSpec(asMode, attributes, netEnabling, newAttDef))
 	  return 0;
 	if (!newAttDef.isNull()) {
 	  newAttDef->setIndex(defComplexLpd().allocAttributeDefinitionListIndex());
@@ -3286,7 +3286,7 @@ Boolean Parser::parseResultElementSpec(unsigned declInputLevel,
       ResultAttributeSpecModeSetter modeSetter(this);
       Boolean netEnabling;
       Ptr<AttributeDefinitionList> newAttDef;
-      if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+      if (!parseAttributeSpec(asMode, attributes, netEnabling, newAttDef))
 	return 0;
       if (!newAttDef.isNull()) {
 	Ptr<Dtd> r(defComplexLpd().resultDtd());

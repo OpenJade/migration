@@ -190,7 +190,12 @@ const ExternalInfo* XMLMessageReporter::locationHeader(
 	  break;
       }
       else {
-	index = loc.index() + origin->refLength();
+	if (origin->asEntityOrigin())
+	  index = loc.index() + origin->refLength();
+	else
+	  // Must be re-running the parser over something using
+	  // something like PiAttspecParser.
+	  index += loc.index();
 	origin = loc.origin().pointer();
       }
     }
@@ -214,7 +219,12 @@ void XMLMessageReporter::showOpenEntities(
       break ;
     } else {
 	const Location &loc = origin->parent();
-	index = loc.index() + origin->refLength();
+	if (origin->asEntityOrigin())
+	  index = loc.index() + origin->refLength();
+	else
+	  // Must be re-running the parser over something using
+	  // something like PiAttspecParser.
+	  index += loc.index();
 	origin = loc.origin().pointer();
     }
   }
@@ -236,7 +246,12 @@ const ExternalInfo *MessageReporter::locationHeader(const Origin *origin,
 	  break;
       }
       else {
-	index = loc.index() + origin->refLength();
+	if (origin->asEntityOrigin())
+	  index = loc.index() + origin->refLength();
+	else
+	  // Must be re-running the parser over something using
+	  // something like PiAttspecParser.
+	  index += loc.index();
 	origin = loc.origin().pointer();
       }
     }
@@ -289,7 +304,12 @@ const ExternalInfo *MessageReporter::locationHeader(const Origin *origin,
       }
       else {
 	const Location &loc = origin->parent();
-	index = loc.index() + origin->refLength();
+	if (origin->asEntityOrigin())
+	  index = loc.index() + origin->refLength();
+	else
+	  // Must be re-running the parser over something using
+	  // something like PiAttspecParser.
+	  index += loc.index();
 	origin = loc.origin().pointer();
       }
     }

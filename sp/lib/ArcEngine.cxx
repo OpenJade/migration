@@ -1,4 +1,5 @@
 // Copyright (c) 1996 James Clark, 2000 Matthias Clasen
+// Copyright (c) 2001 Epremis Corp.
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -12,9 +13,12 @@
 #include "NCVector.h"
 #include "IQueue.h"
 #include "ArcEngineMessages.h"
+#include "ParserMessages.h"
 #include "MessageArg.h"
 #include "ParserOptions.h"
 #include "SgmlParser.h"
+#include "InternalInputSource.h"
+#include "Parser.h"
 #include "Allocator.h"
 #include "LinkProcess.h"
 #include "macros.h"
@@ -113,8 +117,12 @@ private:
   NCVector<ArcProcessor> arcProcessors_;
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> syntax_;
-  StringC arcBase_;
   StringC is10744_;
+  StringC arcBase_;
+  StringC namespaceDelim_;
+  StringC arch_;
+  StringC uselex_;
+  ConstPtr<AttributeDefinitionList> archPiAttributeDefs_;
   int stage_;
   QueueEventHandler eventQueue_;
   NullEventHandler nullHandler_;
@@ -209,40 +217,130 @@ void ArcEngineImpl::appinfo(AppinfoEvent *event)
 void ArcEngineImpl::pi(PiEvent *event)
 {
   currentLocation_ = event->location();
-  if (stage_ == 1
-      && arcBase_.size()
-      && event->dataLength() > is10744_.size() + 1) {
+  if (stage_ == 1 && event->dataLength() > is10744_.size() + 1) {
     Boolean match = 1;
     size_t i = 0;
     for (size_t j = 0; j < is10744_.size() && match; i++, j++)
       if ((*syntax_->generalSubstTable())[event->data()[i]] != is10744_[j])
 	match = 0;
-    if (!syntax_->isS(event->data()[i]))
-      match = 0;
-    do {
-      i++;
-    } while (i < event->dataLength() && syntax_->isS(event->data()[i]));
-    for (size_t j = 0; j < arcBase_.size() && match; i++, j++)
-      if (i >= event->dataLength()
-          || (*syntax_->generalSubstTable())[event->data()[i]] != arcBase_[j])
-	match = 0;
-    if (i >= event->dataLength() || !syntax_->isS(event->data()[i]))
-      match = 0;
     if (match) {
-      size_t dataLength = event->dataLength();
-      const Char *data = event->data();
-      for (;;) {
-	while (i < dataLength && syntax_->isS(data[i]))
-	  i++;
-	if (i >= dataLength)
-	  break;
-	size_t start = i++;
-	while (i < dataLength && !syntax_->isS(data[i]))
-	  i++;
-	StringC name(data + start, i - start);
-	syntax_->generalSubstTable()->subst(name);
-	arcProcessors_.resize(arcProcessors_.size() + 1);
-	arcProcessors_.back().setName(name);
+      if ((event->dataLength() - i) < namespaceDelim_.size())
+       match = 0;
+      else {
+	for (size_t j = 0; j < namespaceDelim_.size() && match; j++)
+	 if ((*syntax_->generalSubstTable())[event->data()[i+j]] != namespaceDelim_[j])
+	  match = 0;
+      }
+      if (match || syntax_->isS(event->data()[i])) {
+	if (match)
+	 i += namespaceDelim_.size();
+	else {
+	  do {
+	    i++;
+	  } while (i < event->dataLength() && syntax_->isS(event->data()[i]));
+	}
+	if (i >= event->dataLength()) {
+	  Location loc(event->location());
+	  loc += i;
+	  setNextLocation(loc);
+	  Messenger::message(ArcEngineMessages::is10744PiKeywordMissing);
+	}
+	else {
+	  StringC token;
+	  do {
+	    token += (*syntax_->generalSubstTable())[event->data()[i++]];
+	  } while (i < event->dataLength() && !syntax_->isS(event->data()[i]));
+	  if (!match && token == arcBase_) {
+	    size_t dataLength = event->dataLength();
+	    const Char *data = event->data();
+	    for (;;) {
+	      while (i < dataLength && syntax_->isS(data[i]))
+	        i++;
+	      if (i >= dataLength)
+	        break;
+	      size_t start = i++;
+	      while (i < dataLength && !syntax_->isS(data[i]))
+	        i++;
+	      StringC name(data + start, i - start);
+	      syntax_->generalSubstTable()->subst(name);
+	      arcProcessors_.resize(arcProcessors_.size() + 1);
+	      Location loc(event->location());
+	      loc += start;
+	      arcProcessors_.back().setName(name, loc);
+	    }
+	  } else if (token == arch_) {
+	    if (archPiAttributeDefs_.isNull()) {
+	      const char *const autoTokens[] = { "ArcAuto", "nArcAuto", 0 };
+	      struct AttdefData {
+		const char *name;
+		Boolean required;
+		enum {
+		  dvName,
+		  dvNameTokenGroup,
+		  dvCdata
+		} declaredValue;
+		const char *const *allowedTokens;
+	      } const attdefData[] = {
+		{ "name", 1, AttdefData::dvName, 0 },
+		{ "public-id", 0, AttdefData::dvCdata, 0 },
+		{ "dtd-public-id", 0, AttdefData::dvCdata, 0 },
+		{ "dtd-system-id", 0, AttdefData::dvCdata, 0 },
+		{ "form-att", 0, AttdefData::dvName, 0 },
+		{ "renamer-att", 0, AttdefData::dvName, 0 },
+		{ "suppressor-att", 0, AttdefData::dvName, 0 },
+		{ "ignore-data-att", 0, AttdefData::dvName, 0 },
+		{ "doc-elem-form", 0, AttdefData::dvCdata, 0 },
+		{ "bridge-form", 0, AttdefData::dvCdata, 0 },
+		{ "data-form", 0, AttdefData::dvCdata, 0 },
+		{ "auto", 0, AttdefData::dvNameTokenGroup, autoTokens },
+		{ "options", 0, AttdefData::dvCdata, 0 },
+		{ "quantity", 0, AttdefData::dvCdata, 0 }
+	      };
+	      Vector<CopyOwner<AttributeDefinition> > attdefs;
+	      for (size_t i = 0; i < SIZEOF(attdefData); i++) {
+		StringC attName(sd_->execToInternal(attdefData[i].name));
+		syntax_->generalSubstTable()->subst(attName);
+		DeclaredValue *declaredValue;
+		switch (attdefData[i].declaredValue) {
+		case AttdefData::dvName:
+		  declaredValue = new TokenizedDeclaredValue(TokenizedDeclaredValue::name, 0);
+		  break;
+		case AttdefData::dvCdata:
+		  declaredValue = new CdataDeclaredValue();
+		  break;
+		case AttdefData::dvNameTokenGroup: {
+		   Vector<StringC> allowedTokens;
+		   for (const char *const *allowedToken = attdefData[i].allowedTokens;
+			*allowedToken; allowedToken++) {
+		     allowedTokens.push_back(sd_->execToInternal(*allowedToken));
+		     syntax_->generalSubstTable()->subst(allowedTokens.back());
+		   }
+		   declaredValue = new NameTokenGroupDeclaredValue(allowedTokens);
+		   break;
+		 }
+		default:
+		  CANNOT_HAPPEN();
+		}
+		if (attdefData[i].required)
+		  attdefs.push_back(new RequiredAttributeDefinition(attName, declaredValue));
+		else
+		  attdefs.push_back(new ImpliedAttributeDefinition(attName, declaredValue));
+	      }
+	      archPiAttributeDefs_ = new AttributeDefinitionList(attdefs, 0);
+	    }
+	    arcProcessors_.resize(arcProcessors_.size() + 1);
+	    arcProcessors_.back().setPiDecl(event->location(),
+					    StringC(event->data() + i, event->dataLength() - i),
+					    i,
+					    archPiAttributeDefs_);
+	  } else if (match || token != uselex_) {
+	    Location loc(event->location());
+	    loc += i - token.size();
+	    setNextLocation(loc);
+	    Messenger::message(ArcEngineMessages::is10744PiKeywordInvalid,
+			       StringMessageArg(token));
+	  }
+	}
       }
     }
   }
@@ -259,6 +357,7 @@ void ArcEngineImpl::endProlog(EndPrologEvent *event)
 			   parser_,
 			   this,
 			   docName_,
+			   arcProcessors_,
 			   *director_,
 			   cancelPtr_);
   if (!event->lpdPointer().isNull()) {
@@ -301,6 +400,10 @@ void ArcEngineImpl::sgmlDecl(SgmlDeclEvent *event)
   arcBase_ = sd_->execToInternal("ArcBase");
   syntax_->generalSubstTable()->subst(arcBase_);
   is10744_ = sd_->execToInternal("IS10744");
+  arch_ = sd_->execToInternal("arch");
+  syntax_->generalSubstTable()->subst(arch_);
+  uselex_ = sd_->execToInternal("USELEX");
+  namespaceDelim_ = sd_->execToInternal(":");
   Boolean atStart = 1;
   for (size_t i = 0; i < appinfo_.size(); i++)
     if (syntax_->isS(appinfo_[i]))
@@ -542,9 +645,11 @@ ArcProcessor::ArcProcessor()
 {
 }
 
-void ArcProcessor::setName(const StringC &name)
+void ArcProcessor::setName(const StringC &name, const Location &loc)
 {
+  piDecl_ = 0;
   name_ = name;
+  declLoc_ = loc;
 }
 
 const Syntax &ArcProcessor::attributeSyntax() const
@@ -629,12 +734,52 @@ void ArcProcessor::checkIdrefs()
   }
 }
 
+void ArcProcessor::setPiDecl(const Location &loc,
+			     const StringC &attspecText,
+			     Index attspecIndex,
+			     const ConstPtr<AttributeDefinitionList> &archPiAttributeDefs)
+{
+    piDecl_ = 1;
+    declLoc_ = loc;
+    piDeclAttspecText_ = attspecText;
+    piDeclAttspecIndex_ = attspecIndex;
+    archPiAttributeDefs_ = archPiAttributeDefs;
+}
+
+class PiAttspecParser {
+ public:
+  PiAttspecParser(const SgmlParser *parser) : parser_(parser->parser_) {}
+  Boolean parsePiAttributeSpec(const StringC &text,
+			       const Location &loc,
+			       AttributeList &attributeList);
+ private:
+  Parser *parser_;
+};
+
+Boolean
+PiAttspecParser::
+parsePiAttributeSpec(const StringC &text,
+		     const Location &loc,
+		     AttributeList &attributeList)
+{
+  Markup *savedCurrentMarkup = parser_->currentMarkup_;
+  parser_->currentMarkup_ = 0;
+  parser_->pushInput(new InternalInputSource(text, InputSourceOrigin::make(loc)));
+  Boolean netEnabling;
+  Ptr<AttributeDefinitionList> newAttDefs;
+  Boolean result = parser_->parseAttributeSpec(piPasMode, attributeList, netEnabling, newAttDefs);
+  parser_->popInputStack();
+  parser_->currentMarkup_ = savedCurrentMarkup;
+  return result;
+}
+
 void ArcProcessor::init(const EndPrologEvent &event,
 			const ConstPtr<Sd> &sd,
 			const ConstPtr<Syntax> &syntax,
 			const SgmlParser *parentParser,
 			Messenger *mgr,
 			const Vector<StringC> &superName,
+			const NCVector<ArcProcessor> &arcProcessors,
 			ArcDirector &director,
 			const volatile sig_atomic_t *cancelPtr)
 {
@@ -647,19 +792,62 @@ void ArcProcessor::init(const EndPrologEvent &event,
   docDtd_ = event.dtdPointer();
   metaSyntax_ = docSyntax_;
   mayDefaultAttribute_ = 1;
-  docSyntax_->generalSubstTable()->subst(name_);
+  ConstPtr<Notation> notation;
+  PiAttspecParser piAttspecParser(parentParser);
+  if (!piDecl())
+    docSyntax_->generalSubstTable()->subst(name_);
+  else {
+    attributeList_.init(archPiAttributeDefs_);
+    Location loc(declLoc_);
+    loc += piDeclAttspecIndex_;
+    if (!piAttspecParser.parsePiAttributeSpec(piDeclAttspecText_, loc, attributeList_))
+      return;
+    supportAttributes(attributeList_, 1);
+    if (name_.size() == 0)
+      return;
+  }
+  const ArcProcessor *first = 0;
+  for (const ArcProcessor *p = arcProcessors.begin(); p != this; p++)
+    if (name_ == p->name()) {
+      if ((piDecl() && p->piDecl()) || (!piDecl() && !p->piDecl())) {
+	setNextLocation(declLoc_);
+	message(ArcEngineMessages::duplicateArcDecl,
+		StringMessageArg(name_),
+		p->declLoc_);
+	return;
+      } else {
+	first = p;
+      }
+    }
+  if (first) {
+    if (piDecl()) {
+      setNextLocation(declLoc_);
+      message(ArcEngineMessages::ignoringPiArcDecl,
+	      StringMessageArg(name_),
+	      first->declLoc_);
+    } else {
+      setNextLocation(declLoc_);
+      message(ArcEngineMessages::ignoringArcBaseArcDecl,
+	      StringMessageArg(name_),
+	      first->declLoc_);
+    }
+    return;
+  }
+  if (!piDecl()) {
+    notation = docDtd_->lookupNotation(name_);
+    if (!notation.isNull()) {
+      ConstPtr<AttributeDefinitionList> notAttDef = notation->attributeDef();
+      attributeList_.init(notAttDef);
+      attributeList_.finish(*this);
+      supportAttributes(attributeList_, 0);
+    }
+    else {
+      setNextLocation(declLoc_);
+      message(ArcEngineMessages::noArcNotation, StringMessageArg(name_));
+    }
+  }
   Vector<StringC> docName(superName);
   docName.push_back(name_);
-  ConstPtr<Notation> notation;
-  notation = docDtd_->lookupNotation(name_);
-  if (!notation.isNull()) {
-    ConstPtr<AttributeDefinitionList> notAttDef = notation->attributeDef();
-    attributeList_.init(notAttDef);
-    attributeList_.finish(*this);
-    supportAttributes(attributeList_);
-  }
-  else
-    message(ArcEngineMessages::noArcNotation, StringMessageArg(name_));
   ArcEngineImpl *engine
     = new ArcEngineImpl(*mgr, parentParser, director, cancelPtr,
 			notation.pointer(),
@@ -689,6 +877,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
 					       sd->internalCharset(),
 					       *mgr_,
 					       sysid)) {
+    setNextLocation(dtdent->defLocation());
     message(ArcEngineMessages::arcGenerateSystemId,
 	    StringMessageArg(name_));
     return;
@@ -717,6 +906,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
   params.prologSyntax = metaSyntax_;
   params.instanceSyntax = metaSyntax_;
   params.doctypeName = dtdent->name();
+  params.origin = InputSourceOrigin::make(dtdent->defLocation());
   SgmlParser parser(params);
   parser.parseAll(*docHandler_, cancelPtr);
   Ptr<Dtd> baseDtd = parser.baseDtd();
@@ -739,6 +929,7 @@ void ArcProcessor::mungeMetaDtd(Dtd &metaDtd, const Dtd &docDtd)
 {
   if (supportAtts_[rArcDataF].size() > 0
       && metaDtd.lookupNotation(supportAtts_[rArcDataF]).isNull()) {
+    setNextLocation(supportAttsText_[rArcDataF]->charLocation(0));
     Messenger::message(ArcEngineMessages::noArcDataF,
 		       StringMessageArg(supportAtts_[rArcDataF]));
     metaDtd.insertNotation(new Notation(supportAtts_[rArcDataF],
@@ -777,27 +968,78 @@ Boolean ArcProcessor::mungeDataEntity(ExternalDataEntity &entity)
   return 0;
 }
 
-ConstPtr<Entity> ArcProcessor::makeDtdEntity(const Notation *)
+ConstPtr<Entity> ArcProcessor::makeDtdEntity(const Notation *notation)
 {
-  if (!supportAtts_[rArcDTD].size()) {
-    mgr_->message(ArcEngineMessages::noArcDTDAtt);
-    return 0;
+  ExternalId externalId;
+  Location defLocation;
+  if (notation) {
+    if (!supportAtts_[rArcDTD].size()) {
+      mgr_->setNextLocation(notation->defLocation());
+      mgr_->message(ArcEngineMessages::noArcDTDAtt);
+      return 0;
+    }
+    ConstPtr<Entity> entity = docDtd_->lookupEntity(arcDtdIsParam_,
+						    supportAtts_[rArcDTD]);
+    if (entity.isNull()) {
+      mgr_->setNextLocation(supportAttsText_[rArcDTD]->charLocation(0));
+      mgr_->message(arcDtdIsParam_
+		    ? ArcEngineMessages::arcDtdNotDeclaredParameter
+		    : ArcEngineMessages::arcDtdNotDeclaredGeneral,
+		    StringMessageArg(supportAtts_[rArcDTD]));
+      return 0;
+    }
+    if (!entity->asExternalEntity()) {
+      mgr_->setNextLocation(entity->defLocation());
+      mgr_->message(ArcEngineMessages::arcDtdNotExternal,
+		    StringMessageArg(supportAtts_[rArcDTD]));
+      return 0;
+    }
+    externalId = entity->asExternalEntity()->externalId();
+    defLocation = entity->defLocation();
+  } else {
+    if (supportAttsText_[rArcDtdPubid]) {
+      Text pubidText(*supportAttsText_[rArcDtdPubid]);
+      const MessageType1 *fpierr;
+      const MessageType1 *urnerr;
+      switch (externalId.setPublic(pubidText, docSd_->internalCharset(),
+				   docSyntax_->space(), fpierr, urnerr)) {
+      case PublicId::fpi:
+        {
+	  PublicId::TextClass textClass;
+	  if (docSd_->formal() && externalId.publicId()->getTextClass(textClass) && textClass == PublicId::SD) {
+	    mgr_->setNextLocation(externalId.publicIdText()->charLocation(0));
+	    mgr_->message(ParserMessages::wwwRequired);
+	  }
+	  if (docSd_->urn() && !docSd_->formal()) {
+	    mgr_->setNextLocation(externalId.publicIdText()->charLocation(0));
+	    mgr_->message(*urnerr, StringMessageArg(*externalId.publicIdString()));
+	  }
+        }
+	break;
+      case PublicId::urn:
+	if (docSd_->formal() && !docSd_->urn()) {
+	  mgr_->setNextLocation(externalId.publicIdText()->charLocation(0));
+	  mgr_->message(*fpierr, StringMessageArg(*externalId.publicIdString()));
+	}
+	break;
+      case PublicId::informal:
+	if (docSd_->formal()) {
+	  mgr_->setNextLocation(externalId.publicIdText()->charLocation(0));
+	  mgr_->message(*fpierr, StringMessageArg(*externalId.publicIdString()));
+	}
+	if (docSd_->urn()) {
+	  mgr_->setNextLocation(externalId.publicIdText()->charLocation(0));
+	  mgr_->message(*urnerr, StringMessageArg(*externalId.publicIdString()));
+	}
+	break;
+      }
+    }
+    if (supportAttsText_[rArcDtdSysid]) {
+      Text sysidText(*supportAttsText_[rArcDtdSysid]);
+      externalId.setSystem(sysidText);
+    }
+    defLocation = declLoc_;
   }
-  ConstPtr<Entity> entity = docDtd_->lookupEntity(arcDtdIsParam_,
-						  supportAtts_[rArcDTD]);
-  if (entity.isNull()) {
-    mgr_->message(arcDtdIsParam_
-		  ? ArcEngineMessages::arcDtdNotDeclaredParameter
-		  : ArcEngineMessages::arcDtdNotDeclaredGeneral,
-		  StringMessageArg(supportAtts_[rArcDTD]));
-    return 0;
-  }
-  if (!entity->asExternalEntity()) {
-    mgr_->message(ArcEngineMessages::arcDtdNotExternal,
-		  StringMessageArg(supportAtts_[rArcDTD]));
-    return 0;
-  }
-  ExternalId externalId(entity->asExternalEntity()->externalId());
 #if 0
   // Use the public identifier of the notation to find the meta-DTD.
   if (externalId.effectiveSystemId().size() == 0 && notation) {
@@ -836,55 +1078,78 @@ ConstPtr<Entity> ArcProcessor::makeDtdEntity(const Notation *)
 #endif
   return new ExternalTextEntity(supportAtts_[rArcDocF],
 				Entity::doctype,
-				entity->defLocation(),
+				defLocation,
 				externalId);
 }
 
-void ArcProcessor::supportAttributes(const AttributeList &atts)
+void ArcProcessor::supportAttributes(const AttributeList &atts, Boolean piDecl)
 {
-  static const char *const s[] = {
-    "ArcFormA",
-    "ArcNamrA",
-    "ArcSuprA",
-    "ArcIgnDA",
-    "ArcDocF",
-    "ArcSuprF",
-    "ArcBridF",
-    "ArcDataF",
-    "ArcAuto",
-    "ArcDTD",
-    "ArcQuant",
-    };
-  for (size_t i = 0; i < SIZEOF(s); i++) {
-    StringC attName(docSd_->execToInternal(s[i]));
-    docSyntax_->generalSubstTable()->subst(attName);
-    unsigned ind;
-    if (atts.attributeIndex(attName, ind)) {
-      const AttributeValue *value = atts.value(ind);
+  static const char *const s[][2] = {
+    { 0, "name" },
+    { 0, "public-id" },
+    { "ArcFormA", "form-att" },
+    { "ArcNamrA", "renamer-att" },
+    { "ArcSuprA", "suppressor-att" },
+    { "ArcIgnDA", "ignore-data-att" },
+    { "ArcDocF", "doc-elem-form" },
+    { "ArcSuprF", 0 },
+    { "ArcBridF", "bridge-form" },
+    { "ArcDataF", "data-form" },
+    { "ArcAuto", "auto" },
+    { "ArcDTD", 0 },
+    { 0, "dtd-public-id" },
+    { 0, "dtd-system-id" },
+    { "ArcQuant", "quantity" }
+  };
+  int column = piDecl ? 1 : 0;
+  for (size_t i = 0; i < nReserve; i++)
+    supportAttsText_[i] = 0;
+  for (size_t i = 0; i < SIZEOF(s); i++)
+   if (s[i][column]) {
+     StringC attName(docSd_->execToInternal(s[i][column]));
+     docSyntax_->generalSubstTable()->subst(attName);
+     unsigned ind;
+     if (atts.attributeIndex(attName, ind)) {
+       const AttributeValue *value = atts.value(ind);
       if (value) {
 	const Text *textP = value->text();
 	// FIXME check for empty value
 	if (textP) {
+	  supportAttsText_[i] = textP;
 	  supportAtts_[i] = textP->string();
 	  switch (i) {
+	  case rArcName:
+	    name_ = supportAtts_[i];
+	    break;
 	  case rArcQuant:
 	    processArcQuant(*textP);
 	    break;
-	  case rArcAuto:
-	    docSyntax_->generalSubstTable()->subst(supportAtts_[i]);
-	    if (supportAtts_[i] == docSd_->execToInternal("ARCAUTO"))
+	  case rArcAuto: {
+	    if (!piDecl)
+	      docSyntax_->generalSubstTable()->subst(supportAtts_[i]);
+	    StringC ArcAuto(docSd_->execToInternal("ArcAuto"));
+	    docSyntax_->generalSubstTable()->subst(ArcAuto);
+	    if (supportAtts_[i] == ArcAuto)
 	      arcAuto_ = 1;
-	    else if (supportAtts_[i] == docSd_->execToInternal("NARCAUTO"))
-	      arcAuto_ = 0;
-	    else
-	      Messenger::message(ArcEngineMessages::invalidArcAuto,
-				 StringMessageArg(supportAtts_[i]));
+	    else {
+	      StringC nArcAuto(docSd_->execToInternal("nArcAuto"));
+	      docSyntax_->generalSubstTable()->subst(nArcAuto);
+	      if (supportAtts_[i] == nArcAuto)
+	        arcAuto_ = 0;
+	      else if (!piDecl) {
+		setNextLocation(textP->charLocation(0));
+	        Messenger::message(ArcEngineMessages::invalidArcAuto,
+				   StringMessageArg(supportAtts_[i]));
+	      }
+	    }
 	    break;
+	  }
 	  case rArcFormA:
 	  case rArcNamrA:
 	  case rArcSuprA:
 	  case rArcIgnDA:
-	    docSyntax_->generalSubstTable()->subst(supportAtts_[i]);
+	    if (!piDecl)
+	      docSyntax_->generalSubstTable()->subst(supportAtts_[i]);
 	    break;
 	  case rArcDocF:
 	  case rArcSuprF:
@@ -913,27 +1178,31 @@ void ArcProcessor::supportAttributes(const AttributeList &atts)
       }
     }
   }
-  processArcOpts(atts);
+  processArcOpts(atts, piDecl);
 }
 
-void ArcProcessor::processArcOpts(const AttributeList &atts)
+void ArcProcessor::processArcOpts(const AttributeList &atts, Boolean piDecl)
 {
-  StringC attName(docSd_->execToInternal("ArcOptSA"));
-  docSyntax_->generalSubstTable()->subst(attName);
-  unsigned ind;
   Vector<StringC> arcOptA;
-  Vector<size_t> arcOptAPos;
-  const Text *arcOptAText = 0;
-  if (atts.attributeIndex(attName, ind)) {
-    const AttributeValue *value = atts.value(ind);
-    if (value) {
-      arcOptAText = value->text();
-      if (arcOptAText)
-	split(*arcOptAText, docSyntax_->space(), arcOptA, arcOptAPos);
+  unsigned ind;
+  if (piDecl)
+    arcOptA.push_back(docSd_->execToInternal("options"));
+  else {
+    StringC attName(docSd_->execToInternal("ArcOptSA"));
+    docSyntax_->generalSubstTable()->subst(attName);
+    Vector<size_t> arcOptAPos;
+    const Text *arcOptAText = 0;
+    if (atts.attributeIndex(attName, ind)) {
+      const AttributeValue *value = atts.value(ind);
+      if (value) {
+	arcOptAText = value->text();
+	if (arcOptAText)
+	  split(*arcOptAText, docSyntax_->space(), arcOptA, arcOptAPos);
+      }
     }
+    if (!arcOptAText)
+      arcOptA.push_back(docSd_->execToInternal("ArcOpt"));
   }
-  if (!arcOptAText)
-    arcOptA.push_back(docSd_->execToInternal("ArcOpt"));
   for (size_t i = 0; i < arcOptA.size(); i++) {
     docSyntax_->generalSubstTable()->subst(arcOptA[i]);
     if (atts.attributeIndex(arcOptA[i], ind)) {

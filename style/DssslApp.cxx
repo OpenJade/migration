@@ -11,7 +11,6 @@
 #include "LocNode.h"
 #include "SdNode.h"
 #include "InputSource.h"
-#include "jade_version.h"
 #include "ArcEngine.h"
 #include "Entity.h"
 
@@ -106,7 +105,8 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'v':
     message(DssslAppMessages::versionInfo,
-	    StringMessageArg(convertInput(JADE_VERSION)));
+	    StringMessageArg(convertInput(SP_T(VERSION))),
+	    StringMessageArg(convertInput(SP_T(PACKAGE))));
     // fall through
   default:
     GroveApp::processOption(opt, arg);

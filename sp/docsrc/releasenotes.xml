@@ -17,13 +17,13 @@
 <chapter><title>OpenSP 1.5 Release Notes</title>
 
 <para>The OpenJade project provides a suite of tools and libraries for validating, processing and applying DSSSL (Document Style Semantics and Specification Language) style sheets to SGML and XML documents.</para>
-<para>The OpenJade is a project undertaken by the community to maintain
+<para>OpenJade is a project undertaken by the community to maintain
 and extend James Clark's Jade, as well as the related SP suite of SGML/XML processing tools. OpenJade and OpenSP are distributed under the same license as Jade.</para>
 <para>OpenSP is written in C++ and provides a class library, libosp, which can be used as a basis for either open source or commerical projects. The library
 can be built as either a dynamic or static library.
 </para>
 <sect1><title>Applications of OpenSP</title>
-<para>The OpenSP library has been used in a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the OpenSP library. In addition to the OpenSP library a set of command line tools are provided to support the validation and transformation of SGML files. In particular <command>onsgmls</command> can validate both XML and SGML documents held on a local file system or access remotely via a web server using the HTTP protocol with stand URI notation; <command>osx</command> will convert SGML to XML to allow a library of SGML documents to be processed with XML tools.</para>
+<para>The OpenSP library has been used in a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the OpenSP library. In addition to the OpenSP library a set of command line tools are provided to support the validation and transformation of SGML files. In particular <command>onsgmls</command> can validate both XML and SGML documents held on a local file system or accessed remotely via a web server using the HTTP protocol with standard URI notation; <command>osx</command> will convert SGML to XML to allow a library of SGML documents to be processed with XML tools.</para>
 </sect1>
 
 <sect1><title>Obtaining OpenSP</title>
@@ -31,7 +31,7 @@ can be built as either a dynamic or static library.
 from the OpenJade web site at http://openjade.sourceforge.net or directly
 from the OpenJade project page at http://sourceforge.net/projects/openjade</para>
 <para>OpenJade is provided in source code form. However as a courtesy
-to Win32 users where development tools are not always available, a binary release for the Win32 platform is usually available.</para>
+to Win32 users, where development tools are not always available, a binary release for the Win32 platform is usually available.</para>
 </sect1>
 <sect1><title>Supported Platforms</title>
 <para>OpenSP is intended to be as portable as possible. It should be
@@ -135,7 +135,7 @@ Red Hat gcc 2.96, GNU gcc 2.95.3 and gcc 3.2</para>
    <entry></entry>
 </row>
 <row>
-   <entry>Sun Solaris xxx</entry>
+   <entry>Sun Solaris 2.8</entry>
    <entry>GNU gcc 2.95.3</entry>
    <entry>Build with --enable-static. Problems with gcc 3.2</entry>
 </row>
@@ -159,9 +159,6 @@ You may need to switch to the super user <command>root</command> to complete the
 <screen>
 make install
 </screen>
-If you wish to install man pages for the various commands you should then do
-<screen>
-make install-man</screen>
 The <command>configure</command> script supports many options. These can be displayed using the command
 <screen>
 ./configure --help
@@ -318,9 +315,6 @@ It is always worth searching for your problem first, as it is often the case tha
 </row>
 <row>
 <entry><para>Description</para></entry>
-</row>
-<row>
-<entry><para>Resolution</para></entry>
 <entry><para>If you wish to create the various autoconf files then newer
 versions are required (autoconf 2.52 and later). As a result of the upgrades
 more platforms are potentially supported.</para></entry>
@@ -347,7 +341,7 @@ more platforms are potentially supported.</para></entry>
 </row>
 <row>
 <entry><para>Description</para></entry>
-<entry><para>The "-x" command line option allows enables SDATA entities
+<entry><para>The "-x" command line option enables SDATA entities
 to be transformed into PIs or treated like normal entities (the default).</para></entry>
 </row>
 </tbody>
@@ -643,7 +637,7 @@ constraints, URN parsing. Many new -w flags.</para>
 <sect1><title>Version 1.3.4</title>
 <formalpara><title>Released October 1999</title>
 <para>The second release from the OpenJade project. This version was
-distributed as part of openjade 1.3</para>
+distributed as part of OpenJade 1.3</para>
 </formalpara>
 
 <para>Changes in OpenJade 1.3.4</para>
@@ -659,7 +653,7 @@ Added the Entity classes to the public interface of the library/DLL.
 </sect1>
 
 <sect1><title>Version 1.3.3</title>
-<para>The first release from the openjade project</para>
+<para>The first release from the OpenJade project</para>
 </sect1>
 
 </chapter>

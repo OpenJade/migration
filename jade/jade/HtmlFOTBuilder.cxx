@@ -153,6 +153,15 @@ public:
     virtual ~AddressRef();
   };
 
+  class UriRefAddressRef : public AddressRef, public Link {
+  public:
+    UriRefAddressRef(const StringC &uriRef)
+      : uriRef_(uriRef) { }
+    void outputRef(bool end, OutputCharStream &, OutputState &) const;
+  private:
+    StringC uriRef_;
+  };
+
   class OutputState {
   public:
     OutputState(const String<CmdLineApp::AppChar> *outputFilename,
@@ -367,6 +376,8 @@ private:
   Vector<StringC> giStack_;
   Length topMargin_;
   Vector<Length> spaceAfterStack_;
+  // For URI Ref links. This is just to get them deleted.
+  IList<UriRefAddressRef> uriRefs_;
 };
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
@@ -787,6 +798,10 @@ void HtmlFOTBuilder::startLink(const Address &addr)
       }
       break;
     }
+  case Address::html:
+    uriRefs_.insert(new UriRefAddressRef(addr.params[0]));
+    aref = uriRefs_.head();
+    break;
   default:
     break;
   }
@@ -1197,6 +1212,15 @@ void HtmlFOTBuilder::OutputState::syncChar(const CharStyleClass *styleClass,
 
 HtmlFOTBuilder::AddressRef::~AddressRef()
 {
+}
+
+void HtmlFOTBuilder::UriRefAddressRef::outputRef(bool end, OutputCharStream &os,
+					    OutputState &) const
+{
+  if (end)
+    os << "</A>";
+  else
+    os << "<A HREF=\"" << uriRef_ << "\">";
 }
 
 HtmlFOTBuilder::Item::~Item()

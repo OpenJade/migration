@@ -137,7 +137,8 @@ install-opensp:	$(install-common) debian/README.Debian
 	$(checkroot)
 	rm -rf $(prefix-osp)
 
-	$(make_directory) $(bindir-osp) $(sgmldir-osp) $(libdir-osp) $(mandir-osp)
+	$(make_directory) $(bindir-osp) $(sgmldir-osp) $(libdir-osp)	\
+	    $(mandir-osp)
 
 	$(MAKE) install SUBDIRS="doc nsgmls sgmlnorm spam spcat spent sx" \
 	    prefix=$(SRCDIR)/$(prefix-osp)/usr $(am_inst_flags)		\
@@ -154,8 +155,6 @@ install-opensp:	$(install-common) debian/README.Debian
 	$(install_file) unicode/catalog unicode/demo.sgm unicode/unicode.syn \
 	    $(libdir-osp)/unicode
 	$(install_file) unicode/unicode.sd $(libdir-osp)/unicode/unicode.decl
-	ln -s ../../$(pkg-osp)/unicode/unicode.decl	\
-	    $(sgmldir-osp)/declaration/unicode.decl
 	$(install_script) unicode/gensyntax.pl $(libdir-osp)/unicode
 
 #	 doc-base etc
@@ -165,8 +164,7 @@ install-opensp:	$(install-common) debian/README.Debian
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg)
 
 #	 install man pages
-#	...	
-
+	dh_undocumented -p$(pkg) onsgmls osgmlnorm ospam ospcat ospent osx
 
 #	 make sure maintainer scripts are good
 	sh -n debian/$(pkg).postinst

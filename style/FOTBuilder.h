@@ -982,26 +982,6 @@ private:
     void emit(FOTBuilder &) const;
     FuncPtr func;
   };
-  template <class Arg1> class OneArgCall : public Call {
-  public:
-    typedef void (FOTBuilder::*FuncPtr)(Arg1);
-    OneArgCall(FuncPtr f, Arg1 arg1) : func_(f), arg1_(arg1) {}
-    virtual Call* clone() const { return new OneArgCall(*this); }
-    virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
-  private:
-    FuncPtr func_;
-    Arg1 arg1_;
-  };
-  template <class Arg1> class OneRefArgCall : public Call {
-  public:
-    typedef void (FOTBuilder::*FuncPtr)(const Arg1&);
-    OneRefArgCall(FuncPtr f, const Arg1& arg1) : func_(f), arg1_(arg1) {}
-    virtual Call* clone() const { return new OneRefArgCall(*this); }
-    virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
-  private:
-    FuncPtr func_;
-    Arg1 arg1_;
-  };
   struct CharactersFromNodeCall : Call {
     CharactersFromNodeCall(const NodePtr &, const Char *, size_t);
     virtual Call* clone() const { return new CharactersFromNodeCall(*this); }
@@ -1044,6 +1024,34 @@ private:
   Call **tail_;
   NodePtr currentNode_;
   StringC processingMode_;
+};
+
+// Would like to make this a member of SaveFOTBuilder, but can't because
+// they would be member templates which are poorly supported under most 
+// compilers.
+
+template <class Arg1> 
+class OneArgCall : public SaveFOTBuilder::Call {
+public:
+  typedef void (FOTBuilder::*FuncPtr)(Arg1);
+  OneArgCall(FuncPtr f, Arg1 arg1) : func_(f), arg1_(arg1) {}
+  virtual SaveFOTBuilder::Call* clone() const { return new OneArgCall(*this); }
+  virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
+private:
+  FuncPtr func_;
+  Arg1 arg1_;
+};
+
+template <class Arg1> 
+class OneRefArgCall : public SaveFOTBuilder::Call {
+public:
+  typedef void (FOTBuilder::*FuncPtr)(const Arg1&);
+  OneRefArgCall(FuncPtr f, const Arg1& arg1) : func_(f), arg1_(arg1) {}
+  virtual SaveFOTBuilder::Call* clone() const { return new OneRefArgCall(*this); }
+  virtual void emit(FOTBuilder& fotb) const { (fotb.*func_)(arg1_); }
+private:
+  FuncPtr func_;
+  Arg1 arg1_;
 };
 
 // Would like to make this a member of SaveFOTBuilder, but can't because

@@ -1,7 +1,8 @@
 LTVERSION=0:0:0
 LIB=ostyle
-DEPLIBS=-lm -L$(TOP)/grove -logrove -L$(TOP)/lib -losp 	\
-  -L$(TOP)/spgrove -lospgrove
+DEPLIBS=-lm -L$(TOP)/grove -L$(TOP)/grove/.libs -logrove \
+  -L$(TOP)/lib -L$(TOP)/lib/.libs -losp 		 \
+  -L$(TOP)/spgrove -L$(TOP)/spgrove/.libs -lospgrove
 OBJS=LangObj.o \
   Collector.o \
   DssslApp.o \

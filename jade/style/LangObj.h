@@ -21,6 +21,7 @@ public:
 };
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
 class RefLangObj : public LanguageObj {
  public:
   static bool supportedLanguage(const StringC &, const StringC &);
@@ -42,6 +43,7 @@ class RefLangObj : public LanguageObj {
   char *oldLocale_;
   char *newLocale_;
 };
+#endif /* SP_HAVE_WCHAR */
 #endif /* SP_HAVE_LOCALE */ 
 
 class LangBuildData;

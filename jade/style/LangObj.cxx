@@ -12,11 +12,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <string.h>
-#include <wchar.h>
-#include <wctype.h>
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
+#include <wchar.h>
+#include <wctype.h>
 #include <locale.h>
+#endif
 #endif
 
 #ifdef DSSSL_NAMESPACE
@@ -24,6 +26,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
 # ifndef __GLIBC__
 static char *strdup(const char *s)
 {
@@ -156,6 +159,7 @@ bool RefLangObj::isLessOrEqual(const StringC &r, const StringC &s) const
   setlocale(LC_ALL, oldLocale_);  
   return (res <= 0);
 }
+#endif /* SP_HAVE_WCHAR */
 #endif /* SP_HAVE_LOCALE */
 
 class LangBuildData {

@@ -1953,6 +1953,49 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
+echo $ac_n "checking for wchar""... $ac_c" 1>&6
+echo "configure:1904: checking for wchar" >&5
+if eval "test \"`echo '$''{'ac_cv_func_wchar'+set}'`\" = set"; then
+  echo $ac_n "(cached) $ac_c" 1>&6
+else
+  cat > conftest.$ac_ext <<EOF
+#line 1962 "configure"
+#include "confdefs.h"
+#include <assert.h>
+#include <wctype.h>
+#ifdef __cplusplus
+extern "C"
+#endif
+wint_t towupper(wint_t wc);
+
+int main() {
+wint_t wc;
+towupper(wc);
+
+; return 0; }
+EOF
+if { (eval echo configure:1979: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+  rm -rf conftest*
+  eval "ac_cv_func_wchar=yes"
+else
+  echo "configure: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  rm -rf conftest*
+  eval "ac_cv_func_wchar=no"
+fi
+rm -f conftest*
+fi
+
+if eval "test \"`echo '$ac_cv_func_'wchar`\" = yes"; then
+  echo "$ac_t""yes" 1>&6
+  cat >> confdefs.h <<\EOF
+#define SP_HAVE_WCHAR 1
+EOF
+
+else
+  echo "$ac_t""no" 1>&6
+fi
+
 echo $ac_n "checking for gettext""... $ac_c" 1>&6
 echo "configure:1958: checking for gettext" >&5
 if eval "test \"`echo '$''{'ac_cv_func_gettext'+set}'`\" = set"; then

@@ -2,18 +2,6 @@ lib_LTLIBRARIES= libosp.la
 
 libosp_la_LDFLAGS = --version-info 0:0:0 -lm 
 
-SUFFIXES = .msg .m4
-
-.m4.cxx: 
-	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
-
-%.h %.cxx %.rc: %.msg
-	$(PERL) -w $(srcdir)/../msggen.pl $(MSGGENFLAGS) $<
-
-$(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
-	rm -f $@
-	$(PERL) -w $(srcdir)/mkversion.pl $(srcdir)/../VERSION >$@
-
 libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	ArcEngineMessages.h ArcProcessor.h Attribute.cxx \
 	Big5CodingSystem.cxx CatalogEntry.h CatalogMessages.h \
@@ -59,7 +47,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
 	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
-	splibpch.h token.h version.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
+	splibpch.h token.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
 	parser_inst.cxx xentmgr_inst.cxx
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
@@ -73,7 +61,7 @@ EXTRA_DIST = ArcEngineMessages.msg CatalogMessages.msg CmdLineAppMessages.msg \
 
 MSGGENFLAGS = -l
 
-BUILT_SOURCES = version.h ArcEngineMessages.h ArcEngineMessages.rc \
+BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	CatalogMessages.h CatalogMessages.rc CmdLineAppMessages.h \
 	CmdLineAppMessages.rc EntityManagerMessages.h \
 	EntityManagerMessages.rc MessageFormatterMessages.h \
@@ -101,10 +89,17 @@ MessageFormatter.o: MessageFormatterMessages.h
 MessageFormatter.lo: MessageFormatterMessages.h
 MessageReporter.o: MessageReporterMessages.h
 MessageReporter.lo: MessageReporterMessages.h
-CmdLineApp.o: version.h CmdLineAppMessages.h
-CmdLineApp.lo: version.h CmdLineAppMessages.h
+CmdLineApp.o: CmdLineAppMessages.h
+CmdLineApp.lo: CmdLineAppMessages.h
 ParserApp.o: ParserAppMessages.h
 ParserApp.lo: ParserAppMessages.h
 ArcEngine.o: ArcEngineMessages.h
 ArcEngine.lo: ArcEngineMessages.h
 
+SUFFIXES = .msg .m4
+
+.m4.cxx: 
+	$(PERL) $(top_srcdir)/instmac.pl $< >$@
+
+%.h %.cxx %.rc: %.msg
+	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

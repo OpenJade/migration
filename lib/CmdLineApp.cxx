@@ -62,8 +62,6 @@ namespace SP_NAMESPACE {
 
 static const SP_TCHAR *progName = 0;
 
-static const SP_TCHAR versionString[] = SP_VERSION;
-
 static FileOutputByteStream standardOutput(1, 0);
 static FileOutputByteStream standardError(2, 0);
 
@@ -287,7 +285,8 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
   case 'v':
     // print the version number
     message(CmdLineAppMessages::versionInfo,
-	    StringMessageArg(convertInput(versionString)));
+	    StringMessageArg(convertInput(SP_T(PACKAGE))),
+	    StringMessageArg(convertInput(SP_T(VERSION))));
     break;
   default:
     CANNOT_HAPPEN();

@@ -181,3 +181,18 @@ E1+notACspecList++wrong type: %1 not a list of create-specs
 E1+notACspecOrCspecList++wrong type: %1 not a create-spec or list of create-specs
 E1+queryNotANodeList++query expression: %1 not a node list
 E1+priorityNotAnExactInteger++priority expression: %1 not an exact integer
+E0+badTopLevelFlowObj++flow objects at the root must be all of class scroll or all of class page-sequence or simple-page-sequence
+E0+noPrincipalPort++current flow parent has no principal port
+E0+noParagraphAncestor++this flow object requires a paragraph as an ancestor flow object
+E0+notInlineFlowObj++flow object not accepted by port; only inline flow objects accepted
+E0+notDisplayFlowObj++flow object not accepted by port; only display flow objects accepted
+E0+notInlineOrDisplayFlowObj++flow object not accepted by port; only display or inline flow objects accepted
+E0+notValidInParagraph++flow object not accepted in a paragraph; only inline, display or paragraph-break flow objects accepted
+E0+notSideBySideItem++a side-by-side flow object only accepts side-by-side-item flow objects as children
+E0+notMathSequence++flow object not accepted by port; only math-sequence, unmath, subscript, superscript, script, mark, fence, fraction, radical, math-operator, grid, character and alignment-point flow objects accepted
+E0+notGridCell++flow object not accepted by port; must be grid-cell
+E0+notSingleChar++flow object not accepted by port; only a single character flow object accepted
+E0+badTableContent++flow object not accepted by port; in a table, only either table-part flow objects or table-column flow objects followed by table-row or table-cell flow objects are allowed
+E0+badTablePartHF++flow object not accepted by port; only table-row or table-cell flow objects accepted
+E0+badTablePartBody++flow object not accepted by port; only table-column flow objects followed by table-row or table-cell flow objects allowd
+E0+badTableRow++flow object not accepted by port; only table-cell flow objects accepted

@@ -1014,7 +1014,7 @@ MessageFragment::appModule,
 ,"this context requires a sosofo"
 #endif
 );
-const MessageType0 InterpreterMessages::notInCharacteristicValue(
+const MessageType0 InterpreterMessages::styleContext(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1022,6 +1022,18 @@ MessageFragment::libModule,
 MessageFragment::appModule,
 #endif
 90
+#ifndef SP_NO_MESSAGE_TEXT
+,"this context requires a style object"
+#endif
+);
+const MessageType0 InterpreterMessages::notInCharacteristicValue(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+91
 #ifndef SP_NO_MESSAGE_TEXT
 ,"procedure can only be used in evaluation of characteristic value"
 #endif
@@ -1033,7 +1045,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-91
+92
 #ifndef SP_NO_MESSAGE_TEXT
 ,"sorry, %1 expression not implemented"
 #endif
@@ -1045,7 +1057,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-92
+93
 #ifndef SP_NO_MESSAGE_TEXT
 ,"Device RGB color requires three arguments"
 #endif
@@ -1057,7 +1069,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-93
+94
 #ifndef SP_NO_MESSAGE_TEXT
 ,"arguments for Device RGB color must be numbers"
 #endif
@@ -1069,7 +1081,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-94
+95
 #ifndef SP_NO_MESSAGE_TEXT
 ,"arguments for Device RGB color must be in the range 0 to 1"
 #endif
@@ -1081,7 +1093,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-95
+96
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unknown color-space family %1"
 #endif
@@ -1093,7 +1105,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-96
+97
 #ifndef SP_NO_MESSAGE_TEXT
 ,"Device RGB Color Space Family does not take any arguments"
 #endif
@@ -1105,7 +1117,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-97
+98
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 is not a pre-defined inherited characteristic"
 #endif
@@ -1117,7 +1129,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-98
+99
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid number format %1"
 #endif
@@ -1129,7 +1141,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-99
+100
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid character %1 in public identifier"
 #endif
@@ -1141,7 +1153,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-100
+101
 #ifndef SP_NO_MESSAGE_TEXT
 ,"debug %1"
 #endif
@@ -1153,7 +1165,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-101
+102
 #ifndef SP_NO_MESSAGE_TEXT
 ,"circular use of specification parts"
 #endif
@@ -1165,7 +1177,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-102
+103
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no style-specification or external-specification with ID %1"
 #endif
@@ -1177,9 +1189,33 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-103
+104
 #ifndef SP_NO_MESSAGE_TEXT
 ,"document did not contain any style-specifications or external-specifications"
+#endif
+);
+const MessageType0 InterpreterMessages::tableCellOutsideTable(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+105
+#ifndef SP_NO_MESSAGE_TEXT
+,"table-cell flow object not inside a table"
+#endif
+);
+const MessageType0 InterpreterMessages::tableRowOutsideTable(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+106
+#ifndef SP_NO_MESSAGE_TEXT
+,"table-row flow object not inside a table"
 #endif
 );
 #ifdef SP_NAMESPACE

@@ -66,12 +66,14 @@ jade/RtfFOTBuilder.cxx
 jade/RtfFOTBuilder.h
 jade/SgmlFOTBuilder.cxx
 jade/SgmlFOTBuilder.h
+jade/TransformFOTBuilder.cxx
+jade/TransformFOTBuilder.h
 jade.mak
 dsssl/demo.dsl
 dsssl/demo.sgm
 dsssl/style-sheet.dtd
 dsssl/dsssl.dtd
-jade/fot.dtd
+dsssl/fot.dtd
 dsssl/catalog
 Makefile.jade
 jade/HtmlFOTBuilder.cxx
@@ -91,6 +93,9 @@ jade/HtmlMessages.msg
 jade/HtmlMessages.rc
 jade/RtfFOTBuilder_inst.cxx
 jade/RtfFOTBuilder_inst.m4
+jade/RtfMessages.h
+jade/RtfMessages.msg
+jade/RtfMessages.rc
 jade/TeXFOTBuilder.cxx
 jade/TeXFOTBuilder.h
 dsssl/FOT.tex
@@ -98,5 +103,8 @@ dsssl/demoMaster.tex
 jadedoc/copying.txt
 jadedoc/jade.htm
 jadedoc/TeX.htm
+jadedoc/transform.htm
 jadedist/bin-files.txt
+jadedist/files.txt
+jadedist/makedist.bat
 jade-generate.mak

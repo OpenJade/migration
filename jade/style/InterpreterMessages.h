@@ -179,33 +179,39 @@ struct InterpreterMessages {
   // 89
   static const MessageType0 sosofoContext;
   // 90
-  static const MessageType0 notInCharacteristicValue;
+  static const MessageType0 styleContext;
   // 91
-  static const MessageType1 expressionNotImplemented;
+  static const MessageType0 notInCharacteristicValue;
   // 92
-  static const MessageType0 RGBColorArgCount;
+  static const MessageType1 expressionNotImplemented;
   // 93
-  static const MessageType0 RGBColorArgType;
+  static const MessageType0 RGBColorArgCount;
   // 94
-  static const MessageType0 RGBColorArgRange;
+  static const MessageType0 RGBColorArgType;
   // 95
-  static const MessageType1 unknownColorSpaceFamily;
+  static const MessageType0 RGBColorArgRange;
   // 96
-  static const MessageType0 deviceRGBColorSpaceNoArgs;
+  static const MessageType1 unknownColorSpaceFamily;
   // 97
-  static const MessageType1 notABuiltinInheritedC;
+  static const MessageType0 deviceRGBColorSpaceNoArgs;
   // 98
-  static const MessageType1 invalidNumberFormat;
+  static const MessageType1 notABuiltinInheritedC;
   // 99
-  static const MessageType1 invalidPublicIdChar;
+  static const MessageType1 invalidNumberFormat;
   // 100
-  static const MessageType1 debug;
+  static const MessageType1 invalidPublicIdChar;
   // 101
-  static const MessageType0 useLoop;
+  static const MessageType1 debug;
   // 102
-  static const MessageType1 missingPart;
+  static const MessageType0 useLoop;
   // 103
+  static const MessageType1 missingPart;
+  // 104
   static const MessageType0 noParts;
+  // 105
+  static const MessageType0 tableCellOutsideTable;
+  // 106
+  static const MessageType0 tableRowOutsideTable;
 };
 
 #ifdef SP_NAMESPACE

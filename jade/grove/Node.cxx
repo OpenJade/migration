@@ -213,6 +213,11 @@ AccessResult Node::getDoctypesAndLinktypes(NamedNodeListPtr &) const
   return accessNotInClass;
 }
 
+AccessResult Node::getNonSgml(unsigned long &) const
+{
+  return accessNotInClass;
+}
+
 AccessResult Node::children(NodeListPtr &) const
 {
   return accessNotInClass;

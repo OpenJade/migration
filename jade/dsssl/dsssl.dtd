@@ -11,7 +11,7 @@
            (style-specification | transformation-specification
             | external-specification)+)>
 <!attlist dsssl-specification
-          version CDATA #FIXED "ISO/IEC 10179:1995"
+          version CDATA #FIXED "ISO/IEC 10179:1996"
 >
 
 <!element transformation-specification - O

@@ -842,6 +842,17 @@ const Insn *CheckSosofoInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
+const Insn *CheckStyleInsn::execute(VM &vm) const
+{
+  if (!vm.sp[-1]->asStyle()) {
+    vm.sp = 0;
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::styleContext);
+    return 0;
+  }
+  return next_.pointer();
+}
+
 const Insn *PushModeInsn::execute(VM &vm) const
 {
   vm.modeStack.push_back(vm.processingMode);

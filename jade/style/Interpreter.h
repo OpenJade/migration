@@ -131,7 +131,12 @@ public:
     keyMin,
     keyMax,
     keyIsConditional,
-    keyPriority
+    keyPriority,
+    keyName,
+    keyGi,
+    keyAttributes,
+    keySystemId,
+    keyPublicId
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);

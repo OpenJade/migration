@@ -347,9 +347,16 @@ FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os)
   return new SgmlFOTBuilder(os);
 }
 
+static
+void outputNumericCharRef(OutputCharStream &os, Char c)
+{
+  os << "&#" << (unsigned long)c << ';';
+}
+
 SgmlFOTBuilder::SgmlFOTBuilder(OutputCharStream *os)
 : os_(os), nodeDepth_(0), elementNodeDepth_(0)
 {
+  os->setEscaper(outputNumericCharRef);
   *os_ << "<!doctype fot public \"-//James Clark//DTD DSSSL Flow Object Tree//EN\">"
        << RE;
 }
@@ -365,7 +372,7 @@ void SgmlFOTBuilder::characters(const Char *s, size_t n)
     case '&':
     case '<':
     case '>':
-      os() << "&#" << (unsigned long)*s;
+      os() << "&#" << (unsigned long)*s << ';';
       break;
     }
   }
@@ -377,7 +384,7 @@ void SgmlFOTBuilder::character(const CharacterNIC &nic)
   os() << "<character";
   if (nic.specifiedC) {
     if (nic.specifiedC & (1 << CharacterNIC::cChar))
-      os() << " char=\"&#" << (unsigned long)nic.ch << '"';
+      os() << " char=\"&#" << (unsigned long)nic.ch << ";\"";
     if (nic.specifiedC & (1 << CharacterNIC::cGlyphId))
       os() << " glyph-id=" << nic.glyphId;
     if (nic.specifiedC & (1 << CharacterNIC::cIsDropAfterLineBreak))

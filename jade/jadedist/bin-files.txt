@@ -1,8 +1,14 @@
-bin\sp110u.dll
+bin\sp112u.dll
 dsssl\style-sheet.dtd
-jade\fot.dtd
+dsssl\fot.dtd
 jadedoc\jade.htm
 jadedoc\TeX.htm
+jadedoc\transform.htm
+doc\catalog.htm
+doc\charset.htm
+doc\sgmldecl.htm
+doc\sysdecl.htm
+doc\sysid.htm
 dsssl\dsssl.dtd
 dsssl\demo.sgm
 dsssl\demo.dsl
@@ -11,5 +17,5 @@ bin\spgrove.dll
 bin\grove.dll
 bin\jade.exe
 dsssl\catalog
-c:\winnt351\system32\msvcrt.dll
-c:\winnt351\system32\msvcirt.dll
+C:\WINDOWS\SYSTEM\MSVCRT.DLL
+C:\WINDOWS\SYSTEM\MSVCIRT.DLL

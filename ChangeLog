@@ -1,3 +1,149 @@
+2002-01-22 11:57  icastle
+
+	* Makefile.lib.in, Makefile.prog.in, configure,
+	config/configure.in, include/config.h: Darwin/Mac OS X support
+	
+	Ref: Kogulé, Ryo
+	
+	Darwin / Mac OS X doesn't want "-fno-explicit-templates",
+	SP_DEFINE_TEMPLATES must be set and SP_MANUAL_INST must not.
+	
+	libtool linking requires "-no-undefined".
+
+2002-01-21 17:24  icastle
+
+	* docsrc/: releasenotes.dsl, releasenotes.xml: Add skeleton for
+	release notes
+
+2002-01-21 17:24  icastle
+
+	* docsrc/releasenotes.xml: file releasenotes.xml was initially
+	added on branch RELEASE-1_3.
+
+2002-01-21 17:24  icastle
+
+	* docsrc/releasenotes.dsl: file releasenotes.dsl was initially
+	added on branch RELEASE-1_3.
+
+2002-01-21 17:06  icastle
+
+	* Makefile.in: Add remaining man pages to the install-man target
+
+2002-01-21 16:56  icastle
+
+	* docsrc/: .cvsignore, Makefile, openjade.xml, osgmlnorm.xml,
+	ospam.xml, ospent.xml: More updates to man pages. Should be
+	finished now for 1.3.1
+
+2002-01-19 09:40  icastle
+
+	* configure: Make sure we have a valid configure in CVS.
+
+2002-01-19 09:38  icastle
+
+	* config/configure.in: AC_CONFIG_AUX_DIR was run to late for
+	AM_INIT_AUTOMAKE
+
+2002-01-19 09:16  icastle
+
+	* config/: install-sh, missing, mkinstalldirs: More
+	autoconf/automake work
+	
+	Forgot to add install-sh, missing and mkinstalldirs on last commit
+
+2002-01-19 09:16  icastle
+
+	* config/mkinstalldirs: file mkinstalldirs was initially added on
+	branch RELEASE-1_3.
+
+2002-01-19 09:16  icastle
+
+	* config/missing: file missing was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 23:17  icastle
+
+	* Makefile.comm.in, Makefile.in, Makefile.lib.in,
+	config/aclocal.m4, config/configure.in, config/install.sh: More
+	work on autoconf - introduce elements of automake
+	
+	Ref: Various bugs on source forge.
+	
+	The Makefiles/configure script was not as clever as it needed to
+	be.  Various people have reported a variety of problems (install
+	directories not being created etc).
+	
+	Incorporate some automake elements into the script... which should
+	make installation a bit more robust.
+	
+	Also added an "install-man" target to install the manpages.
+
+2002-01-18 23:14  icastle
+
+	* lib/UTF8CodingSystem.cxx: Accept Byte Order Marks as valid XML
+	
+	Ref: Source Forge #442560 (Terje Bless/Liam Quinn)
+	
+	Determination of Character Encoding of an XML file brought in line
+	with Second Edition XML 1.0 Specification (REC-xml-20001006) - Byte
+	Order Marks now accepted as valid XML.
+
+2002-01-18 23:06  icastle
+
+	* jade/TransformFOTBuilder.cxx: Fix missing white space problem in
+	processing instruction flow object
+	
+	Ref: Source Forge Bug #505113 and patch #505124 (Markus Hoenicka)
+	
+	No white space was emitted between the public-id and the system-id
+	causing a malformed xml file to be generated.
+	
+	This patch introduces a space between the elements
+
+2002-01-18 22:51  icastle
+
+	* docsrc/spam.1: file spam.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/jade.1: file jade.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/nsgmls.1: file nsgmls.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/ospent.xml: file ospent.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/spent.1: file spent.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/sx.1: file sx.1 was initially added on branch RELEASE-1_3.
+
+2002-01-18 22:51  icastle
+
+	* docsrc/: .cvsignore, jade.1, nsgmls.1, openjade.xml, ospent.xml,
+	osx.xml, sgmlnorm.1, spam.1, spent.1, sx.1: More man page updates
+
+2002-01-18 22:51  icastle
+
+	* docsrc/sgmlnorm.1: file sgmlnorm.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-17 18:40  icastle
+
+	* ChangeLog, configure, style/jade_version.h: Prepare for
+	openjade-1.3.1-pre4
+
 2002-01-17 18:37  icastle
 
 	* docsrc/: Makefile, openjade.xml: More man page updates
@@ -462,7 +608,8 @@
 
 1999-11-11 21:48  clasen
 
-	* style/mkversion.pl: Remove generated and unneeded files.
+	* config/install-sh, style/mkversion.pl: Remove generated and
+	unneeded files.
 
 1999-11-11 18:59  clasen
 
@@ -582,6 +729,11 @@
 	sgmlnorm/sgmlnorm.dsp, spam/spam.dsp, spent/spent.dsp,
 	spgrove/spgrove.dsp, style/style.dsp, sx/sx.dsp: Binaries renamed
 	to avoid conflict with Jade package.
+
+1999-08-29 22:15  clasen
+
+	* config/install-sh: Apply a cleanup patch by Adam, rename
+	install.sh to install-sh since the autoconf manual recommends it.
 
 1999-08-26 12:54  clasen
 

@@ -1,6 +1,6 @@
 <?xml version='1.0'?> <!-- -*- xml -*- -->
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
- "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd">
+ "/usr/share/sgml/docbook/xml-dtd-4.1.2/docbookx.dtd">
 <article>
   <articleinfo>
     <title>osx</title>
@@ -41,12 +41,12 @@
       </refnamediv>
 
       <refsynopsisdiv>
-        <cmdsynopsis>
-          <command>osx</command>
 <!--
  [sx [ -Cehilprvx ] [ -bencoding ] [ -ccatalog_file ] [ -Ddirectory ] [
    -ffile ] [ -wwarning_type ] [ -xxml_output_option ] sysid... ]
 -->
+        <cmdsynopsis>
+          <command>osx</command>
           <arg choice="opt"><option>-Cehilprvx</option></arg>
 	  <arg choice="opt"><option>-b<replaceable>encoding</replaceable></option></arg>
 	  <arg choice="opt"><option>-c<replaceable>catalog_file</replaceable></option></arg>

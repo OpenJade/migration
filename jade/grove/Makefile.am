@@ -10,3 +10,5 @@ libogrove_la_SOURCES = Node.h Node.cxx LocNode.h LocNode.cxx
 pkginclude_HEADERS = Node.h
 
 EXTRA_DIST = grove.dsp
+
+MAINTAINERCLEANFILES = Makefile.in

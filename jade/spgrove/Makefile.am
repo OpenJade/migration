@@ -15,6 +15,8 @@ EXTRA_DIST = grove_inst.m4 grove_inst.cxx spgrove.dsp
 
 BUILT_SOURCES = grove_inst.cxx
 
+MAINTAINERCLEANFILES = Makefile.in
+
 SUFFIXES = .m4 
 
 .m4.cxx:

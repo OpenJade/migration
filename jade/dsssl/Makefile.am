@@ -10,3 +10,5 @@ pkgdoc_DATA = demo.dsl demo.sgm
 
 EXTRA_DIST = builtins.dsl catalog demo.dsl demo.sgm dsssl.dtd \
 	extensions.dsl fot.dtd spec.dtd style-sheet.dtd
+
+MAINTAINERCLEANFILES = Makefile.in

@@ -51,7 +51,6 @@ if test "$GXX"
 then
   CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
 fi
-AC_LANG_CPLUSPLUS
 
 dnl
 dnl  Checks for header files.
@@ -75,6 +74,12 @@ if test "$ac_cv_have_sig_atomic_t" = "no"
 then
     AC_CHECK_TYPE(sig_atomic_t,int)
 fi
+
+dnl
+dnl the following tests require c++, not c; note that if you switch this
+dnl earlier, AC_C_CONST will fail, at least
+dnl
+AC_LANG_CPLUSPLUS
 
 AC_CACHE_CHECK(support for bool,
     ac_cv_typedef_bool,

@@ -5,7 +5,7 @@
 
 I2+versionInfo++%1 version %2
 E0+noSpec++no DSSSL specification: use -d to specify
-I0+prefixInfo++Options with a "doc-"/"spec-" prefix apply only to the document/specification.
+I1+prefixInfo++Options with a "doc-"/"spec-" prefix apply only to the document/specification.
 I1+help2++Enable experimental DSSSL extensions.
 I1+GHelp++Debug mode.
 I1+dHelp++Use DSSSL specification %1.

@@ -1,10 +1,13 @@
 * Finish long options support:
-  Add long alternatives for more options,
-  Improve the option-related error messages a bit (cut the option name off
-  before '=')
   Document the long options 
   Wrap lines in help message. (Add wrapping OutputCharStream.)
+  Then fold the info<n> messages into a single message
 
+* remove the empty delimEnd message by changing the code to use
+  I1+delim++delimiter %1 instead.
+
+* fix the problem with non-ASCII in osx's usage() message and
+  also in eg. onsgmls --bctf=utf-8 --help. 
 
 Things which are missing and need a lot of work
 ===============================================

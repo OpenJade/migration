@@ -239,6 +239,9 @@ void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
 	  principalPortSaveQueues_[conn->flowObjLevel].append(save);
 	}
 	connectionStack_.insert(c);
+	currentFOTBuilder().startNode(vm().currentNode,
+				      vm().processingMode->name(),
+				      matchSpecificity_.ruleType());
 	return;
       }
   }

@@ -794,6 +794,7 @@ SOURCE=.\ParserEventGeneratorKit.cxx
 # Begin Source File
 
 SOURCE=.\ParserMessages.cxx
+# SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 

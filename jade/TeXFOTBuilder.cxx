@@ -409,6 +409,7 @@ public:
   void setGridEquidistantColumns(bool);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
+  void setInlineSpaceSpace(const OptInlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
 
   void startDisplay( const DisplayNIC & );
@@ -858,6 +859,7 @@ private:
 
   void set(const char *,const OptLengthSpec &);
   void set(const char *,const InlineSpace &);
+  void set(const char *,const OptInlineSpace &);
 
   // Structures for non-inherited characteristics,
   // in the order specified in style/FOTBuilder.h.
@@ -3561,6 +3563,12 @@ void TeXFOTBuilder::setEscapementSpaceAfter(const InlineSpace &space)
 }
 
 
+void TeXFOTBuilder::setInlineSpaceSpace(const OptInlineSpace &space)
+{
+  set("InlineSpaceSpace",space);
+}
+
+
 void TeXFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
   // FIX ME!
@@ -4200,6 +4208,13 @@ void TeXFOTBuilder::set(const char *name,const OptLengthSpec &spec)
 {
   if (spec.hasLength) {
     set(name,spec.length);
+  }
+}
+
+void TeXFOTBuilder::set(const char *name,const OptInlineSpace &spec)
+{
+  if (spec.hasSpace) {
+    set(name,spec.space);
   }
 }
 

@@ -11,7 +11,7 @@
     <author>
       <firstname>Ian</firstname>
       <surname>Castle</surname>
-      <affiliation><email>ian.castle@openjade.org</email></affiliation>
+      <affiliation><address><email>ian.castle@openjade.org</email></address></affiliation>
     </author>
   
     <copyright>

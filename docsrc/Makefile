@@ -32,7 +32,8 @@ all: $(MAN_PAGES) releasenotes.pdf releasenotes.html releasenotes.ps
 	rm -f prior.aux
 
 %.ps: %.pdf
-	acroread -toPostScript -pairs $< $@
+#	acroread -toPostScript -pairs $< $@
+	pdf2ps $< $@
 
 %.html: %.xml %.dsl
 	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $*.dsl#html $(XMLDECL) $*.xml

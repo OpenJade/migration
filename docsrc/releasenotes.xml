@@ -3,10 +3,10 @@
 ]>
 <book>
 <bookinfo>
-	<title>OpenSP 1.5</title>
+	<title>OpenSP 1.5.1</title>
 	<subtitle>Release Notes</subtitle>
 	<corpauthor>OpenJade Project</corpauthor>
-        <edition>Release 1.5</edition>
+        <edition>Release 1.5.1</edition>
         <pubdate>November 2002</pubdate>
         <copyright>
                 <year>2002</year>
@@ -14,7 +14,7 @@
         </copyright>
 </bookinfo>
 
-<chapter><title>OpenSP 1.5 Release Notes</title>
+<chapter><title>OpenSP 1.5.1 Release Notes</title>
 
 <para>The OpenJade project provides a suite of tools and libraries for validating, processing and applying DSSSL (Document Style Semantics and Specification Language) style sheets to SGML and XML documents.</para>
 <para>OpenJade is a project undertaken by the community to maintain
@@ -40,7 +40,7 @@ addition OpenSP will also build on Microsoft's Win32 based operating systems.
 </para>
 <para>OpenSP is known to compile with both the GNU gcc c++ compiler and
 Microsoft Visual C++. Other compilers have not been extensively tested.</para>
-<para>OpenSP 1.5 has been successfully built with the following compilers: 
+<para>OpenSP 1.5.1 has been successfully built with the following compilers: 
 Red Hat gcc 2.96, GNU gcc 2.95.3 and gcc 3.2</para>
 <para>OpenSP has been built on a number of architectures including Intel i386 and ia64, Alpha AXP, Sparc, PPC and S/390.</para>
 <para>The following table details known successful builds</para>
@@ -236,6 +236,11 @@ such as <command>onsgmls</command> crashing, then your first port of call should
 The various mailing lists are archived and searchable.
 It is always worth searching for your problem first, as it is often the case that someone has had the same problem before.</para>
 
+</sect1>
+<sect1><title>Version 1.5.1</title>
+<formalpara><title>Released September 2003.</title>
+<para></para>
+</formalpara>
 </sect1>
 <sect1><title>Version 1.5</title>
 <formalpara><title>Released November 2002.</title>

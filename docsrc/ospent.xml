@@ -11,7 +11,7 @@
     <author>
       <firstname>Ian</firstname>
       <surname>Castle</surname>
-      <affiliation><email>ian.castle@openjade.org</email></affiliation>
+      <affiliation><address><email>ian.castle@openjade.org</email></address></affiliation>
     </author>
   
     <copyright>
@@ -60,7 +60,7 @@
         <title>Description</title>
 
    <para><command>ospent</command> (OpenSP print entity) prints the concatenation of the entities
-   with system identifiers <arg rep="repeat"><replaceable>sysid</replaceable></arg> on the standard output.</para>
+   with system identifiers <cmdsynopsis><arg rep="repeat"><replaceable>sysid</replaceable></arg></cmdsynopsis> on the standard output.</para>
    
    <para>The following options are available:</para>
 

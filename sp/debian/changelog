@@ -4,8 +4,9 @@ opensp (1.5pre5-1) unstable; urgency=low
   * debian/control: libosp2 goes in libs (override disparity)
   * debian/control: libosp-dev goes in devel (request change from text,
     mail sent to override-change@debian.org)
+  * debian/rules: clean, then maintainer-clean 
 
- -- Adam Di Carlo <aph@debian.org>  Sat, 10 Feb 2001 03:20:51 -0500
+ -- Adam Di Carlo <aph@debian.org>  Mon, 19 Feb 2001 01:02:04 -0500
 
 opensp (1.5pre4-5) unstable; urgency=low
 

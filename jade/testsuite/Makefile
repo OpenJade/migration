@@ -1,7 +1,7 @@
 # OpenJade testsuite makefile
 # Copyright (C) 1999 Avi Kivity
 
-JADE=../jade/jade
+JADE=../jade/openjade
 JADEX=$(JADE) -c ../dsssl/catalog
 
 all: expr-lang.expected

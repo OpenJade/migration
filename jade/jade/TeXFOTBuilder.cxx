@@ -385,6 +385,7 @@ public:
   void setPageNColumns(long);
   void setPageColumnSep(Length);
   void setPageBalanceColumns(bool);
+  void setPageTwoSide(bool);
   void setGridRowSep(Length);
   void setGridColumnSep(Length);
   void setSubscriptDepth(Length);
@@ -412,11 +413,12 @@ public:
   void setInlineSpaceSpace(const OptInlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
 
-  void startDisplay( const DisplayNIC & );
-  void endDisplay();
+  void startDisplay( const DisplayNIC & ) {};
+  void endDisplay() {};
 
   enum FotObjectClassType { oc_Unknown, oc_Cell };
  
+  static const Length lengthUnspecified = LONG_MAX;
   
   struct Format {
 
@@ -426,8 +428,10 @@ public:
                FotBorderPriority( 0 ),
                FotBorderPresent( true ),
                FotLineRepeat( 1 ),
+               FotLines( symbolWrap ),
                FotLineSep( 1000 ),
-               FotDisplayAlignment( symbolStart ),
+               FotDisplayAlignment( symbolNotApplicable ),
+               FotCellRowAlignment( symbolNotApplicable ),
                FotStartIndentSpec( 0 ),
                FotEndIndentSpec( 0 ),
                FotLeftMargin( 1 ),
@@ -436,8 +440,9 @@ public:
                FotPageNColumns( 1 ),
                FotPageColumnSep( 72000/2 ),
                FotSpan( 1 ),
-               FotCellBeforeColumnMargin( 0 ),
-               FotCellAfterColumnMargin( 0 ),
+               FotCellBeforeColumnMargin( lengthUnspecified ), 
+               FotCellAfterColumnMargin( lengthUnspecified ),
+	       FotCellBackground(false),
                FotObjectClass( oc_Unknown ) {}
 
     long                 FotCurDisplaySize;
@@ -447,7 +452,9 @@ public:
     bool                 FotBorderPresent;
     long                 FotLineRepeat;
     Length               FotLineSep;
+    Symbol		 FotLines;
     Symbol               FotDisplayAlignment;
+    Symbol               FotCellRowAlignment;
     LengthSpec           FotStartIndentSpec;
     LengthSpec           FotEndIndentSpec;
     Length               FotLeftMargin;
@@ -456,6 +463,8 @@ public:
     long                 FotPageNColumns;
     Length               FotPageColumnSep;
     long                 FotSpan;
+    bool		 FotCellBackground;
+    DeviceRGBColor	 FotBackgroundColor;
     Length               FotCellBeforeColumnMargin;
     Length               FotCellAfterColumnMargin;
     FotObjectClassType   FotObjectClass;
@@ -521,10 +530,13 @@ public:
   struct CompoundFotElement : public FotElement {
 
     CompoundFotElement( CompoundFotElement *parent = NULL )
-     : FotElement( parent ), CurrentlyOpenChildIdx( -1 ), LastClosedChildIdx( -1 ) {}
+     : FotElement( parent ), CurrentlyOpenChildIdx( -1 ),
+       LastClosedChildIdx( -1 ) {}
     virtual bool isAtomic() const { return false; }
     virtual void open( TeXFOTBuilder &builder )
-      { FotElement::open( builder ); builder.setCurOs( &PreContent ); };
+      { FotElement::open( builder ); builder.pushOs( &PreContent ); };
+    virtual void close( TeXFOTBuilder &builder )
+      { builder.popOs(); FotElement::close( builder ); };
     virtual void childJustClosed( FotElement &child )
      { CurrentlyOpenChildIdx = -1; LastClosedChildIdx = child.siblingSeqIdx(); };
     virtual void childJustOpened( FotElement &child )
@@ -551,7 +563,8 @@ public:
       #else
        stream <<  NodeInfoProlog << "\\" << name() << "%\n{" << Characteristics << '}';
       #endif
-       PreContent.commit( stream );
+       
+      PreContent.commit( stream );
      }
     virtual void outEpilog( OutputByteStream &stream ) const {
       #ifdef TEXDEBUG
@@ -617,15 +630,21 @@ public:
   struct Column {
 
     Column() : hasWidth( 0 ), computedWidth( 0 ), defaultTeXLeftBorder( 0 ),
-             defaultTeXRightBorder( 0 ), displayAlignment( symbolStart ),
-             isExplicit( false ) {}
+	       defaultTeXRightBorder( 0 ), displayAlignment( symbolStart ),
+	       isExplicit( false ), displaySize(0),
+	       defaultCellBeforeColumnMargin( 0 ),
+	       defaultCellAfterColumnMargin( 0 ) {}
     bool isExplicit;
     bool hasWidth;
     TableLengthSpec width;
     long computedWidth;
+    long displaySize;
     Symbol displayAlignment;
     int defaultTeXLeftBorder; // also used as column border count;
     int defaultTeXRightBorder; //
+    bool defaultCellBackground;
+    Length defaultCellBeforeColumnMargin;
+    Length defaultCellAfterColumnMargin;
   };
 
   struct TablePart;
@@ -635,9 +654,15 @@ public:
      : CompoundFotElement( parent ), missing( false ), OverlappingCell( NULL ),
        nRowsSpanned( 1 ), nColumnsSpanned( 1 ), displaySize( 0 ),
        beforeRowBorder(), afterRowBorder(), beforeColumnBorder(),
-       afterColumnBorder(), TeXTableRowIdx( -1 ), TeXTableColumnIdx( -1 ),
-       displayAlignment( symbolStart ), effectiveAlignment( symbolStart ),
-       paragraphChildrenNum( 0 )  {}
+       afterColumnBorder(), TeXTableRowIdx( -1 ), TeXTableColumnIdx(-1),
+       needsTeXColumnOverride(false),
+       beforeColumnMargin( lengthUnspecified ), 
+       effectiveBeforeColumnMargin( lengthUnspecified ), 
+       afterColumnMargin( lengthUnspecified ),
+       effectiveAfterColumnMargin( lengthUnspecified ),
+       effectiveAlignment( symbolStart ),
+       rowAlignment( symbolNotApplicable ),
+       cellBackground(false) {}
 
     bool missing;
     int TeXTableRowIdx;
@@ -648,29 +673,37 @@ public:
     CellAfterRowBorder afterRowBorder;
     CellBeforeColumnBorder beforeColumnBorder;
     CellAfterColumnBorder afterColumnBorder;
-    Symbol displayAlignment;
+    bool needsTeXColumnOverride;
+    Length beforeColumnMargin;
+    Length effectiveBeforeColumnMargin;
+    Length afterColumnMargin;
+    Length effectiveAfterColumnMargin;
+    Symbol rowAlignment;
     Symbol effectiveAlignment;
     long displaySize;
-    long paragraphChildrenNum;
+    bool cellBackground;
+    DeviceRGBColor backgroundColor;
 
     Cell *OverlappingCell;
     OutputByteStream &content() { return Content; }
     virtual void open( TeXFOTBuilder &builder )
-     { CompoundFotElement::open( builder );
-       builder.setCurOs( &Content );
+     { builder.pushFotElementState();
+       CompoundFotElement::open( builder );
+       builder.pushOs( &Content );
        builder.curFotElementState().EnforcingStructure = false; }
     virtual void close( TeXFOTBuilder &builder )
-     { computeMultiParFlag();
+     { builder.popOs();
        CompoundFotElement::close( builder );
-       builder.curFotElementState().EnforcingStructure = true; }
+       builder.popFotElementState(); }
     virtual const char *name() const { return "TableCell"; }
     bool singleRowBeforeRowBorderPresent() const;
     bool singleRowAfterRowBorderPresent() const;
     bool singleColumnBeforeColumnBorderPresent() const;
     bool singleColumnAfterColumnBorderPresent() const;
     void computeOverridingTeXColumnBorders( TablePart &tablePart );
-    void computeOverridingTeXDisplayAlignment( TablePart &tablePart );
-    void computeMultiParFlag();
+    void computeEffectiveTeXCellWidth( TablePart &tablePart );
+    void computeEffectiveTeXColumnMargins( TablePart &tablePart );
+    void computeTeXRowSpanFiller( TablePart &tablePart );
 
     bool isOverlapped() const { return OverlappingCell == this ? false : true; }
     virtual FotElement &child( size_t ) { assert( false ); return *this; }
@@ -678,7 +711,8 @@ public:
    protected:
     virtual void outProlog( OutputByteStream &stream ) const;
     virtual void outEpilog( OutputByteStream &stream ) const;
-    void outContent( OutputByteStream &stream ) const { Content.commit( stream ); }
+    void outContent( OutputByteStream &stream ) const 
+      { if ( !isOverlapped() ) Content.commit( stream ); }
     TeXTmpOutputByteStream Content;
   };
 
@@ -715,7 +749,7 @@ public:
     String<char> FooterEpilog;
 
     void processColumns( TeXFOTBuilder &builder );
-    void computeTeXColumnBordersAndDisplayAlignment();
+    void computeOverridingTeXCharacteristics();
     void normalizeRows();
     void begin();
 
@@ -741,7 +775,8 @@ public:
     Table(  CompoundFotElement *parent = NULL )
      : CompoundFotElement( parent ), beforeRowBorder(), afterRowBorder(),
        beforeColumnBorder(), afterColumnBorder(), CurCell( NULL ),
-       CurTablePart( NULL ), NoTablePartsSeen( true ) {}
+       displayAlignment( symbolStart ), CurTablePart( NULL ), 
+       NoTablePartsSeen( true ) {}
 
     Vector<TablePart> TableParts;
 
@@ -762,12 +797,19 @@ public:
                          unsigned startingRowIdx,
                          bool hasFirstTableRow, bool hasLastTableRow );
     void begin();
+    virtual void open( TeXFOTBuilder &builder )
+     { builder.pushFotElementState();
+       CompoundFotElement::open( builder );
+       builder.curFotElementState().EnforcingStructure = true; }
+    virtual void close( TeXFOTBuilder &builder )
+     { CompoundFotElement::close( builder );
+       builder.popFotElementState(); }
     void end( TeXFOTBuilder &builder );
 
     Vector<Row> &curRows() { assert( CurRows != NULL ); return *CurRows; }
     TablePart &curTablePart() { assert( CurTablePart != NULL ); return *CurTablePart; }
     Cell &curCell() { assert( CurCell != NULL ); return *CurCell; }
-
+ 
     TablePart *CurTablePart;
     Cell *CurCell;
     Vector<Row> *CurRows;
@@ -777,18 +819,29 @@ public:
   protected:
     void outContent( OutputByteStream &stream ) const;
   };
-
+  
   long computeLengthSpec( const LengthSpec &spec ) const;
   const Format &curFormat() const { assert( FormatStack.size() > 0 ); return FormatStack.back(); }
-  Table &curTable() { return CurTable; }
-  FotElementState &curFotElementState() { return CurFotElementState; }
-  void setCurOs( OutputByteStream *to ) { CurOs = to; }
+  Table &curTable() { assert( TableStack.size() > 0 ); 
+		      return TableStack.back(); }
+  FotElementState &curFotElementState() 
+    { assert( FotElementStateStack_.size() > 0 );
+      return FotElementStateStack_.back(); }
+  void pushFotElementState()
+    { FotElementStateStack_.resize(FotElementStateStack_.size() + 1 ); }
+  void popFotElementState()
+    { assert( FotElementStateStack_.size() > 0 );
+      FotElementStateStack_.resize(FotElementStateStack_.size() - 1 ); }
+
+  void pushOs( OutputByteStream *to );
+  void popOs();
+  
   void elementStart( FotObjectClassType objectClassType );
   
   OutputByteStream *fileout_;
 private:
 				// Variables.
-  OutputByteStream *CurOs;
+  Vector<OutputByteStream *> osStack_;
   StrOutputByteStream stringout_;
   Messenger *mgr_;
   bool preserveSdata_;
@@ -822,8 +875,8 @@ private:
   Vector<Format> FormatStack;
  
   Format NextFormat; 
-  Table CurTable;
-  FotElementState CurFotElementState;
+  Vector<Table> TableStack;
+  Vector<FotElementState> FotElementStateStack_;
 
 				// Functions.
   OutputByteStream &os();
@@ -958,7 +1011,6 @@ OutputByteStream &operator<<( OutputByteStream &os, LengthInPoints length ) {
 // --------- TeXFOTBuilder::FotElement ---------------------------------------
 
 void TeXFOTBuilder::FotElement::open( TeXFOTBuilder &builder ) {
-
   builder.curFotElementState().IsOpen = true;
   if( parent() )
     parent()->childJustOpened( *this );
@@ -970,13 +1022,10 @@ void TeXFOTBuilder::FotElement::open( TeXFOTBuilder &builder ) {
 }
 
 void TeXFOTBuilder::FotElement::close( TeXFOTBuilder &builder ) {
-
   if( parent() )
     parent()->childJustClosed( *this );
-  else {
+  else 
     builder.curFotElementState().IsOpen = false;
-    builder.setCurOs( NULL );
-  }
 }  
 
 TeXFOTBuilder::FotElement *TeXFOTBuilder::FotElement::lastClosed_() {
@@ -987,42 +1036,21 @@ TeXFOTBuilder::FotElement *TeXFOTBuilder::FotElement::lastClosed_() {
 // --------- TeXFOTBuilder Standard Display/Element Handling -----------------
 
 void TeXFOTBuilder::elementStart( FotObjectClassType objectClassType ) {
-
   NextFormat.FotObjectClass = objectClassType;
   FormatStack.push_back( NextFormat );
 }
 
 void TeXFOTBuilder::start() {
-
   NextFormat.FotObjectClass = oc_Unknown;
   FormatStack.push_back( NextFormat );
 }
 
 void TeXFOTBuilder::end() {
-
   assert( FormatStack.size() > 0 );
   FormatStack.resize( FormatStack.size()-1 );
 
   assert( FormatStack.size() > 0 );
   NextFormat = FormatStack.back();
-}
-
-void TeXFOTBuilder::startDisplay( const DisplayNIC & ) {
-
-  if( curTable().CurCell != NULL )
-      NextFormat.FotCurDisplaySize = curTable().CurCell->displaySize;
-  else if( NextFormat.FotSpan > 1 )
-      NextFormat.FotCurDisplaySize
-       = NextFormat.FotPageWidth - NextFormat.FotLeftMargin - NextFormat.FotRightMargin;
-  else
-      NextFormat.FotCurDisplaySize
-       = ( NextFormat.FotPageWidth - NextFormat.FotLeftMargin - NextFormat.FotRightMargin
-            - NextFormat.FotPageColumnSep * ( NextFormat.FotPageNColumns - 1 ) )  
-          / NextFormat.FotPageNColumns;
-
-}
-
-void TeXFOTBuilder::endDisplay() {
 }
 
 // --------- TeXFOTBuilder Misc ----------------------------------------------
@@ -1171,7 +1199,7 @@ void TeXFOTBuilder::Table::end( TeXFOTBuilder &builder ) {
       if( tablePart.needsColumnReprocessing )
         tablePart.processColumns( builder );
 
-      tablePart.computeTeXColumnBordersAndDisplayAlignment();
+      tablePart.computeOverridingTeXCharacteristics();
   }
 }
 
@@ -1211,7 +1239,7 @@ TeXFOTBuilder::FotElement &TeXFOTBuilder::TablePart::child( size_t idx ) {
   return Footer[idx];
 }
 
-void TeXFOTBuilder::TablePart::computeTeXColumnBordersAndDisplayAlignment() {
+void TeXFOTBuilder::TablePart::computeOverridingTeXCharacteristics() {
 
   Vector<Row> *rows;  
   for( int step = 0; step < 3; step++ ) {
@@ -1272,8 +1300,9 @@ void TeXFOTBuilder::TablePart::computeTeXColumnBordersAndDisplayAlignment() {
       for( size_t c = 0; c < (*rows)[r].Cells.size()-1; c++ ) {
         if( !(*rows)[r].Cells[c].isOverlapped() ) {
           (*rows)[r].Cells[c].computeOverridingTeXColumnBorders( *this );
-          (*rows)[r].Cells[c].computeOverridingTeXDisplayAlignment( *this );
-        }
+        } else {
+	  (*rows)[r].Cells[c].computeTeXRowSpanFiller( *this );
+	}
       }
     }
   }
@@ -1315,15 +1344,26 @@ void TeXFOTBuilder::TablePart::processColumns( TeXFOTBuilder &builder ) {
           Columns[i].computedWidth = long(proportionalUnit);
   }
 
+  // Compute display size of the column
+  for( size_t i = 0; i < Columns.size(); i++ ) {
+    if (Columns[i].computedWidth > 0) {
+      Columns[i].displaySize = Columns[i].computedWidth;
+      if (Columns[i].defaultCellBeforeColumnMargin != lengthUnspecified)
+	Columns[i].displaySize -= Columns[i].defaultCellBeforeColumnMargin;
+      
+      if (Columns[i].defaultCellAfterColumnMargin != lengthUnspecified)
+	Columns[i].displaySize -= Columns[i].defaultCellAfterColumnMargin;
+    }
+  }
+  
   columnsProcessed = true;
 }
 
 void TeXFOTBuilder::TablePart::outContent( OutputByteStream &stream ) const {
 
   stream << "\\TeXTable%\n{" << LengthInPoints( parentTable().tableWidth ) 
-         << "}{" << Columns.size() << '}';
+         << "}{" << Columns.size() << "}{";
 
-  stream << '{';
   for( size_t i = 0; i < Columns.size(); i++ ) {
     #ifdef TEXDEBUG
       stream << "\nCOLUMN " << i << " DEF_LEFT_B: " <<  Columns[i].defaultTeXLeftBorder
@@ -1331,20 +1371,35 @@ void TeXFOTBuilder::TablePart::outContent( OutputByteStream &stream ) const {
     #endif
     if( i == 0 && Columns[i].defaultTeXLeftBorder )
       stream << '|';
+
+    //Cell before margin
     if( Columns[i].computedWidth > 0 ) {
+      char alignment;
       switch( Columns[i].displayAlignment ) {
-        case symbolInside:  
-        case symbolStart:
-          stream << "L{" << LengthInPoints( Columns[i].computedWidth ) << '}';
-          break;
         case symbolOutside: 
         case symbolEnd:
-          stream << "R{" << LengthInPoints( Columns[i].computedWidth ) << '}';
+	  alignment =  'U';
           break;
-        case symbolCenter: default:
-          stream << "C{" << LengthInPoints( Columns[i].computedWidth ) << '}';
+        case symbolCenter: 
+	  alignment = 'Y';
+	  break;
+        case symbolInside:  
+        case symbolStart:
+        default:
+	  alignment = 'T';
+          break;
       }
+      stream << alignment << '{' 
+	     << LengthInPoints(Columns[i].defaultCellBeforeColumnMargin)
+	     << "}{" << LengthInPoints( Columns[i].displaySize ) 
+	     << "}{" 
+	     << LengthInPoints(Columns[i].defaultCellAfterColumnMargin) 
+	     << '}';
     } else {
+      stream << "@{\\hspace{" 
+	     << LengthInPoints(Columns[i].defaultCellBeforeColumnMargin)
+	     << "}}";
+
       switch( Columns[i].displayAlignment ) {
         case symbolOutside: 
         case symbolEnd:     stream << 'r'; break;
@@ -1353,6 +1408,9 @@ void TeXFOTBuilder::TablePart::outContent( OutputByteStream &stream ) const {
         case symbolStart:
         default:            stream << 'l'; break;
       }
+      stream << "@{\\hspace{" 
+	     << LengthInPoints(Columns[i].defaultCellAfterColumnMargin)
+	     << "}}";
     }
     if( Columns[i].defaultTeXRightBorder )
       stream << '|';
@@ -1422,15 +1480,27 @@ void TeXFOTBuilder::Row::outContent( OutputByteStream &stream ) const {
 
   bool first = true;
   for( size_t i = 0; i + 1 < Cells.size(); i++ ) {
-    if( !Cells[i].isOverlapped() ) {
-      if( !first )
-        stream << "&";  
-      else
-        first = false;
-      Cells[i].out( stream );
+    /* Output the overlapped cells in a row span but not
+       those in a column span.
+       
+       If the overlapping cell is both row and column spanning
+       only output the first cell in the row.
+    */
+    bool outputCell = !Cells[i].isOverlapped() ||
+      (Cells[i].OverlappingCell->nRowsSpanned > 1 && 
+       Cells[i].OverlappingCell->TeXTableColumnIdx == i);
+  
+    if( !first ) {
+      if (outputCell)
+	stream << "&";  
     }
+    else
+      first = false;
+    if (outputCell)
+      Cells[i].out( stream );
   }
 }
+  
 
 void TeXFOTBuilder::Row::outVerticalBorders
  ( const TeXFOTBuilder::Row *upperRow, 
@@ -1474,44 +1544,133 @@ void TeXFOTBuilder::Row::outVerticalBorders
 
 // --------- TeXFOTBuilder::Cell ----------------------------------------------
 
-void TeXFOTBuilder::Cell::outProlog( OutputByteStream &stream ) const {
+void TeXFOTBuilder::Cell::outProlog( OutputByteStream &stream ) const
+{
+  if ( nColumnsSpanned > 1 || needsTeXColumnOverride ||
+       (rowAlignment != symbolNotApplicable &&
+	rowAlignment != symbolStart ) ||
+       cellBackground )
+  {
+    char color_buf[32];
+    if ( cellBackground ) {
+      double r,g,b;
+      r = (double)backgroundColor.red   / 255.0;
+      g = (double)backgroundColor.green / 255.0;
+      b = (double)backgroundColor.blue  / 255.0;
+      sprintf( color_buf, "{%.2f, %.2f, %.2f}", r, g, b );
+    }
+    else
+      strcpy( color_buf, "");
 
-  if( nColumnsSpanned > 1 ) {
-    stream << "\\multicolumn%\n{" << nColumnsSpanned << "}{";
+    stream << "\\TeXTableCell{" << nColumnsSpanned << "}{";
+  
     if( beforeColumnBorder.borderPresent )
       stream << '|';
-    switch( effectiveAlignment ) {
+
+    if (displaySize) {
+      char alignment;
+      switch( effectiveAlignment ) {
       case symbolOutside: 
-      case symbolEnd:     stream << 'r'; break;
-      case symbolCenter:  stream << 'c'; break;
+      case symbolEnd:     
+	switch (rowAlignment) {
+	case symbolOutside:
+	case symbolEnd:
+	  alignment = cellBackground ? '3' : 'M';
+	  break;
+	case symbolCenter:
+	  alignment = cellBackground ? '6' : 'J';
+	  break;
+	case symbolInside:
+	case symbolStart:
+	default:
+	  alignment = cellBackground ? '9' : 'U';
+	  break;
+	}
+	break;
+      case symbolCenter:  
+	switch (rowAlignment) {
+	case symbolOutside:
+	case symbolEnd:
+	  alignment = cellBackground ? '2' : 'N';
+	  break;
+	case symbolCenter:
+	  alignment = cellBackground ? '5' : 'H';
+	  break;
+	case symbolInside:
+	case symbolStart:
+	default:
+	  alignment = cellBackground ? '8' : 'Y';
+	  break;
+	}
+	break;
       case symbolInside:  
       case symbolStart:
-      default:            stream << 'l'; break;
+      default:
+	switch (rowAlignment) {
+	case symbolOutside:
+	case symbolEnd:
+	  alignment = cellBackground ? '1' : 'B';
+	  break;
+	case symbolCenter:
+	  alignment = cellBackground ? '4' : 'G';
+	  break;
+	case symbolInside:
+	case symbolStart:
+	default:
+	  alignment = cellBackground ? '7' : 'T';
+	  break;
+	}
+	break;
+      } 
+      stream << alignment 
+	     << '{' << LengthInPoints(effectiveBeforeColumnMargin) 
+	     << "}{" << LengthInPoints(displaySize) << "}{"
+	     << LengthInPoints(effectiveAfterColumnMargin) 
+	     << '}' << color_buf;
     }
+    else {
+      //cell-before-margin
+      stream << "@{\\hspace{" << LengthInPoints(effectiveBeforeColumnMargin) 
+	     << "}}";
+      if ( cellBackground )
+	stream << ">{\\columncolor[rgb]" << color_buf << "}";
+      
+      switch (rowAlignment) {
+      case symbolOutside:
+      case symbolEnd:
+	stream << 'r';
+	break;
+      case symbolCenter:
+	stream << 'c';
+	break;
+      case symbolInside:
+      case symbolStart:
+      default:
+	stream << 'l';
+	break;
+      }
+      //cell-after-margin
+      stream << "@{\\hspace{" << LengthInPoints(effectiveAfterColumnMargin) 
+	     << "}}";
+    }
+  
     if( afterColumnBorder.borderPresent )
       stream << '|';
-    stream << "}{";
-  }
 
+    stream << "}%\n{%\n";
+  }
+  
   CompoundFotElement::outProlog( stream );
 }
 
 void TeXFOTBuilder::Cell::outEpilog( OutputByteStream &stream ) const {
 
   CompoundFotElement::outEpilog( stream );
-  if( nColumnsSpanned > 1 )
+  if ( nColumnsSpanned > 1 || needsTeXColumnOverride ||
+       (rowAlignment != symbolNotApplicable &&
+	rowAlignment != symbolStart ) ||
+       cellBackground )
     stream << "}%\n";
-}
-
-void TeXFOTBuilder::Cell::computeMultiParFlag() {
-
-  if( paragraphChildrenNum > 1 ) {
-    StrOutputByteStream str;
-    str << "\\def\\MultiPar{1}";
-    String<char> s;
-    str.extractString( s );
-    Characteristics += s;
-  }
 }
 
 void TeXFOTBuilder::Cell::computeOverridingTeXColumnBorders( TablePart &tablePart ) {
@@ -1531,28 +1690,49 @@ void TeXFOTBuilder::Cell::computeOverridingTeXColumnBorders( TablePart &tablePar
   Characteristics += s;
 }
 
-void TeXFOTBuilder::Cell::computeOverridingTeXDisplayAlignment( TablePart &tablePart ) {
-
-  effectiveAlignment
-   = tablePart.Columns[TeXTableColumnIdx].isExplicit
-      ? tablePart.Columns[TeXTableColumnIdx].displayAlignment : displayAlignment;
+void TeXFOTBuilder::Cell::computeTeXRowSpanFiller( TablePart &tablePart ) {
 
   StrOutputByteStream str;
-  if( effectiveAlignment != tablePart.Columns[TeXTableColumnIdx].displayAlignment ) {
-    str << "\\def\\TeXTableCellDisplayAlignment{";
-    switch( effectiveAlignment ) {
-      case symbolOutside: 
-      case symbolEnd:     str << 'r'; break;
-      case symbolCenter:  str << 'c'; break;
-      case symbolInside:  
-      case symbolStart:
-      default:            str << 'l'; break;
-    }
-    str << '}';
-    String<char> s;
-    str.extractString( s );
-    Characteristics += s;
+
+  if ( isOverlapped() && OverlappingCell->nRowsSpanned > 1 )
+  {
+    // This isn't output automatically for overlapped cell
+    str << "\\def\\ColumnIndex{" << TeXTableColumnIdx <<'}';
+    str << "\\def\\TeXRowSpanFiller{1}";
   }
+  
+  String<char> s;
+  str.extractString( s );
+  Characteristics += s;
+}
+
+void TeXFOTBuilder::Cell::computeEffectiveTeXColumnMargins( TablePart &tablePart ) {
+  effectiveBeforeColumnMargin = beforeColumnMargin != lengthUnspecified
+    ? beforeColumnMargin : 
+    tablePart.Columns[TeXTableColumnIdx].defaultCellBeforeColumnMargin;
+  if( effectiveBeforeColumnMargin != lengthUnspecified &&
+      (tablePart.Columns[TeXTableColumnIdx].defaultCellBeforeColumnMargin
+       != effectiveBeforeColumnMargin || nColumnsSpanned > 1) ) 
+    needsTeXColumnOverride = true;
+
+  
+  effectiveAfterColumnMargin = afterColumnMargin != lengthUnspecified 
+    ? afterColumnMargin :
+    tablePart.Columns[TeXTableColumnIdx].defaultCellAfterColumnMargin;
+  if( effectiveAfterColumnMargin != lengthUnspecified &&
+      (tablePart.Columns[TeXTableColumnIdx].defaultCellAfterColumnMargin
+       != effectiveAfterColumnMargin || nColumnsSpanned > 1) ) 
+    needsTeXColumnOverride = true;
+}
+
+void TeXFOTBuilder::Cell::computeEffectiveTeXCellWidth( TablePart &tablePart )
+{
+  displaySize = 0;
+  for (unsigned i = 0; i < nColumnsSpanned; i++ )
+    displaySize += tablePart.Columns[TeXTableColumnIdx + i].computedWidth;
+
+  if (displaySize)
+    displaySize -= effectiveBeforeColumnMargin + effectiveAfterColumnMargin;
 }
 
 bool TeXFOTBuilder::Cell::singleRowBeforeRowBorderPresent() const {
@@ -1641,7 +1821,20 @@ void TeXFOTBuilder::Border::resolve( Border &adjacentBorder ) {
 inline
 OutputByteStream &TeXFOTBuilder::os()
 {
-  return CurOs == NULL ? *fileout_ : *CurOs;
+  return  *(osStack_.back());
+}
+
+void
+TeXFOTBuilder::pushOs(OutputByteStream *to)
+{
+  osStack_.push_back( to );
+}
+
+void
+TeXFOTBuilder::popOs()
+{
+  assert( osStack_.size() > 0 );
+  osStack_.resize( osStack_.size() - 1);
 }
 
 //
@@ -1730,6 +1923,12 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
       0
     },
     {
+      "UNREGISTERED::OpenJade//Characteristic::page-two-side?",
+      (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setPageTwoSide,
+      0,
+      0
+    },
+    {
       "UNREGISTERED::James Clark//Characteristic::subscript-depth",
       0,
       0,
@@ -1798,7 +1997,7 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
 ////////////////////////////////////////////////////////////////////////
 
 TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
-: fileout_(o), mgr_(mgr), CurOs( NULL ), preserveSdata_(1)
+: fileout_(o), mgr_(mgr), preserveSdata_(1)
 #ifdef OUTLINES
 ,inHeading_(0),headingSet_(0),lastHeaded_(0)
 #endif
@@ -1808,7 +2007,9 @@ TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
   #endif
   NextFormat.FotCurDisplaySize = Format::INITIAL_PAGE_SIZE();
   FormatStack.push_back( NextFormat );
-  os() << "\\FOT{2}";
+  pushFotElementState();
+  pushOs(o);
+  os() << "\\FOT{3}";
 #ifdef OUTLINES
   return_ += Char('\n');
   protectedChar_ += Char('\\');
@@ -1844,6 +2045,19 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       switch(*s) {
       default:
 	os() << char(*s);
+#ifdef OUTLINES
+	if (needToCollect()){
+	  addHeadedText(s,1);
+	  //top(parStack_).headingText_.append(s,1);
+	}
+#endif
+	break;
+      case ' ':
+      case '\t':
+	if ( NextFormat.FotLines == symbolAsis )
+	  os() << '~';
+	else
+	  os() << char(*s);
 #ifdef OUTLINES
 	if (needToCollect()){
 	  addHeadedText(s,1);
@@ -1941,7 +2155,7 @@ void TeXFOTBuilder::tableColumn(const TableColumnNIC &nic)
   setTableColumnNIC(nic);
 
   if( nic.columnIndex >= curTable().curTablePart().Columns.size() )
-      curTable().curTablePart().Columns.resize( nic.columnIndex + 1 );
+    curTable().curTablePart().Columns.resize( nic.columnIndex + 1 );
 
   Column &col = curTable().curTablePart().Columns[nic.columnIndex];
 
@@ -1950,7 +2164,12 @@ void TeXFOTBuilder::tableColumn(const TableColumnNIC &nic)
   if( nic.hasWidth )
       col.width = nic.width;
 
-  col.displayAlignment = curFormat().FotDisplayAlignment;
+  if ( curFormat().FotDisplayAlignment != symbolNotApplicable )
+      col.displayAlignment = curFormat().FotDisplayAlignment;
+  if ( curFormat().FotCellBeforeColumnMargin != lengthUnspecified )
+    col.defaultCellBeforeColumnMargin = curFormat().FotCellBeforeColumnMargin;
+  if ( curFormat().FotCellAfterColumnMargin != lengthUnspecified )
+    col.defaultCellAfterColumnMargin = curFormat().FotCellAfterColumnMargin;
 
   insertAtomic("TableColumn");
 }
@@ -2061,8 +2280,6 @@ void TeXFOTBuilder::endLineField()
 void TeXFOTBuilder::startParagraph(const ParagraphNIC &nic)
 {
   startDisplay( nic );
-  if( curFormat().FotObjectClass == oc_Cell )
-    curTable().curCell().paragraphChildrenNum++;
   start();
   setParagraphNIC(nic);
 #ifdef OUTLINES
@@ -2220,16 +2437,20 @@ void TeXFOTBuilder::startTable(const TableNIC &nic)
   #ifdef TEXDEBUG
     *fileout_ << "\nTABLE_START\n";
   #endif
+  TableStack.resize( TableStack.size() + 1 );
   startDisplay( nic );
   start();
-
+  
   setTableNIC(nic);
 
   Length curStartIndent = computeLengthSpec( curFormat().FotStartIndentSpec );
   curTable().startIndent = curStartIndent;
 
+  startGroup( curTable() );
+  curTable().open( *this);
   curTable().begin();
-  curTable().displayAlignment = curFormat().FotDisplayAlignment;
+  if ( curFormat().FotDisplayAlignment != symbolNotApplicable )
+      curTable().displayAlignment = curFormat().FotDisplayAlignment;
 
   if( nic.widthType == TableNIC::widthExplicit )
       curTable().tableWidth = computeLengthSpec( nic.width );
@@ -2238,12 +2459,12 @@ void TeXFOTBuilder::startTable(const TableNIC &nic)
        = curFormat().FotCurDisplaySize - curStartIndent
           - computeLengthSpec( curFormat().FotEndIndentSpec );
 
-  startGroup( curTable() );
   curTable().curTablePart().open( *this );
 }
 
 void TeXFOTBuilder::endTable()
 {
+  assert( TableStack.size() > 0 );
   #ifdef TEXDEBUG
     *fileout_ << "\nTABLE_END\n";
   #endif
@@ -2260,6 +2481,8 @@ void TeXFOTBuilder::endTable()
   endGroup();
   end();
   endDisplay();
+
+  TableStack.resize( TableStack.size() - 1 );
 }
 
 // A call for each border is made immediately
@@ -2307,17 +2530,20 @@ void TeXFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
 
   setTablePartNIC(nic);
 
-  if( curTable().NoTablePartsSeen )
+  if( curTable().NoTablePartsSeen ) {
       curTable().NoTablePartsSeen = false;
+      /* begin() was arleady called from Table() and 
+	 open() was called from startTable() */
+  }
   else {
       curTable().TableParts.resize( curTable().TableParts.size()+1 );
       curTable().TableParts.back().setSiblingSeqIdx( curTable().TableParts.size()-1 );
       curTable().TableParts.back().setParent( &curTable() );    
+
+      curTable().TableParts.back().begin();    
+      curTable().TableParts.back().open( *this );    
   }
-
-  curTable().TableParts.back().begin();    
-  curTable().TableParts.back().open( *this );    
-
+ 
   startGroup( curTable().curTablePart() );
 }
 
@@ -2357,6 +2583,10 @@ void TeXFOTBuilder::endTableRow()
   #endif
 }
 
+/* 
+ * FIXME: We are getting one extra table cell in each
+ * row whic nic.missing set . What is this ???
+ */
 void TeXFOTBuilder::startTableCell(const TableCellNIC &nic)
 {
   #ifdef TEXDEBUG
@@ -2389,27 +2619,40 @@ void TeXFOTBuilder::startTableCell(const TableCellNIC &nic)
 
   if( nic.nRowsSpanned != 1 )
       cell.nRowsSpanned = nic.nRowsSpanned;
-  
-  long newDisplaySize = 0;
+
   for( size_t i = nic.columnIndex; i < nic.columnIndex + nic.nColumnsSpanned; i++ )
-      if( i < tp.Columns.size() ) {
-          if( tp.Columns[i].hasWidth )
-              newDisplaySize
-               += computeLengthSpec( tp.Columns[i].width );
-      } else
-      if( !nic.missing ) {
-          tp.Columns.resize( tp.Columns.size() + 1 ); 
-          tp.Columns.back().hasWidth = false;
-      }
-
-  if( newDisplaySize > 0 ) {
-      newDisplaySize -= NextFormat.FotCellBeforeColumnMargin
-                         + NextFormat.FotCellAfterColumnMargin;
-      NextFormat.FotCurDisplaySize = newDisplaySize;
+  {
+    if( i >= tp.Columns.size() && !nic.missing ) {
+      tp.Columns.resize( tp.Columns.size() + 1 ); 
+      tp.Columns.back().hasWidth = false;
+      tp.Columns.back().isExplicit = false;
+      tp.columnsProcessed = false;
+    }
   }
+  // We may need reprocessing
+  if( !tp.columnsProcessed )
+      tp.processColumns( *this );
 
-  cell.displaySize = NextFormat.FotCurDisplaySize;
-  cell.displayAlignment = NextFormat.FotDisplayAlignment;
+  if ( !nic.missing ) {
+    if ( NextFormat.FotCellRowAlignment != symbolNotApplicable )
+      cell.rowAlignment = NextFormat.FotCellRowAlignment;
+    if ( NextFormat.FotCellBeforeColumnMargin != lengthUnspecified )
+      cell.beforeColumnMargin = NextFormat.FotCellBeforeColumnMargin;
+    if ( NextFormat.FotCellAfterColumnMargin != lengthUnspecified )
+      cell.afterColumnMargin = NextFormat.FotCellAfterColumnMargin;
+
+    if (NextFormat.FotCellBackground) {
+      cell.cellBackground = true;
+      cell.backgroundColor = NextFormat.FotBackgroundColor;
+    }
+  
+    cell.TeXTableColumnIdx = nic.columnIndex;
+    cell.effectiveAlignment = tp.Columns[nic.columnIndex].displayAlignment;
+    cell.computeEffectiveTeXColumnMargins( tp );
+    cell.computeEffectiveTeXCellWidth( tp );
+
+    NextFormat.FotCurDisplaySize = cell.displaySize;
+  }
   
   elementStart( oc_Cell );
   startGroup( cell );
@@ -2963,6 +3206,7 @@ void TeXFOTBuilder::setMarginaliaSep(const LengthSpec &sep)
 
 void TeXFOTBuilder::setLines(Symbol lines)
 {
+  NextFormat.FotLines = lines;
   set("Lines",lines);
 }
 
@@ -2994,6 +3238,7 @@ void TeXFOTBuilder::setBackgroundColor()
 
 void TeXFOTBuilder::setBackgroundColor(const DeviceRGBColor &color)
 {
+  NextFormat.FotBackgroundColor = color;
   set("BackgroundColor",color);
 }
 
@@ -3144,6 +3389,7 @@ void TeXFOTBuilder::setFloatOutLineNumbers(bool flag)
 
 void TeXFOTBuilder::setCellBackground(bool flag)
 {
+  NextFormat.FotCellBackground = flag;
   set("CellBackground",flag);
 }
 
@@ -3270,6 +3516,7 @@ void TeXFOTBuilder::setBoxBorderAlignment(Symbol align)
 
 void TeXFOTBuilder::setCellRowAlignment(Symbol align)
 {
+  NextFormat.FotCellRowAlignment = align;
   set("CellRowAlignment",align);
 }
 
@@ -3333,6 +3580,8 @@ void TeXFOTBuilder::setLineRepeat(long n)
 void TeXFOTBuilder::setSpan(long n)
 {
   NextFormat.FotSpan = n;
+  NextFormat.FotCurDisplaySize
+    = NextFormat.FotPageWidth - NextFormat.FotLeftMargin - NextFormat.FotRightMargin;
   set("Span",n);
 }
 
@@ -4479,6 +4728,11 @@ void TeXFOTBuilder::setPageColumnSep(Length w)
 void TeXFOTBuilder::setPageBalanceColumns(bool flag)
 {
  set("PageBalanceColumns",flag);
+}
+
+void TeXFOTBuilder::setPageTwoSide(bool flag)
+{
+  set("PageTwoSide",flag);
 }
 
 void TeXFOTBuilder::setSubscriptDepth(Length w)

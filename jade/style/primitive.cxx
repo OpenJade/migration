@@ -1645,8 +1645,34 @@ DEFPRIMITIVE(ProcessChildrenTrim, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SosofoAppend, argc, argv, context, interp, loc)
 {
-  AppendSosofoObj *obj = new (interp) AppendSosofoObj;
-  for (int i = 0; i < argc; i++) {
+  /* Optimize the case where there is no or only
+     one argument */
+  if (argc == 0)
+    return new (interp) EmptySosofoObj;
+  else if (argc == 1) {
+    SosofoObj *sosofo = argv[0]->asSosofo();
+    if (!sosofo)
+      return argError(interp, loc, InterpreterMessages::notASosofo,
+		      0, argv[0]);
+    return sosofo;	
+  }
+
+  /* Don't create another object if the first argument is
+     already an AppendSosofoObj, this handles gracefully 
+     case like 
+     (let loop ( (res (empty-sosofo))
+		 (nl  (node-list-rest (children (current-node)))))
+	(loop (sosofo-append res (process-node-list (node-list-first nl)))
+	      (node-list-rest nl)))
+   */
+  AppendSosofoObj *obj;
+  int i = 0; 
+  if ( argv[i]->asAppendSosofo() )
+    obj = argv[i++]->asAppendSosofo();
+  else 
+    obj = new (interp) AppendSosofoObj;
+
+  for ( ; i < argc; i++) {
     SosofoObj *sosofo = argv[i]->asSosofo();
     if (!sosofo)
       return argError(interp, loc, InterpreterMessages::notASosofo,
@@ -5156,23 +5182,69 @@ DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
   return obj;
 }
           
-static long timeConv(const Char *s, size_t n)
+static time_t timeConv(const Char *s, size_t n)
 {
   char buf[100];
-  for (unsigned i = 0; i < n; i++) 
+  unsigned i;
+  
+  for ( i = 0; i < n && i < (sizeof(buf) - 1); i++) 
     buf[i] = char(s[i]);
-  buf[n] = 0;
-  struct tm tim;
-  sscanf(buf, "%d-%d-%dT%d:%d:%d", 
-            &tim.tm_year,
-            &tim.tm_mon,
-            &tim.tm_mday,
-	    &tim.tm_hour,
-	    &tim.tm_min,
-	    &tim.tm_sec);
-  tim.tm_year -= 1900;
-  tim.tm_mon -= 1;
-  return long(mktime(&tim)); 
+  buf[i] = 0;
+  time_t    today_sec = time(NULL);
+  struct tm tim, *today;
+  int       nparsed;
+
+  today = localtime(&today_sec);
+  
+  /* First try to parse as time string without date */
+  /* Defaults are same as of today */
+  memcpy(&tim, today, sizeof(tim));
+  nparsed = sscanf(buf, "%d:%d:%d", 
+		   &tim.tm_hour,
+		   &tim.tm_min,
+		   &tim.tm_sec);
+
+  /* If we got only one number, it could be
+     a year so try to parse complete format */
+  if ( nparsed < 2 ) {
+    /* Defaults are set to zero */
+    memset( &tim, 0, sizeof(tim) );
+
+    /* This accepts any non digit character between 
+       the date and time spec 
+    */
+    nparsed = sscanf(buf, "%d-%d-%d%*[^0-9]%d:%d:%d", 
+		     &tim.tm_year,
+		     &tim.tm_mon,
+		     &tim.tm_mday,
+		     &tim.tm_hour,
+		     &tim.tm_min,
+		     &tim.tm_sec);
+    switch (nparsed) {
+    case 0:
+	/* Invalid parse */
+	return (time_t)-1;
+	/* Not reached */
+    case 1:
+	/* We only got a year set to January First 
+	   Month is already set to 0
+	*/
+	/* Fall through */
+    case 2:
+	tim.tm_mday = 1;
+	/* Fall through to month normalization */
+    default:
+	tim.tm_mon -= 1;
+	break;
+    }
+
+    if (tim.tm_year < 38 )
+      tim.tm_year += 100; /* Y2K workaround */
+    else if (tim.tm_year >= 1900)
+      tim.tm_year -= 1900;
+  }
+  
+  return mktime(&tim); 
 }
 
 #define DEFTIMECOMP(NAME, OP) \
@@ -5180,12 +5252,19 @@ DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
 { \
   const Char *s1, *s2; \
   size_t n1, n2; \
+  time_t t1, t2; \
   if (!argv[0]->stringData(s1, n1)) \
     return argError(interp, loc, \
                     InterpreterMessages::notAString, 0, argv[0]); \
   if (!argv[1]->stringData(s2, n2)) \
     return argError(interp, loc, \
                     InterpreterMessages::notAString, 1, argv[1]); \
+  if ( (t1 = timeConv(s1, n1)) == (time_t)-1 ) \
+    return argError(interp, loc, \
+                    InterpreterMessages::notATimeString, 0, argv[0]); \
+  if ( (t2 = timeConv(s2, n2)) == (time_t)-1 ) \
+    return argError(interp, loc, \
+                    InterpreterMessages::notATimeString, 1, argv[1]); \
   if (timeConv(s1, n1) OP timeConv(s2, n2)) \
     return interp.makeTrue(); \
   else \

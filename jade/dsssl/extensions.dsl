@@ -135,6 +135,10 @@
   "UNREGISTERED::James Clark//Characteristic::page-balance-columns?"
   #f)
 
+(declare-characteristic page-two-side?
+  "UNREGISTERED::OpenJade//Characteristic::page-two-side?"
+  #f)
+
 (declare-characteristic superscript-height
   "UNREGISTERED::James Clark//Characteristic::superscript-height"
   0pt)

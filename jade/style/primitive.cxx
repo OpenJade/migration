@@ -5106,7 +5106,9 @@ DEFPRIMITIVE(InexactToExact, argc, argv, context, interp, loc)
    if (argv[0]->realValue(d) && modf(d, &d) == 0.0
 	&& fabs(d) < LONG_MAX && dim == 0) 
       return interp.makeInteger((long)d);
-    // FIXME: report that no exact representation is possible
+   interp.setNextLocation(loc);
+   interp.message(InterpreterMessages::noExactRepresentation,
+                  ELObjMessageArg(argv[0], interp));
   case ELObj::longQuantity:  // fall through
     return argv[0]; 
   default:
@@ -5174,7 +5176,7 @@ DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
   }
   return obj;
 }
-
+          
 /* What we're effectively doing here is the C++ equivalent of 
    (modulo error checking)
    (define (map proc li_1 ... li_n)
@@ -5205,8 +5207,8 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
    }
    // Split off the cars of the arguments and
    // check that they are proper lists of the same length
-   ELObj *cars[argc];
-   ELObj *cdrs[argc];
+   Vector<ELObj*> cars(argc);
+   Vector<ELObj*> cdrs(argc);
    bool hasSeenNil = 0;
    bool hasSeenNonNil = 0;
    for (unsigned i = 1; i < argc; i++) {
@@ -5217,7 +5219,7 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
        cdrs[i] = pair->cdr();
      } else if (argv[i]->isNil()) 
        hasSeenNil = 1;
-     else
+     else 
        return argError(interp, loc,
                   InterpreterMessages::notAList, i, argv[i]);
    }
@@ -5230,11 +5232,11 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
 
    // Recurse
    cdrs[0] = func;
-   ELObj **rargv = cdrs;
+   ELObj **rargv = cdrs.begin();
    cars[0] = MapPrimitiveObj::primitiveCall(argc, rargv, context, interp, loc); 
  
    // Prepend the result of applying func to the cars
-   InsnPtr insns[argc + 2];
+   Vector<InsnPtr> insns(argc, InsnPtr());
    insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
    insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
    for (unsigned i = 1; i <= argc; i++) 
@@ -5292,6 +5294,7 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAProcedure, 0, argv[0]);
   if (func->totalArgs() > 0) {
+    interp.setNextLocation(loc);
     interp.message(InterpreterMessages::tooManyArgs);
     return interp.makeError();
   }
@@ -5304,19 +5307,13 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
   ELObj *ret;
   while (nd = nl->nodeListFirst(context, interp)) {
     nl = nl->nodeListRest(context, interp);
-    {
-      EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
-      InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
-      VM vm(context, interp);
-      ret = vm.eval(insn.pointer());
-    }
-    if (interp.isError(ret)) {
-      return interp.makeError();
-    }
+    EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
+    InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
+    VM vm(context, interp);
+    ret = vm.eval(insn.pointer());
     SosofoObj *sosofo = ret->asSosofo();
-    if (!sosofo) {
+    if (!sosofo) 
       return interp.makeError();
-    }
     obj->append(sosofo);
   }
   return obj;

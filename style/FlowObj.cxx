@@ -388,7 +388,7 @@ bool ParagraphFlowObj::Validator_::isValid(const FlowObj &fo,
 					   ProcessContext &context)
 {
   FlowObj::AcceptFlags af(fo.acceptFlags(context));
-  if ((af & (FlowObj::afInline | FlowObj::afDisplay
+  if ((af & (FlowObj::afAlways | FlowObj::afInline | FlowObj::afDisplay
 	     | FlowObj::afParagraphBreak)) != 0)
     return true;
   Interpreter &interp = *context.vm().interp;

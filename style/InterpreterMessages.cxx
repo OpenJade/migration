@@ -1662,6 +1662,18 @@ MessageFragment::appModule,
 ,"%2 argument for primitive %1 has wrong length"
 #endif
 );
+const MessageType1 InterpreterMessages::noExactRepresentation(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+144
+#ifndef SP_NO_MESSAGE_TEXT
+,"quantity %1 can't be represented exactly"
+#endif
+);
 #ifdef SP_NAMESPACE
 }
 #endif

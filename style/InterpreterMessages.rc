@@ -144,4 +144,5 @@ BEGIN
   141, "%2 argument for primitive %1 of wrong type: %3 not an alist"
   142, "%2 argument for primitive %1 of wrong type: %3 not a list of characters"
   143, "%2 argument for primitive %1 has wrong length"
+  144, "quantity %1 can't be represented exactly"
 END

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef CmdLineApp_INCLUDED
@@ -55,6 +55,7 @@ protected:
   virtual void registerOption(AppChar c, const AppChar *name, 
                               const MessageFragment &arg, 
                               const MessageType1 &doc);
+  virtual void changeOptionRegistration(AppChar oldc, AppChar newc);
   virtual void registerUsage(const MessageType1 &u);
   virtual void registerInfo(const MessageType0 &i);
   virtual int init(int argc, AppChar **argv);

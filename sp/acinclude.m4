@@ -217,3 +217,14 @@ if test "$ac_cv_cxx_explinst" = yes; then
             [define if the compiler supports explicit instantiations])
 fi
 ])
+
+AC_DEFUN(AC_DEFINE_DIR, [ 
+  ac_expanded=`( 
+    test "x$prefix" = xNONE && prefix="$ac_default_prefix" 
+    test "x$exec_prefix" = xNONE && exec_prefix="${prefix}" 
+    eval echo \""[$]$2"\" 
+  )` 
+  ifelse($3, , 
+    AC_DEFINE_UNQUOTED($1, "$ac_expanded"), 
+    AC_DEFINE_UNQUOTED($1, "$ac_expanded", $3)) 
+]) 

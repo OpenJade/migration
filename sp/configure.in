@@ -36,13 +36,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
-if test "x$prefix" = "xNONE"; then
-  SP_LOCALE_DIR=/usr/local/share/locale
-else
-  SP_LOCALE_DIR=$prefix/share/locale
-fi
-AC_DEFINE_UNQUOTED(SP_LOCALE_DIR, "$SP_LOCALE_DIR")
-AC_SUBST(SP_LOCALE_DIR)
+AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale)
 dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
 dnl rely on PACKAGE and VERSION substitutions.
 AC_SUBST(PACKAGE)

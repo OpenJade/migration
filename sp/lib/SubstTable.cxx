@@ -44,7 +44,7 @@ Char SubstTable::at(Char t) const
   }
   size_t min = 0;
   size_t max = map_.size() - 1;
-  if (t < map_[min].from || t > map_[max].from)
+  if (map_.size() == 0 || t < map_[min].from || t > map_[max].from)
     return t;
   if (t == map_[min].from)
     return map_[min].to;

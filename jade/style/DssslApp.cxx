@@ -44,6 +44,8 @@ int DssslApp::init(int argc, AppChar **argv)
   // Since we use strtod(), must have C numeric
   setlocale(LC_NUMERIC, "C");
 #endif
+  MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
+                                                  OPENJADE_PACKAGE);
   return ret;
 }
 

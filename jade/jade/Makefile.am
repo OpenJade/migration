@@ -37,6 +37,8 @@ BUILT_SOURCES = JadeMessages.h JadeMessages.rc \
 	TeXFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx \
 	MifFOTBuilder_inst.cxx
 
+MSGGENFLAGS = -l xModule
+
 SUFFIXES = .msg .m4
 
 .m4.cxx:

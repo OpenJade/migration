@@ -34,6 +34,8 @@ EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
 BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 	InterpreterMessages.h DssslAppMessages.h 
 
+MSGGENFLAGS = -l xModule 
+
 SUFFIXES = .m4 .msg 
 
 .m4.cxx:

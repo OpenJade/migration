@@ -1118,30 +1118,66 @@ StyleExpression::StyleExpression(Vector<const Identifier *> &keys,
 InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
 				 int stackPos, const InsnPtr &next)
 {
-  // FIXME handle force!
   Vector<ConstPtr<InheritedC> > ics;
   Vector<ConstPtr<InheritedC> > forceIcs;
+  Vector<const Identifier *> forceKeys(keys_.size()); 
+  for (size_t i = 0; i < keys_.size(); i++) {
+    forceKeys[i] = 0; 
+    if (keys_[i]->name().size() > 6) {
+      StringC prefix(keys_[i]->name().data(), 6);  
+      if (prefix == interp.makeStringC("force!")) {
+        StringC name(keys_[i]->name().data() + 6, keys_[i]->name().size() - 6);
+        forceKeys[i] = interp.lookup(name);
+      }
+    } 
+  }
   bool hasUse = 0;
   size_t useIndex;
   BoundVarList boundVars;
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey sk;
-    if (maybeStyleKeyword(keys_[i])
+    if (forceKeys[i] 
+        && maybeStyleKeyword(forceKeys[i])
+        && !forceKeys[i]->inheritedC().isNull()) {
+      forceIcs.resize(forceIcs.size() + 1);
+      exprs_[i]->markBoundVars(boundVars, 0);
+    }
+    else if (maybeStyleKeyword(keys_[i])
 	&& !(keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse)
         && !keys_[i]->inheritedC().isNull()) {
       ics.resize(ics.size() + 1);
       exprs_[i]->markBoundVars(boundVars, 0);
-    }
+    } 
   }
   // FIXME optimize case where ics.size() == 0
   boundVars.removeUnused();
   BoundVarList noVars;
   Environment newEnv(noVars, boundVars);
   size_t j = 0;
+  size_t k = 0;
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey sk;
-    if (!maybeStyleKeyword(keys_[i]))
+    if (forceKeys[i] 
+        && maybeStyleKeyword(forceKeys[i])
+        && !forceKeys[i]->inheritedC().isNull()) {
+      exprs_[i]->optimize(interp, newEnv, exprs_[i]);
+      ELObj *val = exprs_[i]->constantValue();
+      if (val) {
+	interp.makePermanent(val);
+	forceIcs[k] = forceKeys[i]->inheritedC()->make(val, exprs_[i]->location(), interp);
+	if (forceIcs[k].isNull())
+	  forceIcs.resize(forceIcs.size() - 1);
+	else
+	  k++;
+      }
+      else {
+	forceIcs[k++] = new VarInheritedC(forceKeys[i]->inheritedC(),
+	     	          exprs_[i]->compile(interp, newEnv, 0, InsnPtr()),
+				     exprs_[i]->location());
+      }
+    }    
+    else if (!maybeStyleKeyword(keys_[i]))
       ;
     else if (keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse) {
       if (!hasUse) {

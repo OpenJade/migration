@@ -444,6 +444,8 @@ E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefin
 E1+dsEntityNotationUndefined++notation %1 for external subset undefined
 E1+specifiedAttributeRedeclared+ISO 8879:1986 K4.4+attribute %1 can't be redeclared
 E1+notationMustNotBeDeclared++#IMPLICIT attributes have already been specified for notation %1
+E0+peroGrpoStartTag+ISO 8879:1986 9.4.4p3+a name group is not allowed in a parameter entity reference in a start tag
+W0+peroGrpoEndTag+ISO 8879:1986 9.4.4p3+name group in a parameter entity reference in an end tag (SGML forbids them in start tags)
 # message fragments
 =1000
 +delimStart++delimiter 

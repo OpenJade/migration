@@ -392,7 +392,7 @@ private:
   ElementType *lookupResultElementType(const StringC &name);
   void endProlog();
   Boolean parseEntityReferenceNameGroup(Boolean &ignore);
-  Boolean parseTagNameGroup(Boolean &active);
+  Boolean parseTagNameGroup(Boolean &active, Boolean start);
   void parseGroupStartTag();
   void parseGroupEndTag();
   StartElementEvent *doParseStartTag(Boolean &netEnabling);

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenSP 1.4\n"
-"POT-Creation-Date: 2000-03-07 09:17+0000\n"
+"POT-Creation-Date: 2000-03-09 17:35+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -2080,6 +2080,13 @@ msgstr "notationen %1 för parameterentiteten %2 odefinierad"
 
 msgid "notation %1 for external subset undefined"
 msgstr "notationen %1 för extern delmängd odefinierad"
+
+msgid "attribute %1 can't be redeclared"
+msgstr ""
+
+#, fuzzy
+msgid "#IMPLICIT attributes have already been specified for notation %1"
+msgstr "inga attribut definierade för notationen %1"
 
 msgid "delimiter "
 msgstr "avgränsaren "

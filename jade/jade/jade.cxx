@@ -69,8 +69,12 @@ JadeApp::JadeApp()
 : DssslApp(u), outputType_(fotType)
 {
   registerOption('t',
-#ifdef JADE_MIF
+#if defined(JADE_MIF) && defined(JADE_HTML)
+                 SP_T("(fot|rtf|html|tex|mif|sgml|xml|txt)")
+#elif defined(JADE_MIF)
                  SP_T("(fot|rtf|tex|mif|sgml|xml|txt)")
+#elif defined(JADE_HTML)
+                 SP_T("(fot|rtf|html|tex|sgml|xml|txt)")
 #else
                  SP_T("(fot|rtf|tex|sgml|xml|txt)")
 #endif

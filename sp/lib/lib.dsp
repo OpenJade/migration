@@ -1026,37 +1026,6 @@ SOURCE=.\UTF8CodingSystem.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=..\VERSION
-
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-# Begin Custom Build - Building version.h
-InputPath=..\VERSION
-
-"version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	del /f version.h 
-	perl -w mkversion.pl $(InputPath)>version.h 
-	attrib +r version.h 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-# Begin Custom Build - Building version.h
-InputPath=..\VERSION
-
-"version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	del /f version.h 
-	perl -w mkversion.pl $(InputPath)>version.h 
-	attrib +r version.h 
-	
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\Win32CodingSystem.cxx
 # End Source File
 # Begin Source File
@@ -1937,10 +1906,6 @@ SOURCE=..\include\Vector.cxx
 # Begin Source File
 
 SOURCE=..\include\Vector.h
-# End Source File
-# Begin Source File
-
-SOURCE=.\version.h
 # End Source File
 # Begin Source File
 

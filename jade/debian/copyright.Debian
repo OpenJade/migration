@@ -1,17 +1,17 @@
 
 -----
 
-This package was originally Debianized by Mark W. Eichin
-<eichin@kitten.gen.ma.us> on Fri, 27 Jun 1997 22:28:34 -0400.
-Maintenance is now handled by Adam P. Harris <aph@debian.org>.
+This package has borrowed heavily from the 'jade' package.
+It was originally made into a Debian package, and is now maintained,
+by Adam Di Carlo <aph@debian.org>.
 
 The original source was downloaded from
-<URL:ftp://ftp.jclark.com/pub/jade/>.  This source archive contains
-source for both jade and sp.
+<URL:ftp://openjade.sourceforge.net/pub/openjade/> and/or
+the CVS area at cvs.openjade.sourceforge.net:/cvsroot/openjade .
 
-The Debian maintainers have made minor changes to this software in
-order to better integrate the software with Debian's SGML environment,
-and for the creation and use of libsp as a shared library.  All
-Debian-specific modifications and build scripts are licensed under the
+All materials under the 'debian' subdirectory are licensed under the
 GNU General Public License (GPL) version 2 or later.  You can find a
 copy of the GPL in /usr/share/common-licenses/GPL on Debian systems.
+Any changes made *not* under the 'debian' subdirectory are under
+the same license as the software itself.
+

@@ -2020,7 +2020,7 @@ bool SchemeParser::scanString(unsigned allowed, Token &tok)
       else {
 	StringC name;
 	name += c;
-	while (interp_->lexCategory(c = in->tokenChar(*this)) < Interpreter::lexDelimiter)
+	while (interp_->lexCategory(c = in->tokenChar(*this)) < Interpreter::lexOther)
 	  name += c;
 	if (c != ';')
 	  in->endToken(in->currentTokenLength() - 1);

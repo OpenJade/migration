@@ -1,34 +1,44 @@
-<!SGML -- SGML Declaration for valid XML documents --
-     "ISO 8879:1986 (WWW)"
+<!SGML "ISO 8879:1986 (WWW)"
+
+     -- SGML Declaration for XML 1.0 --
+
+     -- from: 
+        Final text of revised Web SGML Adaptations Annex (TC2) to ISO 8879:1986
+        ISO/IEC JTC1/SC34 N0029: 1998-12-06
+        Annex L.2 (informative): SGML Declaration for XML
+
+        changes made to accommodate validation are noted with 'VALID:'
+     --
 
      CHARSET
          BASESET
-             "ISO Registration Number 176//CHARSET
-             ISO/IEC 10646-1:1993 UCS-4 with implementation 
-             level 3//ESC 2/5 2/15 4/6"
+             "ISO Registration Number 177//CHARSET
+              ISO/IEC 10646-1:1993 UCS-4 with implementation
+              level 3//ESC 2/5 2/15 4/6"
          DESCSET
-                0       9       UNUSED
-                9       2       9
-                11      2       UNUSED
-                13      1       13
-                14      18      UNUSED
-                32      95      32
-                127     1       UNUSED
-                128     32      UNUSED
-                160     55136   160
-                55296   2048    UNUSED  -- surrogates --
-                57344   8190    57344
-                65534   2       UNUSED  -- FFFE and FFFF --
-                65536   1048576 65536 
-     CAPACITY NONE
+                 0        9  UNUSED
+                 9        2       9
+                11        2  UNUSED
+                13        1      13
+                14       18  UNUSED
+                32       95      32
+               127        1  UNUSED
+               128       32  UNUSED
+               160    55136     160
+             55296     2048  UNUSED  -- surrogates --
+             57344     8190   57344
+             65534        2  UNUSED  -- FFFE and FFFF --
+             65536  1048576   65536
+
+     CAPACITY NONE  -- Capacities are not restricted in XML --
 
      SCOPE DOCUMENT
 
      SYNTAX
          SHUNCHAR NONE
-         BASESET "ISO Registration Number 176//CHARSET
-                 ISO/IEC 10646-1:1993 UCS-4 with implementation 
-                 level 3//ESC 2/5 2/15 4/6"
+         BASESET "ISO Registration Number 177//CHARSET
+                  ISO/IEC 10646-1:1993 UCS-4 with implementation
+                  level 3//ESC 2/5 2/15 4/6"
          DESCSET
              0 1114112 0
          FUNCTION
@@ -36,7 +46,6 @@
              RS    10
              SPACE 32
              TAB   SEPCHAR 9
-
          NAMING
              LCNMSTRT ""
              UCNMSTRT ""
@@ -111,24 +120,25 @@
              NAMECASE
                  GENERAL NO
                  ENTITY  NO
-
          DELIM
-             GENERAL SGMLREF
-             HCRO "&#38;#x" -- 38 is the number for ampersand --
-             NESTC "/"
-             NET ">"
-             PIC "?>"
+             GENERAL  SGMLREF
+             HCRO     "&#38;#x"
+                      -- Ampersand followed by "#x" (without quotes) --
+             NESTC    "/"
+             NET      ">"
+             PIC      "?>"
              SHORTREF NONE
 
          NAMES
              SGMLREF
 
-         QUANTITY NONE
+         QUANTITY
+             NONE -- Quantities are not restricted in XML --
 
          ENTITIES
-             "amp" 38
-             "lt" 60
-             "gt" 62
+             "amp"  38
+             "lt"   60
+             "gt"   62
              "quot" 34
              "apos" 39
 
@@ -136,41 +146,44 @@
          MINIMIZE
              DATATAG NO
              OMITTAG NO
-             RANK NO
+             RANK    NO
              SHORTTAG
                  STARTTAG
-                     EMPTY NO
-                     UNCLOSED NO 
+                     EMPTY    NO
+                     UNCLOSED NO
                      NETENABL IMMEDNET
                  ENDTAG
-                     EMPTY NO 
+                     EMPTY    NO
                      UNCLOSED NO
                  ATTRIB
-                     DEFAULT YES
+                     DEFAULT  YES
                      OMITNAME NO
-                     VALUE NO
-             EMPTYNRM YES
+                     VALUE    NO
+             EMPTYNRM  YES
              IMPLYDEF
-                 ATTLIST NO
-                 DOCTYPE NO
-                 ELEMENT NO
-                 ENTITY NO
-                 NOTATION NO
+                 ATTLIST  NO  -- VALID: was YES --
+                 DOCTYPE  NO
+                 ELEMENT  NO  -- VALID: was YES --
+                 ENTITY   NO
+                 NOTATION NO  -- VALID: was YES --
          LINK
-             SIMPLE NO
+             SIMPLE   NO
              IMPLICIT NO
              EXPLICIT NO
          OTHER
-             CONCUR NO
-             SUBDOC NO
-             FORMAL NO
-             URN NO
+             CONCUR   NO
+             SUBDOC   NO
+             FORMAL   NO
+             URN      NO
              KEEPRSRE YES
-             VALIDITY TYPE
+             VALIDITY TYPE -- VALID: was NOASSERT --
              ENTITIES
-                 REF ANY
+                 REF      ANY
                  INTEGRAL YES
+
      APPINFO NONE
-     SEEALSO "ISO 8879:1986//NOTATION
-             Extensible Markup Language (XML) 1.0//EN"
+
+     SEEALSO "ISO 8879//NOTATION Extensible Markup Language (XML) 1.0//EN"
 >
+<!-- $Id$ -->
+

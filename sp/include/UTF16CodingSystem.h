@@ -12,7 +12,7 @@ namespace SP_NAMESPACE {
 
 class SP_API UTF16CodingSystem : public CodingSystem {
 public:
-  Decoder *makeDecoder() const;
+  Decoder *makeDecoder(Boolean) const;
   Encoder *makeEncoder() const;
 };
 

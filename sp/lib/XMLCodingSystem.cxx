@@ -1,4 +1,4 @@
-// Copyright (c) 1994, 1997 James Clark
+// Copyright (c) 1994, 1997 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -10,6 +10,7 @@
 
 #include "XMLCodingSystem.h"
 #include "UTF8CodingSystem.h"
+#include "UTF16CodingSystem.h"
 #include "CodingSystemKit.h"
 #include "Boolean.h"
 #include "Owner.h"
@@ -57,15 +58,6 @@ public:
   Boolean convertOffset(unsigned long &offset) const;
 private:
 
-  class UCS2 : public Decoder {
-  public:
-    UCS2(Boolean swapBytes);
-    size_t decode(Char *to, const char *from, size_t fromLen,
-		  const char **rest);
-    Boolean convertOffset(unsigned long &offset) const;
-  private:
-    Boolean swapBytes_;
-  };
   // Don't keep parsing a PI longer than this.
   // We want to avoid reading some enormous file into memory just because
   // some quote was left off.
@@ -253,9 +245,13 @@ void XMLDecoder::initDecoderDefault()
     subDecoder_ = utf8.makeDecoder();
   }
   else {
-    unsigned short n = 0x1;
     minBytesPerChar_ = 2;
-    subDecoder_ = new UCS2((*(char *)&n == 0x1) != lsbFirst_);
+    UTF16CodingSystem utf16;
+    subDecoder_ = utf16.makeDecoder(
+#ifndef SP_BIGENDIAN 
+      !
+#endif
+      lsbFirst_); 
   }
 }
 
@@ -273,7 +269,11 @@ void XMLDecoder::initDecoderPI()
 				  0,
 				  dummy);
   if (ics) {
-    subDecoder_ = ics->makeDecoder();
+    subDecoder_ = ics->makeDecoder(
+#ifndef SP_BIGENDIAN 
+      !
+#endif
+      lsbFirst_); 
     minBytesPerChar_ = subDecoder_->minBytesPerChar();
   }
   if (!subDecoder_)
@@ -346,52 +346,6 @@ Boolean XMLDecoder::extractEncoding(StringC &name)
       lit = 0;
   }
   return 0;
-}
-
-XMLDecoder::UCS2::UCS2(Boolean swapBytes)
-: swapBytes_(swapBytes)
-{
-}
-
-size_t XMLDecoder::UCS2::decode(Char *to, const char *from, size_t fromLen,
-				const char **rest)
-{
-  union U {
-    unsigned short word;
-    char bytes[2];
-  };
-  fromLen &= ~1;
-  *rest = from + fromLen;
-  if (sizeof(Char) == 2) {
-    if (!swapBytes_) {
-      if (from != (char *)to)
-	memmove(to, from, fromLen);
-      return fromLen/2;
-    }
-  }
-  if (swapBytes_) {
-    for (size_t n = fromLen; n > 0; n -= 2) {
-      U u;
-      u.bytes[1] = *from++;
-      u.bytes[0] = *from++;
-      *to++ = u.word;
-    }
-  }
-  else  {
-    for (size_t n = fromLen; n > 0; n -= 2) {
-      U u;
-      u.bytes[0] = *from++;
-      u.bytes[1] = *from++;
-      *to++ = u.word;
-    }
-  }
-  return fromLen/2;
-}
-
-Boolean XMLDecoder::UCS2::convertOffset(unsigned long &n) const
-{
-  n *= 2;
-  return 1;
 }
 
 #ifdef SP_NAMESPACE

@@ -269,6 +269,7 @@ const CodingSystemKitImpl::Entry CodingSystemKitImpl::bctfTable_[] = {
   { "IDENTITY", identity },
 #ifdef SP_MULTI_BYTE
   { "FIXED-2", fixed2 },
+  { "FIXED-4", fixed4 },
   { "UTF-8", utf8 },
   { "EUC", eucBctf },
   { "SJIS", sjisBctf },
@@ -286,8 +287,6 @@ const CodingSystemKitImpl::Entry CodingSystemKitImpl::encodingTable_[] = {
   { "ISO-10646-UCS-4", fixed4 },
   { "UTF-32", fixed4 },  
   { "UNICODE", unicode },
-  // We don't really support UTF-16, but treating it
-  // as Unicode should work for the most part.
   { "UTF-16", utf16 },
   { "WINDOWS", ansi },
   { "MS-DOS", oem },

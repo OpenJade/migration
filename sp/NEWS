@@ -1,6 +1,9 @@
 Changes in OpenSP 1.4
 
-* support for the koi8-r (RFC 1489) encoding.
+* The multibyte version of OpenSP now uses 32bit chars and supports
+  the full UTF-16 range 0x0000-0x10ffff.
+
+* Support for the koi8-r (RFC 1489) encoding.
  
 * OpenSP now supports long cmdline options. 
 

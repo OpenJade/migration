@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 // This uses a big endian byte order irrespective of host byte order.
@@ -23,16 +23,10 @@ public:
   Boolean convertOffset(unsigned long &offset) const;
 };
 
-class Fixed2Encoder : public Encoder {
+class Fixed2Encoder : public RecoveringEncoder {
 public:
   Fixed2Encoder();
-  ~Fixed2Encoder();
-  void output(Char *, size_t, OutputByteStream *);
   void output(const Char *, size_t, OutputByteStream *);
-private:
-  void allocBuf(size_t);
-  char *buf_;
-  size_t bufSize_;
 };
 
 Decoder *Fixed2CodingSystem::makeDecoder() const
@@ -80,55 +74,20 @@ Boolean Fixed2Decoder::convertOffset(unsigned long &n) const
 }
 
 Fixed2Encoder::Fixed2Encoder()
-: buf_(0), bufSize_(0)
 {
-}
-
-Fixed2Encoder::~Fixed2Encoder()
-{
-  delete [] buf_;
-}
-
-void Fixed2Encoder::allocBuf(size_t n)
-{
-  if (bufSize_ < n) {
-    delete [] buf_;
-    buf_ = new char[bufSize_ = n];
-  }
-}
-
-void Fixed2Encoder::output(Char *s, size_t n, OutputByteStream *sb)
-{
-#ifdef SP_BIG_ENDIAN
-  if (sizeof(Char) == 2) {
-    sb->sputn((char *)s, n*2);
-    return;
-  }
-#endif
-  ASSERT(sizeof(Char) >= 2);
-  char *p = (char *)s;
-  for (size_t i = 0; i < n; i++) {
-    Char c = s[i];
-    *p++ = (c >> 8) & 0xff;
-    *p++ = c & 0xff;
-  }
-  sb->sputn((char *)s, n*2);
 }
 
 void Fixed2Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
-#ifdef SP_BIG_ENDIAN
-  if (sizeof(Char) == 2) {
-    sb->sputn((char *)s, n*2);
-    return;
-  }
-#endif
-  allocBuf(n*2);
   for (size_t i = 0; i < n; i++) {
-    buf_[i*2] = (s[i] >> 8) & 0xff;
-    buf_[i*2 + 1] = s[i] & 0xff;
+    Char c = s[i];
+    if (c > 0xffff)
+      handleUnencodable(c, sb);
+    else {
+     sb->sputc((c >> 8) & 0xff);
+     sb->sputc(c & 0xff);
+    }
   }
-  sb->sputn(buf_, n*2);
 }
 
 #ifdef SP_NAMESPACE

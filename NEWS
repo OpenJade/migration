@@ -2,6 +2,11 @@ Changes in OpenSP 1.5pre6
 
 * RPM spec file updates and corrections from Terje Bless
 
+* Adapt SP patch from Liam Quinn that adds a HTTP/1.0 Host header to HTTP
+  requests. Necessary to fetch DTDs specified in SYSTEM identifiers
+  when the DTD resides on a name-based "Virtual Host".
+  Thanks to 'tbe'.
+
 Changes in OpenSP 1.5pre5
 
 * Fix 32-bit assumptions so we build on 64-bit platforms such

@@ -26,6 +26,43 @@
 (define (cdddar x)  (cdr (cdr (cdr (car x)))) )
 (define (cddddr x)  (cdr (cdr (cdr (cdr x)))) )
 
+;; clause 8.5.8.4
+(define (char>?  c1 c2) (char<?  c2 c1))
+(define (char>=? c1 c2) (char<=? c2 c1))
+
+;; clause 8.5.8.5
+(define (__ci-equiv proc) 
+    (lambda (c1 c2) 
+        (proc (char-upcase c1) (char-upcase c2))
+    )
+)
+(define char-ci=?   (__ci-equiv char=?))
+(define char-ci<?   (__ci-equiv char<?))
+(define char-ci>?   (__ci-equiv char>?))
+(define char-ci<=?  (__ci-equiv char<=?))
+(define char-ci>=?  (__ci-equiv char>=?))
+
+;; clause 8.5.9.6
+(define (__upcase-string s) 
+    (list->string
+        (map char-upcase
+            (string->list s)
+        )
+    )
+)
+(define (__ci-string-equiv proc)
+    (lambda (s1 s2) 
+        (proc (__upcase-string s1) (__upcase-string s2))
+    )
+)
+(define (string>?    s1 s2) (string<?  s2 s1))
+(define (string>=?   s1 s2) (string<=? s2 s1))
+(define string-ci=?  (__ci-string-equic string=?))
+(define string-ci<?  (__ci-string-equic string<?))
+(define string-ci>?  (__ci-string-equic string>?))
+(define string-ci<=? (__ci-string-equic string<=?))
+(define string-ci>=? (__ci-string-equic string>=?))
+
 ;; clause 8.5.10.3
  (define (map f #!rest xs)
    (let ((map1 (lambda (f xs)

@@ -13,14 +13,14 @@
 /* define this appropriately if the type sig_atomic_t is not available */
 #undef sig_atomic_t
 
+/* define this if your system misses new.h */
+#undef SP_NEW_H_MISSING
+
 /* define this if  set_new_handler() has to be declared extern "C" */
 #undef SP_SET_NEW_HANDLER_EXTERN_C 
 
 /* ??? */
 #undef SP_ANSI_LIB       
-
-/* define this if  std:: namespace is not supported */
-#undef SP_NO_STD_NAMESPACE 
 
 /* define this to build a multi-byte version */
 #undef SP_MULTI_BYTE
@@ -107,8 +107,8 @@
 
 #ifdef HAVE_NAMESPACES
 #define SP_NAMESPACE OpenSP
-#define DSSSL_NAMESPACE OpenSP
-#define GROVE_NAMESPACE OpenSP
+#define DSSSL_NAMESPACE OpenJade_DSSSL
+#define GROVE_NAMESPACE OpenJade_Grove
 #endif /* HAVE_NAMESPACES */
 
 #ifdef SP_NAMESPACE

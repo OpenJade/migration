@@ -12,12 +12,21 @@
 #include "GroveManager.h"
 #include "dsssl_ns.h"
 
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
+
+class CodingSystem;
+
+#ifdef SP_NAMESPACE
+}
+#endif
+
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
 
 class Interpreter;
-class CodingSystem;
 
 class STYLE_API StyleEngine {
 public:

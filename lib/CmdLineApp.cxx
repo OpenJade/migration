@@ -194,20 +194,54 @@ void CmdLineApp::usage()
 		    : CmdLineAppMessages::usage,
 		    args2, *stdOut, 1);
       *stdOut << nl;
-#if 0
-      message(i ? CmdLineAppMessages::usageCont 
-                : CmdLineAppMessages::usage, StringMessageArg(tem));
-#endif
     } 
   }
+
+  Vector<CopyOwner<MessageArg> > args;
   for (size_t i = 0; i < preInfos_.size(); i++) {
-    Vector<CopyOwner<MessageArg> > args;
     formatMessage(preInfos_[i], args, *stdOut, 1);
     *stdOut << nl;
   }
   Vector<StringC> leftSide;
   size_t leftSize = 0;
   for (size_t i = 0; i < opts_.size(); i++) {
+    leftSide.resize(leftSide.size() + 1);
+    StringC& s = leftSide.back();
+    static const AppChar* space2 = SP_T("  ");
+    s += convertInput(space2);
+    if (opts_[i].key) {
+      static const AppChar* dash = SP_T("-");
+      s += convertInput(dash);
+      AppChar buf[2];
+      buf[0] = opts_[i].key;
+      buf[1] = SP_T('\0');
+      s += convertInput(buf);
+      if (opts_[i].name) {
+	static const AppChar* commaSpace = SP_T(", ");
+	s += convertInput(commaSpace);
+      }
+      else if (opts_[i].hasArgument) {
+	buf[0] = ' ';
+	s += convertInput(buf);
+      }
+    }
+    if (opts_[i].name) {
+      static const AppChar* dash2 = SP_T("--");
+      s += convertInput(dash2);
+      s += convertInput(opts_[i].name);
+      if (opts_[i].hasArgument) {
+	static const AppChar* equal = SP_T("=");
+	s += convertInput(equal);
+      }
+    }
+    if (opts_[i].hasArgument) {
+      StringC tem;
+      getMessageText(optArgs_[i], tem);
+      s += tem;
+    }
+    if (s.size() > leftSize)
+      leftSize = s.size();
+#if 0
     Vector<CopyOwner<MessageArg> > args(3);
     if (opts_[i].key) {
       AppChar buf[2];
@@ -248,6 +282,7 @@ void CmdLineApp::usage()
     leftSide.push_back(tem);
     if (tem.size() > leftSize)
       leftSize = tem.size(); 
+#endif
   }
   leftSize += 2;
   for (size_t i = 0; i < opts_.size(); i++) {
@@ -255,33 +290,19 @@ void CmdLineApp::usage()
       leftSide[i] += ' ';
     StrOutputCharStream ostr;
     Vector<CopyOwner<MessageArg> > args(1);
-    StringC t, t2;
-    if (getMessageText(optArgs_[i], t2))
-      t+=t2;
+    StringC t;
+    if (!getMessageText(optArgs_[i], t))
+      t.resize(0);
     StringMessageArg arg(t);
     args[0] = arg.copy(); 
     formatMessage(optDocs_[i], args, ostr, 1);
     StringC tem;
     ostr.extractString(tem);
-    leftSide[i] += tem;
-    *stdOut << leftSide[i];
-    *stdOut << nl;
-#if 0
-    message(
-      MessageType1(MessageType::info, MessageFragment::libModule, 0
-#ifndef SP_NO_MESSAGE_TEXT
-                   , "%1"
-#endif
-      ), StringMessageArg(leftSide[i]));
-#endif
+    *stdOut << leftSide[i] << tem << nl;
   }
   for (size_t i = 0; i < infos_.size(); i++) {
-    Vector<CopyOwner<MessageArg> > args;
     formatMessage(infos_[i], args, *stdOut, 1);
     *stdOut << nl;
-#if 0
-    message(infos_[i]);
-#endif
   }
 }
 

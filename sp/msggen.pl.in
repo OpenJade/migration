@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#! @PERL@
 # Copyright (c) 1994 James Clark
 # Copyright (c) 2000 Peter Nilsson
 # See the file COPYING for copying permission.

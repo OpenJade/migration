@@ -1163,6 +1163,9 @@ void RtfFOTBuilder::symbolChar(int ff, unsigned code)
 #if 0
   os() << "{\\field{\\*\\fldinst SYMBOL " << (unsigned long)code
        << " \\\\f \"" << symbolFonts[ff - 1].name << "\"}{\\fldrslt ";
+      if (specFormat_.inputWhitespaceTreatment != symbolPreserve)
+              for (; n > 0 && *s == ' '; s++, n--)
+                      ;
 #endif
   int &n = fontFamilyCharsetsTable_[ff].rtfFontNumber[nWinCharsets - 1];
   if (n < 0)
@@ -2051,8 +2054,9 @@ void RtfFOTBuilder::endLineField()
   }
   else if (inlineState_ == inlineField) {
     os() << "\\tab ";
-    inlineState_ = inlineMiddle;
+    
   }
+  inlineState_ = inlineMiddle;
   end();
 }
 

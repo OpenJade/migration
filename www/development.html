@@ -27,12 +27,13 @@ To get the stable branch checkout (or update to) <font
 face="Times New Roman"><code>jade_1_3_branch</code></font>. For
 example,</p>
 
-<pre>cvs -z9 checkout jade   # get experimental branch</pre>
-
-<pre>cvs -z9 update -r jade_1_3_branch jade  # switch to stable branch</pre>
+<p><pre>
+cvs -z9 checkout jade   # get experimental branch
+cvs -z9 update -r jade_1_3_branch jade  # switch to stable branch
+</pre></p>
 
 <p>Logs of development activity are kept in the <a
-href="ChangeLog">ChangeLog</a> and the <a href="NEWS">NEWS</a>
+href="ChangeLog.jade">ChangeLog</a> and the <a href="NEWS.jade">NEWS</a>
 files. The former is generated automatically from the cvs commit
 logs, while the latter is manually updated by the maintainers,
 and is more user-level.</p>
@@ -43,27 +44,27 @@ and is more user-level.</p>
 repository. Thus to use the OpenJade out of CVS, you will have to
 check out, build and install OpenSP as well:</p>
 
-<pre>cvs -z9 checkout sp</pre>
+<p><pre>cvs -z9 checkout sp</pre></p>
 
 <p>We have also converted the Unix build process to automake, thus
-you'll need the developer tools autoheader, automake, aclocal and autoconf
+you'll need the developer tools automake, autoconf and libtool
 to work from CVS. The sequence of commands to run after an initial 
 checkout of OpenSP is:</p>
 
-<pre>
+<p><pre>
 autoheader
-automake
+automake --add-missing
 aclocal
 autoconf
-</pre>
+</pre></p>
 
 <p>After this, you can do the normal</p>
 
-<pre>
+<p><pre>
 ./configure
 make
 make install
-</pre>
+</pre></p>
 
 <h2>OpenJade Internals Documentation</h2>
 
@@ -77,7 +78,7 @@ Clasen, one of the OpenJade maintainers.</p>
 <p>Preferrably, start with a clean OpenJade release  
 and apply your changes to it. Then generate a patch with the command</p>
 
-<pre>cvs -z9 diff -r jade_1_2_1 &gt; patch</pre>
+<p><pre>cvs -z9 diff -r jade_1_2_1 &gt; patch</pre></p>
 
 <p>Pack the patch using the tools appropriate for your platform
 (Zip for windows or tar -z for *ix) and send it to one of the

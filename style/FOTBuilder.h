@@ -375,6 +375,7 @@ public:
   virtual void atomic();
   // Atomic flow objects
   virtual void characters(const Char *, size_t);
+  virtual void characters(const Vector<CharacterNIC> &);
   // Like characters(), but data comes from charChunk() on a NodePtr.
   // If you are building a tree, then the NodePtr can be saved instead
   // of the data.  The default implementation calls characters().
@@ -718,6 +719,16 @@ public:
     bool partial;
   };
 
+  struct STYLE_API Description {
+    const Extension *extensions;
+    const Feature *features;
+    // Set this if you want character NICs whose default values are the values
+    // of character properties to be included correctly. This degrades per-
+    // formance, so if you don't care (i.e. the formatter has its own
+    // values), set to false.
+    bool wantCharPropertyNICs;
+  };
+
   static const char *symbolName(Symbol);
 };
 
@@ -733,6 +744,7 @@ public:
   class Emitter;
 
   void characters(const Char *, size_t);
+  void characters(const Vector<CharacterNIC> &);
   void charactersFromNode(const NodePtr &, const Char *, size_t);
   void character(const CharacterNIC &);
   void paragraphBreak(const ParagraphNIC &);

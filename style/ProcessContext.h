@@ -37,6 +37,8 @@ public:
   void nextMatch(StyleObj *);
   void processChildren(const ProcessingMode *);
   void processChildrenTrim(const ProcessingMode *);
+  void characters(const Char *, size_t);
+  void charactersFromNode(const NodePtr &, const Char *, size_t);
   void trace(Collector &) const;
   void startFlowObj();
   void endFlowObj();

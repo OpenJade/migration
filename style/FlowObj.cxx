@@ -1441,7 +1441,7 @@ public:
   FlowObj *copy(Collector &) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
-  bool setImplicitChar(ELObj *, const Location &, Interpreter &);
+  void setImplicitCharNICs(const Char *, const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
   bool characterStyle(ProcessContext &, StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
     style = style_;
@@ -1468,88 +1468,82 @@ void CharacterFlowObj::processInner(ProcessContext &context)
   context.currentFOTBuilder().character(*nic_);
 }
 
-bool FlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
+void FlowObj::setImplicitCharNICs(const Char *ch, const Location &loc, 
                                        Interpreter &interp)
 {
   CANNOT_HAPPEN();
-  return false;
 }
 
-
-bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
+void CharacterFlowObj::setImplicitCharNICs(const Char *ch, const Location &loc, 
                                        Interpreter &interp)
 {
-  Identifier *ident = interp.lookup(interp.makeStringC("char")); 
   if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
-      && interp.convertCharC(obj, ident, loc, nic_->ch)) {
-    nic_->valid = 1;
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("space?"), 
-						 nic_->ch, loc, 0),  
-			     ident, loc, nic_->isSpace);
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("record-end?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isRecordEnd);
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("input-tab?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isInputTab);
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("input-whitespace?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isInputWhitespace);
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("punct?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isPunct);
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("drop-after-line-break?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isDropAfterLineBreak); 
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
-      interp.convertBooleanC(
-			     interp.charProperty(interp.makeStringC("drop-unless-before-line-break?"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->isDropUnlessBeforeLineBreak); 
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
-      interp.convertIntegerC(
-			     interp.charProperty(interp.makeStringC("break-before-priority"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->breakBeforePriority);  
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
-      interp.convertIntegerC(
-			     interp.charProperty(interp.makeStringC("break-after-priority"), 
-						 nic_->ch, loc, 0),
-			     ident, loc, nic_->breakAfterPriority);  
-    
-    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript))) {
-      ELObj *prop = interp.charProperty(interp.makeStringC("script"), 
-                                        nic_->ch, loc, 0);
-      if (prop == interp.makeFalse())
-        nic_->script = 0;
-      else {
-        StringC tem;
-        if (interp.convertStringC(prop, ident, loc, tem))
-	  nic_->script = interp.storePublicId(tem.data(), tem.size(), loc);
-      }
-    }
-    
+      && ch) {
+    nic_->ch = *ch;
+    nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+  }
+
+  if (nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))
+    FlowObj::setImplicitCharNICs(&nic_->ch, 1, nic_.pointer(), interp);
+}
+
+void FlowObj::setImplicitCharNICs(const Char *ch, size_t n,
+				  FOTBuilder::CharacterNIC *nic,
+				  Interpreter &interp)
+{
+  for (; n > 0; ++ch, ++nic, --n) {
+    // FIXME. Apply char-map.
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
+      nic->isSpace = interp.isSpace().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
+      nic->isRecordEnd = interp.isRecordEnd().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
+      nic->isInputTab = interp.isInputTab().getValue(*ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
+      nic->isInputWhitespace = interp.isInputWhitespace().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
+      nic->isPunct = interp.isPunct().getValue(*ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
+      nic->isDropAfterLineBreak =
+	interp.isDropAfterLineBreak().getValue(*ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
+      nic->isDropUnlessBeforeLineBreak =
+	interp.isDropUnlessBeforeLineBreak().getValue(*ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
+      nic->breakBeforePriority =
+	interp.breakBeforePriority().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
+      nic->breakAfterPriority =
+	interp.breakAfterPriority().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript)))
+      nic->script = interp.script().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId)))
+      nic->glyphId = interp.glyphId().getValue(*ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cMathFontPosture)))
+      nic->mathFontPosture = interp.mathFontPosture().getValue(*ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass)))
+      nic->mathClass = interp.mathClass().getValue(*ch);
+    nic->specifiedC |=
+      ((1 << FOTBuilder::CharacterNIC::cIsSpace) |
+       (1 << FOTBuilder::CharacterNIC::cIsRecordEnd) |
+       (1 << FOTBuilder::CharacterNIC::cIsInputTab) |
+       (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace) |
+       (1 << FOTBuilder::CharacterNIC::cIsPunct) |
+       (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak) |
+       (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak) |
+       (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority) |
+       (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority) |
+       (1 << FOTBuilder::CharacterNIC::cScript) |
+       (1 << FOTBuilder::CharacterNIC::cGlyphId) |
+       (1 << FOTBuilder::CharacterNIC::cMathFontPosture) |
+       (1 << FOTBuilder::CharacterNIC::cMathClass));
+  }    
+#if 0
     if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId))) {
       ELObj *prop = interp.charProperty(interp.makeStringC("glyph-id"), 
                                         nic_->ch, loc, 0);
@@ -1594,10 +1588,7 @@ bool CharacterFlowObj::setImplicitChar(ELObj *obj, const Location &loc,
       interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathClass);
     }
     
-    return 1;
-  }
-  else 
-    return 0; 
+#endif
 }
 
 void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
@@ -1656,13 +1647,8 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       }
       return;
     case Identifier::keyChar:
-      if (setImplicitChar(obj, loc, interp)) { 
-        nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
-        if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
-          nic_->isInputTab = 0;
-        if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace))) 
-          nic_->isInputWhitespace = 0;
-      }
+      if (interp.convertCharC(obj, ident, loc, nic_->ch))
+	nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
       return;
     case Identifier::keyGlyphId:
       {
@@ -3090,8 +3076,9 @@ void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
 						  const Location &loc)
 {
   FlowObj *tem = 0;
-  if (extensionTable_) {
-    for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
+  if (fotbDescr_.extensions) {
+    for (const FOTBuilder::Extension *ep = fotbDescr_.extensions;
+	 ep->pubid; ep++) {
       if (pubid == ep->pubid) {
 	if (ep->flowObj) {
 	  const FOTBuilder::CompoundExtensionFlowObj *cFlowObj

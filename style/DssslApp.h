@@ -16,8 +16,7 @@ namespace DSSSL_NAMESPACE {
 class STYLE_API DssslApp : public GroveApp, public GroveManager {
 public:
   DssslApp(int unitsPerInch);
-  virtual FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&,
-				     const FOTBuilder::Feature *&) = 0;
+  virtual FOTBuilder *makeFOTBuilder(const FOTBuilder::Description *&) = 0;
   int processSysid(const StringC &);
   bool load(const StringC &sysid, const Vector<StringC> &active,
 	    const NodePtr &parent, NodePtr &rootNode,

@@ -21,6 +21,22 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class ELObjCharPropValues : public CharPropValues {
+public:
+  ELObjCharPropValues()
+    : def_(0), map_(0) {}
+private:
+  // 0 means no value.
+  ELObj *def_;
+  CharMap<ELObj *> map_;
+  bool setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &);
+  bool setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &);
+  ELObj *value(Char, Interpreter &) const;
+  ELObj *defaultValue(Interpreter &) const;
+};
+
 const Char defaultChar = 0xfffd;
 
 static
@@ -62,11 +78,11 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 bool dsssl2,
 			 bool style,
                          bool strictMode,
-			 const FOTBuilder::Extension *extensionTable,
-			 const FOTBuilder::Feature *backendFeatures)
+			 const FOTBuilder::Description &fotbDescr)
+
 : groveManager_(groveManager),
   messenger_(messenger),
-  extensionTable_(extensionTable),
+  fotbDescr_(fotbDescr),
   Collector(maxObjSize()),
   partIndex_(0),  // 0 is for command-line definitions
   dPartIndex_(1),
@@ -79,6 +95,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
   dsssl2_(dsssl2),
+  mathClassCPV_(FOTBuilder::symbolOrdinary),
   style_(style),
   strictMode_(strictMode),
   explicitFeatures_(0),
@@ -99,7 +116,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installPortNames();
   installPrimitives();
   installUnits();
-  installFeatures(backendFeatures);
+  installFeatures(fotbDescr_.features);
   installModules();
   installCharNames();
   installSdata();
@@ -738,6 +755,16 @@ Unit *Interpreter::lookupUnit(const StringC &str)
     unitTable_.insert(unit);
   }
   return unit;
+}
+
+CharProp *Interpreter::lookupCharProperty(const StringC &n)
+{
+  CharProp *p = charPropTable_.lookup(n);
+  if (!p) {
+    p = new CharProp(n);
+    charPropTable_.insert(p);
+  }
+  return p;
 }
 
 ProcessingMode *Interpreter::lookupProcessingMode(const StringC &str)
@@ -2089,318 +2116,578 @@ void Interpreter::compileDefaultLanguage()
 
 void Interpreter::installCharProperties()
 {
-  //FIXME convert this to tables 
-  // initialize charProperties_;
-  // if a character doesn't have a value for a property,
-  // the CharMap contains 0. 
+  //FIXME convert this to tables
 
-  CharProp cp;
+  // NOte that default values are set in the constructors.
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.loc = Location();
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_)
-    for (int i = 0; i < 10; i++) {
-      ELObjPart num(makeInteger(i), unsigned(-1));
-      makePermanent(num.obj);
-      cp.map->setChar(i+'0', num);
-    }
-  charProperties_.insert(makeStringC("numeric-equiv"), cp);
+  lookupCharProperty(makeStringC("numeric-equiv"))->
+    declarePredefined(&numericEquivCPV_);
+  if (!strictMode_) {
+    for (int i = 0; i < 10; i++) 
+      numericEquivCPV_.setValue(i+'0', i);
+  }
   
   if (style()) {
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    lookupCharProperty(makeStringC("space?"))->
+      declarePredefined(&isSpaceCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define SPACE 
 #include "charProps.h"
 #undef SPACE
       };
-   
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-  		       ELObjPart(makeTrue(), unsigned(-1)));
+	isSpaceCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("space?"), cp);
-    
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+
+    lookupCharProperty(makeStringC("record-end?"))->
+      declarePredefined(&isRecordEndCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define RECORD_END
 #include "charProps.h"
 #undef RECORD_END
       };
-    
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-                         ELObjPart(makeTrue(), unsigned(-1)));
+	isRecordEndCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("record-end?"), cp);
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    lookupCharProperty(makeStringC("blank?"))->
+      declarePredefined(&isBlankCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define BLANK
 #include "charProps.h"
 #undef BLANK
       };
-    
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-                         ELObjPart(makeTrue(), unsigned(-1)));
+	isBlankCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("blank?"), cp);
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    lookupCharProperty(makeStringC("input-tab?"))->
+      declarePredefined(&isInputTabCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define INPUT_TAB
 #include "charProps.h"
 #undef INPUT_TAB
       };
-    
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-  		       ELObjPart(makeTrue(), unsigned(-1)));
+	isInputTabCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("input-tab?"), cp);
-     
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+
+    lookupCharProperty(makeStringC("input-whitespace?"))->
+      declarePredefined(&isInputWhitespaceCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define INPUT_WHITESPACE
 #include "charProps.h"
 #undef INPUT_WHITESPACE
       };
-    
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-  		       ELObjPart(makeTrue(), unsigned(-1)));
+	isInputWhitespaceCPV_.setRange(chars[i].c,
+				       chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("input-whitespace?"), cp);
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    lookupCharProperty(makeStringC("punct?"))->
+      declarePredefined(&isPunctCPV_);
     if (!strictMode_) {
       static struct {
-        Char c;
-        unsigned num;
+	Char c;
+	unsigned short num;
       } chars[] = {
 #define PUNCT
 #include "charProps.h"
 #undef PUNCT
       };
-    
       for (size_t i = 0; i < SIZEOF(chars); i++) 
-        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
+	isPunctCPV_.setRange(chars[i].c, chars[i].c+chars[i].num-1, true);
     }
-    charProperties_.insert(makeStringC("punct?"), cp);
-
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    
+    lookupCharProperty(makeStringC("script"))->
+      declarePredefined(&scriptCPV_);
     if (!strictMode_) {
       static struct {
-        Char c1, c2;
-        char *script;
+	Char c1, c2;
+	char *suffix;
       } chars[] = {
 #define SCRIPT
 #include "charProps.h"
 #undef SCRIPT
       };
-    
       StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
       for (size_t i = 0; i < SIZEOF(chars); i++) { 
-        StringC tem(prefix);
-        tem += makeStringC(chars[i].script);
-        StringObj *obj = new (*this) StringObj(tem);
-        makePermanent(obj);  
-        cp.map->setRange(chars[i].c1, chars[i].c2,
-		       ELObjPart(obj, unsigned(-1)));
+	StringC tem(prefix);
+	tem += makeStringC(chars[i].suffix);
+	scriptCPV_.setRange(chars[i].c1, chars[i].c2,
+			    storePublicId(tem.data(), tem.size(), Location()));
       }
     }
-    charProperties_.insert(makeStringC("script"), cp);
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    charProperties_.insert(makeStringC("glyph-id"), cp);  
+    lookupCharProperty(makeStringC("glyph-id"))->
+      declarePredefined(&glyphIdCPV_);
+    // FIXME. Default values?
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    charProperties_.insert(makeStringC("drop-after-line-break?"), cp);  
+    lookupCharProperty(makeStringC("drop-after-line-break?"))->
+      declarePredefined(&isDropAfterLineBreakCPV_);
+    // FIXME: Values.
 
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    charProperties_.insert(makeStringC("drop-unless-before-line-break?"), cp);  
+    lookupCharProperty(makeStringC("drop-unless-before-line-break?"))->
+      declarePredefined(&isDropUnlessBeforeLineBreakCPV_);
+    // FIXME: Values.
 
-    cp.def = ELObjPart(makeInteger(0), unsigned(-1));
-    makePermanent(cp.def.obj);
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    CharProp cp2;
-    cp2.def = ELObjPart(cp.def.obj, unsigned(-1));
-    cp2.loc = Location();
-    cp2.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    lookupCharProperty(makeStringC("break-before-priority"))->
+      declarePredefined(&breakBeforePriorityCPV_);
+    lookupCharProperty(makeStringC("break-after-priority"))->
+      declarePredefined(&breakAfterPriorityCPV_);
     if(!strictMode_) {
       static struct {
-        Char c;
-        unsigned short num;
-        unsigned short bbp;
-        unsigned short bap;
-      } chars[] ={
+	Char c;
+	unsigned short num;
+	unsigned short bbp;
+	unsigned short bap;
+      } chars[] = {
 #define BREAK_PRIORITIES
 #include "charProps.h"
 #undef BREAK_PRIORITIES
       };
-      for(size_t i = 0; i < SIZEOF(chars); ++i) {
-        ELObj *obj = makeInteger(chars[i].bbp);
-        makePermanent(obj);
-        cp.map->setRange(chars[i].c, chars[i].c + chars[i].num-1,
-		       ELObjPart(obj, unsigned(-1)));
-        if (chars[i].bap != chars[i].bbp) {
-	  obj = makeInteger(chars[i].bap);
-	  makePermanent(obj);
-        }
-        cp2.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-			ELObjPart(obj, unsigned(-1)));
-      } 
+      for (size_t i = 0; i < SIZEOF(chars); ++i) {
+	breakBeforePriorityCPV_.setRange(chars[i].c, chars[i].c + chars[i].num-1,
+					 chars[i].bbp);
+	breakAfterPriorityCPV_.setRange(chars[i].c, chars[i].c + chars[i].num-1,
+					chars[i].bap);
+      }
     }
 
-    charProperties_.insert(makeStringC("break-before-priority"), cp);  
-    charProperties_.insert(makeStringC("break-after-priority"), cp2);  
+    lookupCharProperty(makeStringC("math-class"))->
+      declarePredefined(&mathClassCPV_);
+    // FIXME: Values.
 
-    cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
-    makePermanent(cp.def.obj);
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    charProperties_.insert(makeStringC("math-class"), cp);  
-
-    cp.def = ELObjPart(makeFalse(), unsigned(-1));
-    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-    charProperties_.insert(makeStringC("math-font-posture"), cp);  
+    lookupCharProperty(makeStringC("math-font-posture"))->
+      declarePredefined(&mathFontPostureCPV_);
+    // FIXME: Values.
   }
-}
-
-// return 1 if the character has the property, return 0 if no such property
-// or the character doesn't have the property
-// set ret to the value or the default value
-ELObj *Interpreter::charProperty(const StringC &prop, Char c, const Location &loc, ELObj *def) 
-{
-  const CharProp *cp = charProperties_.lookup(prop);
-  if (!cp) {
-    setNextLocation(loc);
-    message(InterpreterMessages::unknownCharProperty,
-            StringMessageArg(prop));
-    return makeError();
-  }
-
-  if ((*cp->map)[c].obj) 
-    return (*cp->map)[c].obj;
-  else if (def) 
-    return def;
-  else 
-    return cp->def.obj;
-}
-
-void Interpreter::addCharProperty(const Identifier *prop, Owner<Expression> &defval)
-{
-  // FIXME: what about variable default values ?
-  defval->optimize(*this, Environment(), defval);
-  // FIXME: this is a kind of memory leak
-  makePermanent(defval->constantValue());
-  ELObjPart val(defval->constantValue(), partIndex_);
-  const CharProp *cp = charProperties_.lookup(prop->name());
-  if (cp) {
-    if (partIndex_ < cp->def.defPart) 
-      ((CharProp *)cp)->def = val;
-    else if (partIndex_ == cp->def.defPart && 
-             !ELObj::eqv(*val.obj, *cp->def.obj)) {
-      // FIXME: report previous location
-      setNextLocation(defval->location());
-      message(InterpreterMessages::duplicateCharPropertyDecl,
-              StringMessageArg(prop->name()), cp->loc);
-    }
-  }
-   else {
-    CharProp ncp;
-    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
-    ncp.def = val;
-    ncp.loc = defval->location();
-    charProperties_.insert(prop->name(), ncp);
-  }
-}
-
-void Interpreter::setCharProperty(const Identifier *prop, Char c, Owner<Expression> &val)
-{
-  // FIXME: what about variable default values ?
-  const CharProp *cp = charProperties_.lookup(prop->name());
-  if (!cp) {
-    CharProp ncp;
-    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
-    ncp.def = ELObjPart(0, unsigned(-1));
-    ncp.loc = val->location();
-    charProperties_.insert(prop->name(), ncp);
-    cp = charProperties_.lookup(prop->name());
-  }
-  val->optimize(*this, Environment(), val);
-  makePermanent(val->constantValue());
-  ELObjPart obj = ELObjPart(val->constantValue(), partIndex_);
-  
-  ELObjPart def = (*cp->map)[c];
-  if (def.obj) {
-    if (partIndex_ < def.defPart) 
-      cp->map->setChar(c, obj);
-    else if (partIndex_ == def.defPart && !ELObj::eqv(*obj.obj, *def.obj)) {
-      setNextLocation(val->location());
-      // FIXME: report previous location
-      message(InterpreterMessages::duplicateAddCharProperty,
-              StringMessageArg(prop->name()),
-              StringMessageArg(StringC(&c, 1)));
-    }
-  }
-  else 
-    cp->map->setChar(c, obj);
 }
 
 void
 Interpreter::compileCharProperties()
 {
-  HashTableIter<StringC, CharProp> iter(charProperties_);
-  const StringC *key;
-  const CharProp *val;
-  while (iter.next(key, val)) 
-    if (!val->def.obj) {
-      // FIXME location
-      setNextLocation(val->loc);
-      message(InterpreterMessages::unknownCharProperty,
-              StringMessageArg(*key));
-      ((CharProp *)val)->def = ELObjPart(makeError(), 0);
-    }
+  NamedTableIter<CharProp> iter(charPropTable_);
+  CharProp *val;
+  while ((val = iter.next())) 
+    val->compile(*this);
 }
 
-
-void Interpreter::installExtensionCharNIC(Identifier *ident,
+CharPropValues *Interpreter::installExtensionCharNIC(Identifier *ident,
 					  const StringC &pubid,
 					  const Location &loc)
 {
   ident->setCharNIC(currentPartIndex(), loc);
+  // FIXME! Shouldn't even get into CVS!
+  return new ELObjCharPropValues;
+}
+
+ELObj *CharProp::value(Char ch, ELObj *def,
+		       const Location &loc, Interpreter &interp)
+{
+  addedProp_ *p=(addedProp_ *)added_(ch);
+  if (p != 0 && p->computed_ != computedOK) {
+    compileAdded_(*p,interp);
+    if(p->computed_ == computedError) {
+      if (!values_) {
+	interp.setNextLocation (loc);
+	interp.message (InterpreterMessages::unknownCharProperty,
+			StringMessageArg (name()));
+      }
+      return interp.makeError();
+    }
+    ASSERT(p->computed_ == computedOK);
+  }
+  ASSERT(values_);
+  ELObj *tem = values_->value(ch, interp);
+  if(tem)
+    return tem;
+  else if (def)
+    return def;
+  if (defComputed_ != computedOK) {
+    compileDef_ (interp);
+    if (defComputed_ == computedError)
+      return interp.makeError();
+    ASSERT(defComputed_ == computedOK);
+  }
+  tem = values_->defaultValue(interp);
+  ASSERT(tem);
+  return tem;
+}
+
+void CharProp::setValue(StringC &chars, Owner<Expression> &expr,
+			unsigned part, const Location &loc)
+{
+  ASSERT(chars.size()>0);
+  addedPropsVec_.resize (addedPropsVec_.size() + 1);
+  addedProp_ &p = addedPropsVec_.back();
+  p.chars_.swap(chars);
+  p.part_ = part;
+  p.loc_ = loc;
+  p.expr_.swap(expr);
+  p.computed_ = notComputed;
+
+  if(!addedProps_)
+    addedProps_ = new CharMap<NCVector<addedProp_>::size_type> (noAddedVal_);
+  for(size_t i = 0; i < p.chars_.size(); ++i) {
+    ASSERT((*addedProps_)[p.chars_[i]] == noAddedVal_);
+    addedProps_->setChar(p.chars_[i],addedPropsVec_.size() - 1);
+  }
+}
+
+void CharProp::declare(Owner<Expression> &expr,
+		       unsigned part,
+		       const Location &loc,
+		       CharPropValues *values)
+{
+  ASSERT(!defExpr_);
+  ASSERT(expr);
+  defExpr_.swap(expr);
+  defPart_ = part;
+  defLoc_ = loc;
+  if (values)
+    values_ = values;
+  else if (!values_) {
+    // FIXME! Shall not get into CVS!
+    values_ = new ELObjCharPropValues ();
+  }
+}
+
+void CharProp::declarePredefined(CharPropValues *values)
+{
+  values_ = values;
+}
+
+bool CharProp::hasAddedValue(Char ch,unsigned &part,Location &loc) const
+{
+  const addedProp_ *p = added_(ch);
+  if(p) {
+    part = p->part_;
+    loc = p->loc_;
+    return true;
+  }
+  return false;
+}
+
+bool CharProp::declared(unsigned &part, Location &loc) const
+{
+  if(defExpr_) {
+    part = defPart_;
+    loc = defLoc_;
+    return true;
+  }
+  return false;
+}
+
+void CharProp::compile(Interpreter &interp)
+{
+  compileDef_(interp);
+  for(NCVector<addedProp_>::size_type i = 0; i < addedPropsVec_.size(); ++i)
+    compileAdded_(addedPropsVec_[i],interp);
+  if (!hadError_) {
+    addedProps_.clear();
+    addedPropsVec_.clear();
+  }
+}
+    
+void CharProp::compileDef_(Interpreter &interp)
+{
+  switch(defComputed_) {
+  case notComputed:
+    if (defExpr_) {
+      defComputed_ = beingComputed;
+      InsnPtr insn = Expression::optimizeCompile (defExpr_, interp,
+						  Environment(), 0, InsnPtr());
+      VM vm (interp);
+      ELObj *p = vm.eval (insn.pointer());
+      if (!interp.isError(p)
+	  && values_->setDefault(name(), defLoc_, p, interp))
+	defComputed_ = computedOK;
+      else
+	defComputed_ = computedError;
+    }
+    else if (values_) {
+      defComputed_ = computedOK;
+    } else
+      defComputed_ = computedError;
+    break;
+  case beingComputed:
+    interp.setNextLocation(defLoc_);
+    interp.message(InterpreterMessages::charPropertyLoop,
+		    StringMessageArg(name()));
+    defComputed_ = computedError;
+    break;
+  default:
+    ;
+  }
+}
+
+void CharProp::compileAdded_(addedProp_ &added, Interpreter &interp)
+{
+  switch(added.computed_) {
+  case notComputed: { // Own block since InsnPtr and VM have destructors.
+    // Check that property is declared.
+    if (!values_) {
+      interp.setNextLocation (added.loc_);
+      interp.message (InterpreterMessages::unknownCharProperty,
+		      StringMessageArg (name()));
+      added.computed_ = computedError;
+      hadError_ = true;
+      return;
+    }
+    ASSERT(added.expr_);
+    added.computed_ = beingComputed;
+    InsnPtr insn = Expression::optimizeCompile (added.expr_, interp,
+						Environment(), 0, InsnPtr());
+    VM vm (interp);
+    ELObj *p = vm.eval (insn.pointer());
+    if (!interp.isError(p) &&
+	values_->setValue(name(), added.chars_, added.loc_, p, interp))
+      added.computed_ = computedOK;
+    else {
+      added.computed_ = computedError;
+      hadError_ = true;
+    }
+    break;
+  }
+  case beingComputed:
+    interp.setNextLocation(added.loc_);
+    interp.message(InterpreterMessages::charPropertyLoop,
+		    StringMessageArg(name()));
+    added.computed_ = computedError;
+    break;
+  default:
+    ;
+  }
+}
+
+const CharProp::addedProp_ *CharProp::added_(Char ch) const
+{
+  if (!addedProps_)
+    return 0;
+  NCVector<addedProp_>::size_type n((*addedProps_)[ch]);
+  if (n == noAddedVal_)
+    return 0;
+  return &addedPropsVec_[n];
+}
+
+bool IntegerCharPropValues::setDefault(const StringC &name,
+				       const Location &loc,
+				       ELObj *obj, Interpreter &interp)
+{
+  if (!obj->exactIntegerValue(def_)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotInteger,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return false;
+  }
+  return true;
+}
+
+bool IntegerCharPropValues::setValue(const StringC &name, const StringC &chars,
+				     const Location &loc,
+				     ELObj *obj, Interpreter &interp)
+{
+  ValT_ v;
+  if (!obj->exactIntegerValue(v.l_)) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::charPropertyNotInteger,
+		   StringMessageArg(name),
+		   ELObjMessageArg(obj, interp));
+    return false;
+  }
+  v.hasValue_ = true;
+  for(size_t i=0; i<chars.size(); ++i)
+    map_.setChar(chars[i],v);
+  return true;
+}
+  
+ELObj *IntegerCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v=map_[ch];
+  if(v.hasValue_)
+    return interp.makeInteger(v.l_);
+  return 0;
+}
+
+ELObj *IntegerCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return interp.makeInteger(def_);
+}
+
+bool MaybeIntegerCharPropValues::setDefault(const StringC &name,
+					    const Location &loc,
+					    ELObj *obj, Interpreter &interp)
+{
+  if (obj->exactIntegerValue(def_) || (defFalse_ = (!obj->isTrue())))
+    return true;
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotIntegerOrFalse,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
+}
+
+bool MaybeIntegerCharPropValues::setValue(const StringC &name,
+					  const StringC &chars,
+					  const Location &loc,
+					  ELObj *obj,
+					  Interpreter &interp)
+{
+  ValT_ v;
+  if (obj->exactIntegerValue(v.l_) || (v.isFalse_ = (!obj->isTrue()))) {
+    v.hasValue_ = true;
+    for (size_t i = 0; i < chars.size(); ++i)
+      map_.setChar(chars[i], v);
+    return true;
+  }
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::charPropertyNotIntegerOrFalse,
+		 StringMessageArg(name),
+		 ELObjMessageArg(obj, interp));
+  return false;
+}
+
+ELObj *MaybeIntegerCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_) {
+    if (v.isFalse_)
+      return interp.makeFalse();
+    else
+      return interp.makeInteger(v.l_);
+  }
+  return 0;
+}
+    
+ELObj *MaybeIntegerCharPropValues::defaultValue(Interpreter &interp) const
+{
+  if (defFalse_)
+    return interp.makeFalse();
+  return interp.makeInteger(def_);
+}
+
+bool BooleanCharPropValues::setDefault(const StringC &, const Location &,
+				       ELObj *obj, Interpreter &)
+{
+  def_ = obj->isTrue();
+  return 1;
+}
+
+bool BooleanCharPropValues::setValue(const StringC &, const StringC &chars,
+				     const Location &, ELObj *obj,
+				     Interpreter &)
+{
+  ValT_ v;
+  v.hasValue_ = true;
+  v.b_ = obj->isTrue();
+  for (size_t i = 0; i < chars.size(); ++i)
+    map_.setChar (chars[i], v);
+  return true;
+}
+
+ELObj *BooleanCharPropValues::value(Char ch, Interpreter &interp) const
+{
+  ValT_ v(map_[ch]);
+  if (v.hasValue_)
+    return v.b_ ? interp.makeTrue() : interp.makeFalse();
+  return 0;
+}
+
+ELObj *BooleanCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return def_ ? interp.makeTrue() : interp.makeFalse();
+}
+
+bool PublicIdCharPropValues::setDefault(const StringC &name,
+					const Location &loc,
+					ELObj *obj, Interpreter &)
+{
+  Char *c;
+  size_t n;
+  if (obj->stringData (c, n));
+  return 0;
+}
+
+bool PublicIdCharPropValues::setValue(const StringC &name,
+				      const StringC &chars,
+				      const Location &loc,
+				      ELObj *obj, Interpreter &interp)
+{
+}
+
+ELObj *PublicIdCharPropValues::value(Char, Interpreter &) const
+{
+}
+
+ELObj *PublicIdCharPropValues::defaultValue(Interpreter &) const
+{
+}
+
+bool SymbolCharPropValues::setDefault(const StringC &, const Location &,
+		  ELObj *, Interpreter &)
+{
+}
+
+bool SymbolCharPropValues::setValue(const StringC &, const StringC &, const Location &,
+		ELObj *,Interpreter &)
+{
+}
+
+ELObj *SymbolCharPropValues::value(Char, Interpreter &) const
+{
+}
+
+ELObj *SymbolCharPropValues::defaultValue(Interpreter &) const
+{
+}
+
+bool ELObjCharPropValues::setDefault(const StringC &, const Location &,
+				     ELObj *obj, Interpreter &interp)
+{
+  ASSERT(obj);
+  interp.makePermanent (obj);
+  def_ = obj;
+}
+
+bool ELObjCharPropValues::setValue(const StringC &, const StringC &chars,
+				   const Location &,
+				   ELObj *obj, Interpreter &interp)
+{
+  ASSERT(obj);
+  interp.makePermanent (obj);
+  for(size_t i = 0; i < chars.size(); ++i)
+    map_.setChar(chars[i], obj);
+}
+
+ELObj *ELObjCharPropValues::value(Char ch, Interpreter &) const
+{
+  return map_[ch];
+}
+
+ELObj *ELObjCharPropValues::defaultValue(Interpreter &interp) const
+{
+  return def_;
 }
 
 void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)

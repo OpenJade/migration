@@ -529,6 +529,7 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
   if (!getToken(allowIdentifier, tok))
     return 0;
   Identifier *ident = lookup(currentToken_);
+  CharProp *cp = interp_->lookupCharProperty(currentToken_);
   if (!getToken(allowString|(dsssl2() ? unsigned(allowFalse) : 0), tok))
     return 0;
   StringC pubid;
@@ -543,10 +544,10 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
   Location defLoc;
   unsigned defPart;
   if (ident->inheritedCDefined(defPart, defLoc)) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateCharacteristic,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::duplicateCharacteristic,
+		     StringMessageArg(ident->name()),
+		     defLoc);
   } 
   else if (ident->charNICDefined(defPart, defLoc)
            && defPart <= interp_->currentPartIndex()) {
@@ -557,9 +558,15 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 		       defLoc);
     }
   }
+  else if (cp->declared (defPart, defLoc)
+	   && defPart <= interp_->currentPartIndex()) {
+    message(InterpreterMessages::duplicateCharPropertyDecl,
+	    StringMessageArg(cp->name()),
+	    defLoc);
+  }
   else {
-    interp_->installExtensionCharNIC(ident, pubid, loc);
-    interp_->addCharProperty(ident, expr);
+    cp->declare(expr, interp_->currentPartIndex(), loc,
+		interp_->installExtensionCharNIC(ident, pubid, loc));
   }
   return 1;
 }
@@ -2603,52 +2610,84 @@ bool SchemeParser::parseSpecialQuery(Owner<Expression> &rexp, const char *query)
 
 bool SchemeParser::doDeclareCharProperty()
 {
+  Location loc(in_->currentLocation());
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
-  Identifier *ident = lookup(currentToken_);
+  CharProp *cp = interp_->lookupCharProperty (currentToken_);
   Owner<Expression> expr;
   Identifier::SyntacticKey key;
   if (!parseExpression(0, expr, key, tok))
     return 0;
   if (!getToken(allowCloseParen, tok))
     return 0;
-  interp_->addCharProperty(ident, expr);
+  Location defLoc;
+  unsigned defPart;
+  if (cp->declared(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex())
+      message(InterpreterMessages::duplicateCharPropertyDecl,
+	      StringMessageArg(cp->name()),
+	      defLoc);
+  }
+  cp->declare(expr, interp_->currentPartIndex(), loc);
   return 1;
 }
 
 bool SchemeParser::doAddCharProperties()
 {
+  Location loc (in_->currentLocation());
   NCVector<Owner<Expression> > exprs;
-  Vector<const Identifier *> keys;
+  Vector<CharProp *> cps;
   Token tok;
   for (;;) {
     if (!getToken(allowKeyword|allowOtherExpr, tok))
       return 0;
-    if (tok!=tokenKeyword)
+    if (tok != tokenKeyword)
       break;
-    keys.push_back(lookup(currentToken_));
+    cps.push_back(interp_->lookupCharProperty(currentToken_));
     exprs.resize(exprs.size() + 1);
     Identifier::SyntacticKey key;
     if (!parseExpression(0, exprs.back(), key, tok))
       return 0;
   }
   
-  for(;;) {
-    if (tok!=tokenChar) {
+  StringC chars;
+  for (;;) {
+    if (tok != tokenChar) {
       message(InterpreterMessages::badAddCharProperty);
       return 0;
     }
-    for (size_t j = 0; j < keys.size(); j++) 
-      interp_->setCharProperty(keys[j], currentToken_[0], exprs[j]);
-    if(!getToken(allowOtherExpr|allowCloseParen, tok))
+    // FIXME: Check duplicates in same decl. Silently remove them or signal
+    // errors?
+    chars += currentToken_[0];
+    if (!getToken(allowOtherExpr|allowCloseParen, tok))
       return 0;
     if (tok==tokenCloseParen)
       break;
   }
+
+  unsigned defPart;
+  Location defLoc;
+  for (size_t i = 0; i < cps.size(); i++) {
+    StringC chars2;
+    for (size_t j = 0; j < chars.size(); j++) {
+      if (cps[i]->hasAddedValue (chars[j], defPart, defLoc)
+	  && defPart <= interp_->currentPartIndex()) {
+	if (defPart == interp_->currentPartIndex()) {
+	  message (InterpreterMessages::duplicateAddCharProperty,
+		   StringMessageArg(cps[i]->name()),
+		   defLoc);
+	}
+      }
+      else
+	chars2 += chars[j];
+    }
+    if (chars2.size() > 0)
+      cps[i]->setValue(chars2, exprs[i], interp_->currentPartIndex(), loc);
+  }
   return 1;
 }
-
 
 #ifdef DSSSL_NAMESPACE
 }

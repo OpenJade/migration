@@ -155,6 +155,14 @@ void FOTBuilder::characters(const Char *, size_t)
 {
 }
   
+void FOTBuilder::characters(const Vector<CharacterNIC> &v)
+{
+  // This is really slow. A FOTBuilder should either override this or
+  // set Description::wantCharPropertyNICs=false.
+  for (size_t i = 0; i< v.size(); ++i)
+    character(v[i]);
+}
+
 void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 {
   characters(s, n);
@@ -1600,6 +1608,8 @@ void SaveFOTBuilder::characters(const Char *s, size_t n)
   *tail_ = new CharactersCall(s, n);
   tail_ = &(*tail_)->next;
 }
+
+ONEREFARG_CALL(characters, Vector<CharacterNIC>);
 
 ONEREFARG_CALL(character, CharacterNIC);
 

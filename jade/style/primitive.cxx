@@ -4933,7 +4933,7 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
  
    // Prepend the result of applying func to the cars
    InsnPtr* insns = new InsnPtr[argc + 2];
-   ArrayDeleter<InsnPtr> insns_del = insns;
+   ArrayDeleter<InsnPtr> insns_del(insns);
    insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
    insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
    for (unsigned i = 1; i <= argc; i++) 

@@ -24,6 +24,22 @@ protected:
   StringC defaultOutputBasename_;
 private:
   void processGrove();
+  int generateEvents(ErrorCountEventHandler *eceh);
+  Boolean getDssslSpecFromGrove();
+  Boolean getDssslSpecFromPi(const Char *s, size_t n,
+			     const Location &loc);
+  static void splitOffId(StringC &, StringC &);
+  Boolean handleSimplePi(const Char *, size_t, const Location &);
+  Boolean handleAttlistPi(const Char *, size_t, const Location &);
+  static void skipS(const Char *&s, size_t &n);
+  static Boolean isS(Char c);
+  static Boolean matchCi(const StringC &s, const char *key);
+  static Boolean matchCi(const Char *s, size_t n, const char *key);
+  static Boolean getAttribute(const Char *&s, size_t &n,
+			      StringC &name, StringC &value);
+  Boolean initSpecParser();
+
+  Boolean dssslSpecOption_;
   StringC dssslSpecSysid_; // system ID of doc
   StringC dssslSpecId_; // unique ID in doc
   // Variables to be defined as true

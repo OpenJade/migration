@@ -169,7 +169,7 @@ DataEntityEvent::DataEntityEvent(Type type, const InternalEntity *entity,
 
 const Entity *DataEntityEvent::entity() const
 {
-  return location().origin()->asEntityOrigin()->entity().pointer();
+  return location().origin()->asEntityOrigin()->entity();
 }
 
 CdataEntityEvent::CdataEntityEvent(const InternalEntity *entity,
@@ -214,7 +214,7 @@ PiEntityEvent::PiEntityEvent(const PiEntity *entity,
 
 const Entity *PiEntityEvent::entity() const
 {
-  return location().origin()->asEntityOrigin()->entity().pointer();
+  return location().origin()->asEntityOrigin()->entity();
 }
 
 ImmediatePiEvent::ImmediatePiEvent(StringC &str, const Location &loc)

@@ -60,16 +60,13 @@ void Parser::doProlog()
 	StringC gi;
 	if (lookingAtStartTag(gi)) {
 	  currentInput()->ungetToken();
-	  if (!implyDtd(gi)) {
-	    message(ParserMessages::noDtd);
-	    giveUp();
-	  }
+	  implyDtd(gi);
 	  return;
 	}
       }
 	    
       if (++tries >= maxTries) {
-	message(ParserMessages::noDtd);
+	message(ParserMessages::notSgml);
 	giveUp();
 	return;
       }
@@ -155,7 +152,10 @@ void Parser::doProlog()
 void Parser::endProlog()
 {
   if (baseDtd().isNull()
-      || baseDtd()->documentElementType()->definition()->undefined()) {
+#if 0
+      || baseDtd()->documentElementType()->definition()->undefined()
+#endif
+      ) {
     // We could continue, but there's not a lot of point.
     giveUp();
     return;
@@ -256,9 +256,9 @@ void Parser::doDeclSubset()
 	eventHandler().entityEnd(new (eventAllocator())
 				 EntityEndEvent(currentLocation()));
       if (inputLevel() == 2) {
-	ConstPtr<Entity> e
-	  = currentLocation().origin()->asEntityOrigin()->entity();
-	if (!e.isNull()
+	const Entity *e
+	  = currentLocation().origin()->entity();
+	if (e
 	    && (e->declType() == Entity::doctype
 		|| e->declType() == Entity::linktype)) {
 	  popInputStack();
@@ -502,7 +502,7 @@ Boolean Parser::lookingAtStartTag(StringC &gi)
   if (!instanceSyntax().isNameStartCharacter(c))
     return 0;
   do {
-    gi += Char(c);
+    gi += (*instanceSyntax().generalSubstTable())[(Char)c];
     c = currentInput()->tokenChar(messenger());
   } while (instanceSyntax().isNameCharacter(c));
   return 1;
@@ -538,8 +538,11 @@ Boolean Parser::parseElementDecl()
   if (!parseParam(allowNameNameGroup, declInputLevel, parm))
     return 0;
   Vector<NameToken> nameVector;
-  if (parm.type == Param::nameGroup)
+  if (parm.type == Param::nameGroup) {
     parm.nameTokenVector.swap(nameVector);
+    if (options().warnElementGroupDecl)
+      message(ParserMessages::elementGroupDecl);
+  }
   else {
     nameVector.resize(1);
     parm.token.swap(nameVector[0].name);
@@ -561,6 +564,8 @@ Boolean Parser::parseElementDecl()
   Vector<const RankStem *> constRankStems;
   size_t i;
   if (parm.type == Param::number) {
+    if (options().warnRank)
+      message(ParserMessages::rank);
     parm.token.swap(rankSuffix);
     rankStems.resize(nameVector.size());
     constRankStems.resize(nameVector.size());
@@ -601,6 +606,8 @@ Boolean Parser::parseElementDecl()
   unsigned char omitFlags = 0;
   if (parm.type == Param::minus
       || parm.type == Param::reservedName + Syntax::rO) {
+    if (options().warnMinimizationParam)
+      message(ParserMessages::minimizationParam);
     omitFlags |= ElementDefinition::omitSpec;
     if (parm.type != Param::minus)
       omitFlags |= ElementDefinition::omitStart;
@@ -631,6 +638,8 @@ Boolean Parser::parseElementDecl()
 				ElementDefinition::cdata);
     if (!parseParam(allowMdc, declInputLevel, parm))
       return 0;
+    if (options().warnCdataContent)
+      message(ParserMessages::cdataContent);
     break;
   case Param::reservedName + Syntax::rRCDATA:
     def = new ElementDefinition(markupLocation(),
@@ -639,6 +648,8 @@ Boolean Parser::parseElementDecl()
 				ElementDefinition::rcdata);
     if (!parseParam(allowMdc, declInputLevel, parm))
       return 0;
+    if (options().warnRcdataContent)
+      message(ParserMessages::rcdataContent);
     break;
   case Param::reservedName + Syntax::rEMPTY:
     def = new ElementDefinition(markupLocation(),
@@ -839,12 +850,16 @@ Boolean Parser::parseExceptions(unsigned declInputLevel,
   if (!parseParam(allowExceptionsMdc, declInputLevel, parm))
     return 0;
   if (parm.type == Param::exclusions) {
+    if (options().warnExclusion)
+      message(ParserMessages::exclusion);
     def->setExclusions(parm.elementVector);
     static AllowedParams allowInclusionsMdc(Param::mdc, Param::inclusions);
     if (!parseParam(allowInclusionsMdc, declInputLevel, parm))
       return 0;
   }
   if (parm.type == Param::inclusions) {
+    if (options().warnInclusion)
+      message(ParserMessages::inclusion);
     def->setInclusions(parm.elementVector);
     size_t nI = def->nInclusions();
     size_t nE = def->nExclusions();
@@ -1116,6 +1131,8 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
 		  declInputLevel, parm))
     return 0;
   if (parm.type == Param::indicatedReservedName + Syntax::rNOTATION) {
+    if (options().warnDataAttributes)
+      message(ParserMessages::dataAttributes);
     isNotation = 1;
     static AllowedParams
       allowNameGroupAll(Param::name,
@@ -1146,6 +1163,8 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
   else {
     isNotation = 0;
     if (parm.type == Param::nameGroup) {
+      if (options().warnAttlistGroupDecl)
+	message(ParserMessages::attlistGroupDecl);
       attributed.resize(parm.nameTokenVector.size());
       for (size_t i = 0; i < attributed.size(); i++)
 	attributed[i] = lookupCreateElement(parm.nameTokenVector[i].name);
@@ -1221,10 +1240,14 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
   case Param::reservedName + Syntax::rNAME:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::name, 0);
+    if (options().warnNameDeclaredValue)
+      message(ParserMessages::nameDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNAMES:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::name, 1);
+    if (options().warnNameDeclaredValue)
+      message(ParserMessages::nameDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNMTOKEN:
     declaredValue
@@ -1237,18 +1260,26 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
   case Param::reservedName + Syntax::rNUMBER:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::number, 0);
+    if (options().warnNumberDeclaredValue)
+      message(ParserMessages::numberDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNUMBERS:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::number, 1);
+    if (options().warnNumberDeclaredValue)
+      message(ParserMessages::numberDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNUTOKEN:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::numberToken, 0);
+    if (options().warnNutokenDeclaredValue)
+      message(ParserMessages::nutokenDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNUTOKENS:
     declaredValue
       = new TokenizedDeclaredValue(TokenizedDeclaredValue::numberToken, 1);
+    if (options().warnNutokenDeclaredValue)
+      message(ParserMessages::nutokenDeclaredValue);
     break;
   case Param::reservedName + Syntax::rNOTATION:
     {
@@ -1336,6 +1367,9 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
     }
     break;
   case Param::attributeValue:
+    if (options().warnAttributeValueNotLiteral)
+      message(ParserMessages::attributeValueNotLiteral);
+    // falll through
   case Param::attributeValueLiteral:
   case Param::tokenizedAttributeValueLiteral:
     {
@@ -1366,6 +1400,8 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
       message(ParserMessages::dataAttributeDefaultValue);
     else if (haveDefLpd())
       message(ParserMessages::linkAttributeDefaultValue);
+    else if (options().warnCurrent)
+      message(ParserMessages::currentAttribute);
     break;
   case Param::indicatedReservedName + Syntax::rCONREF:
     if (declaredValue->isId())
@@ -1376,6 +1412,8 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
       message(ParserMessages::dataAttributeDefaultValue);
     else if (haveDefLpd())
       message(ParserMessages::linkAttributeDefaultValue);
+    else if (options().warnConref)
+      message(ParserMessages::conrefAttribute);
     break;
   case Param::indicatedReservedName + Syntax::rIMPLIED:
     def = new ImpliedAttributeDefinition(attributeName,
@@ -1414,6 +1452,8 @@ Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
     if (!parseParam(endAllow, declInputLevel, parm))
       return 0;
   }
+  else if (options().warnMissingSystemId)
+    message(ParserMessages::missingSystemId);
   return 1;
 }
 
@@ -1510,24 +1550,38 @@ Boolean Parser::parseEntityDecl()
     return parseExternalEntity(name, declType, declInputLevel, parm);
   case Param::reservedName + Syntax::rCDATA:
     dataType = Entity::cdata;
+    if (options().warnInternalCdataEntity)
+      message(ParserMessages::internalCdataEntity);
     break;
   case Param::reservedName + Syntax::rSDATA:
     dataType = Entity::sdata;
+    if (options().warnInternalSdataEntity)
+      message(ParserMessages::internalSdataEntity);
     break;
   case Param::reservedName + Syntax::rPI:
     dataType = Entity::pi;
+    if (options().warnPiEntity)
+      message(ParserMessages::piEntity);
     break;
   case Param::reservedName + Syntax::rSTARTTAG:
     bracketed = InternalTextEntity::starttag;
+    if (options().warnBracketEntity)
+      message(ParserMessages::bracketEntity);
     break;
   case Param::reservedName + Syntax::rENDTAG:
     bracketed = InternalTextEntity::endtag;
+    if (options().warnBracketEntity)
+      message(ParserMessages::bracketEntity);
     break;
   case Param::reservedName + Syntax::rMS:
     bracketed = InternalTextEntity::ms;
+    if (options().warnBracketEntity)
+      message(ParserMessages::bracketEntity);
     break;
   case Param::reservedName + Syntax::rMD:
     bracketed = InternalTextEntity::md;
+    if (options().warnBracketEntity)
+      message(ParserMessages::bracketEntity);
     break;
   }
   if (parm.type != Param::paramLiteral) {
@@ -1643,9 +1697,13 @@ Boolean Parser::parseExternalEntity(StringC &name,
     switch (parm.type) {
     case Param::reservedName + Syntax::rCDATA:
       dataType = Entity::cdata;
+      if (options().warnExternalCdataEntity)
+	message(ParserMessages::externalCdataEntity);
       break;
     case Param::reservedName + Syntax::rSDATA:
       dataType = Entity::sdata;
+      if (options().warnExternalSdataEntity)
+	message(ParserMessages::externalSdataEntity);
       break;
     case Param::reservedName + Syntax::rNDATA:
       dataType = Entity::ndata;
@@ -1655,7 +1713,7 @@ Boolean Parser::parseExternalEntity(StringC &name,
     }
     if (!parseParam(allowName, declInputLevel, parm))
       return 0;
-    ConstPtr<Notation> notation(lookupCreateNotation(parm.token));
+    Ptr<Notation> notation(lookupCreateNotation(parm.token));
     if (!parseParam(allowDsoMdc, declInputLevel, parm))
       return 0;
     AttributeList attributes(notation->attributeDef());
@@ -1664,8 +1722,13 @@ Boolean Parser::parseExternalEntity(StringC &name,
 	message(ParserMessages::notationNoAttributes,
 		StringMessageArg(notation->name()));
       Boolean netEnabling;
-      if (!parseAttributeSpec(1, attributes, netEnabling))
+      Ptr<AttributeDefinitionList> newAttDef;
+      if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
 	return 0;
+      if (!newAttDef.isNull()) {
+	newAttDef->setIndex(defDtd().allocAttributeDefinitionListIndex());
+	notation->setAttributeDef(newAttDef);
+      }
       if (attributes.nSpec() == 0)
 	message(ParserMessages::emptyDataAttributeSpec);
       if (!parseParam(allowMdc, declInputLevel, parm))
@@ -1971,8 +2034,9 @@ Boolean Parser::parseDoctypeDeclStart()
 #endif
   }
   else if (parm.type == Param::mdc) {
-    message(ParserMessages::noDtdSubset, StringMessageArg(name));
-    return 1;
+    if (options().errorValid)
+      message(ParserMessages::noDtd);
+    disableValidation();
   }
   // Discard mdc or dso
   if (currentMarkup())
@@ -1985,9 +2049,13 @@ Boolean Parser::parseDoctypeDeclStart()
   if (parm.type == Param::mdc) {
     // unget the mdc
     currentInput()->ungetToken();
+    if (entity.isNull()) {
+      (void)parseDoctypeDeclEnd();
+      return 1;
+    }
     // reference the entity
     Ptr<EntityOrigin> origin
-      = new (internalAllocator()) EntityOrigin(entity, currentLocation());
+      = EntityOrigin::make(internalAllocator(), entity, currentLocation());
     entity->dsReference(*this, origin);
     if (inputLevel() == 1) {	// reference failed
       (void)parseDoctypeDeclEnd();
@@ -2000,8 +2068,18 @@ Boolean Parser::parseDoctypeDeclStart()
   return 1;
 }
 
-Boolean Parser::implyDtd(const StringC &gi)
+void Parser::implyDtd(const StringC &gi)
 {
+  startMarkup(eventsWanted().wantPrologMarkup(), Location());
+#if 0
+  if (currentMarkup()) {
+    currentMarkup()->addDelim(Syntax::dMDO);
+    currentMarkup()->addReservedName(Syntax::rDOCTYPE,
+				     syntax().reservedName(Syntax::rDOCTYPE));
+    currentMarkup()->addS(syntax().space());
+    currentMarkup()->addName(gi.data(), gi.size());
+  }
+#endif
   ExternalId id;
   // The null location indicates that this is a fake entity.
   ConstPtr<Entity> entity(new ExternalTextEntity(gi,
@@ -2011,21 +2089,29 @@ Boolean Parser::implyDtd(const StringC &gi)
   // Don't use Entity::generateSystemId because we don't want an error
   // if it fails.
   StringC str;
-  StringC name;
   if (!entityCatalog().lookup(*entity, syntax(), sd().internalCharset(),
 			      messenger(), str)) {
-    if (!entityCatalog().defaultDoctype(sd().internalCharset(),
-					messenger(),
-					name,
-					str))
-      return 0;
-    for (size_t i = 0; i < name.size(); i++)
-      syntax().generalSubstTable()->subst(name[i]);
+    if (options().errorValid) {
+      message(ParserMessages::noDtdSubset);
+      disableValidation();
+    }
+    eventHandler().startDtd(new (eventAllocator())
+				  StartDtdEvent(gi, ConstPtr<Entity>(), 0,
+					markupLocation(),
+					currentMarkup()));
+    startDtd(gi);
+    parseDoctypeDeclEnd(1);
+    return;
   }
-  else
-    name = gi;
   id.setEffectiveSystem(str);
-  entity = new ExternalTextEntity(name,
+#if 0
+  if (currentMarkup()) {
+    currentMarkup()->addS(syntax().space());
+    currentMarkup()->addReservedName(Syntax::rSYSTEM,
+				     syntax().reservedName(Syntax::rSYSTEM));
+  }
+#endif
+  entity = new ExternalTextEntity(gi,
 				  Entity::doctype,
 				  Location(),
 				  id);
@@ -2033,36 +2119,24 @@ Boolean Parser::implyDtd(const StringC &gi)
   declStr += syntax().delimGeneral(Syntax::dMDO);
   declStr += syntax().reservedName(Syntax::rDOCTYPE);
   declStr += syntax().space();
-  declStr += name;
+  declStr += gi;
   declStr += syntax().space();
   declStr += syntax().reservedName(Syntax::rSYSTEM);
   declStr += syntax().delimGeneral(Syntax::dMDC);
-  message(ParserMessages::implyingDtd, StringMessageArg(declStr));
+  if (options().errorValid)
+    message(ParserMessages::implyingDtd, StringMessageArg(declStr));
   Ptr<EntityOrigin> origin
-    = new (internalAllocator()) EntityOrigin(entity, currentLocation());
-  startMarkup(eventsWanted().wantPrologMarkup(), Location());
-  if (currentMarkup()) {
-    currentMarkup()->addDelim(Syntax::dMDO);
-    currentMarkup()->addReservedName(Syntax::rDOCTYPE,
-				     syntax().reservedName(Syntax::rDOCTYPE));
-    currentMarkup()->addS(syntax().space());
-    currentMarkup()->addName(name.data(), name.size());
-    currentMarkup()->addS(syntax().space());
-    currentMarkup()->addReservedName(Syntax::rSYSTEM,
-				     syntax().reservedName(Syntax::rSYSTEM));
-  }
+    = EntityOrigin::make(internalAllocator(), entity, currentLocation());
   eventHandler().startDtd(new (eventAllocator())
-			  StartDtdEvent(name, entity, 0,
+			  StartDtdEvent(gi, entity, 0,
 					markupLocation(),
 					currentMarkup()));
-  startDtd(name);
+  startDtd(gi);
   entity->dsReference(*this, origin);
-  if (inputLevel() == 1) {
+  if (inputLevel() == 1)
     parseDoctypeDeclEnd(1);
-    return 1;
-  }
-  setPhase(declSubsetPhase);
-  return 1;
+  else
+    setPhase(declSubsetPhase);
 }
 
 Boolean Parser::parseDoctypeDeclEnd(Boolean fake)
@@ -2072,8 +2146,10 @@ Boolean Parser::parseDoctypeDeclEnd(Boolean fake)
   endDtd();
   if (fake) {
     startMarkup(eventsWanted().wantPrologMarkup(), Location());
+#if 0
     if (currentMarkup())
       currentMarkup()->addDelim(Syntax::dMDC);
+#endif
   }
   else {
     startMarkup(eventsWanted().wantPrologMarkup(), currentLocation());
@@ -2086,11 +2162,13 @@ Boolean Parser::parseDoctypeDeclEnd(Boolean fake)
   eventHandler().endDtd(new (eventAllocator()) EndDtdEvent(tem,
 							   markupLocation(),
 							   currentMarkup()));
+#if 0
   if (fake) {
     Char c = syntax().standardFunction(Syntax::fRE);
     eventHandler().sSep(new (eventAllocator())
 			SSepEvent(&c, 1, Location(), 1));
   }
+#endif
   return 1;
 }
 
@@ -2106,8 +2184,10 @@ void Parser::checkDtd(Dtd &dtd)
   int i = 0;
   while ((p = elementIter.next()) != 0) {
     if (p->definition() == 0) {
-      if (p->name() == dtd.name())
-	message(ParserMessages::documentElementUndefined);
+      if (p->name() == dtd.name()) {
+	if (validate())
+	  message(ParserMessages::documentElementUndefined);
+      }
       else if (options().warnUndefinedElement)
 	message(ParserMessages::dtdUndefinedElement, StringMessageArg(p->name()));
       if (def.isNull())
@@ -2441,7 +2521,7 @@ Boolean Parser::parseLinktypeDeclStart()
     }
     // reference the entity
     Ptr<EntityOrigin> origin
-      = new (internalAllocator()) EntityOrigin(entity, currentLocation());
+      = EntityOrigin::make(internalAllocator(), entity, currentLocation());
     entity->dsReference(*this, origin);
     if (inputLevel() == 1) {	// reference failed
       (void)parseLinktypeDeclEnd();
@@ -2697,8 +2777,17 @@ Boolean Parser::parseLinkSet(Boolean idlink)
       
       if (parm.type == Param::dso) {
 	Boolean netEnabling;
-	if (!parseAttributeSpec(1, attributes, netEnabling))
+	Ptr<AttributeDefinitionList> newAttDef;
+	if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
 	  return 0;
+	if (!newAttDef.isNull()) {
+	  newAttDef->setIndex(defComplexLpd().allocAttributeDefinitionListIndex());
+	  for (size_t i = 0; i < assocElementTypes.size(); i++) {
+	    const ElementType *e = assocElementTypes[i];
+	    if (e && defComplexLpd().attributeDef(e) == attDef)
+	      defComplexLpd().setAttributeDef(e, newAttDef);
+	  }
+	}
 	static AllowedParams
 	  allow5e(Param::name,
 		  Param::indicatedReservedName + Syntax::rIMPLIED);
@@ -2813,7 +2902,8 @@ Boolean Parser::parseResultElementSpec(unsigned declInputLevel,
   }
   else {
     implied = 0;
-    resultType = lookupResultElementType(parm.token);
+    ElementType *e = lookupResultElementType(parm.token);
+    resultType = e;
     static AllowedParams
       allow(Param::dso,
 	    Param::mdc,
@@ -2828,14 +2918,23 @@ Boolean Parser::parseResultElementSpec(unsigned declInputLevel,
 		    declInputLevel, parm))
       return 0;
     ConstPtr<AttributeDefinitionList> attDef;
-    if (resultType)
-      attDef = resultType->attributeDef();
+    if (e)
+      attDef = e->attributeDef();
     attributes.init(attDef);
     if (parm.type == Param::dso) {
       ResultAttributeSpecModeSetter modeSetter(this);
       Boolean netEnabling;
-      if (!parseAttributeSpec(1, attributes, netEnabling))
+      Ptr<AttributeDefinitionList> newAttDef;
+      if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
 	return 0;
+      if (!newAttDef.isNull()) {
+	Ptr<Dtd> r(defComplexLpd().resultDtd());
+	if (!r.isNull()) {
+	  newAttDef->setIndex(r->allocAttributeDefinitionListIndex());
+	  if (e)
+	    e->setAttributeDef(newAttDef);
+	}
+      }
       modeSetter.clear();
       if (attributes.nSpec() == 0)
 	message(ParserMessages::emptyResultAttributeSpec);
@@ -2853,12 +2952,12 @@ Boolean Parser::parseResultElementSpec(unsigned declInputLevel,
   return 1;
 }
 
-const ElementType *Parser::lookupResultElementType(const StringC &name)
+ElementType *Parser::lookupResultElementType(const StringC &name)
 {
-  const Dtd *dtd = defComplexLpd().resultDtd().pointer();
+  Dtd *dtd = defComplexLpd().resultDtd().pointer();
   if (!dtd)
     return 0;
-  const ElementType *e = dtd->lookupElementType(name);
+  ElementType *e = dtd->lookupElementType(name);
   if (!e)
     message(ParserMessages::noSuchResultElement, StringMessageArg(name));
   return e;
@@ -2944,12 +3043,18 @@ Boolean Parser::parseMarkedSectionDeclStart()
 				  
     return 1;
   }
+  Boolean discardMarkup;
   if (startMarkup(inInstance()
 		  ? eventsWanted().wantMarkedSections()
 		  : eventsWanted().wantPrologMarkup(),
 		  currentLocation())) {
     currentMarkup()->addDelim(Syntax::dMDO);
     currentMarkup()->addDelim(Syntax::dDSO);
+    discardMarkup = 0;
+  }
+  else if (options().warnStatusKeywordSpecS) {
+    startMarkup(1, currentLocation());
+    discardMarkup = 1;
   }
   unsigned declInputLevel = inputLevel();
   static AllowedParams allowStatusDso(Param::dso,
@@ -2960,11 +3065,11 @@ Boolean Parser::parseMarkedSectionDeclStart()
 				      Param::reservedName + Syntax::rTEMP);
   Param parm;
   MarkedSectionEvent::Status status = MarkedSectionEvent::include;
-  for (;;) {
-    if (!parseParam(allowStatusDso, declInputLevel, parm))
-      return 0;
-    if (parm.type == Param::dso)
-      break;
+  if (!parseParam(allowStatusDso, declInputLevel, parm))
+    return 0;
+  if (options().warnMissingStatusKeyword && parm.type == Param::dso)
+    message(ParserMessages::missingStatusKeyword);
+  while (parm.type != Param::dso) {
     switch (parm.type) {
     case Param::reservedName + Syntax::rCDATA:
       if (status < MarkedSectionEvent::cdata)
@@ -2973,12 +3078,29 @@ Boolean Parser::parseMarkedSectionDeclStart()
     case Param::reservedName + Syntax::rRCDATA:
       if (status < MarkedSectionEvent::rcdata)
 	status = MarkedSectionEvent::rcdata;
+      if (options().warnRcdataMarkedSection)
+	message(ParserMessages::rcdataMarkedSection);
       break;
     case Param::reservedName + Syntax::rIGNORE:
       if (status < MarkedSectionEvent::ignore)
 	status = MarkedSectionEvent::ignore;
+      if (inInstance() && options().warnInstanceIgnoreMarkedSection)
+	message(ParserMessages::instanceIgnoreMarkedSection);
+      break;
+    case Param::reservedName + Syntax::rINCLUDE:
+      if (inInstance() && options().warnInstanceIncludeMarkedSection)
+	message(ParserMessages::instanceIncludeMarkedSection);
+      break;
+    case Param::reservedName + Syntax::rTEMP:
+      if (options().warnTempMarkedSection)
+	message(ParserMessages::tempMarkedSection);
       break;
     }
+    if (!parseParam(allowStatusDso, declInputLevel, parm))
+      return 0;
+    if (options().warnMultipleStatusKeyword
+        && parm.type != Param::dso)
+      message(ParserMessages::multipleStatusKeyword);
   }
   // FIXME this disallows
   // <!entity % e "include [ stuff ">
@@ -3002,11 +3124,23 @@ Boolean Parser::parseMarkedSectionDeclStart()
     startSpecialMarkedSection(imsMode, markupLocation());
     break;
   }
-  if (currentMarkup())
+  if (currentMarkup()) {
+    if (options().warnStatusKeywordSpecS) {
+      Location loc(markupLocation());
+      for (MarkupIter iter(*currentMarkup()); iter.valid(); iter.advance(loc, syntaxPointer())) {
+	if (iter.type() == Markup::s) {
+	  setNextLocation(loc);
+	  message(ParserMessages::statusKeywordSpecS);
+	}
+      }
+      if (discardMarkup)
+	startMarkup(0, markupLocation());
+    }
     eventHandler().markedSectionStart(new (eventAllocator())
 				      MarkedSectionStartEvent(status,
 							      markupLocation(),
 							      currentMarkup()));
+  }
   return 1;
 }
 
@@ -3062,6 +3196,8 @@ void Parser::emptyCommentDecl()
 			       CommentDeclEvent(markupLocation(),
 						currentMarkup()));
   }
+  if (options().warnEmptyCommentDecl)
+    message(ParserMessages::emptyCommentDecl);
 }
 
 Boolean Parser::parseCommentDecl()
@@ -3079,10 +3215,14 @@ Boolean Parser::parseCommentDecl()
     case tokenS:
       if (currentMarkup())
 	currentMarkup()->addS(currentChar());
+      if (options().warnCommentDeclS)
+	message(ParserMessages::commentDeclS);
       break;
     case tokenCom:
       if (!parseComment(comMode))
 	return 0;
+      if (options().warnCommentDeclMultiple)
+	message(ParserMessages::commentDeclMultiple);
       break;
     case tokenMdc:
       if (currentMarkup())

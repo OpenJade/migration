@@ -3,7 +3,6 @@
 
 #include "splib.h"
 #include "IdentityCodingSystem.h"
-#include <iostream.h>
 #include <limits.h>
 
 #ifdef SP_NAMESPACE
@@ -20,7 +19,7 @@ public:
 class IdentityEncoder : public RecoveringEncoder {
 public:
   IdentityEncoder();
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 };
 
 IdentityCodingSystem::IdentityCodingSystem()
@@ -64,9 +63,7 @@ IdentityEncoder::IdentityEncoder()
 {
 }
 
-// FIXME handle errors from streambuf::sputn
-
-void IdentityEncoder::output(const Char *s, size_t n, streambuf *sb)
+void IdentityEncoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   if (sizeof(Char) != sizeof(char)) {
     for (size_t i = 0; i < n; i++) {

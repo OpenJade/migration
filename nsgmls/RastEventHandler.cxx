@@ -657,7 +657,7 @@ void RastEventHandler::attributeInfo(const AttributeList &attributes,
   if (defIndex >= attributeSortOrder_[attributeType].size())
     attributeSortOrder_[attributeType].resize(defIndex + 1);
   Vector<size_t> &sortOrder = attributeSortOrder_[attributeType][defIndex];
-  if (sortOrder.size() == 0
+  if (sortOrder.size() != length
       || attributeType == simpleAttribute) {
     sortOrder.resize(length);
     size_t i;
@@ -747,9 +747,9 @@ void RastEventHandler::attributeInfo(const AttributeList &attributes,
 	    const SubdocEntity *subdocEntity = entity->asSubdocEntity();
 	    if (subdocEntity) {
 	      Ptr<InputSourceOrigin> entityOrigin
-		= new EntityOrigin(entity,
-				   ((TokenizedAttributeValue *)value)
-				   ->tokenLocation(i));
+		= EntityOrigin::make(entity,
+				     ((TokenizedAttributeValue *)value)
+				     ->tokenLocation(i));
 	      subdocEntityInfo(subdocEntity, entityOrigin, 0);
 	    }
 	    else {

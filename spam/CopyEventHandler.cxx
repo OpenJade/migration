@@ -913,7 +913,7 @@ void CopyEventHandler::outputMarkup(const Location &loc,
       if (!level++) {
 	const EntityOrigin *origin = iter.entityOrigin();
 	// entityStarts in the SGML declaration don't have explicit references
-	if (!origin->entity().isNull())
+	if (origin->entity())
 	  entityRef(origin);
       }
       break;

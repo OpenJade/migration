@@ -44,6 +44,8 @@ Boolean Parser::parseParam(const AllowedParams &allow,
     case tokenCom:
       if (!parseComment(comMode))
 	return 0;
+      if (options().warnPsComment)
+	message(ParserMessages::psComment);
       break;
     case tokenDso:
       if (!allow.dso()) {
@@ -153,6 +155,8 @@ Boolean Parser::parseParam(const AllowedParams &allow,
       // fall through
     case tokenPeroNameStart:
       {
+	if (options().warnInstanceParamEntityRef && inInstance())
+	  message(ParserMessages::instanceParamEntityRef);
 	ConstPtr<Entity> entity;
 	Ptr<EntityOrigin> origin;
 	if (!parseEntityReference(1, token == tokenPeroGrpo, entity, origin))
@@ -634,12 +638,17 @@ Boolean Parser::parseGroup(const AllowedGroupTokens &allowToken,
       return 0;
     if (gc.type == GroupConnector::grpcGC)
       break;
-    if (connector == GroupConnector::grpcGC)
-      connector = gc.type;
-    else if (gc.type != connector) {
-      if (options().warnShould)
+    if (options().warnNameGroupNotOr) {
+      if (gc.type != GroupConnector::orGC)
+	message(ParserMessages::nameGroupNotOr);
+    }
+    else if (options().warnShould) {
+      if (connector == GroupConnector::grpcGC)
+	connector = gc.type;
+      else if (gc.type != connector) {
 	message(ParserMessages::mixedConnectors);
-      connector = gc.type;
+	connector = gc.type;
+      }
     }
   }
   if (nDuplicates + vec.size() > syntax().grpcnt())
@@ -766,6 +775,7 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
   const AllowedGroupConnectors *connectorp = &allowAnyConnectorGrpc;
 
   GroupConnector gc;
+  Boolean pcdataCheck = 0;
   do {
     if (!parseGroupToken(allowContentToken, nestingLevel, declInputLevel,
 			 groupInputLevel, gt))
@@ -781,6 +791,16 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
     tokenVector.back() = contentToken;
     if (!parseGroupConnector(*connectorp, declInputLevel, groupInputLevel, gc))
       return 0;
+    if (options().warnMixedContentRepOrGroup && gt.type == GroupToken::pcdata) {
+      if (tokenVector.size() != 1)
+	message(ParserMessages::pcdataNotFirstInGroup);
+      else if (gc.type == GroupConnector::seqGC)
+	message(ParserMessages::pcdataInSeqGroup);
+      else
+	pcdataCheck = 1;
+      if (nestingLevel != 1)
+	message(ParserMessages::pcdataInNestedModelGroup);
+    }
     if (tokenVector.size() == 1) {
       connector = gc.type;
       switch (gc.type) {
@@ -792,6 +812,8 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
 	break;
       case GroupConnector::andGC:
 	connectorp = &allowAndGrpc;
+	if (options().warnAndGroup)
+	  message(ParserMessages::andGroup);
 	break;
       default:
 	break;
@@ -803,8 +825,13 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
   switch (connector) {
   case GroupConnector::orGC:
     group = new OrModelGroup(tokenVector, oi);
+    if (pcdataCheck && oi != ContentToken::rep)
+      message(ParserMessages::pcdataGroupNotRep);
     break;
   case GroupConnector::grpcGC:
+    if (pcdataCheck && oi != ContentToken::rep && oi != ContentToken::none)
+      message(ParserMessages::pcdataGroupNotRep);
+    // fall through
   case GroupConnector::seqGC:
     group = new SeqModelGroup(tokenVector, oi);
     break;

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
 
 #include "config.h"
@@ -13,11 +13,7 @@
 #include "macros.h"
 #include "CharMap.h"
 #include "CharsetRegistry.h"
-#ifdef SP_SHORT_HEADERS
-#include <strstrea.h>
-#else
-#include <strstream.h>
-#endif
+#include "IList.h"
 #include <string.h>
 #include <limits.h>
 
@@ -25,16 +21,23 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-class tmpstreambuf : public streambuf {
+class NullOutputByteStream : public OutputByteStream {
+public:
+  NullOutputByteStream() { ptr_ = end_ = 0; }
+  void flush() { }
+  void flushBuf(char) { }
+};
+
+class TmpOutputByteStream : public OutputByteStream {
 public:
   struct Block;
   class Iter {
   public:
-    Iter(const tmpstreambuf &sb) : block_(sb.head_), lastBlockUsed_(sb.lastBlockUsed()) { }
+    Iter(const TmpOutputByteStream &sb) : block_(sb.head_), lastBlockUsed_(sb.lastBlockUsed()) { }
     bool next(const char *&p, size_t &n) {
       if (block_) {
 	p = block_->buf;
-	n = block_->next ? tmpstreambuf::bufSize : lastBlockUsed_;
+	n = block_->next ? TmpOutputByteStream::bufSize : lastBlockUsed_;
 	block_ = block_->next;
 	return 1;
       }
@@ -45,12 +48,10 @@ public:
     Block *block_;
     size_t lastBlockUsed_;
   };
-  tmpstreambuf();
-  ~tmpstreambuf();
-  int overflow(int ch);
-  int sync();
-  int underflow();
-  streampos seekoff(streamoff, ios::seek_dir, int);
+  TmpOutputByteStream();
+  ~TmpOutputByteStream();
+  void flush();
+  void flushBuf(char ch);
   enum { bufSize = 1024 };
 private:
   friend class Iter;
@@ -59,13 +60,7 @@ private:
     char buf[bufSize];
   };
   size_t lastBlockUsed() const {
-  // Sun and IBM's C++ compilers think pptr() is non-const
-#if defined(__SUNPRO_CC) || defined(__xlC__)
-    return ((tmpstreambuf *)this)->lastBlockUsed();
-  }
-  size_t lastBlockUsed() {
-#endif
-    return last_ ? (pptr() - last_->buf) : 0;
+    return last_ ? (ptr_ - last_->buf) : 0;
   }
   unsigned nFullBlocks_;
   Block *head_;
@@ -83,7 +78,7 @@ private:
 
 class RtfFOTBuilder : public SerialFOTBuilder {
 public:
-  RtfFOTBuilder(streambuf *, const Vector<StringC> &, 
+  RtfFOTBuilder(OutputByteStream *, const Vector<StringC> &, 
 		const Ptr<ExtendEntityManager> &, const CharsetInfo &, Messenger *);
   ~RtfFOTBuilder();
   void characters(const Char *, size_t);
@@ -115,6 +110,7 @@ public:
   void setHyphenationLadderCount(long);
   void setWidowCount(long);
   void setOrphanCount(long);
+  void setHeadingLevel(long);
   void setColor(const DeviceRGBColor &);
   void setBackgroundColor(const DeviceRGBColor &);
   void setBackgroundColor();
@@ -184,6 +180,65 @@ public:
   void setCellAfterColumnMargin(Length);
   void setCellBackground(bool);
   void setCellRowAlignment(Symbol);
+  // math
+  void startMathSequence();
+  void endMathSequence();
+  void startFractionSerial();
+  void endFractionSerial();
+  void startFractionNumerator();
+  void endFractionNumerator();
+  void startFractionDenominator();
+  void endFractionDenominator();
+  void startSubscript();
+  void endSubscript();
+  void startSuperscript();
+  void endSuperscript();
+  void startRadicalSerial();
+  void endRadicalSerial();
+  void startRadicalDegree();
+  void endRadicalDegree();
+  void startFenceSerial();
+  void endFenceSerial();
+  void startFenceOpen();
+  void endFenceOpen();
+  void startFenceClose();
+  void endFenceClose();
+  void startMathOperatorSerial();
+  void endMathOperatorSerial();
+  void startMathOperatorOperator();
+  void endMathOperatorOperator();
+  void startMathOperatorLowerLimit();
+  void endMathOperatorLowerLimit();
+  void startMathOperatorUpperLimit();
+  void endMathOperatorUpperLimit();
+  void startMarkSerial();
+  void endMarkSerial();
+  void startMarkOver();
+  void endMarkOver();
+  void startMarkUnder();
+  void endMarkUnder();
+  void startScriptSerial();
+  void endScriptSerial();
+  void startScriptPreSup();
+  void startScriptPreSub();
+  void startScriptPostSup();
+  void startScriptPostSub();
+  void startScriptMidSup();
+  void startScriptMidSub();
+  void startGrid(const GridNIC &);
+  void endGrid();
+  void startGridCell(const GridCellNIC &);
+  void endGridCell();
+  void setMathDisplayMode(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowSep(Length);
+  void setGridColumnSep(Length);
+  void setSubscriptDepth(Length);
+  void setSuperscriptHeight(Length);
+  void setUnderMarkDepth(Length);
+  void setOverMarkHeight(Length);
+
   void startNode(const NodePtr &, const StringC &, RuleType);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
@@ -224,7 +279,7 @@ public:
     breakColumn
   };
 private:
-  ostream &os() { return *osp_; }
+  OutputByteStream &os() { return *osp_; }
   void start();
   void end();
   void atomic();
@@ -232,6 +287,14 @@ private:
   void setCharset(int);
   void inlinePrepare();
   void flushPendingElements();
+  void doStartLink(const Address &);
+  void flushFields() {
+    flushPendingElements();
+    if (havePendingLink_) {
+      havePendingLink_ = 0;
+      doStartLink(pendingLink_);
+    }
+  }
   void startDisplay(const DisplayNIC &);
   void endDisplay();
   void newPar(bool allowSpaceBefore = 1);
@@ -253,6 +316,14 @@ private:
   void displaySizeChanged();
   void symbolChar(int ff, unsigned code);
   void initJIS();
+  void enterMathMode();
+  void exitMathMode();
+  static int points(Length n) {
+    if (n >= 0)
+      return (n + 10)/20;
+    else
+      return (n - 10)/20;
+  }
 
   enum InlineState {
     inlineFirst,		// never had an inline FO
@@ -309,6 +380,12 @@ private:
     char quadding;		// 'l', 'c', 'r', 'j'
     Symbol lines;
     char widowOrphanControl;
+    char headingLevel;
+  };
+  enum {
+    gridPosRowMajor,
+    gridPosColumnMajor,
+    gridPosExplicit
   };
   struct Format : ParaFormat, CommonFormat {
     Format();
@@ -333,6 +410,16 @@ private:
     long cellLeftMargin;
     long cellRightMargin;
     char cellVerticalAlignment;
+    char gridPosType;
+    char gridColumnAlignment;
+    bool mathInline;
+    bool mathPosture;
+    int superscriptHeight; // in points
+    int subscriptDepth; // in points
+    int overMarkHeight; // in points
+    int underMarkDepth; // in points
+    int gridRowSep; // in points
+    int gridColumnSep; // in points
     // These are needed for handling LengthSpecs
     LengthSpec positionPointShiftSpec;
     LengthSpec leftIndentSpec;
@@ -389,11 +476,10 @@ private:
   bool keepWithNext_;
   bool hyphenateSuppressed_;
   long maxConsecHyphens_;
-  ostream *osp_;
-  ostream finalos_;
-  tmpstreambuf tempbuf_;
-  ostream tempos_;
-  ostrstream cellos_;
+  OutputByteStream *osp_;
+  OutputByteStream *finalos_;
+  TmpOutputByteStream tempos_;
+  StrOutputByteStream cellos_;
   long tableWidth_;
   char tableAlignment_;
   long tableDisplaySize_;
@@ -424,7 +510,7 @@ private:
   unsigned nHeaderRows_;
   Vector<Column> columns_;
   unsigned tableLevel_;
-  ostrstream fieldos_;
+  StrOutputByteStream fieldos_;
   int fieldTabPos_;
   long displaySize_;
   bool hadSection_;
@@ -446,18 +532,55 @@ private:
   BitVector elementsRefed_;
   // Leaders
   unsigned leaderDepth_;
-  ostrstream nullos_;
-  ostream *preLeaderOsp_;
+  NullOutputByteStream nullos_;
+  OutputByteStream *preLeaderOsp_;
   enum { CHAR_TABLE_CHAR_BITS = 16 };
   enum { CHAR_TABLE_SYMBOL_FLAG = 1U << 31, CHAR_TABLE_DB_FLAG = 1U << 30 };
   CharMap<Unsigned32> charTable_;
   String<char> hfPart_[nHF];
-  ostrstream hfos_;
+  StrOutputByteStream hfos_;
   enum RTFVersion {
     word95,
     word97
   };
   RTFVersion rtfVersion_;
+  Address pendingLink_;
+  bool havePendingLink_;
+  // Charaction for separating arguments in an EQ field; must be ',' or ';'
+  char eqArgSep_;
+  unsigned mathLevel_;
+  enum MathSpecial {
+    mathNormal,
+    mathFence,
+    mathIntegral
+  };
+  MathSpecial mathSpecial_;
+  OutputFormat mathSaveOutputFormat_;
+  struct ReorderFlowObject;
+  friend struct ReorderFlowObject;
+  struct ReorderFlowObject : public Link {
+    OutputByteStream *saveOsp;
+    StrOutputByteStream buf;
+    OutputFormat saveOutputFormat;
+    Vector<String<char> > streams;
+  };
+  struct Grid;
+  friend struct Grid;
+  struct Grid : public Link {
+    OutputByteStream *saveOsp;
+    StrOutputByteStream buf;
+    OutputFormat saveOutputFormat;
+    size_t nRows;
+    size_t nColumns;
+    char posType;
+    String<char> *curCellPtr;
+    Vector<Vector<String<char> > > cells;
+  };
+  IList<ReorderFlowObject> reorderStack_;
+  IList<Grid> gridStack_;
+  void startReorderFlowObject();
+  void endReorderFlowObjectPort();
+  void endReorderFlowObject();
   friend struct OutputFormat;
   friend struct Format;
   friend struct CommonFormat;
@@ -489,12 +612,12 @@ inline int halfPoints(long n)
   return n/10;
 }
 
-tmpstreambuf::tmpstreambuf()
+TmpOutputByteStream::TmpOutputByteStream()
 : head_(0), last_(0), nFullBlocks_(0)
 {
 }
 
-tmpstreambuf::~tmpstreambuf()
+TmpOutputByteStream::~TmpOutputByteStream()
 {
   while (head_) {
     Block *tem = head_;
@@ -503,19 +626,13 @@ tmpstreambuf::~tmpstreambuf()
   }
 }
 
-int tmpstreambuf::overflow(int ch)
+void TmpOutputByteStream::flushBuf(char ch)
 {
-  if (last_ && pptr() < last_->buf + bufSize) {
-    sync();
-    if (ch != EOF)
-      return sputc(ch);
-    return 0;
-  }
   Block *tem = new Block;
   char *p = tem->buf;
-  if (ch != EOF)
-    *p++ = ch;
-  setp(p, tem->buf + bufSize);
+  *p++ = ch;
+  ptr_ = p;
+  end_ = tem->buf + bufSize;
   tem->next = 0;
   if (last_) {
     nFullBlocks_++;
@@ -524,42 +641,14 @@ int tmpstreambuf::overflow(int ch)
   else
     head_ = tem;
   last_ = tem;
-  return 0;
 }
 
-int tmpstreambuf::sync()
+void TmpOutputByteStream::flush()
 {
-  setp(pptr(), last_->buf + bufSize);
-  return 0;
 }
 
-int tmpstreambuf::underflow()
-{
-  return EOF;
-}
 
-// Just enough to give us the current offset.
-
-streampos tmpstreambuf::seekoff(streamoff off, ios::seek_dir dir,
-				int mode)
-{
-  if ((mode & ios::out) && dir == ios::cur && off == 0) {
-    if (last_ == 0)
-      return 0;
-    else
-      return nFullBlocks_ * bufSize + (pptr() - last_->buf);
-  }
-  return EOF;
-}
-
-ostream &operator<<(ostream &os, const String<char> &s)
-{
-  for (size_t i = 0; i < s.size(); i++)
-    os << s[i];
-  return os;
-}
-
-FOTBuilder *makeRtfFOTBuilder(streambuf *sbuf,
+FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
 			      const Vector<StringC> &options,
 			      const Ptr<ExtendEntityManager> &entityManager,
 			      const CharsetInfo &systemCharset,
@@ -600,22 +689,71 @@ FOTBuilder *makeRtfFOTBuilder(streambuf *sbuf,
       0,
       0
     },
+    {
+      "UNREGISTERED::James Clark//Characteristic::subscript-depth",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setSubscriptDepth,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::over-mark-height",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setOverMarkHeight,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::under-mark-depth",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setUnderMarkDepth,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::superscript-height",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setSuperscriptHeight,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::grid-row-sep",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setGridRowSep,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::grid-column-sep",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&RtfFOTBuilder::setGridColumnSep,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::heading-level",
+      0,
+      0,
+      (void (FOTBuilder::*)(long))&RtfFOTBuilder::setHeadingLevel,
+      0
+    },
     { 0, 0, 0}
   };
   ext = extensions;
-  return new RtfFOTBuilder(sbuf, options, entityManager, systemCharset, mgr);
+  return new RtfFOTBuilder(os, options, entityManager, systemCharset, mgr);
 }
 
-RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
+RtfFOTBuilder::RtfFOTBuilder(OutputByteStream *os,
 			     const Vector<StringC> &options,
 			     const Ptr<ExtendEntityManager> &entityManager,
 			     const CharsetInfo &systemCharset, Messenger *mgr)
-: finalos_(sbuf),
+: finalos_(os),
   entityManager_(entityManager),
   systemCharset_(&systemCharset), mgr_(mgr),
   inlineState_(inlineFirst),
   continuePar_(0),
-  tempos_(&tempbuf_), osp_(&tempos_),
+  osp_(&tempos_),
   accumSpace_(0),
   keepWithNext_(0), hadSection_(0),
   linkDepth_(0),
@@ -641,7 +779,11 @@ RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
   keep_(0),
   hadParInKeep_(0),
   charTable_(0),
-  rtfVersion_(word95)
+  rtfVersion_(word97),
+  havePendingLink_(0),
+  eqArgSep_(','),
+  mathLevel_(0),
+  mathSpecial_(mathNormal)
 {
   specFormat_.fontSize = 20; // 10 points
   specFormatStack_.push_back(specFormat_);
@@ -662,21 +804,23 @@ RtfFOTBuilder::RtfFOTBuilder(streambuf *sbuf,
       }
     }
   }
-  initJIS();
   for (int i = 0; i < nSymbolFonts; i++) {
     for (int j = 0; j < 256; j++) {
       Char c = symbolFonts[i].mapping[j];
       if (c && !charTable_[c])
-	charTable_.setChar(c, j | (1 << (CHAR_TABLE_CHAR_BITS + i)) | CHAR_TABLE_SYMBOL_FLAG);
+	charTable_.setChar(c, j | (i << CHAR_TABLE_CHAR_BITS) | CHAR_TABLE_SYMBOL_FLAG);
     }
     StringC tem;
     for (const char *s = symbolFonts[i].name; *s; s++)
       tem += *s;
     fontFamilyNameTable_.insert(tem, i + 1);
   }
+  // We want characters like right arrow to come from the symbol font, not using
+  // charset 128.
+  initJIS();
   for (size_t i = 0; i < options.size(); i++) {
-    if (options[i] == systemCharset.execToDesc("97"))
-      rtfVersion_ = word97;
+    if (options[i] == systemCharset.execToDesc("95"))
+      rtfVersion_ = word95;
   }
 }
 
@@ -734,7 +878,7 @@ RtfFOTBuilder::~RtfFOTBuilder()
   }
   os() << "}\n";
   os().flush();
-  osp_ = &finalos_;
+  osp_ = finalos_;
   os() << "{\\rtf1\\ansi\\deff0\n";
   os() << "{\\fonttbl";
   HashTableIter<StringC,int> iter(fontFamilyNameTable_);
@@ -763,22 +907,25 @@ RtfFOTBuilder::~RtfFOTBuilder()
 	 << "\\blue" << (n & 0xff)
 	 << ';';
   }
-  os() << "}{\\stylesheet}\n";
+  os() << "}{\\stylesheet";
+  for (int i = 1; i <= 9; i++)
+    os() << "{\\s" << i << " Heading " << i << ";}";
+  os() << "}\n";
   if (maxConsecHyphens_ > 0)
     os() << "\\hyphconsec" << maxConsecHyphens_;
   os() << "\\deflang" << DEFAULT_LANG << "\\notabind\\facingp\\hyphauto1\\widowctrl\n";
 
-  tmpstreambuf::Iter sbIter(tempbuf_);
+  TmpOutputByteStream::Iter sbIter(tempos_);
   const char *s;
   size_t n;
   while (sbIter.next(s, n)) {
     while (n > 0) {
       const char *p = (char *)memchr(s, BOOKMARK_CHAR, n);
       if (!p) {
-	os().write(s, n);
+	os().sputn(s, n);
 	break;
       }
-      os().write(s, p - s);
+      os().sputn(s, p - s);
       n -= (p - s);
       s = p;
       --n;
@@ -903,11 +1050,8 @@ void RtfFOTBuilder::syncCharFormat()
     outputFormat_.charBackgroundColor = specFormat_.charBackgroundColor;
     changed = 1;
   }
-  if (!hyphenateSuppressed_ && !specFormat_.hyphenate) {
+  if (!specFormat_.hyphenate)
     hyphenateSuppressed_ = 1;
-    os() << "\\hyphpar0";
-    changed = 1;
-  }
   if (outputFormat_.kern != specFormat_.kern) {
     os() << "\\kerning" << (specFormat_.kern ? '1' : '0');
     outputFormat_.kern = specFormat_.kern;
@@ -927,7 +1071,7 @@ void RtfFOTBuilder::setCharset(int cs)
 }
 
 inline
-void hexChar(ostream &os, unsigned code)
+void hexChar(OutputByteStream &os, unsigned code)
 {
   static const char hex[] = "0123456789abcdef";
   os << "\\'" << hex[(code >> 4) & 0xf] << hex[code & 0xf];
@@ -935,12 +1079,19 @@ void hexChar(ostream &os, unsigned code)
 
 void RtfFOTBuilder::symbolChar(int ff, unsigned code)
 {
+#if 0
+  os() << "{\\field{\\*\\fldinst SYMBOL " << (unsigned long)code
+       << " \\\\f \"" << symbolFonts[ff - 1].name << "\"}{\\fldrslt ";
+#endif
   int &n = fontFamilyCharsetsTable_[ff].rtfFontNumber[nWinCharsets - 1];
   if (n < 0)
     n = nextRtfFontNumber_++;
   os() << "{\\f" << n;
   hexChar(os(), code);
   os() << "}";
+#if 0
+  os() << "}}";
+#endif
 }
 
 void RtfFOTBuilder::characters(const Char *s, size_t n)
@@ -957,7 +1108,24 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
   // This avoids clearing followWhitespaceChar_.
   if (inlineState_ != inlineMiddle)
     inlinePrepare();
+  else
+    flushFields();
   syncCharFormat();
+  if (mathLevel_ && mathSpecial_ == mathIntegral && n > 0) {
+    switch (*s) {
+    case 0x222b: // integral
+      return;
+    case 0x2211: // sum
+      os() << "\\\\su";
+      return;
+    case 0x220f: // product
+      os() << "\\\\pr";
+      return;
+    default:
+      os() << "\\\\vc\\\\";
+      break;
+    }
+  }
   for (; n > 0; s++, n--) {
     bool prevWhitespaceChar = followWhitespaceChar_;
     followWhitespaceChar_ = 0;
@@ -1045,9 +1213,28 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
       break;
     case '\0':
       break;
+    case ';':
+    case ',':
+      if (mathLevel_ && *s == eqArgSep_ && mathSpecial_ == mathNormal)
+	os() << "\\\\";
+      os() << char(*s);
+      break;
+    case '(':
+    case ')':
+      if (mathLevel_ && mathSpecial_ == mathNormal)
+	os() << "\\\\";
+      os() << char(*s);
+      break;
     case '\\':
       if (outputFormat_.charset == jisCharset)
 	setCharset(0);
+      if (mathLevel_ && mathSpecial_ == mathNormal) {
+	// quote once to get through RTF
+	// quote again to get through field
+	// quote again to get through C++
+	os() << "\\\\\\\\";
+	break;
+      }
       // fall through
     case '{':
     case '}':
@@ -1059,8 +1246,14 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
 	setCharset(0);
       // fall through
     default:
-      if (*s < 0x80)
-	os() << char(*s);
+      if (*s < 0x80) {
+	if (specFormat_.mathPosture
+	    && (('a' <= *s && *s <= 'z')
+	        || ('A' <= *s && *s <= 'Z')))
+	  os() << "{\\i " << char(*s) << '}';
+	else
+	  os() << char(*s);
+      }
       else {
 	unsigned long code = charTable_[*s];
 	if (code & CHAR_TABLE_SYMBOL_FLAG)
@@ -1077,7 +1270,7 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
 	    setCharset(i);
 	  }
 	  if (code & CHAR_TABLE_DB_FLAG) {
-	    os() << "{\\dbch";
+	    os() << "{\\dbch\\uc2\\u" << int(short(*s));
 	    hexChar(os(), (code >> 8) & 0xff);
 	    hexChar(os(), code & 0xff);
 	    os() << "}";
@@ -1127,9 +1320,15 @@ void RtfFOTBuilder::setFontPosture(Symbol posture)
   case symbolOblique:
   case symbolItalic:
     specFormat_.isItalic = 1;
+    specFormat_.mathPosture = 0;
+    break;
+  case symbolMath:
+    specFormat_.isItalic = 0;
+    specFormat_.mathPosture = 1;
     break;
   default:
     specFormat_.isItalic = 0;
+    specFormat_.mathPosture = 0;
     break;
   }
 }
@@ -1183,6 +1382,11 @@ void RtfFOTBuilder::setOrphanCount(long n)
     specFormat_.widowOrphanControl |= orphanControl;
   else
     specFormat_.widowOrphanControl &= widowControl;
+}
+
+void RtfFOTBuilder::setHeadingLevel(long n)
+{
+  specFormat_.headingLevel = (n >= 1 && n <= 9) ? char(n) : 0;
 }
 
 void RtfFOTBuilder::setColor(const DeviceRGBColor &color)
@@ -1295,6 +1499,10 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
     if (!doBreak_ && keepWithNext_)
       os() << "\\keepn";
     keepWithNext_ = 0;
+    if (hyphenateSuppressed_) {
+      os() << "\\hyphpar0";
+      hyphenateSuppressed_ = 0;
+    }
     os() << "\\par";
   }
   switch (doBreak_) {
@@ -1312,7 +1520,6 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
   os() << "\\pard";
   if (tableLevel_)
     os() << "\\intbl";
-  flushPendingElements();
   if (accumSpace_) {
     os() << "\\sb" << accumSpace_;
     accumSpace_ = 0;
@@ -1321,6 +1528,8 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
     os() << "\\keep";
   if (!paraFormat_.widowOrphanControl)
     os() << "\\nowidctlpar";
+  if (paraFormat_.headingLevel)
+    os() << "\\s" << int(paraFormat_.headingLevel);
   if (displayBoxLevels_.size() > 0) {
     const Format &boxFormat = specFormatStack_[displayBoxLevels_[0]];
     os() << "\\box";
@@ -1352,7 +1561,6 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
     if (paraFormat_.rightIndent || addRightIndent_)
       os() << "\\ri" << paraFormat_.rightIndent + addRightIndent_;
   }
-  hyphenateSuppressed_ = 0;
 }
 
 // This must be called before any inline flow object.
@@ -1362,8 +1570,10 @@ void RtfFOTBuilder::inlinePrepare()
   followWhitespaceChar_ = 0;
   if (inlineState_ == inlineMiddle
       || inlineState_ == inlineField
-      || inlineState_ == inlineFieldEnd)
+      || inlineState_ == inlineFieldEnd) {
+    flushFields();
     return;
+  }
   newPar();
   os() << "\\sl" << (paraFormat_.lineSpacingAtLeast ? paraFormat_.lineSpacing : - paraFormat_.lineSpacing);
   int fli = continuePar_ ? 0 : paraFormat_.firstLineIndent;
@@ -1373,6 +1583,7 @@ void RtfFOTBuilder::inlinePrepare()
     os() << "\\q" << paraFormat_.quadding;
   inlineState_ = inlineMiddle;
   os() << ' ';
+  flushFields();
 }
 
 void RtfFOTBuilder::setPositionPointShift(const LengthSpec &val)
@@ -1699,20 +1910,20 @@ void RtfFOTBuilder::endLineField()
     osp_ = &tempos_;
     // Strip trailing spaces and adjust position of
     // tab stop accordingly.
-    char *str = fieldos_.str();
-    int i = fieldos_.pcount();
+    String<char> str;
+    fieldos_.extractString(str);
+    size_t i = str.size();
     for (; i > 0; i--)
       if (str[i - 1] != ' ')
         break;
     // Assume each space is .25 em.
-    int sep = (fieldos_.pcount() - i)*outputFormat_.fontSize*5/2;
+    int sep = (str.size() - i)*outputFormat_.fontSize*5/2;
+    str.resize(i);
     static const int minTabSep = 26;
     if (sep < minTabSep)
       sep = minTabSep;
     os() << "\\tqr\\tx" <<  fieldTabPos_ - sep << "\\tx" << fieldTabPos_ << "\\tab ";
-    os().write(str, i);
-    fieldos_.rdbuf()->freeze(0);
-    fieldos_.seekp(0, ios::beg);
+    os() << str;
     os() << "\\tab ";
   }
   else if (inlineState_ == inlineField) {
@@ -1736,7 +1947,6 @@ void RtfFOTBuilder::endLeader()
 {
   if (--leaderDepth_ == 0) {
     osp_ = preLeaderOsp_;
-    nullos_.seekp(0, ios::beg);
     // MS Word doesn't mind if tabs aren't set at the beginning of the paragraph.
     os() << "\\tqr\\tldot\\tx" << (displaySize_ - paraFormat_.rightIndent) << "\\tab ";
   }
@@ -1889,8 +2099,13 @@ void RtfFOTBuilder::startSimplePageSequence()
 
 void RtfFOTBuilder::endSimplePageSequence()
 {
-  if (inlineState_ != inlineFirst)
+  if (inlineState_ != inlineFirst) {
+    if (hyphenateSuppressed_) {
+      os() << "\\hyphpar0";
+      hyphenateSuppressed_ = 0;
+    }
     os() << "\\par";
+  }
   inlineState_ = inlineFirst;
   continuePar_ = 0;
   end();
@@ -1911,10 +2126,7 @@ void RtfFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned)
 void RtfFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned i)
 {
   outputFormat_ = saveOutputFormat_;
-  char *s = hfos_.str();
-  hfPart_[i].assign(s, hfos_.pcount());
-  hfos_.rdbuf()->freeze(0);
-  hfos_.seekp(0, ios::beg);
+  hfos_.extractString(hfPart_[i]);
   osp_ = &tempos_;
 }
 
@@ -2016,55 +2228,69 @@ void RtfFOTBuilder::startLink(const Address &addr)
 {
   start();
   if (linkDepth_++ == 0) {
-    switch (addr.type) {
-    case Address::resolvedNode:
-      {
-	GroveString id; 
-        if (addr.node->getId(id) == accessOK)
-	  idrefButton(id.data(), id.size());
-	else {
-	  unsigned long n;
-	  if (addr.node->elementIndex(n) == accessOK) {
-	    os() << "{\\field";
-	    os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
-	    os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
-	    outputBookmarkName(n);
-	    os() << ' ';
-	    if (rtfVersion_ >= word97)
-	      os() << "}{\\fldrslt ";
-	    elementsRefed_.add(n);
-	  }
-	  else
-	    os() << "{{";
-	}
-	break;
-      }
-    case Address::idref:
-      {
-        const StringC &id = addr.params[0];
-	size_t i = 0;
-        for (; i < id.size(); i++) {
-	  // If they use multiple IDREFs, they'll only get
-	  // the first.
-	  if (id[i] == ' ')
-	    break;
-	}
-	idrefButton(id.data(), i);
-	break;
-      }
-    default:
-      os() << "{{";
-      break;
+    if (inlineState_ == inlineMiddle)
+      doStartLink(addr);
+    else {
+      pendingLink_ = addr;
+      havePendingLink_ = 1;
     }
-    saveOutputFormat_ = outputFormat_;
   }
 }
+
+void RtfFOTBuilder::doStartLink(const Address &addr)
+{
+  switch (addr.type) {
+  case Address::resolvedNode:
+    {
+      GroveString id; 
+      if (addr.node->getId(id) == accessOK)
+	idrefButton(id.data(), id.size());
+      else {
+	unsigned long n;
+	if (addr.node->elementIndex(n) == accessOK) {
+	  os() << "{\\field";
+	  os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
+	  os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
+	  outputBookmarkName(n);
+	  os() << ' ';
+	  if (rtfVersion_ >= word97)
+	    os() << "}{\\fldrslt ";
+	  elementsRefed_.add(n);
+	}
+	else
+	  os() << "{{";
+      }
+      break;
+    }
+  case Address::idref:
+    {
+      const StringC &id = addr.params[0];
+      size_t i = 0;
+      for (; i < id.size(); i++) {
+	// If they use multiple IDREFs, they'll only get
+	// the first.
+	if (id[i] == ' ')
+	  break;
+      }
+      idrefButton(id.data(), i);
+      break;
+    }
+  default:
+    os() << "{{";
+    break;
+  }
+  saveOutputFormat_ = outputFormat_;
+} 
 
 void RtfFOTBuilder::endLink()
 {
   if (--linkDepth_ == 0) {
-    os() << (rtfVersion_ >= word97 ? "}}" : "}{\\fldrslt }}");
-    outputFormat_ = saveOutputFormat_;
+    if (havePendingLink_)
+      havePendingLink_ = 0;
+    else {
+      os() << (rtfVersion_ >= word97 ? "}}" : "}{\\fldrslt }}");
+      outputFormat_ = saveOutputFormat_;
+    }
   }
   end();
 }
@@ -2151,6 +2377,7 @@ void RtfFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
     if (specFormat_.displayAlignment != 'l')
       os() << "\\q" << specFormat_.displayAlignment;
     os() << "\\sl1000";
+    flushFields();
   }
   else
     inlinePrepare();
@@ -2181,25 +2408,30 @@ bool RtfFOTBuilder::systemIdFilename(const StringC &systemId, String<char> &file
 }
 
 // Return -1 if an error should be generated
+// FIXME in some cases should copy the entity into a file in the same
+// directory as the output file.
 
 int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &filename)
 {
   if (systemId.size() == 0)
     return -1;
-  ParsedSystemId parsedBuf;
-  Owner<InputSource> in
-    = entityManager_->open(systemId, *systemCharset_, new InputSourceOrigin, 0, *mgr_);
+  Owner<InputSource> in(entityManager_->open(systemId,
+					     *systemCharset_,
+					     InputSourceOrigin::make(),
+					     0,
+					     *mgr_));
   if (!in)
     return 0;
   Xchar c = in->get(*mgr_);
-  const ParsedSystemId *parsed;
+  StorageObjectLocation soLoc;
   if (c == InputSource::eE && in->accessError()) {
+    ParsedSystemId parsedBuf;
     if (!entityManager_->parseSystemId(systemId, *systemCharset_, 0, 0, *mgr_, parsedBuf))
       return 0;
     if (parsedBuf.size() != 1 || parsedBuf[0].baseId.size())
       return 0;
-    parsedBuf[0].id = parsedBuf[0].specId;
-    parsed = &parsedBuf;
+    soLoc.storageObjectSpec = &parsedBuf[0];
+    soLoc.actualStorageId = parsedBuf[0].specId;
   }
   else {
     const Location &loc = in->currentLocation();
@@ -2208,16 +2440,16 @@ int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &file
     const InputSourceOrigin *tem = loc.origin()->asInputSourceOrigin();
     if (!tem)
       return -1;
-    parsed
+    const ParsedSystemId *psi
       = ExtendEntityManager::externalInfoParsedSystemId(tem->externalInfo());
-    if (!parsed)
+    if (!psi || psi->size() != 1)
+      return -1;
+    if (!ExtendEntityManager::externalize(tem->externalInfo(), 0, soLoc))
       return -1;
   }
-  if (parsed->size() != 1)
+  if (strcmp(soLoc.storageObjectSpec->storageManager->type(), "OSFILE") != 0)
     return -1;
-  if (strcmp((*parsed)[0].storageManager->type(), "OSFILE") != 0)
-    return -1;
-  const StringC &id = (*parsed)[0].id;
+  const StringC &id = soLoc.actualStorageId;
   String<char> buf;
   // FIXME use WideCharToMultibyte
   for (size_t i = 0; i < id.size(); i++)
@@ -2606,10 +2838,7 @@ void RtfFOTBuilder::endTableCell()
       os() << "\\sa" << accumSpace_;
   }
   accumSpace_ = 0;
-  char *s = cellos_.str();
-  cells_.back()[cellIndex_].content.assign(s, cellos_.pcount());
-  cellos_.rdbuf()->freeze(0);
-  cellos_.seekp(0, ios::beg);
+  cellos_.extractString(cells_.back()[cellIndex_].content);
   end();
   osp_ = &tempos_;
   accumSpace_ = 0;
@@ -2747,6 +2976,563 @@ void RtfFOTBuilder::setCellRowAlignment(Symbol align)
   }
 }
 
+void RtfFOTBuilder::enterMathMode()
+{
+  if (mathLevel_++ == 0) {
+    mathSaveOutputFormat_ = outputFormat_;
+    os() << "{\\field{\\*\\fldinst  EQ ";
+  }
+}
+
+void RtfFOTBuilder::exitMathMode()
+{
+  if (--mathLevel_ == 0) {
+    os() << "}{\\fldrslt}}";
+    outputFormat_ = mathSaveOutputFormat_;
+  }
+}
+
+void RtfFOTBuilder::setSubscriptDepth(Length n)
+{
+  specFormat_.subscriptDepth = points(n);
+}
+
+
+void RtfFOTBuilder::setSuperscriptHeight(Length n)
+{
+  specFormat_.superscriptHeight = points(n);
+}
+
+void RtfFOTBuilder::setUnderMarkDepth(Length n)
+{
+  specFormat_.underMarkDepth = points(n);
+}
+
+
+void RtfFOTBuilder::setOverMarkHeight(Length n)
+{
+  specFormat_.overMarkHeight = points(n);
+}
+
+void RtfFOTBuilder::startSubscript()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  os() << "\\\\s\\\\do" << specFormat_.subscriptDepth << '(';
+}
+
+void RtfFOTBuilder::endSubscript()
+{
+  os() << ")";
+  exitMathMode();
+  end();
+}
+
+void RtfFOTBuilder::startSuperscript()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  os() << "\\\\s\\\\up" << specFormat_.superscriptHeight << '(';
+}
+
+void RtfFOTBuilder::endSuperscript()
+{
+  os() << ")";
+  exitMathMode();
+  end();
+}
+
+void RtfFOTBuilder::startMathSequence()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+}
+
+void RtfFOTBuilder::endMathSequence()
+{
+  exitMathMode();
+  end();
+}
+
+void RtfFOTBuilder::startFractionSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  os() << "\\\\f";
+}
+
+void RtfFOTBuilder::endFractionSerial()
+{
+  exitMathMode();
+  end();
+}
+
+void RtfFOTBuilder::startFractionNumerator()
+{
+  os() << '(';
+}
+
+void RtfFOTBuilder::endFractionNumerator()
+{
+}
+
+void RtfFOTBuilder::startFractionDenominator()
+{
+  os() << eqArgSep_;
+}
+
+void RtfFOTBuilder::endFractionDenominator()
+{
+  os() << ')';
+}
+
+void RtfFOTBuilder::startRadicalSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  startReorderFlowObject();
+}
+
+void RtfFOTBuilder::endRadicalSerial()
+{
+  Vector<String<char> > &v = reorderStack_.head()->streams;
+  *reorderStack_.head()->saveOsp << "\\\\r(" << v[1] << eqArgSep_ << v[0] << ')';
+  endReorderFlowObject();
+  end();
+  exitMathMode();
+}
+ 
+void RtfFOTBuilder::startRadicalDegree()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::endRadicalDegree()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startFenceSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  startReorderFlowObject();
+}
+
+void RtfFOTBuilder::endFenceSerial()
+{
+  Vector<String<char> > &v = reorderStack_.head()->streams;
+  *reorderStack_.head()->saveOsp 
+    << "\\\\b\\\\lc\\\\" << v[1] << "\\\\rc\\\\" << v[2] <<'(' << v[0] << ')';
+  endReorderFlowObject();
+  end();
+  exitMathMode();
+}
+
+void RtfFOTBuilder::startFenceOpen()
+{
+  endReorderFlowObjectPort();
+  mathSpecial_ = mathFence;
+}
+
+void RtfFOTBuilder::endFenceOpen()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startFenceClose()
+{
+}
+ 
+void RtfFOTBuilder::endFenceClose()
+{
+  endReorderFlowObjectPort();
+  mathSpecial_ = mathNormal;
+}
+
+void RtfFOTBuilder::setMathDisplayMode(Symbol sym)
+{
+  switch (sym) {
+  case symbolDisplay:
+    specFormat_.mathInline = 0;
+    break;
+  case symbolInline:
+    specFormat_.mathInline = 1;
+    break;
+  default:
+    break;
+  }
+}
+
+void RtfFOTBuilder::startMathOperatorSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  os() << "\\\\i";
+  if (specFormat_.mathInline)
+    os() << "\\\\in";
+  startReorderFlowObject();
+}
+
+void RtfFOTBuilder::endMathOperatorSerial()
+{
+  Vector<String<char> > &v = reorderStack_.head()->streams;
+  // FIXME handle sum, product, integral specially
+  *reorderStack_.head()->saveOsp 
+    << v[1]
+    << '(' << v[2] << eqArgSep_ << v[3] << eqArgSep_ << v[0] << ')';
+  endReorderFlowObject();
+  end();
+  exitMathMode();
+}
+
+void RtfFOTBuilder::startMathOperatorOperator()
+{
+  endReorderFlowObjectPort();
+  mathSpecial_ = mathIntegral;
+}
+
+void RtfFOTBuilder::endMathOperatorOperator()
+{
+  mathSpecial_ = mathNormal;
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startMathOperatorLowerLimit()
+{
+}
+
+void RtfFOTBuilder::endMathOperatorLowerLimit()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startMathOperatorUpperLimit()
+{
+}
+
+void RtfFOTBuilder::endMathOperatorUpperLimit()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startMarkSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  startReorderFlowObject();
+}
+
+void RtfFOTBuilder::endMarkSerial()
+{
+  Vector<String<char> > &v = reorderStack_.head()->streams;
+  OutputByteStream &o = *reorderStack_.head()->saveOsp;
+  o << "\\\\o(" << v[0];
+  if (v[1].size() > 2)
+    o << eqArgSep_ << "\\\\s\\\\up" << specFormat_.overMarkHeight 
+      << '(' << v[1] << ')';
+  if (v[2].size() > 2)
+    o << eqArgSep_ << "\\\\s\\\\do" << specFormat_.underMarkDepth
+      << '(' << v[2] << ')';
+  o << ')';
+  endReorderFlowObject();
+  end();
+  exitMathMode();
+}
+
+void RtfFOTBuilder::startMarkOver()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::endMarkOver()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startMarkUnder()
+{
+}
+
+void RtfFOTBuilder::endMarkUnder()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptSerial()
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  startReorderFlowObject();
+}
+
+void RtfFOTBuilder::endScriptSerial()
+{
+  endReorderFlowObjectPort();
+  Vector<String<char> > &v = reorderStack_.head()->streams;
+  ASSERT(v.size() == 7);
+  OutputByteStream &o = *reorderStack_.head()->saveOsp;
+  const String<char> &preSup = v[1];
+  const String<char> &preSub = v[2];
+  const String<char> &postSup = v[3];
+  const String<char> &postSub = v[4];
+  const String<char> &midSup = v[5];
+  const String<char> &midSub = v[6];
+  o << "\\\\o(";
+  if (preSup.size() > 2)
+    o << "\\\\s\\\\up" << specFormat_.superscriptHeight << '(' << preSup << ')';
+  o << eqArgSep_;
+  if (preSub.size() > 2)
+    o << "\\\\s\\\\do" << specFormat_.subscriptDepth << '(' << preSub << ')';
+  o << ')';
+  o << "\\\\o(";
+  o << v[0];
+  if (midSup.size() > 2)
+    o << eqArgSep_ << "\\\\s\\\\up" << specFormat_.overMarkHeight
+      << '(' << midSup << ')';
+  if (midSub.size() > 2)
+    o << eqArgSep_ << "\\\\s\\\\do" << specFormat_.underMarkDepth
+      << '(' << midSub << ')';
+  o << ')';
+  o << "\\\\o(";
+  if (postSup.size() > 2)
+    o << "\\\\s\\\\up" << specFormat_.superscriptHeight << '(' << postSup << ')';
+  o << eqArgSep_;
+  if (postSub.size() > 2)
+    o << "\\\\s\\\\do" << specFormat_.subscriptDepth << '(' << postSub << ')';
+  o << ')';
+  endReorderFlowObject();
+  end();
+  exitMathMode();
+}
+
+void RtfFOTBuilder::startScriptPreSup()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptPreSub()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptPostSup()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptPostSub()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptMidSup()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startScriptMidSub()
+{
+  endReorderFlowObjectPort();
+}
+
+void RtfFOTBuilder::startReorderFlowObject()
+{
+  reorderStack_.insert(new ReorderFlowObject);
+  ReorderFlowObject &r = *reorderStack_.head();
+  r.saveOsp = osp_;
+  r.saveOutputFormat = outputFormat_;
+  osp_ = &r.buf;
+  os() << '{';
+}
+
+void RtfFOTBuilder::endReorderFlowObjectPort()
+{
+  os() << '}';
+  ReorderFlowObject &r = *reorderStack_.head();
+  r.streams.resize(r.streams.size() + 1);
+  r.buf.extractString(r.streams.back());
+  os() << '{';
+  outputFormat_ = r.saveOutputFormat;
+}
+
+void RtfFOTBuilder::endReorderFlowObject()
+{
+  osp_ = reorderStack_.head()->saveOsp;
+  delete reorderStack_.get();
+}
+
+void RtfFOTBuilder::setGridPositionCellType(Symbol sym)
+{
+  switch (sym) {
+  case symbolRowMajor:
+    specFormat_.gridPosType = gridPosRowMajor;
+    break;
+  case symbolColumnMajor:
+    specFormat_.gridPosType = gridPosColumnMajor;
+    break;
+  case symbolExplicit:
+    specFormat_.gridPosType = gridPosExplicit;
+    break;
+  default:
+    break;
+  }
+}
+
+void RtfFOTBuilder::setGridColumnAlignment(Symbol sym)
+{
+  switch (sym) {
+  case symbolStart:
+    specFormat_.gridColumnAlignment = 'l';
+    break;
+  case symbolCenter:
+    specFormat_.gridColumnAlignment = 'c';
+    break;
+  case symbolEnd:
+    specFormat_.gridColumnAlignment = 'r';
+    break;
+  default:
+    break;
+  }
+}
+
+void RtfFOTBuilder::setGridRowSep(Length n)
+{
+  specFormat_.gridRowSep = points(n);
+}
+
+void RtfFOTBuilder::setGridColumnSep(Length n)
+{
+  specFormat_.gridColumnSep = points(n);
+}
+
+void RtfFOTBuilder::startGrid(const GridNIC &nic)
+{
+  start();
+  inlinePrepare();
+  enterMathMode();
+  gridStack_.insert(new Grid);
+  Grid &g = *gridStack_.head();
+  g.saveOsp = osp_;
+  g.saveOutputFormat = outputFormat_;
+  g.posType = specFormat_.gridPosType;
+  g.nColumns = nic.nColumns;
+  if (!g.nColumns)
+    g.nColumns = 1;
+  g.nRows = nic.nRows;
+  if (!g.nRows)
+    g.nRows = 1;
+  osp_ = &g.buf;
+}
+
+void RtfFOTBuilder::endGrid()
+{
+  osp_ = gridStack_.head()->saveOsp;
+  Grid &g = *gridStack_.head();
+  for (size_t i = 0; i < g.cells.size(); i++) {
+    if (g.cells[i].size() > g.nColumns)
+      g.nColumns = g.cells[i].size();
+  }
+  if (g.cells.size() > g.nRows)
+    g.nRows = g.cells.size();
+  os() << "\\\\a"
+       << "\\\\hs" << specFormat_.gridColumnSep
+       << "\\\\vs" << specFormat_.gridRowSep
+       << "\\\\a" << specFormat_.gridColumnAlignment
+       << "\\\\co" << g.nColumns << '(';
+  for (size_t i = 0; i < g.cells.size(); i++) {
+    size_t j = 0;
+    for (; j < g.cells[i].size(); j++) {
+      if (i || j)
+        os() << eqArgSep_;
+      os() << g.cells[i][j];
+    }
+    if (!j)
+      j++;
+    for (; j < g.nColumns; j++)
+      os() << eqArgSep_;
+  }
+  os() << ')';
+  delete gridStack_.get();
+  end();
+  exitMathMode();
+}
+
+void RtfFOTBuilder::startGridCell(const GridCellNIC &nic)
+{
+  if (!gridStack_.empty()) {
+    os() << '{';
+    Grid &g = *gridStack_.head();
+    g.curCellPtr = 0;
+    switch (g.posType) {
+    case gridPosExplicit:
+      if (nic.rowNumber > 0 && nic.columnNumber > 0) {
+	if (nic.columnNumber > g.cells.size())
+	  g.cells.resize(nic.columnNumber);
+	Vector<String<char> > &column = g.cells[nic.columnNumber - 1];
+	if (nic.rowNumber > column.size())
+	  column.resize(nic.rowNumber);
+	g.curCellPtr = &column[nic.rowNumber - 1];
+      }
+      break;
+    case gridPosRowMajor:
+      if (g.cells.size() == 0
+	  || g.cells.back().size() >= g.nColumns)
+	g.cells.resize(g.cells.size() + 1);
+      g.cells.back().resize(g.cells.back().size() + 1);
+      g.curCellPtr = &g.cells.back().back();
+      break;
+    case gridPosColumnMajor:
+      if (g.cells.size() < g.nRows)
+	g.cells.resize(g.nRows);
+      if (g.cells[g.nRows - 1].size() == g.cells[0].size()) {
+        g.cells[0].resize(g.cells[0].size() + 1);
+	g.curCellPtr = &g.cells[0].back();
+      }
+      else {
+	for (size_t i = 1;; i++) {
+	  ASSERT(i < g.cells.size());
+	  if (g.cells[i].size() < g.cells[0].size()) {
+	    g.cells[i].resize(g.cells[i].size() + 1);
+	    g.curCellPtr = &g.cells[i].back();
+	    break;
+	  }
+	}
+      }
+      break;
+    default:
+      CANNOT_HAPPEN();
+    }
+  }
+  start();
+}
+
+void RtfFOTBuilder::endGridCell()
+{
+  if (!gridStack_.empty()) {
+    os() << '}';
+    Grid &g = *gridStack_.head();
+    if (g.curCellPtr)
+      g.buf.extractString(*g.curCellPtr);
+    else {
+      String<char> tem;
+      g.buf.extractString(tem);
+    }
+    outputFormat_ = g.saveOutputFormat;
+  }
+  end();
+}
+
+
 void RtfFOTBuilder::outputBookmarkName(const Char *s, size_t n)
 {
   os() << "ID_";
@@ -2774,7 +3560,7 @@ void RtfFOTBuilder::outputBookmarkName(const Char *s, size_t n)
 
 void RtfFOTBuilder::outputBookmarkName(unsigned long n)
 {
-  os() << "E_" << n;
+  os() << (rtfVersion_ >= word97 ? "_" : "E_") << n;
 }
 
 void RtfFOTBuilder::flushPendingElements()
@@ -2893,14 +3679,18 @@ RtfFOTBuilder::Format::Format()
   borderPresent(1), borderPriority(0), borderOmitAtBreak(0),
   cellLeftMargin(0), cellRightMargin(0), cellTopMargin(0), cellBottomMargin(0),
   cellVerticalAlignment('t'),
-  lineSpacingSpec(240), cellBackground(0), scoreSpaces(1), hyphenate(0)
+  lineSpacingSpec(240), cellBackground(0), scoreSpaces(1), hyphenate(0),
+  gridPosType(gridPosRowMajor), gridColumnAlignment('c'),
+  gridRowSep(2), gridColumnSep(2),
+  mathInline(0), mathPosture(0), superscriptHeight(5), subscriptDepth(3),
+  overMarkHeight(10), underMarkDepth(10)
 {
 }
 
 RtfFOTBuilder::ParaFormat::ParaFormat()
 : leftIndent(0), rightIndent(0), firstLineIndent(0), quadding('l'),
   lineSpacing(240), lines(symbolWrap), lineSpacingAtLeast(0),
-  widowOrphanControl(widowControl|orphanControl)
+  widowOrphanControl(widowControl|orphanControl), headingLevel(0)
 {
 }
 

@@ -19,6 +19,8 @@ OBJS=Collector.o \
   style_inst.o
 INCLUDE=-I$(srcdir)/../grove
 
-GENSRCS=style_inst.cxx FlowObj_inst.cxx InterpreterMessages.h
+GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
+  InterpreterMessages.h
 
 FlowObj.o: FlowObj_inst.cxx
+primitive.o: primitive_inst.cxx

@@ -48,9 +48,9 @@ class TranslateEncoder : public RecoveringEncoder {
 public:
   TranslateEncoder(Encoder *, const ConstPtr<CharMapResource<Char> > &map,
 		   Char illegalChar);
-  void output(const Char *, size_t, streambuf *);
-  void output(Char *, size_t, streambuf *);
-  void startFile(streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
+  void output(Char *, size_t, OutputByteStream *);
+  void startFile(OutputByteStream *);
 private:
   Owner<Encoder> encoder_;
   ConstPtr<CharMapResource<Char> > map_;
@@ -66,12 +66,12 @@ TranslateEncoder::TranslateEncoder(Encoder *encoder,
 {
 }
 
-void TranslateEncoder::startFile(streambuf *sbuf)
+void TranslateEncoder::startFile(OutputByteStream *sbuf)
 {
   encoder_->startFile(sbuf);
 }
 
-void TranslateEncoder::output(const Char *s, size_t n, streambuf *sbuf)
+void TranslateEncoder::output(const Char *s, size_t n, OutputByteStream *sbuf)
 {
   size_t j = 0;
   for (; n > 0; s++, n--) {
@@ -95,7 +95,7 @@ void TranslateEncoder::output(const Char *s, size_t n, streambuf *sbuf)
     encoder_->output(buf_, j, sbuf);
 }
 
-void TranslateEncoder::output(Char *s, size_t n, streambuf *sbuf)
+void TranslateEncoder::output(Char *s, size_t n, OutputByteStream *sbuf)
 {
   size_t i = 0;
   for (;;) {

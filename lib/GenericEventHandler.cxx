@@ -800,7 +800,7 @@ SpOpenEntity::location(SGMLApplication::Position pos) const
   if (!ExtendEntityManager::externalize(externalInfo, off, soLoc))
     return loc;
   loc.lineNumber = soLoc.lineNumber;
-  GenericEventHandler::setString(loc.filename, soLoc.storageObjectSpec->id);
+  GenericEventHandler::setString(loc.filename, soLoc.actualStorageId);
   loc.columnNumber = soLoc.columnNumber;
   loc.byteOffset = soLoc.byteIndex;
   loc.other = soLoc.storageObjectSpec;

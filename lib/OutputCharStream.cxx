@@ -5,7 +5,6 @@
 #include "OutputCharStream.h"
 #include "CodingSystem.h"
 #include "macros.h"
-#include <iostream.h>
 #include <stdio.h>
 
 #ifdef SP_NAMESPACE
@@ -69,13 +68,13 @@ OutputCharStream &OutputCharStream::operator<<(int n)
   return *this << buf;
 }
 
-IosOutputCharStream::IosOutputCharStream()
+EncodeOutputCharStream::EncodeOutputCharStream()
 : buf_(0), byteStream_(0), escaper_(0)
 {
 }
 
-IosOutputCharStream::IosOutputCharStream(streambuf *byteStream,
-					 const OutputCodingSystem *codingSystem)
+EncodeOutputCharStream::EncodeOutputCharStream(OutputByteStream *byteStream,
+					       const OutputCodingSystem *codingSystem)
 : buf_(0),
   byteStream_(byteStream),
   escaper_(0),
@@ -87,8 +86,8 @@ IosOutputCharStream::IosOutputCharStream(streambuf *byteStream,
   encoder_->startFile(byteStream_);
 }
 
-IosOutputCharStream::IosOutputCharStream(streambuf *byteStream,
-					 Encoder *encoder)
+EncodeOutputCharStream::EncodeOutputCharStream(OutputByteStream *byteStream,
+					       Encoder *encoder)
 : buf_(0),
   byteStream_(byteStream),
   escaper_(0),
@@ -97,15 +96,15 @@ IosOutputCharStream::IosOutputCharStream(streambuf *byteStream,
   allocBuf(0);
 }
 
-IosOutputCharStream::~IosOutputCharStream()
+EncodeOutputCharStream::~EncodeOutputCharStream()
 {
   if (byteStream_)
     flush();
   delete [] buf_;
 }
 
-void IosOutputCharStream::open(streambuf *byteStream,
-			       const OutputCodingSystem *codingSystem)
+void EncodeOutputCharStream::open(OutputByteStream *byteStream,
+				  const OutputCodingSystem *codingSystem)
 {
   if (byteStream_)
     flush();
@@ -120,20 +119,16 @@ void IosOutputCharStream::open(streambuf *byteStream,
   encoder_->startFile(byteStream_);
 }
 
-void IosOutputCharStream::flush()
+void EncodeOutputCharStream::flush()
 {
   if (ptr_ > buf_) {
     encoder_->output(buf_, ptr_ - buf_, byteStream_);
     ptr_ = buf_;
   }
-#ifdef SP_ANSI_IOSTREAMS
-  byteStream_->pubsync();
-#else
-  byteStream_->sync();
-#endif
+  byteStream_->flush();
 }
 
-void IosOutputCharStream::flushBuf(Char c)
+void EncodeOutputCharStream::flushBuf(Char c)
 {
   ASSERT(buf_ != 0);
   encoder_->output(buf_, ptr_ - buf_, byteStream_);
@@ -141,7 +136,7 @@ void IosOutputCharStream::flushBuf(Char c)
   *ptr_++ = c;
 }
 
-void IosOutputCharStream::allocBuf(int bytesPerChar)
+void EncodeOutputCharStream::allocBuf(int bytesPerChar)
 {
   const int blockSize = 1024;
   size_t bufSize = bytesPerChar ? blockSize/bytesPerChar : blockSize;
@@ -149,14 +144,14 @@ void IosOutputCharStream::allocBuf(int bytesPerChar)
   end_ = buf_ + bufSize;
 }
 
-void IosOutputCharStream::setEscaper(Escaper f)
+void EncodeOutputCharStream::setEscaper(Escaper f)
 {
   escaper_ = f;
 }
 
-void IosOutputCharStream::handleUnencodable(Char c, streambuf *)
+void EncodeOutputCharStream::handleUnencodable(Char c, OutputByteStream *)
 {
-  IosOutputCharStream tem(byteStream_, encoder_);
+  EncodeOutputCharStream tem(byteStream_, encoder_);
   if (escaper_)
     (*escaper_)(tem, c);
 }

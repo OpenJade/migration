@@ -38,6 +38,7 @@ const char endSubdocCode = '}';
 const char fileCode = 'f';
 const char locationCode = 'L';
 const char includedElementCode = 'i';
+const char emptyElementCode = 'e';
 
 const OutputCharStream::Newline nl = OutputCharStream::newline;
 
@@ -80,6 +81,7 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
   outputNotationSysid_((outputFlags & outputNotationSysid) != 0),
   outputIncluded_((outputFlags & outputIncluded) != 0),
   outputNonSgml_((outputFlags & outputNonSgml) != 0),
+  outputEmpty_((outputFlags & outputEmpty) != 0),
   haveData_(0), lastSos_(0)
 {
   os_->setEscaper(escape);
@@ -221,6 +223,8 @@ void SgmlsEventHandler::startElement(StartElementEvent *event)
   currentLocation_.clear();
   if (outputIncluded_ && event->included())
     os() << includedElementCode << nl;
+  if (outputEmpty_ && event->mustOmitEnd())
+    os() << emptyElementCode << nl;
   outputLocation(event->location());
   os() << startElementCode << event->name() << nl;
   delete event;
@@ -556,7 +560,7 @@ void SgmlsEventHandler::outputLocation1(const Location &loc)
   else {
     flushData();
     os() << locationCode << soLoc.lineNumber << space;
-    outputString(soLoc.storageObjectSpec->id);
+    outputString(soLoc.actualStorageId);
     os() << nl;
     lastLineno_ = soLoc.lineNumber;
     lastSos_ = soLoc.storageObjectSpec;

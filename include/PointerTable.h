@@ -18,7 +18,7 @@ template<class P, class K, class HF, class KF>
 class PointerTable {
   void constraints() {
     P p(0);
-    K key = KF::key(*p);
+    const K &key = KF::key(*p);
     unsigned long n = HF::hash(key);
     n = 0;			// prevent warning
   }

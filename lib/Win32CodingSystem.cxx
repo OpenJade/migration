@@ -10,7 +10,6 @@
 #ifdef SP_MULTI_BYTE
 
 #include <windows.h>
-#include <iostream.h>
 #include <io.h>
 #include "Win32CodingSystem.h"
 #include "Boolean.h"
@@ -46,7 +45,7 @@ class Win32Encoder : public Encoder {
 public:
   Win32Encoder(unsigned int codePage);
   ~Win32Encoder();
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 private:
   char *buf_;
   size_t bufLen_;
@@ -171,7 +170,7 @@ Win32Encoder::~Win32Encoder()
   delete [] buf_;
 }
 
-void Win32Encoder::output(const Char *s, size_t n, streambuf *sb)
+void Win32Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   if (n == 0)
     return;

@@ -6,6 +6,7 @@
 #endif
 #include "splib.h"
 #include "ParserOptions.h"
+#include <string.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -26,19 +27,8 @@ ParserOptions::ParserOptions()
   errorIdref(1),
   errorSignificant(1),
   errorAfdr(1),
-  errorLpdNotation(0),
-  warnSgmlDecl(0),
-  warnShould(0),
-  warnDuplicateEntity(0),
-  warnUndefinedElement(0),
-  warnDefaultEntityReference(0),
-  warnMixedContent(0),
-  warnUnclosedTag(0),
-  warnNet(0),
-  warnEmptyTag(0),
-  warnUnusedMap(0),
-  warnUnusedParam(0),
-  warnNotationSystemId(0)
+  errorValid(1),
+  errorLpdNotation(0)
 {
   for (int i = 0; i < nQuantity; i++)
     quantity[i] = 99999999;
@@ -47,6 +37,11 @@ ParserOptions::ParserOptions()
   quantity[LITLEN] = 24000;
   quantity[PILEN] = 24000;
   quantity[DTEMPLEN] = 24000;
+}
+
+Warnings::Warnings()
+{
+  memset(this, 0, sizeof(Warnings));
 }
 
 #ifdef SP_NAMESPACE

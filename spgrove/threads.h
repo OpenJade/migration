@@ -11,7 +11,6 @@
 // WIN32
 
 #define SP_THREAD
-#define SP_ThreadLocalStorage __declspec(thread)
 
 #define STRICT 1
 #include <windows.h>

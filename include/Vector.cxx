@@ -80,9 +80,10 @@ void Vector<T>::insert(const T *p, size_t n, const T &t)
   reserve(size_ + n);
   if (i != size_)
     memmove(ptr_ + i + n, ptr_ + i, (size_ - i)*sizeof(T));
-  size_ += n;
-  for (T *pp = ptr_ + i; n-- > 0; pp++)
+  for (T *pp = ptr_ + i; n-- > 0; pp++) {
     (void)new (pp) T(t);
+    size_++;
+  }
 }
 
 template<class T>
@@ -93,9 +94,10 @@ void Vector<T>::insert(const T *p, const T *q1, const T *q2)
   reserve(size_ + n);
   if (i != size_)
     memmove(ptr_ + i + n, ptr_ + i, (size_ - i)*sizeof(T));
-  size_ += n;
-  for (T *pp = ptr_ + i; q1 != q2; q1++, pp++)
+  for (T *pp = ptr_ + i; q1 != q2; q1++, pp++) {
     (void)new (pp) T(*q1);
+    size_++;
+  }
 }
 
 #endif
@@ -143,10 +145,13 @@ T *Vector<T>::erase(const T *p1, const T *p2)
 template<class T>
 void Vector<T>::reserve1(size_t size)
 {
-  alloc_ *= 2;
-  if (size > alloc_)
-    alloc_ += size;
-  void *p = ::operator new(alloc_*sizeof(T));
+  // Try to preserve a consistent start in the
+  // event of an out of memory exception.
+  size_t newAlloc = alloc_*2;
+  if (size > newAlloc)
+    newAlloc += size;
+  void *p = ::operator new(newAlloc * sizeof(T));
+  alloc_ = newAlloc;
   if (ptr_) {
     memcpy(p, ptr_, size_*sizeof(T));
     ::operator delete((void *)ptr_);

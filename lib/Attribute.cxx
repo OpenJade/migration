@@ -826,6 +826,22 @@ AttributeDefinitionList
   defs_.swap(vec);
 }
 
+AttributeDefinitionList:: AttributeDefinitionList(const ConstPtr<AttributeDefinitionList> &def)
+: prev_(def), index_(size_t(-1))
+{
+  if (def.isNull()) {
+    anyCurrent_ = 0;
+    notationIndex_ = size_t(-1);
+    idIndex_ = size_t(-1);
+  }
+  else {
+    anyCurrent_ = def->anyCurrent_;
+    notationIndex_ = def->notationIndex_;
+    idIndex_ = def->idIndex_;
+    defs_ = def->defs_;
+  }
+}
+
 Boolean AttributeDefinitionList::tokenIndex(const StringC &token, unsigned &index) const
 {
   for (size_t i = 0; i < defs_.size(); i++)
@@ -1067,6 +1083,12 @@ void AttributeList::init(const ConstPtr<AttributeDefinitionList> &def)
     for (size_t i = 0; i < clearLim; i++)
       vec_[i].clear();
   }
+}
+
+void AttributeList::changeDef(const ConstPtr<AttributeDefinitionList> &def)
+{
+  vec_.resize(def.isNull() ? 0 : def->size());
+  def_ = def;
 }
 
 void AttributeList::swap(AttributeList &to)

@@ -24,6 +24,7 @@ class ElementChunk;
 
 __instantiate(`PointerTable<ElementChunk *,StringC,Hash,ElementChunk>')
 __instantiate(`Vector<ElementChunk *>')
+__instantiate(Vector<ConstPtr<Origin> >)
 
 #ifdef SP_NAMESPACE
 }

@@ -19,7 +19,9 @@ struct CmdLineAppMessages {
   // 4005
   static const MessageType1 unknownEncoding;
   // 4006
-  static const MessageType2 cannotOpenOutputError;
+  static const MessageType2 openFileError;
+  // 4007
+  static const MessageType2 closeFileError;
 };
 const MessageType1 CmdLineAppMessages::invalidOptionError(
 MessageType::error,
@@ -93,7 +95,7 @@ MessageFragment::appModule,
 ,"unknown encoding %1"
 #endif
 );
-const MessageType2 CmdLineAppMessages::cannotOpenOutputError(
+const MessageType2 CmdLineAppMessages::openFileError(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -103,6 +105,18 @@ MessageFragment::appModule,
 4006
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot open output file %1 (%2)"
+#endif
+);
+const MessageType2 CmdLineAppMessages::closeFileError(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+4007
+#ifndef SP_NO_MESSAGE_TEXT
+,"cannot close output file %1 (%2)"
 #endif
 );
 #ifdef SP_NAMESPACE

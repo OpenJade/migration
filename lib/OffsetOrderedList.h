@@ -8,6 +8,7 @@
 #include "Owner.h"
 #include "NCVector.h"
 #include "Boolean.h"
+#include "Mutex.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -38,6 +39,7 @@ private:
   // bytes used in current block
   int blockUsed_;
   NCVector<Owner<OffsetOrderedListBlock> > blocks_;
+  Mutex mutex_;
 };
 
 inline

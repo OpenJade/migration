@@ -44,6 +44,16 @@ Boolean Parser::parseProcessingInstruction()
   if (buf.size() > syntax().pilen())
     message(ParserMessages::processingInstructionLength,
 	    NumberMessageArg(syntax().pilen()));
+  if (options().warnPiMissingName) {
+    size_t i = 0;
+    if (buf.size() && syntax().isNameStartCharacter(buf[0])) {
+      for (i = 1; i < buf.size(); i++)
+	if (!syntax().isNameCharacter(buf[i]))
+	  break;
+    }
+    if (i == 0 || i >= buf.size() || !syntax().isS(buf[i]))
+      message(ParserMessages::piMissingName);
+  }
   noteMarkup();
   eventHandler().pi(new (eventAllocator()) ImmediatePiEvent(buf, location));
   return 1;
@@ -218,6 +228,8 @@ Boolean Parser::parseLiteral(Mode litMode,
 
 Boolean Parser::parseNamedCharRef()
 {
+  if (options().warnNamedCharRef)
+    message(ParserMessages::namedCharRef);
   InputSource *in = currentInput();
   Index startIndex = currentLocation().index();
   in->discardInitial();
@@ -242,9 +254,13 @@ Boolean Parser::parseNamedCharRef()
     break;
   case tokenRe:
     refEndType = NamedCharRef::endRE;
+    if (options().warnRefc)
+      message(ParserMessages::refc);
     break;
   default:
     refEndType = NamedCharRef::endOmitted;
+    if (options().warnRefc)
+      message(ParserMessages::refc);
     break;
   }
   in->startToken();
@@ -287,10 +303,18 @@ Boolean Parser::parseNumericCharRef(Char &ch, Location &loc)
       break;
     case tokenRe:
       markupPtr->addRefEndRe();
+      if (options().warnRefc)
+	message(ParserMessages::refc);
       break;
     default:
+      if (options().warnRefc)
+	message(ParserMessages::refc);
       break;
     }
+  }
+  else if (options().warnRefc) {
+    if (getToken(refMode) != tokenRefc)
+      message(ParserMessages::refc);
   }
   else
     (void)getToken(refMode);
@@ -426,11 +450,18 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
   else {
     entity = lookupEntity(isParameter, name, startLocation, 1);
     if (entity.isNull()) {
-      if (haveApplicableDtd())
-	message(isParameter
-		? ParserMessages::parameterEntityUndefined
-		: ParserMessages::entityUndefined,
-		StringMessageArg(name));
+      if (haveApplicableDtd()) {
+	if (!isParameter) {
+	  Boolean known;
+	  entity = createUndefinedEntity(name, startLocation, known);
+	  if (validate() || !known)
+	    message(ParserMessages::entityUndefined,
+		    StringMessageArg(name));
+	}
+	else 
+	  message(ParserMessages::parameterEntityUndefined,
+		  StringMessageArg(name));
+      }
       else
 	message(ParserMessages::entityApplicableDtd);
     }
@@ -445,20 +476,29 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
       break;
     case tokenRe:
       markupPtr->addRefEndRe();
+      if (options().warnRefc)
+	message(ParserMessages::refc);
       break;
     default:
+      if (options().warnRefc)
+	message(ParserMessages::refc);
       break;
     }
+  }
+  else if (options().warnRefc) {
+    if (getToken(refMode) != tokenRefc)
+      message(ParserMessages::refc);
   }
   else
     (void)getToken(refMode);
   if (!entity.isNull())
-    origin = new (internalAllocator())
-               EntityOrigin(entity, startLocation,
-			    currentLocation().index()
-			    + currentInput()->currentTokenLength()
-			    - startLocation.index(),
-			    markupPtr);
+    origin = EntityOrigin::make(internalAllocator(),
+				entity,
+				startLocation,
+				currentLocation().index()
+				+ currentInput()->currentTokenLength()
+				- startLocation.index(),
+				markupPtr);
   else
     origin = (EntityOrigin *)0;
   return 1;

@@ -13,9 +13,3 @@
 +inUnnamedEntity++In entity included from %2
 +invalidLocation++(invalid location)
 +offset++offset 
-+ordinal1++st
-+ordinal2++nd
-+ordinal3++rd
-+ordinaln++th
-+invalidArgumentType++(invalid argument type)
-+invalidMessage++(invalid message)

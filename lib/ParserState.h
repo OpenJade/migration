@@ -73,6 +73,7 @@ public:
   const Ptr<Dtd> &defDtdPointer() const;
   Boolean haveCurrentDtd() const;
   const Dtd &currentDtd() const;
+  Dtd &currentDtdNonConst() const;
   const ConstPtr<Dtd> &currentDtdPointer() const;
   void startLpd(Ptr<Lpd> &lpd);
   void endLpd();
@@ -151,6 +152,9 @@ public:
 				const StringC &name,
 				const Location &,
 				Boolean referenced);
+  ConstPtr<Entity> createUndefinedEntity(const StringC &,
+					 const Location &,
+					 Boolean &);
   Boolean appendCurrentRank(StringC &, const RankStem *) const;
   void setCurrentRank(const RankStem *, const StringC &);
   void startMarkedSection(const Location &);
@@ -178,6 +182,8 @@ public:
   typedef NamedTableIter<Id> IdTableIter;
   IdTableIter idTableIter();
   const ParserOptions &options() const;
+  Boolean validate() const;
+  void disableValidation();
   void keepMessages();
   void releaseKeptMessages();
   void discardKeptMessages();
@@ -192,6 +198,8 @@ public:
   // AFDR extensions
   void setHadAfdrDecl();
   Boolean hadAfdrDecl() const;
+
+  Boolean stupidNetTrick() const;
 
   // Implementation of AttributeContext.
   Boolean defineId(const StringC &, const Location &, Location &);
@@ -214,6 +222,7 @@ private:
   Id *lookupCreateId(const StringC &);
 
   ParserOptions options_;
+  Boolean validate_;
   EventHandler *handler_;
   Pass1EventHandler pass1Handler_;
   Boolean allowPass2_;
@@ -265,18 +274,21 @@ private:
   XcharMap<PackedBoolean> normalMap_;
   unsigned inputLevel_;
   IList<InputSource> inputStack_;
-  ConstPtr<Dtd> currentDtd_;
+  Ptr<Dtd> currentDtd_;
+  ConstPtr<Dtd> currentDtdConst_;
   Vector<Ptr<Dtd> > dtd_;
   Ptr<Dtd> pass1Dtd_;
   ConstPtr<Syntax> syntax_;
   Vector<StringC> currentRank_;
   NamedTable<Id> idTable_;
   NamedResourceTable<Entity> instanceDefaultedEntityTable_;
+  NamedResourceTable<Entity> undefinedEntityTable_;
   Vector<ConstPtr<AttributeValue> > currentAttributes_;
   Markup *currentMarkup_;
   Markup markup_;
   Location markupLocation_;
   Boolean hadAfdrDecl_;
+  Boolean stupidNetTrick_;
   const volatile sig_atomic_t *cancelPtr_;
   static sig_atomic_t dummyCancel_;
   static const Location nullLocation_;
@@ -295,6 +307,8 @@ Boolean ParserState::wantMarkup() const
 	  ? options_.eventsWanted.wantInstanceMarkup()
 	  : options_.eventsWanted.wantPrologMarkup());
 }
+
+
 
 inline
 const EventsWanted &ParserState::eventsWanted() const
@@ -414,6 +428,12 @@ const Dtd &ParserState::currentDtd() const
 }
 
 inline
+Dtd &ParserState::currentDtdNonConst() const
+{
+  return *currentDtd_;
+}
+
+inline
 const Ptr<Dtd> &ParserState::defDtdPointer() const
 {
   return defDtd_;
@@ -422,7 +442,7 @@ const Ptr<Dtd> &ParserState::defDtdPointer() const
 inline
 const ConstPtr<Dtd> &ParserState::currentDtdPointer() const
 {
-  return currentDtd_;
+  return currentDtdConst_;
 }
 
 inline
@@ -669,6 +689,18 @@ const ParserOptions &ParserState::options() const
 }
 
 inline
+Boolean ParserState::validate() const
+{
+  return validate_;
+}
+
+inline
+void ParserState::disableValidation()
+{
+  validate_ = 0;
+}
+
+inline
 void ParserState::keepMessages()
 {
   keepingMessages_ = 1;
@@ -789,6 +821,12 @@ inline
 Boolean ParserState::hadAfdrDecl() const
 {
   return hadAfdrDecl_;
+}
+
+inline
+Boolean ParserState::stupidNetTrick() const
+{
+  return stupidNetTrick_;
 }
 
 #ifdef SP_NAMESPACE

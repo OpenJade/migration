@@ -52,7 +52,7 @@ int SpentApp::processSysid(const StringC &sysid)
 {
   InputSource *in = entityManager()->open(sysid,
 					  systemCharset(),
-					  new InputSourceOrigin,
+					  InputSourceOrigin::make(),
 					  isNdata_ ? ExtendEntityManager::isNdata : 0,
 					  *this);
   if (!in)

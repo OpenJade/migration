@@ -409,7 +409,7 @@ MessageFragment::appModule,
 ,"%2 argument for primitive %1 of wrong type: %3 not a string"
 #endif
 );
-const MessageType3 InterpreterMessages::notASymbolOrString(
+const MessageType3 InterpreterMessages::notAStringOrSymbol(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -417,6 +417,18 @@ MessageFragment::libModule,
 MessageFragment::appModule,
 #endif
 35
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a string or symbol"
+#endif
+);
+const MessageType3 InterpreterMessages::notASymbolOrString(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+36
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol"
 #endif
@@ -428,7 +440,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-36
+37
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a char"
 #endif
@@ -440,7 +452,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-37
+38
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a style"
 #endif
@@ -452,7 +464,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-38
+39
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an exact integer"
 #endif
@@ -464,7 +476,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-39
+40
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a quantity"
 #endif
@@ -476,7 +488,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-40
+41
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a color-space"
 #endif
@@ -488,7 +500,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-41
+42
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a number"
 #endif
@@ -500,7 +512,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-42
+43
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a sosofo"
 #endif
@@ -512,7 +524,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-43
+44
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an optional singleton node list"
 #endif
@@ -524,7 +536,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-44
+45
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a singleton node list"
 #endif
@@ -536,7 +548,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-45
+46
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a node list"
 #endif
@@ -548,7 +560,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-46
+47
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a named node list"
 #endif
@@ -560,7 +572,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-47
+48
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a length or length-spec"
 #endif
@@ -572,7 +584,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-48
+49
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a quantity or length-spec"
 #endif
@@ -584,7 +596,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-49
+50
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an integer or the symbol \"force\""
 #endif
@@ -596,7 +608,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-50
+51
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a valid element matching pattern"
 #endif
@@ -608,7 +620,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-51
+52
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an address"
 #endif
@@ -620,7 +632,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-52
+53
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a glyph-id"
 #endif
@@ -632,7 +644,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-53
+54
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a glyph-subst-table"
 #endif
@@ -644,9 +656,21 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-54
+55
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a list of pairs of glyph-ids"
+#endif
+);
+const MessageType3 InterpreterMessages::notAProcedure(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+56
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a procedure"
 #endif
 );
 const MessageType0L InterpreterMessages::duplicateDefaultRule(
@@ -656,7 +680,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-55
+57
 #ifndef SP_NO_MESSAGE_TEXT
 ,"default rule already defined in same part"
 ,"first definition was here"
@@ -669,7 +693,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-57
+59
 #ifndef SP_NO_MESSAGE_TEXT
 ,"root rule already defined in same part"
 ,"first definition was here"
@@ -682,7 +706,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-59
+61
 #ifndef SP_NO_MESSAGE_TEXT
 ,"rule for ID %1 already defined in same part"
 ,"first definition was here"
@@ -695,7 +719,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-61
+63
 #ifndef SP_NO_MESSAGE_TEXT
 ,"identical element rule already defined in same part"
 ,"first definition was here"
@@ -708,7 +732,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-63
+65
 #ifndef SP_NO_MESSAGE_TEXT
 ,"initial value already declared for characteristic %1 in same part"
 ,"first declaration was here"
@@ -721,7 +745,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-65
+67
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 is not a valid keyword in a style expression"
 #endif
@@ -733,7 +757,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-66
+68
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 is not a valid keyword in a make expression for flow object class %2"
 #endif
@@ -745,7 +769,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-67
+69
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 is not the name of any flow object class"
 #endif
@@ -757,7 +781,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-68
+70
 #ifndef SP_NO_MESSAGE_TEXT
 ,"content expression cannot be specified in make expression for atomic flow object class %1"
 #endif
@@ -769,7 +793,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-69
+71
 #ifndef SP_NO_MESSAGE_TEXT
 ,"value for \"label:\" not a symbol"
 #endif
@@ -781,7 +805,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-70
+72
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no port for label %1"
 #endif
@@ -793,7 +817,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-71
+73
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid content map"
 #endif
@@ -805,7 +829,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-72
+74
 #ifndef SP_NO_MESSAGE_TEXT
 ,"content map references non-existent port %1"
 #endif
@@ -817,7 +841,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-73
+75
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid value for %1 characteristic"
 #endif
@@ -829,7 +853,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-74
+76
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no clause in cond expression matched"
 #endif
@@ -841,7 +865,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-75
+77
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no clause in case expression matched %1"
 #endif
@@ -853,7 +877,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-76
+78
 #ifndef SP_NO_MESSAGE_TEXT
 ,"expected \"else\" not %1"
 #endif
@@ -865,7 +889,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-77
+79
 #ifndef SP_NO_MESSAGE_TEXT
 ,"sorry, cannot handle unresolvable quantities in datums in case expression"
 #endif
@@ -877,9 +901,9 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-78
+80
 #ifndef SP_NO_MESSAGE_TEXT
-,"user error %1"
+,"%1"
 #endif
 );
 const MessageType0 InterpreterMessages::divideBy0(
@@ -889,7 +913,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-79
+81
 #ifndef SP_NO_MESSAGE_TEXT
 ,"division by zero"
 #endif
@@ -901,7 +925,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-80
+82
 #ifndef SP_NO_MESSAGE_TEXT
 ,"procedure does not have %1 keyword argument"
 #endif
@@ -913,7 +937,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-81
+83
 #ifndef SP_NO_MESSAGE_TEXT
 ,"argument not a keyword"
 #endif
@@ -925,7 +949,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-82
+84
 #ifndef SP_NO_MESSAGE_TEXT
 ,"support for more than one style-specification-body not yet implemented"
 #endif
@@ -937,7 +961,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-83
+85
 #ifndef SP_NO_MESSAGE_TEXT
 ,"specification document does not have the DSSSL architecture as a base architecture"
 #endif
@@ -949,7 +973,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-84
+86
 #ifndef SP_NO_MESSAGE_TEXT
 ,"specification document did not contain a style-specification-body element"
 #endif
@@ -961,7 +985,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-85
+87
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unknown character name %1"
 #endif
@@ -973,7 +997,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-86
+88
 #ifndef SP_NO_MESSAGE_TEXT
 ,"attempt to use current node when there is none"
 #endif
@@ -985,7 +1009,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-87
+89
 #ifndef SP_NO_MESSAGE_TEXT
 ,"attempt to process node in illegal context"
 #endif
@@ -997,7 +1021,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-88
+90
 #ifndef SP_NO_MESSAGE_TEXT
 ,"radix must be 2, 8, 10 or 16"
 #endif
@@ -1009,7 +1033,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-89
+91
 #ifndef SP_NO_MESSAGE_TEXT
 ,"this context requires a sosofo"
 #endif
@@ -1021,7 +1045,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-90
+92
 #ifndef SP_NO_MESSAGE_TEXT
 ,"this context requires a style object"
 #endif
@@ -1033,7 +1057,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-91
+93
 #ifndef SP_NO_MESSAGE_TEXT
 ,"procedure can only be used in evaluation of characteristic value"
 #endif
@@ -1045,7 +1069,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-92
+94
 #ifndef SP_NO_MESSAGE_TEXT
 ,"sorry, %1 expression not implemented"
 #endif
@@ -1057,7 +1081,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-93
+95
 #ifndef SP_NO_MESSAGE_TEXT
 ,"Device RGB color requires three arguments"
 #endif
@@ -1069,7 +1093,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-94
+96
 #ifndef SP_NO_MESSAGE_TEXT
 ,"arguments for Device RGB color must be numbers"
 #endif
@@ -1081,7 +1105,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-95
+97
 #ifndef SP_NO_MESSAGE_TEXT
 ,"arguments for Device RGB color must be in the range 0 to 1"
 #endif
@@ -1093,7 +1117,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-96
+98
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unknown color-space family %1"
 #endif
@@ -1105,7 +1129,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-97
+99
 #ifndef SP_NO_MESSAGE_TEXT
 ,"Device RGB Color Space Family does not take any arguments"
 #endif
@@ -1117,7 +1141,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-98
+100
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 is not a pre-defined inherited characteristic"
 #endif
@@ -1129,7 +1153,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-99
+101
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid number format %1"
 #endif
@@ -1141,7 +1165,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-100
+102
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid character %1 in public identifier"
 #endif
@@ -1153,7 +1177,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-101
+103
 #ifndef SP_NO_MESSAGE_TEXT
 ,"debug %1"
 #endif
@@ -1165,7 +1189,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-102
+104
 #ifndef SP_NO_MESSAGE_TEXT
 ,"circular use of specification parts"
 #endif
@@ -1177,7 +1201,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-103
+105
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no style-specification or external-specification with ID %1"
 #endif
@@ -1189,7 +1213,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-104
+106
 #ifndef SP_NO_MESSAGE_TEXT
 ,"document did not contain any style-specifications or external-specifications"
 #endif
@@ -1201,7 +1225,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-105
+107
 #ifndef SP_NO_MESSAGE_TEXT
 ,"table-cell flow object not inside a table"
 #endif
@@ -1213,9 +1237,33 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-106
+108
 #ifndef SP_NO_MESSAGE_TEXT
 ,"table-row flow object not inside a table"
+#endif
+);
+const MessageType1 InterpreterMessages::noNodePropertyValue(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+109
+#ifndef SP_NO_MESSAGE_TEXT
+,"no value for node property %1"
+#endif
+);
+const MessageType0 InterpreterMessages::returnNotNodeList(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+110
+#ifndef SP_NO_MESSAGE_TEXT
+,"value returned by procedure was not a node-list"
 #endif
 );
 #ifdef SP_NAMESPACE

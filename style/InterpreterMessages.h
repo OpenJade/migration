@@ -79,139 +79,147 @@ struct InterpreterMessages {
   // 34
   static const MessageType3 notAString;
   // 35
-  static const MessageType3 notASymbolOrString;
+  static const MessageType3 notAStringOrSymbol;
   // 36
-  static const MessageType3 notAChar;
+  static const MessageType3 notASymbolOrString;
   // 37
-  static const MessageType3 notAStyle;
+  static const MessageType3 notAChar;
   // 38
-  static const MessageType3 notAnExactInteger;
+  static const MessageType3 notAStyle;
   // 39
-  static const MessageType3 notAQuantity;
+  static const MessageType3 notAnExactInteger;
   // 40
-  static const MessageType3 notAColorSpace;
+  static const MessageType3 notAQuantity;
   // 41
-  static const MessageType3 notANumber;
+  static const MessageType3 notAColorSpace;
   // 42
-  static const MessageType3 notASosofo;
+  static const MessageType3 notANumber;
   // 43
-  static const MessageType3 notAnOptSingletonNode;
+  static const MessageType3 notASosofo;
   // 44
-  static const MessageType3 notASingletonNode;
+  static const MessageType3 notAnOptSingletonNode;
   // 45
-  static const MessageType3 notANodeList;
+  static const MessageType3 notASingletonNode;
   // 46
-  static const MessageType3 notANamedNodeList;
+  static const MessageType3 notANodeList;
   // 47
-  static const MessageType3 notALengthSpec;
+  static const MessageType3 notANamedNodeList;
   // 48
-  static const MessageType3 notAQuantityOrLengthSpec;
+  static const MessageType3 notALengthSpec;
   // 49
-  static const MessageType3 notAPriority;
+  static const MessageType3 notAQuantityOrLengthSpec;
   // 50
-  static const MessageType3 notAPattern;
+  static const MessageType3 notAPriority;
   // 51
-  static const MessageType3 notAnAddress;
+  static const MessageType3 notAPattern;
   // 52
-  static const MessageType3 notAGlyphId;
+  static const MessageType3 notAnAddress;
   // 53
-  static const MessageType3 notAGlyphSubstTable;
+  static const MessageType3 notAGlyphId;
   // 54
-  static const MessageType3 notAGlyphIdPairList;
+  static const MessageType3 notAGlyphSubstTable;
   // 55
-  static const MessageType0L duplicateDefaultRule;
+  static const MessageType3 notAGlyphIdPairList;
+  // 56
+  static const MessageType3 notAProcedure;
   // 57
-  static const MessageType0L duplicateRootRule;
+  static const MessageType0L duplicateDefaultRule;
   // 59
-  static const MessageType1L duplicateIdRule;
+  static const MessageType0L duplicateRootRule;
   // 61
-  static const MessageType0L duplicateElementRule;
+  static const MessageType1L duplicateIdRule;
   // 63
-  static const MessageType1L duplicateInitialValue;
+  static const MessageType0L duplicateElementRule;
   // 65
-  static const MessageType1 invalidStyleKeyword;
-  // 66
-  static const MessageType2 invalidMakeKeyword;
+  static const MessageType1L duplicateInitialValue;
   // 67
-  static const MessageType1 unknownFlowObjectClass;
+  static const MessageType1 invalidStyleKeyword;
   // 68
-  static const MessageType1 atomicContent;
+  static const MessageType2 invalidMakeKeyword;
   // 69
-  static const MessageType0 labelNotASymbol;
+  static const MessageType1 unknownFlowObjectClass;
   // 70
-  static const MessageType1 badConnection;
+  static const MessageType1 atomicContent;
   // 71
-  static const MessageType0 badContentMap;
+  static const MessageType0 labelNotASymbol;
   // 72
-  static const MessageType1 contentMapBadPort;
+  static const MessageType1 badConnection;
   // 73
-  static const MessageType1 invalidCharacteristicValue;
+  static const MessageType0 badContentMap;
   // 74
-  static const MessageType0 condFail;
+  static const MessageType1 contentMapBadPort;
   // 75
-  static const MessageType1 caseFail;
+  static const MessageType1 invalidCharacteristicValue;
   // 76
-  static const MessageType1 caseElse;
+  static const MessageType0 condFail;
   // 77
-  static const MessageType0 caseUnresolvedQuantities;
+  static const MessageType1 caseFail;
   // 78
-  static const MessageType1 errorProc;
+  static const MessageType1 caseElse;
   // 79
-  static const MessageType0 divideBy0;
+  static const MessageType0 caseUnresolvedQuantities;
   // 80
-  static const MessageType1 invalidKeyArg;
+  static const MessageType1 errorProc;
   // 81
-  static const MessageType0 keyArgsNotKey;
+  static const MessageType0 divideBy0;
   // 82
-  static const MessageType0 oneBody;
+  static const MessageType1 invalidKeyArg;
   // 83
-  static const MessageType0 specNotArc;
+  static const MessageType0 keyArgsNotKey;
   // 84
-  static const MessageType0 noStyleSpec;
+  static const MessageType0 oneBody;
   // 85
-  static const MessageType1 unknownCharName;
+  static const MessageType0 specNotArc;
   // 86
-  static const MessageType0 noCurrentNode;
+  static const MessageType0 noStyleSpec;
   // 87
-  static const MessageType0 noCurrentProcessingMode;
+  static const MessageType1 unknownCharName;
   // 88
-  static const MessageType0 invalidRadix;
+  static const MessageType0 noCurrentNode;
   // 89
-  static const MessageType0 sosofoContext;
+  static const MessageType0 noCurrentProcessingMode;
   // 90
-  static const MessageType0 styleContext;
+  static const MessageType0 invalidRadix;
   // 91
-  static const MessageType0 notInCharacteristicValue;
+  static const MessageType0 sosofoContext;
   // 92
-  static const MessageType1 expressionNotImplemented;
+  static const MessageType0 styleContext;
   // 93
-  static const MessageType0 RGBColorArgCount;
+  static const MessageType0 notInCharacteristicValue;
   // 94
-  static const MessageType0 RGBColorArgType;
+  static const MessageType1 expressionNotImplemented;
   // 95
-  static const MessageType0 RGBColorArgRange;
+  static const MessageType0 RGBColorArgCount;
   // 96
-  static const MessageType1 unknownColorSpaceFamily;
+  static const MessageType0 RGBColorArgType;
   // 97
-  static const MessageType0 deviceRGBColorSpaceNoArgs;
+  static const MessageType0 RGBColorArgRange;
   // 98
-  static const MessageType1 notABuiltinInheritedC;
+  static const MessageType1 unknownColorSpaceFamily;
   // 99
-  static const MessageType1 invalidNumberFormat;
+  static const MessageType0 deviceRGBColorSpaceNoArgs;
   // 100
-  static const MessageType1 invalidPublicIdChar;
+  static const MessageType1 notABuiltinInheritedC;
   // 101
-  static const MessageType1 debug;
+  static const MessageType1 invalidNumberFormat;
   // 102
-  static const MessageType0 useLoop;
+  static const MessageType1 invalidPublicIdChar;
   // 103
-  static const MessageType1 missingPart;
+  static const MessageType1 debug;
   // 104
-  static const MessageType0 noParts;
+  static const MessageType0 useLoop;
   // 105
-  static const MessageType0 tableCellOutsideTable;
+  static const MessageType1 missingPart;
   // 106
+  static const MessageType0 noParts;
+  // 107
+  static const MessageType0 tableCellOutsideTable;
+  // 108
   static const MessageType0 tableRowOutsideTable;
+  // 109
+  static const MessageType1 noNodePropertyValue;
+  // 110
+  static const MessageType0 returnNotNodeList;
 };
 
 #ifdef SP_NAMESPACE

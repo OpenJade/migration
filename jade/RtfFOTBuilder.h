@@ -4,7 +4,7 @@
 #ifndef RtfFOTBuilder_INCLUDED
 #define RtfFOTBuilder_INCLUDED 1
 
-#include <iostream.h>
+#include "OutputByteStream.h"
 #include "FOTBuilder.h"
 #include "Ptr.h"
 #include "ExtendEntityManager.h"
@@ -16,7 +16,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 FOTBuilder *
-makeRtfFOTBuilder(streambuf *,
+makeRtfFOTBuilder(OutputByteStream *,
 		  const Vector<StringC> &options,
 		  const Ptr<ExtendEntityManager> &,
 		  const CharsetInfo &, Messenger *,

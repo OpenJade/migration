@@ -1,4 +1,4 @@
-bin\sp112u.dll
+bin\sp114u.dll
 dsssl\style-sheet.dtd
 dsssl\fot.dtd
 jadedoc\jade.htm
@@ -17,5 +17,4 @@ bin\spgrove.dll
 bin\grove.dll
 bin\jade.exe
 dsssl\catalog
-C:\WINDOWS\SYSTEM\MSVCRT.DLL
-C:\WINDOWS\SYSTEM\MSVCIRT.DLL
+bin\MSVCRT.DLL

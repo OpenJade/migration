@@ -1,2 +1,2 @@
 LIB=grove
-OBJS=Node.o
+OBJS=Node.o LocNode.o

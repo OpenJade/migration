@@ -120,6 +120,7 @@ public:
     keyBeforeColumnBorder,
     keyAfterColumnBorder,
     keyColumnNumber,
+    keyRowNumber,
     keyNColumnsSpanned,
     keyNRowsSpanned,
     keyWidth,
@@ -132,11 +133,11 @@ public:
     keyMax,
     keyIsConditional,
     keyPriority,
-    keyName,
-    keyGi,
-    keyAttributes,
-    keySystemId,
-    keyPublicId
+    keyGridNRows,
+    keyGridNColumns,
+    keyRadical,
+    keyNull,
+    keyIsRcs
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
@@ -209,11 +210,29 @@ private:
   ELObj *obj_;
 };
 
-class Interpreter : public QueryContext, public NumberCache, public Messenger {
+class Interpreter : 
+  public Collector,
+  public SdataMapper,
+  public NumberCache,
+  public Messenger {
 public:
   enum PortName {
     portNumerator,
     portDenominator,
+    portPreSup,
+    portPreSub,
+    portPostSup,
+    portPostSub,
+    portMidSup,
+    portMidSub,
+    portOverMark,
+    portUnderMark,
+    portOpen,
+    portClose,
+    portDegree,
+    portOperator,
+    portLowerLimit,
+    portUpperLimit,
     portHeader,
     portFooter
   };
@@ -236,6 +255,8 @@ public:
   bool isUnspecified(const ELObj *) const;
   CharObj *makeChar(Char);
   ELObj *makeLengthSpec(const FOTBuilder::LengthSpec &);
+  AddressObj *makeAddressNone();
+  NodeListObj *makeEmptyNodeList();
   void dispatchMessage(Message &);
   void dispatchMessage(const Message &);
   void initMessage(Message &);
@@ -276,8 +297,10 @@ public:
   const ConstPtr<InheritedC> &cellAfterRowBorderC() const;
   const ConstPtr<InheritedC> &cellBeforeColumnBorderC() const;
   const ConstPtr<InheritedC> &cellAfterColumnBorderC() const;
+  const ConstPtr<InheritedC> &fractionBarC() const;
   const char *storePublicId(const Char *, size_t, const Location &);
   unsigned allocGlyphSubstTableUniqueId();
+  bool lookupNodeProperty(const StringC &, ComponentName::Id &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -356,6 +379,7 @@ private:
   void installInheritedCProc(const Identifier *);
   void installFlowObjs();
   void installSdata();
+  void installNodeProperties();
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);
   bool parseLambda(Owner<Expression> &);
@@ -439,6 +463,7 @@ private:
   ConstPtr<InheritedC> cellAfterRowBorderC_;
   ConstPtr<InheritedC> cellBeforeColumnBorderC_;
   ConstPtr<InheritedC> cellAfterColumnBorderC_;
+  ConstPtr<InheritedC> fractionBarC_;
   class StringSet {
   public:
     StringSet();
@@ -452,6 +477,9 @@ private:
   HashTable<StringC,Char> sdataEntityNameTable_;
   const char *afiiPublicId_;
   unsigned nextGlyphSubstTableUniqueId_;
+  AddressObj *addressNoneObj_;
+  NodeListObj *emptyNodeListObj_;
+  HashTable<StringC,int> nodePropertyTable_;
   friend class Identifier;
 };
 
@@ -513,6 +541,18 @@ inline
 CharObj *Interpreter::makeChar(Char c)
 {
   return new (*this) CharObj(c);
+}
+
+inline
+AddressObj *Interpreter::makeAddressNone()
+{
+  return addressNoneObj_;
+}
+
+inline
+NodeListObj *Interpreter::makeEmptyNodeList()
+{
+  return emptyNodeListObj_;
 }
 
 inline
@@ -606,6 +646,12 @@ const ConstPtr<InheritedC> &Interpreter::cellAfterColumnBorderC() const
 }
 
 inline
+const ConstPtr<InheritedC> &Interpreter::fractionBarC() const
+{
+  return fractionBarC_;
+}
+
+inline
 FunctionObj *Interpreter::lookupExternalProc(const StringC &pubid)
 {
   FunctionObj *const *func = externalProcTable_.lookup(pubid);
@@ -662,8 +708,6 @@ void Identifier::setFlowObj(FlowObj *fo)
 {
   flowObj_ = fo;
 }
-
-bool operator==(const StringC &, const char *);
 
 #ifdef DSSSL_NAMESPACE
 }

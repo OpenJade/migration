@@ -25,6 +25,7 @@ struct StorageObjectPosition {
   // Were the RSs other than the first in the storage object inserted?
   PackedBoolean insertedRSs;
   Offset endOffset;
+  StringC id;
 };
 
 #ifdef SP_NAMESPACE

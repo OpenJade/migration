@@ -62,10 +62,6 @@ public:
   typedef EntityDecl::DeclType DeclType;
   Boolean document(const CharsetInfo &, Messenger &, StringC &) const;
   Boolean sgmlDecl(const CharsetInfo &, Messenger &, StringC &) const;
-  Boolean defaultDoctype(const CharsetInfo &,
-			 Messenger &,
-			 StringC &,
-			 StringC &) const;
   Boolean lookup(const EntityDecl &entity,
 		 const Syntax &,
 		 const CharsetInfo &,
@@ -138,7 +134,6 @@ private:
   Boolean haveDocument_;
   Location documentLoc_;
   size_t documentBaseNumber_;
-  StringC defaultDoctype_;
   Boolean haveCurrentBase_;
   Vector<Location> base_;
   Ptr<ExtendEntityManager> em_;
@@ -264,7 +259,7 @@ Boolean SOCatalogManagerImpl::mapCatalog(ParsedSystemId &systemId,
     ConstPtr<EntityCatalog> deleter(catalog);
     CatalogParser parser(*catalogCharset_);
     parser.parseCatalog(catalogSystemId, 1, *sysidCharset_, *catalogCharset_,
-			new InputSourceOrigin, catalog, mgr);
+			InputSourceOrigin::make(), catalog, mgr);
     // FIXME do catalog caching here
     StringC s;
     if (maps.back().type == ParsedSystemId::Map::catalogDocument) {
@@ -308,13 +303,13 @@ SOCatalogManagerImpl::makeCatalog(StringC &systemId,
   for (i = 0; i < nSystemCatalogsMustExist_; i++)
     parser.parseCatalog(systemCatalogs_[i], 1,
 			*sysidCharset_, *catalogCharset_,
-			new InputSourceOrigin, entityCatalog,
+			InputSourceOrigin::make(), entityCatalog,
 			mgr);
   addCatalogsForDocument(parser, systemId, entityCatalog, charset, mgr);
   for (i = nSystemCatalogsMustExist_; i < systemCatalogs_.size(); i++)
     parser.parseCatalog(systemCatalogs_[i], 0,
 			*sysidCharset_, *catalogCharset_,
-			new InputSourceOrigin, entityCatalog,
+			InputSourceOrigin::make(), entityCatalog,
 			mgr);
 
   return entityCatalog;
@@ -336,7 +331,7 @@ void SOCatalogManagerImpl::addCatalogsForDocument(CatalogParser &parser,
       StringC tem;
       v.unparse(charset, 0, tem);
       parser.parseCatalog(tem, 1, charset, *catalogCharset_,
-			  new InputSourceOrigin, impl, mgr);
+			  InputSourceOrigin::make(), impl, mgr);
       if (!impl->document(charset, mgr, sysid)) {
 	mgr.message(CatalogMessages::noDocumentEntry, StringMessageArg(tem));
 	sysid.resize(0);
@@ -372,7 +367,7 @@ void SOCatalogManagerImpl::addCatalogsForDocument(CatalogParser &parser,
     }
   for (i = 0; i < catalogs.size(); i++)
     parser.parseCatalog(catalogs[i], 0, charset,
-			*catalogCharset_, new InputSourceOrigin, impl,
+			*catalogCharset_, InputSourceOrigin::make(), impl,
 			mgr);
 }
 
@@ -559,29 +554,6 @@ Boolean SOEntityCatalog::document(const CharsetInfo &charset,
 						0, charset, 0, mgr, result);
 }
 
-Boolean SOEntityCatalog::defaultDoctype(const CharsetInfo &charset,
-					Messenger &mgr,
-					StringC &name,
-					StringC &sysid) const
-{
-  if (defaultDoctype_.size() == 0)
-    return 0;
-  int tableIndex = EntityDecl::doctype;
-  if (tableIndex >= EntityDecl::parameterEntity)
-    tableIndex--;
-  const CatalogEntry *entry
-    = names_[tableIndex].lookup(defaultDoctype_, 0);
-  name = defaultDoctype_;
-  return expandCatalogSystemId(entry->to,
-			       entry->loc,
-			       entry->baseNumber,
-			       0,
-			       charset,
-			       0,
-			       mgr,
-			       sysid);
-}
-
 void SOEntityCatalog::addPublicId(StringC &publicId, StringC &systemId,
 				  const Location &loc, Boolean override)
 {
@@ -619,9 +591,6 @@ void SOEntityCatalog::addName(StringC &name, DeclType declType,
 			      StringC &systemId, const Location &loc,
 			      Boolean override)
 {
-  if (declType == EntityDecl::doctype
-      && defaultDoctype_.size() == 0)
-    defaultDoctype_ = name;
   CatalogEntry entry;
   entry.loc = loc;
   entry.catalogNumber = catalogNumber_;
@@ -844,7 +813,7 @@ void CatalogParser::parseCatalog(const StringC &sysid,
 				 tem)) {
 	    InputSource *in = em->open(tem,
 				       catalogCharset,
-				       new InputSourceOrigin(paramLoc_),
+				       InputSourceOrigin::make(paramLoc_),
 				       0,
 				       mgr);
 	    if (in && (in->get(mgr) != InputSource::eE || !in->accessError()))
@@ -874,7 +843,7 @@ void CatalogParser::parseCatalog(const StringC &sysid,
     if (em->expandSystemId(subSysids[i], subSysidLocs[i], 0, catalogCharset,
 			   0, mgr, tem))
       parseCatalog(tem, 1, catalogCharset, catalogCharset,
-		   new InputSourceOrigin(subSysidLocs[i]), catalog, mgr);
+		   InputSourceOrigin::make(subSysidLocs[i]), catalog, mgr);
   }
 }
 
@@ -904,10 +873,9 @@ Boolean CatalogParser::inLoop(const Location &loc)
       if (ExtendEntityManager::externalize(info1,
 					   origin->startOffset(parent.index()),
 					   soLoc1)) {
-	const StorageObjectSpec *sos = soLoc.storageObjectSpec;
-	const StorageObjectSpec *sos1 = soLoc1.storageObjectSpec;
-	if (sos->storageManager == sos1->storageManager
-	    && sos->id == sos1->id) {
+	if (soLoc.storageObjectSpec->storageManager
+	    == soLoc1.storageObjectSpec->storageManager
+	    && soLoc.actualStorageId == soLoc1.actualStorageId) {
 	  setNextLocation(loc.origin()->parent());
 	  message(CatalogMessages::inLoop);
 	  return 1;

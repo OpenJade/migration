@@ -10,6 +10,7 @@
 #include "macros.h"
 #include "ELObjMessageArg.h"
 #include "LocNode.h"
+#include "VM.h"
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>

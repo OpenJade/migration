@@ -149,7 +149,6 @@ void FOTBuilder::atomic()
 
 void FOTBuilder::characters(const Char *, size_t)
 {
-  atomic();
 }
   
 void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
@@ -159,8 +158,9 @@ void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 
 void FOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & CharacterNIC::cChar)
+  if (nic.specifiedC & (1 << CharacterNIC::cChar))
     characters(&nic.ch, 1);
+  atomic();
 }
   
 void FOTBuilder::startSequence()

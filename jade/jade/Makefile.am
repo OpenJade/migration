@@ -38,6 +38,8 @@ BUILT_SOURCES = JadeMessages.h JadeMessages.rc \
 	TeXFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx \
 	MifFOTBuilder_inst.cxx
 
+MAINTAINERCLEANFILES = Makefile.in  jade-out.fot
+
 MSGGENFLAGS = -l xModule
 
 SUFFIXES = .msg .m4 .rc
@@ -46,4 +48,4 @@ SUFFIXES = .msg .m4 .rc
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_builddir)/msggen.pl $(MSGGENFLAGS) $<
+	[ ! -f $(top_srcdir)/msggen.pl ] || $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

@@ -37,6 +37,8 @@ BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 	InterpreterMessages.h InterpreterMessages.cxx \
 	InterpreterMessages.rc DssslAppMessages.h DssslAppMessages.rc 
 
+MAINTAINERCLEANFILES = Makefile.in
+
 MSGGENFLAGS = -l xModule 
 
 SUFFIXES = .m4 .msg .rc
@@ -45,5 +47,5 @@ SUFFIXES = .m4 .msg .rc
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_builddir)/msggen.pl $(MSGGENFLAGS) $<
+	[ ! -f $(top_srcdir)/msggen.pl ] || $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
 

@@ -1,17 +1,32 @@
+* Move parsing the spec before constructing the grove in DssslApp. 
+
+* If the -T option is given, collect the titles of all PIs which would
+  be applicable but for the title. Then, if no applicable PI is found
+  issue a different message listing the available titles. This requires
+  StringVectorMessageArg to be made part of the SP_API.
+
 * Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message
 
-* remove the empty delimEnd message by changing the code to use
-  I1+delim++delimiter %1 instead.
-
-* Link the OpenSP docs from the web page.
+* The empty delimEnd message has been removed from ParserMessages.msg.
+  If translators need to do something different than just put a string
+  before the actual delimiter, we should support simple insertions in
+  message fragments and use
+  +delim++delimiter %
+  instead.
 
 Things which are missing and need a lot of work
 ===============================================
 
-* Check the win32 port.
+* Check the win32 port of OpenJade (OpenSP works).
 
-* Support i18n on win32.
+* Support i18n on win32. As a first step, write a perl script to translate
+  the .rc files using the translations from the <lang>.po files. Be careful,
+  the quoting in .rc seems to be different from the quoting in .po. 
+  This will give us compile-time language-choice on win32, ie one could
+  decide to run this script for de.po before the compilation to get the
+  German translations compiled in. I still have no idea how install-time
+  language-selection would be handled. 
 
 * SGML backend: Change the document-type FO to be non-atomic, to allow an
   internal DTD subset. ADD FOs for DTD declarations.
@@ -24,10 +39,13 @@ Things which are missing and need a lot of work
   must abandon SP_CHARSET_FIXED to do this, since otherwise
   SP does unwanted conversions on numeric char refs. On the
   other hand, we do want SP_CHARSET_FIXED, if we are using
-  jades builtin repertoire (ie Unicode). Since Char is only
-  16bit, have to map other-chars in the private area somewhere
-  and tell the user/backend about it.
-  
+  jades builtin repertoire (ie Unicode). This could be done
+  by scanning the cmdline args for "-s"/"--strict" before
+  constructing the JadeApp instance.  
+
+  Since Char is only 16bit, have to map other-chars in the 
+  Unicode private area somewhere and tell the user/backend about it.
+ 
 * combine-char: If we do this, we can't do character translation
   as a map char --> char any longer, but instead have to deal
   with string --> string.
@@ -41,6 +59,9 @@ Things which are missing and need a lot of work
 * check table-auto-width and multi-process features.
 
 * A caching mechanism for DTDs, dsssl specs, ...
+  This is complicated, since the result of parsing a DTD does depend not
+  only on the sysid, but also on cmdline options which could define parameter
+  entities and on the catalogs used to search for entities. 
 
 * An XSLFO backend ? Would try to approximate the DSSSL FOT into an XSLFO
   document. Then we could take advantage of existing XSL formatters. We could

@@ -240,7 +240,7 @@ AC_ARG_ENABLE(default-search-path,
 
 dnl Output.
 AC_SUBST(LIBOBJS)
-AC_OUTPUT([Makefile lib/Makefile nsgmls/Makefile spent/Makefile 
+AC_OUTPUT([Makefile msggen.pl lib/Makefile nsgmls/Makefile spent/Makefile 
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
 	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile
 	intl/Makefile po/Makefile.in],

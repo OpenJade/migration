@@ -129,6 +129,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   initialProcessingMode_.setDefined();
   // can't be done before initializing lexCategory_
   installBuiltins();
+  installCharProperties();
 }
 
 void Interpreter::compile()
@@ -143,6 +144,7 @@ void Interpreter::compile()
       break;
     mode->compile(*this);
   }
+  compileCharProperties();
   compileDefaultLanguage();
 }
 
@@ -2074,6 +2076,288 @@ void Interpreter::compileDefaultLanguage()
     defaultLanguage_ = obj;
   }
 }
+
+void Interpreter::installCharProperties()
+{
+  //FIXME convert this to tables 
+  // initialize charProperties_;
+  // if a character doesn't have a value for a property,
+  // the CharMap contains 0. 
+
+  CharProp cp;
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.loc = Location();
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_)
+    for (int i = 0; i < 10; i++) {
+      ELObjPart num(makeInteger(i), unsigned(-1));
+      makePermanent(num.obj);
+      cp.map->setChar(i+'0', num);
+    }
+  charProperties_.insert(makeStringC("numeric-equiv"), cp);
+  
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define SPACE 
+#include "charProps.h"
+#undef SPACE
+    };
+   
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+        cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("space?"), cp);
+    
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define RECORD_END
+#include "charProps.h"
+#undef RECORD_END
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("record-end?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define BLANK
+#include "charProps.h"
+#undef BLANK
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("blank?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define INPUT_TAB
+#include "charProps.h"
+#undef INPUT_TAB
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("input-tab?"), cp);
+    
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define INPUT_WHITESPACE
+#include "charProps.h"
+#undef INPUT_WHITESPACE
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("input-whitespace?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c;
+      unsigned num;
+    } chars[] = {
+#define PUNCT
+#include "charProps.h"
+#undef PUNCT
+    };
+    
+    for (size_t i = 0; i < SIZEOF(chars); i++) 
+      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
+	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+  }
+  charProperties_.insert(makeStringC("punct?"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if (!strictMode_) {
+    static struct {
+      Char c1, c2;
+      char *script;
+    } chars[] = {
+#define SCRIPT
+#include "charProps.h"
+#undef SCRIPT
+    };
+    
+    StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
+    for (size_t i = 0; i < SIZEOF(chars); i++) { 
+      StringC tem(prefix);
+      tem += makeStringC(chars[i].script);
+      StringObj *obj = new (*this) StringObj(tem);
+      makePermanent(obj);  
+      for (Char c = chars[i].c1; c <= chars[i].c2; c++)   
+	cp.map->setChar(c, ELObjPart(obj, unsigned(-1)));
+    }
+  }
+  charProperties_.insert(makeStringC("script"), cp);
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("glyph-id"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("drop-after-line-break?"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("drop-unless-before-line-break?"), cp);  
+
+  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("break-before-priority"), cp);  
+
+  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("break-after-priority"), cp);  
+
+  cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
+  makePermanent(cp.def.obj);
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("math-class"), cp);  
+
+  cp.def = ELObjPart(makeFalse(), unsigned(-1));
+  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  charProperties_.insert(makeStringC("math-font-posture"), cp);  
+}
+
+// return 1 if the character has the property, return 0 if no such property
+// or the character doesn't have the property
+// set ret to the value or the default value
+ELObj *Interpreter::charProperty(const StringC &prop, Char c, const Location &loc, ELObj *def) 
+{
+  const CharProp *cp = charProperties_.lookup(prop);
+  if (!cp) {
+    setNextLocation(loc);
+    message(InterpreterMessages::unknownCharProperty,
+            StringMessageArg(prop));
+    return makeError();
+  }
+
+  if ((*cp->map)[c].obj) 
+    return (*cp->map)[c].obj;
+  else if (def) 
+    return def;
+  else 
+    return cp->def.obj;
+}
+
+void Interpreter::addCharProperty(const Identifier *prop, Owner<Expression> &defval)
+{
+  // FIXME: what about variable default values ?
+  defval->optimize(*this, Environment(), defval);
+  // FIXME: this is a kind of memory leak
+  makePermanent(defval->constantValue());
+  ELObjPart val(defval->constantValue(), partIndex_);
+  const CharProp *cp = charProperties_.lookup(prop->name());
+  if (cp) {
+    if (partIndex_ < cp->def.defPart) 
+      ((CharProp *)cp)->def = val;
+    else if (partIndex_ == cp->def.defPart && 
+             !ELObj::eqv(*val.obj, *cp->def.obj)) {
+      // FIXME: report previous location
+      setNextLocation(defval->location());
+      message(InterpreterMessages::duplicateCharPropertyDecl,
+              StringMessageArg(prop->name()), cp->loc);
+    }
+  }
+   else {
+    CharProp ncp;
+    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
+    ncp.def = val;
+    ncp.loc = defval->location();
+    charProperties_.insert(prop->name(), ncp);
+  }
+}
+
+void Interpreter::setCharProperty(const Identifier *prop, Char c, Owner<Expression> &val)
+{
+  // FIXME: what about variable default values ?
+  const CharProp *cp = charProperties_.lookup(prop->name());
+  if (!cp) {
+    CharProp ncp;
+    ncp.map = new CharMap<ELObjPart>(ELObjPart(0,0));
+    ncp.def = ELObjPart(0, unsigned(-1));
+    ncp.loc = val->location();
+    charProperties_.insert(prop->name(), ncp);
+    cp = charProperties_.lookup(prop->name());
+  }
+  val->optimize(*this, Environment(), val);
+  makePermanent(val->constantValue());
+  ELObjPart obj = ELObjPart(val->constantValue(), partIndex_);
+  
+  ELObjPart def = (*cp->map)[c];
+  if (def.obj) {
+    if (partIndex_ < def.defPart) 
+      cp->map->setChar(c, obj);
+    else if (partIndex_ == def.defPart && !ELObj::eqv(*obj.obj, *def.obj)) {
+      setNextLocation(val->location());
+      // FIXME: report previous location
+      message(InterpreterMessages::duplicateAddCharProperty,
+              StringMessageArg(prop->name()),
+              StringMessageArg(StringC(&c, 1)));
+    }
+  }
+  else 
+    cp->map->setChar(c, obj);
+}
+
+void
+Interpreter::compileCharProperties()
+{
+  HashTableIter<StringC, CharProp> iter(charProperties_);
+  const StringC *key;
+  const CharProp *val;
+  while (iter.next(key, val)) 
+    if (!val->def.obj) {
+      // FIXME location
+      setNextLocation(val->loc);
+      message(InterpreterMessages::unknownCharProperty,
+              StringMessageArg(*key));
+      ((CharProp *)val)->def = ELObjPart(makeError(), 0);
+    }
+}
+
 
 #ifdef DSSSL_NAMESPACE
 }

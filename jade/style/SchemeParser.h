@@ -100,6 +100,8 @@ private:
   bool doWeights();
   bool doToupper();
   bool doTolower();
+  bool doDeclareCharProperty();
+  bool doAddCharProperties();
   bool skipForm();
   bool parseSpecialQuery(Owner<Expression> &expr, const char *query);
   bool parseExpression(unsigned allowed, Owner<Expression> &,

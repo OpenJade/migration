@@ -24,6 +24,7 @@
 #include "Node.h"
 #include "GroveManager.h"
 #include "Pattern.h"
+#include "CharMap.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -272,6 +273,22 @@ struct CharPart {
   unsigned defPart;
 };
 
+struct ELObjPart {
+  ELObjPart();
+  ELObjPart(ELObj *x, unsigned y);
+  void operator=(const ELObjPart &);
+  bool operator==(const ELObjPart &) const;
+  bool operator!=(const ELObjPart &) const;
+  ELObj *obj;
+  unsigned defPart;
+};
+
+struct CharProp {
+  CharMap<ELObjPart> *map;
+  ELObjPart def;
+  Location loc;
+};
+
 class Interpreter : 
   public Collector,
   public Pattern::MatchContext,
@@ -331,6 +348,10 @@ public:
   static StringC makeStringC(const char *);
   SymbolObj *portName(PortName);
   ELObj *cValueSymbol(FOTBuilder::Symbol);
+  ELObj *charProperty(const StringC &, Char, const Location &, ELObj *);
+  void addCharProperty(const Identifier *, Owner<Expression> &);
+  void setCharProperty(const Identifier *, Char, Owner<Expression> &);
+  void compileCharProperties();
   // Map of LexCategory
   XcharMap<char> lexCategory_;
   static void normalizeGeneralName(const NodePtr &, StringC &);
@@ -422,6 +443,7 @@ private:
   void installFlowObjs();
   void installSdata();
   void installNodeProperties();
+  void installCharProperties();
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -499,6 +521,7 @@ private:
   unsigned defaultLanguageDefPart_;
   Location defaultLanguageDefLoc_;
   friend class Identifier;
+  HashTable<StringC, CharProp> charProperties_;
 };
 
 inline
@@ -808,6 +831,38 @@ void Identifier::setFlowObj(FlowObj *fo, unsigned part, const Location &loc)
   flowObjPart_ = part;
   flowObjLoc_ = loc;
 }
+
+inline
+ELObjPart::ELObjPart()
+: obj(0), defPart(0)
+{
+}
+
+inline
+ELObjPart::ELObjPart(ELObj *o, unsigned p)
+: obj(o), defPart(p)
+{
+}
+
+inline
+void ELObjPart::operator=(const ELObjPart &x)
+{
+  obj = x.obj;
+  defPart = x.defPart;
+}
+
+inline
+bool ELObjPart::operator==(const ELObjPart &x) const
+{
+  return defPart == x.defPart && obj && x.obj && ELObj::eqv(*obj, *x.obj);
+}
+
+inline
+bool ELObjPart::operator!=(const ELObjPart &x) const
+{
+  return !(*this == x);
+}
+
 
 #ifdef DSSSL_NAMESPACE
 }

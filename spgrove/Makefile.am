@@ -15,6 +15,8 @@ EXTRA_DIST = grove_inst.m4 spgrove.dsp
 
 BUILT_SOURCES = grove_inst.cxx
 
+MSGGENFLAGS = -l xModule
+
 SUFFIXES = .m4 .msg
 
 .m4.cxx:

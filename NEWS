@@ -1,4 +1,10 @@
-Changes in OpenJade ?.?.?
+Changes in OpenJade 1.2.2 
+
+* Predefined character names line-feed and carriage-return 
+  for the character numbers 10 and 13.
+
+* standard-chars and map-sdata-entity declaration element
+  type forms are supported
 
 * Style language additions: map-constructor
  

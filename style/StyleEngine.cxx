@@ -4,11 +4,13 @@
 #include "stylelib.h"
 #include "StyleEngine.h"
 #include "Interpreter.h"
+#include "InterpreterMessages.h"
 #include "SchemeParser.h"
 #include "FOTBuilder.h"
 #include "DssslSpecEventHandler.h"
 #include "ArcEngine.h"
 #include "ProcessContext.h"
+#include "macros.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -20,8 +22,8 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 bool debugMode,
 			 bool dsssl2,
 			 const FOTBuilder::Extension *extensionTable)
-: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, debugMode, dsssl2,
-			       extensionTable))
+: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
+                               debugMode, dsssl2, extensionTable))
 {
 }
 
@@ -33,6 +35,42 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   DssslSpecEventHandler specHandler(mgr);
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
+
+  for (int phase = 0; phase < 2; phase++) {
+    for (size_t i = 0; i < parts.size(); i++) {
+      DssslSpecEventHandler::Part::DIter diter(parts[i]->doc()->diter());
+      bool local = 0;
+      do {
+	if (local) 
+    	  diter = parts[i]->diter();
+	local = !local;
+	for (; !diter.done(); diter.next()) {
+	  if ((diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::charRepertoire ||
+               diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::standardChars)
+	      ? phase == 0
+	      : phase == 1) {
+	    Owner<InputSource> in;
+	    diter.cur()->makeInputSource(specHandler, in);
+	    switch (diter.cur()->type()) {
+	    case DssslSpecEventHandler::DeclarationElement::standardChars:
+	      interpreter_->addStandardChars(in);
+	      break;
+	    case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
+	      interpreter_->addSdataEntity(diter.cur()->name(), 
+				           diter.cur()->text(),
+				           in);
+	      break;
+	    default:
+	      interpreter_->message(InterpreterMessages::unsupportedDeclaration);
+	      break;
+	    }
+	  }
+	}
+      } while (local);
+    }
+    interpreter_->dEndPart();
+  }
+
   for (size_t i = 0; i < parts.size(); i++) {
     for (DssslSpecEventHandler::Part::Iter iter(parts[i]->iter());
          !iter.done();

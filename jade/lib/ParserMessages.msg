@@ -160,7 +160,7 @@ E1+missingMinimumChars++the specified character set is invalid because it does n
 E1+duplicateCharNumbers++character numbers declared more than once: %1
 E1+codeSetHoles++character numbers should have been declared UNUSED: %1
 W1+basesetCharsMissing++character numbers missing in base set: %1
-E1+documentCharMax++this system requires that characters in the document character set not have numbers exceeding %1
+W1+documentCharMax++characters in the document character set with numbers exceeding %1 not supported
 E1+fpiMissingField++invalid formal public identifier %1: missing //
 E1+fpiMissingTextClassSpace++invalid formal public identifier %1: no SPACE after public text class
 E1+fpiInvalidTextClass++invalid formal public identifier %1: invalid public text class

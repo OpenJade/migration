@@ -178,7 +178,6 @@ struct InheritedCInfo : public Resource {
   const VarStyleObj *style;
   // Includes both direct and indirect dependencies.
   Vector<size_t> dependencies;
-  bool beingComputed;
 };
 
 struct PopList : public Resource {
@@ -194,6 +193,8 @@ class StyleStack {
 public:
   StyleStack();
   // These append on to dependencies.
+  ELObj *actual(const ConstPtr<InheritedC> &, const Location &, Interpreter &,
+		Vector<size_t> &dependencies);
   ELObj *actual(const ConstPtr<InheritedC> &, Interpreter &,
 		Vector<size_t> &dependencies);
   ELObj *inherited(const ConstPtr<InheritedC> &, unsigned specLevel, Interpreter &,
@@ -202,6 +203,7 @@ public:
   void pop();
   void pushEmpty() { level_++; }
   void popEmpty() { level_--; }
+  unsigned level() const { return level_; }
   void trace(Collector &) const;
 private:
   Vector<Ptr<InheritedCInfo> > inheritedCInfo_;
@@ -237,6 +239,14 @@ inline
 const NodePtr &VarStyleObj::node() const
 {
   return node_;
+}
+
+inline
+ELObj *StyleStack::actual(const ConstPtr<InheritedC> &ic,
+			  Interpreter &interp,
+			  Vector<size_t> &dep)
+{
+  return actual(ic, Location(), interp, dep);
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -1819,7 +1819,7 @@ MessageFragment::appModule,
 #endif
 );
 const MessageType1 ParserMessages::documentCharMax(
-MessageType::error,
+MessageType::warning,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
 #else
@@ -1827,7 +1827,7 @@ MessageFragment::appModule,
 #endif
 157
 #ifndef SP_NO_MESSAGE_TEXT
-,"this system requires that characters in the document character set not have numbers exceeding %1"
+,"characters in the document character set with numbers exceeding %1 not supported"
 #endif
 );
 const MessageType1 ParserMessages::fpiMissingField(

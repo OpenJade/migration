@@ -115,4 +115,8 @@ BEGIN
   112, "called from here...(%1 calls omitted)"
   113, "node processing loop detected"
   114, "unquote-splicing expression does not evaluate to a list"
+  115, "circular use of actual value of characteristic %1"
+  116, "characteristic %1 already defined in same part"
+  117, "first definition was here"
+  118, "flow object class %1 already defined in same part"
 END

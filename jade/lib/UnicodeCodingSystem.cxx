@@ -89,12 +89,12 @@ size_t UnicodeDecoder::decode(Char *to, const char *from, size_t fromLen,
   if (subDecoder_)
     return subDecoder_->decode(to, from, fromLen, rest);
   if (!hadFirstChar_) {
-    hadFirstChar_ = 1;
-    minBytesPerChar_ = 2;
     if (fromLen < 2) {
       *rest = from;
       return 0;
     }
+    hadFirstChar_ = 1;
+    minBytesPerChar_ = 2;
     U u;
     u.bytes[0] = from[0];
     u.bytes[1] = from[1];

@@ -13,6 +13,8 @@ INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = spcat_inst.cxx SpcatMessages.h SpcatMessages.rc
 
+MAINTAINERCLEANFILES = Makefile.in
+
 MSGGENFLAGS = -l appModule
 
 SUFFIXES = .m4 .msg .rc

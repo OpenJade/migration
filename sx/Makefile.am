@@ -16,6 +16,8 @@ INCLUDES = -I$(top_srcdir)/include
 BUILT_SOURCES = XmlOutputMessages.h XmlOutputMessages.rc \
 	SxMessages.h SxMessages.rc sx_inst.cxx
 
+MAINTAINERCLEANFILES = Makefile.in
+
 MSGGENFLAGS = -l appModule
 
 SUFFIXES = .msg .m4 .rc

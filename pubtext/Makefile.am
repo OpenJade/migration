@@ -11,3 +11,5 @@ EXTRA_DIST = HTML32.dcl HTML32.dtd HTML32.soc HTML4-f.dtd \
 	HTMLspec.ent HTMLsym.ent ISOlat1.ent ISOlat1.sgm html-1.dtd \
 	html-1s.dtd html-s.dtd html.dcl html.dtd html.soc xml.dcl xml.soc \
 	japan.dcl opensp-implied.dcl .cvsignore
+
+MAINTAINERCLEANFILES = Makefile.in

@@ -3,6 +3,8 @@
 docdir = $(prefix)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
 
+MAINTAINERCLEANFILES = Makefile.in
+
 pkgdoc_DATA = archform.htm build.htm catalog.htm charset.htm \
 	features.htm generic.htm ideas.htm index.htm new.htm nsgmls.htm \
 	sgmldecl.htm sgmlnorm.htm sgmlsout.htm spam.htm spcat.htm \

@@ -16,6 +16,8 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 
 BUILT_SOURCES = nsgmls_inst.cxx NsgmlsMessages.h NsgmlsMessages.rc \
 	RastEventHandlerMessages.h RastEventHandlerMessages.rc
+
+MAINTAINERCLEANFILES = Makefile.in
   
 MSGGENFLAGS = -l appModule 
 

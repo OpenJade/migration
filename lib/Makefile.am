@@ -99,6 +99,8 @@ BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	app_inst.cxx arc_inst.cxx entmgr_inst.cxx parser_inst.cxx \
 	xentmgr_inst.cxx
 
+MAINTAINERCLEANFILES = Makefile.in
+
 SUFFIXES = .msg .m4 .rc
 
 .m4.cxx: 

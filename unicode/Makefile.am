@@ -3,3 +3,5 @@
 pkgdata_DATA = catalog demo.sgm gensyntax.pl unicode.sd unicode.syn
 
 EXTRA_DIST = catalog demo.sgm gensyntax.pl unicode.sd unicode.syn .cvsignore
+
+MAINTAINERCLEANFILES = Makefile.in

@@ -1136,7 +1136,7 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
   }
   // FIXME optimize case where ics.size() == 0
   boundVars.removeUnused();
-  Vector<const Identifier *> noVars;
+  BoundVarList noVars;
   Environment newEnv(noVars, boundVars);
   size_t j = 0;
   for (size_t i = 0; i < keys_.size(); i++) {
@@ -1331,7 +1331,7 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
   if (!gotOne)
     return next;
   boundVars.removeUnused();
-  Vector<const Identifier *> noVars;
+  BoundVarList noVars;
   Environment newEnv(noVars, boundVars);
   InsnPtr code;
   for (size_t i = 0; i < keys_.size(); i++)

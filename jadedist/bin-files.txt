@@ -13,6 +13,7 @@ doc\sgmlnorm.htm
 doc\sgmlsout.htm
 doc\spam.htm
 doc\spent.htm
+doc\sx.htm
 doc\sysdecl.htm
 doc\sysid.htm
 doc\xml.htm
@@ -22,7 +23,12 @@ dsssl\dsssl.dtd
 dsssl\demo.sgm
 dsssl\demo.dsl
 dsssl\catalog
-bin\sp130.dll
+dsssl\jadetex.dtx
+dsssl\jadetex.ini
+dsssl\jadetex.ins
+dsssl\pdfjadetex.ini
+dsssl\Makefile.jadetex
+bin\sp132.dll
 bin\style.dll
 bin\spgrove.dll
 bin\grove.dll
@@ -38,6 +44,7 @@ jadedoc\copying.txt
 jadedoc\dsssl2.htm
 jadedoc\jade.htm
 jadedoc\TeX.htm
+jadedoc\mif.htm
 jadedoc\transform.htm
 pubtext\ISOlat1.ent
 pubtext\ISOlat1.sgm

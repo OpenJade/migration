@@ -76,18 +76,6 @@ private:
   void operator=(const ProcessContext &); // undefined
   void badContentMap(bool &, const Location &);
   void coverSpannedRows();
-  struct SavedConnection {
-    unsigned connectableLevel;
-    unsigned portIndex;
-    bool operator==(const SavedConnection &c) const {
-      return connectableLevel == c.connectableLevel && portIndex == c.portIndex;
-    }
-    bool operator!=(const SavedConnection &c) const {
-      return !(*this == c);
-    }
-  };
-  void saveCurrentConnection(SavedConnection &);
-  void restoreConnection(const SavedConnection &);
   void restoreConnection(unsigned connectableLevel, size_t portIndex);
   struct Port {
     Port();
@@ -132,7 +120,7 @@ private:
     unsigned nColumns;
     StyleObj *rowStyle;
     bool inTableRow;
-    SavedConnection rowConnection;
+    unsigned rowConnectableLevel;
   };
   struct NodeStackEntry {
     unsigned long elementIndex;

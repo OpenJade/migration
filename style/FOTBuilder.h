@@ -115,7 +115,7 @@ public:
     symbolMaxUniform,
     symbolMiter,
     symbolRound,
-    symbolJoin,
+    symbolBevel,
     symbolButt,
     symbolSquare,
     symbolLoose,
@@ -657,6 +657,8 @@ public:
     public:
       virtual bool convertString(StringC &) const = 0;
       virtual bool convertStringPairList(Vector<StringC> &) const = 0;
+      virtual bool convertStringList(Vector<StringC> &) const = 0;
+      virtual bool convertBoolean(bool &) const = 0;
     };
     virtual CompoundExtensionFlowObj *asCompoundExtensionFlowObj();
     virtual const CompoundExtensionFlowObj *asCompoundExtensionFlowObj() const;

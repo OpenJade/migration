@@ -151,12 +151,12 @@ BoxObj *ELObj::asBox()
 
 void ELObj::print(Interpreter &interp, OutputCharStream &out)
 {
-  print(interp, out, 10);
+  out << "#<unknown object " << (unsigned long)this << ">";
 }
 
-void ELObj::print(Interpreter &, OutputCharStream &out, unsigned)
+void ELObj::print(Interpreter &interp, OutputCharStream &out, unsigned)
 {
-  out << "#<unknown object " << (unsigned long)this << ">";
+  print(interp, out);
 }
 
 bool ELObj::exactIntegerValue(long &)
@@ -582,6 +582,11 @@ bool IntegerObj::isEqual(ELObj &obj)
   return obj.exactIntegerValue(n) && n == n_;
 }
 
+void IntegerObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  print(interp, out, 10);
+}
+
 void IntegerObj::print(Interpreter &, OutputCharStream &out, unsigned radix)
 {
   if (radix == 10) {
@@ -999,7 +1004,7 @@ NodePtr NodeListObj::nodeListRef(long n, EvalContext &context, Interpreter &inte
     GroveString str;
     if (nd->charChunk(interp, str) == accessOK && str.size() <= n) {
       bool chunk;
-      nl = nodeListChunkRest(context, interp, chunk);
+      nl = nl->nodeListChunkRest(context, interp, chunk);
       if (chunk)
 	n -= str.size();
       else

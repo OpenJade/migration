@@ -66,6 +66,11 @@ void CopyEventHandler::withNamedCharRef(const StringC &str,
   withNamedCharRef(str.data(), str.size(), loc);
 }
 
+static
+void escape(OutputCharStream &s, Char c)
+{
+  s << "&#" << (unsigned long)c << ";";
+}
 
 CopyEventHandler::CopyEventHandler(OutputCharStream *os,
 				   unsigned normalizeFlags,
@@ -76,6 +81,7 @@ CopyEventHandler::CopyEventHandler(OutputCharStream *os,
   currentAttributes_(0), emptyElementNormal_(0)
 {
   outputEntityLevel_ = outputEntity_.size() == 0 ? 0 : unsigned(-1);
+  os_->setEscaper(escape);
 }
 
 CopyEventHandler::~CopyEventHandler()

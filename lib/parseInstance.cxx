@@ -1155,7 +1155,7 @@ void Parser::extendData()
   InputSource *in = currentInput();
   size_t length = in->currentTokenLength();
   // This is one of the parser's inner loops, so it needs to be fast.
-  while (isNormal[in->tokenChar(messenger())])
+  while (isNormal[in->tokenCharInBuffer(messenger())])
     length++;
   in->endToken(length);
 }

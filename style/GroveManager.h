@@ -19,7 +19,7 @@ class STYLE_API GroveManager {
 public:
   virtual ~GroveManager();
   virtual bool load(const StringC &, const Vector<StringC> &active, const NodePtr &parent,
-		    NodePtr &) = 0;
+		    NodePtr &, const Vector<StringC> &architecture) = 0;
   virtual bool readEntity(const StringC &, StringC &) = 0;
 };
 

@@ -8,6 +8,9 @@
 #include "HtmlFOTBuilder.h"
 #include "TeXFOTBuilder.h"
 #include "TransformFOTBuilder.h"
+#ifdef JADE_MIF
+#include "MifFOTBuilder.h"
+#endif
 #include "OutputCharStream.h"
 #include "macros.h"
 #include "sptchar.h"
@@ -28,7 +31,11 @@ public:
   void processOption(AppChar opt, const AppChar *arg);
   FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&);
 private:
-  enum OutputType { fotType, rtfType, htmlType, texType, sgmlType, xmlType };
+  enum OutputType { fotType, rtfType, htmlType, texType,
+#ifdef JADE_MIF
+                    mifType,
+#endif
+                    sgmlType, xmlType };
   static const AppChar *const outputTypeNames[];
   OutputType outputType_;
   String<AppChar> outputFilename_;
@@ -41,6 +48,9 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
   SP_T("rtf"),
   SP_T("html"),
   SP_T("tex"),
+#ifdef JADE_MIF
+  SP_T("mif"),
+#endif
   SP_T("sgml"),
   SP_T("xml")
 };
@@ -48,7 +58,13 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
 JadeApp::JadeApp()
 : DssslApp(u), outputType_(fotType)
 {
-  registerOption('t', SP_T("(fot|rtf|html|tex|sgml|xml)"));
+  registerOption('t',
+#ifdef JADE_MIF
+                 SP_T("(fot|rtf|html|tex|mif|sgml|xml)")
+#else
+                 SP_T("(fot|rtf|html|tex|sgml|xml)")
+#endif
+		 );
   registerOption('o', SP_T("output_file"));
 }
 
@@ -139,6 +155,10 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
     return makeTeXFOTBuilder(&outputFile_, this, exts);
   case htmlType:
     return makeHtmlFOTBuilder(outputFilename_, this, exts);
+#ifdef JADE_MIF
+  case mifType:
+    return makeMifFOTBuilder(outputFilename_, entityManager(), systemCharset(), this, exts);
+#endif /* JADE_MIF */
   case fotType:
     return makeSgmlFOTBuilder(new RecordOutputCharStream(new EncodeOutputCharStream(&outputFile_,
 						         outputCodingSystem_)));

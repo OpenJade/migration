@@ -2127,12 +2127,16 @@ DEFPRIMITIVE(StringToNumber, argc, argv, context, interp, loc)
   else
     radix = 10;
   ELObj *result = interp.convertNumber(StringC(s, n), int(radix));
-  // Return #f for quantities.
-  // Note that resolveQuantities would have to be used to make this
-  // work for quantities.
-  double tem;
-  if (result && result->realValue(tem))
-    return result;
+  if (result) {
+    result = result->resolveQuantities(0, interp, loc);
+    if (interp.isError(result))
+      return result;
+    long n;
+    double d;
+    int dim;
+    if (result->quantityValue(n, d, dim) != ELObj::noQuantity)
+      return result;
+  }
   return interp.makeFalse();
 }
 
@@ -4160,36 +4164,40 @@ DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAString, 0, argv[0]);
   StringC sysid(s, n);
-  static const Identifier::SyntacticKey keys[2] = {
-    Identifier::keyActive, Identifier::keyParent
+  static const Identifier::SyntacticKey keys[3] = {
+      Identifier::keyActive, Identifier::keyArchitecture, Identifier::keyParent
   };
-  int pos[2];
-  if (!decodeKeyArgs(argc - 1, argv + 1, keys, 2, interp, loc, pos))
+  int pos[3];
+  if (!decodeKeyArgs(argc - 1, argv + 1, keys, 3, interp, loc, pos))
     return interp.makeError();
-  Vector<StringC> active;
-  if (pos[0] >= 0) {
-    ELObj *obj = argv[pos[0] + 1];
-    while (!obj->isNil()) {
-      PairObj *pair = obj->asPair();
-      if (!pair)
-   	return argError(interp, loc,
-			InterpreterMessages::notAList, pos[0] + 1, argv[pos[0] + 1]);
-      if (!pair->car()->stringData(s, n))
-	return argError(interp, loc,
-  		        InterpreterMessages::notAString, pos[0] + 1, pair->car());
-      active.resize(active.size() + 1);
-      active.back().assign(s, n);
-      obj = pair->cdr();
+  Vector<StringC> lists[2];
+  for (int i = 0; i < 2; i++) {
+    if (pos[i] >= 0) {
+      ELObj *obj = argv[pos[0] + 1];
+      while (!obj->isNil()) {
+	PairObj *pair = obj->asPair();
+	if (!pair)
+   	  return argError(interp, loc,
+			  InterpreterMessages::notAList, pos[i] + 1, argv[pos[i] + 1]);
+	if (!pair->car()->stringData(s, n))
+	  return argError(interp, loc,
+  		          InterpreterMessages::notAString, pos[i] + 1, pair->car());
+	lists[i].resize(lists[i].size() + 1);
+	lists[i].back().assign(s, n);
+	obj = pair->cdr();
+      }
     }
   }
+
   NodePtr parent;
-  if (pos[1] >= 0) {
-    if (!argv[pos[1] + 1]->optSingletonNodeList(context, interp, parent) || !parent)
+  if (pos[2] >= 0) {
+    if (!argv[pos[2] + 1]->optSingletonNodeList(context, interp, parent) || !parent)
       return argError(interp, loc,
-		      InterpreterMessages::notASingletonNode, pos[1] + 1, argv[pos[1] + 1]);
+		      InterpreterMessages::notASingletonNode, pos[2] + 1, argv[pos[2] + 1]);
   }
+
   NodePtr nd;
-  if (!interp.groveManager()->load(sysid, active, parent, nd))
+  if (!interp.groveManager()->load(sysid, lists[0], parent, nd, lists[1]))
     return interp.makeEmptyNodeList();
   return new (interp) NodePtrNodeListObj(nd);
 }

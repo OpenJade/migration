@@ -2,6 +2,7 @@ sp_srcdir=.
 XPROGDIRS=jade
 XLIBDIRS=grove spgrove style
 include $(sp_srcdir)/Makefile
-XDEFINES=-DSP_MULTI_BYTE
+# Use -DJADE_MIF to include the MIF backend
+XDEFINES=-DSP_MULTI_BYTE -DJADE_MIF
 XLIBS=-lm
 srcdir=$(sp_srcdir)

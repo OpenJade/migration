@@ -72,6 +72,7 @@ public:
   NullEventHandler(Messenger &mgr) : mgr_(&mgr) { }
   void message(MessageEvent *event) {
     mgr_->dispatchMessage(event->message());
+    delete event;
   }
 private:
   Messenger *mgr_;

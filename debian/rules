@@ -111,6 +111,7 @@ build:	config.status Makefile
 
 clean:
 	$(checkdir)
+	[ ! -f Makefile ] || $(MAKE) clean
 	[ ! -f Makefile ] || $(MAKE) maintainer-clean
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libosp).shlibs					\

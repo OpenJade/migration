@@ -2,6 +2,7 @@
 # See the file COPYING for copying permission.
 # Next line tells msggen to generate a .cxx file.
 !cxx
+=0
 # Format is+
 # TN+tag+relevant clauses+message
 # where T is a letter indicating the type, and N is the number of arguments.

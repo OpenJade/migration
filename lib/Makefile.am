@@ -61,42 +61,36 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 ## We include the windows-only source and aux files here, so that
 ## make dist-zip produces a working windows distribution.
 EXTRA_DIST = ArcEngineMessages.msg ArgEngineMessages.rc \
-	ArcEngineMessages.po CatalogMessages.msg CatalogMessages.rc \
-	CatalogMessages.po CmdLineAppMessages.msg CmdLineAppMessages.rc \
-	CmdLineAppMessages.po EntityManagerMessages.msg \
-	EntityManagerMessages.rc EntityManagerMessages.po \
+	CatalogMessages.msg CatalogMessages.rc \
+	CmdLineAppMessages.msg CmdLineAppMessages.rc \
+	EntityManagerMessages.msg EntityManagerMessages.rc \
 	MessageFormatterMessages.msg MessageFormatterMessages.rc \
-	MessageFormatterMessages.po MessageReporterMessages.msg \
-	MessageReporterMessages.rc MessageReporterMessages.po \
-	ParserAppMessages.msg ParserAppMessages.rc ParserAppMessages.po \
-	ParserMessages.msg ParserMessages.rc ParserMessages.po \
+	MessageReporterMessages.msg MessageReporterMessages.rc \
+	ParserAppMessages.msg ParserAppMessages.rc \
+	ParserMessages.msg ParserMessages.rc \
 	PosixStorageMessages.msg PosixStorageMessages.rc \
-	PosixStorageMessages.po StdioStorageMessages.msg \
-	StdioStorageMessages.rc StdioStorageMessages.po \
+	StdioStorageMessages.msg StdioStorageMessages.rc \
 	URLStorageMessages.msg URLStorageMessages.rc \
-	URLStorageMessages.po app_inst.m4 arc_inst.m4 entmgr_inst.m4 \
+	app_inst.m4 arc_inst.m4 entmgr_inst.m4 \
 	parser_inst.m4 xentmgr_inst.m4 WinInetStorage.cxx \
 	WinInetStorageMessages.h WinInetStorageMessages.msg \
-	WinInetStorageMessages.rc WinInetStorageMessages.po \
-	WinApp.cxx Win32CodingSystem.cxx lib.rc lib.dsp
+	WinInetStorageMessages.rc WinApp.cxx Win32CodingSystem.cxx \
+	lib.rc lib.dsp
 
 MSGGENFLAGS = -l libModule
 
 BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
-	ArcEngineMessages.po CatalogMessages.h CatalogMessages.rc \
-	CatalogMessages.po CmdLineAppMessages.h CmdLineAppMessages.rc \
-	CmdLineAppMessages.po EntityManagerMessages.h \
-	EntityManagerMessages.rc EntityManagerMessages.po \
+	CatalogMessages.h CatalogMessages.rc \
+	CmdLineAppMessages.h CmdLineAppMessages.rc \
+	EntityManagerMessages.h EntityManagerMessages.rc \
 	MessageFormatterMessages.h MessageFormatterMessages.rc \
-	MessageFormatterMessages.po MessageReporterMessages.h \
-	MessageReporterMessages.rc MessageReporterMessages.po \
-	ParserAppMessages.h ParserAppMessages.rc ParserAppMessages.po \
+	MessageReporterMessages.h MessageReporterMessages.rc \
+	ParserAppMessages.h ParserAppMessages.rc \
 	ParserMessages.cxx ParserMessages.h ParserMessages.rc \
-	ParserMessages.po PosixStorageMessages.h PosixStorageMessages.rc \
-	PosixStorageMessages.po StdioStorageMessages.h StdioStorageMessages.rc \
-	StdioStorageMessages.po URLStorageMessages.h URLStorageMessages.rc \
-	URLStorageMessages.po WinInetStorageMessages.h \
-	WinInetStorageMessages.rc WinInetStorageMessages.po \
+	PosixStorageMessages.h PosixStorageMessages.rc \
+	StdioStorageMessages.h StdioStorageMessages.rc \
+	RLStorageMessages.h URLStorageMessages.rc \
+	WinInetStorageMessages.h WinInetStorageMessages.rc \
 	app_inst.cxx arc_inst.cxx entmgr_inst.cxx parser_inst.cxx \
 	xentmgr_inst.cxx
 
@@ -123,10 +117,10 @@ ParserApp.lo: ParserAppMessages.h
 ArcEngine.o: ArcEngineMessages.h
 ArcEngine.lo: ArcEngineMessages.h
 
-SUFFIXES = .msg .m4 .rc .po
+SUFFIXES = .msg .m4 .rc
 
 .m4.cxx: 
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
-%.h %.cxx %.rc %.po: %.msg
+%.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

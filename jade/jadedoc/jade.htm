@@ -4,7 +4,9 @@
 <title>Jade - James' DSSSL Engine</title>
 <body bgcolor="#ffffff">
 <h1>Jade - James' DSSSL Engine</h1>
-
+<p><strong>Note:</strong> This file documents the last version
+  released by James, 1.2.1. For changes in OpenJade releases since 
+  then, look at <a href="../NEWS">NEWS</a>.  
 <h2>Contents</h2>
 <UL>
 <LI><A HREF="#whatis">What is Jade?</A>
@@ -308,14 +310,15 @@ If there is no input filename, then the extension is added onto
 <CODE>jade-out</CODE>.
 <DD>
 <DT>
-<CODE>-V <VAR>variable</VAR></CODE>
+<CODE>-V <VAR>variable[=value]</VAR></CODE>
 <DD>
 This is equivalent to doing
 <PRE>
-(define <VAR>variable</VAR> #t)
+(define <VAR>variable</VAR> "value")
 </PRE>
 except that this definition will take priority over any definition of
-<VAR>variable</VAR> in a style-sheet.
+<VAR>variable</VAR> in a style-sheet. If the optional part [=value]
+is omitted, the variable is set to #t.
 </DL>
 <P>
 Jade ignores the <SAMP>SP_CHARSET_FIXED</SAMP> and
@@ -401,6 +404,22 @@ This returns a string containing the contents of the external entity
 with system identifier <code><var>string</var></code>.  This should be
 used only for textual entities (CDATA and SDATA), and not for binary
 entities (NDATA).
+
+<h3>POSIX locale access</h3>
+<pre>
+(language <var>lang</var> <var>country</var>)
+</pre>
+<p>
+This procedure returns an object of type <code>language</code>, if the
+system supports the specified language. <code><var>lang</var></code> is
+a string or symbol giving the two letter language code.
+<code><var>country</var></code> is a string or symbol giving the tro letter
+country code.
+
+<p>
+This procedure uses POSIX locales. Its public identifier is
+"UNREGISTERED::OpenJade//Procedure::language."
+
 
 <h2><A NAME="limitations">Current Jade Limitations</A></h2>
 <p>

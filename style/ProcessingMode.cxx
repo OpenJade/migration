@@ -19,7 +19,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 ProcessingMode::ProcessingMode(const StringC &name, const ProcessingMode *initial)
-: Named(name), initial_(initial)
+: Named(name), initial_(initial), defined_(0)
 {
 }
 

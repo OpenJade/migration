@@ -1780,6 +1780,9 @@ DEP_CPP_XENTM=\
 # Begin Source File
 
 SOURCE=.\lib\URLStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_URLST=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -1947,26 +1950,183 @@ DEP_CPP_URLST=\
 	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_URLST=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	".\lib\URLStorageMessages.h"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
+	
 
 "$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -1976,6 +2136,9 @@ DEP_CPP_URLST=\
 # Begin Source File
 
 SOURCE=.\lib\UnivCharsetDesc.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_UNIVC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -2141,26 +2304,181 @@ DEP_CPP_UNIVC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_UNIVC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -2170,6 +2488,9 @@ DEP_CPP_UNIVC=\
 # Begin Source File
 
 SOURCE=.\lib\UnicodeCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_UNICO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -2335,26 +2656,181 @@ DEP_CPP_UNICO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_UNICO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -2364,6 +2840,9 @@ DEP_CPP_UNICO=\
 # Begin Source File
 
 SOURCE=.\lib\Undo.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_UNDO_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -2529,26 +3008,181 @@ DEP_CPP_UNDO_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_UNDO_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -2558,6 +3192,9 @@ DEP_CPP_UNDO_=\
 # Begin Source File
 
 SOURCE=.\lib\TypeId.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_TYPEI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -2723,26 +3360,181 @@ DEP_CPP_TYPEI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_TYPEI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -2752,6 +3544,9 @@ DEP_CPP_TYPEI=\
 # Begin Source File
 
 SOURCE=.\lib\TrieBuilder.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_TRIEB=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -2917,26 +3712,181 @@ DEP_CPP_TRIEB=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_TRIEB=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -2958,6 +3908,9 @@ SOURCE=.\lib\TokenMessageArg.h
 # Begin Source File
 
 SOURCE=.\lib\TokenMessageArg.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_TOKEN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -3123,26 +4076,181 @@ DEP_CPP_TOKEN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_TOKEN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -3164,6 +4272,9 @@ SOURCE=.\lib\token.h
 # Begin Source File
 
 SOURCE=.\lib\Text.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_TEXT_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -3329,26 +4440,181 @@ DEP_CPP_TEXT_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_TEXT_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -3358,6 +4624,9 @@ DEP_CPP_TEXT_=\
 # Begin Source File
 
 SOURCE=.\lib\Syntax.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SYNTA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -3523,26 +4792,181 @@ DEP_CPP_SYNTA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SYNTA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -3552,6 +4976,9 @@ DEP_CPP_SYNTA=\
 # Begin Source File
 
 SOURCE=.\lib\StorageManager.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_STORA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -3717,26 +5144,181 @@ DEP_CPP_STORA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_STORA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -3746,6 +5328,9 @@ DEP_CPP_STORA=\
 # Begin Source File
 
 SOURCE=.\lib\StdioStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_STDIO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -3912,26 +5497,182 @@ DEP_CPP_STDIO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_STDIO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StdioStorageMessages.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -3941,6 +5682,9 @@ DEP_CPP_STDIO=\
 # Begin Source File
 
 SOURCE=.\lib\SOEntityCatalog.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SOENT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -4107,26 +5851,182 @@ DEP_CPP_SOENT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SOENT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\CatalogMessages.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4136,6 +6036,9 @@ DEP_CPP_SOENT=\
 # Begin Source File
 
 SOURCE=.\lib\SJISCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SJISC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -4301,26 +6204,181 @@ DEP_CPP_SJISC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SJISC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4330,6 +6388,9 @@ DEP_CPP_SJISC=\
 # Begin Source File
 
 SOURCE=.\lib\ShortReferenceMap.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SHORT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -4495,26 +6556,181 @@ DEP_CPP_SHORT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SHORT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4524,6 +6740,9 @@ DEP_CPP_SHORT=\
 # Begin Source File
 
 SOURCE=.\lib\SgmlParser.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SGMLP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -4689,26 +6908,181 @@ DEP_CPP_SGMLP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SGMLP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4718,6 +7092,9 @@ DEP_CPP_SGMLP=\
 # Begin Source File
 
 SOURCE=.\lib\SearchResultMessageArg.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SEARC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -4883,26 +7260,181 @@ DEP_CPP_SEARC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SEARC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4912,6 +7444,9 @@ DEP_CPP_SEARC=\
 # Begin Source File
 
 SOURCE=.\lib\SdText.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SDTEX=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -5077,26 +7612,181 @@ DEP_CPP_SDTEX=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SDTEX=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -5106,6 +7796,9 @@ DEP_CPP_SDTEX=\
 # Begin Source File
 
 SOURCE=.\lib\Sd.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SD_CX=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -5271,24 +7964,179 @@ DEP_CPP_SD_CX=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SD_CX=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -5298,6 +8146,9 @@ DEP_CPP_SD_CX=\
 # Begin Source File
 
 SOURCE=.\lib\RewindStorageObject.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_REWIN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -5463,26 +8314,181 @@ DEP_CPP_REWIN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_REWIN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -5492,6 +8498,9 @@ DEP_CPP_REWIN=\
 # Begin Source File
 
 SOURCE=.\lib\Recognizer.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_RECOG=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -5657,26 +8666,181 @@ DEP_CPP_RECOG=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_RECOG=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -5686,6 +8850,9 @@ DEP_CPP_RECOG=\
 # Begin Source File
 
 SOURCE=.\lib\PosixStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_POSIX=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -5854,26 +9021,184 @@ DEP_CPP_POSIX=\
 	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_POSIX=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\PosixStorageMessages.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	{$(INCLUDE)}"\sys\STAT.H"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
+	
 
 "$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -5883,6 +9208,9 @@ DEP_CPP_POSIX=\
 # Begin Source File
 
 SOURCE=.\lib\Partition.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARTI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -6048,26 +9376,181 @@ DEP_CPP_PARTI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARTI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -6077,6 +9560,9 @@ DEP_CPP_PARTI=\
 # Begin Source File
 
 SOURCE=.\lib\parseSd.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -6242,26 +9728,181 @@ DEP_CPP_PARSE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -6271,6 +9912,9 @@ DEP_CPP_PARSE=\
 # Begin Source File
 
 SOURCE=.\lib\ParserState.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -6436,26 +10080,181 @@ DEP_CPP_PARSER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -6465,6 +10264,9 @@ DEP_CPP_PARSER=\
 # Begin Source File
 
 SOURCE=.\lib\ParserOptions.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSERO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -6630,26 +10432,181 @@ DEP_CPP_PARSERO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSERO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -6659,6 +10616,9 @@ DEP_CPP_PARSERO=\
 # Begin Source File
 
 SOURCE=.\lib\ParserMessages.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSERM=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -6824,26 +10784,181 @@ DEP_CPP_PARSERM=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSERM=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -7049,6 +11164,9 @@ DEP_CPP_PARSER_=\
 # Begin Source File
 
 SOURCE=.\lib\Parser.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSER_C=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -7214,26 +11332,181 @@ DEP_CPP_PARSER_C=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSER_C=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -7243,6 +11516,9 @@ DEP_CPP_PARSER_C=\
 # Begin Source File
 
 SOURCE=.\lib\parseParam.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSEP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -7408,9 +11684,6 @@ DEP_CPP_PARSEP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
@@ -7421,6 +11694,166 @@ DEP_CPP_PARSEP=\
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSEP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Undo.h"\
+	
+NODEP_CPP_PARSEP=\
+	".\lib\message"\
+	".\lib\options"\
+	
 
 "$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
@@ -7437,6 +11870,9 @@ DEP_CPP_PARSEP=\
 # Begin Source File
 
 SOURCE=.\lib\parseMode.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSEM=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -7602,26 +12038,181 @@ DEP_CPP_PARSEM=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSEM=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -7631,6 +12222,9 @@ DEP_CPP_PARSEM=\
 # Begin Source File
 
 SOURCE=.\lib\parseInstance.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSEI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -7796,26 +12390,181 @@ DEP_CPP_PARSEI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSEI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -7825,6 +12574,9 @@ DEP_CPP_PARSEI=\
 # Begin Source File
 
 SOURCE=.\lib\parseDecl.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSED=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -7990,26 +12742,181 @@ DEP_CPP_PARSED=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSED=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8019,6 +12926,9 @@ DEP_CPP_PARSED=\
 # Begin Source File
 
 SOURCE=.\lib\parseCommon.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSEC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -8184,26 +13094,181 @@ DEP_CPP_PARSEC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSEC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8213,6 +13278,9 @@ DEP_CPP_PARSEC=\
 # Begin Source File
 
 SOURCE=.\lib\parseAttribute.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSEA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -8378,26 +13446,181 @@ DEP_CPP_PARSEA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSEA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8407,6 +13630,9 @@ DEP_CPP_PARSEA=\
 # Begin Source File
 
 SOURCE=.\lib\Param.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARAM=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -8572,26 +13798,181 @@ DEP_CPP_PARAM=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARAM=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8601,6 +13982,9 @@ DEP_CPP_PARAM=\
 # Begin Source File
 
 SOURCE=.\lib\OutputState.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_OUTPU=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -8766,26 +14150,181 @@ DEP_CPP_OUTPU=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_OUTPU=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8795,6 +14334,9 @@ DEP_CPP_OUTPU=\
 # Begin Source File
 
 SOURCE=.\lib\OutputCharStream.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_OUTPUT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -8960,26 +14502,181 @@ DEP_CPP_OUTPUT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_OUTPUT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -8989,6 +14686,9 @@ DEP_CPP_OUTPUT=\
 # Begin Source File
 
 SOURCE=.\lib\OpenElement.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_OPENE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -9154,26 +14854,181 @@ DEP_CPP_OPENE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_OPENE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -9195,6 +15050,9 @@ SOURCE=.\lib\OffsetOrderedList.h
 # Begin Source File
 
 SOURCE=.\lib\OffsetOrderedList.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_OFFSE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -9362,26 +15220,183 @@ DEP_CPP_OFFSE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_OFFSE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\Mutex.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OffsetOrderedList.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -9391,6 +15406,9 @@ DEP_CPP_OFFSE=\
 # Begin Source File
 
 SOURCE=.\lib\NumericCharRefOrigin.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_NUMER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -9556,26 +15574,181 @@ DEP_CPP_NUMER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_NUMER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -9585,6 +15758,9 @@ DEP_CPP_NUMER=\
 # Begin Source File
 
 SOURCE=.\lib\Notation.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_NOTAT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -9750,26 +15926,181 @@ DEP_CPP_NOTAT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_NOTAT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -9779,6 +16110,9 @@ DEP_CPP_NOTAT=\
 # Begin Source File
 
 SOURCE=.\lib\ModeInfo.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MODEI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -9944,26 +16278,181 @@ DEP_CPP_MODEI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MODEI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -9973,6 +16462,9 @@ DEP_CPP_MODEI=\
 # Begin Source File
 
 SOURCE=.\lib\MessageReporter.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -10139,26 +16631,182 @@ DEP_CPP_MESSA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\MessageReporterMessages.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -10168,6 +16816,9 @@ DEP_CPP_MESSA=\
 # Begin Source File
 
 SOURCE=.\lib\MessageEventHandler.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSAG=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -10333,26 +16984,181 @@ DEP_CPP_MESSAG=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSAG=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -10362,6 +17168,9 @@ DEP_CPP_MESSAG=\
 # Begin Source File
 
 SOURCE=.\lib\MessageArg.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSAGE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -10527,26 +17336,181 @@ DEP_CPP_MESSAGE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSAGE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -10556,6 +17520,9 @@ DEP_CPP_MESSAGE=\
 # Begin Source File
 
 SOURCE=.\lib\Message.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSAGE_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -10721,26 +17688,181 @@ DEP_CPP_MESSAGE_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSAGE_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -10750,6 +17872,9 @@ DEP_CPP_MESSAGE_=\
 # Begin Source File
 
 SOURCE=.\lib\Markup.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MARKU=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -10915,26 +18040,181 @@ DEP_CPP_MARKU=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MARKU=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -10944,6 +18224,9 @@ DEP_CPP_MARKU=\
 # Begin Source File
 
 SOURCE=.\lib\Lpd.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_LPD_C=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -11109,26 +18392,181 @@ DEP_CPP_LPD_C=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_LPD_C=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -11138,6 +18576,9 @@ DEP_CPP_LPD_C=\
 # Begin Source File
 
 SOURCE=.\lib\Location.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_LOCAT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -11304,26 +18745,182 @@ DEP_CPP_LOCAT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_LOCAT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\Mutex.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -11333,6 +18930,9 @@ DEP_CPP_LOCAT=\
 # Begin Source File
 
 SOURCE=.\lib\LiteralStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_LITER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -11498,26 +19098,181 @@ DEP_CPP_LITER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_LITER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -11527,6 +19282,9 @@ DEP_CPP_LITER=\
 # Begin Source File
 
 SOURCE=.\lib\LinkProcess.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_LINKP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -11692,26 +19450,181 @@ DEP_CPP_LINKP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_LINKP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -11721,6 +19634,9 @@ DEP_CPP_LINKP=\
 # Begin Source File
 
 SOURCE=.\lib\Link.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_LINK_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -11886,26 +19802,181 @@ DEP_CPP_LINK_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_LINK_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -11915,6 +19986,9 @@ DEP_CPP_LINK_=\
 # Begin Source File
 
 SOURCE=.\lib\InternalInputSource.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_INTER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -12080,26 +20154,181 @@ DEP_CPP_INTER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_INTER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -12109,6 +20338,9 @@ DEP_CPP_INTER=\
 # Begin Source File
 
 SOURCE=.\lib\InputSource.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_INPUT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -12274,26 +20506,181 @@ DEP_CPP_INPUT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_INPUT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -12303,6 +20690,9 @@ DEP_CPP_INPUT=\
 # Begin Source File
 
 SOURCE=.\lib\IListBase.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ILIST=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -12468,26 +20858,181 @@ DEP_CPP_ILIST=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ILIST=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -12497,6 +21042,9 @@ DEP_CPP_ILIST=\
 # Begin Source File
 
 SOURCE=.\lib\IdentityCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_IDENT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -12662,26 +21210,181 @@ DEP_CPP_IDENT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_IDENT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -12691,6 +21394,9 @@ DEP_CPP_IDENT=\
 # Begin Source File
 
 SOURCE=.\lib\Id.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ID_CX=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -12856,24 +21562,179 @@ DEP_CPP_ID_CX=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ID_CX=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -12883,6 +21744,9 @@ DEP_CPP_ID_CX=\
 # Begin Source File
 
 SOURCE=.\lib\Hash.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_HASH_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -13048,26 +21912,181 @@ DEP_CPP_HASH_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_HASH_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -13077,6 +22096,9 @@ DEP_CPP_HASH_=\
 # Begin Source File
 
 SOURCE=.\lib\Group.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_GROUP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -13242,26 +22264,181 @@ DEP_CPP_GROUP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_GROUP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -13271,6 +22448,9 @@ DEP_CPP_GROUP=\
 # Begin Source File
 
 SOURCE=.\lib\Fixed2CodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_FIXED=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -13436,26 +22616,181 @@ DEP_CPP_FIXED=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_FIXED=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -13465,6 +22800,9 @@ DEP_CPP_FIXED=\
 # Begin Source File
 
 SOURCE=.\lib\ExternalId.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_EXTER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -13630,26 +22968,181 @@ DEP_CPP_EXTER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_EXTER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -13659,6 +23152,9 @@ DEP_CPP_EXTER=\
 # Begin Source File
 
 SOURCE=.\lib\ExtendEntityManager.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_EXTEN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -13827,26 +23323,184 @@ DEP_CPP_EXTEN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_EXTEN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EntityManagerMessages.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\Mutex.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OffsetOrderedList.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -13856,6 +23510,9 @@ DEP_CPP_EXTEN=\
 # Begin Source File
 
 SOURCE=.\lib\Event.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_EVENT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -14021,26 +23678,181 @@ DEP_CPP_EVENT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_EVENT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -14050,6 +23862,9 @@ DEP_CPP_EVENT=\
 # Begin Source File
 
 SOURCE=.\lib\EUCJPCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_EUCJP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -14215,26 +24030,181 @@ DEP_CPP_EUCJP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_EUCJP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -14244,6 +24214,9 @@ DEP_CPP_EUCJP=\
 # Begin Source File
 
 SOURCE=.\lib\ErrnoMessageArg.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ERRNO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -14409,26 +24382,181 @@ DEP_CPP_ERRNO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ERRNO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -14634,6 +24762,9 @@ DEP_CPP_ENTMG=\
 # Begin Source File
 
 SOURCE=.\lib\EntityManager.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ENTIT=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -14799,26 +24930,181 @@ DEP_CPP_ENTIT=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ENTIT=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -14828,6 +25114,9 @@ DEP_CPP_ENTIT=\
 # Begin Source File
 
 SOURCE=.\lib\EntityDecl.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ENTITY=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -14993,26 +25282,181 @@ DEP_CPP_ENTITY=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ENTITY=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15022,6 +25466,9 @@ DEP_CPP_ENTITY=\
 # Begin Source File
 
 SOURCE=.\lib\EntityCatalog.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ENTITYC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -15187,26 +25634,181 @@ DEP_CPP_ENTITYC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ENTITYC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15216,6 +25818,9 @@ DEP_CPP_ENTITYC=\
 # Begin Source File
 
 SOURCE=.\lib\Entity.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ENTITY_=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -15381,26 +25986,181 @@ DEP_CPP_ENTITY_=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ENTITY_=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15410,6 +26170,9 @@ DEP_CPP_ENTITY_=\
 # Begin Source File
 
 SOURCE=.\lib\ElementType.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ELEME=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -15575,26 +26338,181 @@ DEP_CPP_ELEME=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ELEME=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15604,6 +26522,9 @@ DEP_CPP_ELEME=\
 # Begin Source File
 
 SOURCE=.\lib\Dtd.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_DTD_C=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -15769,26 +26690,181 @@ DEP_CPP_DTD_C=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_DTD_C=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15798,6 +26874,9 @@ DEP_CPP_DTD_C=\
 # Begin Source File
 
 SOURCE=.\lib\DescriptorManager.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_DESCR=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -15963,26 +27042,181 @@ DEP_CPP_DESCR=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_DESCR=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -15992,6 +27226,9 @@ DEP_CPP_DESCR=\
 # Begin Source File
 
 SOURCE=.\lib\ContentToken.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CONTE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -16157,26 +27394,181 @@ DEP_CPP_CONTE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CONTE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -16186,6 +27578,9 @@ DEP_CPP_CONTE=\
 # Begin Source File
 
 SOURCE=.\lib\CharsetRegistry.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CHARS=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -16366,26 +27761,196 @@ DEP_CPP_CHARS=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CHARS=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\big5.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\gb2312.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\iso646-jis.h"\
+	".\lib\iso8859-2.h"\
+	".\lib\iso8859-3.h"\
+	".\lib\iso8859-4.h"\
+	".\lib\iso8859-5.h"\
+	".\lib\iso8859-6.h"\
+	".\lib\iso8859-7.h"\
+	".\lib\iso8859-8.h"\
+	".\lib\iso8859-9.h"\
+	".\lib\jis0201.h"\
+	".\lib\jis0208.h"\
+	".\lib\jis0212.h"\
+	".\lib\ksc5601.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -16395,6 +27960,9 @@ DEP_CPP_CHARS=\
 # Begin Source File
 
 SOURCE=.\lib\CharsetInfo.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CHARSE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -16560,26 +28128,181 @@ DEP_CPP_CHARSE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CHARSE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -16589,6 +28312,9 @@ DEP_CPP_CHARSE=\
 # Begin Source File
 
 SOURCE=.\lib\CharsetDecl.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CHARSET=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -16754,26 +28480,181 @@ DEP_CPP_CHARSET=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CHARSET=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -16783,6 +28664,9 @@ DEP_CPP_CHARSET=\
 # Begin Source File
 
 SOURCE=.\lib\Attribute.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ATTRI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -16948,26 +28832,181 @@ DEP_CPP_ATTRI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ATTRI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -16977,6 +29016,9 @@ DEP_CPP_ATTRI=\
 # Begin Source File
 
 SOURCE=.\lib\assert.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ASSER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -17142,26 +29184,181 @@ DEP_CPP_ASSER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ASSER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -17367,6 +29564,9 @@ DEP_CPP_APP_I=\
 # Begin Source File
 
 SOURCE=.\lib\Allocator.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ALLOC=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -17532,26 +29732,181 @@ DEP_CPP_ALLOC=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ALLOC=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -17561,6 +29916,9 @@ DEP_CPP_ALLOC=\
 # Begin Source File
 
 SOURCE=.\lib\ErrorCountEventHandler.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ERROR=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -17726,26 +30084,181 @@ DEP_CPP_ERROR=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ERROR=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -17755,6 +30268,9 @@ DEP_CPP_ERROR=\
 # Begin Source File
 
 SOURCE=.\lib\Win32CodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_WIN32=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -17920,26 +30436,181 @@ DEP_CPP_WIN32=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_WIN32=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -17949,6 +30620,9 @@ DEP_CPP_WIN32=\
 # Begin Source File
 
 SOURCE=.\lib\UTF8CodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_UTF8C=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -18114,26 +30788,181 @@ DEP_CPP_UTF8C=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_UTF8C=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -18143,6 +30972,9 @@ DEP_CPP_UTF8C=\
 # Begin Source File
 
 SOURCE=.\lib\StringVectorMessageArg.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_STRIN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -18308,26 +31140,181 @@ DEP_CPP_STRIN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_STRIN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -18337,6 +31324,9 @@ DEP_CPP_STRIN=\
 # Begin Source File
 
 SOURCE=.\lib\ParserApp.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSERA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -18503,9 +31493,6 @@ DEP_CPP_PARSERA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
@@ -18516,6 +31503,171 @@ DEP_CPP_PARSERA=\
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSERA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserAppMessages.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
@@ -18532,6 +31684,9 @@ DEP_CPP_PARSERA=\
 # Begin Source File
 
 SOURCE=.\lib\EntityApp.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ENTITYA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -18698,26 +31853,182 @@ DEP_CPP_ENTITYA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ENTITYA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\WinInetStorage.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -18727,6 +32038,9 @@ DEP_CPP_ENTITYA=\
 # Begin Source File
 
 SOURCE=.\lib\CmdLineApp.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CMDLI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -18896,26 +32210,168 @@ DEP_CPP_CMDLI=\
 	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CMDLI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\MessageTable.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\CmdLineAppMessages.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\Priority.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\version.h"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
+	
 
 "$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -18925,6 +32381,9 @@ DEP_CPP_CMDLI=\
 # Begin Source File
 
 SOURCE=.\lib\ConsoleOutput.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CONSO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -19090,26 +32549,181 @@ DEP_CPP_CONSO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CONSO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -19119,6 +32733,9 @@ DEP_CPP_CONSO=\
 # Begin Source File
 
 SOURCE=.\lib\ContentState.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CONTEN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -19284,26 +32901,181 @@ DEP_CPP_CONTEN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CONTEN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -19313,6 +33085,9 @@ DEP_CPP_CONTEN=\
 # Begin Source File
 
 SOURCE=.\lib\ArcEngine.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_ARCEN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -19479,26 +33254,182 @@ DEP_CPP_ARCEN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_ARCEN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcEngineMessages.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -19910,6 +33841,9 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\lib\SGMLApplication.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_SGMLA=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -20075,26 +34009,181 @@ DEP_CPP_SGMLA=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_SGMLA=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -20104,6 +34193,9 @@ DEP_CPP_SGMLA=\
 # Begin Source File
 
 SOURCE=.\lib\ParserEventGeneratorKit.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_PARSERE=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -20269,26 +34361,181 @@ DEP_CPP_PARSERE=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
  "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_PARSERE=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
  "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -20298,6 +34545,9 @@ DEP_CPP_PARSERE=\
 # Begin Source File
 
 SOURCE=.\lib\GenericEventHandler.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_GENER=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -20463,26 +34713,181 @@ DEP_CPP_GENER=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_GENER=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -20492,6 +34897,9 @@ DEP_CPP_GENER=\
 # Begin Source File
 
 SOURCE=.\lib\EventGenerator.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_EVENTG=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -20657,26 +35065,181 @@ DEP_CPP_EVENTG=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_EVENTG=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -20721,6 +35284,9 @@ DEP_RSC_LIB_R=\
 # Begin Source File
 
 SOURCE=.\lib\MessageTable.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSAGET=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -20887,26 +35453,182 @@ DEP_CPP_MESSAGET=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSAGET=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\MessageTable.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -20916,6 +35638,9 @@ DEP_CPP_MESSAGET=\
 # Begin Source File
 
 SOURCE=.\lib\WinInetStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_WININ=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -21083,26 +35808,183 @@ DEP_CPP_WININ=\
 	".\lib\WinInetStorageMessages.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_WININ=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\WinInetStorage.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	".\lib\WinInetStorageMessages.h"\
+	
 
 "$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -21196,6 +36078,9 @@ SOURCE=.\lib\xentmgr_inst.m4
 # Begin Source File
 
 SOURCE=.\lib\TranslateCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_TRANS=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -21362,26 +36247,182 @@ DEP_CPP_TRANS=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_TRANS=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TranslateCodingSystem.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -21391,6 +36432,9 @@ DEP_CPP_TRANS=\
 # Begin Source File
 
 SOURCE=.\lib\CodingSystemKit.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CODIN=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -21559,26 +36603,184 @@ DEP_CPP_CODIN=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CODIN=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Big5CodingSystem.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TranslateCodingSystem.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\XMLCodingSystem.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -21612,6 +36814,9 @@ SOURCE=.\lib\EntityManagerMessages.msg
 # Begin Source File
 
 SOURCE=.\lib\CodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_CODING=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -21777,26 +36982,181 @@ DEP_CPP_CODING=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_CODING=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -21806,6 +37166,9 @@ DEP_CPP_CODING=\
 # Begin Source File
 
 SOURCE=.\lib\Big5CodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_BIG5C=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -21972,26 +37335,182 @@ DEP_CPP_BIG5C=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_BIG5C=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Big5CodingSystem.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -22001,6 +37520,9 @@ DEP_CPP_BIG5C=\
 # Begin Source File
 
 SOURCE=.\lib\OutputByteStream.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_OUTPUTB=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -22168,26 +37690,183 @@ DEP_CPP_OUTPUTB=\
 	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_OUTPUTB=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	{$(INCLUDE)}"\sys\STAT.H"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
+	
 
 "$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -22197,6 +37876,9 @@ DEP_CPP_OUTPUTB=\
 # Begin Source File
 
 SOURCE=.\lib\MessageFormatter.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_MESSAGEF=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -22363,26 +38045,182 @@ DEP_CPP_MESSAGEF=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_MESSAGEF=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\MessageFormatterMessages.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -22392,6 +38230,10 @@ DEP_CPP_MESSAGEF=\
 # Begin Source File
 
 SOURCE=.\lib\WinApp.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+# PROP Exclude_From_Build 0
 DEP_CPP_WINAP=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -22559,28 +38401,184 @@ DEP_CPP_WINAP=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-# PROP Exclude_From_Build 0
-
 "$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
 # PROP Exclude_From_Build 0
+DEP_CPP_WINAP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\WinApp.h"\
+	".\include\WinInetStorage.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -22590,6 +38588,9 @@ DEP_CPP_WINAP=\
 # Begin Source File
 
 SOURCE=.\lib\NotationStorage.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_NOTATI=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -22755,26 +38756,181 @@ DEP_CPP_NOTATI=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_NOTATI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -22784,6 +38940,9 @@ DEP_CPP_NOTATI=\
 # Begin Source File
 
 SOURCE=.\lib\XMLCodingSystem.cxx
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
 DEP_CPP_XMLCO=\
 	".\generic\EventGenerator.h"\
 	".\generic\ParserEventGeneratorKit.h"\
@@ -22950,26 +39109,182 @@ DEP_CPP_XMLCO=\
 	".\lib\Undo.h"\
 	
 
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-
 "$(INTDIR)\XMLCodingSystem.obj" : $(SOURCE) $(DEP_CPP_XMLCO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+DEP_CPP_XMLCO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\XMLCodingSystem.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
 
 "$(INTDIR)\XMLCodingSystem.obj" : $(SOURCE) $(DEP_CPP_XMLCO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -23494,6 +39809,93 @@ DEP_RSC_NSGMLS_=\
 # Begin Source File
 
 SOURCE=.\spam\spam_inst.cxx
+
+!IF  "$(CFG)" == "spam - Win32 Release"
+
+DEP_CPP_SPAM_=\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\spam\CopyEventHandler.h"\
+	".\spam\MarkupEventHandler.h"\
+	
+
+"$(INTDIR)\spam_inst.obj" : $(SOURCE) $(DEP_CPP_SPAM_) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
+
 DEP_CPP_SPAM_=\
 	".\include\Allocator.h"\
 	".\include\Attribute.h"\
@@ -23578,11 +39980,16 @@ DEP_CPP_SPAM_=\
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ENDIF 
+
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\spam\spam.cxx
+
+!IF  "$(CFG)" == "spam - Win32 Release"
+
 DEP_CPP_SPAM_C=\
 	".\include\Allocator.h"\
 	".\include\Attribute.h"\
@@ -23647,7 +40054,6 @@ DEP_CPP_SPAM_C=\
 	".\include\ParserOptions.h"\
 	".\include\PointerTable.cxx"\
 	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
 	".\include\Ptr.h"\
 	".\include\RangeMap.cxx"\
 	".\include\RangeMap.h"\
@@ -23659,7 +40065,6 @@ DEP_CPP_SPAM_C=\
 	".\include\ShortReferenceMap.h"\
 	".\include\sptchar.h"\
 	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
 	".\include\StringOf.h"\
 	".\include\StringResource.h"\
 	".\include\SubstTable.cxx"\
@@ -23682,11 +40087,79 @@ DEP_CPP_SPAM_C=\
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
+
+DEP_CPP_SPAM_C=\
+	".\include\Allocator.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\InputSource.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\macros.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\SgmlParser.h"\
+	".\include\sptchar.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\spam\CopyEventHandler.h"\
+	".\spam\SpamMessages.h"\
+	
+
+"$(INTDIR)\spam.obj" : $(SOURCE) $(DEP_CPP_SPAM_C) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\spam\MarkupEventHandler.cxx
+
+!IF  "$(CFG)" == "spam - Win32 Release"
+
 DEP_CPP_MARKUP=\
 	".\include\Allocator.h"\
 	".\include\Attribute.h"\
@@ -23736,7 +40209,6 @@ DEP_CPP_MARKUP=\
 	".\include\OwnerTable.h"\
 	".\include\PointerTable.cxx"\
 	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
 	".\include\Ptr.h"\
 	".\include\RangeMap.cxx"\
 	".\include\RangeMap.h"\
@@ -23746,7 +40218,6 @@ DEP_CPP_MARKUP=\
 	".\include\SdText.h"\
 	".\include\ShortReferenceMap.h"\
 	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
 	".\include\StringOf.h"\
 	".\include\StringResource.h"\
 	".\include\SubstTable.cxx"\
@@ -23767,11 +40238,45 @@ DEP_CPP_MARKUP=\
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
+
+DEP_CPP_MARKUP=\
+	".\include\Allocator.h"\
+	".\include\Boolean.h"\
+	".\include\config.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\xnew.h"\
+	".\spam\MarkupEventHandler.h"\
+	
+
+"$(INTDIR)\MarkupEventHandler.obj" : $(SOURCE) $(DEP_CPP_MARKUP) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\spam\CopyEventHandler.cxx
+
+!IF  "$(CFG)" == "spam - Win32 Release"
+
 DEP_CPP_COPYE=\
 	".\include\Allocator.h"\
 	".\include\Attribute.h"\
@@ -23825,7 +40330,6 @@ DEP_CPP_COPYE=\
 	".\include\OwnerTable.h"\
 	".\include\PointerTable.cxx"\
 	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
 	".\include\Ptr.h"\
 	".\include\RangeMap.cxx"\
 	".\include\RangeMap.h"\
@@ -23835,7 +40339,6 @@ DEP_CPP_COPYE=\
 	".\include\SdText.h"\
 	".\include\ShortReferenceMap.h"\
 	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
 	".\include\StringOf.h"\
 	".\include\StringResource.h"\
 	".\include\SubstTable.cxx"\
@@ -23856,6 +40359,37 @@ DEP_CPP_COPYE=\
 "$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
+
+DEP_CPP_COPYE=\
+	".\include\Allocator.h"\
+	".\include\Boolean.h"\
+	".\include\config.h"\
+	".\include\Event.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\macros.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\xnew.h"\
+	".\spam\CopyEventHandler.h"\
+	
+
+"$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
 
 # End Source File
 ################################################################################
@@ -24032,6 +40566,106 @@ SOURCE=.\spent\SpentMessages.msg
 # Begin Source File
 
 SOURCE=.\sgmlnorm\sgmlnorm.cxx
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
+DEP_CPP_SGMLN=\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
+
+"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
+
 DEP_CPP_SGMLN=\
 	".\generic\SGMLApplication.h"\
 	".\include\Allocator.h"\
@@ -24128,11 +40762,36 @@ DEP_CPP_SGMLN=\
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
+!ENDIF 
+
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\sgmlnorm\SGMLGenerator.cxx
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
+DEP_CPP_SGMLG=\
+	".\generic\SGMLApplication.h"\
+	".\include\Boolean.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
+
+"$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
+
 DEP_CPP_SGMLG=\
 	".\generic\SGMLApplication.h"\
 	".\include\Boolean.h"\
@@ -24151,6 +40810,8 @@ DEP_CPP_SGMLG=\
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
+
+!ENDIF 
 
 # End Source File
 # End Target

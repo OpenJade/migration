@@ -622,7 +622,7 @@ MessageFragment::appModule,
 51
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid comment declaration: found %1 outside comment but inside comment declaration"
-,"commment declaration started here"
+,"comment declaration started here"
 #endif
 );
 const MessageType1 ParserMessages::instanceDeclaration(
@@ -4890,6 +4890,30 @@ MessageFragment::appModule,
 414
 #ifndef SP_NO_MESSAGE_TEXT
 ,"SGML declaration reference was used but minimum literal was not \"ISO 8879:1986 (WWW)\""
+#endif
+);
+const MessageType0 ParserMessages::pcdataGroupMemberOccurrenceIndicator(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+415
+#ifndef SP_NO_MESSAGE_TEXT
+,"member of model group containing #PCDATA has occurrence indicator"
+#endif
+);
+const MessageType0 ParserMessages::pcdataGroupMemberModelGroup(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+416
+#ifndef SP_NO_MESSAGE_TEXT
+,"member of model group containing #PCDATA is a model group"
 #endif
 );
 const MessageFragment ParserMessages::delimStart(

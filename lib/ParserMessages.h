@@ -824,6 +824,10 @@ struct ParserMessages {
   static const MessageType1 sdTextClass;
   // 414
   static const MessageType0 sgmlDeclRefRequiresWww;
+  // 415
+  static const MessageType0 pcdataGroupMemberOccurrenceIndicator;
+  // 416
+  static const MessageType0 pcdataGroupMemberModelGroup;
   // 1000
   static const MessageFragment delimStart;
   // 1001

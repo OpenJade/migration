@@ -2,6 +2,9 @@
 // See the file COPYING for copying permission.
 
 #include "splib.h"
+
+#ifdef SP_WIDE_SYSTEM
+
 #include "WinApp.h"
 #include "CodingSystemKit.h"
 #include "Ptr.h"
@@ -216,3 +219,5 @@ Boolean WinApp::getRegistry(const char *name, StringC &value)
 #ifdef SP_NAMESPACE
 }
 #endif
+
+#endif /* SP_WIDE_SYSTEM */

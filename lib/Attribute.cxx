@@ -1013,6 +1013,8 @@ TokenizedAttributeValue::makeSemantics(const DeclaredValue *value,
 				       unsigned &nIdrefs,
 				       unsigned &nEntityNames) const
 {
+  if (text_.size() == 0)
+    return 0;
   return value->makeSemantics(*this, context, name, nIdrefs, nEntityNames);
 }
 

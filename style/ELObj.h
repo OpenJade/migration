@@ -70,6 +70,7 @@ public:
   virtual bool charValue(Char &);
   virtual bool stringData(const Char *&, size_t &);
   virtual void print(Interpreter &, OutputCharStream &);
+  virtual void print(Interpreter &, OutputCharStream &, unsigned);
   virtual bool exactIntegerValue(long &);
   virtual bool realValue(double &);
   virtual bool inexactRealValue(double &);
@@ -234,7 +235,7 @@ public:
 
 class IntegerObj : public ELObj {
 public:
-  void print(Interpreter &, OutputCharStream &);
+  void print(Interpreter &, OutputCharStream &, unsigned);
   bool exactIntegerValue(long &);
   bool realValue(double &);
   QuantityType quantityValue(long &, double &, int &);

@@ -33,7 +33,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 1.1.
+The current version is 1.1.1.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -115,10 +115,10 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew1_1.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew1_1_1.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_1.zip">Jade</A>.
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_1_1.zip">Jade</A>.
 This package includes the sources for a compatible version of SP
 (which may be different from the latest released version of SP).
 <p>
@@ -213,12 +213,13 @@ The system data of the processing instruction is parsed like an SGML
 start-tag.  It will be parsed using the reference concrete syntax
 whatever the actual concrete syntax of the document.  The name that
 starts the processing instruction can be either
-<CODE>stylesheet</CODE> or <CODE>xml-stylesheet</CODE>.  The
-processing instruction will be ignored unless the value of the
-<CODE>type</CODE> attribute is one of <CODE>text/dsssl</CODE>,
-<CODE>text/x-dsssl</CODE>, <CODE>application/dsssl</CODE>, or
-<CODE>application/x-dsssl</CODE>.  The value of <CODE>href</CODE>
-attribute is the system identifier of the DSSSL specification.
+<CODE>stylesheet</CODE>, <CODE>xml-stylesheet</CODE> or
+<CODE>xml:stylesheet</CODE>.  The processing instruction will be
+ignored unless the value of the <CODE>type</CODE> attribute is one of
+<CODE>text/dsssl</CODE>, <CODE>text/x-dsssl</CODE>,
+<CODE>application/dsssl</CODE>, or <CODE>application/x-dsssl</CODE>.
+The value of <CODE>href</CODE> attribute is the system identifier of
+the DSSSL specification.
 <DT>
 <CODE>&lt;?dsssl <VAR>sysid</VAR>&gt;</CODE>
 <DD>

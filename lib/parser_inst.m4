@@ -175,6 +175,7 @@ __instantiate(IListIter<InputSource>)
 __instantiate(NamedResourceTable<Notation>)
 __instantiate(NamedResourceTable<Entity>)
 __instantiate(NamedResourceTableIter<Entity>)
+__instantiate(NamedResourceTableIter<Notation>)
 __instantiate(ConstNamedResourceTableIter<Entity>)
 __instantiate(ConstNamedResourceTableIter<Notation>)
 

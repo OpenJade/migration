@@ -154,6 +154,7 @@ bool SchemeParser::doMode()
   if (!getToken(allowIdentifier, tok))
     return 0;
   defMode_ = lookupProcessingMode(currentToken_);
+  defMode_->setDefined();
   for (;;) {
     if (!getToken(allowOpenParen|allowCloseParen, tok))
       return 0;

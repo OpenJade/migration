@@ -1444,6 +1444,19 @@ typedef NamedResourceTableIter<Entity> Dummy_104;
 #endif
 #endif
 #ifdef __DECCXX
+#pragma define_template NamedResourceTableIter<Notation>
+#else
+#ifdef __xlC__
+#pragma define(NamedResourceTableIter<Notation>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class NamedResourceTableIter<Notation>;
+#else
+typedef NamedResourceTableIter<Notation> Dummy_105;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
 #pragma define_template ConstNamedResourceTableIter<Entity>
 #else
 #ifdef __xlC__
@@ -1452,7 +1465,7 @@ typedef NamedResourceTableIter<Entity> Dummy_104;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstNamedResourceTableIter<Entity>;
 #else
-typedef ConstNamedResourceTableIter<Entity> Dummy_105;
+typedef ConstNamedResourceTableIter<Entity> Dummy_106;
 #endif
 #endif
 #endif
@@ -1465,7 +1478,7 @@ typedef ConstNamedResourceTableIter<Entity> Dummy_105;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstNamedResourceTableIter<Notation>;
 #else
-typedef ConstNamedResourceTableIter<Notation> Dummy_106;
+typedef ConstNamedResourceTableIter<Notation> Dummy_107;
 #endif
 #endif
 #endif
@@ -1479,7 +1492,7 @@ typedef ConstNamedResourceTableIter<Notation> Dummy_106;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<IdLinkRule>;
 #else
-typedef Vector<IdLinkRule> Dummy_107;
+typedef Vector<IdLinkRule> Dummy_108;
 #endif
 #endif
 #endif
@@ -1492,7 +1505,7 @@ typedef Vector<IdLinkRule> Dummy_107;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<SourceLinkRuleResource> >;
 #else
-typedef Vector<ConstPtr<SourceLinkRuleResource> > Dummy_108;
+typedef Vector<ConstPtr<SourceLinkRuleResource> > Dummy_109;
 #endif
 #endif
 #endif
@@ -1505,7 +1518,7 @@ typedef Vector<ConstPtr<SourceLinkRuleResource> > Dummy_108;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Vector<ConstPtr<SourceLinkRuleResource> > >;
 #else
-typedef Vector<Vector<ConstPtr<SourceLinkRuleResource> > > Dummy_109;
+typedef Vector<Vector<ConstPtr<SourceLinkRuleResource> > > Dummy_110;
 #endif
 #endif
 #endif
@@ -1518,7 +1531,7 @@ typedef Vector<Vector<ConstPtr<SourceLinkRuleResource> > > Dummy_109;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ResultElementSpec>;
 #else
-typedef Vector<ResultElementSpec> Dummy_110;
+typedef Vector<ResultElementSpec> Dummy_111;
 #endif
 #endif
 #endif
@@ -1531,7 +1544,7 @@ typedef Vector<ResultElementSpec> Dummy_110;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<AttributeDefinitionList> >;
 #else
-typedef Vector<ConstPtr<AttributeDefinitionList> > Dummy_111;
+typedef Vector<ConstPtr<AttributeDefinitionList> > Dummy_112;
 #endif
 #endif
 #endif
@@ -1544,7 +1557,7 @@ typedef Vector<ConstPtr<AttributeDefinitionList> > Dummy_111;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<Lpd> >;
 #else
-typedef Vector<ConstPtr<Lpd> > Dummy_112;
+typedef Vector<ConstPtr<Lpd> > Dummy_113;
 #endif
 #endif
 #endif
@@ -1557,7 +1570,7 @@ typedef Vector<ConstPtr<Lpd> > Dummy_112;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<LpdEntityRef *>;
 #else
-typedef Vector<LpdEntityRef *> Dummy_113;
+typedef Vector<LpdEntityRef *> Dummy_114;
 #endif
 #endif
 #endif
@@ -1570,7 +1583,7 @@ typedef Vector<LpdEntityRef *> Dummy_113;
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
 #else
-typedef PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_114;
+typedef PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_115;
 #endif
 #endif
 #endif
@@ -1583,7 +1596,7 @@ typedef PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> D
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
 #else
-typedef PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_115;
+typedef PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_116;
 #endif
 #endif
 #endif
@@ -1596,7 +1609,7 @@ typedef PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRe
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
 #else
-typedef OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_116;
+typedef OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_117;
 #endif
 #endif
 #endif
@@ -1609,7 +1622,7 @@ typedef OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
 #else
-typedef OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_117;
+typedef OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_118;
 #endif
 #endif
 #endif
@@ -1622,7 +1635,7 @@ typedef OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> D
 #ifdef SP_ANSI_CLASS_INST
 template class IList<LinkProcessOpenElement>;
 #else
-typedef IList<LinkProcessOpenElement> Dummy_118;
+typedef IList<LinkProcessOpenElement> Dummy_119;
 #endif
 #endif
 #endif

@@ -818,6 +818,12 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
       if (nestingLevel != 1)
 	message(ParserMessages::pcdataInNestedModelGroup);
     }
+    else if (pcdataCheck) {
+      if (gt.type == GroupToken::modelGroup)
+	message(ParserMessages::pcdataGroupMemberModelGroup);
+      if (contentToken->occurrenceIndicator() != ContentToken::none)
+	message(ParserMessages::pcdataGroupMemberOccurrenceIndicator);
+    }
     if (tokenVector.size() == 1) {
       connector = gc.type;
       switch (gc.type) {

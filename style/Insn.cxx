@@ -1276,18 +1276,31 @@ const Insn *SetNonInheritedCsSosofoInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
-SetNonInheritedCInsn::SetNonInheritedCInsn(const Identifier *nic, const Location &loc,
+
+SetPseudoNonInheritedCInsn::SetPseudoNonInheritedCInsn(const Identifier *nic, const Location &loc,
 					   InsnPtr next)
 : nic_(nic), loc_(loc), next_(next)
 {
 }
 
-const Insn *SetNonInheritedCInsn::execute(VM &vm) const
+const Insn *SetPseudoNonInheritedCInsn::execute(VM &vm) const
 {
   ASSERT(vm.sp[-2]->asSosofo() != 0);
   ((FlowObj *)vm.sp[-2])->setNonInheritedC(nic_, vm.sp[-1], loc_, *vm.interp);
   vm.sp--;
   return next_.pointer();
+}
+
+SetNonInheritedCInsn::SetNonInheritedCInsn(const Identifier *nic, const Location &loc,
+					   InsnPtr next)
+: SetPseudoNonInheritedCInsn(nic, loc, next)
+{
+}
+
+const Insn *SetNonInheritedCInsn::execute(VM &vm) const
+{
+  vm.actualDependencies->resize(0);
+  return SetPseudoNonInheritedCInsn::execute(vm);
 }
 
 SetContentInsn::SetContentInsn(const CompoundFlowObj *flowObj, InsnPtr next)

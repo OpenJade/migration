@@ -167,6 +167,7 @@ Boolean DssslApp::getDssslSpecFromPi(const Char *s, size_t n,
     Boolean (DssslApp::*handler)(const Char *s, size_t, const Location &);
   } pis[] = {
     { "xml-stylesheet", &DssslApp::handleAttlistPi },
+    { "xml:stylesheet", &DssslApp::handleAttlistPi },
     { "stylesheet", &DssslApp::handleAttlistPi },
     { "dsssl", &DssslApp::handleSimplePi },
   };

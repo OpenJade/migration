@@ -76,14 +76,20 @@ private:
 // Value for characteristic is on top of the stack
 // Flow object is next down.
 
-class SetNonInheritedCInsn : public Insn {
+class SetPseudoNonInheritedCInsn : public Insn {
 public:
-  SetNonInheritedCInsn(const Identifier *, const Location &, InsnPtr);
+  SetPseudoNonInheritedCInsn(const Identifier *, const Location &, InsnPtr);
   const Insn *execute(VM &) const;
 private:
   Location loc_;
   const Identifier *nic_;
   InsnPtr next_;
+};
+
+class SetNonInheritedCInsn : public SetPseudoNonInheritedCInsn {
+public:
+  SetNonInheritedCInsn(const Identifier *, const Location &, InsnPtr);
+  const Insn *execute(VM &) const;
 };
 
 // sosofo with content is on top of the stack

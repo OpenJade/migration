@@ -30,7 +30,7 @@ AH_TEMPLATE([SP_HAVE_SOCKET],[define this if sockets are available])
 AH_TEMPLATE([sig_atomic_t],[define this appropriately if the type sig_atomic_t is not available])
 AH_TEMPLATE([SP_NEW_H_MISSING],[define this if your system misses new.h])
 AH_TEMPLATE([SP_SET_NEW_HANDLER_EXTERN_C],[define this if  set_new_handler() has to be declared extern "C"])
-AH_TEMPLATE([SP_MULTI_BYTE],[define this to build a multi-byte version])
+AC_DEFINE(SP_MULTI_BYTE,[1],[define this to build a multi-byte version])
 AH_TEMPLATE([SP_DEFINE_TEMPLATES],[define this to include template definitions in the headers])
 AH_TEMPLATE([SP_MANUAL_INST],[define this to compile explicit template instantiations])
 AH_TEMPLATE([SP_FANCY_NEW_HANDLER],[define this if the new handler takes size_t and returns int.])
@@ -392,9 +392,6 @@ AC_CHECK_FUNCS(setlocale)
 dnl Checks for system services.
 ACX_CHECK_PATHNAME_STYLE_DOS
 
-dnl Package options.
-dnl AC_DEFINE(SP_MULTI_BYTE,1,
-dnl           [define this to build a multi-byte version])
 AC_MSG_CHECKING(whether to include support for http)
 AC_ARG_ENABLE(http,
 [  --enable-http           include support for http],

@@ -41,7 +41,6 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_CXX
-AC_PATH_PROGS(M4, gm4 gnum4 m4, m4)
 AC_PATH_PROGS(PERL, perl, perl)
 test "$INSTALL" = "./config/install.sh -c" && INSTALL=`pwd`"/config/install.sh -c"
 

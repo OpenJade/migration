@@ -11,17 +11,18 @@
 # Original SP Makefile Copyright (c) 1994, 1995, 1996 James Clark
 
 TOP=/free/CVS/OpenJade/jade
+top_builddir=.
 prefix=/usr/local.peano
 exec_prefix=${prefix}
 srcdir=.
 bindir=${exec_prefix}/bin
 datadir=${prefix}/share
+libdir=${exec_prefix}/lib
 
-LIBTOOL=$(TOP)/libtool
+LIBTOOL=$(SHELL) $(top_builddir)/libtool
 
-SP_LIBDIRS=lib $(XLIBDIRS)
-LIBDIRS=lib grove spgrove style
-PROGDIRS=spcat jade nsgmls spam sgmlnorm spent sx 
+LIBDIRS=grove spgrove style
+PROGDIRS=jade
 dodirs=$(LIBDIRS) $(PROGDIRS)
 
 # Automatic template instantiation can cause compilers to generate
@@ -73,13 +74,11 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/Makefile.lt -f $$srcdir/../Makefile.prog \
 		-f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): $(SP_LIBDIRS)
+jade: grove spgrove style
 
-jade: grove spgrove style lib
+spgrove: grove
 
-spgrove: grove lib
-
-style: grove spgrove lib
+style: grove spgrove
 
 # GNU tar
 TAR=tar
@@ -104,13 +103,11 @@ dist: FORCE
 	  `sed -e "s|.*|sp-$$version/&|" FILES`; \
 	rm -fr sp-$$version
 
-mrproper:
+distclean:	mrproper
+mrproper: 	clean
 	rm -f Makefile Makefile.comm Makefile.lib Makefile.prog \
 		config.cache config.log config.status libtool
+	rm -f Makefile*.dist
 	find . -name Makefile.dep | xargs rm -f
-	test ! -f Makefile.dist || mv Makefile.dist Makefile
-	test ! -f Makefile.comm.dist || mv Makefile.comm.dist Makefile.comm
-	test ! -f Makefile.prog.dist || mv Makefile.prog.dist Makefile.prog
-	test ! -f Makefile.lib.dist || mv Makefile.lib.dist Makefile.lib
 
 FORCE:

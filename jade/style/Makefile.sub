@@ -1,6 +1,6 @@
-LIB=style
-DEPLIBS=-lm -L$(TOP)/grove/.libs -lgrove -L$(TOP)/lib/.libs -lsp 	\
-  -L$(TOP)/spgrove/.libs -lspgrove
+LIB=ostyle
+DEPLIBS=-lm -L$(TOP)/grove/.libs -logrove -L$(TOP)/lib/.libs -losp 	\
+  -L$(TOP)/spgrove/.libs -lospgrove
 OBJS=LangObj.o \
   Collector.o \
   DssslApp.o \

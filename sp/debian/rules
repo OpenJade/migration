@@ -81,7 +81,7 @@ config.status:	ChangeLog
 	aclocal
 #	libtoolize --force --copy
 	autoconf
-	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
+	CFLAGS="-O2 -DHAVE_BOOL=1 --pipe" CXXFLAGS="-O2 -DHAVE_BOOL=1 --pipe" \
 	   ./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
 	   --enable-http --enable-static --enable-shared		\
@@ -91,7 +91,8 @@ config.status:	ChangeLog
 
 build:	config.status
 	$(checkdir)
-	$(MAKE) SUBDIRS=lib CXXFLAGS="-O2 --pipe -D_REENTRANT"
+#	 HAVE_BOOL here and below is a hack around an autoconf problem
+	$(MAKE) SUBDIRS=lib CXXFLAGS="-O2 -DHAVE_BOOL=1 --pipe -D_REENTRANT"
 	$(MAKE)
 	touch build
 

@@ -187,7 +187,7 @@ void WinApp::setRegistry(const char *name, const StringC &value)
   buf.resize(len + 1);
   WideCharToMultiByte(CP_ACP, 0, value.data(), value.size(), buf.begin(), len, 0, 0);
   buf[len] = '\0';
-  RegSetValue(hk, name, REG_SZ, buf.data(), len);
+  RegSetValueA(hk, name, REG_SZ, buf.data(), len);
   RegCloseKey(hk);
 }
 

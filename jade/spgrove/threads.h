@@ -269,9 +269,25 @@ public:
   }
   void pulse() { condition_broadcast(condition_); }
   bool wait() const {
-    mutex_lock  (                        mutex_);
-    if(!set_) condition_wait(condition_, mutex_);
-    mutex_unlock(                        mutex_);
+    mutex_lock  (
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_);
+    if(!set_) condition_wait(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      condition_, 
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_);
+    mutex_unlock(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_);
     return 1;
       // 0 would be interpreted as timeout, which is not supported directly
       // do we need that? would require some more coding, with another thread
@@ -284,10 +300,10 @@ public:
   }
 private:
   // nWaiters_ functionality already in Mach C Threads
-  mutex_t mutex_;
+  mutable mutex_t mutex_;
     // every C Threads condition_t needs a mutex_t
     // but also see set_ below
-  condition_t condition_;
+  mutable condition_t condition_;
     // can't have struct and struct mutex because of the const in wait()
     // (can/should this const-ness be revised?)
   bool set_;
@@ -409,10 +425,26 @@ public:
     pthread_cond_destroy(&condition_);
   }
   void pulse() { pthread_cond_broadcast(&condition_); }
-  bool wait() {
-    pthread_mutex_lock(&mutex_);
-    if (!set_) pthread_cond_wait(&condition_, &mutex_);
-    pthread_mutex_unlock(&mutex_);
+  bool wait() const {
+    pthread_mutex_lock(&(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_));
+    if (!set_) pthread_cond_wait(&(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      condition_), &(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_));
+    pthread_mutex_unlock(&(
+#ifndef HAVE_MUTABLE
+      ((Condition *)this)->
+#endif
+      mutex_));
     return 1;
       // 0 would be interpreted as timeout, which is not supported directly
       // do we need that? would require some more coding, with another thread
@@ -424,8 +456,8 @@ public:
     pthread_cond_broadcast(&condition_);
   }
 private:
-  pthread_mutex_t mutex_;
-  pthread_cond_t condition_;
+  mutable pthread_mutex_t mutex_;
+  mutable pthread_cond_t condition_;
   bool set_;
 };
 

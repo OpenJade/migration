@@ -31,4 +31,5 @@ Character Primitives
 (char-ci>=? #\a #\A --> #t
 
 String Primitives
+(string=? "abc" "abc" --> #t
 

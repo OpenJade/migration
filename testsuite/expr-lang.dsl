@@ -50,7 +50,7 @@
 )
 
 (define (test-string)
-    (empty-sosofo)
+  (testcase 'string=? "\latin-small-letter-a\latin-small-letter-b;c" "abc")
 )
 
 (define symbol-proc-map
@@ -59,7 +59,8 @@
         (char>? . ,char>?) (char>=? . ,char>=?) (char-ci=? . ,char-ci=?)
         (char-ci<? . ,char-ci<?) (char-ci<=? . ,char-ci<=?)
         (char-ci>? . ,char-ci>?) (char-ci>=? . ,char-ci>=?)
-    )     
+	(string=? . ,string=?)
+	)
 )
      
 (define (symbol->proc sym) (cdr (assoc sym symbol-proc-map)))     

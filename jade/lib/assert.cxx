@@ -1,6 +1,8 @@
 // Copyright (c) 1994 James Clark
 // See the file COPYING for copying permission.
 
+#ifdef SP_USE_OWN_ASSERT
+
 #include "splib.h"
 #include <stdlib.h>
 #include "macros.h"
@@ -22,3 +24,4 @@ void assertionFailed(const char *, const char *, int)
 #ifdef SP_NAMESPACE
 }
 #endif
+#endif /* SP_USE_OWN_ASSERT */

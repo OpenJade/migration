@@ -1398,6 +1398,7 @@ bool FlowObj::setImplicitChar(ELObj *obj, const Location &loc,
                                        Interpreter &interp)
 {
   CANNOT_HAPPEN();
+  return false;
 }
 
 

@@ -39,7 +39,7 @@ ParserApp::ParserApp(const char *requiredInternalCode)
   registerOption('x');
   registerOption('i', SP_T("entity"));
   registerOption('w', SP_T("warning_type"));
-  registerLongOption(SP_T("activate), 'a', SP_T("type"));
+  registerLongOption(SP_T("activate"), 'a', SP_T("type"));
   registerLongOption(SP_T("architecture"), 'A', SP_T("name"));
   registerLongOption(SP_T("show-open-entities"), 'e');
   registerLongOption(SP_T("max-errors"), 'E', SP_T("number"));

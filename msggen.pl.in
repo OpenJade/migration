@@ -191,6 +191,10 @@ namespace SP_NAMESPACE {
 END
 }
 
+if (defined($opt_l)) {
+    print "extern MessageModule $module;\n\n";
+}
+
 foreach $i (0 .. $#message) {
     if (defined($message[$i])) {
 	if ($type[$i] eq "") {
@@ -216,7 +220,11 @@ foreach $i (0 .. $#message) {
 	    }
 	    print ",\n";
 	}
-	print "MessageFragment::$module,\n";
+	if (defined($opt_l)) {
+	    print "&$module,\n";
+	} else {
+	    print "0,\n";
+	}
 	print "$i\n";
 	print "#ifndef SP_NO_MESSAGE_TEXT\n";
 	$str = $message[$i];

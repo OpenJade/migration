@@ -22,6 +22,7 @@ FlowObj::FlowObj()
 void FlowObj::process(ProcessContext &context)
 {
   context.startFlowObj();
+  context.validate(*this);
   unsigned flags = 0;
   pushStyle(context, flags);
   processInner(context);
@@ -282,7 +283,12 @@ void ParagraphFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startParagraph(*nic_);
+  context.
+    pushPrincipalPort(&fotb, new ProcessContext::Validator(ProcessContext::
+							  Validator::
+							  aDisplayOrInline));
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endParagraph();
 }
 
@@ -629,6 +635,8 @@ void SequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSequence();
+  // We *don't* push the principal port, so that the validator of the parent's
+  // port will be used.
   CompoundFlowObj::processInner(context);
   fotb.endSequence();
 }
@@ -753,9 +761,12 @@ void SimplePageSequenceFlowObj::processInner(ProcessContext &context)
     context.setPageType(i);
     for (int j = 0; j < HeaderFooter::nParts; j++) {
       if (hf_->part[j]) {
-        context.pushPrincipalPort(hf_fotb[i | (j << nPageTypeBits)]);
+        context.
+	  pushPseudoPort(hf_fotb[i | (j << nPageTypeBits)],
+			 new ProcessContext::Validator(ProcessContext::
+						       Validator::aInline));
 	hf_->part[j]->process(context);
-        context.popPrincipalPort();
+        context.popPseudoPort();
     }
   }
   }
@@ -981,9 +992,13 @@ void MultiModeFlowObj::processInner(ProcessContext &context)
 		      nic_->namedModes,
 		      fotbs);
   Vector<SymbolObj *> portSyms(nic_->namedModes.size());
-  for (size_t i = 0; i < portSyms.size(); i++)
+  Vector<ProcessContext::Validator *> validators(nic_->namedModes.size());
+  for (size_t i = 0; i < portSyms.size(); i++) {
     portSyms[i] = context.vm().interp->makeSymbol(nic_->namedModes[i].name);
-  context.pushPorts(nic_->hasPrincipalMode, portSyms, fotbs);
+    validators[i] =
+      new ProcessContext::Validator (ProcessContext::Validator::aAny);
+  }
+  context.pushPorts(nic_->hasPrincipalMode, portSyms, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMultiMode();
@@ -1506,9 +1521,9 @@ void FlowObj::fixCharNICs(const Char *ch, size_t n,
   Vector<size_t> dep;
   FunctionObj *func = context.currentStyleStack().
     actual(interp.charMapC(), interp, dep)->asFunction();
-  if (func->nRequiredArgs()>1
-      || (func->nRequiredArgs() + func->nOptionalArgs()
-	  + func->restArg() ? 1 : 0) == 0)
+  if (func && (func->nRequiredArgs()>1
+	       || (func->nRequiredArgs() + func->nOptionalArgs()
+		   + func->restArg() ? 1 : 0) == 0))
     func = 0;
   InsnPtr insn(func != 0 ? func->makeCallInsn(1, interp, loc, InsnPtr()) : InsnPtr());
   VM vm(interp);
@@ -1833,7 +1848,12 @@ void FractionFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portNumerator);
   labels[1] = context.vm().interp->portName(Interpreter::portDenominator);
-  context.pushPorts(0, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] =
+    new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  validators[1] =
+    new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  context.pushPorts(0, labels, fotbs, validators);
   // Fraction flow object doesn't have principal port,
   // so clear the current connection.
   CompoundFlowObj::processInner(context);
@@ -1910,7 +1930,11 @@ void ScriptFlowObj::processInner(ProcessContext &context)
   labels[3] = context.vm().interp->portName(Interpreter::portPostSub);
   labels[4] = context.vm().interp->portName(Interpreter::portMidSup);
   labels[5] = context.vm().interp->portName(Interpreter::portMidSub);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(6);
+  for (size_t i = 0; i<6; ++i)
+    validators[6] =
+      new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  context.pushPorts(1, labels, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endScript();
@@ -1933,7 +1957,12 @@ void MarkFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portOverMark);
   labels[1] = context.vm().interp->portName(Interpreter::portUnderMark);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] =
+    new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  validators[1] =
+    new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  context.pushPorts(1, labels, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMark();
@@ -1956,7 +1985,12 @@ void FenceFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portOpen);
   labels[1] = context.vm().interp->portName(Interpreter::portClose);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] =
+    new ProcessContext::Validator(ProcessContext::Validator::aSingleChar);
+  validators[1] =
+    new ProcessContext::Validator(ProcessContext::Validator::aSingleChar);
+  context.pushPorts(1, labels, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endFence();
@@ -1998,7 +2032,10 @@ void RadicalFlowObj::processInner(ProcessContext &context)
     fotb.radicalRadicalDefaulted();
   Vector<SymbolObj *> labels(1);
   labels[0] = context.vm().interp->portName(Interpreter::portDegree);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(1);
+  validators[0] =
+    new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  context.pushPorts(1, labels, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endRadical();
@@ -2039,7 +2076,11 @@ void MathOperatorFlowObj::processInner(ProcessContext &context)
   labels[0] = context.vm().interp->portName(Interpreter::portOperator);
   labels[1] = context.vm().interp->portName(Interpreter::portLowerLimit);
   labels[2] = context.vm().interp->portName(Interpreter::portUpperLimit);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(3);
+  for (size_t i = 0; i < 3; ++i)
+    validators[i] =
+      new ProcessContext::Validator(ProcessContext::Validator::aMathSequence);
+  context.pushPorts(1, labels, fotbs, validators);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMathOperator();
@@ -2334,7 +2375,12 @@ public:
     Vector<SymbolObj *> labels(2);
     labels[0] = context.vm().interp->portName(Interpreter::portHeader);
     labels[1] = context.vm().interp->portName(Interpreter::portFooter);
-    context.pushPorts(1, labels, fotbs);
+    Vector<ProcessContext::Validator *> validators(2);
+    validators[0] =
+      new ProcessContext::Validator(ProcessContext::Validator::aTableHF);
+    validators[1] =
+      new ProcessContext::Validator(ProcessContext::Validator::aTableHF);
+    context.pushPorts(1, labels, fotbs, validators);
     CompoundFlowObj::processInner(context);
     context.popPorts();
     if (context.inTableRow())
@@ -3027,9 +3073,14 @@ void CompoundExtensionFlowObj::processInner(ProcessContext &context)
   fotb.startExtension(*fo_, context.vm().currentNode, fotbs);
   if (portNames.size()) {
     Vector<SymbolObj *> portSyms(portNames.size());
-    for (size_t i = 0; i < portSyms.size(); i++)
+    Vector<ProcessContext::Validator *> validators(portNames.size());
+    for (size_t i = 0; i < portSyms.size(); i++) {
       portSyms[i] = context.vm().interp->makeSymbol(portNames[i]);
-    context.pushPorts(fo_->hasPrincipalPort(), portSyms, fotbs);
+      // FIXME. A way for extensions to specify accepted contents.
+      validators[i] =
+	new ProcessContext::Validator(ProcessContext::Validator::aAny);
+    }
+    context.pushPorts(fo_->hasPrincipalPort(), portSyms, fotbs, validators);
     CompoundFlowObj::processInner(context);
     context.popPorts();
   }

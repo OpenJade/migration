@@ -16,7 +16,8 @@ namespace DSSSL_NAMESPACE {
 ProcessContext::ProcessContext(Interpreter &interp, FOTBuilder &fotb)
 : Collector::DynamicRoot(interp), vm_(interp), flowObjLevel_(0), havePageType_(0), connectableStackLevel_(0)
 {
-  connectionStack_.insert(new Connection(&fotb));
+  connectionStack_.insert(new Connection(&fotb,
+			  new Validator(Validator::aRoot)));
 }
 
 void ProcessContext::process(const NodePtr &node)
@@ -377,6 +378,11 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
 
 void ProcessContext::endFlowObj()
 {
+  ASSERT(invalidLevels_.size() == 0 || flowObjLevel_ >= invalidLevels_.back());
+  if (invalidLevels_.size() > 0 && invalidLevels_.back() == flowObjLevel_) {
+    invalidLevels_.resize(invalidLevels_.size() - 1);
+    delete connectionStack_.get();
+  }
   flowObjLevel_--;
   if (flowObjLevel_ < principalPortSaveQueues_.size()) {
     IQueue<NodeSaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
@@ -394,14 +400,28 @@ ProcessContext::Connection::Connection(const StyleStack &s, Port *p, unsigned co
 {
 }
 
-ProcessContext::Connection::Connection(FOTBuilder *f)
-: fotb(f), port(0), nBadFollow(0), connectableLevel(0)
+ProcessContext::Connection::Connection(FOTBuilder *f, Validator *v,
+				       const StyleStack &s)
+: fotb(f), port(0), nBadFollow(0), connectableLevel(0), validator(v),
+  styleStack(s)
 {
+}
+
+void ProcessContext::validate(const FlowObj &fo)
+{
+  if (!connectionStack_.head()->
+      validator->isValid(fo, Location(), *vm().interp)) {
+    invalidLevels_.resize(invalidLevels_.size() + 1);
+    invalidLevels_.back() = flowObjLevel_;
+    // FIXME: Is this the right thing to do? (i.e. how about the style stack?)
+    pushPseudoPort(&ignoreFotb_, new Validator(Validator::aAny));
+  }
 }
 
 void ProcessContext::pushPorts(bool,
 			       const Vector<SymbolObj *> &labels,
-			       const Vector<FOTBuilder *> &fotbs)
+			       const Vector<FOTBuilder *> &fotbs,
+			       const Vector<Validator *> validators)
 {
   Connectable *c = new Connectable(labels.size(), currentStyleStack(), flowObjLevel_);
   connectableStack_.insert(c);
@@ -419,12 +439,25 @@ void ProcessContext::popPorts()
   delete connectableStack_.get();
 }
 
-void ProcessContext::pushPrincipalPort(FOTBuilder* principalPort)
+void ProcessContext::pushPrincipalPort(FOTBuilder* principalPort,
+				       Validator *validator)
 {
-  connectionStack_.insert(new Connection(principalPort));
+  connectionStack_.insert(new Connection(principalPort, validator,
+					 currentStyleStack()));
 }
 
 void ProcessContext::popPrincipalPort()
+{
+  delete connectionStack_.get();
+}
+
+void ProcessContext::pushPseudoPort(FOTBuilder* principalPort,
+				       Validator *validator)
+{
+  connectionStack_.insert(new Connection(principalPort, validator));
+}
+
+void ProcessContext::popPseudoPort()
 {
   delete connectionStack_.get();
 }
@@ -543,6 +576,25 @@ void ProcessContext::trace(Collector &c) const
         c.trace(styles[i][j]);
   }
 }
+
+bool ProcessContext::Validator::isValid(const FlowObj &fo,
+			     const Location &loc,
+			     Interpreter &interp)
+{
+  switch (accept_) {
+  case aInline:
+    return false;
+  }
+  return true;
+}
+
+bool ProcessContext::Validator::charsValid(size_t n,
+					   const Location &loc,
+					   Interpreter &interp)
+{
+  return false;
+}
+
 SosofoObj *SosofoObj::asSosofo()
 {
   return this;

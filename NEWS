@@ -7,7 +7,7 @@ Changes in OpenSP 1.5pre6
   when the DTD resides on a name-based "Virtual Host".
   Thanks to 'tbe'.
 
-* Some GCC >= 2.96 fixes
+* Some GCC >= 2.96 fixes and other build improvements
 
 * A few minor documentation improvements, thanks to Terje Bless
 

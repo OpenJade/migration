@@ -4339,6 +4339,23 @@ void TeXFOTBuilder::setParagraphNIC(const ParagraphNIC &nic)
 
 void TeXFOTBuilder::setCharacterNIC(const CharacterNIC &nic)
 {
+#if 1
+  if (nic.valid) {
+    set("Ch",(unsigned long)nic.ch);
+    set("GlyphId",nic.glyphId);
+    set("BreakBeforePriority",nic.breakBeforePriority);
+    set("MathClass",nic.mathClass);
+    set("MathFontPosture",nic.mathFontPosture);
+    stringout_ << "\\def\\Script%\n{" << nic.script+29 << '}';
+    set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
+    set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
+    set("IsPunct",nic.isPunct);
+    set("IsInputWhiteSpace",nic.isInputWhitespace);
+    set("IsInputTab",nic.isInputTab);
+    set("IsRecordEnd",nic.isRecordEnd);
+    set("IsSpace",nic.isSpace);
+  }
+#else
   if (nic.specifiedC & (1 << CharacterNIC::cChar))
     set("Ch",(unsigned long)nic.ch);
   if (nic.specifiedC & (1 << CharacterNIC::cGlyphId))
@@ -4367,6 +4384,7 @@ void TeXFOTBuilder::setCharacterNIC(const CharacterNIC &nic)
     set("IsRecordEnd",nic.isRecordEnd);
   if (nic.specifiedC & (1 << CharacterNIC::cIsSpace))
     set("IsSpace",nic.isSpace);
+#endif
   MAYBESET("StretchFactor",nic.stretchFactor,1.0);
 }
 

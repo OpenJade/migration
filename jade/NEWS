@@ -6,8 +6,8 @@ Changes in OpenJade 1.4-devel
 * A new external procedure with public identifier
   "UNREGISTERED::OpenJade//Procedure::uri-ref-address" returns an address
   object to the supplied URI. This allows hyperlinks to resources of the WWW
-  in documents. Currently URI references are implemented in the HTML/CSS back
-  end.
+  in documents. Currently URI references are implemented in the HTML/CSS 
+  and TeX backends.
 
 * The command line option --help gives a summary of the usage and all
   supported command line options.

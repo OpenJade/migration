@@ -2901,7 +2901,8 @@ void TeXFOTBuilder::startLink(const Address &addr)
     message(TeXMessages::unsupportedLinkTei);
     break;
   case Address::html:
-    message(TeXMessages::unsupportedLinkHtml);
+    set("Label",addr.params[0]);
+    set("LinkType", "url");
     break;
   }
   if (addr.node) {

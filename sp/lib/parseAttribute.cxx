@@ -145,13 +145,46 @@ Boolean Parser::parseAttributeValueSpec(Boolean inDecl,
   }
   unsigned index;
   if (!atts.attributeIndex(name, index)) {
-    if (!implydefAttlist())
-      message(ParserMessages::noSuchAttribute, StringMessageArg(name));
     if (newAttDef.isNull())
       newAttDef = new AttributeDefinitionList(atts.def());
-    newAttDef
-      ->append(new ImpliedAttributeDefinition(name,
-					      new CdataDeclaredValue));
+    AttributeDefinition *newDef = 0;
+    if (!inInstance()) {
+      // We are parsing a data attribute specification
+      Ptr<Notation> notation;
+      Dtd::NotationIter notationIter(currentDtdNonConst().notationIter());
+      for (;;) {
+        notation = notationIter.next();
+        if (notation.isNull()
+            || atts.def() == notation->attributeDef())
+	  break;
+      }
+      ASSERT(!notation.isNull());
+      if (!notation->defined()) {
+        Notation *nt =
+          lookupCreateNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+        ConstPtr<AttributeDefinitionList> common = nt->attributeDef();
+        if (!common.isNull() && common->attributeIndex(name, index)) {
+          newDef = common->def(index)->copy();
+          newDef->setSpecified(1);
+        }
+      }
+      if (!newDef) {
+        Notation *nt =
+          lookupCreateNotation(syntax().rniReservedName(Syntax::rALL));
+        ConstPtr<AttributeDefinitionList> common = nt->attributeDef();
+        if (!common.isNull() && common->attributeIndex(name, index)) {
+          newDef = common->def(index)->copy();
+          newDef->setSpecified(0);
+        }
+      }
+    }
+    if (!newDef) {
+      if (!implydefAttlist())
+        message(ParserMessages::noSuchAttribute, StringMessageArg(name));
+      newDef = new ImpliedAttributeDefinition(name,
+                                              new CdataDeclaredValue);
+    }
+    newAttDef->append(newDef);
     atts.changeDef(newAttDef);
     index = atts.size() - 1;
   }

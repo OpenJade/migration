@@ -91,9 +91,12 @@ SingleByteWin32Decoder::SingleByteWin32Decoder(unsigned int codePage,
 {
   for (int i = 0; i < 256; i++) {
     char c = i;
+    wchar_t mapped;
     if (MultiByteToWideChar(codePage, MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-			    &c, 1, map_ + i, 1) == 0)
+			    &c, 1, &mapped, 1) == 0)
       map_[i] = defaultChar;
+    else 
+      map_[i] = Char(mapped);
   }
 }
 
@@ -137,9 +140,13 @@ size_t MultiByteWin32Decoder::decode(Char *to, const char *from,
   if ((fromLen - i) & 1)
     fromLen--;
 
+  String<wchar_t> tow;
+  tow.resize(fromLen);
   int count = MultiByteToWideChar(codePage_,
 				  MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-				  from, fromLen, to, fromLen);
+				  from, fromLen, tow.data(), fromLen);
+  for (size_t i = 0; i < count; i++)
+    to[i] = Char(tow[i]);
   if (count) {
     *rest = from + fromLen;
     return count;
@@ -149,9 +156,12 @@ size_t MultiByteWin32Decoder::decode(Char *to, const char *from,
   while (fromLen > 0) {
     int nBytes = 1 + isLeadByte_[(unsigned char)*from];
     ASSERT(nBytes <= fromLen);
+    wchar_t tow;
     if (MultiByteToWideChar(codePage_, MB_PRECOMPOSED|MB_ERR_INVALID_CHARS,
-			    from, nBytes, to, 1) != 1)
+			    from, nBytes, &tow, 1) != 1)
       *to = defaultChar_;
+    else
+      *to = Char(tow);
     from += nBytes;
     fromLen -= nBytes;
     to++;
@@ -169,7 +179,7 @@ Win32Encoder::~Win32Encoder()
 {
   delete [] buf_;
 }
-
+x
 void Win32Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   if (n == 0)

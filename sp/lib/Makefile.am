@@ -2,7 +2,7 @@
 
 lib_LTLIBRARIES= libosp.la
 
-libosp_la_LDFLAGS = -version-info 1:0:0
+libosp_la_LDFLAGS = -version-info 2:0:0
 
 ## We list the generated sources here. This has the side-effect
 ## of putting them in the distribution, but that is actually nice
@@ -56,7 +56,8 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
 	splibpch.h token.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
 	parser_inst.cxx xentmgr_inst.cxx SubstTable.cxx \
-	UTF16CodingSystem.cxx Fixed4CodingSystem.cxx
+	UTF16CodingSystem.cxx Fixed4CodingSystem.cxx \
+	memcmp.c memmove.c strerror.c
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 
@@ -78,7 +79,7 @@ EXTRA_DIST = ArcEngineMessages.msg ArcEngineMessages.rc \
 	parser_inst.m4 xentmgr_inst.m4 WinInetStorage.cxx \
 	WinInetStorageMessages.h WinInetStorageMessages.msg \
 	WinInetStorageMessages.rc WinApp.cxx Win32CodingSystem.cxx \
-	lib.rc lib.dsp
+	lib.rc lib.dsp .cvsignore
 
 MSGGENFLAGS = -l libModule
 

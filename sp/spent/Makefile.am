@@ -8,7 +8,8 @@ ospent_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
-EXTRA_DIST = spent.dsp SpentMessages.msg SpentMessages.rc
+EXTRA_DIST = spent.dsp SpentMessages.msg SpentMessages.rc \
+	.cvsignore
 
 BUILT_SOURCES = SpentMessages.msg SpentMessages.rc
 

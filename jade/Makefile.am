@@ -37,13 +37,6 @@ BUILT_SOURCES = JadeMessages.h JadeMessages.rc \
 	TeXFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx \
 	MifFOTBuilder_inst.cxx
 
-HtmlFOTBuilder.o: HtmlFOTBuilder_inst.cxx HtmlMessages.h
-RtfFOTBuilder.o: RtfFOTBuilder_inst.cxx RtfMessages.h
-TeXFOTBuilder.o: TeXFOTBuilder_inst.cxx TeXMessages.h
-MifFOTBuilder.o: MifFOTBuilder_inst.cxx MifMessages.h
-TransformFOTBuilder.o: TransformFOTBuilder_inst.cxx
-jade.o: JadeMessages.h
-
 SUFFIXES = .msg .m4
 
 .m4.cxx:
@@ -51,5 +44,3 @@ SUFFIXES = .msg .m4
 
 %.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
-
-

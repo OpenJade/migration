@@ -15,9 +15,6 @@ EXTRA_DIST = grove_inst.m4 spgrove.dsp
 
 BUILT_SOURCES = grove_inst.cxx
 
-GroveBuilder.o: grove_inst.cxx
-GroveBuilder.lo: grove_inst.cxx
-
 SUFFIXES = .m4 .msg
 
 .m4.cxx:

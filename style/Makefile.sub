@@ -2,12 +2,12 @@ LTVERSION=0:0:0
 LIB=ostyle
 DEPLIBS=-lm -L$(TOP)/grove/.libs -logrove -L$(TOP)/lib/.libs -losp 	\
   -L$(TOP)/spgrove/.libs -lospgrove
-OBJS=DocumentGenerator.o\
-  TransformationMode.o\
+OBJS=InterpreterMessages.o \
+  DocumentGenerator.o \
+  TransformationMode.o \
   LangObj.o \
   Collector.o \
   DssslApp.o \
-  InterpreterMessages.o \
   DssslSpecEventHandler.o \
   ELObj.o \
   ELObjMessageArg.o \
@@ -46,3 +46,5 @@ primitive.lo: primitive_inst.cxx
 DssslApp.lo: jade_version.h DssslAppMessages.h
 InterpreterMessages.o: InterpreterMessages.h
 InterpreterMessages.lo: InterpreterMessages.h
+
+

@@ -665,6 +665,11 @@ openjade demo.sgm
         only recognized character repertoire is the built-in
         repertoire. It has the public identifier 
         <code>&quot;UNREGISTERED::OpenJade//Character Repertoire::OpenJade&quot;</code>.</font></p>
+
+	<p><font face="Arial">Character properties are supported, but
+	<code>declare-char-characteristic+property</code> is only
+	partially supported.</font></p>
+
         <h3><font face="Arial">Validation</font></h3>
         <p><font face="Arial">Several things that it would be
         desirable to have checked aren't checked: </font></p>
@@ -675,21 +680,16 @@ openjade demo.sgm
                 allowed as the value of some characteristic; #t
                 and #f are treated as a special kind of symbol in
                 this case.</font></li>
-            <li><font face="Arial">OpenJade doesn't check whether
-                a flow object is occurring in a context where it
-                is allowed.</font></li>
-            <li><font face="Arial">OpenJade does not prevent flow
-                objects being attached to the principal port of a
-                flow object when the flow object shouldn't have a
-                principal port.</font></li>
+            <li><font face="Arial">OpenJade checks whether
+                a standard flow object is occurring in a context where it
+                is allowed, however extension flow objects (declared with
+		<code>declare-flow-object-class</code>) are not
+                checked by the front-end.</font></li>
             <li><font face="Arial">Most type-checking is done at
                 run-time not compile-time.</font></li>
             <li><font face="Arial">OpenJade does not check for
                 non-inherited characteristics that are required
                 to be specified.</font></li>
-            <li><font face="Arial">It doesn't check that optional
-                features that have been used were declared in the
-                features form.</font></li>
         </ul>
         <h3><font face="Arial">Other limitations</font></h3>
         <p><font face="Arial">The following primitives are just

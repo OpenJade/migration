@@ -27,6 +27,17 @@ Things which are missing and need a lot of work
 
 * check table-auto-width and multi-process features.
 
+* An XSLFO backend ? Would try to approximate the DSSSL FOT into an XSLFO
+  document. Then we could take advantage of existing XSL formatters. We could
+  also drop JadeTeX in favor of PassiveTeX (when it gets ready) then.
+
+* TeXFOTBuilder: Only output Start/EndNode pairs for nodes actually referred to
+  (see RtfFOTBuilder).
+
+* Do page feature in the front-end.
+
+* TeX backend: Implement general indirect FOs by outputting relevant info from
+  a TeX run and reading that info in the next OJ run.
 
 Simple things
 =============
@@ -42,7 +53,19 @@ Simple things
 * Set up framework for I18N: generating .po from .msg, po/OpenXYZ.pot from ../*.po,
   generate and install .mo files. See GNU gettext Makefile.in.in.
 
+* Remove FOTBuilder::characters(const Vector<CharacterNIC> &) and instead add
+  a procedure that lets the backend query character properties for a Char
+  array. Makes storing parts of the FOT more efficient (otherwise,
+  SaveFOTBuilder will have to store the NIC Vectors, for example.)
+  Should be done before next release.
 
+* A way for backends to declare/access extension character properties.
+  (Not needed until we have a backend that actually would do this.)
+
+* Validation of extension flow objects. (Not very important, since the backends
+  can handle these special cases without major effort.) Instead we could add a
+  FOTBuilder::FOMessage() non-virtual, so that backends may produce consistent
+  error messages without knowing about ProcessContext internals.
 
 Things which have to be added to the jade internals documentation
 =================================================================

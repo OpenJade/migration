@@ -1,5 +1,8 @@
 Changes in OpenJade 1.3
 
+* Jade ignores duplicate keywords in make expressions, as 
+  mandated by DSSSL.
+
 * External procedure with public identifier
 
   "UNREGISTERED::OpenJade//Procedure::language"

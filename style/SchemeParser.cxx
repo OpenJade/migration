@@ -1232,14 +1232,19 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
       return 0;
     if (!tem)
       break;
-    // FIXME check for duplicates
     if (keys.size() == exprs.size()) {
       const Identifier *k = tem->keyword();
       if (k) {
-	keys.push_back(k);
 	tem.clear();
 	if (!parseExpression(0, tem, key, tok))
 	  return 0;
+        size_t i;
+        for (i = 0; i < keys.size(); i++) 
+          if (keys[i]->name() == k->name()) 
+            break;
+        if (i < keys.size())
+          continue;
+        keys.push_back(k);
       }
     }
     exprs.resize(exprs.size() + 1);

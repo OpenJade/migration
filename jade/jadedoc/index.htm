@@ -47,7 +47,7 @@ content="text/html; charset=iso-8859-1">
             <li><a
                 href="#limitations"><font
                 face="Arial">Current OpenJade Limitations</font></a></li>
-            <li><a href="../NEWS"><font
+            <li><a href="NEWS"><font
                 face="Arial">New additions to previous versions</font></a></li>
             <li><a href="dsssl2.htm"><font face="Arial">Experimental
                 DSSSL extensions</font></a></li>
@@ -251,25 +251,28 @@ openjade demo.sgm
                         ignored unless the value of the <code>type</code>
                         attribute is one of <code>text/dsssl</code>,
                         <code>text/x-dsssl</code>, <code>application/dsssl</code>,
-                        or <code>application/x-dsssl</code>. The
-                        value of <code>href</code> attribute is
-                        the system identifier of the DSSSL
-                        specification.
-                        Additionally, you may specify the <code>title</code>
-                        and <code>media</code> attributes. If the 
-                        <code>title</code> attribute is specified, the 
-                        processing instruction will be ignored unless a
-                        <code>-T</code> command line option with the same
-                        argument was specified. If the <code>media</code> 
-                        attribute is specified (a comma-separated list of 
-                        media types), the processing instruction will be 
-                        ignored unless the selected backend is suitable for 
-                        one of the listed media types. See the <a 
+                        or <code>application/x-dsssl</code>. It is also
+                        ignored if the selected backend is not suitable 
+                        for one of the media types listed as the value of 
+                        the <code>media</code> attribute. 
+                        OpenJade recognizes the media types
+                        &quot;print&quot; (FOT, RTF, TeX and MIF backends) and
+                        &quot;screen&quot; (FOT and HTML backends).
+                        See the <a
                         href="http://www.w3.org/TR/1998/REC-html40-19980424"
                         >HTML4.0 specification</a> for a list of valid media
-                        types. OpenJade recognizes the media types 
-                        &quot;print&quot; (FOT, RTF, TeX and MIF backends) and 
-                        &quot;screen&quot; (FOT and HTML backends).</font></dd>
+                        types. 
+                        The value of <code>href</code> attribute is
+                        the system identifier of the DSSSL
+                        specification.
+                        If there are multiple processing instructions in
+                        the prolog, OpenJade selects one according to
+                        the mechanism described in the <a
+                        href="http://www.w3.org/TR/1998/REC-html40-19980424"
+                        >HTML4.0 specification</a>, taking the 
+                        values of the <code>alternate</code> and 
+                        <code>title</code> attributes into account. 
+                        </font></dd>
                     <dt><font face="Arial"><code>&lt;?dsssl </code><code><var>sysid</var></code><code>&gt;</code>
                         </font></dt>
                     <dd><font face="Arial">The system identifier

@@ -45,6 +45,7 @@ public:
     PackedBoolean intDecl;
     PackedBoolean extDecl;
     PackedBoolean sdataAsPi;
+    PackedBoolean preserveCase;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,
@@ -86,6 +87,7 @@ private:
   void inputOpened(InputSource *in);
   void inputClosed(InputSource *in);
   const StringC &generalName(const StringC &name, StringC &buf);
+  Boolean equalsIgnoreCase(const StringC &str1, StringC &str2);
   char *convertSuffix(char *name);
   Boolean checkFirstSeen(const StringC &name);
 

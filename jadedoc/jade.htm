@@ -4,7 +4,9 @@
 <title>Jade - James' DSSSL Engine</title>
 <body bgcolor="#ffffff">
 <h1>Jade - James' DSSSL Engine</h1>
-
+<p><strong>Note:</strong> This file documents the last version
+  released by James, 1.2.1. For changes in OpenJade releases since 
+  then, look at <a href="../NEWS">NEWS</a>.  
 <h2>Contents</h2>
 <UL>
 <LI><A HREF="#whatis">What is Jade?</A>
@@ -14,6 +16,11 @@
 <UL>
 <LI><A HREF="#building-win32">Win32</A>
 <LI><A HREF="#building-unix">Unix</A>
+</UL>
+<LI><A HREF="#install">Installing Jade</A>
+<UL>
+<LI><A HREF="#install-win32">Win32</A>
+<LI><A HREF="#install-unix">Unix</A>
 </UL>
 <LI><A HREF="#using">Using Jade</A>
 <LI><A HREF="#extensions">Jade Extensions</A>
@@ -151,25 +158,36 @@ The distributions include the sources for a compatible version of SP
 
 <h3><A NAME=building-win32>Win32</A></h3>
 <p>
-Only Microsoft Visual C++ 6.0 is supported.  To build using the Visual
-Studio GUI, open the workspace <code>jade.dsw</code> and build the
-<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
-project.  To build on the command line, ensure that the directory
-containing <code>msdev</code> is in your path, typically by executing
+Only Microsoft Visual C++ 6.0 is supported. Also, Perl 5 is required; the 
+executable must be on your PATH.
+</p>
+<p>
+To build on the command line, ensure that the directories
+containing <code>msdev</code> and <code>nmake</code> are in your path, 
+typically by executing
 the command:
 <pre>
-path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;%path%
+path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;
+    C:/Program Files/Microsoft Visual Studio/VC98/Bin;%path%
 </pre>
 <p>
-then run the command:
+(all in one long line) then run the command:
 <pre>
-msdev jade.dsw /make "all - Win32 Release"
+build-win32.bat
 </pre>
-
+<p>
+To build using the Visual
+Studio GUI, open the workspace <code>jade.dsw</code> and build the
+<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
+project.  You must first do a command-line build, however, to get
+the perl-generated files.
+</p>
 <h3><A NAME=building-unix>Unix</A></h3>
 <p>
 The following compilers should work:
 <ul>
+<li>gcc 2.95
+<li>egcs 1.1.2
 <li>egcs 1.0.2
 <li>gcc 2.8.1
 <li>gcc 2.7.2
@@ -184,7 +202,29 @@ that you must use -DSP_MULTI_BYTE. If you plan to do any development,
 also do <code>make depend</code>.
 <p>
 Alternatively you can build using the <a
-HREF="autoconf.htm">experimental autoconf support</a>.
+HREF="autoconf.htm">experimental autoconf support</a>. This
+will soon be the recommended method.
+
+<h2><A NAME=install>Installing Jade</A></h2>
+
+<h3><A NAME=install-win32>Win32</A></h3>
+<p>
+OpenJade requires the file <code>dsssl/builtins.dsl</code> to operate. 
+You can tell OpenJade where this file is in one of two ways:
+<ul>
+<li>By including a SYSTEM catalog entry for "builtins.dsl" pointing to this 
+file. See <code>dsssl/catalog</code> for an example.</li>
+<li>By including the <code>dsssl/catalog</code> catalog with the 
+<code>-c</code> command line option or the <code>SGML_CATALOG_FILES</code>
+environment variable.</li>
+</ul>
+<h3><A NAME=install-unix>Unix</A></h3>
+<p>
+Run
+<pre>
+make install
+</pre>
+as <code>root</code>.
 
 <h2><A NAME=using>Using Jade</A></h2>
 <P>
@@ -308,14 +348,15 @@ If there is no input filename, then the extension is added onto
 <CODE>jade-out</CODE>.
 <DD>
 <DT>
-<CODE>-V <VAR>variable</VAR></CODE>
+<CODE>-V <VAR>variable[=value]</VAR></CODE>
 <DD>
 This is equivalent to doing
 <PRE>
-(define <VAR>variable</VAR> #t)
+(define <VAR>variable</VAR> "value")
 </PRE>
 except that this definition will take priority over any definition of
-<VAR>variable</VAR> in a style-sheet.
+<VAR>variable</VAR> in a style-sheet. If the optional part [=value]
+is omitted, the variable is set to #t.
 </DL>
 <P>
 Jade ignores the <SAMP>SP_CHARSET_FIXED</SAMP> and
@@ -401,6 +442,22 @@ This returns a string containing the contents of the external entity
 with system identifier <code><var>string</var></code>.  This should be
 used only for textual entities (CDATA and SDATA), and not for binary
 entities (NDATA).
+
+<h3>POSIX locale access</h3>
+<pre>
+(language <var>lang</var> <var>country</var>)
+</pre>
+<p>
+This procedure returns an object of type <code>language</code>, if the
+system supports the specified language. <code><var>lang</var></code> is
+a string or symbol giving the two letter language code.
+<code><var>country</var></code> is a string or symbol giving the tro letter
+country code.
+
+<p>
+This procedure uses POSIX locales. Its public identifier is
+"UNREGISTERED::OpenJade//Procedure::language."
+
 
 <h2><A NAME="limitations">Current Jade Limitations</A></h2>
 <p>

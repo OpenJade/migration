@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /Yu"splib.h" /FD /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "..\include" /I "..\generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /D SP_HAVE_LOCALE=1 /Yu"splib.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "NDEBUG"
@@ -113,7 +113,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -127,7 +127,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -153,7 +153,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -167,7 +167,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -401,7 +401,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -415,7 +415,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -687,7 +687,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -701,7 +701,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1089,7 +1089,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1103,7 +1103,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

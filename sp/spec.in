@@ -79,11 +79,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %changelog
 * Fri Apr 09 2004 Terje Bless <link@pobox.com>
 - Add man pages to the "files" section for OpenSP.
-
-* Fri Apr 09 2004 Terje Bless <link@pobox.com>
 - Use _datadir macro for doc files (Karl Eichwalder and Ville Skytta).
-
-* Fri Apr 09 2004 Terje Bless <link@pobox.com>
 - Tweak name of l10n files; they get the lib's major rev appended.
 
 * Wed Feb 21 2001 Terje Bless <link@pobox.com>

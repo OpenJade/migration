@@ -19,6 +19,8 @@ using namespace GROVE_NAMESPACE;
 class DocumentGenerator {
 public:
   DocumentGenerator(SdataMapper *, OutputCharStream *);
+  void emit(const GroveStringListPtr &, const char *, const char *,
+	    const char *);
   void emit(const NodePtr &);
   void emit(const NodeListPtr &, const GroveString &);
 private:

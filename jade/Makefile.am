@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = check-news dist-zip
 
-SUBDIRS = style grove spgrove jadedoc dsssl jade 
+SUBDIRS = jadedoc dsssl style grove groveoa spgrove jade 
 
 ## Note that we include the windows-only aux files.
 EXTRA_DIST = config/config.sub config/ltconfig config/missing \

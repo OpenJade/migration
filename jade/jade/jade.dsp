@@ -416,6 +416,10 @@ InputName=TeXMessages
 # End Source File
 # Begin Source File
 
+SOURCE=.\TextFOTBuilder.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\TransformFOTBuilder.cxx
 # End Source File
 # Begin Source File

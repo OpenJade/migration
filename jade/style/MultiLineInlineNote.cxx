@@ -1,15 +1,19 @@
-
 #include "MultiLineInlineNote.h"
-#include <iostream.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
 
-MultiLineInlineNoteFlowObj::NIC::NIC()
+
+MultiLineInlineNoteFlowObj::MultiLineInlineNoteFlowObj()
+: openclose_(new NIC)
 {
-   for (int i = 0; i < 2; i++)
-    openclose[i] = 0;
+ hasSubObjects_ = 1;
+}
+
+MultiLineInlineNoteFlowObj::MultiLineInlineNoteFlowObj(const MultiLineInlineNoteFlowObj &fo)
+: CompoundFlowObj(fo), openclose_(new NIC(*fo.openclose_))
+{
 }
 
 void MultiLineInlineNoteFlowObj::traceSubObjects(Collector &c) const
@@ -25,10 +29,12 @@ void MultiLineInlineNoteFlowObj::processInner(ProcessContext &context)
   FOTBuilder &fotb = context.currentFOTBuilder();
   //dos apuntadores diferentes para port al FOTBuilder
   FOTBuilder* openclosefotb[2];
-  fotb.startMultiLineInlineNote(*nic_, openclosefotb);
+  FOTBuilder::MultiLineInlineNoteNIC* tmpnic;
+  tmpnic = openclose_->nic_;
+  fotb.startMultiLineInlineNote(*tmpnic, openclosefotb);
 
   //si existe para i=0 entrarara para open sino para close
-  for (int i=0; i<2; i++){
+  for (int i = 0; i<2; i++){
    if (openclose_->openclose[i]) {
       context.pushPrincipalPort(openclosefotb[i]);
       openclose_->openclose[i]->process(context);
@@ -68,17 +74,18 @@ void MultiLineInlineNoteFlowObj::setNonInheritedC(const Identifier *ident,
                                                  const Location &loc,
                                                  Interpreter &interp)
 {
- SosofoObj *sosofo = obj->asSosofo();
+ SosofoObj *sosofo;
  Identifier::SyntacticKey key;
  if (ident->syntacticKey(key)) {
   switch (key) {
    case Identifier::keyBreakBeforePriority:
-      interp.convertIntegerC(obj, ident, loc, nic_->breakBeforePriority);
+      interp.convertIntegerC(obj, ident, loc, openclose_->nic_->breakBeforePriority);
       return;
    case Identifier::keyBreakAfterPriority:
-      interp.convertIntegerC(obj, ident, loc, nic_->breakAfterPriority);
+      interp.convertIntegerC(obj, ident, loc, openclose_->nic_->breakAfterPriority);
       return;
    case Identifier::keyOpen:
+      sosofo = obj->asSosofo();
       if (!sosofo) {
          interp.setNextLocation(loc);
          interp.message(InterpreterMessages::invalidCharacteristicValue,
@@ -88,6 +95,7 @@ void MultiLineInlineNoteFlowObj::setNonInheritedC(const Identifier *ident,
       openclose_->openclose[0] = sosofo;
       return;
    case Identifier::keyClose:
+      sosofo = obj->asSosofo();
       if (!sosofo) {
          interp.setNextLocation(loc);
          interp.message(InterpreterMessages::invalidCharacteristicValue,
@@ -101,7 +109,13 @@ void MultiLineInlineNoteFlowObj::setNonInheritedC(const Identifier *ident,
   }
  }
  CANNOT_HAPPEN();
+}
 
+MultiLineInlineNoteFlowObj::NIC::NIC()
+: nic_(new FOTBuilder::MultiLineInlineNoteNIC())
+{
+   for (int i = 0; i < 2; i++)
+    openclose[i] = 0;
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -416,8 +416,8 @@ void FOTBuilder::endAlignedColumn()
 void FOTBuilder::startMultiLineInlineNote(const MultiLineInlineNoteNIC &, FOTBuilder* openclosenic[2])
 {
 //para multi-line-inline-note.open y multi-line-inline-note.close
-  openclosenic[0] = this;
   openclosenic[1] = this;
+  openclosenic[0] = this;
   start();
 }
 
@@ -2340,9 +2340,9 @@ StartMultiLineInlineNoteCall::StartMultiLineInlineNoteCall(const SaveFOTBuilder:
 : arg(nic)
 {
   //multi-line-inline-note.open
-  openclosenic[0] = &argopenclose[0]; 
-  //multi-line-inline-note.close
   openclosenic[1] = &argopenclose[1]; 
+  //multi-line-inline-note.close
+  openclosenic[0] = &argopenclose[0]; 
 
 }
 
@@ -2748,7 +2748,7 @@ void SerialFOTBuilder::endMultiLineInlineNoteOpenClose()
 {
   //oco :)
   Owner<SaveFOTBuilder> oc[2];
-  for (int o=0; o < 2; o++){
+  for (int o=1; o >= 0; o--){
    oc[o] = save_.get();
    //indica que start (close o open) es mediante la o
    startMultiLineInlineNoteOpenClose(o);

@@ -24,15 +24,15 @@ public:
     return c.allocateObject(1);
   }
 
-  struct NIC : public FOTBuilder::InlineNIC {
+  struct NIC{
       NIC();
       SosofoObj *openclose[2];
+      FOTBuilder::MultiLineInlineNoteNIC *nic_;
   };
   
-  MultiLineInlineNoteFlowObj()
-   : nic_(new FOTBuilder::MultiLineInlineNoteNIC), openclose_(new NIC) { }
-  MultiLineInlineNoteFlowObj(const MultiLineInlineNoteFlowObj &fo)
-   : CompoundFlowObj(fo), nic_(new FOTBuilder::MultiLineInlineNoteNIC(*fo.nic_)), openclose_(new NIC(*fo.openclose_)) { }
+  MultiLineInlineNoteFlowObj();
+
+  MultiLineInlineNoteFlowObj(const MultiLineInlineNoteFlowObj &fo);
 
   void traceSubObjects(Collector &) const;
   void processInner(ProcessContext &);
@@ -41,8 +41,7 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
                         const Location &, Interpreter &);
 private:
-  Owner<FOTBuilder::MultiLineInlineNoteNIC> nic_;
-  Owner<NIC> openclose_; 
+  Owner<MultiLineInlineNoteFlowObj::NIC> openclose_; 
 };
 
 #ifdef DSSSL_NAMESPACE

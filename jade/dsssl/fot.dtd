@@ -82,8 +82,6 @@
 <!ELEMENT included-container-area %flow;>
 <!ELEMENT glyph-annotation %flow;>
 <!ELEMENT aligned-column %flow;>
-<!ELEMENT multi-line-inline-note %flow;>
-<!ELEMENT emphasizing-mark %flow;>
 <!ELEMENT side-by-side %flow;>
 <!ELEMENT side-by-side-item %flow;>
 <!ELEMENT leader %flow;>
@@ -136,6 +134,23 @@
 <!ELEMENT simple-page-sequence.right-footer %flow;>
 <!ELEMENT simple-page-sequence.center-footer %flow;>
 
+<!ELEMENT multi-line-inline-note
+  ((multi-line-inline-note.open
+    |multi-line-inline-note.close)*,
+  %flow;)
+>
+<!ELEMENT multi-line-inline-note.open %flow;>
+<!ELEMENT multi-line-inline-note.close %flow;>
+
+<!ELEMENT emphasizing-mark %flow;>
+  ((emphasizing-mark.mark)*,
+  %flow;)
+>
+<!ELEMENT emphasizing-mark.mark %flow;>
+
+
+
+
 <!ATTLIST column-set-sequence 
  %display-nic;
 >
@@ -157,12 +172,11 @@
 <!ATTLIST glyph-annotation 
  %glyphannotation-nic;
 >
-<!ATTLIST multi-line-inline-note 
- %multilineinlinenote-nic;
->
+
 <!ATTLIST emphasizing-mark 
  %emphasizingmark-nic;
 >
+<!ATTLIST emphasizing-mark.mark %hf;>
 
 <!ENTITY % hf "
   front %boolean; #IMPLIED
@@ -175,11 +189,11 @@
 <!ATTLIST simple-page-sequence.right-footer %hf;>
 <!ATTLIST simple-page-sequence.center-footer %hf;>
 
-<!ATTLIST page-sequence.right-header %hf;>
-<!ATTLIST page-sequence.center-header %hf;>
-<!ATTLIST page-sequence.left-footer %hf;>
-<!ATTLIST page-sequence.right-footer %hf;>
-<!ATTLIST page-sequence.center-footer %hf;>
+<!ATTLIST multi-line-inline-note 
+ %multilineinlinenote-nic;
+>
+<!ATTLIST multi-line-inline-note.open %hf;>
+<!ATTLIST multi-line-inline-note.close %hf;>
 
 <!ELEMENT table
 (table.before-row-border, table.after-row-border,

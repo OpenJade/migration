@@ -93,13 +93,6 @@
                          combine
                          (combine init (node-list-first nl)))))
 
-(define (node-list-contains? nl snl)
-  (node-list-reduce nl
-		    (lambda (result i)
-		      (or result
-			  (node-list=? snl i)))
-		    #f))
-
 (define (node-list-remove-duplicates nl)
   (node-list-reduce nl
 		    (lambda (result snl)

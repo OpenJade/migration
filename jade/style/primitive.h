@@ -170,6 +170,7 @@ PRIMITIVE(NodeListReverse, "node-list-reverse", 1, 0, 0, query)
 PRIMITIVE(NodeListLength, "node-list-length", 1, 0, 0, query)
 PRIMITIVE(SgmlParse, "sgml-parse", 1, 0, 1, query)
 PRIMITIVE(IsMatchElement, "match-element?", 2, 0, 0, query)
+PRIMITIVE(NodeListContains, "node-list-contains?", 2, 0, 0, query)
 // External procedures
 XPRIMITIVE(ReadEntity, "read-entity", 1, 0, 0)
 XPRIMITIVE(Debug, "debug", 1, 0, 0)

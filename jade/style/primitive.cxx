@@ -1857,6 +1857,21 @@ DEFPRIMITIVE(IsMatchElement, argc, argv, context, interp, loc)
   return interp.makeFalse();
 }
 
+DEFPRIMITIVE(NodeListContains, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  NodePtr node;
+  if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+		    InterpreterMessages::notASingletonNode, 1, argv[1]);
+  if (nl->contains(node)) 
+    return interp.makeTrue();
+  return interp.makeFalse();
+}
+
 DEFPRIMITIVE(ProcessNodeList, argc, argv, context, interp, loc)
 {
   if (!context.processingMode) {

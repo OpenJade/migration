@@ -584,7 +584,8 @@ void Entity::checkEntlvl(ParserState &parser)
 {
   // -1 because document entity isn't counted
   if (parser.inputLevel() - 1 == parser.syntax().entlvl())
-    parser.message(ParserMessages::entlvl);
+    parser.message(ParserMessages::entlvl, 
+                   NumberMessageArg(parser.syntax().entlvl()));
 }
 
 Boolean Entity::checkNotOpen(ParserState &parser) const

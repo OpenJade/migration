@@ -22,7 +22,7 @@ E1+duplicateGroupToken+10.1.3p6+token %1 has already occurred in this group
 Q1+groupCount+10.1.3.1+the number of tokens in a group must not exceed GRPCNT (%1)
 E0+literalLevel+10.1.2p6 9.1.1p3+an entity end in a literal must terminate an entity referenced in the same literal
 E1+literalMinimumData+10.1.7p3+character %1 invalid: only minimum data characters allowed
-#018E0+literalNonSgml+9.2p2+non-SGML character number %1 not allowed in literal
+-E0+literalNonSgml+9.2p2+non-SGML character number %1 not allowed in literal
 E0+dataTagPatternNonSgml+11.2.4.4p9+a parameter literal in a data tag pattern must not contain a numeric character reference to a non-SGML character
 E0+dataTagPatternFunction+11.2.4.4p9+a parameter literal in a data tag pattern must not contain a numeric character reference to a function character
 E0+eroGrpoStartTag+9.4.4p3+a name group is not allowed in a general entity reference in a start tag
@@ -32,7 +32,7 @@ E1+characterNumber+4.36+%1 is not a character number in the document character s
 E1+parameterEntityUndefined+9.4.4.1p2+parameter entity %1 not defined
 E1+entityUndefined+9.4.4.1p2+general entity %1 not defined and no default entity
 E0+rniNameStart++RNI delimiter must be followed by name start character
-#028E0+commentNonSgml+10.3p2+non-SGML character not allowed in comment
+-E0+commentNonSgml+10.3p2+non-SGML character not allowed in comment
 E0+commentEntityEnd+10.3p2+unterminated comment: found end of entity inside comment+comment started here
 W0+mixedConnectors+10.1.3p4+only one type of connector should be used in a single group
 E1+noSuchReservedName++%1 is not a reserved name
@@ -41,7 +41,7 @@ Q1+minimumLiteralLength+10.1.7.1+length of interpreted minimum literal must not 
 Q1+tokenizedAttributeValueLength+7.9.4.5 7.9.3p5+length of tokenized attribute value must not exceed LITLEN less NORMSEP (%1)
 Q1+systemIdentifierLength+10.1.6.1+length of system identifier must not exceed LITLEN (%1)
 Q1+parameterLiteralLength+10.1.2.1+length of interpreted parameter literal must not exceed LITLEN (%1)
-Q1+dataTagPatternLiteralLength+11.2.4.5p3+length of interpreted parameter literal in data tag pattern must not exceed DTEMPLEN
+Q1+dataTagPatternLiteralLength+11.2.4.5p3+length of interpreted parameter literal in data tag pattern must not exceed DTEMPLEN (%1)
 E0+literalClosingDelimiter++literal is missing closing delimiter
 E2+paramInvalidToken++%1 invalid: only %2 and parameter separators are allowed
 E2+groupTokenInvalidToken++%1 invalid: only %2 and token separators are allowed
@@ -55,7 +55,7 @@ E1+prologCharacter++character %1 not allowed in prolog
 E0+documentEndProlog++end of document in prolog
 E1+prologDeclaration++%1 declaration not allowed in prolog
 E1+rankStemGenericIdentifier+11.2.1p2+%1 used both a rank stem and generic identifier
-E0+missingTagMinimization+11.2p3+omitted tag minimization parameter can be omitted only if "OMITTAG NO" is specified on the SGML declaration
+E0+missingTagMinimization+11.2p3+omitted tag minimization parameter can be omitted only if OMITTAG NO is specified
 E1+duplicateElementDefinition+11.2p2+element type %1 already defined
 E0+entityApplicableDtd++entity reference with no applicable DTD
 E1+commentDeclInvalidToken+10.3p1+invalid comment declaration: found %1 outside comment but inside comment declaration+comment declaration started here
@@ -66,7 +66,7 @@ E1+duplicateAttlistNotation+11.4.1.1p4+duplicate attribute definition list for n
 E1+duplicateAttlistElement+11.3p4+duplicate attribute definition list for element %1
 E0+endTagEntityEnd++entity end not allowed in end tag
 E1+endTagCharacter++character %1 not allowed in end tag
-E1+endTagInvalidToken++%1 invalid: only s and tagc allowed here
+E1+endTagInvalidToken++%1 invalid: only S separators and TAGC allowed here
 E0+pcdataNotAllowed++character data is not allowed here
 E1+elementNotAllowed++document type does not allow element %1 here
 E2+missingElementMultiple++document type does not allow element %1 here; missing one of %2 start-tag
@@ -93,7 +93,7 @@ E0+piEntityReference+10.5.3p9+a reference to a PI entity is allowed only in a co
 E0+internalDataEntityReference+10.5.3p9+a reference to a CDATA or SDATA entity is allowed only in a context where a data character could occur
 E0+externalNonTextEntityReference+9.4p0+a reference to a subdocument entity or external data entity is allowed only in a context where a data character could occur
 E0+externalNonTextEntityRcdata+9.4p0+a reference to a subdocument entity or external data entity is not allowed in replaceable character data
-E0+entlvl+9.4.1+the number of open entities cannot exceed ENTLVL
+Q1+entlvl+9.4.1+the number of open entities cannot exceed ENTLVL (%1)
 E0+piEntityRcdata+10.5.3p9+a reference to a PI entity is not allowed in replaceable character data
 E1+recursiveEntityReference+9.4p4+entity %1 is already open
 E1+undefinedShortrefMapInstance+11.6.2p2+short reference map %1 not defined
@@ -104,17 +104,17 @@ E2+undefinedShortrefMapDtd+11.6.1p2+short reference map %1 for element %2 not de
 E1+unknownShortrefDelim+11.5p4+%1 is not a short reference delimiter
 E1+delimDuplicateMap+11.5p6+short reference delimiter %1 already mapped in this declaration
 E0+noDocumentElement++no document element
-#097E0+
+-E0+
 E0+processingInstructionEntityEnd++entity end not allowed in processing instruction
 Q1+processingInstructionLength+8.1p1+length of processing instruction must not exceed PILEN (%1)
-E0+processingInstructionClose++missing pic delimiter
+E0+processingInstructionClose++missing PIC delimiter
 E0+attributeSpecNameTokenExpected+7.9p2 7.9.1.2p1+an attribute specification must start with a name or name token
 E1+noSuchAttributeToken+7.9.1.2p1+%1 is not a member of a group specified for any attribute
-E0+attributeNameShorttag+7.9.1.2+the name and vi delimiter can be omitted from an attribute specification only if SHORTTAG YES is specified
+E0+attributeNameShorttag+7.9.1.2+the name and VI delimiter can be omitted from an attribute specification only if SHORTTAG YES is specified
 E1+noSuchAttribute++there is no attribute %1
 E0+attributeValueExpected+7.9.3p1+an attribute value specification must start with a literal or a name character
 Q1+nameTokenLength+9.3.1+length of name token must not exceed NAMELEN (%1)
-E0+attributeSpecLiteral+7.9.3p1 7.9.1.2p1+an attribute value literal can occur in an attribute specification list only after a vi delimiter
+E0+attributeSpecLiteral+7.9.3p1 7.9.1.2p1+an attribute value literal can occur in an attribute specification list only after a VI delimiter
 E1+duplicateAttributeSpec+7.9p5+duplicate specification of attribute %1
 E1+duplicateAttributeDef+11.3.2p2+duplicate definition of attribute %1
 E0+emptyDataAttributeSpec+11.4.1.2p3+data attribute specification must be omitted if attribute specification list is empty
@@ -137,8 +137,8 @@ E3+attributeValueNotInGroup+7.9.4.1p2+value of attribute %2 cannot be %1; must b
 E1+notDataOrSubdocEntity+7.9.4.3p1+%1 is not a data or subdocument entity
 E3+ambiguousModelInitial++content model is ambiguous: when no tokens have been matched, both the %2 and %3 occurrences of %1 are possible
 E5+ambiguousModel++content model is ambiguous: when the current token is the %2 occurrence of %1, both the %4 and %5 occurrences of %3 are possible
-E5+ambiguousModelSingleAnd++content model is ambiguous: when the current token is the %2 occurrence of %1 and the innermost containing and group has been matched, both the %4 and %5 occurrences of %3 are possible
-E6+ambiguousModelMultipleAnd++content model is ambiguous: when the current token is the %2 occurrence of %1 and the innermost %3 containing and groups have been matched, both the %5 and %6 occurrences of %4 are possible
+E5+ambiguousModelSingleAnd++content model is ambiguous: when the current token is the %2 occurrence of %1 and the innermost containing AND group has been matched, both the %4 and %5 occurrences of %3 are possible
+E6+ambiguousModelMultipleAnd++content model is ambiguous: when the current token is the %2 occurrence of %1 and the innermost %3 containing AND groups have been matched, both the %5 and %6 occurrences of %4 are possible
 E1+commentDeclarationCharacter++invalid comment declaration: found character %1 outside comment but inside comment declaration+comment declaration started here
 E1+nonSgmlCharacter++non SGML character number %1
 E0+dataMarkedSectionDeclSubset++data or replaceable character data in declaration subset
@@ -146,10 +146,10 @@ E1+duplicateId+4.153+ID %1 already defined+ID %1 first defined here
 E1+notFixedValue+4.136+value of fixed attribute %1 not equal to default
 E1+sdCommentSignificant++character %1 is not significant in the reference concrete syntax and so cannot occur in a comment in the SGML declaration
 E1+standardVersion+13p2+minimum data of first minimum literal in SGML declaration must be "ISO 8879:1986" or "ISO 8879:1986 (ENR)" or "ISO 8879:1986 (WWW)" not %1
-E1+namingBeforeLcnmstrt+13.4.5p1+parameter before "LCNMSTRT" must be "NAMING" not %1
+E1+namingBeforeLcnmstrt+13.4.5p1+parameter before LCNMSTRT must be NAMING not %1
 E1+sdEntityEnd+13p1+unexpected entity end in SGML declaration: only %1, S separators and comments allowed
 E2+sdInvalidNameToken++%1 invalid: only %2 and parameter separators allowed
-E1+numberTooBig++magnitude of %1 too big (length exceeds NAMELEN)
+E1+numberTooBig++magnitude of %1 too big
 E1+sdLiteralSignificant++character %1 is not significant in the reference concrete syntax and so cannot occur in a literal in the SGML declaration except as the replacement of a character reference
 E1+syntaxCharacterNumber+4.36+%1 is not a valid syntax reference character number
 E0+sdParameterEntity+451p7+a parameter entity reference cannot occur in an SGML declaration
@@ -180,8 +180,7 @@ E1+capacityExceedsTotalcap++value of capacity %1 exceeds value of TOTALCAP
 E1+unknownPublicSyntax++syntax %1 is unknown
 E0+nmstrtLength+13.4.5p13+UCNMSTRT must have the same number of characters as LCNMSTRT
 E0+nmcharLength+13.4.5p13+UCNMCHAR must have the same number of characters as LCNMCHAR
-# This isn't formally a quantity error, but we'll treat it as one.
-Q1+subdocLevel+9.4.2p1+number of open subdocuments exceeds quantity specified for SUBDOC parameter in SGML declaration (%1)
+E1+subdocLevel+9.4.2p1+number of open subdocuments exceeds quantity specified for SUBDOC parameter in SGML declaration (%1)
 E1+subdocEntity+10.5.5p12+entity %1 declared SUBDOC, but SUBDOC NO specified in SGML declaration
 E0+parameterEntityNotEnded+10.1.1p2+a parameter entity referenced in a parameter separator must end in the same declaration
 X1+missingId++reference to non-existent ID %1
@@ -227,8 +226,8 @@ E2+delimiterLength+13.4.6p5+length of delimiter %1 exceeds NAMELEN (%2)
 W2+reservedNameLength++length of reserved name %1 exceeds NAMELEN (%2)
 E1+nmcharNmstrt+13.4.5p12+character numbers assigned to both LCNMCHAR or UCNMCHAR and LCNMSTRT or UCNMSTRT: %1
 E0+scopeInstanceSyntaxCharset+13.3p7+when the concrete syntax scope is INSTANCE the syntax reference character set of the declared syntax must be the same as that of the reference concrete syntax
-W0+emptyOmitEndTag+11.2.2p8+end-tag minimization should be "O" for element with declared content of EMPTY
-W1+conrefOmitEndTag+11.2.2p8+end-tag minimization should be "O" for element %1 because it has CONREF attribute
+W0+emptyOmitEndTag+11.2.2p8+end-tag minimization should be O for element with declared content of EMPTY
+W1+conrefOmitEndTag+11.2.2p8+end-tag minimization should be O for element %1 because it has CONREF attribute
 E1+conrefEmpty+11.3.4p12+element %1 has a declared content of EMPTY and a CONREF attribute
 E1+notationEmpty+11.3.3p21+element %1 has a declared content of EMPTY and a NOTATION attribute
 E0+dataAttributeDeclaredValue+11.4.1p2+declared value of data attribute cannot be ENTITY, ENTITIES, ID, IDREF, IDREFS or NOTATION
@@ -312,7 +311,7 @@ E1+duplicateImpliedResult+12.2.2p6+#IMPLIED already linked to result element typ
 E1+simpleLinkCount+12.1.1.1p1+number of active simple link processes exceeds quantity specified for SIMPLE parameter in SGML declaration (%1)
 E0+duplicateExplicitChain+7.1p11+only one chain of explicit link processes can be active
 E1+explicit1RequiresSourceTypeBase+12.1.2p5 12.1.3p5 12.1.3.1+source document type name for link type %1 must be base document type since EXPLICIT YES 1
-E0+oneImplicitLink+7.1p10+one one implicit link process can be active
+E0+oneImplicitLink+7.1p10+only one implicit link process can be active
 W1+sorryLink++sorry, link type %1 not activated: only one implicit or explicit link process can be active (with base document type as source document type)
 E0+entityReferenceMissingName+9.4.4p1 9.4.4p2+name missing after name group in entity reference
 E1+explicitNoRequiresSourceTypeBase+12.1.2p5 12.1.3p5 12.1.3.1+source document type name for link type %1 must be base document type since EXPLICIT NO
@@ -387,21 +386,21 @@ W0+missingAttributeName++attribute name missing
 W0+elementGroupDecl++element declaration for group of element types
 W0+attlistGroupDecl++attribute definition list declaration for group of element types
 W0+emptyCommentDecl++empty comment declaration
-W0+commentDeclS++s separator in comment declaration
+W0+commentDeclS++S separator in comment declaration
 W0+commentDeclMultiple++multiple comments in comment declaration
 W0+missingStatusKeyword++no status keyword
 W0+multipleStatusKeyword++multiple status keywords
 W0+instanceParamEntityRef++parameter entity reference in document instance
 W0+current++current attribute
 W0+minimizationParam++element type minimization parameter
-W0+refc++reference not terminated by refc delimiter
+W0+refc++reference not terminated by REFC delimiter
 W0+pcdataNotFirstInGroup++#PCDATA not first in model group
-W0+pcdataInSeqGroup++#PCDATA in seq group
+W0+pcdataInSeqGroup++#PCDATA in SEQ group
 W0+pcdataInNestedModelGroup++#PCDATA in nested model group
-W0+pcdataGroupNotRep++#PCDATA in model group that does not have rep occurrence indicator
+W0+pcdataGroupNotRep++#PCDATA in model group that does not have REP occurrence indicator
 W0+nameGroupNotOr++name group or name token group used connector other than OR
 W0+piMissingName++processing instruction does not start with name
-W0+instanceStatusKeywordSpecS++s separator in status keyword specification in document instance
+W0+instanceStatusKeywordSpecS++S separator in status keyword specification in document instance
 W0+externalDataEntityRef++reference to external data entity
 W0+attributeValueExternalEntityRef++reference to external entity in attribute value
 W1+dataCharDelim++character %1 is the first character of a delimiter but occurred as data
@@ -423,19 +422,18 @@ W0+pcdataGroupMemberModelGroup++member of model group containing #PCDATA is a mo
 E0+entityRefNone++reference to non-predefined entity
 E0+entityRefInternal++reference to external entity
 E0+implydefEntityDefault++declaration of default entity conflicts with IMPLYDEF ENTITY YES
-E0+sorryActiveDoctypes++Parsing with respect to more than one active doctype not supported
-E0+activeDocLink+7.1+Cannot have active doctypes and link types at the same time
-# This isn't formally a quantity error, but we'll treat it as one.
-Q1+concurrentInstances+7.2.1+number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)
+E0+sorryActiveDoctypes++parsing with respect to more than one active doctype not supported
+E0+activeDocLink+7.1+cannot have active doctypes and link types at the same time
+E1+concurrentInstances+7.2.1+number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)
 E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document type
 E0+emptyStartTagBaseDtd+7.4.1.1+element not in the base document type can't have an empty start-tag
 E0+emptyEndTagBaseDtd+7.5.1.1+element not in base document type can't have an empty end-tag
 W0+immediateRecursion++immediately recursive element
-E1+urnMissingField++invalid universal resource name %1: missing : 
-E1+urnMissingPrefix++invalid universal resource name %1: missing urn: prefix 
-E1+urnInvalidNid++invalid universal resource name %1: invalid namespace identifier  
-E1+urnInvalidNss++invalid universal resource name %1: invalid namespace specific string 
-E1+urnExtraField++invalid universal resource name %1: extra field
+E1+urnMissingField++invalid URN %1: missing ":" 
+E1+urnMissingPrefix++invalid URN %1: missing "urn:" prefix 
+E1+urnInvalidNid++invalid URN %1: invalid namespace identifier  
+E1+urnInvalidNss++invalid URN %1: invalid namespace specific string 
+E1+urnExtraField++invalid URN %1: extra field
 E0+omittedProlog++prolog can't be omitted unless CONCUR NO and LINK EXPLICIT NO and either IMPLYDEF ELEMENT YES or IMPLYDEF DOCTYPE YES
 E0+impliedDocumentElement++can't determine name of #IMPLIED document element
 E0+impliedDoctypeConcurLink++can't use #IMPLICIT doctype unless CONCUR NO and LINK EXPLICIT NO

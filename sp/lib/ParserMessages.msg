@@ -268,7 +268,7 @@ Q2+attsplen+7.9.2+normalized length of attribute specification list must not exc
 E1+duplicateDelimShortref+13.4.6p2+short reference delimiter %1 already specified
 E1+duplicateDelimShortrefSet+13.4.6.2+single character short references were already specified for character numbers: %1
 W1+defaultEntityInAttribute++default entity used in entity attribute %1
-W1+defaultEntityReference++reference to entity %1 uses default entity 
+W1+defaultEntityReference++reference to entity %1 uses default entity
 W2+mapDefaultEntity++entity %1 in short reference map %2 uses default entity
 E1+noSuchDtd+12.1.3p6+no DTD %1 declared
 W1+noLpdSubset++LPD %1 has neither internal nor external subset
@@ -429,10 +429,10 @@ E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document 
 E0+emptyStartTagBaseDtd+7.4.1.1+element not in the base document type can't have an empty start-tag
 E0+emptyEndTagBaseDtd+7.5.1.1+element not in base document type can't have an empty end-tag
 W0+immediateRecursion++immediately recursive element
-E1+urnMissingField++invalid URN %1: missing ":" 
-E1+urnMissingPrefix++invalid URN %1: missing "urn:" prefix 
-E1+urnInvalidNid++invalid URN %1: invalid namespace identifier  
-E1+urnInvalidNss++invalid URN %1: invalid namespace specific string 
+E1+urnMissingField++invalid URN %1: missing ":"
+E1+urnMissingPrefix++invalid URN %1: missing "urn:" prefix
+E1+urnInvalidNid++invalid URN %1: invalid namespace identifier
+E1+urnInvalidNss++invalid URN %1: invalid namespace specific string
 E1+urnExtraField++invalid URN %1: extra field
 E0+omittedProlog++prolog can't be omitted unless CONCUR NO and LINK EXPLICIT NO and either IMPLYDEF ELEMENT YES or IMPLYDEF DOCTYPE YES
 E0+impliedDocumentElement++can't determine name of #IMPLIED document element

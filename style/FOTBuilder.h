@@ -158,7 +158,7 @@ public:
   };
   enum { nSymbols = symbolColumnMajor + 1 };
   typedef const char *PublicId;
-  struct GlyphId {
+  struct STYLE_API GlyphId {
     GlyphId() : publicId(0), suffix(0) { }
     GlyphId(const char *s, unsigned long n = 0) : publicId(s), suffix(n) { }
     PublicId publicId;
@@ -167,7 +167,7 @@ public:
     // public identifier of the glyph id.
     unsigned long suffix;
   };
-  struct GlyphSubstTable : public Resource {
+  struct STYLE_API GlyphSubstTable : public Resource {
     unsigned uniqueId;
     Vector<GlyphId> pairs;
     GlyphId subst(const GlyphId &) const;
@@ -182,16 +182,16 @@ public:
     double displaySizeFactor;
     operator bool() const { return length != 0 || displaySizeFactor != 0.0; }
   };
-  struct TableLengthSpec : LengthSpec {
+  struct STYLE_API TableLengthSpec : LengthSpec {
     TableLengthSpec() : tableUnitFactor(0.0) { }
     double tableUnitFactor;
   };
-  struct OptLengthSpec {
+  struct STYLE_API OptLengthSpec {
     OptLengthSpec() : hasLength(0) { }
     bool hasLength;
     LengthSpec length;
   };
-  struct DisplaySpace {
+  struct STYLE_API DisplaySpace {
     DisplaySpace() : priority(0), conditional(1), force(0) { }
     LengthSpec nominal;
     LengthSpec min;
@@ -200,18 +200,18 @@ public:
     bool conditional;
     bool force;
   };
-  struct InlineSpace {
+  struct STYLE_API InlineSpace {
     LengthSpec nominal;
     LengthSpec min;
     LengthSpec max;
   };
-  struct OptInlineSpace {
+  struct STYLE_API OptInlineSpace {
     OptInlineSpace() : hasSpace(0) { }
     bool hasSpace;
     InlineSpace space;
   };
   // non-inherited characteristics for all displayed flow objects
-  struct DisplayNIC {
+  struct STYLE_API DisplayNIC {
     DisplayNIC();
     DisplaySpace spaceBefore;
     DisplaySpace spaceAfter;
@@ -224,17 +224,17 @@ public:
     bool mayViolateKeepBefore;
     bool mayViolateKeepAfter;
   };
-  struct InlineNIC {
+  struct STYLE_API InlineNIC {
     InlineNIC();
     long breakBeforePriority;
     long breakAfterPriority;
   };
-  struct DisplayGroupNIC : DisplayNIC {
+  struct STYLE_API DisplayGroupNIC : DisplayNIC {
     DisplayGroupNIC();
     bool hasCoalesceId;
     StringC coalesceId;
   };
-  struct ExternalGraphicNIC : DisplayNIC, InlineNIC {
+  struct STYLE_API ExternalGraphicNIC : DisplayNIC, InlineNIC {
     ExternalGraphicNIC();
     bool isDisplay;
     Symbol scaleType; // symbolFalse if not a symbol
@@ -251,17 +251,17 @@ public:
     LengthSpec positionPointX;
     LengthSpec positionPointY;
   };
-  struct BoxNIC : DisplayNIC, InlineNIC {
+  struct STYLE_API BoxNIC : DisplayNIC, InlineNIC {
     BoxNIC();
     bool isDisplay;
   };
-  struct RuleNIC : DisplayNIC, InlineNIC {
+  struct STYLE_API RuleNIC : DisplayNIC, InlineNIC {
     RuleNIC();
     Symbol orientation;
     bool hasLength;
     LengthSpec length;
   };
-  struct LeaderNIC : InlineNIC {
+  struct STYLE_API LeaderNIC : InlineNIC {
     LeaderNIC();
     bool hasLength;
     LengthSpec length;
@@ -269,7 +269,7 @@ public:
   // A paragraph has the same non-inherited characteristics
   // as a display-group.
   typedef DisplayNIC ParagraphNIC;
-  struct CharacterNIC {
+  struct STYLE_API CharacterNIC {
     CharacterNIC();
     enum {
       cIsDropAfterLineBreak,
@@ -308,7 +308,7 @@ public:
     double stretchFactor;
   };
   typedef InlineNIC LineFieldNIC;
-  struct TableNIC : public DisplayNIC {
+  struct STYLE_API TableNIC : public DisplayNIC {
     TableNIC();
     enum WidthType {
       widthFull,
@@ -319,14 +319,14 @@ public:
     LengthSpec width;
   };
   typedef DisplayNIC TablePartNIC;
-  struct TableColumnNIC {
+  struct STYLE_API TableColumnNIC {
     TableColumnNIC();
     unsigned columnIndex;  // zero-based
     unsigned nColumnsSpanned;
     bool hasWidth;
     TableLengthSpec width;
   };
-  struct TableCellNIC {
+  struct STYLE_API TableCellNIC {
     TableCellNIC();
     // If true, this isn't a real table cell.
     // Rather it's one that can be used to fill in cells missing in this row.
@@ -335,18 +335,18 @@ public:
     unsigned nColumnsSpanned;
     unsigned nRowsSpanned;
   };
-  struct DeviceRGBColor {
+  struct STYLE_API DeviceRGBColor {
     unsigned char red;
     unsigned char green;
     unsigned char blue;
   };
-  struct MultiMode {
+  struct STYLE_API MultiMode {
     MultiMode();
     bool hasDesc;
     StringC name;
     StringC desc;
   };
-  struct Address {
+  struct STYLE_API Address {
     enum Type {
       // An address of #f
       none,
@@ -476,7 +476,7 @@ public:
                                  FOTBuilder *&upperLimit);
   virtual void endMathOperator();
   
-  struct GridNIC {
+  struct STYLE_API GridNIC {
     GridNIC();
     unsigned nColumns;
     unsigned nRows;
@@ -484,7 +484,7 @@ public:
   virtual void startGrid(const GridNIC &);
   virtual void endGrid();
 
-  struct GridCellNIC {
+  struct STYLE_API GridCellNIC {
     GridCellNIC();
     unsigned columnNumber;
     unsigned rowNumber;
@@ -704,7 +704,7 @@ public:
 			      Vector<FOTBuilder *> &ports);
   virtual void endExtension(const CompoundExtensionFlowObj &);
 
-  struct Extension {
+  struct STYLE_API Extension {
     const char *pubid;
     void (FOTBuilder::*boolSetter)(bool);
     void (FOTBuilder::*stringSetter)(const StringC &);
@@ -969,6 +969,7 @@ public:
   void endExtension(const CompoundExtensionFlowObj &);
 
   struct Call {
+    Call() : next(0) {}
     virtual ~Call();
     virtual Call* clone() const = 0;
     virtual void emit(FOTBuilder &) const = 0;

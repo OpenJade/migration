@@ -12,7 +12,6 @@ dnl
 
 dnl Initialization.
 AC_INIT(pubtext)
-AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(OpenSP, 1.4)
 AM_CONFIG_HEADER(include/config.h)
 AM_SANITY_CHECK

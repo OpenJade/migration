@@ -153,7 +153,7 @@ dnl FIXME these need tests for non-GNU compilers
               [define this if your system misses new.h])
     AC_CACHE_CHECK(whether to declare set_new_handler extern "C",
                     ac_cv_cxx_new_handler_extern_c,
-                    [AC_TRY_COMPILE([
+                    [AC_TRY_LINK([
 typedef void (*new_handler)();
 new_handler set_new_handler(new_handler);],[
 set_new_handler(0);],

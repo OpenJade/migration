@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
+<HTML>
+<HEAD>
+<TITLE>SPCAT</TITLE>
+</HEAD>
+<BODY>
+<H1>SPCAT</H1>
+<H2>SYNOPSIS</H2>
+<P>
+<CODE>spcat</CODE>
+[
+<CODE>-vC</CODE>
+]
+[
+<CODE>-b<VAR>bctf</VAR></CODE>
+]
+[
+<CODE>-f<VAR>error_file</VAR></CODE>
+]
+[
+<CODE>-c<VAR>catalog_sysid</VAR></CODE>
+]
+[
+<CODE>-D<VAR>directory</VAR></CODE>
+]
+[
+<CODE>-P<VAR>public_id</VAR></CODE>
+]
+[
+<CODE>-S<VAR>system_id</VAR></CODE>
+]
+[
+<CODE>-p<VAR>parameter_entity</VAR></CODE>
+]
+[
+<CODE>-d<VAR>doctype</VAR></CODE>
+]
+[
+<CODE>-l<VAR>linktype</VAR></CODE>
+]
+[
+<CODE>-e<VAR>entity</VAR></CODE>
+]
+[
+<CODE>-n<VAR>notation</VAR></CODE>
+]
+[
+<CODE>-s<VAR>doctype</VAR></CODE>
+]
+
+<H2>DESCRIPTION</H2>
+<P>
+Spcat (SGML print catalog)
+prints effective system identifiers found by sp in the catalogs 
+on the standard output. It doesn't check that the system identifiers 
+correspond to actual files. The return value is 0 if the last system 
+identifier was successfully created and 1 otherwise. 
+<P>
+The following options are available:
+<DL>
+<DT>
+<CODE>-C</CODE>
+<DT>
+<CODE>-b<VAR>bctf</VAR></CODE>
+<DT>
+<CODE>-f<VAR>error_file</VAR></CODE>
+<DT>
+<CODE>-c<VAR>catalog_sysid</VAR></CODE>
+<DT>
+<CODE>-D<VAR>directory</VAR></CODE>
+<DD>
+These options have the same effect as in <A HREF="nsgmls.htm">nsgmls</A>.
+<DT>
+<CODE>-v</CODE>
+<DD>
+Print the version number.
+<DT>
+<CODE>-P<VAR>public_id</VAR></CODE>
+<DD>
+Print the effective system identifier for the public identifier
+<VAR>public_id</VAR>.
+<DT>
+<CODE>-S<VAR>system_id</VAR></CODE>
+<DD>
+Print the effective system identifier for the system identifier
+<VAR>system_id</VAR>.
+<DT>
+<CODE>-p<VAR>parameter_entity</VAR></CODE>
+<DD>
+Print the effective system identifier for the parameter entity
+with the name <VAR>parameter_entity</VAR>.
+<DT>
+<CODE>-d<VAR>doctype</VAR></CODE>
+<DD>
+Print the effective system identifier for the declaration of the 
+document type with the name <VAR>doctype</VAR>.
+<DT>
+<CODE>-l<VAR>linktype</VAR></CODE>
+<DD>
+Print the effective system identifier for the declaration of the 
+link type with the name <VAR>linktype</VAR>.
+<DT>
+<CODE>-e<VAR>entity</VAR></CODE>
+<DD>
+Print the effective system identifier for the general entity 
+with the name <VAR>entity</VAR>.
+<DT>
+<CODE>-n<VAR>notation</VAR></CODE>
+<DD>
+Print the effective system identifier for the notation
+with the name <VAR>notation</VAR>.
+<DT>
+<CODE>-s<VAR>doctype</VAR></CODE>
+<DD>
+Print the effective system identifier for the SGML declaration
+associated with the document type <VAR>doctype</VAR>. Until sp
+implements the <CODE>DTDDECL</CODE> catalog entry, this will
+just return the value of the <CODE>SGMLDECL</CODE> entry.
+</DL>
+<P>
+</BODY>
+</HTML>

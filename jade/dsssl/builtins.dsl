@@ -258,7 +258,7 @@
 		(subgrove 
 		 (apply node-list
 			(map (lambda (name)
-			       (node-property name snl))
+			       (node-property name snl null: (empty-node-list)))
 			     (node-property 'subnode-property-names 
 					    snl))))))
    nl))

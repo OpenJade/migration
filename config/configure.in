@@ -28,10 +28,10 @@ dnl  Backup original Makefiles, people may want to revert to it if
 dnl  configure doesn't work.
 dnl
 echo 'saving distribution makefiles...'
-test ! -f Makefile.dist && cp Makefile Makefile.dist
-test ! -f Makefile.lib.dist && cp Makefile.lib Makefile.lib.dist
-test ! -f Makefile.prog.dist && cp Makefile.prog Makefile.prog.dist
-test ! -f Makefile.comm.dist && cp Makefile.comm Makefile.comm.dist
+test ! -f Makefile.dist && test -f Makefile && cp Makefile Makefile.dist
+test ! -f Makefile.lib.dist && test -f Makefile.lib && cp Makefile.lib Makefile.lib.dist
+test ! -f Makefile.prog.dist && test -f Makefile.prog && cp Makefile.prog Makefile.prog.dist
+test ! -f Makefile.comm.dist && test -f Makefile.comm && cp Makefile.comm Makefile.comm.dist
 
 dnl
 dnl  Check for programs
@@ -93,6 +93,11 @@ dnl
 dnl Check for thread support.
 AC_CHECK_LIB(threads,cthread_fork,LIB_THREADS="-lthreads",LIB_THREADS="")
 AC_SUBST(LIB_THREADS)
+
+dnl
+dnl Check if type of size_t is unsigned int
+dnl
+OJ_SIZE_T_IS_UINT
 
 dnl
 dnl the following tests require c++, not c; note that if you switch this

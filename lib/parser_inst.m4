@@ -165,8 +165,7 @@ __instantiate(Vector<ContentModelAmbiguity>)
 __instantiate(Vector<Transition>)
 __instantiate(Vector<LeafContentToken*>)
 __instantiate(Vector<size_t>)
- // we really just want to test if size_t == unsigned int
-#if !defined(SIZEOF_SIZE_T) || !defined(SIZEOF_UNSIGNED_INT) || (SIZEOF_SIZE_T != SIZEOF_UNSIGNED_INT)
+#ifndef SIZE_T_IS_UINT
 __instantiate(Vector<unsigned int>)
 #endif
 

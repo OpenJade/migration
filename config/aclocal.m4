@@ -3373,3 +3373,25 @@ AC_DEFUN(smr_SWITCH, [
            [ AC_MSG_RESULT(no)
             ifelse($5, , , AC_DEFINE($5))]))])
 
+dnl
+dnl Examine size_t and define SIZE_T_IS_UINT, if size_t is an unsigned int
+dnl
+AC_DEFUN(OJ_SIZE_T_IS_UINT,[
+	AC_REQUIRE([AC_TYPE_SIZE_T])
+	AC_MSG_CHECKING(whether size_t is unsigned int)
+	ac_cv_size_t_is_uint=no
+	AC_LANG_SAVE
+	AC_LANG_CPLUSPLUS
+	AC_TRY_COMPILE([#include <unistd.h>
+
+                       template<class T> class foo { };
+
+                        ], [
+			foo<size_t> x;
+			foo<unsigned int> y;
+			x = y;
+		],ac_cv_size_t_is_uint=yes)
+	AC_LANG_RESTORE
+	AC_MSG_RESULT($ac_cv_size_t_is_uint)
+	test "$ac_cv_size_t_is_uint" = "yes" && AC_DEFINE(SIZE_T_IS_UINT)
+])

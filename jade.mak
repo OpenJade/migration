@@ -151,7 +151,7 @@ LINK32_OBJS= \
 OUTDIR=.\grove\Debug
 INTDIR=.\grove\Debug
 
-ALL : ".\lib\UnicodeDebug\grove.dll"
+ALL : ".\lib\Debug\grove.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\LocNode.obj"
@@ -161,7 +161,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\grove.exp"
 	-@erase "$(OUTDIR)\grove.lib"
 	-@erase "$(OUTDIR)\grove.pdb"
-	-@erase ".\lib\UnicodeDebug\grove.dll"
+	-@erase ".\lib\Debug\grove.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -209,17 +209,17 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug\grove.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\grove.dll"
 LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
  odbccp32.lib /nologo /base:0x20200000 /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/grove.pdb" /debug /machine:I386\
- /out:"lib\UnicodeDebug\grove.dll" /implib:"$(OUTDIR)/grove.lib" 
+ /pdb:"$(OUTDIR)/grove.pdb" /debug /machine:I386 /out:"lib\Debug\grove.dll"\
+ /implib:"$(OUTDIR)/grove.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\LocNode.obj" \
 	"$(INTDIR)\Node.obj"
 
-".\lib\UnicodeDebug\grove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\lib\Debug\grove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -295,9 +295,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /machine:I386 /out:"bin/spgrove.dll"
+# ADD LINK32 lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /machine:I386 /out:"bin/spgrove.dll"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/spgrove.pdb" /machine:I386\
@@ -328,7 +328,7 @@ LINK32_OBJS= \
 OUTDIR=.\spgrove\Debug
 INTDIR=.\spgrove\Debug
 
-ALL : "grove - Win32 Debug" ".\lib\UnicodeDebug\spgrove.dll"
+ALL : "grove - Win32 Debug" ".\lib\Debug\spgrove.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\GroveApp.obj"
@@ -339,7 +339,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\spgrove.exp"
 	-@erase "$(OUTDIR)\spgrove.lib"
 	-@erase "$(OUTDIR)\spgrove.pdb"
-	-@erase ".\lib\UnicodeDebug\spgrove.dll"
+	-@erase ".\lib\Debug\spgrove.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -388,19 +388,19 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug\spgrove.dll"
-LINK32_FLAGS=lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\spgrove.dll"
+LINK32_FLAGS=lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20100000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/spgrove.pdb" /debug /machine:I386\
- /out:"lib\UnicodeDebug\spgrove.dll" /implib:"$(OUTDIR)/spgrove.lib" 
+ /out:"lib\Debug\spgrove.dll" /implib:"$(OUTDIR)/spgrove.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\GroveApp.obj" \
 	"$(INTDIR)\GroveBuilder.obj" \
 	"$(INTDIR)\SdNode.obj" \
 	".\grove\Debug\grove.lib"
 
-".\lib\UnicodeDebug\spgrove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\lib\Debug\spgrove.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -437,10 +437,13 @@ CLEAN :
 	-@erase "$(INTDIR)\Insn.obj"
 	-@erase "$(INTDIR)\Interpreter.obj"
 	-@erase "$(INTDIR)\InterpreterMessages.obj"
+	-@erase "$(INTDIR)\MacroFlowObj.obj"
 	-@erase "$(INTDIR)\NumberCache.obj"
+	-@erase "$(INTDIR)\Pattern.obj"
 	-@erase "$(INTDIR)\primitive.obj"
 	-@erase "$(INTDIR)\ProcessContext.obj"
 	-@erase "$(INTDIR)\ProcessingMode.obj"
+	-@erase "$(INTDIR)\SchemeParser.obj"
 	-@erase "$(INTDIR)\Style.obj"
 	-@erase "$(INTDIR)\style.pch"
 	-@erase "$(INTDIR)\style_inst.obj"
@@ -496,9 +499,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /machine:I386 /out:"bin\style.dll"
+# ADD LINK32 lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /machine:I386 /out:"bin\style.dll"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/style.pdb" /machine:I386\
@@ -518,10 +521,13 @@ LINK32_OBJS= \
 	"$(INTDIR)\Insn.obj" \
 	"$(INTDIR)\Interpreter.obj" \
 	"$(INTDIR)\InterpreterMessages.obj" \
+	"$(INTDIR)\MacroFlowObj.obj" \
 	"$(INTDIR)\NumberCache.obj" \
+	"$(INTDIR)\Pattern.obj" \
 	"$(INTDIR)\primitive.obj" \
 	"$(INTDIR)\ProcessContext.obj" \
 	"$(INTDIR)\ProcessingMode.obj" \
+	"$(INTDIR)\SchemeParser.obj" \
 	"$(INTDIR)\Style.obj" \
 	"$(INTDIR)\style_inst.obj" \
 	"$(INTDIR)\StyleEngine.obj" \
@@ -549,8 +555,8 @@ LINK32_OBJS= \
 OUTDIR=.\style\Debug
 INTDIR=.\style\Debug
 
-ALL : "spgrove - Win32 Debug" "grove - Win32 Debug"\
- ".\lib\UnicodeDebug\style.dll" "$(OUTDIR)\style.bsc"
+ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\lib\Debug\style.dll"\
+ "$(OUTDIR)\style.bsc"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Collector.obj"
@@ -581,14 +587,20 @@ CLEAN :
 	-@erase "$(INTDIR)\Interpreter.sbr"
 	-@erase "$(INTDIR)\InterpreterMessages.obj"
 	-@erase "$(INTDIR)\InterpreterMessages.sbr"
+	-@erase "$(INTDIR)\MacroFlowObj.obj"
+	-@erase "$(INTDIR)\MacroFlowObj.sbr"
 	-@erase "$(INTDIR)\NumberCache.obj"
 	-@erase "$(INTDIR)\NumberCache.sbr"
+	-@erase "$(INTDIR)\Pattern.obj"
+	-@erase "$(INTDIR)\Pattern.sbr"
 	-@erase "$(INTDIR)\primitive.obj"
 	-@erase "$(INTDIR)\primitive.sbr"
 	-@erase "$(INTDIR)\ProcessContext.obj"
 	-@erase "$(INTDIR)\ProcessContext.sbr"
 	-@erase "$(INTDIR)\ProcessingMode.obj"
 	-@erase "$(INTDIR)\ProcessingMode.sbr"
+	-@erase "$(INTDIR)\SchemeParser.obj"
+	-@erase "$(INTDIR)\SchemeParser.sbr"
 	-@erase "$(INTDIR)\Style.obj"
 	-@erase "$(INTDIR)\style.pch"
 	-@erase "$(INTDIR)\Style.sbr"
@@ -603,7 +615,7 @@ CLEAN :
 	-@erase "$(OUTDIR)\style.exp"
 	-@erase "$(OUTDIR)\style.lib"
 	-@erase "$(OUTDIR)\style.pdb"
-	-@erase ".\lib\UnicodeDebug\style.dll"
+	-@erase ".\lib\Debug\style.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -663,10 +675,13 @@ BSC32_SBRS= \
 	"$(INTDIR)\Insn.sbr" \
 	"$(INTDIR)\Interpreter.sbr" \
 	"$(INTDIR)\InterpreterMessages.sbr" \
+	"$(INTDIR)\MacroFlowObj.sbr" \
 	"$(INTDIR)\NumberCache.sbr" \
+	"$(INTDIR)\Pattern.sbr" \
 	"$(INTDIR)\primitive.sbr" \
 	"$(INTDIR)\ProcessContext.sbr" \
 	"$(INTDIR)\ProcessingMode.sbr" \
+	"$(INTDIR)\SchemeParser.sbr" \
 	"$(INTDIR)\Style.sbr" \
 	"$(INTDIR)\style_inst.sbr" \
 	"$(INTDIR)\StyleEngine.sbr" \
@@ -679,13 +694,13 @@ BSC32_SBRS= \
 
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug\style.dll"
+# ADD LINK32 lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\Debug\style.dll"
 # SUBTRACT LINK32 /map
-LINK32_FLAGS=lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /base:0x20000000 /subsystem:windows\
  /dll /incremental:no /pdb:"$(OUTDIR)/style.pdb" /debug /machine:I386\
- /out:"lib\UnicodeDebug\style.dll" /implib:"$(OUTDIR)/style.lib" 
+ /out:"lib\Debug\style.dll" /implib:"$(OUTDIR)/style.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Collector.obj" \
 	"$(INTDIR)\common_inst.obj" \
@@ -701,10 +716,13 @@ LINK32_OBJS= \
 	"$(INTDIR)\Insn.obj" \
 	"$(INTDIR)\Interpreter.obj" \
 	"$(INTDIR)\InterpreterMessages.obj" \
+	"$(INTDIR)\MacroFlowObj.obj" \
 	"$(INTDIR)\NumberCache.obj" \
+	"$(INTDIR)\Pattern.obj" \
 	"$(INTDIR)\primitive.obj" \
 	"$(INTDIR)\ProcessContext.obj" \
 	"$(INTDIR)\ProcessingMode.obj" \
+	"$(INTDIR)\SchemeParser.obj" \
 	"$(INTDIR)\Style.obj" \
 	"$(INTDIR)\style_inst.obj" \
 	"$(INTDIR)\StyleEngine.obj" \
@@ -712,7 +730,7 @@ LINK32_OBJS= \
 	".\grove\Debug\grove.lib" \
 	".\spgrove\Debug\spgrove.lib"
 
-".\lib\UnicodeDebug\style.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\lib\Debug\style.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -789,9 +807,9 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/jade.exe"
+# ADD LINK32 lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/jade.exe"
 # SUBTRACT LINK32 /profile
-LINK32_FLAGS=lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
  /pdb:"$(OUTDIR)/jade.pdb" /machine:I386 /out:"bin/jade.exe" 
@@ -829,7 +847,7 @@ OUTDIR=.\jade\Debug
 INTDIR=.\jade\Debug
 
 ALL : "style - Win32 Debug" "spgrove - Win32 Debug" "grove - Win32 Debug"\
- ".\lib\UnicodeDebug\jade.exe"
+ ".\lib\Debug\jade.exe"
 
 CLEAN : 
 	-@erase "$(INTDIR)\HtmlFOTBuilder.obj"
@@ -842,7 +860,7 @@ CLEAN :
 	-@erase "$(INTDIR)\TransformFOTBuilder.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(OUTDIR)\jade.pdb"
-	-@erase ".\lib\UnicodeDebug\jade.exe"
+	-@erase ".\lib\Debug\jade.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -887,12 +905,11 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386
-# ADD LINK32 lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug\jade.exe"
-LINK32_FLAGS=lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /debug /machine:I386 /out:"lib\Debug\jade.exe"
+LINK32_FLAGS=lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no\
- /pdb:"$(OUTDIR)/jade.pdb" /debug /machine:I386 /out:"lib\UnicodeDebug\jade.exe"\
- 
+ /pdb:"$(OUTDIR)/jade.pdb" /debug /machine:I386 /out:"lib\Debug\jade.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\HtmlFOTBuilder.obj" \
 	"$(INTDIR)\jade.obj" \
@@ -906,7 +923,7 @@ LINK32_OBJS= \
 	".\spgrove\Debug\spgrove.lib" \
 	".\style\Debug\style.lib"
 
-".\lib\UnicodeDebug\jade.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\lib\Debug\jade.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1024,8 +1041,8 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/groveoa.dll"
-LINK32_FLAGS=lib\UnicodeRelease\sp120u.lib kernel32.lib user32.lib gdi32.lib\
+# ADD LINK32 lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/groveoa.dll"
+LINK32_FLAGS=lib\Release\sp130.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
  /incremental:no /pdb:"$(OUTDIR)/groveoa.pdb" /machine:I386\
@@ -1074,8 +1091,7 @@ SOURCE=$(InputPath)
 OUTDIR=.\groveoa\Debug
 INTDIR=.\groveoa\Debug
 
-ALL : "spgrove - Win32 Debug" "grove - Win32 Debug"\
- ".\lib\UnicodeDebug\groveoa.dll"
+ALL : "spgrove - Win32 Debug" "grove - Win32 Debug" ".\lib\Debug\groveoa.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\CGroveBuilder.obj"
@@ -1092,8 +1108,8 @@ CLEAN :
 	-@erase ".\groveoa\groveoa.h"
 	-@erase ".\groveoa\groveoa.tlb"
 	-@erase ".\groveoa\groveoa_i.c"
-	-@erase ".\lib\UnicodeDebug\groveoa.dll"
-	-@erase ".\lib\UnicodeDebug\groveoa.ilk"
+	-@erase ".\lib\Debug\groveoa.dll"
+	-@erase ".\lib\Debug\groveoa.ilk"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1143,13 +1159,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\UnicodeDebug/groveoa.dll"
+# ADD LINK32 lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/groveoa.dll"
 # SUBTRACT LINK32 /incremental:no
-LINK32_FLAGS=lib\UnicodeDebug\sp120ud.lib kernel32.lib user32.lib gdi32.lib\
+LINK32_FLAGS=lib\Debug\sp130d.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll\
  /incremental:yes /pdb:"$(OUTDIR)/groveoa.pdb" /debug /machine:I386\
- /def:".\groveoa\groveoa.def" /out:"lib\UnicodeDebug/groveoa.dll"\
+ /def:".\groveoa\groveoa.def" /out:"lib\Debug/groveoa.dll"\
  /implib:"$(OUTDIR)/groveoa.lib" 
 DEF_FILE= \
 	".\groveoa\groveoa.def"
@@ -1162,7 +1178,7 @@ LINK32_OBJS= \
 	".\grove\Debug\grove.lib" \
 	".\spgrove\Debug\spgrove.lib"
 
-".\lib\UnicodeDebug\groveoa.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\lib\Debug\groveoa.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -1185,9 +1201,6 @@ LINK32_OBJS= \
 # Begin Source File
 
 SOURCE=.\grove\Node.cxx
-
-!IF  "$(CFG)" == "grove - Win32 Release"
-
 DEP_CPP_NODE_=\
 	".\grove\Node.h"\
 	".\include\Boolean.h"\
@@ -1198,30 +1211,12 @@ DEP_CPP_NODE_=\
 "$(INTDIR)\Node.obj" : $(SOURCE) $(DEP_CPP_NODE_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "grove - Win32 Debug"
-
-DEP_CPP_NODE_=\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	".\include\macros.h"\
-	
-
-"$(INTDIR)\Node.obj" : $(SOURCE) $(DEP_CPP_NODE_) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
 # Begin Source File
 
 SOURCE=.\grove\LocNode.cxx
-
-!IF  "$(CFG)" == "grove - Win32 Release"
-
 DEP_CPP_LOCNO=\
 	".\grove\LocNode.h"\
 	".\grove\Node.h"\
@@ -1232,21 +1227,6 @@ DEP_CPP_LOCNO=\
 "$(INTDIR)\LocNode.obj" : $(SOURCE) $(DEP_CPP_LOCNO) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "grove - Win32 Debug"
-
-DEP_CPP_LOCNO=\
-	".\grove\LocNode.h"\
-	".\grove\Node.h"\
-	".\include\Boolean.h"\
-	".\include\config.h"\
-	
-
-"$(INTDIR)\LocNode.obj" : $(SOURCE) $(DEP_CPP_LOCNO) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 # End Target
@@ -1689,9 +1669,12 @@ DEP_CPP_STYLE=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -1858,9 +1841,12 @@ DEP_CPP_STYLEE=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2022,9 +2008,12 @@ DEP_CPP_STYLE_=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2074,6 +2063,7 @@ BuildCmds= \
 
 SOURCE=.\style\ProcessingMode.cxx
 DEP_CPP_PROCE=\
+	".\grove\LocNode.h"\
 	".\grove\Node.h"\
 	".\include\Allocator.h"\
 	".\include\ArcEngine.h"\
@@ -2186,9 +2176,12 @@ DEP_CPP_PROCE=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2350,9 +2343,12 @@ DEP_CPP_PROCES=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2515,11 +2511,14 @@ DEP_CPP_PRIMI=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\primitive.h"\
 	".\style\primitive_inst.cxx"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2681,9 +2680,12 @@ DEP_CPP_NUMBE=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -2891,6 +2893,7 @@ DEP_CPP_INTERP=\
 	".\include\xnew.h"\
 	".\spgrove\GroveApp.h"\
 	".\spgrove\GroveBuilder.h"\
+	".\style\charNames.h"\
 	".\style\Collector.h"\
 	".\style\dsssl_ns.h"\
 	".\style\DssslApp.h"\
@@ -2905,9 +2908,13 @@ DEP_CPP_INTERP=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
+	".\style\sdata.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3069,9 +3076,12 @@ DEP_CPP_INSN_=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3233,9 +3243,12 @@ DEP_CPP_FOTBU=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3397,9 +3410,12 @@ DEP_CPP_EXPRE=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3560,9 +3576,12 @@ DEP_CPP_ELOBJ=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3724,9 +3743,12 @@ DEP_CPP_ELOBJ_=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -3889,9 +3911,12 @@ DEP_CPP_DSSSL=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4096,9 +4121,12 @@ DEP_CPP_FLOWO=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4260,9 +4288,12 @@ DEP_CPP_INHER=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4423,9 +4454,12 @@ DEP_CPP_STYLE_I=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4586,9 +4620,12 @@ DEP_CPP_COMMO=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4801,9 +4838,12 @@ DEP_CPP_GROVEM=\
 	".\style\Insn2.h"\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -4971,9 +5011,12 @@ DEP_CPP_DSSSLA=\
 	".\style\Interpreter.h"\
 	".\style\InterpreterMessages.h"\
 	".\style\jade_version.h"\
+	".\style\MacroFlowObj.h"\
 	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
 	".\style\ProcessContext.h"\
 	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
 	".\style\SosofoObj.h"\
 	".\style\Style.h"\
 	".\style\style_pch.h"\
@@ -5044,6 +5087,507 @@ SOURCE=.\style\jade_version.h
 !IF  "$(CFG)" == "style - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\style\Pattern.cxx
+DEP_CPP_PATTE=\
+	".\grove\Node.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\spgrove\GroveApp.h"\
+	".\spgrove\GroveBuilder.h"\
+	".\style\Collector.h"\
+	".\style\dsssl_ns.h"\
+	".\style\DssslApp.h"\
+	".\style\DssslSpecEventHandler.h"\
+	".\style\ELObj.h"\
+	".\style\ELObjMessageArg.h"\
+	".\style\EvalContext.h"\
+	".\style\Expression.h"\
+	".\style\FOTBuilder.h"\
+	".\style\GroveManager.h"\
+	".\style\Insn.h"\
+	".\style\Insn2.h"\
+	".\style\Interpreter.h"\
+	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
+	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
+	".\style\ProcessContext.h"\
+	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
+	".\style\SosofoObj.h"\
+	".\style\Style.h"\
+	".\style\style_pch.h"\
+	".\style\StyleEngine.h"\
+	".\style\stylelib.h"\
+	".\style\VM.h"\
+	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
+# ADD CPP /Yu"stylelib.h"
+
+"$(INTDIR)\Pattern.obj" : $(SOURCE) $(DEP_CPP_PATTE) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "spgrove" /I "grove" /I "include" /D\
+ "NDEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "style - Win32 Debug"
+
+# ADD CPP /Yu"stylelib.h"
+
+BuildCmds= \
+	$(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "spgrove" /I "grove" /I "include" /D\
+ "_DEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /FR"$(INTDIR)/" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h"\
+ /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c $(SOURCE) \
+	
+
+"$(INTDIR)\Pattern.obj" : $(SOURCE) $(DEP_CPP_PATTE) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
+
+"$(INTDIR)\Pattern.sbr" : $(SOURCE) $(DEP_CPP_PATTE) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\style\MacroFlowObj.cxx
+DEP_CPP_MACRO=\
+	".\grove\Node.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\spgrove\GroveApp.h"\
+	".\spgrove\GroveBuilder.h"\
+	".\style\Collector.h"\
+	".\style\dsssl_ns.h"\
+	".\style\DssslApp.h"\
+	".\style\DssslSpecEventHandler.h"\
+	".\style\ELObj.h"\
+	".\style\ELObjMessageArg.h"\
+	".\style\EvalContext.h"\
+	".\style\Expression.h"\
+	".\style\FOTBuilder.h"\
+	".\style\GroveManager.h"\
+	".\style\Insn.h"\
+	".\style\Insn2.h"\
+	".\style\Interpreter.h"\
+	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
+	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
+	".\style\ProcessContext.h"\
+	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
+	".\style\SosofoObj.h"\
+	".\style\Style.h"\
+	".\style\style_pch.h"\
+	".\style\StyleEngine.h"\
+	".\style\stylelib.h"\
+	".\style\VM.h"\
+	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
+# ADD CPP /Yu"stylelib.h"
+
+"$(INTDIR)\MacroFlowObj.obj" : $(SOURCE) $(DEP_CPP_MACRO) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "spgrove" /I "grove" /I "include" /D\
+ "NDEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "style - Win32 Debug"
+
+# ADD CPP /Yu"stylelib.h"
+
+BuildCmds= \
+	$(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "spgrove" /I "grove" /I "include" /D\
+ "_DEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /FR"$(INTDIR)/" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h"\
+ /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c $(SOURCE) \
+	
+
+"$(INTDIR)\MacroFlowObj.obj" : $(SOURCE) $(DEP_CPP_MACRO) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
+
+"$(INTDIR)\MacroFlowObj.sbr" : $(SOURCE) $(DEP_CPP_MACRO) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\style\SchemeParser.cxx
+DEP_CPP_SCHEM=\
+	".\grove\Node.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\spgrove\GroveApp.h"\
+	".\spgrove\GroveBuilder.h"\
+	".\style\Collector.h"\
+	".\style\dsssl_ns.h"\
+	".\style\DssslApp.h"\
+	".\style\DssslSpecEventHandler.h"\
+	".\style\ELObj.h"\
+	".\style\ELObjMessageArg.h"\
+	".\style\EvalContext.h"\
+	".\style\Expression.h"\
+	".\style\FOTBuilder.h"\
+	".\style\GroveManager.h"\
+	".\style\Insn.h"\
+	".\style\Insn2.h"\
+	".\style\Interpreter.h"\
+	".\style\InterpreterMessages.h"\
+	".\style\MacroFlowObj.h"\
+	".\style\NumberCache.h"\
+	".\style\Pattern.h"\
+	".\style\ProcessContext.h"\
+	".\style\ProcessingMode.h"\
+	".\style\SchemeParser.h"\
+	".\style\SosofoObj.h"\
+	".\style\Style.h"\
+	".\style\style_pch.h"\
+	".\style\StyleEngine.h"\
+	".\style\stylelib.h"\
+	".\style\VM.h"\
+	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
+# ADD CPP /Yu"stylelib.h"
+
+"$(INTDIR)\SchemeParser.obj" : $(SOURCE) $(DEP_CPP_SCHEM) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "spgrove" /I "grove" /I "include" /D\
+ "NDEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "style - Win32 Debug"
+
+# ADD CPP /Yu"stylelib.h"
+
+BuildCmds= \
+	$(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "spgrove" /I "grove" /I "include" /D\
+ "_DEBUG" /D "WIN32" /D "_WINDOWS" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D\
+ SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D\
+ "SP_MULTI_BYTE" /FR"$(INTDIR)/" /Fp"$(INTDIR)/style.pch" /Yu"stylelib.h"\
+ /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c $(SOURCE) \
+	
+
+"$(INTDIR)\SchemeParser.obj" : $(SOURCE) $(DEP_CPP_SCHEM) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
+
+"$(INTDIR)\SchemeParser.sbr" : $(SOURCE) $(DEP_CPP_SCHEM) "$(INTDIR)"\
+ "$(INTDIR)\style.pch"
+   $(BuildCmds)
 
 !ENDIF 
 
@@ -5702,7 +6246,7 @@ DEP_CPP_RTFOL=\
 !IF  "$(CFG)" == "jadedist - Win32 Release"
 
 ".\jadedist\jade.zip" : 
-   CD C:\home\work\SP\jadedist
+   CD C:\home\work\jade2\jadedist
    makedist
 
 !ENDIF 
@@ -6196,7 +6740,7 @@ InputPath=.\groveoa\groveoa.idl
 
 BuildCmds= \
 	midl /Oicf /h $(InputDir)\groveoa.h /iid $(InputDir)\groveoa_i.c /proxy\
-                 $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
+                                 $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
 	
 
 "$(InputDir)\groveoa.tlb" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
@@ -6217,7 +6761,7 @@ InputPath=.\groveoa\groveoa.idl
 
 BuildCmds= \
 	midl /Oicf /h $(InputDir)\groveoa.h /iid $(InputDir)\groveoa_i.c /proxy\
-                 $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
+                                 $(InputDir)\groveoa_p.c /tlb $(InputDir)\groveoa.tlb $(InputPath) \
 	
 
 "$(InputDir)\groveoa.tlb" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"

@@ -21,7 +21,7 @@ namespace SP_NAMESPACE {
 class SP_API EntityDecl : public NamedResource {
 public:
   enum DeclType { generalEntity, parameterEntity, doctype, linktype,
-		  notation };
+		  notation, sgml };
   enum DataType { sgmlText, pi, cdata, sdata, ndata, subdoc };
   EntityDecl(const StringC &, DeclType declType, DataType dataType,
 	     const Location &defLocation);

@@ -52,6 +52,7 @@ protected:
   virtual void registerOption(AppChar c, const AppChar *argName = 0);
   virtual int init(int argc, AppChar **argv);
   void resetCodingSystemKit();
+  static Boolean stringMatches(const AppChar *s, const char *key);
   const AppChar *errorFile_;
   const CodingSystem *outputCodingSystem_;
   String<AppChar> optstr_;

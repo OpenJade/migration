@@ -234,13 +234,15 @@ SP_NAMESPACE::PackedBoolean *CGroveBuilder::lookupWarningType(WarningType type)
   ENTRY(UndefinedElement)
   ENTRY(DefaultEntityReference)
   ENTRY(MixedContent)
-  ENTRY(UnclosedTag)
-  ENTRY(Net)
   ENTRY(EmptyTag)
   ENTRY(UnusedMap)
   ENTRY(UnusedParam)
   ENTRY(NotationSystemId)
 #undef ENTRY
+  case warningUnclosedTag:
+    return &app_.options.noUnclosedTag;
+  case warningNet:
+    return &app_.options.noNet;
   }
   return 0;
 }
@@ -248,6 +250,10 @@ SP_NAMESPACE::PackedBoolean *CGroveBuilder::lookupWarningType(WarningType type)
 STDMETHODIMP CGroveBuilder::get_Error(ErrorType type, VARIANT_BOOL *retval)
 {
   *retval = 0;
+  if (type == errorValid) {
+    *retval = (app_.options.typeValid == 0 ? 0 : -1);
+    return NOERROR;
+  }
   SP_NAMESPACE::PackedBoolean *p = lookupErrorType(type);
   if (!p)
     return E_INVALIDARG;
@@ -257,6 +263,10 @@ STDMETHODIMP CGroveBuilder::get_Error(ErrorType type, VARIANT_BOOL *retval)
 
 STDMETHODIMP CGroveBuilder::put_Error(ErrorType type, VARIANT_BOOL b)
 {
+  if (type == errorValid) {
+    app_.options.typeValid = (b ? SP_NAMESPACE::ParserOptions::sgmlDeclTypeValid : 0);
+    return NOERROR;
+  }
   SP_NAMESPACE::PackedBoolean *p = lookupErrorType(type);
   if (!p)
     return E_INVALIDARG;
@@ -271,9 +281,9 @@ SP_NAMESPACE::PackedBoolean *CGroveBuilder::lookupErrorType(ErrorType type)
   ENTRY(Idref)
   ENTRY(Significant)
   ENTRY(Afdr)
-  ENTRY(LpdNotation)
-  ENTRY(Valid)
 #undef ENTRY
+  case errorLpdNotation:
+    return &errorLpdNotation_;
   }
   return 0;
 }

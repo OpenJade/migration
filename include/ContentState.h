@@ -52,6 +52,7 @@ private:
   unsigned totalExcludeCount_;
   unsigned tagLevel_;
   unsigned netEnablingCount_;
+  unsigned long nextIndex_;
   const ElementType *lastEndedElementType_;
   ElementType documentElementContainer_;
 };

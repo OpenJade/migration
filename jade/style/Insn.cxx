@@ -400,6 +400,7 @@ const Insn *PrimitiveCallInsn::execute(VM &vm) const
     vm.needStack(1);
   ELObj **argp = vm.sp - nArgs_;
   *argp = prim_->primitiveCall(nArgs_, argp, vm, *vm.interp, loc_);
+  ASSERT(vm.interp->objectMaybeLive(*argp));
   vm.sp = argp + 1;
   if (vm.interp->isError(*argp)) {
     vm.sp = 0;

@@ -17,6 +17,7 @@ doc\sx.htm
 doc\sysdecl.htm
 doc\sysid.htm
 doc\xml.htm
+dsssl\builtins.dsl
 dsssl\style-sheet.dtd
 dsssl\fot.dtd
 dsssl\dsssl.dtd

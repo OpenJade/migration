@@ -123,6 +123,7 @@ print <<END if $gen_c;
 END
 
 print <<END;
+#include "splib.h"
 #include "Message.h"
 
 #ifdef SP_NAMESPACE

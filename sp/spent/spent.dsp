@@ -50,7 +50,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\opent.exe"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"..\bin\ospent.exe"
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "spent - Win32 Debug"
@@ -91,6 +91,11 @@ LINK32=link.exe
 SOURCE=.\spent.cxx
 # End Source File
 # Begin Source File
+
+SOURCE=.\SpentMessages.rc
+# End Source File
+# Begin Source File
+
 SOURCE=.\SpentMessages.msg
 
 !IF  "$(CFG)" == "spent - Win32 Release"

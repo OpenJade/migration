@@ -5,7 +5,8 @@
 M4=m4
 PERL=perl
 
-GENSRCS=lib\entmgr_inst.cxx \
+GENSRCS=msggen.pl \
+lib\entmgr_inst.cxx \
 lib\xentmgr_inst.cxx \
 lib\parser_inst.cxx \
 lib\app_inst.cxx \
@@ -22,6 +23,7 @@ lib\StdioStorageMessages.h \
 lib\ParserMessages.h \
 lib\ParserAppMessages.h \
 lib\CmdLineAppMessages.h \
+lib\EntityAppMessages.h \
 nsgmls\nsgmls_inst.cxx \
 nsgmls\RastEventHandlerMessages.h \
 nsgmls\NsgmlsMessages.h \
@@ -30,8 +32,7 @@ spam\spam_inst.cxx \
 sx\SxMessages.h \
 sx\XmlOutputMessages.h \
 sx\sx_inst.cxx \
-include\config.h \
-msggen.pl
+include\config.h
 
 .SUFFIXES: .m4 .msg .pl .in
 

@@ -92,6 +92,10 @@ SOURCE=.\spcat.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\SpcatMessages.rc
+# End Source File
+# Begin Source File
+
 SOURCE=.\SpcatMessages.msg
 
 !IF  "$(CFG)" == "spcat - Win32 Release"

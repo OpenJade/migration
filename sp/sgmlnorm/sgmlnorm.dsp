@@ -96,6 +96,10 @@ SOURCE=.\sgmlnorm.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\SgmlnormMessages.rc
+# End Source File
+# Begin Source File
+
 SOURCE=.\SgmlnormMessages.msg
 
 !IF  "$(CFG)" == "sgmlnorm - Win32 Release"

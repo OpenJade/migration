@@ -271,6 +271,14 @@ SOURCE=.\CmdLineApp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\DtdDeclEventHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DtdDeclEventHandler.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\CmdLineAppMessages.msg
 
 !IF  "$(CFG)" == "lib - Win32 Release"

@@ -897,6 +897,7 @@ private:
   void setlength(const char *,Length);
   void set(const char *,const StringC &);
   void set(const char *,const GroveString &);
+  void set(const char *,const GroveString &,long unsigned int);
   void set(const char *,Symbol);
   void set(const char *,const LengthSpec &);
   void set(const char *,double);
@@ -904,6 +905,7 @@ private:
   void set(const char *,bool);
   void set(const char *,long);
   void set(const char *,long unsigned int);
+  void set(const char *,long unsigned int,long unsigned int);
   void set(const char *name,unsigned int n) {
     set(name, (unsigned long)n);
   }
@@ -2257,14 +2259,16 @@ void TeXFOTBuilder::currentNodePageNumber(const NodePtr &node)
 {
   GroveString id;
   unsigned long ei;
-
+  unsigned  long gi;
   // FIX ME!
   // Only PARTIALLY supported -- I currently allow cross-references
   // only to elements.
   if (node->getId(id) == accessOK) {
-    set("Label",id);
+    gi=node->groveIndex();
+    set("Label",id,gi);
   } else if (node->elementIndex(ei) == accessOK) {
-    set("Element",ei);
+    gi=node->groveIndex();
+    set("Element",ei,gi);
   } else {
     message(TeXMessages::unsupportedPageNumberNonElement);
     return;
@@ -3067,12 +3071,14 @@ void TeXFOTBuilder::startNode(const NodePtr &node,
 {
   GroveString id;
   unsigned long ei;
-
+  unsigned long gi=0;
   if (node->getId(id) == accessOK) {
-    set("Label",id);
+    gi=node->groveIndex();
+    set("Label",id,gi);
   }
   else if (node->elementIndex(ei) == accessOK) {
-    set("Element", ei);
+    gi=node->groveIndex();
+    set("Element", ei,gi);
   }
   unsigned long g = node->groveIndex();
   if (g) {
@@ -3109,7 +3115,7 @@ void TeXFOTBuilder::startLink(const Address &addr)
 {
   GroveString id;
   unsigned long ei;
-
+  unsigned  long gi;
   // FIX ME!
   // This needs a lot of work -- for now, it supports only links to
   // elements.
@@ -3118,10 +3124,11 @@ void TeXFOTBuilder::startLink(const Address &addr)
   case Address::none:
     break;
   case Address::resolvedNode:
+    gi=addr.node->groveIndex();
     if (addr.node->getId(id) == accessOK) {
-      set("Label",id);
+      set("Label",id,gi);
     } else if (addr.node->elementIndex(ei) == accessOK) {
-      set("Element", ei);
+      set("Element", ei,gi);
     }
     else {
       message(TeXMessages::unsupportedLinkNonElement);
@@ -4043,6 +4050,15 @@ void TeXFOTBuilder::set(const char *name,const GroveString &value)
 	      << value
 	      << '}';
 }
+//
+// For idref addresses
+//
+void TeXFOTBuilder::set(const char *name,const GroveString &value, long unsigned int g)
+{
+  stringout_ << "\\def\\" << name << "%\n{"
+	     <<g <<':'<< value
+	      << '}';
+}
 
 //
 // Set a Symbol.
@@ -4429,6 +4445,13 @@ void TeXFOTBuilder::set(const char *name,long unsigned int n)
   stringout_ << "\\def\\" << name << "%\n{" << n << '}';
 }
 
+//
+// For addresses.
+//
+void TeXFOTBuilder::set(const char *name,long unsigned int n,long unsigned int g)
+{
+  stringout_ << "\\def\\" << name << "%\n{" << g  <<':' <<n <<'}';
+}
 //
 // Set a PublicId.
 //

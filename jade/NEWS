@@ -46,24 +46,24 @@ Changes in OpenJade 1.4devel
   Patch from Francis J. Lacoste.
 
 * Improve table support in the JadeTeX backend:
-
   - Support for nested tables.  cell-after-column-margin: and
     cell-before-column-margin: wasn't really working.
-
   - Row spanning was broken. This patch only supports 'start row
     alignment though.
-
   - Paragraphs in cell spanning multiple column are now working.
-
   - Support for the row-alignment: characteristic.
-
   - Support for cell-background? and background-color properties.
-
   Patch from Francis J. Lacoste.  To see benefits of this, requires
   JadeTeX 3.2 or better.
 
 * Add support for the 'asis and 'asis-wrap values for the paragraph's
   'lines:' characteristic.  Patch from Francis J. Lacoste.
+
+* Allow JadeTeX to resolve references to subdocs or to content
+  produced through a "sgml-parse" by hacking on the NodeIndex
+  instruction.  Patch from Jean-Marie Kubek.
+
+* Update contrib/jadetex to version 3.2.
 
 Changes in OpenJade 1.3
 

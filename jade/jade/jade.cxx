@@ -49,9 +49,6 @@ private:
   String<AppChar> outputFilename_;
   Vector<StringC> outputOptions_;
   FileOutputByteStream outputFile_;
-  Boolean outputTypeOption_;
-  void handleAttribute(const StringC &name, StringC &value);
-  void processOutputType(const AppChar *arg);
 };
 
 const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
@@ -70,7 +67,7 @@ const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
 };
 
 JadeApp::JadeApp()
-: DssslApp(u), outputType_(fotType), outputTypeOption_(0)
+: DssslApp(u), outputType_(fotType)
 {
   registerOption('t', SP_T("output-type"), JadeMessages::outputType,
                  JadeMessages::tHelp);
@@ -78,62 +75,39 @@ JadeApp::JadeApp()
                  JadeMessages::oHelp);
 }
 
-void JadeApp::handleAttribute(const StringC &name, StringC &value)
-{
-  if (!outputTypeOption_ && matchCi(name, "media")) {
-    // FIXME this is an ugly way to convert StringC --> AppChar[]
-    AppChar tem[256];
-    for (size_t i = 0; i < 256; i++) {
-      if (i == value.size()) {
-        tem[i] = SP_T('\0');
-        break;
-      }
-      tem[i] = AppChar(value[i]);
-    }
-    tem[255] = SP_T('\0');
-    processOutputType(tem);
-  }
-  else
-    DssslApp::handleAttribute(name, value);
-}
-
-void JadeApp::processOutputType(const AppChar *arg)
-{
-  const AppChar *sub = tcschr(arg, SP_T('-'));
-  size_t len = sub ? sub - arg : tcslen(arg);
-  for (size_t i = 0;; i++) {
-    if (i >= SIZEOF(outputTypeNames)) {
-      message(JadeMessages::unknownType, StringMessageArg(convertInput(arg)));
-      break;
-    }
-    if (tcsncmp(arg, outputTypeNames[i], len) == 0) {
-      outputType_ = OutputType(i);
-      break;
-    }
-  }
-  if (sub) {
-    StringC tem(convertInput(sub));
-    StringC arg;
-    for (size_t i = 0; i < tem.size(); i++) {
-      if (tem[i] == '-') {
-        if (arg.size())
-          outputOptions_.push_back(arg);
-        arg.resize(0);
-      }
-      else
-        arg += tem[i];
-    }
-    if (arg.size())
-      outputOptions_.push_back(arg);
-  }
-}
-
 void JadeApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
   case 't':
-    outputTypeOption_ = 1;
-    processOutputType(arg);
+    {
+      const AppChar *sub = tcschr(arg, SP_T('-'));
+      size_t len = sub ? sub - arg : tcslen(arg);
+      for (size_t i = 0;; i++) {
+        if (i >= SIZEOF(outputTypeNames)) {
+	  message(JadeMessages::unknownType, StringMessageArg(convertInput(arg)));
+	  break;
+	}
+	if (tcsncmp(arg, outputTypeNames[i], len) == 0) {
+	  outputType_ = OutputType(i);
+	  break;
+	}
+      }
+      if (sub) {
+	StringC tem(convertInput(sub));
+	StringC arg;
+	for (size_t i = 0; i < tem.size(); i++) {
+	  if (tem[i] == '-') {
+	    if (arg.size())
+	      outputOptions_.push_back(arg);
+	    arg.resize(0);
+	  }
+	  else
+	    arg += tem[i];
+	}
+	if (arg.size())
+	  outputOptions_.push_back(arg);
+      }
+    }
     break;
   case 'o':
     if (*arg == 0)

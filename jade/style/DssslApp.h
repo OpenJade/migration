@@ -28,8 +28,6 @@ protected:
   int init(int argc, AppChar **argv);
   int unitsPerInch_;
   StringC defaultOutputBasename_;
-  static Boolean matchCi(const StringC &s, const char *key);
-  virtual void handleAttribute(const StringC &name, StringC &value);
 private:
   void processGrove();
   int generateEvents(ErrorCountEventHandler *eceh);
@@ -41,13 +39,11 @@ private:
   Boolean handleAttlistPi(const Char *, size_t, const Location &);
   static void skipS(const Char *&s, size_t &n);
   static Boolean isS(Char c);
+  static Boolean matchCi(const StringC &s, const char *key);
   static Boolean matchCi(const Char *s, size_t n, const char *key);
   static Boolean getAttribute(const Char *&s, size_t &n,
 			      StringC &name, StringC &value);
   Boolean initSpecParser();
-
-  Boolean piIsDsssl_;
-  StringC piHref_;
 
   Boolean dssslSpecOption_;
   StringC dssslSpecSysid_; // system ID of doc

@@ -14,8 +14,6 @@
 #include <OpenSP/ArcEngine.h>
 #include <OpenSP/Entity.h>
 #include <OpenSP/MessageTable.h>
-#include <OpenSP/ErrorCountEventHandler.h>
-#include <OpenSP/Event.h>
 
 #include <ctype.h>
 #include <string.h>
@@ -79,7 +77,7 @@ int DssslApp::init(int argc, AppChar **argv)
   setlocale(LC_NUMERIC, "C");
 #endif
   MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
-                                                  OPENJADE_PACKAGE,
+                                                  "jade",
 						  OPENJADE_LOCALE_DIR);
   return ret;
 }
@@ -226,13 +224,13 @@ PrologPiEventHandler::PrologPiEventHandler(DssslApp &app)
 
 void PrologPiEventHandler::pi(PiEvent *event)
 {
-  if (app_->getDssslSpecFromPi(event->data(), 
-                               event->dataLength(), 
+  if (app_->getDssslSpecFromPi(event->data(),
+                               event->dataLength(),
                                event->location())) {
     gotSpec_ = 1;
     cancel();
   }
-  delete event; 
+  delete event;
 }
 
 void PrologPiEventHandler::endProlog(EndPrologEvent *event)
@@ -286,39 +284,41 @@ Boolean DssslApp::handleSimplePi(const Char *s, size_t n,
 				         dssslSpecSysid_);
 }
 
-void DssslApp::handleAttribute(const StringC &name, StringC &value)
-{
-  if (matchCi(name, "type")) {
-    static const char *types[] = {
-      "text/dsssl",
-      "text/x-dsssl",
-      "application/dsssl",
-      "application/x-dsssl"
-    };
-    for (size_t i = 0; i < SIZEOF(types); i++)
-      if (matchCi(value, types[i])) {
-	piIsDsssl_ = 1;
-	break;
-      }
-  }
-  else if (matchCi(name, "href")) 
-    value.swap(piHref_);
-}
-
 Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
 				  const Location &loc)
 {
   // FIXME maybe give warnings if syntax is wrong
+  Boolean hadHref = 0;
+  StringC href;
+  Boolean isDsssl = 0;
   StringC name;
   StringC value;
-  piIsDsssl_ = 0;
-  while (getAttribute(s, n, name, value)) 
-    handleAttribute(name, value);
-  if (!piIsDsssl_ || piHref_.size() == 0)
+  while (getAttribute(s, n, name, value)) {
+    if (matchCi(name, "type")) {
+      static const char *types[] = {
+	"text/dsssl",
+	"text/x-dsssl",
+	"application/dsssl",
+	"application/x-dsssl"
+      };
+      for (size_t i = 0; i < SIZEOF(types); i++)
+	if (matchCi(value, types[i])) {
+	  isDsssl = 1;
+	  break;
+	}
+      if (!isDsssl)
+	return 0;
+    }
+    else if (matchCi(name, "href")) {
+      hadHref = 1;
+      value.swap(href);
+    }
+  }
+  if (!isDsssl || !hadHref)
     return 0;
-  splitOffId(piHref_, dssslSpecId_);
+  splitOffId(href, dssslSpecId_);
   // FIXME should use location of attribute value rather than location of PI
-  return entityManager()->expandSystemId(piHref_, loc, 0, systemCharset(), 0, *this,
+  return entityManager()->expandSystemId(href, loc, 0, systemCharset(), 0, *this,
 				         dssslSpecSysid_);
 }
 

@@ -672,40 +672,13 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
   long lResult;
   double dResult;
   bool usingD;
+  bool spec = 0;
   int dim;
   switch (argv[0]->quantityValue(lResult, dResult, dim)) {
   case ELObj::noQuantity:
-    {
-      const LengthSpec *lsp = argv[0]->lengthSpec();
-      if (!lsp)
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantityOrLengthSpec, 0, argv[0]);
-      LengthSpec ls(*lsp);
-      for (int i = 1; i < argc; i++) {
-	lsp = argv[i]->lengthSpec();
-	if (lsp)
-	  ls += *lsp;
-	else {
-	  switch (argv[i]->quantityValue(lResult, dResult, dim)) {
-	  case ELObj::noQuantity:
-            return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
-	  		    i, argv[i]);
-	  case ELObj::longQuantity:
-	    dResult = lResult;
-	    // fall through
-	  case ELObj::doubleQuantity:
-	    if (dim != 1) {
-	      interp.setNextLocation(loc);
-	      interp.message(InterpreterMessages::incompatibleDimensions);
-	      return interp.makeError();
-	    }
-	    ls += dResult;
-	    break;
-	  }
-	}
-      }
-      return new (interp) LengthSpecObj(ls);
-    }
+    dim = 1;
+    spec = 1;
+    break;
   case ELObj::longQuantity:
     usingD = 0;
     break;
@@ -715,14 +688,16 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
   default:
     CANNOT_HAPPEN();
   }
-  for (int i = 1; i < argc; i++) {
+  for (int i = 1; !spec && i < argc; i++) {
     long lResult2;
     double dResult2;
     int dim2;
     switch (argv[i]->quantityValue(lResult2, dResult2, dim2)) {
     case ELObj::noQuantity:
-      return argError(interp, loc, InterpreterMessages::notAQuantity,
-		      i, argv[i]);
+      // FIXME shouldn't quantityValue set dim to 1 for length-specs ?
+      dim2 = 1;
+      spec = 1;
+      break;
     case ELObj::longQuantity:
       if (!usingD) {
 	if (lResult2 < 0) {
@@ -758,6 +733,35 @@ DEFPRIMITIVE(Plus, argc, argv, context, interp, loc)
       return interp.makeError();
     }
   }
+
+  if (spec) {
+    LengthSpec ls;
+    for (int i = 0; i < argc; i++) {
+      const LengthSpec *lsp = argv[i]->lengthSpec();
+      if (lsp)
+	ls += *lsp;
+      else {
+	switch (argv[i]->quantityValue(lResult, dResult, dim)) {
+	case ELObj::noQuantity:
+	  return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
+			  i, argv[i]);
+	case ELObj::longQuantity:
+	  dResult = lResult;
+	  // fall through
+	case ELObj::doubleQuantity:
+	  if (dim != 1) {
+	    interp.setNextLocation(loc);
+	    interp.message(InterpreterMessages::incompatibleDimensions);
+	    return interp.makeError();
+	  }
+	  ls += dResult;
+	  break;
+	}
+      }
+    }
+    return new (interp) LengthSpecObj(ls);
+  }
+
   if (!usingD) {
     if (dim == 0)
       return interp.makeInteger(lResult);
@@ -777,41 +781,13 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
   long lResult;
   double dResult;
   bool usingD;
+  bool spec = 0;
   int dim;
   switch (argv[0]->quantityValue(lResult, dResult, dim)) {
   case ELObj::noQuantity:
-     {
-      const LengthSpec *lsp = argv[0]->lengthSpec();
-      if (!lsp)
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantityOrLengthSpec, 0, argv[0]);
-      LengthSpec ls(*lsp);
-      for (int i = 1; i < argc; i++) {
-	lsp = argv[i]->lengthSpec();
-	if (lsp)
-	  ls -= *lsp;
-	else {
-	  switch (argv[i]->quantityValue(lResult, dResult, dim)) {
-	  case ELObj::noQuantity:
-            return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
-	  		    i, argv[i]);
-	  case ELObj::longQuantity:
-	    dResult = lResult;
-	    // fall through
-	  case ELObj::doubleQuantity:
-	    if (dim != 1) {
-	      interp.setNextLocation(loc);
-	      interp.message(InterpreterMessages::incompatibleDimensions);
-	      return interp.makeError();
-	    }
-	    ls -= dResult;
-	    break;
-	  }
-	}
-      }
-      return new (interp) LengthSpecObj(ls);
-    }
- case ELObj::longQuantity:
+    spec = 1;
+    break;
+  case ELObj::longQuantity:
     usingD = 0;
     break;
   case ELObj::doubleQuantity:
@@ -827,15 +803,15 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
       lResult = -lResult;
   }
   else {
-    for (int i = 1; i < argc; i++) {
+    for (int i = 1; !spec && i < argc; i++) {
       long lResult2;
       double dResult2;
       int dim2;
       switch (argv[i]->quantityValue(lResult2, dResult2, dim2)) {
       case ELObj::noQuantity:
-	return argError(interp, loc,
-			InterpreterMessages::notAQuantity, i,
-			argv[i]);
+        dim2 = dim;
+	spec = 1;
+	break;
       case ELObj::longQuantity:
 	if (!usingD) {
 	  if (lResult2 > 0) {
@@ -872,6 +848,42 @@ DEFPRIMITIVE(Minus, argc, argv, context, interp, loc)
       }
     }
   }
+
+  if (spec) {
+    LengthSpec ls;
+    for (int i = 0; i < argc; i++) {
+      const LengthSpec *lsp = argv[i]->lengthSpec();
+      if (lsp) {
+        if (i > 0 || argc == 1) 
+          ls -= *lsp;
+        else
+          ls += *lsp;
+      }
+      else {
+        switch (argv[i]->quantityValue(lResult, dResult, dim)) {
+        case ELObj::noQuantity:
+          return argError(interp, loc, InterpreterMessages::notAQuantityOrLengthSpec,
+        		  i, argv[i]);
+	case ELObj::longQuantity:
+	  dResult = lResult;
+	  // fall through
+	case ELObj::doubleQuantity:
+	  if (dim != 1) {
+	    interp.setNextLocation(loc);
+	    interp.message(InterpreterMessages::incompatibleDimensions);
+	    return interp.makeError();
+	  }
+          if (i > 0 || argc == 1) 
+	    ls -= dResult;
+          else 
+	    ls += dResult;
+	  break;
+	}
+      }
+    }
+    return new (interp) LengthSpecObj(ls);
+  }
+  
   if (!usingD) {
     if (dim == 0)
       return interp.makeInteger(lResult);

@@ -1,5 +1,20 @@
 Changes in OpenSP 1.5pre4
 
+* Fix 32-bit assumptions so we build on 64-bit platforms such
+  as Alpha.
+
+* Enable internationalized builds on Win32
+
+* Other Win32 fixes
+
+* Reinstate the '-widref' option which was accidentally removed.
+
+* Build hygene
+
+* German translation updates
+
+Changes in OpenSP 1.5pre4
+
 * More of Annex K supported: Common data attributes can now be
   specified in external entity declarations.
   

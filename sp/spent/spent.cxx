@@ -30,6 +30,8 @@ SpentApp::SpentApp()
 {
   registerOption('n', SP_T("non-sgml"), SpentMessages::nHelp);
   registerOption('r', SP_T("raw"), SpentMessages::rHelp);
+  registerInfo(SpentMessages::info1);
+  registerInfo(SpentMessages::info2);
 }
 
 void SpentApp::processOption(AppChar opt, const AppChar *arg)

@@ -57,7 +57,7 @@ protected:
                               const MessageType1 &doc);
   virtual void changeOptionRegistration(AppChar oldc, AppChar newc);
   virtual void registerUsage(const MessageType1 &u);
-  virtual void registerInfo(const MessageType0 &i, bool pre = 0);
+  virtual void registerInfo(const MessageType1 &i, bool pre = 0);
   // This is for backwards compability. Note that the second argument is the */
   // argument name and not the long option name as above.
   virtual void registerOption(AppChar c, const AppChar* argName =0);
@@ -70,8 +70,8 @@ protected:
   Vector<MessageType1> optDocs_;
   Vector<MessageFragment> optArgs_;
   Vector<MessageType1> usages_;
-  Vector<MessageType0> preInfos_;
-  Vector<MessageType0> infos_;
+  Vector<MessageType1> preInfos_;
+  Vector<MessageType1> infos_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;
   enum {

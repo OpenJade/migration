@@ -12,5 +12,8 @@ I1+oHelp++Output the entity named %1.
 I1+pHelp++Output the prolog.
 I1+rHelp++Raw.
 I1+xHelp++Expand references.
+I1+info1++%1 is an SGML markup stream editor. %1 parses the SGML document
+I1+info2++contained in SYSID... and copies portions of the document to the
+I1+info3++standard output, adding or changing markup as specified by the options.
 +option++OPTION
 +name++NAME

@@ -1,3 +1,21 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#~ msgid ""
+#~ msgstr ""
+
 msgid ""
 "no system identifier could be generated for meta-DTD for architecture %1"
 msgstr ""
@@ -167,11 +185,11 @@ msgstr "Ausgabedatei %1 kann nicht geöffnet werden (%2)"
 msgid "cannot close output file %1 (%2)"
 msgstr "Ausgabedatei %1 kann nicht geschlossen werden (%2)"
 
-msgid "Use bctf %1."
-msgstr "Benutze BCTF %1."
+msgid "Use bctf %1 for output."
+msgstr "Benutze BCTF %1 zur Ausgabe."
 
-msgid "Use encoding %1."
-msgstr "Benutze Kodierung %1."
+msgid "Use encoding %1 for output."
+msgstr "Benutze Kodierung %1 zur Ausgabe."
 
 msgid "Append error messages to file %1."
 msgstr "Hänge Fehlermeldungen an die Datei %1 an."
@@ -189,7 +207,16 @@ msgid "FILE"
 msgstr "DATEI"
 
 msgid "NOTHING"
-msgstr ""
+msgstr "Nichts"
+
+msgid "Try the \"--help\" option for more information."
+msgstr "Die \"--help\" Option liefert mehr Information."
+
+msgid "ARG"
+msgstr "ARGUMENT"
+
+msgid "Undocumented option (check the application's manual)."
+msgstr "Undokumentierte Option (siehe Programmdokumentation)."
 
 msgid "Use catalog %1."
 msgstr "Benutze Katalog %1."
@@ -2206,9 +2233,6 @@ msgstr "Notation %1 für externe Teilmenge undefiniert"
 msgid "delimiter "
 msgstr "Begrenzer "
 
-msgid ""
-msgstr ""
-
 msgid "digit"
 msgstr "Ziffer"
 
@@ -2445,6 +2469,41 @@ msgstr "Dasselbe wie -wdefault."
 msgid "Same as -wundef."
 msgstr "Dasselbe wie -wundef."
 
+msgid "%1 parses and validates the SGML document whose document entity is"
+msgstr ""
+"%1 parsed und validiert das SGML Dokument dessen Dokumententität durch die"
+
+msgid "specified by the system identifiers SYSID... and prints on the standard"
+msgstr ""
+"Systembezeichner SYSID... spezifiziert ist und gibt auf der Standardausgabe"
+
+msgid ""
+"output a simple text representation of its Element Structure Information Set."
+msgstr ""
+"eine einfache Textrepräsentation seiner Elementstrukturinformationsmenge "
+"(ESIS) aus."
+
+msgid "If more than one system identifier is specified, then the corresponding"
+msgstr ""
+"Sind mehrere Systembezeichner spezifiziert, so ist die Dokumententität die"
+
+msgid "entities will be concatenated to form the document entity. If no system"
+msgstr ""
+"Verkettung der entsprechenden Entitäten. Ist kein Systembezeichner "
+"spezifiziert,"
+
+msgid "identifiers are specified, then %1 will read the document entity from"
+msgstr ""
+"so liest %1 die Dokumententität von der Standardeingabe. Auf der "
+"Kommandozeile"
+
+msgid "the standard input. A command line system identifier of - can be used"
+msgstr ""
+"kann der Systembezeichner - verwendet werden, um die Standardeingabe zu"
+
+msgid "to refer to the standard input."
+msgstr "spezifizieren."
+
 msgid "OPTION"
 msgstr "OPTION"
 
@@ -2485,7 +2544,7 @@ msgstr ""
 "Bereich impliziert; nicht normalisiert"
 
 msgid "Hoist omitted tags."
-msgstr ""
+msgstr "Ziehe weggelassene Tags aus internen Entitäten heraus."
 
 msgid "Prefer lowercase."
 msgstr "Ziehe Kleinschreibung vor."
@@ -2505,8 +2564,33 @@ msgstr "Roh."
 msgid "Expand references."
 msgstr "Expandiere Referenzen."
 
+msgid "%1 is an SGML markup stream editor. %1 parses the SGML document"
+msgstr "%1 ist ein SGML Markupstromeditor. %1 parsed das SGML Dokument, das in"
+
+msgid "contained in SYSID... and copies portions of the document to the"
+msgstr ""
+"SYSID... enthalten ist und kopiert Teile des Dokumentes in die Standard-"
+
+msgid "standard output, adding or changing markup as specified by the options."
+msgstr ""
+"ausgabe, wobei Markup entsprechend der Optionen hinzugefügt oder verändert "
+"wird."
+
 msgid "Modify the XML output according to %1."
 msgstr "Modifiziere die XML Ausgabe gemäß %1."
+
+msgid "%1 converts SGML to XML. %1 parses and validates the SGML document"
+msgstr "%1 konvertiert SGML zu XML. %1 parsed und validiert das SGML Dokument, das in"
+
+msgid ""
+"contained in SYSID... and writes an equivalent XML document to the standard"
+msgstr ""
+"SYSID... enthalten ist und gibt ein äquivalentes XML Dokument auf der "
+"Standard-"
+
+msgid ""
+"output. %1 will warn about SGML constructs which have no XML equivalent."
+msgstr "ausgabe aus. %1 warnt vor SGML-Konstrukten, die keine XML-Entsprechung haben."
 
 msgid "reference to internal SDATA entity %1 not allowed in XML"
 msgstr "Referenz auf interne SDATA Entität %1 in XML nicht erlaubt"
@@ -2545,8 +2629,18 @@ msgstr "Gib Kommentare aus."
 msgid "Raw output."
 msgstr "Rohe Ausgabe."
 
+msgid "%1 prints on the standard output a normalized document instance"
+msgstr "%1 gibt auf der Standardausgabe eine normalisierte Dokumentinstanz für"
+
+msgid "for the SGML document contained in the concatenation of the entities"
+msgstr "das in der Verkettung der Entitäten mit den Systembezeichnern SYSID..."
+
+msgid "with system identifiers SYSID..."
+msgstr "enthaltene SGML Dokument aus."
+
 msgid "Print the effective system id for the public id %1."
-msgstr "Gib den effektiven Systembezeichner für den öffentlichen Bezeichner %1 aus."
+msgstr ""
+"Gib den effektiven Systembezeichner für den öffentlichen Bezeichner %1 aus."
 
 msgid "Print the effective system id for system id %1."
 msgstr "Gib den effektiven Systembezeichner für Systembezeichner %1 aus."
@@ -2567,7 +2661,25 @@ msgid "Print the effective system id for notation %1."
 msgstr "Gib den effektiven Systembezeichner für Notation %1 aus."
 
 msgid "Print the effective system id for the SGML declaration for doctype %1."
-msgstr "Gib den effektiven Systembezeichner für die SGML Deklaration für Dokumenttyp %1 aus."
+msgstr ""
+"Gib den effektiven Systembezeichner für die SGML Deklaration für Dokumenttyp "
+"%1 aus."
+
+msgid "%1 prints effective system identifiers found in the catalogs on the"
+msgstr ""
+"%1 gibt den in den Katalogen gefundenen effektiven Systembezeichner auf"
+
+msgid ""
+"standard output. It doesn't check that the system identifiers correspond"
+msgstr ""
+"der Standardausgabe aus. %1 prüft nicht, ob der Systembezeichner auf eine"
+
+msgid ""
+"to actual files. The return value is 0 if the last system identifier was"
+msgstr "existierende Datei verweist. Der Rückgabewert ist 0, falls der letzte"
+
+msgid "successfully created and 1 otherwise."
+msgstr "Systembezeichner erfolgreich erzeugt wurde, sonst 1."
 
 msgid "LITERAL"
 msgstr "LITERAL"
@@ -2577,3 +2689,12 @@ msgstr "nicht-SGML"
 
 msgid "raw"
 msgstr "roh"
+
+msgid "%1 prints the concatenation of the entities with system identifiers"
+msgstr "%1 gibt die Verkettung der Entitäten mit den Systembezeichnern"
+
+msgid "SYSID... on the standard output"
+msgstr "SYSID... auf der Standardausgabe aus."
+
+#~ msgid "NAME "
+#~ msgstr "NAME"

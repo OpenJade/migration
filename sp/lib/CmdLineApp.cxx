@@ -153,7 +153,7 @@ void CmdLineApp::registerUsage(const MessageType1 &u)
   usages_.push_back(u);
 }
 
-void CmdLineApp::registerInfo(const MessageType0 &i, bool pre)
+void CmdLineApp::registerInfo(const MessageType1 &i, bool pre)
 {
   if (pre)
     preInfos_.push_back(i);
@@ -175,29 +175,24 @@ void CmdLineApp::usage()
 {
   const OutputCharStream::Newline nl = OutputCharStream::newline;
   Owner<OutputCharStream> stdOut(makeStdOut());
-  String<AppChar> tmp;
-  if (progName) {
-    StringMessageArg arg(convertInput(progName));
-    Vector<CopyOwner<MessageArg> > args(1);
-    args[0] = arg.copy();
-    if (usages_.size() == 0) 
-      usages_.push_back(CmdLineAppMessages::defaultUsage);
-    for (size_t i = 0; i < usages_.size(); i++) {
-      StrOutputCharStream ostr;
-      StringC tem;
-      formatMessage(usages_[i], args, ostr, 1);
-      ostr.extractString(tem); 
-      Vector<CopyOwner<MessageArg> > args2(1);
-      StringMessageArg arg2(tem);
-      args2[0] = arg2.copy();
-      formatMessage(i ? CmdLineAppMessages::usageCont 
-		    : CmdLineAppMessages::usage,
-		    args2, *stdOut, 1);
-      *stdOut << nl;
-    } 
-  }
-
-  Vector<CopyOwner<MessageArg> > args;
+  Vector<CopyOwner<MessageArg> > args(1);
+  StringMessageArg arg(convertInput(progName ? progName : SP_T("program")));
+  args[0] = arg.copy();
+  if (usages_.size() == 0) 
+    usages_.push_back(CmdLineAppMessages::defaultUsage);
+  for (size_t i = 0; i < usages_.size(); i++) {
+    StrOutputCharStream ostr;
+    StringC tem;
+    formatMessage(usages_[i], args, ostr, 1);
+    ostr.extractString(tem); 
+    Vector<CopyOwner<MessageArg> > args2(1);
+    StringMessageArg arg2(tem);
+    args2[0] = arg2.copy();
+    formatMessage(i ? CmdLineAppMessages::usageCont 
+		  : CmdLineAppMessages::usage,
+		  args2, *stdOut, 1);
+    *stdOut << nl;
+  } 
   for (size_t i = 0; i < preInfos_.size(); i++) {
     formatMessage(preInfos_[i], args, *stdOut, 1);
     *stdOut << nl;
@@ -241,61 +236,19 @@ void CmdLineApp::usage()
     }
     if (s.size() > leftSize)
       leftSize = s.size();
-#if 0
-    Vector<CopyOwner<MessageArg> > args(3);
-    if (opts_[i].key) {
-      AppChar buf[2];
-      buf[0] = opts_[i].key;
-      buf[1] = SP_T('\0');
-      StringMessageArg arg(convertInput(buf));
-      args[0] = arg.copy(); 
-    }
-    if (opts_[i].name) { 
-      StringMessageArg arg(convertInput(opts_[i].name));
-      args[1] = arg.copy(); 
-    }
-    StringC t;
-    getMessageText(optArgs_[i], t);
-    StringMessageArg arg2(t);
-    args[2] = arg2.copy(); 
-    StrOutputCharStream ostr;
-    const char *a = "";
-    if (opts_[i].key) {
-      if (opts_[i].name) 
-        a = opts_[i].hasArgument ? "  -%1, --%2=%3"
-                         : "  -%1, --%2"; 
-      else  
-        a = opts_[i].hasArgument ? "  -%1 %3" 
-                         :  "  -%1"; 
-    } 
-    else if (opts_[i].name) {
-     a = opts_[i].hasArgument ? "  --%2=%3"
-                      : "  --%2"; 
-    }
-    formatMessage(MessageType3(MessageType::info, MessageFragment::libModule, 0
-#ifndef SP_NO_MESSAGE_TEXT
-                         ,a
-#endif
-           ), args, ostr, 1);
-    StringC tem;
-    ostr.extractString(tem);
-    leftSide.push_back(tem);
-    if (tem.size() > leftSize)
-      leftSize = tem.size(); 
-#endif
   }
   leftSize += 2;
   for (size_t i = 0; i < opts_.size(); i++) {
     for (size_t j = leftSide[i].size(); j <= leftSize; j++)
       leftSide[i] += ' ';
     StrOutputCharStream ostr;
-    Vector<CopyOwner<MessageArg> > args(1);
+    Vector<CopyOwner<MessageArg> > args2(1);
     StringC t;
     if (!getMessageText(optArgs_[i], t))
       t.resize(0);
     StringMessageArg arg(t);
-    args[0] = arg.copy(); 
-    formatMessage(optDocs_[i], args, ostr, 1);
+    args2[0] = arg.copy(); 
+    formatMessage(optDocs_[i], args2, ostr, 1);
     StringC tem;
     ostr.extractString(tem);
     *stdOut << leftSide[i] << tem << nl;

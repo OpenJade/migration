@@ -88,7 +88,7 @@
 
 (define (write-empty-line) (write-line ""))
 
-(define newline (list->string (list #\line-feed #\carriage-return)))
+(define newline "\carriage-return;\line-feed;")
 
 (define (write-line string)
     (make formatting-instruction

@@ -1,0 +1,7 @@
+Character Primitives
+(char=? #\a #\b --> #f
+(char=? #\a #\a --> #t
+(char=? #\a #\A --> #f
+
+String Primitives
+

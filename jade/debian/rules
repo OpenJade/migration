@@ -74,9 +74,9 @@ ChangeLog:
 	[ ! -e OpenJade-$(UPSTREAM_VERSION) ]
 	[ -f $(cvs_pure_src_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz ]
 	tar -xzvf $(cvs_pure_src_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz \
-		 OpenJade-$(UPSTREAM_VERSION)/ChangeLog
-	mv OpenJade-$(UPSTREAM_VERSION)/ChangeLog .
-	rm -r OpenJade-$(UPSTREAM_VERSION)
+		 OpenJade-1.4devel/ChangeLog
+	mv OpenJade-1.4devel/ChangeLog .
+	rm -r OpenJade-1.4devel
 
 config.status:	ChangeLog
 	automake --add-missing

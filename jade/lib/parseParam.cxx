@@ -599,9 +599,7 @@ Boolean Parser::parseTagNameGroup(Boolean &active)
   for (size_t i = 0; i < parm.nameTokenVector.size(); i++) {
     Ptr<Dtd> dtd = lookupDtd(parm.nameTokenVector[i].name).pointer();
     if (!dtd.isNull()) {
-      if (instantiateDtd(dtd) > sd().concur()) 
-	message(ParserMessages::concurrentInstances, 
-		NumberMessageArg(sd().concur()));
+      instantiateDtd(dtd);
       if (currentDtdPointer() == dtd)
 	active = 1;
     }

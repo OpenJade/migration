@@ -123,7 +123,8 @@ public:
   }
   FlowObj();
   FlowObj(const FlowObj &fo)
-    : style_(fo.style_), locp_(fo.locp_ ? new Location(*fo.locp_) : 0)
+    : SosofoObj(fo), style_(fo.style_),
+    locp_(fo.locp_ ? new Location(*fo.locp_) : 0)
     { }
   virtual FlowObj *copy(Collector &) const = 0;
   virtual CompoundFlowObj *asCompoundFlowObj();

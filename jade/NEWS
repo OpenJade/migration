@@ -1,0 +1,16 @@
+Changes in OpenJade ?.?.?
+
+* Style language additions: map-constructor
+ 
+* + and - return a length-spec if any of there arguments
+  is a length-spec
+
+* Most of the non-core expression language:
+  c...r,  keyword->string, string->keyword, exact?, inexact?,
+  zero?, positive?, negative?, odd?, even?, exp, log, sin, cos,
+  tan, asin, acos, atan, expt, exact->inexact, inexact->exact,
+  quantity->number, string->list, list->string, map, time<?,
+  time>?, time<=?, time>=?
+
+
+1.2.1  The begin.

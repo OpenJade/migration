@@ -1,6 +1,4 @@
-* Finish long options support:
-  Document the long options 
-  Wrap lines in help message. (Add wrapping OutputCharStream.)
+* Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message
 
 * remove the empty delimEnd message by changing the code to use
@@ -8,6 +6,8 @@
 
 * fix the problem with non-ASCII in osx's usage() message and
   also in eg. onsgmls --bctf=utf-8 --help. 
+
+* Link the OpenSP docs from the web page.
 
 Things which are missing and need a lot of work
 ===============================================

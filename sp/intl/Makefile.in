@@ -58,9 +58,9 @@ OBJECTS = @INTLOBJS@ bindtextdom.o dcgettext.o dgettext.o gettext.o \
 finddomain.o loadmsgcat.o localealias.o textdomain.o
 CATOBJS = cat-compat.o ../po/cat-id-tbl.o
 GETTOBJS = intl-compat.o
-DISTFILES.common = ChangeLog Makefile.in linux-msg.sed po2tbl.sed.in \
+DISTFILES.common = Makefile.in linux-msg.sed po2tbl.sed.in \
 xopen-msg.sed $(HEADERS) $(SOURCES)
-DISTFILES = $(DISTFILES.common) VERSION
+DISTFILES = $(DISTFILES.common)
 DISTFILES.gettext = $(DISTFILES.common) libintl.glibc libintl.inst
 
 .SUFFIXES:
@@ -82,6 +82,8 @@ libintl.a: $(OBJECTS)
 	cd ../po && $(MAKE) cat-id-tbl.o
 
 check install: all
+
+installcheck:
 
 # This installation goal is only used in GNU gettext.  Packages which
 # only use the library should use install instead.
@@ -140,7 +142,7 @@ maintainer-clean: distclean
 
 
 distdir = ../$(PACKAGE)-$(VERSION)/$(subdir)
-dist: Makefile $(DISTFILES)
+distdir: Makefile $(DISTFILES)
 	for file in $(DISTFILES); do \
 	  ln $(srcdir)/$$file $(distdir) 2> /dev/null \
 	    || cp -p $(srcdir)/$$file $(distdir); \

@@ -181,6 +181,7 @@ private:
   void initMessage(Message &);
   void parsePublic();
   void parseDelegate();
+  void parseDtddecl();
   void parseSystem();
   void parseNameMap(EntityDecl::DeclType declType);
   void parseOverride();
@@ -222,6 +223,7 @@ private:
   StringC noKey_;
   StringC baseKey_;
   StringC delegateKey_;
+  StringC dtddeclKey_;
   XcharMap<unsigned char> categoryTable_;
   SubstTable<Char> substTable_;
   Boolean override_;
@@ -744,7 +746,8 @@ CatalogParser::CatalogParser(const CharsetInfo &charset)
   yesKey_(charset.execToDesc("YES")),
   noKey_(charset.execToDesc("NO")),
   baseKey_(charset.execToDesc("BASE")),
-  delegateKey_(charset.execToDesc("DELEGATE"))
+  delegateKey_(charset.execToDesc("DELEGATE")),
+  dtddeclKey_(charset.execToDesc("DTDDECL"))
 {
   static const char lcletters[] = "abcdefghijklmnopqrstuvwxyz";
   static const char ucletters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -854,6 +857,8 @@ void CatalogParser::parseCatalog(const StringC &sysid,
       }
       else if (param_ == delegateKey_)
 	parseDelegate();
+      else if (param_ == dtddeclKey_)
+	parseDtddecl();
       else {
 	if (!wasRecovering && parseParam() == eofParam)
 	  break;
@@ -956,6 +961,17 @@ void CatalogParser::parseDelegate()
   if (!parseArg())
     return;
   catalog_->addDelegate(publicId, param_, paramLoc_, override_);
+}
+
+void CatalogParser::parseDtddecl()
+{
+  message(CatalogMessages::dtddeclNotSupported);
+  if (parseParam(minimumLiteral) != literalParam) {
+    message(CatalogMessages::literalExpected);
+    return;
+  }
+  if (!parseArg())
+    return;
 }
 
 void CatalogParser::parseSystem()

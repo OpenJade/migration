@@ -30,6 +30,8 @@ struct CatalogMessages {
   static const MessageType1 noDocumentEntry;
   // 2111
   static const MessageType2 noPublicEntry;
+  // 2112
+  static const MessageType0 dtddeclNotSupported;
 };
 const MessageType0 CatalogMessages::nameExpected(
 MessageType::error,
@@ -173,6 +175,18 @@ MessageFragment::appModule,
 2111
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no entry for public identifier %1 in catalog %2"
+#endif
+);
+const MessageType0 CatalogMessages::dtddeclNotSupported(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+2112
+#ifndef SP_NO_MESSAGE_TEXT
+,"DTDDECL catalog entries are not supported"
 #endif
 );
 #ifdef SP_NAMESPACE

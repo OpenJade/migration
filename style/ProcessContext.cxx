@@ -235,7 +235,7 @@ void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
       Port &port = conn->ports[i];
       for (size_t j = 0; j < port.labels.size(); j++)
 	if (port.labels[j] == label) {
-	  restoreConnection(connLevel, j);
+	  restoreConnection(connLevel, i);
 	  return;
 	}
     }
@@ -635,11 +635,15 @@ SetNonInheritedCsSosofoObj::~SetNonInheritedCsSosofoObj()
 ELObj *SetNonInheritedCsSosofoObj::resolve(ProcessContext &context)
 {
   VM &vm = context.vm();
+  StyleStack *saveStyleStack = vm.styleStack;
   vm.styleStack = &context.currentStyleStack();
+  unsigned saveSpecLevel = vm.specLevel;
+  vm.specLevel = vm.styleStack->level();
   Vector<size_t> dep;
   vm.actualDependencies = &dep;
   ELObj *obj = vm.eval(code_.pointer(), display_, flowObj_->copy(*vm.interp));
-  vm.styleStack = 0;
+  vm.styleStack = saveStyleStack;
+  vm.specLevel = saveSpecLevel;
   if (vm.interp->isError(obj))
     return 0;
   return obj;
@@ -647,11 +651,16 @@ ELObj *SetNonInheritedCsSosofoObj::resolve(ProcessContext &context)
 
 void SetNonInheritedCsSosofoObj::process(ProcessContext &context)
 {
+  context.startFlowObj();
+  unsigned flags = 0;
+  flowObj_->pushStyle(context, flags);
   ELObj *obj = resolve(context);
   if (obj) {
     ELObjDynamicRoot protect(*context.vm().interp, obj);
-    ((FlowObj *)obj)->process(context);
+    ((FlowObj *)obj)->processInner(context);
   }
+  flowObj_->popStyle(context, flags);
+  context.endFlowObj();
 }
 
 bool SetNonInheritedCsSosofoObj::isCharacter()

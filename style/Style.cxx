@@ -137,10 +137,18 @@ ELObj *StyleStack::inherited(const ConstPtr<InheritedC> &ic, unsigned specLevel,
   return spec->value(vm, style, dependencies);
 }
 
-ELObj *StyleStack::actual(const ConstPtr<InheritedC> &ic, Interpreter &interp,
-			  Vector<size_t> &dependencies)
+ELObj *StyleStack::actual(const ConstPtr<InheritedC> &ic, const Location &loc,
+			  Interpreter &interp, Vector<size_t> &dependencies)
 {
   size_t ind = ic->index();
+  for (size_t i = 0; i < dependencies.size(); i++) {
+    if (dependencies[i] == ind) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::actualLoop,
+		     StringMessageArg(ic->identifier()->name()));
+      return interp.makeError();
+    }
+  }
   dependencies.push_back(ind);
   ConstPtr<InheritedC> spec;
   const VarStyleObj *style = 0;
@@ -161,7 +169,6 @@ ELObj *StyleStack::actual(const ConstPtr<InheritedC> &ic, Interpreter &interp,
       spec = p->spec;
     }
   }
-  // FIXME catch loops
   VM vm(interp);
   vm.styleStack = this;
   vm.specLevel = level_;

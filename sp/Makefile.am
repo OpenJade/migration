@@ -22,3 +22,9 @@ BUILT_SOURCES = config.h msggen.pl
 EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak
 
+dist-hook:
+	if test -f $(top_srcdir)/update-changelog; then \
+	  cd $(top_srcdir); \
+	  ./update-changelog; \
+	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
+	fi

@@ -275,7 +275,7 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, const FOTBuilder::Extension *);
+	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
   void defineVariable(const StringC &);
   void endPart();
   void dEndPart();
@@ -345,6 +345,7 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool strictMode() const;
   void setNodeLocation(const NodePtr &);
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
@@ -360,15 +361,20 @@ public:
   enum LexCategory {
     lexLetter,			// a - z A - Z
     lexOtherNameStart,		// !$%&*/<=>?~_^:
+    lexAddNameStart,
     lexDigit,			// 0-9
     lexOtherNumberStart,	// -+.
+    lexOther,
     lexDelimiter,		// ;()"
     lexWhiteSpace,
-    lexOther
+    lexAddWhiteSpace
   };
   LexCategory lexCategory(Xchar);
   void addStandardChars(Owner<InputSource> &);
   void addSdataEntity(const StringC &name, const StringC &text, Owner<InputSource> &);
+  void addNameChars(Owner<InputSource> &);
+  void addSeparatorChars(Owner<InputSource> &);
+  void setCharRepertoire(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -458,6 +464,7 @@ private:
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool strictMode_;
   friend class Identifier;
 };
 
@@ -652,6 +659,12 @@ inline
 bool Interpreter::dsssl2() const
 {
   return dsssl2_;
+}
+
+inline
+bool Interpreter::strictMode() const
+{
+  return strictMode_;
 }
 
 inline

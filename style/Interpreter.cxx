@@ -55,6 +55,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+                         bool strictMode,
 			 const FOTBuilder::Extension *extensionTable)
 : groveManager_(groveManager),
   messenger_(messenger),
@@ -70,7 +71,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
   initialStyle_(0),
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
-  dsssl2_(dsssl2)
+  dsssl2_(dsssl2),
+  strictMode_(strictMode)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -86,8 +88,10 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installPortNames();
   installPrimitives();
   installUnits();
-  installCharNames();
-  installSdata();
+  if (!strictMode_) {
+    installCharNames();
+    installSdata();
+  }
   installFlowObjs();
   installInheritedCs();
   installNodeProperties();
@@ -95,15 +99,27 @@ Interpreter::Interpreter(GroveManager *groveManager,
   static const char *lexCategories[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "!$%&*/<=>?~_^:",
+    "",
     "0123456789",
     "-+.",
+    "",
     "();\"",
     " \t\r\n\f",
+    "",
   };
   lexCategory_.setChar(InputSource::eE, lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
+
+ // #',@[\\]`{|} are ASCII chars not mentioned above,
+ // but I guess we don't want to allow any of these
+ // in names (as most of them have special meaning in
+ // scheme/dsssl).
+ if (!strictMode_)
+   for (Char i = 127; i < charMax; i++)
+     lexCategory_.setChar(i, lexAddNameStart);
+
   initialProcessingMode_.setDefined();
   // can't be done before initializing lexCategory_
   installBuiltins();
@@ -467,6 +483,25 @@ bool getToken(InputSource *in, Interpreter &inp)
    }
 }
 
+void Interpreter::setCharRepertoire(const StringC &pubid)
+{
+  if (pubid == "UNREGISTERED::James Clark//Character Repertoire::Jade") {
+    if (strictMode_) {
+      installCharNames();
+      installSdata();
+      // This assumes that we process char-repertoire
+      // declaration before any declarations which change
+      // lexical categories.
+      for (Char i = 127; i < charMax; i++)
+        lexCategory_.setChar(i, lexAddNameStart);
+      strictMode_ = 0;
+    }
+   } else {
+     message(InterpreterMessages::unsupportedCharRepertoire,
+                StringMessageArg(pubid));
+   }
+}
+ 
 void Interpreter::addStandardChars(Owner<InputSource> &ins) 
 {
   InputSource *in = ins.pointer();
@@ -509,6 +544,40 @@ void Interpreter::addStandardChars(Owner<InputSource> &ins)
     }
     else 
       namedCharTable_.insert(name, ch, 1);
+  }
+}
+
+void Interpreter::addNameChars(Owner<InputSource> &ins)
+{
+  InputSource *in = ins.pointer();
+  if (!in)
+    return;
+  for (;;) {
+    if (!getToken(in, *this))
+      break;
+    StringC ch(in->currentTokenStart(), in->currentTokenLength());
+
+    const CharPart *cp = namedCharTable_.lookup(ch);
+    if (cp && lexCategory_[cp->c] == lexOther)
+      lexCategory_.setChar(cp->c, lexAddNameStart);
+    // FIXME else give an error
+  }
+}
+
+void Interpreter::addSeparatorChars(Owner<InputSource> &ins)
+{
+  InputSource *in = ins.pointer();
+  if (!in)
+    return;
+  for (;;) {
+    if (!getToken(in, *this))
+      break;
+    StringC ch(in->currentTokenStart(), in->currentTokenLength());
+
+    const CharPart *cp = namedCharTable_.lookup(ch);
+    if (cp && lexCategory_[cp->c] == lexOther)
+      lexCategory_.setChar(cp->c, lexAddWhiteSpace);
+    // FIXME else give an error
   }
 }
 

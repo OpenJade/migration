@@ -125,12 +125,12 @@ private:
   void createQuasiquoteAbbreviation(const char *, Owner<Expression> &);
   bool parseRuleBody(Owner<Expression> &, ProcessingMode::RuleType &);
   bool getToken(unsigned, Token &);
-  bool isDelimiter(Xchar);
+  bool handleNumber(unsigned, Token &);
+  bool handleIdentifier(unsigned, Token &);
   void extendToken();
   bool scanString();
   void skipComment();
   bool tokenRecover(unsigned, Token &);
-  bool tokenIsNumber();
   bool scanString(unsigned, Token &);
   ELObj *convertAfiiGlyphId(const StringC &);
   Identifier *lookup(const StringC &str);

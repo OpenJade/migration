@@ -55,6 +55,7 @@ private:
   StringC rootSystemId_;
   bool debugMode_;
   bool dsssl2_;
+  bool strictMode_;
 };
 
 #ifdef DSSSL_NAMESPACE

@@ -21,9 +21,10 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+                         bool strictMode,
 			 const FOTBuilder::Extension *extensionTable)
 : interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
-                               debugMode, dsssl2, extensionTable))
+                               debugMode, dsssl2, strictMode, extensionTable))
 {
 }
 
@@ -52,6 +53,15 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
 	    Owner<InputSource> in;
 	    diter.cur()->makeInputSource(specHandler, in);
 	    switch (diter.cur()->type()) {
+            case DssslSpecEventHandler::DeclarationElement::charRepertoire:
+              interpreter_->setCharRepertoire(diter.cur()->name());
+              break;
+            case DssslSpecEventHandler::DeclarationElement::addNameChars:
+              interpreter_->addNameChars(in);
+              break;
+            case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
+              interpreter_->addSeparatorChars(in);
+              break;
 	    case DssslSpecEventHandler::DeclarationElement::standardChars:
 	      interpreter_->addStandardChars(in);
 	      break;

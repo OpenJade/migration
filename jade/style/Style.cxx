@@ -572,6 +572,17 @@ CIEABCColorSpaceObj::~CIEABCColorSpaceObj()
   delete abcData_;
 }
 
+void CIEABCColorSpaceObj::traceSubObjects(Collector &c) const
+{ 
+  for (int i = 0; i < 3; i++)  
+    if (abcData_->decodeAbc_[i])
+      c.trace(abcData_->decodeAbc_[i]);
+  for (int i = 0; i < 3; i++)  
+    if (abcData_->decodeLmn_[i])
+      c.trace(abcData_->decodeLmn_[i]);
+  
+}
+
 static 
 bool applyFunc(Interpreter &interp, FunctionObj *f, double &d)
 {
@@ -667,6 +678,15 @@ CIEAColorSpaceObj::CIEAColorSpaceObj(const double *wp, const double *bp,
 CIEAColorSpaceObj::~CIEAColorSpaceObj()
 {
   delete aData_;
+}
+
+void CIEAColorSpaceObj::traceSubObjects(Collector &c) const
+{ 
+  if (aData_->decodeA_)
+    c.trace(aData_->decodeA_);
+  for (int i = 0; i < 3; i++)  
+    if (aData_->decodeLmn_[i])
+      c.trace(aData_->decodeLmn_[i]);
 }
 
 ELObj *CIEAColorSpaceObj::makeColor(int argc, ELObj **argv,

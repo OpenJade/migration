@@ -186,6 +186,9 @@ public:
 class CIEXYZColorSpaceObj : public ColorSpaceObj {
 public:
   CIEXYZColorSpaceObj(const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   ~CIEXYZColorSpaceObj();
   ELObj *makeColor(const double *, Interpreter &);
 protected:
@@ -201,6 +204,9 @@ struct XYZData {
 class CIELUVColorSpaceObj : public CIEXYZColorSpaceObj {
 public:
   CIELUVColorSpaceObj(const double *, const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   ~CIELUVColorSpaceObj();
   ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
 private:
@@ -213,6 +219,9 @@ struct LUVData {
 class CIELABColorSpaceObj : public CIEXYZColorSpaceObj {
 public:
   CIELABColorSpaceObj(const double *, const double *, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   ~CIELABColorSpaceObj();
   ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
 private:
@@ -227,7 +236,11 @@ public:
   CIEABCColorSpaceObj(const double *, const double *, const double *,
                       FunctionObj **, const double *, const double *,
                       FunctionObj **, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   ~CIEABCColorSpaceObj();
+  void traceSubObjects(Collector &) const;
   ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
 private:
 struct ABCData {
@@ -246,7 +259,11 @@ public:
   CIEAColorSpaceObj(const double *, const double *, const double *,
                     FunctionObj *, const double *, const double *,
                     FunctionObj **, const double *);
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   ~CIEAColorSpaceObj();
+  void traceSubObjects(Collector &) const;
   ELObj *makeColor(int argc, ELObj **argv, Interpreter &interp, const Location &);
 private:
 struct AData {

@@ -253,6 +253,19 @@ Multiple
 Parse only the prolog. Onsgmls will exit after parsing the document type
 declaration. Implies <tt>-s</tt>.</dd>
 
+<dt><a NAME="optR"></a><tt>-R</tt>, <tt>--restricted</tt></dt>
+
+<dd>
+Restrict file reading. This option is intended for use with onsgmls-based
+Web tools (e.g., CGI scripts) to prevent reading of arbitrary
+files on the Web server. With this option enabled, onsgmls will not
+read any local files unless they are located in a directory (or
+subdirectory) specified by the <tt>-D</tt> option or included in the
+SGML_SEARCH_PATH environment variable. As a further security
+precaution, this option limits filenames to the characters
+A-Z, a-z, 0-9, '/', '.', '_', '-' and does not allow filenames
+containing "..".</dd>
+
 <dt><tt>-s</tt>, <tt>--no-output</tt></dt>
 
 <dd>

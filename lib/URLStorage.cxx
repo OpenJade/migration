@@ -7,7 +7,6 @@
 
 // FIXME This implementation won't work on an EBCDIC machine.
 
-#include <strstream.h>
 #include "splib.h"
 #ifdef WINSOCK
 #include <winsock.h>
@@ -19,6 +18,7 @@
 #define SP_HAVE_SOCKET
 #else
 #ifdef SP_HAVE_SOCKET
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -344,7 +344,6 @@ StorageObject *URLStorageManager::makeStorageObject(const StringC &specId,
 
 	while ( *line != ':' && *line != '/' )
 	  host += *line++ ;
-	host += (unsigned char)0 ;
 
 	if ( *line == ':' )
           while ( isdigit(*++line) )
@@ -354,7 +353,6 @@ StorageObject *URLStorageManager::makeStorageObject(const StringC &specId,
 
 	while ( *line && ! isspace(*line) )
           path += *line++ ;
-	path += (unsigned char)0 ;
 
 	break ;
 
@@ -555,15 +553,25 @@ HTTP_RESPONSE_TYPE HttpSocketStorageObject::open(const String<char> &host,
   if (!isdigit((unsigned char)host[0])) {
     request += host;
     if (port != 80) {
+      char portstr[sizeof(unsigned short)*3 + 1];
+      sprintf(portstr, "%u", port);
       request.append(":", 1);
-      ostrstream pbuf ;
-      pbuf << port << ends ;
-      request.append(pbuf.str(), strlen(pbuf.str())) ;
+      request.append(portstr, strlen(portstr));
     } 
+  }
+  request.append("\r\n", 2);
+  char* http_ua = getenv("SP_HTTP_USER_AGENT") ;
+  if ( ! http_ua )
+    http_ua = "libosp 1.5" ;
+  request.append("User-Agent: ", 12) ;
+  request.append(http_ua, strlen(http_ua)) ;
+  request.append("\r\n", 2);
+  const char* http_accept = getenv("SP_HTTP_ACCEPT") ;
+  if ( http_accept ) {
+    request.append("Accept: ", 8) ;
+    request.append(http_accept, strlen(http_accept) ;
     request.append("\r\n", 2);
   }
-  request.append("User-Agent: Code Valet 1.1 (libosp 1.5)\r\n", 41) ;
-//  request.append("Accept: text/*\r\n", 16);
   request.append("\r\n", 2);
 
   // FIXME check length of write

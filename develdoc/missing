@@ -10,11 +10,9 @@ missing DSSSL architectural element forms
 7.1.1	features
 7.1.2	sgml-grove-plan
 7.1.3	char-repertoire		* 
-7.1.4	standard-chars	      	*	
 7.1.5	other-chars             +
 7.1.6	baseset-encoding        + (the patch is only semi-functional)
 7.1.7	literal-described-char  + (the patch is only semi-functional)
-7.1.8	map-sdata-entity	*
 7.1.9	add-separator-chars	*
 7.1.10	add-name-chars		*
 7.1.11	combine-char            + (the patch is only semi-functional)
@@ -23,41 +21,12 @@ missing DSSSL architectural element forms
 missing expression language primitives
 ======================================
 
-8.5.3.5		c..r		 *
-8.5.3.15	assoc		 *
-8.5.5.2		keyword->string	 *
-8.5.5.3		string->keyword	 *
-8.5.7.6		exact?		 *
-		inexact?	 *
-8.5.7.8		zero?		 *
-		positive?	 *
-		negative?	 *
-		odd?		 *
-		even?		 *
-8.5.7.17	exp		 *
-		log		 *
-8.5.7.18	sin		 *
-		cos		 *
-		tan		 *
-8.5.7.19	asin		 *
-		acos		 *
-		atan		 *
-8.5.7.21	expt		 *
-8.5.7.22	exact->inexact	 *
-		inexact->exact	 *  
-8.5.7.23	quantity->number *
 8.5.8.1		declare-char-property
 		add-char-properties
 8.5.8.2		language?	 *
 		current-language *
 		with-language	 *
 8.5.8.2.1	define-language	 *
-8.5.8.2.1.1	collate		 *
-		element		 *
-		symbol		 *
-		order		 *
-8.5.8.2.1.2	toupper		 *
-		tolower		 *		
 8.5.8.4		char<?		 *
 		char>?		 *
 		char<=?		 * 
@@ -79,13 +48,6 @@ missing expression language primitives
 		string-ci>?	 *
 		string-ci<=?	 *
 		string-ci>=?	 *
-8.5.9.9		string->list	 *
-		list->string	 *
-8.5.10.3	map		 *
-8.5.11		time<?		 *
-		time>?		 *
-		time<=?		 *
-		time>=?		 *
 
 
 missing property set modules
@@ -149,10 +111,10 @@ missing SDQL primitives
 	node-list-sublist		*
 	node-list-count			*
 	node-list-last			*
-	there-exist?
-	for-all?
-	select-each
-	union-for-each
+	there-exist?                    *
+	for-all?                        *
+	select-each                     *
+	union-for-each                  *
 10.2.3	node-list-property		*
 	origin				*
 	origin-to-subnode-rel		*
@@ -203,7 +165,6 @@ Style language
 ==============
 
 12.4.1   query
-12.4.3	 map-constructor                      *
 12.4.6	 char-script-case
 	 declare-char-characteristic+property
 12.4.7	 sync

@@ -1,4 +1,5 @@
 PROG=ospcat
-OBJS=spcat.o
+OBJS=spcat.o spcat_inst.o
 INCLUDE=
 LIBS=../lib/libosp.a
+GENSRCS=spcat_inst.cxx

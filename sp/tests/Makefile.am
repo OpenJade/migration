@@ -16,10 +16,11 @@ $(SHOWSTOPPERS)
 
 EXTRA_DIST = $(TESTS)
 
-TESTS_ENVIRONMENT = top_srcdir=$(top_srcdir) PATH=.:../nsgmls:$$PATH \
-		    ONSGMLS=`echo onsgmls|sed '$(transform)'`\
-		    OSGMLNORM=`echo osgmlnorm|sed '$(transform)'`\
-		    $(SHELL)
+TESTS_ENVIRONMENT = top_srcdir=$(top_srcdir) \
+	PATH=.:../nsgmls:../sgmlnorm:../sx:../spent:../spcat:../spam:$$PATH \
+	ONSGMLS=`echo onsgmls|sed '$(transform)'`\
+	OSGMLNORM=`echo osgmlnorm|sed '$(transform)'`\
+	$(SHELL)
 
 # Two auxiliary programs used by the tests.
 INCLUDES = -I.. -I$(top_srcdir)/lib -I$(top_srcdir)/intl

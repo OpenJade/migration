@@ -81,8 +81,7 @@ ACX_CHECK_PATHNAME_STYLE_DOS
 dnl
 dnl  Checks for library functions.
 dnl 
-dnl FIXME add check for memcmp, recommended by autoscan
-AC_REPLACE_FUNCS(memmove strerror strtoul)
+AC_REPLACE_FUNCS(memmove memcmp strerror strtoul)
 AC_CHECK_FUNCS(setlocale gettext)
 if test "$ac_cv_have_gettext" = "no"
 then
@@ -92,10 +91,7 @@ fi
 dnl
 dnl Check for thread support.
 dnl
-dnl FIXME need to set SP_MUTEX_MACH
-dnl FIXME need to check for pthreads as well and set SP_MUTEX_PTHREADS
-AC_CHECK_LIB(threads,cthread_fork,LIB_THREADS="-lthreads",LIB_THREADS="")
-AC_SUBST(LIB_THREADS)
+AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 
 dnl
 dnl  HTTP support
@@ -133,8 +129,6 @@ AC_DEFINE(SP_NO_STD_NAMESPACE)
 AC_DEFINE(SP_DEFINE_TEMPLATES)
 dnl AC_DEFINE(SP_MANUAL_INST)
 dnl AC_DEFINE(SP_NEW_H_MISSING)
-dnl AC_DEFINE(SP_MUTEX_PTHREADS)
-dnl AC_DEFINE(SP_MUTEX_MACH)
 dnl AC_DEFINE(SP_QUAL_TEMPLATE_DTOR_BROKEN)
 dnl AC_DEFINE(SP_DECLARE_PLACEMENT_OPERATOR_NEW)
 dnl AC_DEFINE(SP_HAVE_PLACEMENT_OPERATOR_DELETE)

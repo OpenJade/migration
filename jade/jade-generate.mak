@@ -14,6 +14,7 @@ jade/HtmlFOTBuilder_inst.cxx \
 jade/RtfFOTBuilder_inst.cxx \
 jade/JadeMessages.h \
 jade/HtmlMessages.h \
+jade/RtfMessages.h \
 jade/DssslAppMessages.h \
 style/InterpreterMessages.h
 

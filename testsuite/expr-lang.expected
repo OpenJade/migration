@@ -30,6 +30,22 @@ Character Primitives
 (char-ci>=? #\a #\a) --> #t
 (char-ci>=? #\a #\A) --> #t
 
+Character Properties
+(char-property space? #\ ) --> #t
+(char-property space? #\  foo) --> #t
+(char-property space? #\!) --> #f
+(char-property space? #\! foo) --> foo
+(char-property break-before-priority #\ ) --> 2
+(char-property break-after-priority #\ ) --> 3
+(char-property break-before-priority #\a) --> 1
+(char-property break-after-priority #\a) --> 1
+(char-property funny #\a) --> #\a
+(char-property funny #\b) --> #\a
+(char-property funny #\c) --> #\a
+(char-property funny #\d) --> boring
+(char-property funny #\e) --> boring
+(char-property funny #\z) --> boring
+
 String Primitives
 
 Standard examples

@@ -14,6 +14,13 @@ Changes in OpenSP 1.5pre7
 
 * Enhancements to osx. Contributed by Jessica Perry Hekman, Dynamic Diagrams.
 
+* Added support for the PI-based architecture use declaration syntax
+  defined by Amendment 1 to ISO/IEC 10744:1997 (HyTime).  This makes
+  it possible to specify architectural support attributes when using
+  architectures with XML, and is generally simpler than the original
+  syntax.  See http://www.ornl.gov/sgml/wg8/document/1985.htm for
+  details.  Patch contributed by Peter Newcomb of Epremis Corp.
+
 Changes in OpenSP 1.5pre6
 
 * RPM spec file updates and corrections from Terje Bless

@@ -216,6 +216,7 @@ public:
 					  const Location &);
   const Syntax &attributeSyntax() const;
 
+  friend class PiAttspecParser;
 private:
   ParserState(const ParserState &); // undefined
   void operator=(const ParserState &); // undefined

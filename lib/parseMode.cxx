@@ -60,6 +60,7 @@ static struct {
   { mlitMode, modeUsedInProlog|modeUsedInSd },
   { mlitaMode, modeUsedInProlog|modeUsedInSd },
   { asMode, modeUsedInProlog },
+  { piPasMode, modeUsedInProlog },
   { slitMode, modeUsedInProlog },
   { slitaMode, modeUsedInProlog },
   { sdslitMode, modeUsedInSd },

@@ -15,6 +15,7 @@ exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
 datadir=@datadir@
+libdir=@libdir@
 
 DESTDIR=
 

@@ -16,7 +16,6 @@ datadir=@datadir@
 
 CXX=@CXX@
 CC=@CC@
-M4=@M4@
 PERL=@PERL@
 LIBTOOL=@LIBTOOL@
 INSTALL=@INSTALL@
@@ -47,7 +46,7 @@ CXXDEPGENFLAGS=-MM
 
 .m4.cxx:
 	rm -f $@
-	$(M4) $(srcdir)/../lib/instmac.m4 $< >$@
+	$(PERL) $(srcdir)/../lib/instmac.pl $< >$@
 	chmod -w $@
 
 .msg.h:

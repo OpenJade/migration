@@ -1,6 +1,5 @@
-openjade (1.4devel1-3.1) unstable; urgency=low
+openjade (1.4devel1-4) unstable; urgency=low
 
-  * EXPERIMENTAL
   * upstream changes from CVS, see NEWS
   * debian/rules: compile with -O3 instead of -O2 to try to get this thing
     faster; CXXFLAGS propogates to the library stuff properly now; remove
@@ -9,7 +8,7 @@ openjade (1.4devel1-3.1) unstable; urgency=low
     this is proper -- it certainly inhibits some warnings
   * debian/control: update standards to 3.5.0 (no changes required)
 
- -- Adam Di Carlo <aph@debian.org>  Wed, 31 Jan 2001 18:42:51 -0500
+ -- Adam Di Carlo <aph@debian.org>  Fri,  2 Feb 2001 21:44:24 -0500
 
 openjade (1.4devel1-3) unstable; urgency=low
 

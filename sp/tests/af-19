@@ -8,9 +8,9 @@ LC_ALL=C; export LC_ALL
 tmpfiles=""
 trap 'rm -fr $tmpfiles' 1 2 3 15
 
-tmpfiles="$tmpfiles af-1.sgml af-1.dtd af-meta-1.dtd"
-cat <<EOF >af-1.sgml
-<!DOCTYPE doc SYSTEM "af-1.dtd">
+tmpfiles="$tmpfiles af-19.sgml af-19.dtd af-meta-19.dtd"
+cat <<EOF >af-19.sgml
+<!DOCTYPE doc SYSTEM "af-19.dtd">
 <doc>
  <s>
   <v n="1">verse 1</v>
@@ -18,7 +18,7 @@ cat <<EOF >af-1.sgml
  </s>
 </doc>
 EOF
-cat <<EOF >af-1.dtd
+cat <<EOF >af-19.dtd
 <!NOTATION SGML PUBLIC "-//ISO 8879:1986//NOTATION Standard Generalized Markup
     Language//EN">
 
@@ -32,7 +32,7 @@ cat <<EOF >af-1.dtd
     complex CDATA "complex"
     -- ArcOpt CDATA "complex" cf. af-18 --
     ArcDTD CDATA #FIXED "opendtd">
-<!ENTITY opendtd SYSTEM "af-meta-1.dtd" CDATA SGML>
+<!ENTITY opendtd SYSTEM "af-meta-19.dtd" CDATA SGML>
 
 <!ELEMENT doc - o (s+)>
 <!ATTLIST doc
@@ -46,7 +46,7 @@ cat <<EOF >af-1.dtd
   open NMTOKEN #FIXED "verse">
 EOF
 
-cat <<EOF >af-meta-1.dtd
+cat <<EOF >af-meta-19.dtd
 <!ENTITY % complex "IGNORE">
 <!ELEMENT open     - o (stanza+)>
 <![%complex;[
@@ -59,13 +59,13 @@ cat <<EOF >af-meta-1.dtd
   n CDATA #REQUIRED>
 EOF
 
-tmpfiles="$tmpfiles af-1-onsgmls.out"
+tmpfiles="$tmpfiles af-19-onsgmls.out"
 
 : ${ONSGMLS=onsgmls}
-${ONSGMLS} >af-1-onsgmls.out -A open af-1.sgml
+${ONSGMLS} >af-19-onsgmls.out -A open af-19.sgml
 
-tmpfiles="$tmpfiles af-1-onsgmls.ok"
-cat <<EOF >af-1-onsgmls.ok
+tmpfiles="$tmpfiles af-19-onsgmls.ok"
+cat <<EOF >af-19-onsgmls.ok
 (OPEN
 (STANZA
 AN CDATA 1
@@ -82,15 +82,15 @@ C
 EOF
 
 : ${DIFF=diff}
-${DIFF} af-1-onsgmls.ok af-1-onsgmls.out
+${DIFF} af-19-onsgmls.ok af-19-onsgmls.out
 result=$?
 test $result = 0 || { rm -fr $tmpfiles; exit 1; }
 
-tmpfiles="$tmpfiles af-1-norm.out"
+tmpfiles="$tmpfiles af-19-norm.out"
 : ${OSGMLNORM=osgmlnorm}
-${OSGMLNORM} >af-1-norm.out -A open af-1.sgml
-tmpfiles="$tmpfiles af-1-norm.ok"
-cat <<EOF >af-1-norm.ok
+${OSGMLNORM} >af-19-norm.out -A open af-19.sgml
+tmpfiles="$tmpfiles af-19-norm.ok"
+cat <<EOF >af-19-norm.ok
 <OPEN>
 <STANZA>
 <VERSE N="1">verse 1</VERSE>
@@ -99,7 +99,7 @@ cat <<EOF >af-1-norm.ok
 </OPEN>
 EOF
 
-${DIFF} af-1-norm.ok af-1-norm.out
+${DIFF} af-19-norm.ok af-19-norm.out
 result=$?
 test $result = 0 || result=$(($result + 1))
 

@@ -130,7 +130,6 @@ dnl These need tests for non-GNU compilers
   if test "$ac_cv_c_gnu_automatic_templates" = yes; then
     AC_DEFINE(SP_DEFINE_TEMPLATES,,
               [define this to include template definitions in the headers])
-)
   else
     AC_DEFINE(SP_MANUAL_INST,,
               [define this to compile explicit template instantiations])

@@ -233,10 +233,10 @@ public:
   Boolean haveRootOrigin();
   void setLocOrigin(const ConstPtr<Origin> &);
   void appendMessage(MessageItem *);
+  ~GroveImpl();
 private:
   GroveImpl(const GroveImpl &);
   void operator=(const GroveImpl &);
-  ~GroveImpl();
 
   Boolean maybeMoreSiblings1(const ParentChunk *) const;
   void *allocFinish(size_t);

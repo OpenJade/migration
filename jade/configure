@@ -1686,17 +1686,71 @@ if test "${enable_spincludedir+set}" = set; then
 echo "${ECHO_T}$enableval" >&6
            SPINCLUDEDIR="$enableval"
 	 else
-	   echo "$as_me:$LINENO: result: \"/usr/include/OpenSP\"" >&5
-echo "${ECHO_T}\"/usr/include/OpenSP\"" >&6
-	   SPINCLUDEDIR="/usr/include/OpenSP"
+           for d in ${prefix}/include/OpenSP /usr/local/include/OpenSP \
+             /usr/include/OpenSP; do
+	     as_ac_File=`echo "ac_cv_file_$d" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $d" >&5
+echo $ECHO_N "checking for $d... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$d"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  SPINCLUDEDIR="$d"; break
+fi
+
+	   done
          fi
 else
-   echo "$as_me:$LINENO: result: \"/usr/include/OpenSP\"" >&5
-echo "${ECHO_T}\"/usr/include/OpenSP\"" >&6
-          SPINCLUDEDIR="/usr/include/OpenSP"
+  for d in ${prefix}/include/OpenSP /usr/local/include/OpenSP \
+           /usr/include/OpenSP; do
+	   as_ac_File=`echo "ac_cv_file_$d" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $d" >&5
+echo $ECHO_N "checking for $d... $ECHO_C" >&6
+if eval "test \"\${$as_ac_File+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  test "$cross_compiling" = yes &&
+  { { echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+   { (exit 1); exit 1; }; }
+if test -r "$d"; then
+  eval "$as_ac_File=yes"
+else
+  eval "$as_ac_File=no"
+fi
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_File'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_File'}'`" >&6
+if test `eval echo '${'$as_ac_File'}'` = yes; then
+  SPINCLUDEDIR="$d"; break
+fi
+
+	 done
 fi;
+if test x${SPINCLUDEDIR} = x; then
+  { { echo "$as_me:$LINENO: error: \"OpenSP include files do not exist\"" >&5
+echo "$as_me: error: \"OpenSP include files do not exist\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
 
 
+case "${SPINCLUDEDIR}" in
+  ${prefix}/include/OpenSP) osplibdir=${prefix}/lib ;;
+  /usr/local/include/OpenSP) osplibdir=/usr/local/lib ;;
+  *) osplibdir=/usr/lib ;;
+esac
 echo "$as_me:$LINENO: checking location of OpenSP Library" >&5
 echo $ECHO_N "checking location of OpenSP Library... $ECHO_C" >&6
 # Check whether --enable-splibdir or --disable-splibdir was given.
@@ -1708,15 +1762,16 @@ if test "${enable_splibdir+set}" = set; then
 echo "${ECHO_T}$enableval" >&6
            SPLIBDIR="$enableval"
 	 else
-	   echo "$as_me:$LINENO: result: \"/usr/lib\"" >&5
-echo "${ECHO_T}\"/usr/lib\"" >&6
-	   SPLIBDIR="/usr/lib"
+	   echo "$as_me:$LINENO: result: $osplibdir" >&5
+echo "${ECHO_T}$osplibdir" >&6
+	   SPLIBDIR=$osplibdir
          fi
 else
-   echo "$as_me:$LINENO: result: \"/usr/lib\"" >&5
-echo "${ECHO_T}\"/usr/lib\"" >&6
-          SPLIBDIR="/usr/lib"
+   echo "$as_me:$LINENO: result: $osplibdir" >&5
+echo "${ECHO_T}$osplibdir" >&6
+          SPLIBDIR=$osplibdir
 fi;
+unset osplibdir
 
 
 
@@ -3009,9 +3064,13 @@ case "${host}" in
     LINKFLAGS="-no-undefined"
     ;;
   *)
-    ;;
-esac
-
+    if test "$GXX"
+    then
+       echo "$as_me:$LINENO: checking whether GNU C++ supports automatic template instantiation" >&5
+echo $ECHO_N "checking whether GNU C++ supports automatic template instantiation... $ECHO_C" >&6
+if test "${ac_cv_c_gnu_automatic_templates+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3213,6 +3272,45 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
+
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 8)
+  yes
+#endif
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  egrep "yes" >/dev/null 2>&1; then
+  ac_cv_c_gnu_automatic_templates=yes
+else
+  ac_cv_c_gnu_automatic_templates=no
+fi
+rm -f conftest*
+
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_c_gnu_automatic_templates" >&5
+echo "${ECHO_T}$ac_cv_c_gnu_automatic_templates" >&6
+        if test "$ac_cv_c_gnu_automatic_templates" = yes; then
+
+cat >>confdefs.h <<\_ACEOF
+#define SP_DEFINE_TEMPLATES 1
+_ACEOF
+
+        else
+
+cat >>confdefs.h <<\_ACEOF
+#define SP_MANUAL_INST 1
+_ACEOF
+
+            CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
+        fi
+    fi
+    ;;
+esac
 
 echo "$as_me:$LINENO: checking for ANSI C header files" >&5
 echo $ECHO_N "checking for ANSI C header files... $ECHO_C" >&6
@@ -6732,7 +6830,7 @@ test "x$enable_libtool_lock" != xno && enable_libtool_lock=yes
 case $host in
 *-*-irix6*)
   # Find out which ABI we are using.
-  echo '#line 6735 "configure"' > conftest.$ac_ext
+  echo '#line 6833 "configure"' > conftest.$ac_ext
   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   (eval $ac_compile) 2>&5
   ac_status=$?
@@ -7261,7 +7359,7 @@ chmod -w .
 save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS -o out/conftest2.$ac_objext"
 compiler_c_o=no
-if { (eval echo configure:7264: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
+if { (eval echo configure:7362: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>out/conftest.err; } && test -s out/conftest2.$ac_objext; then
   # The compiler can only warn and ignore the option if not recognized
   # So say no if there are warnings
   if test -s out/conftest.err; then
@@ -8880,7 +8978,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8883 "configure"
+#line 8981 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -8978,7 +9076,7 @@ else
     lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<EOF
-#line 8981 "configure"
+#line 9079 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

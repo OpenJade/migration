@@ -1,5 +1,21 @@
 Changes in OpenJade 1.3
 
+* Style sheet extensions.dsl lists all known
+  external procedures ready for easy inclusion
+  as an external-specification.
+
+* External procedure with public identifier
+  "UNREGISTERED::OpenJade//Procedure::expt"
+  allows to form integral powers of quantities.
+  
+* External procedure with public identifier
+  "UNREGISTERED::OpenJade//Procedure::sgml-parse"
+  allows to parse wrt. an architecture.
+
+* Jade supports force! for inherited characteristics.
+
+* Jade supports character properties.
+ 
 * Jade supports special-query-expressions.
 
 * Jade can bind variables to string values on the command line.
@@ -10,9 +26,7 @@ Changes in OpenJade 1.3
   mandated by DSSSL.
 
 * External procedure with public identifier
-
   "UNREGISTERED::OpenJade//Procedure::language"
-
   to create a language object by reference to a POSIX locale.
  
 * Language-dependent procedures of the expression language:

@@ -662,8 +662,17 @@ bool SchemeParser::doDefine()
 {
   Location loc(in_->currentLocation());
   Token tok;
-  if (!getToken(allowOpenParen|allowIdentifier, tok))
+  bool internal = 0;
+  if (!getToken(allowOpenParen|allowIdentifier|
+         ((interp_->currentPartIndex() == unsigned(-1)) ? allowKeyword : 0), tok))
     return 0;
+  if (tok == tokenKeyword) {
+    internal = 1;
+    if ((currentToken_ != interp_->makeStringC("internal"))  
+        || !getToken(allowOpenParen|allowIdentifier, tok))
+      return 0;
+  }
+
   Vector<const Identifier *> formals;
   bool isProcedure;
   if (tok == tokenOpenParen) {
@@ -707,7 +716,9 @@ bool SchemeParser::doDefine()
 	      StringMessageArg(ident->name()),
 	      defLoc);
   }
-  else
+  else if (internal)
+    ident->setBuiltinDefinition(expr, interp_->currentPartIndex(), loc);
+  else 
     ident->setDefinition(expr, interp_->currentPartIndex(), loc);
   return 1;
 }

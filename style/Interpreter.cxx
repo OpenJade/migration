@@ -1752,6 +1752,16 @@ void Identifier::setDefinition(Owner<Expression> &expr,
   value_ = 0;
 }
 
+void Identifier::setBuiltinDefinition(Owner<Expression> &expr,
+				     unsigned part,
+				     const Location &loc)
+{
+  if (!builtin_) { 
+    builtin_ = new Identifier(name());
+    builtin_->setDefinition(expr, part, loc);
+  }
+}
+
 void Identifier::setValue(ELObj *value, unsigned partIndex)
 {
   maybeSaveBuiltin();
@@ -1762,7 +1772,9 @@ void Identifier::setValue(ELObj *value, unsigned partIndex)
 
 bool Identifier::defined(unsigned &part, Location &loc) const
 {
-  if (!def_ && !value_)
+  if (builtin_ && preferBuiltin_)
+    return builtin_->defined(part, loc);
+  if (!def_ && !value_) 
     return 0;
   part = defPart_;
   loc = defLoc_;

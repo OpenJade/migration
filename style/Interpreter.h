@@ -192,8 +192,8 @@ public:
   bool syntacticKey(SyntacticKey &) const;
   void setSyntacticKey(SyntacticKey);
   bool defined(unsigned &, Location &) const;
-  void setDefinition(Owner<Expression> &, unsigned part,
-                     const Location &);
+  void setDefinition(Owner<Expression> &, unsigned part, const Location &);
+  void setBuiltinDefinition(Owner<Expression> &, unsigned part, const Location &);
   void setValue(ELObj *, unsigned defPart = unsigned(-1));
   bool evaluated() const;
   const ConstPtr<InheritedC> &inheritedC() const;

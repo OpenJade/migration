@@ -542,7 +542,7 @@ Boolean SOEntityCatalog::lookupChar(const StringC &name,
     int d = charset.digitWeight(number[i]);
     if (d < 0)
       return 0;
-    if (n <= UnivChar(-1)/10 && (n *= 10) <= UnivChar(-1) - d)
+    if (n <= univCharMax/10 && (n *= 10) <= univCharMax - d)
       n += d;
   }
   result = n;
@@ -832,7 +832,7 @@ CatalogParser::CatalogParser(const CharsetInfo &charset)
   for (p = wwwMinChars; *p; p++) {
     WideChar c;
     ISet<WideChar> set;
-    if (charset.univToDesc(*p, c, set) > 0 && c <= Char(-1))
+    if (charset.univToDesc(*p, c, set) > 0 && c <= charMax)
       categoryTable_.setChar(Char(c), min);
   }
   categoryTable_.setChar(charset.execToDesc('\''), lita);

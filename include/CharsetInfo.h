@@ -55,7 +55,7 @@ unsigned CharsetInfo::univToDesc(UnivChar from, WideChar &to,
 				 ISet<WideChar> &toSet)
      const
 {
-  if (from <= Char(-1)) {
+  if (from <= charMax) {
     Unsigned32 n = inverse_[from];
     if (n == Unsigned32(-1))
       return 0;
@@ -72,7 +72,7 @@ unsigned CharsetInfo::univToDesc(UnivChar from, WideChar &to,
 				 ISet<WideChar> &toSet, WideChar &count)
      const
 {
-  if (from <= Char(-1)) {
+  if (from <= charMax) {
     Char fromMax;
     Unsigned32 n = inverse_.getRange(from, fromMax);
     if (n == Unsigned32(-1)) {

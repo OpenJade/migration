@@ -130,7 +130,7 @@ unsigned UnivCharsetDesc::univToDesc(UnivChar to, WideChar &from,
 	count = toMin - to;
     }
     min = max;
-  } while (min++ != Char(-1));
+  } while (min++ != charMax);
   return ret;
 }
 
@@ -152,13 +152,13 @@ Boolean UnivCharsetDescIter::next(WideChar &descMin,
       descMin = ch;
       descMax = nextChar_;
       univMin = UnivCharsetDesc::extractChar(tem, ch);
-      if (nextChar_ == Char(-1))
+      if (nextChar_ == charMax)
         doneCharMap_ = 1;
       else
 	nextChar_++;
       return 1;
     }
-    if (nextChar_ == Char(-1))
+    if (nextChar_ == charMax)
       doneCharMap_ = 1;
     else
       nextChar_++;

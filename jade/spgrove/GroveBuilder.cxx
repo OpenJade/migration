@@ -5855,7 +5855,7 @@ AccessResult ElementTypeNode::getRankGroup(GroveStringListPtr &stems) const
 AccessResult ElementTypeNode::getRankStem(GroveString &str) const
 {
   const ElementDefinition *def = elementType_.definition();
-  if (def == 0  || !def->nRankStems() != 1)
+  if (def == 0  || def->nRankStems() != 1)
     return accessNull;
   setString(str, def->rankStem(0)->name());
   return accessOK;

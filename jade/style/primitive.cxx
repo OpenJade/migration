@@ -50,7 +50,7 @@ public:
 protected:
   void advance(EvalContext &, Interpreter &);
   void chunkAdvance(EvalContext &, Interpreter &);
-  TreeNodeListObj *copy(Interpreter &);
+  SubtreeNodeListObj *copy(Interpreter &);
   unsigned depth_;
 };
 
@@ -60,7 +60,7 @@ public:
 protected:
   void advance(EvalContext &, Interpreter &);
   void chunkAdvance(EvalContext &, Interpreter &);
-  TreeNodeListObj *copy(Interpreter &);
+  SubgroveNodeListObj *copy(Interpreter &);
   unsigned depth_;
 };
 
@@ -69,7 +69,7 @@ public:
   DescendantsNodeListObj(const NodePtr &, Interpreter &);
   bool contains(EvalContext &, Interpreter &, const NodePtr &);
 protected:
-  TreeNodeListObj *copy(Interpreter &);
+  DescendantsNodeListObj *copy(Interpreter &);
 };
 
 class SiblingNodeListObj : public NodeListObj {
@@ -5669,7 +5669,7 @@ SubgroveNodeListObj::SubgroveNodeListObj(const NodePtr &start)
 {
 }
 
-TreeNodeListObj *SubgroveNodeListObj::copy(Interpreter &interp)
+SubgroveNodeListObj *SubgroveNodeListObj::copy(Interpreter &interp)
 {
   return new (interp) SubgroveNodeListObj(*this);
 }
@@ -5793,7 +5793,7 @@ SubtreeNodeListObj::SubtreeNodeListObj(const NodePtr &start)
 {
 }
 
-TreeNodeListObj *SubtreeNodeListObj::copy(Interpreter &interp)
+SubtreeNodeListObj *SubtreeNodeListObj::copy(Interpreter &interp)
 {
   return new (interp) SubtreeNodeListObj(*this);
 }
@@ -5848,7 +5848,7 @@ DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start,
   advance(context, interp);
 }
 
-TreeNodeListObj *DescendantsNodeListObj::copy(Interpreter &interp)
+DescendantsNodeListObj *DescendantsNodeListObj::copy(Interpreter &interp)
 {
   return new (interp) DescendantsNodeListObj(*this);
 }

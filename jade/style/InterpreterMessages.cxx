@@ -1266,6 +1266,54 @@ MessageFragment::appModule,
 ,"value returned by procedure was not a node-list"
 #endif
 );
+const MessageType0 InterpreterMessages::stackTrace(
+MessageType::info,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+111
+#ifndef SP_NO_MESSAGE_TEXT
+,"called from here"
+#endif
+);
+const MessageType1 InterpreterMessages::stackTraceEllipsis(
+MessageType::info,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+112
+#ifndef SP_NO_MESSAGE_TEXT
+,"called from here...(%1 calls omitted)"
+#endif
+);
+const MessageType0 InterpreterMessages::processNodeLoop(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+113
+#ifndef SP_NO_MESSAGE_TEXT
+,"node processing loop detected"
+#endif
+);
+const MessageType0 InterpreterMessages::spliceNotList(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+114
+#ifndef SP_NO_MESSAGE_TEXT
+,"unquote-splicing expression does not evaluate to a list"
+#endif
+);
 #ifdef SP_NAMESPACE
 }
 #endif

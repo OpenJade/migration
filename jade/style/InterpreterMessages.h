@@ -220,6 +220,14 @@ struct InterpreterMessages {
   static const MessageType1 noNodePropertyValue;
   // 110
   static const MessageType0 returnNotNodeList;
+  // 111
+  static const MessageType0 stackTrace;
+  // 112
+  static const MessageType1 stackTraceEllipsis;
+  // 113
+  static const MessageType0 processNodeLoop;
+  // 114
+  static const MessageType0 spliceNotList;
 };
 
 #ifdef SP_NAMESPACE

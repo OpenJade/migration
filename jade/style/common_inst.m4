@@ -19,11 +19,14 @@
 #include "HashTableItemBase.h"
 #include "SubstTable.h"
 #include "ISet.h"
+#include "Owner.h"
 #undef SP_DEFINE_TEMPLATES
 
 #include "types.h"
 #include "Entity.h"
 #include "Syntax.h"
+#include "ExtendEntityManager.h"
+#include "Event.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -59,6 +62,11 @@ __instantiate(ISet<Char>)
 __instantiate(Vector<TextItem>)
 __instantiate(`HashTableItem<StringC, int>')
 __instantiate(`HashTable<StringC,int>')
+__instantiate(Vector<PackedBoolean>)
+__instantiate(Owner<EventHandler>)
+__instantiate(Ptr<EntityManager>)
+__instantiate(Ptr<ExtendEntityManager>)
+__instantiate(Vector<StorageObjectSpec>)
 
 #ifdef SP_NAMESPACE
 }

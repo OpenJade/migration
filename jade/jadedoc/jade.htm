@@ -33,11 +33,20 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 0.7.
+The current version is 0.8.
 This should be considered a beta test version.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
+<p>
+You can discuss Jade and get help from other users on DSSSList, the
+DSSSL Users' Mailing List.  I will announce new versions of Jade on
+DSSSList.  To subscribe send mail to <A
+HREF="mailto:majordomo@mulberrytech.com">majordomo@mulberrytech.com</A>
+with "subscribe dssslist" as the body of your message.  To subscribe
+to the digest instead, the body should be "subscribe dssslist-digest".
+The list is <A
+HREF="http://www.mulberrytech.com/dsssl/dssslist/archive">archived</A>.
 <p>
 Jade includes the following components:
 <UL>
@@ -75,8 +84,7 @@ engine with the spgrove grove interface and four backends:
 <UL>
 <LI>
 A backend that generates an SGML representation of the flow
-object tree.  The DTD for the SGML generated is in
-<CODE>jade/fot.dtd</CODE>.
+object tree.
 <LI>
 A backend that generates RTF.  This has been tested with
 Microsoft Word 97 and Microsoft's free
@@ -108,10 +116,10 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew0_7.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew0_8.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade0_7.zip">Jade</A>.
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade0_8.zip">Jade</A>.
 This package includes the sources for a compatible version of SP
 (which may be different from the latest released version of SP).
 <p>
@@ -233,6 +241,13 @@ in addition to the normal SP options:
 This specifies that <CODE><VAR>dsssl_spec</VAR></CODE> is the system
 identifier of the DSSSL specification to be used.
 <DT>
+<CODE>-G</CODE>
+<DD>
+Debug mode.
+When an error occurs in the evaluation of an expression,
+Jade will display a stack trace.
+Note that this disables tail-call optimization.
+<DT>
 <CODE>-t <VAR>output_type</VAR></CODE>
 <DD>
 <CODE><VAR>output_type</VAR></CODE> specifies the type of output as follows:
@@ -340,6 +355,31 @@ page is a front (ie recto, odd-numbered) page and as
 <code><var>sosofo2</var></code> if it is a back (ie verso,
 even-numbered) page
 
+<h3>Numbering</h3>
+
+<pre>
+(all-element-number)
+(all-element-number <var>osnl</var>)
+</pre>
+<p>
+This is the same as <CODE>element-number</CODE> except it counts
+elements with any generic identifier.  If <CODE><VAR>osnl</VAR></CODE>
+is not an element returns #f, otherwise returns 1 plus the number of
+elements that started before <CODE><VAR>osnl</VAR></CODE>.  This
+provides an efficient way of creating a unique identifier for any
+element in a document.
+
+<h3>External entity access</h3>
+
+<pre>
+(read-entity <var>string</var>)
+</pre>
+<p>
+This returns a string containing the contents of the external entity
+with system identifier <code><var>string</var></code>.  This should be
+used only for textual entities (CDATA and SDATA), and not for binary
+entities (NDATA).
+
 <h2><A NAME="limitations">Current Jade Limitations</A></h2>
 <p>
 This section describes the limitations of the front-end (the general-purpose
@@ -351,8 +391,11 @@ with the following additions (all part of full DSSSL)
 <LI>the math flow objects
 <LI>lambda (including #!key)
 <LI>let, letrec, let* and named let
+<LI>quasiquotation
 <LI>node-list-first
 <LI>node-list-rest
+<LI>node-property
+<LI>sgml-parse
 <LI>children
 <LI>descendants
 <LI>attributes
@@ -377,7 +420,6 @@ with the following additions (all part of full DSSSL)
 <LI>node-list-address (argument restricted to a singletion node-list)
 <LI>element-with-id
 <LI>empty-node-list
-<LI>node-property
 </UL>
 <P>
 Note that only inherited characteristics that are applicable to some
@@ -510,10 +552,19 @@ The content of the flow object is ignored: a dotted leader will always be
 used.  The specified length is ignored: it always fills out the line.
 <DT>
 <CODE>external-graphic</CODE>
+<DD>
+On Windows platforms, this can be used to embed OLE objects, by making
+the the value of the <CODE>notation-system-id:</CODE> a formal system
+identifier whose storage manager is <CODE>CLSID</CODE> and whose
+storage object identifier is the COM CLSID (including surrounding
+braces). The system identifier may also be just
+<CODE>&lt;CLSID&gt;</CODE> (that is, the storage object identifier may
+be empty); in this case, the OLE default CLSID for the file (usually
+chosen based on the file's extension) will be used.
 <DT>
 <CODE>link</CODE>
 <DD>
-Only destinations that are single elements in the same document.
+Only destinations that are single elements in the same RTF output file.
 <DT>
 <CODE>table</CODE>
 <DT>
@@ -662,8 +713,13 @@ Specifies the separation between columns of a grid flow object.
 
 <h3><A NAME=backend-fot>SGML Flow Object Tree backend</A></h3>
 <p>
-Most non-inherited characteristics for the character flow object
-aren't reported.
+The DTD for the SGML generated is in <CODE>jade/fot.dtd</CODE>.
+<p>
+Characteristics declared with <code>declare-characteristic</code> are
+not reported.
+<p>
+Flow objects of classes declared with <code>declare-flow-object</code>
+are not reported.
 
 <h2><A NAME=source>Reading the Jade Sources</A></h2>
 <P>
@@ -681,8 +737,10 @@ crashes on any input whatever, that's a bug and I want to hear about
 it.  If Jade fails to process a specification that conforms to the
 DSSSL standard in the manner required by the DSSSL standard in a way
 that is not documented here as a current limitation nor is documented
-in my list of <A HREF="http://www.jclark.com/dsssl/errata.htm">DSSSL errata</A>, that's a
-bug and I want to hear about it.
+as an error in the proposed <A
+HREF="http://www.ornl.gov/sgml/wg8/document/1883.htm">Technical
+Corrigendum</A> to the DSSSL standard, that's a bug and I want to hear
+about it.
 <p>
 Please report bugs by email to me, <A
 href="mailto:jjc@jclark.com"><CODE>jjc@jclark.com</CODE></A>.  Do not
@@ -733,13 +791,17 @@ Write another backend.  I would like to see the following backends:
 <LI>
 MIF
 <LI>
-groff/troff (I'll probably do this)
+groff/troff
+<LI>
+a formatter that can produce output using
+<UL>
+<LI>
+PDF
+<LI>
+Windows GDI
 <LI>
 Plain text
-<LI>
-PostScript
-<LI>
-Windows browser
+</UL>
 </UL>
 <LI>
 Write some more documentation.

@@ -13,6 +13,9 @@
 #include "macros.h"
 #include "CharMap.h"
 #include "CharsetRegistry.h"
+#ifdef WIN32
+#include "RtfOle.h"
+#endif
 #include "IList.h"
 #include <string.h>
 #include <limits.h>
@@ -67,13 +70,13 @@ private:
   Block *last_;
 };
 
-class BitVector {
+class ElementSet {
 public:
-  BitVector();
-  void add(unsigned long);
-  bool contains(unsigned long) const;
+  ElementSet();
+  void add(unsigned long, unsigned long);
+  bool contains(unsigned long, unsigned long) const;
 private:
-  Vector<char> v_;
+  Vector<Vector<char> > v_;
 };
 
 class RtfFOTBuilder : public SerialFOTBuilder {
@@ -298,14 +301,17 @@ private:
   void startDisplay(const DisplayNIC &);
   void endDisplay();
   void newPar(bool allowSpaceBefore = 1);
-  bool systemIdFilename(const StringC &systemId, String<char> &filename);
-  int systemIdFilename1(const StringC &systemId, String<char> &filename);
+  bool includePicture(const ExternalGraphicNIC &);
+  bool embedObject(const ExternalGraphicNIC &);
+  bool systemIdNotation(const StringC &systemId, const char *, StringC &);
+  bool systemIdFilename(const StringC &systemId, StringC &filename);
+  int systemIdFilename1(const StringC &systemId, StringC &filename);
   int makeColor(const DeviceRGBColor &);
-  void outputBookmarkName(const Char *, size_t);
-  void outputBookmarkName(unsigned long);
+  void outputBookmarkName(unsigned long groveIndex, const Char *, size_t);
+  void outputBookmarkName(unsigned long groveIndex, unsigned long elementIndex);
   static unsigned convertLanguage(unsigned language, unsigned country,
 				  unsigned &langCharsets);
-  void idrefButton(const Char *s, size_t n);
+  void idrefButton(unsigned long groveIndex, const Char *s, size_t n);
   void outputTable();
   void storeBorder(Border &);
   void resolveBorder(Border &, Border &);
@@ -358,6 +364,10 @@ private:
     unsigned language;
     unsigned country;
     bool kern;
+    bool charBorder;
+    int charBorderColor;
+    long charBorderThickness;
+    bool charBorderDouble;
   };
   struct OutputFormat : CommonFormat {
     OutputFormat();
@@ -463,7 +473,9 @@ private:
   unsigned nodeLevel_;
   Vector<size_t> displayBoxLevels_;
   bool boxFirstPara_;      // not yet had a paragraph in the outermost displayed box
-  long boxSep_;
+  long boxLeftSep_;
+  long boxRightSep_;
+  long boxTopSep_;
   long accumSpaceBox_;
   HashTable<StringC,int> fontFamilyNameTable_;
   struct FontFamilyCharsets {
@@ -529,7 +541,7 @@ private:
   const CharsetInfo *systemCharset_;
   bool followWhitespaceChar_;
   unsigned currentColumn_;
-  BitVector elementsRefed_;
+  ElementSet elementsRefed_;
   // Leaders
   unsigned leaderDepth_;
   NullOutputByteStream nullos_;
@@ -578,6 +590,9 @@ private:
   };
   IList<ReorderFlowObject> reorderStack_;
   IList<Grid> gridStack_;
+#ifdef WIN32
+  Vector<StringC> oleObject_;
+#endif
   void startReorderFlowObject();
   void endReorderFlowObjectPort();
   void endReorderFlowObject();
@@ -603,7 +618,7 @@ long RtfFOTBuilder::computeLengthSpec(const LengthSpec &spec)
 
 const int hfPreSpace = 190;
 const int hfPostSpace = 50;
-const char BOOKMARK_CHAR = '\0';
+const char INSERTION_CHAR = '\0';
 const int SYMBOL_FONT_PAGE = 0xf000;
 const unsigned DEFAULT_LANG = 0x400;
 
@@ -870,6 +885,29 @@ void RtfFOTBuilder::initJIS()
   }
 }
 
+inline
+void outputWord(OutputByteStream &os, unsigned long n)
+{
+  os << char((n >> 24) & 0xff)
+     << char((n >> 16) & 0xff)
+     << char((n >> 8) & 0xff)
+     << char(n & 0xff);
+}
+
+inline
+unsigned long readWord(const char *&s, size_t &n, TmpOutputByteStream::Iter &sbIter)
+{
+  unsigned long result = 0;
+  for (int i = 0; i < 4; i++, n--) {
+    if (n == 0) {
+      bool gotSome = sbIter.next(s, n);
+      ASSERT(gotSome);
+    }
+    result = (result << 8) | (unsigned char)*s++;
+  }
+  return result;
+}
+
 RtfFOTBuilder::~RtfFOTBuilder()
 {
   if (doBalance_) {
@@ -920,7 +958,7 @@ RtfFOTBuilder::~RtfFOTBuilder()
   size_t n;
   while (sbIter.next(s, n)) {
     while (n > 0) {
-      const char *p = (char *)memchr(s, BOOKMARK_CHAR, n);
+      const char *p = (char *)memchr(s, INSERTION_CHAR, n);
       if (!p) {
 	os().sputn(s, n);
 	break;
@@ -930,21 +968,44 @@ RtfFOTBuilder::~RtfFOTBuilder()
       s = p;
       --n;
       s++;
-      unsigned long ei = 0;
-      for (int i = 0; i < 4; i++, n--) {
-        if (n == 0) {
-          bool gotSome = sbIter.next(s, n);
-          ASSERT(gotSome);
-	}
-	ei = (ei << 8) | (unsigned char)*s++;
+      if (n == 0) {
+	bool gotSome = sbIter.next(s, n);
+	ASSERT(gotSome);
       }
-      if (elementsRefed_.contains(ei)) {
-	os() << "{\\*\\bkmkstart ";
-        outputBookmarkName(ei);
-        os() << '}';
-        os() << "{\\*\\bkmkend ";
-	outputBookmarkName(ei);
-	os() << '}';
+      char kind = *s++;
+      n--;
+      switch (kind) {
+      case 'b':
+	{
+	  unsigned long grovei = readWord(s, n, sbIter);
+	  unsigned long ei = readWord(s, n, sbIter);
+	  if (elementsRefed_.contains(grovei, ei)) {
+	    os() << "{\\*\\bkmkstart ";
+	    outputBookmarkName(grovei, ei);
+	    os() << '}';
+	    os() << "{\\*\\bkmkend ";
+	    outputBookmarkName(grovei, ei);
+	    os() << '}';
+	  }	
+	  break;
+	}
+#ifdef WIN32
+      case 'o':
+	{
+	  unsigned long oi = readWord(s, n, sbIter);
+	  StringC filename(oleObject_[oi]);
+	  filename += 0;
+	  StringC clsid(oleObject_[oi + 1]);
+	  clsid += 0;
+	  if (!outputObject(filename.data(), clsid.data(), os()))
+	    mgr_->message(RtfMessages::cannotEmbedFilename,
+	                  StringMessageArg(oleObject_[oi]),
+			  StringMessageArg(oleObject_[oi + 1]));
+	  break;
+	}
+#endif /* WIN32 */
+      default:
+	CANNOT_HAPPEN();
       }
     }
   }
@@ -1049,6 +1110,33 @@ void RtfFOTBuilder::syncCharFormat()
     os() << "\\highlight" << specFormat_.charBackgroundColor;
     outputFormat_.charBackgroundColor = specFormat_.charBackgroundColor;
     changed = 1;
+  }
+  if (specFormat_.charBorder) {
+    if (!outputFormat_.charBorder
+        || specFormat_.charBorderColor != outputFormat_.charBorderColor
+	|| specFormat_.charBorderThickness != outputFormat_.charBorderThickness
+	|| specFormat_.charBorderDouble != outputFormat_.charBorderDouble) {
+      outputFormat_.charBorder = 1;
+      os() << "\\chbrdr";
+      if (specFormat_.charBorderDouble)
+    	os() << "\\brdrdb";
+      else
+	os() << "\\brdrs";
+      os() << "\\brdrw" << specFormat_.charBorderThickness;
+      if (specFormat_.charBorderColor)
+	os() << "\\brdrcf" << specFormat_.charBorderColor;
+      changed = 1;
+      outputFormat_.charBorderColor = specFormat_.charBorderColor;
+      outputFormat_.charBorderThickness = specFormat_.charBorderThickness;
+      outputFormat_.charBorderDouble = specFormat_.charBorderDouble;
+    }
+  }
+  else {
+    if (outputFormat_.charBorder) {
+      os() << "\\chbrdr";
+      changed = 1;
+      outputFormat_.charBorder = 0;
+    }
   }
   if (!specFormat_.hyphenate)
     hyphenateSuppressed_ = 1;
@@ -1469,22 +1557,17 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
   long boxExtraTopSep = 0;
   if (boxFirstPara_) {
     boxFirstPara_ = 0;
-    long leftSep = paraFormat_.leftIndent;
-    long rightSep = paraFormat_.rightIndent;
+    boxLeftSep_ = paraFormat_.leftIndent;
+    boxRightSep_ = paraFormat_.rightIndent;
     for (size_t i = 1; i < displayBoxLevels_.size(); i++) {
-      leftSep += specFormatStack_[displayBoxLevels_[i]].leftIndent;
-      rightSep += specFormatStack_[displayBoxLevels_[i]].rightIndent;
+      boxLeftSep_ += specFormatStack_[displayBoxLevels_[i]].leftIndent;
+      boxRightSep_ += specFormatStack_[displayBoxLevels_[i]].rightIndent;
     }
-    boxSep_ = leftSep > rightSep ? leftSep : rightSep;
     // RTF doesn't include space before or after a paragraph inside
     // the box.
-    boxExtraTopSep = accumSpace_;
+    boxTopSep_ = accumSpace_;
     accumSpace_ = accumSpaceBox_;
     accumSpaceBox_ = 0;
-    if (boxExtraTopSep > boxSep_)
-      boxExtraTopSep -= boxSep_;
-    else
-      boxExtraTopSep = 0;
   }
   if (inlineState_ != inlineFirst) {
     if (!allowSpaceBefore) {
@@ -1532,27 +1615,39 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
     os() << "\\s" << int(paraFormat_.headingLevel);
   if (displayBoxLevels_.size() > 0) {
     const Format &boxFormat = specFormatStack_[displayBoxLevels_[0]];
-    os() << "\\box";
-    if (boxFormat.lineThickness > 75)
-      os() << "\\brdrth\\brdrw" << boxFormat.lineThickness/2;
-    else {
-      if (boxFormat.lineDouble)
-	os() << "\\brdrdb";
-      else
-	os() << "\\brdrs";
-      os() << "\\brdrw" << boxFormat.lineThickness;
-    }
-    os() << "\\brsp" << boxSep_;
-    if (boxFormat.color)
-      os() << "\\brdrcf" << boxFormat.color;
-    if (boxSep_ + boxFormat.leftIndent + addLeftIndent_)
-      os() << "\\li" << boxSep_ + boxFormat.leftIndent + addLeftIndent_;
-    if (boxSep_ + boxFormat.rightIndent + addRightIndent_)
-      os() << "\\ri" << boxSep_ + boxFormat.rightIndent + addRightIndent_;
-    if (boxExtraTopSep) {
-      os() << "\\sl-" << boxExtraTopSep;
-      keepWithNext_ = 1;
-      newPar(0);
+    for (const char *s = "tlbr"; *s; s++) {
+      os() << "\\brdr" << *s;
+      if (boxFormat.lineThickness > 75)
+	os() << "\\brdrth\\brdrw" << boxFormat.lineThickness/2;
+      else {
+	if (boxFormat.lineDouble)
+	  os() << "\\brdrdb";
+	else
+	  os() << "\\brdrs";
+	os() << "\\brdrw" << boxFormat.lineThickness;
+      }
+      long sep;
+      switch (*s) {
+      case 't':
+	sep = boxTopSep_;
+	break;
+      case 'l':
+	sep = boxLeftSep_;
+	break;
+      case 'r':
+	sep = boxRightSep_;
+	break;
+      default:
+	sep = 0;
+	break;
+      }
+      os() << "\\brsp" << sep;
+      if (boxFormat.color)
+	os() << "\\brdrcf" << boxFormat.color;
+      if (boxLeftSep_ + boxFormat.leftIndent + addLeftIndent_)
+	os() << "\\li" << boxLeftSep_ + boxFormat.leftIndent + addLeftIndent_;
+      if (boxRightSep_ + boxFormat.rightIndent + addRightIndent_)
+	os() << "\\ri" << boxRightSep_ + boxFormat.rightIndent + addRightIndent_;
     }
   }
   else {
@@ -1746,6 +1841,12 @@ void RtfFOTBuilder::startBox(const BoxNIC &nic)
   else {
     if (specFormat_.boxHasBackground && specFormat_.backgroundColor)
       specFormat_.charBackgroundColor = specFormat_.backgroundColor;
+    if (specFormat_.boxHasBorder && !specFormat_.charBorder) {
+      specFormat_.charBorder = 1;
+      specFormat_.charBorderColor = specFormat_.color;
+      specFormat_.charBorderThickness = specFormat_.lineThickness;
+      specFormat_.charBorderDouble = specFormat_.lineDouble;
+    }
     inlinePrepare();
   }
   start();
@@ -1760,7 +1861,7 @@ void RtfFOTBuilder::endBox()
       // It was the outermost box.
       if (boxFirstPara_) {
 	boxFirstPara_ = 0;
-	boxSep_ = 0;
+	boxLeftSep_ = boxRightSep_ = boxTopSep_ = 0;
 	long boxHeight = accumSpace_;
 	if (boxHeight <= 0)
 	  boxHeight = 1;
@@ -1768,8 +1869,8 @@ void RtfFOTBuilder::endBox()
 	newPar(1);
 	os() << "\\sl-" << boxHeight;
       }
-      else if (accumSpace_ > boxSep_) {
-	long extra = accumSpace_ - boxSep_;
+      else if (accumSpace_) {
+	long extra = accumSpace_;
 	accumSpace_ = 0;
 	keepWithNext_ = 1;
 	newPar(1);
@@ -2195,7 +2296,6 @@ void RtfFOTBuilder::pageNumber()
 
 void RtfFOTBuilder::startScore(Symbol type)
 {
-  start();
   switch (type) {
   case symbolAfter:
     if (specFormat_.lineDouble)
@@ -2211,14 +2311,15 @@ void RtfFOTBuilder::startScore(Symbol type)
   default:
     break;
   }
+  start();
 }
 
-void RtfFOTBuilder::idrefButton(const Char *s, size_t n)
+void RtfFOTBuilder::idrefButton(unsigned long groveIndex, const Char *s, size_t n)
 {
   os() << "{\\field";
   os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
   os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
-  outputBookmarkName(s, n);
+  outputBookmarkName(groveIndex, s, n);
   if (rtfVersion_ >= word97)
     os() << "}{\\fldrslt ";
   os() << ' ';
@@ -2244,18 +2345,19 @@ void RtfFOTBuilder::doStartLink(const Address &addr)
     {
       GroveString id; 
       if (addr.node->getId(id) == accessOK)
-	idrefButton(id.data(), id.size());
+	idrefButton(addr.node->groveIndex(), id.data(), id.size());
       else {
 	unsigned long n;
 	if (addr.node->elementIndex(n) == accessOK) {
 	  os() << "{\\field";
 	  os() << "{\\*\\fldinst   ";  // doesn't work without the trailing spaces!
 	  os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
-	  outputBookmarkName(n);
+	  unsigned long g = addr.node->groveIndex();
+	  outputBookmarkName(g, n);
 	  os() << ' ';
 	  if (rtfVersion_ >= word97)
 	    os() << "}{\\fldrslt ";
-	  elementsRefed_.add(n);
+	  elementsRefed_.add(g, n);
 	}
 	else
 	  os() << "{{";
@@ -2272,7 +2374,7 @@ void RtfFOTBuilder::doStartLink(const Address &addr)
 	if (id[i] == ' ')
 	  break;
       }
-      idrefButton(id.data(), i);
+      idrefButton(addr.node->groveIndex(), id.data(), i);
       break;
     }
   default:
@@ -2376,28 +2478,64 @@ void RtfFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
     newPar();
     if (specFormat_.displayAlignment != 'l')
       os() << "\\q" << specFormat_.displayAlignment;
-    os() << "\\sl1000";
     flushFields();
   }
   else
     inlinePrepare();
-  String<char> filename;
-  if (systemIdFilename(nic.entitySystemId, filename)) {
-    os() << "{\\field\\flddirty{\\*\\fldinst INCLUDEPICTURE \"";
-    for (size_t i = 0; i < filename.size(); i++) {
-      if (filename[i] == '\\')
-	os() << "\\\\\\\\";
-      else
-	os() << filename[i];
-    }
-    os() << "\" }{\\fldrslt }}";
-  }
+  if (!embedObject(nic))
+    includePicture(nic);
   if (nic.isDisplay)
     endDisplay();
   atomic();
 }
 
-bool RtfFOTBuilder::systemIdFilename(const StringC &systemId, String<char> &filename)
+bool RtfFOTBuilder::includePicture(const ExternalGraphicNIC &nic)
+{
+  StringC filename;
+  if (systemIdFilename(nic.entitySystemId, filename)) {
+    os() << "{\\field\\flddirty{\\*\\fldinst INCLUDEPICTURE \"";
+    // FIXME non-ascii characters
+    for (size_t i = 0; i < filename.size(); i++) {
+      if (filename[i] == '\\')
+	os() << "\\\\\\\\";
+      else
+	os() << char(filename[i]);
+    }
+    os() << "\" }{\\fldrslt }}";
+    return 1;
+  }
+  return 0;
+}
+
+#ifdef WIN32
+
+bool RtfFOTBuilder::embedObject(const ExternalGraphicNIC &nic)
+{
+  if (nic.notationSystemId.size() == 0)
+    return 0;
+  StringC clsid;
+  if (!systemIdNotation(nic.notationSystemId, "CLSID", clsid))
+    return 0;
+  StringC filename;
+  if (systemIdFilename(nic.entitySystemId, filename)) {
+    os() << INSERTION_CHAR << 'o';
+    outputWord(os(), oleObject_.size());
+    oleObject_.push_back(filename);
+    oleObject_.push_back(clsid);
+  }
+  return 1;
+}
+
+#else /* not WIN32 */
+
+bool RtfFOTBuilder::embedObject(const ExternalGraphicNIC &)
+{
+  return 0;
+}
+
+#endif /* not WIN32 */
+
+bool RtfFOTBuilder::systemIdFilename(const StringC &systemId, StringC &filename)
 {
   int res = systemIdFilename1(systemId, filename);
   if (res < 0) {
@@ -2411,7 +2549,7 @@ bool RtfFOTBuilder::systemIdFilename(const StringC &systemId, String<char> &file
 // FIXME in some cases should copy the entity into a file in the same
 // directory as the output file.
 
-int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &filename)
+int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, StringC &filename)
 {
   if (systemId.size() == 0)
     return -1;
@@ -2424,8 +2562,8 @@ int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &file
     return 0;
   Xchar c = in->get(*mgr_);
   StorageObjectLocation soLoc;
+  ParsedSystemId parsedBuf;
   if (c == InputSource::eE && in->accessError()) {
-    ParsedSystemId parsedBuf;
     if (!entityManager_->parseSystemId(systemId, *systemCharset_, 0, 0, *mgr_, parsedBuf))
       return 0;
     if (parsedBuf.size() != 1 || parsedBuf[0].baseId.size())
@@ -2449,23 +2587,22 @@ int RtfFOTBuilder::systemIdFilename1(const StringC &systemId, String<char> &file
   }
   if (strcmp(soLoc.storageObjectSpec->storageManager->type(), "OSFILE") != 0)
     return -1;
-  const StringC &id = soLoc.actualStorageId;
-  String<char> buf;
-  // FIXME use WideCharToMultibyte
-  for (size_t i = 0; i < id.size(); i++)
-    buf += char(id[i]);
-#if 0
-  buf += '\0';
-  // This is bad because it means you can't move the generated RTF file around.
-  char *ptr;
-  filename.resize(2048);
-  unsigned len = GetFullPathNameA(buf.data(), 2048, filename.begin(), &ptr);
-  if (len == 0)
+  filename = soLoc.actualStorageId;
+  return 1;
+}
+
+bool RtfFOTBuilder::systemIdNotation(const StringC &systemId,
+				     const char *notation,
+				     StringC &id)
+{
+  ParsedSystemId parsedBuf; 
+  if (!entityManager_->parseSystemId(systemId, *systemCharset_, 0, 0, *mgr_, parsedBuf))
     return 0;
-  filename.resize(len);
-#else
-  filename = buf;
-#endif
+  if (parsedBuf.size() != 1)
+    return 0;
+  if (strcmp(parsedBuf[0].storageManager->type(), notation) != 0)
+    return 0;
+  id = parsedBuf[0].specId;
   return 1;
 }
 
@@ -2523,16 +2660,16 @@ void RtfFOTBuilder::endTable()
 
 void RtfFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
 {
-  if (tableLevel_ == 1)
-    nHeaderRows_ = 0;
   startDisplay(nic);
   start();
 }
 
 void RtfFOTBuilder::endTablePartSerial()
 {
-  if (tableLevel_ == 1 && cells_.size())
+  if (tableLevel_ == 1 && cells_.size()) {
     outputTable();
+    nHeaderRows_ = 0;
+  }
   end();
   endDisplay();
 }
@@ -3533,9 +3670,12 @@ void RtfFOTBuilder::endGridCell()
 }
 
 
-void RtfFOTBuilder::outputBookmarkName(const Char *s, size_t n)
+void RtfFOTBuilder::outputBookmarkName(unsigned long groveIndex, const Char *s, size_t n)
 {
-  os() << "ID_";
+  os() << "ID";
+  if (groveIndex)
+    os() << groveIndex;
+  os() << '_';
   for (; n > 0; n--, s++) {
     Char c = *s;
     switch (c) {
@@ -3558,9 +3698,12 @@ void RtfFOTBuilder::outputBookmarkName(const Char *s, size_t n)
   }
 }
 
-void RtfFOTBuilder::outputBookmarkName(unsigned long n)
+void RtfFOTBuilder::outputBookmarkName(unsigned long groveIndex, unsigned long n)
 {
-  os() << (rtfVersion_ >= word97 ? "_" : "E_") << n;
+  os() << (rtfVersion_ >= word97 ? "_" : "E_");
+  if (groveIndex)
+    os() << groveIndex << '_';
+  os() << n;
 }
 
 void RtfFOTBuilder::flushPendingElements()
@@ -3569,21 +3712,20 @@ void RtfFOTBuilder::flushPendingElements()
     const NodePtr &node = pendingElements_[i];
     GroveString id;
     if (node->getId(id) == accessOK) {
+      unsigned long g = node->groveIndex();
       os() << "{\\*\\bkmkstart ";
-      outputBookmarkName(id.data(), id.size());
+      outputBookmarkName(g, id.data(), id.size());
       os() << '}';
       os() << "{\\*\\bkmkend ";
-      outputBookmarkName(id.data(), id.size());
+      outputBookmarkName(g, id.data(), id.size());
       os() << '}';
     }
     else {
       unsigned long n;
       if (node->elementIndex(n) == accessOK) {
-	os() << BOOKMARK_CHAR;
-	os() << char((n >> 24) & 0xff)
-	     << char((n >> 16) & 0xff)
-	     << char((n >> 8) & 0xff)
-	     << char(n & 0xff);
+	os() << INSERTION_CHAR << 'b';
+	outputWord(os(), node->groveIndex());
+	outputWord(os(), n);
       }
     }
   }
@@ -3622,13 +3764,14 @@ void RtfFOTBuilder::currentNodePageNumber(const NodePtr &node)
   unsigned long n;
   if (node->getId(id) == accessOK) {
     os() << "{\\field\\flddirty{\\*\\fldinst PAGEREF ";
-    outputBookmarkName(id.data(), id.size());
+    outputBookmarkName(node->groveIndex(), id.data(), id.size());
     os() << "}{\\fldrslt 000}}";
   }
   else if (node->elementIndex(n) == accessOK) {
     os() << "{\\field\\flddirty{\\*\\fldinst PAGEREF ";
-    outputBookmarkName(n);
-    elementsRefed_.add(n);
+    unsigned long groveIndex = node->groveIndex();
+    outputBookmarkName(groveIndex, n);
+    elementsRefed_.add(groveIndex, n);
     os() << "}{\\fldrslt 000}}";
   }
 }
@@ -3662,7 +3805,8 @@ RtfFOTBuilder::CommonFormat::CommonFormat()
   language(0), country(0),
   color(0), charBackgroundColor(0),
   underline(noUnderline), isStrikethrough(0), positionPointShift(0),
-  kern(0), isSmallCaps(0)
+  kern(0), isSmallCaps(0),
+  charBorder(0)
 {
 }
 
@@ -3710,22 +3854,25 @@ RtfFOTBuilder::FontFamilyCharsets::FontFamilyCharsets()
     rtfFontNumber[i] = -1;
 }
 
-BitVector::BitVector()
+ElementSet::ElementSet()
 {
 }
 
-void BitVector::add(unsigned long n)
+void ElementSet::add(unsigned long groveIndex, unsigned long n)
 {
-  if (n >= v_.size()) {
-    for (size_t k = 1 + (n - v_.size()); k > 0; --k)
-      v_.push_back(0);
+  if (groveIndex >= v_.size())
+    v_.resize(groveIndex + 1);
+  Vector<char> &elems = v_[groveIndex];
+  if (n >= elems.size()) {
+    for (size_t k = 1 + (n - elems.size()); k > 0; --k)
+      elems.push_back(0);
   }
-  v_[n] = 1;
+  elems[n] = 1;
 }
 
-bool BitVector::contains(unsigned long n) const
+bool ElementSet::contains(unsigned long groveIndex, unsigned long n) const
 {
-  return n < v_.size() && v_[n] != 0;
+  return groveIndex < v_.size() && n < v_[groveIndex].size() && v_[groveIndex][n] != 0;
 }
 
 // This was mostly automatically generated using GetLocaleInfo().

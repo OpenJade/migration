@@ -9,6 +9,7 @@
 #include "Message.h"
 #include "SgmlParser.h"
 #include "FOTBuilder.h"
+#include "GroveManager.h"
 #include "dsssl_ns.h"
 
 #ifdef DSSSL_NAMESPACE
@@ -19,14 +20,14 @@ class Interpreter;
 
 class STYLE_API StyleEngine {
 public:
-  StyleEngine(Messenger &, const NodePtr &root,
-	      int unitsPerInch, const FOTBuilder::Extension * = 0);
+  StyleEngine(Messenger &, GroveManager &,
+	      int unitsPerInch, bool debugMode, const FOTBuilder::Extension * = 0);
   void defineVariable(const StringC &);
   void parseSpec(SgmlParser &specParser,
 		 const CharsetInfo &charset,
 		 const StringC &id,
 		 Messenger &mgr);
-  void process(FOTBuilder &);
+  void process(const NodePtr &, FOTBuilder &);
   ~StyleEngine();
 private:
   StyleEngine(const StyleEngine &);  // undefined

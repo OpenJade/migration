@@ -19,6 +19,7 @@
 #include "Attribute.h"
 #include "Vector.h"
 #include "LocNode.h"
+#include "SdNode.h"
 #include "threads.h"
 #include "macros.h"
 
@@ -152,7 +153,7 @@ private:
 
 class GroveImpl {
 public:
-  GroveImpl();
+  GroveImpl(unsigned groveIndex);
 
   // Const interface
   void addRef() const { ++(((GroveImpl *)this)->refCount_); }
@@ -160,6 +161,7 @@ public:
     if (!--(((GroveImpl *)this)->refCount_))
       delete (GroveImpl *)this;
   }
+  unsigned groveIndex() const { return groveIndex_; }
   const SgmlDocumentChunk *root() const { return root_; }
   const AttributeValue *impliedAttributeValue() const {
     return impliedAttributeValue_.pointer();
@@ -167,10 +169,10 @@ public:
   // Return 0 if not yet available.
   Boolean getAppinfo(const StringC *&) const;
   const SubstTable<Char> *generalSubstTable() const {
-    return syntax_.isNull() ? 0 : syntax_->generalSubstTable();
+    return instanceSyntax_.isNull() ? 0 : instanceSyntax_->generalSubstTable();
   }
   const SubstTable<Char> *entitySubstTable() const {
-    return syntax_.isNull() ? 0 : syntax_->entitySubstTable();
+    return instanceSyntax_.isNull() ? 0 : instanceSyntax_->entitySubstTable();
   }
   // Be careful not to change ref counts while accessing DTD.
   const Dtd *governingDtd() const { return dtd_.pointer(); }
@@ -193,6 +195,8 @@ public:
   Boolean waitForMoreNodes() const;
   AccessResult proxifyLocation(const Location &, Location &) const;
   const MessageItem *messageList() const { return messageList_; }
+  // must not be called till grove is complete
+  void getSd(ConstPtr<Sd> &, ConstPtr<Syntax> &, ConstPtr<Syntax> &) const;
   // non-const interface
   void *allocChunk(size_t);
   void appendSibling(Chunk *);
@@ -211,7 +215,7 @@ public:
   void pop();
   void setAppinfo(const StringC &);
   void setDtd(const ConstPtr<Dtd> &dtd);
-  void setSyntax(const ConstPtr<Syntax> &syntax) { syntax_ = syntax; }
+  void setSd(const ConstPtr<Sd> &, const ConstPtr<Syntax> &, const ConstPtr<Syntax> &);
   void storeAttributeValue(const ConstPtr<AttributeValue> &value) {
     values_.push_back(value);
   }
@@ -238,12 +242,15 @@ private:
     BlockHeader() : next(0) { }
     BlockHeader *next;
   };
+  unsigned groveIndex_;
   SgmlDocumentChunk *root_;
   ParentChunk *origin_;
   DataChunk *pendingData_;
   Chunk **tailPtr_;
   ConstPtr<Dtd> dtd_;
-  ConstPtr<Syntax> syntax_;
+  ConstPtr<Sd> sd_;
+  ConstPtr<Syntax> prologSyntax_;
+  ConstPtr<Syntax> instanceSyntax_;
   ConstPtr<AttributeValue> impliedAttributeValue_;
   Vector<ConstPtr<AttributeValue> > values_;
   Vector<ConstPtr<Origin> > origins_;
@@ -303,10 +310,24 @@ private:
   GroveImplPtr grove_;
 };
 
-class GroveBuilderEventHandler : public ErrorCountEventHandler {
+class GroveBuilderMessageEventHandler : public ErrorCountEventHandler {
 public:
-  GroveBuilderEventHandler(Messenger *mgr, MessageFormatter *msgFmt_);
-  ~GroveBuilderEventHandler();
+  GroveBuilderMessageEventHandler(unsigned groveIndex, Messenger *mgr, MessageFormatter *msgFmt_);
+  ~GroveBuilderMessageEventHandler();
+  void message(MessageEvent *);
+  void sgmlDecl(SgmlDeclEvent *);
+  void makeInitialRoot(NodePtr &);
+  void setSd(const ConstPtr<Sd> &, const ConstPtr<Syntax> &, const ConstPtr<Syntax> &);
+protected:
+  GroveImpl *grove_;
+private:
+  Messenger *mgr_;
+  MessageFormatter *msgFmt_;
+};
+
+class GroveBuilderEventHandler : public GroveBuilderMessageEventHandler {
+public:
+  GroveBuilderEventHandler(unsigned groveIndex, Messenger *mgr, MessageFormatter *msgFmt_);
   void appinfo(AppinfoEvent *);
   void startElement(StartElementEvent *);
   void endElement(EndElementEvent *);
@@ -316,15 +337,8 @@ public:
   void externalDataEntity(ExternalDataEntityEvent *);
   void subdocEntity(SubdocEntityEvent *);
   void pi(PiEvent *);
-  void message(MessageEvent *);
   void endProlog(EndPrologEvent *);
-  void sgmlDecl(SgmlDeclEvent *);
-  void makeInitialRoot(NodePtr &);
   void entityDefaulted(EntityDefaultedEvent *);
-private:
-  GroveImpl *grove_;
-  Messenger *mgr_;
-  MessageFormatter *msgFmt_;
 };
 
 inline
@@ -361,7 +375,7 @@ public:
   void addRef();
   void release();
   bool canReuse(NodePtr &ptr) const;
-  const void *groveUniqueId() const;
+  unsigned groveIndex() const;
   bool operator==(const Node &node) const;
   // Implemented with double dispatching.
   virtual bool same(const BaseNode &) const = 0;
@@ -458,7 +472,7 @@ struct SgmlDocumentChunk : public ParentChunk {
   const Chunk *after() const { return this + 1; }
 };
 
-class SgmlDocumentNode : public ChunkNode {
+class SgmlDocumentNode : public ChunkNode, public SdNode {
 public:
   SgmlDocumentNode(const GroveImpl *grove,
 		   const SgmlDocumentChunk *chunk);
@@ -479,6 +493,9 @@ public:
   AccessResult firstSibling(NodePtr &) const { return accessNotInClass; }
   AccessResult siblingsIndex(unsigned long &) const { return accessNotInClass; }
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const { return accessNull; }
+  AccessResult getSd(ConstPtr<Sd> &sd,
+		     ConstPtr<Syntax> &prologSyntax,
+		     ConstPtr<Syntax> &instanceSyntax) const;
 private:
   const SgmlDocumentChunk *chunk() const {
     return (const SgmlDocumentChunk *)ChunkNode::chunk();
@@ -1085,6 +1102,8 @@ public:
     return accessOK;
   }
   AccessResult nextChunkSibling(NodePtr &) const;
+  AccessResult firstSibling(NodePtr &) const;
+  AccessResult siblingsIndex(unsigned long &) const;
   void accept(NodeVisitor &);
   const ClassDef &classDef() const { return ClassDef::message; }
   bool same(const BaseNode &) const;
@@ -1594,19 +1613,26 @@ void DataNode::add(GroveImpl &grove, const DataEvent &event)
  }
 }
 
-GroveBuilderEventHandler::GroveBuilderEventHandler(Messenger *mgr, MessageFormatter *msgFmt)
-: mgr_(mgr), grove_(new GroveImpl), msgFmt_(msgFmt)
+GroveBuilderMessageEventHandler::GroveBuilderMessageEventHandler(unsigned groveIndex,
+								 Messenger *mgr,
+								 MessageFormatter *msgFmt)
+: mgr_(mgr), grove_(new GroveImpl(groveIndex)), msgFmt_(msgFmt)
 {
   grove_->addRef();
 }
 
-GroveBuilderEventHandler::~GroveBuilderEventHandler()
+GroveBuilderMessageEventHandler::~GroveBuilderMessageEventHandler()
 {
   grove_->setComplete();
   grove_->release();
 }
 
-void GroveBuilderEventHandler::message(MessageEvent *event)
+void GroveBuilderMessageEventHandler::makeInitialRoot(NodePtr &root)
+{
+  root.assign(new SgmlDocumentNode(grove_, grove_->root()));
+}
+
+void GroveBuilderMessageEventHandler::message(MessageEvent *event)
 {
   mgr_->dispatchMessage(event->message());
   const Message &msg = event->message();
@@ -1635,17 +1661,29 @@ void GroveBuilderEventHandler::message(MessageEvent *event)
   ErrorCountEventHandler::message(event);
 }
 
+void GroveBuilderMessageEventHandler::sgmlDecl(SgmlDeclEvent *event)
+{
+  grove_->setSd(event->sdPointer(), event->prologSyntaxPointer(), event->instanceSyntaxPointer());
+  delete event;
+}
+
+void GroveBuilderMessageEventHandler::setSd(const ConstPtr<Sd> &sd, const ConstPtr<Syntax> &prologSyntax, const ConstPtr<Syntax> &instanceSyntax)
+{
+  grove_->setSd(sd, prologSyntax, instanceSyntax);
+}
+
+GroveBuilderEventHandler::GroveBuilderEventHandler(unsigned groveIndex,
+						   Messenger *mgr,
+						   MessageFormatter *msgFmt)
+: GroveBuilderMessageEventHandler(groveIndex, mgr, msgFmt)
+{
+}
+
 void GroveBuilderEventHandler::appinfo(AppinfoEvent *event)
 {
   const StringC *appinfo;
   if (event->literal(appinfo))
     grove_->setAppinfo(*appinfo);
-  delete event;
-}
-
-void GroveBuilderEventHandler::sgmlDecl(SgmlDeclEvent *event)
-{
-  grove_->setSyntax(event->instanceSyntaxPointer());
   delete event;
 }
 
@@ -1709,16 +1747,37 @@ void GroveBuilderEventHandler::entityDefaulted(EntityDefaultedEvent *event)
   delete event;
 }
 
-void GroveBuilderEventHandler::makeInitialRoot(NodePtr &root)
-{
-  root.assign(new SgmlDocumentNode(grove_, grove_->root()));
-}
-
-ErrorCountEventHandler *GroveBuilder::make(Messenger *mgr, MessageFormatter *msgFmt,
+ErrorCountEventHandler *GroveBuilder::make(unsigned index,
+					   Messenger *mgr,
+					   MessageFormatter *msgFmt,
+					   bool validateOnly,
 					   NodePtr &root)
 {
-  GroveBuilderEventHandler *eh = new GroveBuilderEventHandler(mgr, msgFmt);
+  GroveBuilderMessageEventHandler *eh;
+  if (validateOnly)
+    eh = new GroveBuilderMessageEventHandler(index, mgr, msgFmt);
+  else
+    eh = new GroveBuilderEventHandler(index, mgr, msgFmt);
   eh->makeInitialRoot(root);
+  return eh;
+}
+
+ErrorCountEventHandler *GroveBuilder::make(unsigned index,
+					   Messenger *mgr,
+					   MessageFormatter *msgFmt,
+					   bool validateOnly,
+					   const ConstPtr<Sd> &sd,
+					   const ConstPtr<Syntax> &prologSyntax,
+					   const ConstPtr<Syntax> &instanceSyntax,
+					   NodePtr &root)
+{
+  GroveBuilderMessageEventHandler *eh;
+  if (validateOnly)
+    eh = new GroveBuilderMessageEventHandler(index, mgr, msgFmt);
+  else
+    eh = new GroveBuilderEventHandler(index, mgr, msgFmt);
+  eh->makeInitialRoot(root);
+  eh->setSd(sd, prologSyntax, instanceSyntax);
   return eh;
 }
 
@@ -1729,8 +1788,9 @@ bool GroveBuilder::setBlocking(bool b)
   return prev;
 }
 
-GroveImpl::GroveImpl()
-: root_(0),
+GroveImpl::GroveImpl(unsigned groveIndex)
+: groveIndex_(groveIndex),
+  root_(0),
   impliedAttributeValue_(new ImpliedAttributeValue),
   tailPtr_(0),
   freePtr_(0),
@@ -1778,13 +1838,27 @@ void GroveImpl::setAppinfo(const StringC &appinfo)
 Boolean GroveImpl::getAppinfo(const StringC *&appinfo) const
 {
   if (!haveAppinfo_) {
-    if (!complete_ && syntax_.isNull())
+    if (!complete_ && sd_.isNull())
       return 0; // not available yet
     appinfo = 0;
   }
   else
     appinfo = &appinfo_;
   return 1;
+}
+
+void GroveImpl::setSd(const ConstPtr<Sd> &sd, const ConstPtr<Syntax> &prologSyntax, const ConstPtr<Syntax> &instanceSyntax)
+{
+  instanceSyntax_ = instanceSyntax;
+  prologSyntax_ = prologSyntax;
+  sd_ = sd;
+}
+
+void GroveImpl::getSd(ConstPtr<Sd> &sd, ConstPtr<Syntax> &prologSyntax, ConstPtr<Syntax> &instanceSyntax) const
+{
+  instanceSyntax = instanceSyntax_;
+  prologSyntax = prologSyntax_;
+  sd = sd_;
 }
 
 void GroveImpl::finishProlog()
@@ -2104,17 +2178,32 @@ AccessResult SgmlDocumentNode::getDoctypesAndLinktypes(NamedNodeListPtr &ptr) co
 AccessResult SgmlDocumentNode::getMessages(NodeListPtr &ptr) const
 {
   while (grove()->messageList() == 0) {
-    if (grove()->complete()) {
-      if (grove()->messageList())
-	break;
-      return accessNull;
-    }
+    if (grove()->complete())
+      break;
     if (!grove()->waitForMoreNodes())
       return accessTimeout;
   }
-  NodePtr tem(new MessageNode(grove(), grove()->messageList()));
-  ptr.assign(new SiblingNodeList(tem));
+  if (grove()->messageList()) {
+    NodePtr tem(new MessageNode(grove(), grove()->messageList()));
+    ptr.assign(new SiblingNodeList(tem));
+  }
+  else
+    ptr.assign(new BaseNodeList);
   return accessOK;
+}
+
+AccessResult SgmlDocumentNode::getSd(ConstPtr<Sd> &sd,
+				     ConstPtr<Syntax> &prologSyntax,
+				     ConstPtr<Syntax> &instanceSyntax) const
+{
+  while (!grove()->complete()) {
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  }
+  grove()->getSd(sd, prologSyntax, instanceSyntax);
+  if (!sd.isNull() && !prologSyntax.isNull() && !instanceSyntax.isNull())
+    return accessOK;
+  return accessNull;
 }
 
 AccessResult
@@ -2231,6 +2320,20 @@ AccessResult MessageNode::nextChunkSibling(NodePtr &ptr) const
   if (!p)
     return accessNull;
   ptr.assign(new MessageNode(grove(), p));
+  return accessOK;
+}
+
+AccessResult MessageNode::firstSibling(NodePtr &ptr) const
+{
+  ptr.assign(new MessageNode(grove(), grove()->messageList()));
+  return accessOK;
+}
+
+AccessResult MessageNode::siblingsIndex(unsigned long &n) const
+{
+  n = 0;
+  for (const MessageItem *p = grove()->messageList(); p != item_; p = p->next())
+    n++;
   return accessOK;
 }
 
@@ -4240,9 +4343,9 @@ void BaseNode::release()
     delete this;
 }
 
-const void *BaseNode::groveUniqueId() const
+unsigned BaseNode::groveIndex() const
 {
-  return grove_;
+  return grove_->groveIndex();
 }
 
 bool BaseNode::operator==(const Node &node) const

@@ -45,29 +45,6 @@ class SaveFOTBuilder;
 
 class STYLE_API FOTBuilder {
 public:
-  //para PageModel, GenericPageModelIc 
-  struct StModel{
-    StModel(const FOTBuilder::StModel& stpm) : stwidth_(stpm.stwidth_), stheight_(stpm.stheight_) { }
-    StModel(long w, long h) : stwidth_(w), stheight_(h) { }
-    StModel() : stwidth_(0), stheight_(0) { }
-    void operator=(const FOTBuilder::StModel &);
-    long stwidth_;
-    long stheight_;
-  };
-
-  //para PageModel, ExtensionPageModelIc 
-  struct ListaStModel{
-    ListaStModel() : datastpm_() {}
-    ListaStModel(const FOTBuilder::StModel& stpm) : datastpm_(stpm) {}
-    //necesario para pasar por parametro por copia 
-//    ListaStModel(const FOTBuilder::ListaStModel &);
-    //añadimos uno mas al final
-    void pushStpm(const FOTBuilder::StModel& stpm);
-    const FOTBuilder::StModel& popStpm();
-    FOTBuilder::ListaStModel *segstpm_;
-    const FOTBuilder::StModel datastpm_;
-  };
-
   enum Symbol {
     symbolFalse,
     symbolTrue,
@@ -202,6 +179,101 @@ public:
     // the suffix in decimal onto publicId to get the complete
     // public identifier of the glyph id.
     unsigned long suffix;
+  };
+
+  //Para PageModelObj ....
+  struct StHeader{
+    StHeader(const FOTBuilder::StHeader& sthead): stwidth_(sthead.stwidth_), stheight_(sthead.stheight_),
+    stfillingdirection_(sthead.stfillingdirection_), stcontentsalignment_(sthead.stcontentsalignment_) { } 	
+    StHeader(): stwidth_(0), stheight_(0), stfillingdirection_(symbolFalse), stcontentsalignment_(symbolFalse) { }
+
+    long stheight_;
+    long stwidth_;
+    Symbol stfillingdirection_;
+    Symbol stcontentsalignment_;
+  };
+  
+  struct StFooter{
+    StFooter(const FOTBuilder::StFooter& stfoot): stwidth_(stfoot.stwidth_), stheight_(stfoot.stheight_),
+    stfillingdirection_(stfoot.stfillingdirection_), stcontentsalignment_(stfoot.stcontentsalignment_) { } 	
+    StFooter(): stwidth_(0), stheight_(0), stfillingdirection_(symbolFalse), stcontentsalignment_(symbolFalse) { }
+    
+    long stheight_;
+    long stwidth_;
+    Symbol stfillingdirection_;
+    Symbol stcontentsalignment_;
+  };
+
+  struct StRegion{
+    StRegion(const FOTBuilder::StRegion& streg): stx_origin_(streg.stx_origin_), sty_origin_(streg.sty_origin_),
+    stwidth_(streg.stwidth_), stheight_(streg.stheight_), stfillingdirection_(streg.stfillingdirection_),
+    StHeader_(new FOTBuilder::StHeader(*streg.StHeader_)), StFooter_(new FOTBuilder::StFooter(*streg.StFooter_)){ }
+ 	
+    StRegion(): stx_origin_(0), sty_origin_(0), stwidth_(0), stheight_(0), stfillingdirection_(symbolFalse),
+    StHeader_(new FOTBuilder::StHeader()), StFooter_(new FOTBuilder::StFooter()){ }
+    
+    void operator=(const FOTBuilder::StRegion &);
+    
+    long stx_origin_;
+    long sty_origin_;
+    long stwidth_;
+    long stheight_;
+    Symbol stfillingdirection_;
+    FOTBuilder::StHeader *StHeader_;
+    FOTBuilder::StFooter *StFooter_;
+  };
+
+  //para PageModel, GenericPageModelIc 
+  struct StModel{
+    StModel(const FOTBuilder::StModel& stpm): stwidth_(stpm.stwidth_), stheight_(stpm.stheight_), 
+    stfillingdirection_(stpm.stfillingdirection_), StRegion_(new FOTBuilder::StRegion(*stpm.StRegion_)){
+      	inString(stpm.id_); 
+    }
+    StModel(const FOTBuilder::StModel& stpm, char *id): stwidth_(stpm.stwidth_), stheight_(stpm.stheight_), 
+    stfillingdirection_(stpm.stfillingdirection_), StRegion_(new FOTBuilder::StRegion(*stpm.StRegion_)){
+    	inString(id);
+    }
+    StModel() : stwidth_(0), stheight_(0), stfillingdirection_(symbolFalse), StRegion_(new FOTBuilder::StRegion()){
+    	id_[0]='\0';
+    }
+    void operator=(const FOTBuilder::StModel &);
+    void inString(const char *);
+    
+    //FALTA PROTECCIONES...
+    long stwidth_;
+    long stheight_;
+    Symbol stfillingdirection_;
+    FOTBuilder::StRegion *StRegion_;
+    char id_[30];
+  };
+
+  //Para guardar los identificadores de los define-page-models
+  struct StTID{
+    StTID() : quantsid_(0) { }
+    //para introducir los id de los PageModel que estan el FOTBuilder::StModel
+    //FALTA
+    bool insertTID(const char *);
+    void putid(char *, const char *);
+    bool repetit(const char *);
+    bool iguals(const char *, const char *);
+    //FALTA (de momento esta limitado a una memoria de 50 define-page-model!!)
+    //solo comprobara un max de 50
+    char tid_[50][30];
+    int quantsid_;
+  }t_ids;
+  //var publica de FOTBuilder, --> t_ids 
+  
+  //para PageModel, ExtensionPageModelIc 
+  struct ListaStModel{
+    ListaStModel() : datastpm_() {}
+    ListaStModel(const FOTBuilder::StModel& stpm) : datastpm_(stpm) {}
+    //necesario para pasar por parametro por copia 
+    //ListaStModel(const FOTBuilder::ListaStModel &);
+    //añadimos uno mas al final
+    void pushStpm(const FOTBuilder::StModel& stpm);
+    const FOTBuilder::StModel& popStpm();
+    FOTBuilder::ListaStModel *segstpm_;
+    const FOTBuilder::StModel datastpm_;
   };
 
 	
@@ -802,8 +874,9 @@ public:
   virtual void setFirstPageType(Symbol);
   virtual void setJustifySpread(bool);
   virtual void setBindingEdge(Symbol);
-  virtual void setInitialPageModel(const StModel &);
-  virtual void setRepeatPageModels(const StModel &);
+  virtual void pageModelObj(const StModel &);
+  virtual void setInitialPageModel(const StModel[20]);
+  virtual void setRepeatPageModels(const StModel[20]);
   virtual void setBlankBackPageModel(const StModel &);
   virtual void setBlankFrontPageModel(const StModel &);
   //For anchor
@@ -1156,8 +1229,9 @@ public:
   void setFirstPageType(Symbol);
   void setJustifySpread(bool);
   void setBindingEdge(Symbol);
-  void setInitialPageModel(const FOTBuilder::StModel &);
-  void setRepeatPageModels(const FOTBuilder::StModel &);
+  void pageModelObj(const FOTBuilder::StModel &);
+  void setInitialPageModel(const FOTBuilder::StModel[20]);
+  void setRepeatPageModels(const FOTBuilder::StModel[20]);
   void setBlankBackPageModel(const FOTBuilder::StModel &);
   void setBlankFrontPageModel(const FOTBuilder::StModel &);
   //For anchor
@@ -1255,17 +1329,46 @@ private:
     FuncPtr func;
     StModel arg;
   };
-/*  struct SetInitialPageModelArgCall : Call {
-    SetInitialPageModelArgCall(const Vector<ConstPtr<StModel> > &stpm) : arg(stpm){ }
+/*  struct PageModelListArgCall : Call {
+    typedef void (FOTBuilder::*FuncPtr)(const FOTBuilder::StModel *stpm);
+    PageModelListArgCall(FuncPtr f, const FOTBuilder::StModel *stpm) : func(f) {
+     int i = 0;
+     while (stpm[i].id_[0] != '\0'){
+      arg[i] = stpm[i];
+      i++;
+     }
+    }
     void emit(FOTBuilder &);
-    Vector<ConstPtr<StModel> > arg;
+    FuncPtr func;
+    StModel arg[20];
   };
+*/
+
+  struct SetInitialPageModelArgCall : Call {
+    SetInitialPageModelArgCall(const FOTBuilder::StModel stpm[20]){
+     int i = 0;
+     while (stpm[i].id_[0] != '\0'){
+      arg[i] = stpm[i];
+      i++;
+     }
+    }
+    void emit(FOTBuilder &);
+    StModel arg[20];
+  };
+  
   struct SetRepeatPageModelsArgCall : Call {
-    SetRepeatPageModelsArgCall(const Vector<ConstPtr<StModel> > &stpm) : arg(stpm){ }
+    SetRepeatPageModelsArgCall(const FOTBuilder::StModel stpm[20]){
+     int i = 0;
+     while (stpm[i].id_[0] != '\0'){
+      arg[i] = stpm[i];
+      i++;
+     }
+    }
     void emit(FOTBuilder &);
-    Vector<ConstPtr<StModel> > arg;
+    StModel arg[20];
   };
-*/  struct ExtensionStringArgCall : Call {
+
+  struct ExtensionStringArgCall : Call {
     typedef void (FOTBuilder::*FuncPtr)(const StringC &);
     ExtensionStringArgCall(FuncPtr f, const StringC &s) : func(f), arg(s) { }
     void emit(FOTBuilder &);

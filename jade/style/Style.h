@@ -1,6 +1,7 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
 
+
 #ifndef Style_INCLUDED
 #define Style_INCLUDED 1
 
@@ -40,9 +41,9 @@ public:
   InheritedC(const Identifier *ident, unsigned index);
   virtual ~InheritedC();
   virtual void set(VM &vm, const VarStyleObj *, FOTBuilder &,
-                   ELObj *&, Vector<size_t> &dependencies) const = 0;
-  virtual ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const = 0;
-  virtual ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const = 0;
+                   ELObj *&, Vector<size_t> &dependencies) const =0;
+  virtual ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const =0;
+  virtual ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const =0;
   unsigned index() const;
   const Identifier *identifier() const;
   void setIdentifier(const Identifier *);

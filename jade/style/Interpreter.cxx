@@ -17,6 +17,7 @@
 #include "InternalInputSource.h"
 #include <stdlib.h>
 #include "LangObj.h"
+#include "PageModelObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -45,6 +46,7 @@ size_t maxObjSize()
     sizeof(MacroFlowObj),
     sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
     sizeof(LangObj),
+    sizeof(PageModelObj),
 #ifdef SP_HAVE_LOCALE
 #ifdef SP_HAVE_WCHAR
     sizeof(RefLangObj),
@@ -377,6 +379,13 @@ void Interpreter::installSyntacticKeys()
     { "close", Identifier::keyClose },
     { "mark", Identifier::keyMark },
     { "direction", Identifier::keyDirection },
+    { "filling-direction", Identifier::keyFillingDirection },
+    { "region", Identifier::keyRegion},
+    { "x-origin", Identifier::keyXOrigin},
+    { "y-origin", Identifier::keyYOrigin},
+    { "header", Identifier::keyHeader},
+    { "contents-alignment", Identifier::keyContentsalignment},
+    { "footer", Identifier::keyFooter},
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -1079,22 +1088,22 @@ bool Interpreter::convertEnumC(const FOTBuilder::Symbol *syms,  size_t nSyms,
 
 //para PageModel -> Generic IC FALTA
 bool Interpreter::convertPageModelC(ELObj *obj, const Identifier *ident, const Location &loc,
-				    FOTBuilder::StModel &stpm)
+				    FOTBuilder::StModel &stpm, int tipo)
 {
-  PageModelObj *pmobj;
   //obj tiene los valores del .dsl, lo convertimos a tipo PageModelObj
   //si es un simbolo quiere decir que es una lista!!
+  PageModelObj *pmobj = 0;
+
   if (obj->asSymbol()) {
-	  pmobj = getSendPageModel(); 
+	  pmobj = getSendPageModel(tipo); 
   }
     else  pmobj = obj->asPageModel();
+
   if (pmobj){
-   //cout << "el nombre del define-page-model es: ";
-   //pmobj->whatID(*this,cout); 
-   //cout << endl;
+   //DEBUG: pmobj->whatID(); 
    //obtenemos en stpm el valor del fichero .dsl, para despues pasarlo al FOTBuilder 
    if (pmobj->pageModelData(stpm)){
-      return 1;
+    return 1;
    }
   }
   invalidCharacteristicValue(ident, loc);
@@ -1106,9 +1115,12 @@ bool Interpreter::convertPageModelC(ELObj *obj, const Identifier *ident, const L
 void Interpreter::sendPageModel(PageModelObj *send)
 {
 PairObj *last;
-
+//DEBUG
+//send->print();
+//send->whatID();
  if (!pageModelsSends_){
       pageModelsSends_ = new (*this) PairObj(send, 0);
+      actualpair_ = pageModelsSends_;
  }
  else{
      last  = pageModelsSends_;
@@ -1122,19 +1134,92 @@ PairObj *last;
 }
 
 //FALTA : nos de el ultimo define-page-model
-PageModelObj* Interpreter::getSendPageModel()
+PageModelObj* Interpreter::getSendPageModel(int tipo)
 {
  PageModelObj *pmobj = 0;
- PairObj * last = pageModelsSends_;
- //last->car()->asPageModel()->print(*this,cout);
+ FOTBuilder::StModel stpm;
+ //actualpair_->car()->asPageModel()->print(*this,cout);
  //si hay alguno
- if (last){
-  while(last->cdr()){
-   last = last->cdr()->asPair();
+ if (actualpair_){
+  while(actualpair_->cdr()){
+    pmobj = actualpair_->car()->asPageModel();
+    //FALTA controlar
+    pmobj->pageModelData(stpm);
+    if (sonIguales(contID.RaizID[contID.actualRaizID].init_rep[tipo].getActual(), stpm.id_)){
+     break;
+    }
+    else actualpair_ = actualpair_->cdr()->asPair();
+  }
+  //cuidado si no lo encontrara coge el ultimo, que en principio no se puede dar
+  pmobj = actualpair_->car()->asPageModel(); 
  }
-  pmobj = last->car()->asPageModel(); 
- }
+ actualpair_ = pageModelsSends_;
  return pmobj;
+}
+
+char* Interpreter::st_listIDs::getActual()
+{
+  return id[actual];
+}
+
+void Interpreter::st_listIDs::insertarStr(char *str)
+{
+ int i = 0;
+ while (str[i] != '\0')
+ {
+  id[quant][i] = str[i];
+  i++;
+ }
+ id[quant][i] = '\0';
+}
+
+void Interpreter::st_raizID::insert_ID(char *str)
+{
+ switch (ultim){
+  case 0:
+	  init_rep[0].insertarStr(str); 
+	  init_rep[0].quant++;
+	  break;
+
+  case 1:
+	  init_rep[1].insertarStr(str); 
+	  init_rep[1].quant++;
+	  break;
+   default:
+	   //FALTA caracteristica invalida
+	   break;	   
+
+ }
+}
+
+//struct st_raizID Para PageModel. identificar IDs
+//0-> intial 1->repeat
+void Interpreter::st_raizID::insert_charact(int n)
+{
+ switch(n){
+   case 0:
+	   ultim = 0;
+	   break;
+   case 1:
+	   ultim = 1;
+	   break;
+   default:
+	   //FALTA caracteristica invalida
+	   break;	   
+ }
+}
+
+bool Interpreter::sonIguales(char *s1, char *s2)
+{
+ int i = 0;
+ bool igual = true;
+ bool res = false;
+ while ((s1[i] != '\0') && (s2[i] != '\0') && (igual)){
+     igual = (s1[i] == s2[i]);
+     i++;
+ }
+ if ((igual) && (s1[i] == '\0') && (s2[i] == '\0')) res = true;
+ return res;
 }
 
 void Interpreter::invalidCharacteristicValue(const Identifier *ident, const Location &loc)

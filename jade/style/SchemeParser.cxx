@@ -759,7 +759,6 @@ bool SchemeParser::doDefinePageModel()
   StringC *nomdefine = 0;
   //obtengo la localizacion de los datos de entrada actuales
   Location loc(in_->currentLocation());
-
   //enum token, todos los tokens posibles
   Token tok;
   //mira a ver si es un token valido con el enum
@@ -786,17 +785,19 @@ bool SchemeParser::doDefinePageModel()
     }
   }
 
-  
-  //creamos el objeto donde guardara la info de la hoja de estilo
-  if (nomdefine) pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel(0,0), *nomdefine);
-   else pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel(0,0));
+ //pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel(), *nomdefine); 
+ pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel()); 
+ StringC tmpnom = *nomdefine;
+
   for (;;) {
-    //si es token abrir parentesis, sale, otra vez?
+   //si es token abrir parentesis, sale, otra vez?
     if (!getToken(allowOpenParen|allowCloseParen, tok))
       return 0;
     //token cierre de parentesis, fin!
-    if (tok == tokenCloseParen)
-      break;
+    if (tok == tokenCloseParen){
+       break;
+     }
+
     //token identificador (width,height...)
     if (!getToken(allowIdentifier, tok))
       return 0;
@@ -816,11 +817,30 @@ bool SchemeParser::doDefinePageModel()
         if (!doHeight())
           return 0;
         break;
+      case Identifier::keyFillingDirection:
+        if (!doFillingDirection())
+          return 0;
+        break;
+      case Identifier::keyRegion:
+    	if (!doRegion())
+          return 0;
+        break;
       default:
         return 0;
       }
     }
   }
+  //creamos el objeto donde guardara la info de la hoja de estilo
+  if (nomdefine) { 
+            pagemodelObj_->setID(tmpnom); 
+            // debuger
+	    // cout << "............................................." << endl;
+            // cout << "SchemeParser.cxx--Nombre de define-page-model: ";
+            // pagemodelObj_->whatID();
+            // cout << endl;
+  }
+   else pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel());
+
   //lo hace permanente en interpreter!!
   interp_->sendPageModel(pagemodelObj_);
 
@@ -860,6 +880,477 @@ bool SchemeParser::doHeight()
   if (!getToken(allowCloseParen, tok))
     return 0;
   pagemodelObj_->setHeight(result);
+  return 1;
+}
+
+bool SchemeParser::doFillingDirection()
+{
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolRightToLeft,
+  FOTBuilder::symbolLeftToRight,
+  FOTBuilder::symbolTopToBottom
+  };
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+	
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setFillingDirection(result);
+  return 1;
+}
+
+bool SchemeParser::doRegion()
+{
+  Token tok;
+
+  for (;;) {
+   //si es token abrir parentesis, sale, otra vez?
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    //token cierre de parentesis, fin!
+    if (tok == tokenCloseParen){
+       break;
+     }
+    //token identificador (width,height...)
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    //obtiene identificador
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyXOrigin:
+    	if (!doRegionXOrigin())
+          return 0;
+        break;
+      case Identifier::keyYOrigin:
+        if (!doRegionYOrigin())
+          return 0;
+        break;
+      case Identifier::keyWidth:
+        if (!doRegionWidth())
+          return 0;
+        break;
+      case Identifier::keyHeight:
+        if (!doRegionHeight())
+          return 0;
+        break;
+      case Identifier::keyFillingDirection:
+        if (!doRegionFillingdirection())
+          return 0;
+        break;
+      case Identifier::keyHeader:
+    	if (!doHeader())
+          return 0;
+        break;
+      case Identifier::keyFooter:
+    	if (!doFooter())
+          return 0;
+        break;
+	default:
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+//para header 
+bool SchemeParser::doHeader()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen){
+       break;
+     }
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyHeight:
+        if (!doRegionHeaderHeight())
+          return 0;
+        break;
+      case Identifier::keyWidth:
+        if (!doRegionHeaderWidth())
+          return 0;
+        break;
+      case Identifier::keyFillingDirection:
+        if (!doRegionHeaderFillingdirection())
+          return 0;
+        break;
+      case Identifier::keyContentsalignment:
+        if (!doRegionHeaderContentsalignment())
+          return 0;
+        break;
+	default:
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+bool SchemeParser::doFooter()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen){
+       break;
+     }
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyHeight:
+        if (!doRegionFooterHeight())
+          return 0;
+        break;
+      case Identifier::keyWidth:
+        if (!doRegionFooterWidth())
+          return 0;
+        break;
+      case Identifier::keyFillingDirection:
+        if (!doRegionFooterFillingdirection())
+          return 0;
+        break;
+      case Identifier::keyContentsalignment:
+        if (!doRegionFooterContentsalignment())
+          return 0;
+        break;
+	default:
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+/**********************************/
+bool SchemeParser::doRegionXOrigin()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_X_Origin(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionYOrigin()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Y_Origin(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionWidth()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Width(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionHeight()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Height(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionHeaderHeight()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Header_Height(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionHeaderWidth()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Header_Width(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionHeaderFillingdirection()
+{
+ 
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolRightToLeft,
+  FOTBuilder::symbolLeftToRight,
+  FOTBuilder::symbolTopToBottom
+  };
+
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setRegion_Header_FillingDirection(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionHeaderContentsalignment()
+{
+
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolStart,
+  FOTBuilder::symbolEnd,
+  FOTBuilder::symbolCenter,
+  FOTBuilder::symbolJustify
+  };
+  
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setRegion_Header_ContentsAlignment(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionFooterHeight()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Footer_Height(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionFooterWidth()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setRegion_Footer_Width(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionFooterFillingdirection()
+{
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolRightToLeft,
+  FOTBuilder::symbolLeftToRight,
+  FOTBuilder::symbolTopToBottom
+  };
+
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setRegion_Footer_FillingDirection(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionFooterContentsalignment()
+{
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolStart,
+  FOTBuilder::symbolEnd,
+  FOTBuilder::symbolCenter,
+  FOTBuilder::symbolJustify
+  };
+
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setRegion_Footer_ContentsAlignment(result);
+  return 1;
+}
+
+bool SchemeParser::doRegionFillingdirection()
+{
+  static const unsigned allow = (~0 & ~allowEndOfEntity);
+  FOTBuilder::Symbol result;
+  SymbolObj *tmpobj;
+  Token tok;
+
+ //FIXME falta control de apostrofe solo...
+ if (!getToken(allow, tok))
+    return 0;
+ 
+ if (!getToken(allowExpr, tok))
+    return 0;
+  
+  Location loc(in_->currentLocation());
+  const Identifier *ident = lookup(currentToken_);
+
+  static FOTBuilder::Symbol vals[] = {
+  FOTBuilder::symbolFalse,
+  FOTBuilder::symbolRightToLeft,
+  FOTBuilder::symbolLeftToRight,
+  FOTBuilder::symbolTopToBottom
+  };
+
+   tmpobj = interp_->makeSymbol(currentToken_);
+   interp_->convertEnumC(vals, SIZEOF(vals), tmpobj, ident, loc, result);
+
+   if (!getToken(allowCloseParen, tok))
+     return 0;
+  pagemodelObj_->setRegion_FillingDirection(result);
   return 1;
 }
 
@@ -1666,6 +2157,62 @@ bool SchemeParser::parseBindingsAndBody1(Vector<const Identifier *> &vars,
   return parseBegin(body);
 }
 
+//dev cierto si son iguales
+bool SchemeParser::iguales(char *s1, char *s2)
+{
+  int i = 0;
+  bool igual = true;
+  bool res = false;
+  while ((s1[i] != '\0') && (s2[i] != '\0') && (igual)){
+     igual = (s1[i] == s2[i]);
+     i++;
+  }
+  if ((igual) && (s1[i] == '\0') && (s2[i] == '\0')) res = true;
+  return res;
+}
+
+//comprueba las caracteristicas posibles para PageModel
+//cierto si es una caracteristica de PageModelObj
+void SchemeParser::CharactPM(char *str)
+{
+ if (iguales(str, "initial-page-model")){
+  interp_->contID.RaizID[interp_->contID.nRaizID].insert_charact(0);
+ }
+ if (iguales(str, "repeat-page-models")){
+  interp_->contID.RaizID[interp_->contID.nRaizID].insert_charact(1);
+ }
+}
+
+void SchemeParser::sendID(char *str)
+{
+ interp_->contID.RaizID[interp_->contID.nRaizID].insert_ID(str);
+}
+
+void SchemeParser::tratarSymbolID(StringC& str, bool charact)
+{
+ StringObj res1(str);
+ const Char *s1 = res1.data();
+ char ptrid1[30];
+ size_t i1;
+  for (i1 = 0; i1 < res1.size(); i1++)
+        switch (s1[i1]) {
+              case '\\':
+              case '"':
+	          // fall through
+	          break;
+	       default:
+	          ptrid1[i1]=s1[i1];
+		  break;
+	 }
+ ptrid1[i1]='\0';
+ if (charact){
+    CharactPM(ptrid1);
+ }
+ else{ 
+   sendID(ptrid1);
+ }
+}
+
 bool SchemeParser::parseDatum(unsigned otherAllowed,
 			     ELObj *&result,
 			     Location &loc,
@@ -1675,6 +2222,12 @@ bool SchemeParser::parseDatum(unsigned otherAllowed,
   if (!parseSelfEvaluating(otherAllowed|allowVector|allowUnquote|allowUnquoteSplicing, result, tok))
     return 0;
   loc = in_->currentLocation();
+  //inserta en la estructura del interp si son initial o repeat de PageModel
+  //el segundo parametro indica si es la caracteristica o si es el id.
+  //true -> characteristic
+  //false -> symbol id
+  //FALTA
+  tratarSymbolID(currentToken_, true);
   //en recursivo si no es un token, tendra ya tem con su informacion.
   if (result){
     return 1;
@@ -1706,7 +2259,8 @@ bool SchemeParser::parseDatum(unsigned otherAllowed,
       PairObj *last = new (*interp_) PairObj(tem, 0);
       list = last;
       for (;;) {
-	if (!parseDatum(allowCloseParen|allowPeriod, tem, ignore, tok)){
+        tratarSymbolID(currentToken_, false);
+       if (!parseDatum(allowCloseParen|allowPeriod, tem, ignore, tok)){
 	 return 0;
 	}
 	if (!tem) {

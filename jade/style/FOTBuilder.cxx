@@ -864,12 +864,17 @@ void FOTBuilder::setBindingEdge(Symbol)
 {
 }
 
-//stpm viene dado por el GenericPageModelInheritedC
-void FOTBuilder::setInitialPageModel(const StModel& stpm)
+//para enviar el define-page-model
+void FOTBuilder::pageModelObj(const StModel& stpm)
 {
 }
 
-void FOTBuilder::setRepeatPageModels(const StModel& stpm)
+//stpm viene dado por el GenericPageModelInheritedC
+void FOTBuilder::setInitialPageModel(const StModel stpm[20])
+{
+}
+
+void FOTBuilder::setRepeatPageModels(const StModel stpm[20])
 {
 }
 
@@ -1375,12 +1380,100 @@ void FOTBuilder::extensionSet(void (FOTBuilder::*func)(long), long arg)
   (this->*func)(arg);
 }
 
+void FOTBuilder::StRegion::operator=(const FOTBuilder::StRegion& streg)
+{
+ stx_origin_ = streg.stx_origin_;
+ sty_origin_ = streg.sty_origin_;
+ stwidth_ = streg.stwidth_;
+ stheight_ = streg.stheight_;
+ stfillingdirection_ = streg.stfillingdirection_;
+
+ StHeader_ = new FOTBuilder::StHeader(*streg.StHeader_);
+ StFooter_ = new FOTBuilder::StFooter(*streg.StFooter_);
+}
+
 //para PageModel
 void FOTBuilder::StModel::operator=(const FOTBuilder::StModel& stpm)
 {
  stwidth_ = stpm.stwidth_;
  stheight_ = stpm.stheight_;
+ stfillingdirection_ = stpm.stfillingdirection_;
+
+ StRegion_ = new FOTBuilder::StRegion(*stpm.StRegion_);
+
+ int i = 0;
+ while (stpm.id_[i] != '\0'){
+	 id_[i] = stpm.id_[i];
+	 i++;
+ }
+ id_[i] = '\0';
 }
+
+void FOTBuilder::StModel::inString(const char *str)
+{
+ int i = 0;
+ while (str[i] != '\0'){
+  id_[i] = str[i];
+  i++;
+ }
+ id_[i] = '\0';
+}
+
+
+//Para PageModel
+bool FOTBuilder::StTID::iguals(const char *s1, const char *s2)
+{
+  int i = 0;
+  bool igual = true;
+  bool res = false;
+  while ((s1[i] != '\0') && (s2[i] != '\0') && (igual)){
+     igual = (s1[i] == s2[i]);
+     i++;
+  }
+  if ((igual) && (s1[i] == '\0') && (s2[i] == '\0')) res = true;
+     return res;
+}
+
+//Para PageModel
+bool FOTBuilder::StTID::repetit(const char *strid)
+{
+  int i = 0;
+  bool igual = false;
+  while ((i < quantsid_) && (!igual)){
+    igual = iguals(strid,tid_[i]);
+    i++;
+  }
+  return igual;
+}
+
+//FALTA inserta s2, en s1
+void FOTBuilder::StTID::putid(char *s1, const char *s2)
+{
+  int i = 0;
+  while (s2[i] != '\0'){
+    s1[i] = s2[i];
+    i++;
+  }
+  s1[i] = '\0';
+}
+
+//dev falso si no estaba en el array, -> no repetido
+//cierto si estaba repetido, NO INSERTA
+bool FOTBuilder::StTID::insertTID(const char *strid)
+{
+ bool repe = false;
+ //para cuando sea una lista!
+ if (quantsid_ == 0){
+     putid(tid_[0],strid);
+ }
+ else if (quantsid_ < 50){
+    repe = repetit(strid);
+    if (!repe) putid(tid_[quantsid_],strid);
+ }
+ if (!repe) quantsid_++;
+ return repe;
+}
+
 
 /*FOTBuilder::ListaStModel::ListaStModel(const FOTBuilder::ListaStModel &vstpm){
  FOTBuilder::ListaStModel *last = &vstpm;
@@ -1877,29 +1970,37 @@ INLINE_SPACE_ARG_CALL(setEscapementSpaceBefore)
 INLINE_SPACE_ARG_CALL(setEscapementSpaceAfter)
 
 //Para PageModel
-/*void SaveFOTBuilder::setInitialPageModel(const Vector<ConstPtr<FOTBuilder::StModel> > &stpm)
+void SaveFOTBuilder::setInitialPageModel(const FOTBuilder::StModel stpm[20])
 {
   *tail_ = new SetInitialPageModelArgCall(stpm);
   tail_ = &(*tail_)->next;
 }
 
-void SaveFOTBuilder::setRepeatPageModels(const Vector<ConstPtr<FOTBuilder::StModel> > &stpm)
+void SaveFOTBuilder::setRepeatPageModels(const FOTBuilder::StModel stpm[20])
 {
   *tail_ = new SetRepeatPageModelsArgCall(stpm);
   tail_ = &(*tail_)->next;
 }
-*/
+
+
 //Para PageModel
 #define PAGE_MODEL_ARG_CALL(F) \
   void SaveFOTBuilder::F(const FOTBuilder::StModel& stpm) { \
     *tail_ = new PageModelArgCall(&FOTBuilder::F, stpm); \
      tail_ = &(*tail_)->next; }
 
-PAGE_MODEL_ARG_CALL(setInitialPageModel)
-PAGE_MODEL_ARG_CALL(setRepeatPageModels)
+PAGE_MODEL_ARG_CALL(pageModelObj)
 PAGE_MODEL_ARG_CALL(setBlankBackPageModel)
 PAGE_MODEL_ARG_CALL(setBlankFrontPageModel)
 
+/*
+#define PAGE_MODEL_LIST_ARG_CALL(F) \
+  void SaveFOTBuilder::F(const FOTBuilder::StModel *stpm) { \
+    *tail_ = new PageModelListArgCall(&FOTBuilder::F, stpm); \
+     tail_ = &(*tail_)->next; }
+PAGE_MODEL_LIST_ARG_CALL(setInitialPageModel)
+PAGE_MODEL_LIST_ARG_CALL(setRepeatPageModels)
+*/
 
 SaveFOTBuilder::Call::~Call()
 {
@@ -1916,7 +2017,7 @@ void SaveFOTBuilder::LongArgCall::emit(FOTBuilder &fotb)
 }
 
 //Para PageModel
-/*void SaveFOTBuilder::SetInitialPageModelArgCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::SetInitialPageModelArgCall::emit(FOTBuilder &fotb)
 {
   fotb.setInitialPageModel(arg);
 }
@@ -1925,12 +2026,18 @@ void SaveFOTBuilder::SetRepeatPageModelsArgCall::emit(FOTBuilder &fotb)
 {
   fotb.setRepeatPageModels(arg);
 }
-*/
+
 //Para PageModel
 void SaveFOTBuilder::PageModelArgCall::emit(FOTBuilder &fotb)
 {
   (fotb.*func)(arg);
 }
+
+/*void SaveFOTBuilder::PageModelListArgCall::emit(FOTBuilder &fotb)
+{
+  (fotb.*func)(arg);
+}
+*/
 
 void SaveFOTBuilder::ExtensionLongArgCall::emit(FOTBuilder &fotb)
 {

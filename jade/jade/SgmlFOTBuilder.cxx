@@ -160,8 +160,9 @@ public:
   void setFirstPageType(Symbol);
   void setJustifySpread(bool);
   void setBindingEdge(Symbol);
-  void setInitialPageModel(const FOTBuilder::StModel &);
-  void setRepeatPageModels(const FOTBuilder::StModel &);
+  void pageModelObj(const FOTBuilder::StModel &);
+  void setInitialPageModel(const FOTBuilder::StModel stpm[20]);
+  void setRepeatPageModels(const FOTBuilder::StModel stpm[20]);
   void setBlankBackPageModel(const FOTBuilder::StModel &);
   void setBlankFrontPageModel(const FOTBuilder::StModel &);
   //For anchor
@@ -384,7 +385,7 @@ private:
 
   //para PageModel
   void pageModelC(const char *, const FOTBuilder::StModel &);
-  void extensionPageModelC(const char *, const FOTBuilder::StModel &);
+  void extensionPageModelC(const char *, const FOTBuilder::StModel stpm[20]);
   void publicIdC(const char *, PublicId);
   void inlineSpaceC(const char *name, const InlineSpace &);
   void displaySpaceNIC(const char *name, const DisplaySpace &);
@@ -1197,16 +1198,61 @@ void SgmlFOTBuilder::integerC(const char *s, long n)
 }
 
 //para PageModel
+void SgmlFOTBuilder::pageModelObj(const FOTBuilder::StModel& stpm)
+{
+  os() << "<define-page-model id=";
+  int i = 0;
+  while (stpm.id_[i] != '\0'){
+   os() << stpm.id_[i];
+   i++;
+  }
+  os() << " width="  << quot << stpm.stwidth_ << quot << ' '  << "height=" << quot <<  stpm.stheight_;
+  os() << quot << ' ' << "filling-direction=" << quot << stpm.stfillingdirection_ << quot << ">" << RE; 
+  os() << "<region x-origin=" << quot << stpm.StRegion_->stx_origin_; 
+  os() << quot << ' ' << "y-origin=" << quot << stpm.StRegion_->sty_origin_; 
+  os() << quot << ' ' << "width=" << quot << stpm.StRegion_->stwidth_; 
+  os() << quot << ' ' << "height=" << quot << stpm.StRegion_->stheight_;
+  os() << quot << ' ' << "filling-direction=" << quot << stpm.StRegion_->stfillingdirection_ << quot << ">" << RE; 
+  os() << "<header height=" << quot << stpm.StRegion_->StHeader_->stheight_; 
+  os() << quot << ' ' << "width=" << quot << stpm.StRegion_->StHeader_->stwidth_; 
+  os() << quot << ' ' << "filling-direction=" << quot << stpm.StRegion_->StHeader_->stfillingdirection_; 
+  os() << quot << ' ' << "contents-alignment=" << quot << stpm.StRegion_->StHeader_->stcontentsalignment_ << quot << "/>" << RE;
+  os() << "<footer height=" << quot << stpm.StRegion_->StFooter_->stheight_; 
+  os() << quot << ' ' << "width=" << quot << stpm.StRegion_->StFooter_->stwidth_; 
+  os() << quot << ' ' << "filling-direction=" << quot << stpm.StRegion_->StFooter_->stfillingdirection_; 
+  os() << quot << ' ' << "contents-alignment=" << quot << stpm.StRegion_->StFooter_->stcontentsalignment_ << quot << "/>" << RE;
+  os() << "</region>" << RE;
+  os() << "</define-page-model>" << RE;
+}
+
+//para PageModel
 void SgmlFOTBuilder::pageModelC(const char *s, const FOTBuilder::StModel& stpm)
 {
-  ics_ << ' ' << s << ".width="  << quot << stpm.stwidth_ << quot << ' '  << s << ".height=" << quot <<  stpm.stheight_ << quot; 
+  ics_ << ' ' << s <<  "=" << quot;
+  int i = 0;
+  while (stpm.id_[i] != '\0'){
+   ics_ << stpm.id_[i];
+   i++;
+  }
+  ics_ << quot;
 }
 
 //ics_ pone a continuacion
 //os() al principio!! --> PageModelObj
-void SgmlFOTBuilder::extensionPageModelC(const char *s, const FOTBuilder::StModel& stpm)
+void SgmlFOTBuilder::extensionPageModelC(const char *s, const FOTBuilder::StModel stpm[20])
 {
-  ics_ << ' ' << s << ".width="  << quot << stpm.stwidth_ << quot << ' '  << s << ".height=" << quot <<  stpm.stheight_ << quot; 
+  ics_ << ' ' << s <<  '=' << quot;
+  int j = 0;
+  while (stpm[j].id_[0] != '\0'){
+   int i = 0;
+   while (stpm[j].id_[i] != '\0'){
+    if ((j != 0) && (i == 0)) ics_ << ' ' << stpm[j].id_[i];
+     else ics_ << stpm[j].id_[i];
+    i++;
+   }
+   j++;
+  }
+  ics_ << quot;
 }
 
 void SgmlFOTBuilder::setExpandTabs(long n)
@@ -1491,12 +1537,12 @@ void SgmlFOTBuilder::setBindingEdge(Symbol sym)
   symbolC("binding-edge", sym);
 }
 
-void SgmlFOTBuilder::setInitialPageModel(const FOTBuilder::StModel& stpm)
+void SgmlFOTBuilder::setInitialPageModel(const FOTBuilder::StModel stpm[20])
 {
   extensionPageModelC("initial-page-model", stpm);
 }
 
-void SgmlFOTBuilder::setRepeatPageModels(const FOTBuilder::StModel& stpm)
+void SgmlFOTBuilder::setRepeatPageModels(const FOTBuilder::StModel stpm[20])
 {
   extensionPageModelC("repeat-page-models", stpm);
 }

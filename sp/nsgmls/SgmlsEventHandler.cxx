@@ -11,6 +11,7 @@
 #include "ExtendEntityManager.h"
 #include "StorageManager.h"
 #include "macros.h"
+#include "sptchar.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -45,7 +46,15 @@ const char omissionCode = 'o';
 const OutputCharStream::Newline nl = OutputCharStream::newline;
 
 const char space = ' ';
-const Char re = '\r';
+const char re = '\r';
+const Char reChar = re;
+const char escapePrefix = '\\';
+const Char escapePrefixChar = escapePrefix;
+const char sdataDelim = '|';
+const char nonSgmlEscape = '%';
+const char newlineEscape = 'n';
+const char numEscape = '#';
+const char escapeEnd = ';';
 
 inline
 void SgmlsEventHandler::startData()
@@ -91,7 +100,7 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
 
   haveData_(0), lastSos_(0), inDocument_(0)
 {
-  os_->setEscaper(escape);
+  os_->setEscaper(escaper);
 }
 
 SgmlsEventHandler::~SgmlsEventHandler()
@@ -186,9 +195,9 @@ void SgmlsEventHandler::sdataEntity(SdataEntityEvent *event)
 {
   outputLocation(event->location());
   startData();
-  os() << "\\|";
+  os() << escapePrefix << sdataDelim;
   outputString(event->data(), event->dataLength());
-  os() << "\\|";
+  os() << escapePrefix << sdataDelim;
   delete event;
 }
 
@@ -224,7 +233,7 @@ void SgmlsEventHandler::nonSgmlChar(NonSgmlCharEvent *event)
   if (outputNonSgml_) {
     outputLocation(event->location());
     startData();
-    os() << "\\%" << (unsigned long)event->character() << ';';
+    os() << escapePrefix << nonSgmlEscape << (unsigned long)event->character() << escapeEnd;
   }
   delete event;
 }
@@ -328,13 +337,13 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
 	      outputString(p, length);
 	      break;
 	    case TextItem::sdata:
-	      os() << "\\|";
+	      os() << escapePrefix << sdataDelim;
 	      outputString(p, length);
-	      os() << "\\|";
+	      os() << escapePrefix << sdataDelim;
 	      break;
 	    case TextItem::nonSgml:
 	      if (outputNonSgml_)
-		os() << "\\%" << (unsigned long)*p << ';';
+		os() << escapePrefix << nonSgmlEscape << (unsigned long)*p << escapeEnd;
 	      break;
 	    default:
 	      break;
@@ -545,19 +554,20 @@ void SgmlsEventHandler::outputString(const Char *p, size_t n)
 {
   for (; n > 0; p++, n--) {
     switch (*p) {
-    case '\\':			// FIXME we're punning Chars and chars
-      os() << "\\\\";
+    case escapePrefixChar:
+      os() << escapePrefix << escapePrefix;
       break;
-    case re:
-      os() << "\\n";
+    case reChar:
+      os() << escapePrefix << newlineEscape;
       if (outputLine_ && haveData_)
 	lastLineno_++;
       break;
     default:
       // FIXME not clear what to do here given possibility of wide characters
-      if (*p < 040) {
+      unsigned long c = *p;
+      if (c < 040) {
 	static const char digits[] = "0123456789";
-	os() << "\\0" << digits[*p / 8] << digits[*p % 8];
+	os() << escapePrefix << '0' << digits[(c / 8) % 8] << digits[c % 8];
       }
       else
 	os().put(*p);
@@ -566,9 +576,9 @@ void SgmlsEventHandler::outputString(const Char *p, size_t n)
   }
 }
 
-void SgmlsEventHandler::escape(OutputCharStream &s, Char c)
+void SgmlsEventHandler::escaper(OutputCharStream &s, Char c)
 {
-  s << "\\#" << (unsigned long)c << ";";
+  s << escapePrefix << numEscape << (unsigned long)c << escapeEnd;
 }
 
 void SgmlsEventHandler::outputLocation1(const Location &loc)

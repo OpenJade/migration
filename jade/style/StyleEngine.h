@@ -35,6 +35,7 @@ private:
   void operator=(const StyleEngine &); // undefined
 
   Interpreter *interpreter_;
+  StringC cmdline;
 };
 
 #ifdef DSSSL_NAMESPACE

@@ -320,7 +320,6 @@ public:
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
 	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
-  void defineVariable(const StringC &);
   void endPart();
   void dEndPart();
   FalseObj *makeFalse();

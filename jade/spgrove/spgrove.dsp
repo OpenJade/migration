@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x20100000" /subsystem:windows /dll /machine:I386 /out:"..\bin\spgrove.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x20100000" /subsystem:windows /dll /machine:I386 /out:"..\bin\ospgrove13.dll"
 # SUBTRACT LINK32 /profile /map
 
 !ELSEIF  "$(CFG)" == "spgrove - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x20100000" /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\spgrove.dll"
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /base:"0x20100000" /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\ospgrove13d.dll"
 # SUBTRACT LINK32 /incremental:no
 
 !ENDIF 
@@ -105,7 +105,7 @@ InputName=grove_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -119,7 +119,7 @@ InputName=grove_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

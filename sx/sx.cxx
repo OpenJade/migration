@@ -37,6 +37,7 @@ struct {
   { SP_T("internal-decl"), &XmlOutputEventHandler::Options::intDecl },
   { SP_T("external-decl"), &XmlOutputEventHandler::Options::extDecl },
   { SP_T("sdata-as-pis"), &XmlOutputEventHandler::Options::sdataAsPi },
+  { SP_T("write-outside-outdir"), &XmlOutputEventHandler::Options::writeOutsideOutDir },
 };
 
 class SxApp : public ParserApp {
@@ -79,6 +80,7 @@ SxApp::SxApp()
   outputOptions_.extDecl = 1;
   outputOptions_.expInt = 1;
   outputOptions_.expExt = 1;
+  outputOptions_.writeOutsideOutDir = 1;
   outputDir_ = NULL;
   dtdLoc_ = NULL;
 }

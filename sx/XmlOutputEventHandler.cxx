@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libgen.h>
+#include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -1089,14 +1090,22 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 
 	  strcpy (filePath, outputDir_);
 
-	  // Drop the scheme if there is one (so
-	  // "http://www.bar.com/foo" becomes
-	  // "output_dir/www.bar.com/foo")
+          /* Drop the scheme if there is one (so
+             "http://www.bar.com/foo" becomes
+             "output_dir/www.bar.com/foo") */
 
 	  char *scheme = strchr(originalFilePath, ':');
-	  if (scheme != NULL)
+	  if (scheme != NULL) {
             // drop initial colon
             originalFilePath = scheme + 1;
+          } else {
+            // check for leading slashes in non-scheme filenames
+            // and warn that we're going to remove them
+            if (strncmp(originalFilePath, "/", 1) == 0) {
+              app_->message(XmlOutputMessages::removingLeadingSlashes,
+                            StringMessageArg(*systemIdPointer));
+            }
+          }
 
           // drop initial slashes (there may be multiple)
           while (strncmp(originalFilePath, "/", 1) == 0) {
@@ -1108,8 +1117,25 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
           strcat (filePath, "/");
           strcat(filePath, originalFilePath);
 
-	  // Make the necessary directories
+          // Check to make sure we haven't passed outside of the
+          // output directory
 	  char *dirs = strdup (filePath);
+          char realDirs[MAXPATHLEN];
+          char realOutputDir[MAXPATHLEN];
+          char *outputDir = strdup(outputDir_);
+
+          realpath((const char *)dirname(dirs), realDirs);
+          realpath((const char *)dirname(outputDir), realOutputDir);
+
+          if (strncmp(realDirs, realOutputDir, strlen (realOutputDir)) != 0) {
+            app_->message(XmlOutputMessages::pathOutsideOutputDirectory,
+                          StringMessageArg(*systemIdPointer));
+            if (! options_.writeOutsideOutDir) {
+              exit (1);
+            }
+          }
+
+	  // Make the necessary directories
 	  maybeCreateDirectories(dirname(dirs));
 
 	  // Set the suffix to ".xml"

@@ -45,6 +45,7 @@ public:
     PackedBoolean intDecl;
     PackedBoolean extDecl;
     PackedBoolean sdataAsPi;
+    PackedBoolean writeOutsideOutDir;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,

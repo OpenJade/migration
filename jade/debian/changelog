@@ -1,3 +1,15 @@
+openjade (1.4devel1-5) unstable; urgency=low
+
+  * debian/control: fix override disparities in libostyle0 and
+    libostyle-dev
+  * debian/control: build-depends on gettext
+    closes: #105181
+  * problem fixed a while ago where we weren't shipping the HTML
+    documentation
+    closes: #71093
+
+ -- Adam Di Carlo <aph@debian.org>  Fri, 20 Jul 2001 02:14:58 -0400
+
 openjade (1.4devel1-4) unstable; urgency=low
 
   * upstream changes from CVS, see NEWS
@@ -34,6 +46,4 @@ openjade (1.4devel1-1) unstable; urgency=low
 
  -- Adam Di Carlo <aph@debian.org>  Sat, 20 May 2000 12:55:44 -0400
 
-Local variables:
-mode: debian-changelog
-End:
+

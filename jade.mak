@@ -1798,9 +1798,6 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\style\ProcessContext.cxx
-
-!IF  "$(CFG)" == "style - Win32 Release"
-
 DEP_CPP_PROCES=\
 	"..\sp\include\Allocator.h"\
 	"..\sp\include\Attributed.h"\
@@ -1907,9 +1904,9 @@ DEP_CPP_PROCES=\
 	".\style\stylelib.h"\
 	".\style\VM.h"\
 	
-NODEP_CPP_PROCES=\
-	".\style\}"\
-	
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
 # ADD CPP /Yu"stylelib.h"
 
 "$(INTDIR)\ProcessContext.obj" : $(SOURCE) $(DEP_CPP_PROCES) "$(INTDIR)"\
@@ -1923,112 +1920,6 @@ NODEP_CPP_PROCES=\
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
 
-DEP_CPP_PROCES=\
-	"..\sp\include\Allocator.h"\
-	"..\sp\include\Attributed.h"\
-	"..\sp\include\CharsetDecl.h"\
-	"..\sp\include\CodingSystem.h"\
-	"..\sp\include\constant.h"\
-	"..\sp\include\ContentToken.h"\
-	"..\sp\include\CopyOwner.cxx"\
-	"..\sp\include\ElementType.h"\
-	"..\sp\include\EntityCatalog.h"\
-	"..\sp\include\EntityDecl.h"\
-	"..\sp\include\EntityManager.h"\
-	"..\sp\include\HashTable.cxx"\
-	"..\sp\include\HashTableItemBase.cxx"\
-	"..\sp\include\IListBase.h"\
-	"..\sp\include\IListIterBase.h"\
-	"..\sp\include\IQueue.cxx"\
-	"..\sp\include\ISet.cxx"\
-	"..\sp\include\Lpd.h"\
-	"..\sp\include\Markup.h"\
-	"..\sp\include\Mode.h"\
-	"..\sp\include\NamedResource.h"\
-	"..\sp\include\NamedResourceTable.h"\
-	"..\sp\include\Notation.h"\
-	"..\sp\include\Owner.cxx"\
-	"..\sp\include\OwnerTable.cxx"\
-	"..\sp\include\PointerTable.cxx"\
-	"..\sp\include\Ptr.cxx"\
-	"..\sp\include\RangeMap.cxx"\
-	"..\sp\include\RangeMap.h"\
-	"..\sp\include\rtti.h"\
-	"..\sp\include\Sd.h"\
-	"..\sp\include\SdText.h"\
-	"..\sp\include\ShortReferenceMap.h"\
-	"..\sp\include\StringOf.cxx"\
-	"..\sp\include\SubstTable.cxx"\
-	"..\sp\include\TypeId.h"\
-	"..\sp\include\UnivCharsetDesc.h"\
-	"..\sp\include\Vector.cxx"\
-	"..\sp\include\XcharMap.cxx"\
-	".\grove\Node.h"\
-	".\include\ArcEngine.h"\
-	".\include\Attribute.h"\
-	".\include\Boolean.h"\
-	".\include\CharsetInfo.h"\
-	".\include\config.h"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\Entity.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\ExternalId.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.h"\
-	".\include\IList.h"\
-	".\include\IListIter.h"\
-	".\include\InputSource.h"\
-	".\include\IQueue.h"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\macros.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\Named.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.h"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.h"\
-	".\include\Resource.h"\
-	".\include\SgmlParser.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\Vector.h"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\style\Collector.h"\
-	".\style\dsssl_ns.h"\
-	".\style\DssslSpecEventHandler.h"\
-	".\style\ELObj.h"\
-	".\style\ELObjMessageArg.h"\
-	".\style\EvalContext.h"\
-	".\style\Expression.h"\
-	".\style\FOTBuilder.h"\
-	".\style\Insn.h"\
-	".\style\Insn2.h"\
-	".\style\Interpreter.h"\
-	".\style\InterpreterMessages.h"\
-	".\style\NumberCache.h"\
-	".\style\ProcessContext.h"\
-	".\style\ProcessingMode.h"\
-	".\style\SosofoObj.h"\
-	".\style\Style.h"\
-	".\style\style_pch.h"\
-	".\style\StyleEngine.h"\
-	".\style\stylelib.h"\
-	".\style\VM.h"\
-	
 # ADD CPP /Yu"stylelib.h"
 
 BuildCmds= \
@@ -2054,6 +1945,9 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\style\primitive.cxx
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
 DEP_CPP_PRIMI=\
 	"..\sp\include\Allocator.h"\
 	"..\sp\include\Attributed.h"\
@@ -2161,9 +2055,6 @@ DEP_CPP_PRIMI=\
 	".\style\stylelib.h"\
 	".\style\VM.h"\
 	
-
-!IF  "$(CFG)" == "style - Win32 Release"
-
 # ADD CPP /Yu"stylelib.h"
 
 "$(INTDIR)\primitive.obj" : $(SOURCE) $(DEP_CPP_PRIMI) "$(INTDIR)"\
@@ -2177,6 +2068,113 @@ DEP_CPP_PRIMI=\
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
 
+DEP_CPP_PRIMI=\
+	"..\sp\include\Allocator.h"\
+	"..\sp\include\Attributed.h"\
+	"..\sp\include\CharsetDecl.h"\
+	"..\sp\include\CodingSystem.h"\
+	"..\sp\include\constant.h"\
+	"..\sp\include\ContentToken.h"\
+	"..\sp\include\CopyOwner.cxx"\
+	"..\sp\include\ElementType.h"\
+	"..\sp\include\EntityCatalog.h"\
+	"..\sp\include\EntityDecl.h"\
+	"..\sp\include\EntityManager.h"\
+	"..\sp\include\HashTable.cxx"\
+	"..\sp\include\HashTableItemBase.cxx"\
+	"..\sp\include\IListBase.h"\
+	"..\sp\include\IListIterBase.h"\
+	"..\sp\include\IQueue.cxx"\
+	"..\sp\include\ISet.cxx"\
+	"..\sp\include\Lpd.h"\
+	"..\sp\include\Markup.h"\
+	"..\sp\include\Mode.h"\
+	"..\sp\include\NamedResource.h"\
+	"..\sp\include\NamedResourceTable.h"\
+	"..\sp\include\Notation.h"\
+	"..\sp\include\Owner.cxx"\
+	"..\sp\include\OwnerTable.cxx"\
+	"..\sp\include\PointerTable.cxx"\
+	"..\sp\include\Ptr.cxx"\
+	"..\sp\include\RangeMap.cxx"\
+	"..\sp\include\RangeMap.h"\
+	"..\sp\include\rtti.h"\
+	"..\sp\include\Sd.h"\
+	"..\sp\include\SdText.h"\
+	"..\sp\include\ShortReferenceMap.h"\
+	"..\sp\include\StringOf.cxx"\
+	"..\sp\include\SubstTable.cxx"\
+	"..\sp\include\TypeId.h"\
+	"..\sp\include\UnivCharsetDesc.h"\
+	"..\sp\include\Vector.cxx"\
+	"..\sp\include\XcharMap.cxx"\
+	".\grove\Node.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Boolean.h"\
+	".\include\CharsetInfo.h"\
+	".\include\config.h"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\Entity.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.h"\
+	".\include\IList.h"\
+	".\include\IListIter.h"\
+	".\include\InputSource.h"\
+	".\include\IQueue.h"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\macros.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\Named.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.h"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.h"\
+	".\include\Resource.h"\
+	".\include\SgmlParser.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\Vector.h"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\style\Collector.h"\
+	".\style\dsssl_ns.h"\
+	".\style\DssslSpecEventHandler.h"\
+	".\style\ELObj.h"\
+	".\style\ELObjMessageArg.h"\
+	".\style\EvalContext.h"\
+	".\style\Expression.h"\
+	".\style\FOTBuilder.h"\
+	".\style\Insn.h"\
+	".\style\Insn2.h"\
+	".\style\Interpreter.h"\
+	".\style\InterpreterMessages.h"\
+	".\style\NumberCache.h"\
+	".\style\primitive.h"\
+	".\style\ProcessContext.h"\
+	".\style\ProcessingMode.h"\
+	".\style\SosofoObj.h"\
+	".\style\Style.h"\
+	".\style\style_pch.h"\
+	".\style\StyleEngine.h"\
+	".\style\stylelib.h"\
+	".\style\VM.h"\
+	
 # ADD CPP /Yu"stylelib.h"
 
 BuildCmds= \
@@ -3437,15 +3435,15 @@ BuildCmds= \
 # Begin Source File
 
 SOURCE=.\style\Collector.cxx
+
+!IF  "$(CFG)" == "style - Win32 Release"
+
 DEP_CPP_COLLE=\
 	".\include\Boolean.h"\
 	".\include\config.h"\
 	".\include\macros.h"\
 	".\style\Collector.h"\
 	
-
-!IF  "$(CFG)" == "style - Win32 Release"
-
 # SUBTRACT CPP /YX
 
 "$(INTDIR)\Collector.obj" : $(SOURCE) $(DEP_CPP_COLLE) "$(INTDIR)"
@@ -3457,6 +3455,12 @@ DEP_CPP_COLLE=\
 
 !ELSEIF  "$(CFG)" == "style - Win32 Debug"
 
+DEP_CPP_COLLE=\
+	".\include\Boolean.h"\
+	".\include\config.h"\
+	".\include\macros.h"\
+	".\style\Collector.h"\
+	
 # SUBTRACT CPP /YX
 
 BuildCmds= \
@@ -4182,8 +4186,12 @@ SOURCE=.\jade\RtfFOTBuilder.cxx
 
 DEP_CPP_RTFFO=\
 	"..\sp\include\constant.h"\
+	"..\sp\include\CopyOwner.cxx"\
+	"..\sp\include\EntityCatalog.h"\
+	"..\sp\include\EntityManager.h"\
 	"..\sp\include\HashTable.cxx"\
 	"..\sp\include\HashTableItemBase.cxx"\
+	"..\sp\include\IListBase.h"\
 	"..\sp\include\ISet.cxx"\
 	"..\sp\include\Owner.cxx"\
 	"..\sp\include\OwnerTable.cxx"\
@@ -4193,21 +4201,29 @@ DEP_CPP_RTFFO=\
 	"..\sp\include\RangeMap.h"\
 	"..\sp\include\rtti.h"\
 	"..\sp\include\StringOf.cxx"\
+	"..\sp\include\SubstTable.cxx"\
 	"..\sp\include\TypeId.h"\
 	"..\sp\include\UnivCharsetDesc.h"\
 	"..\sp\include\Vector.cxx"\
 	"..\sp\include\XcharMap.cxx"\
+	".\grove\Node.h"\
 	".\include\Boolean.h"\
 	".\include\CharsetInfo.h"\
 	".\include\config.h"\
+	".\include\CopyOwner.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
 	".\include\Hash.h"\
 	".\include\HashTable.h"\
 	".\include\HashTableItemBase.h"\
+	".\include\IList.h"\
 	".\include\InputSource.h"\
 	".\include\ISet.h"\
 	".\include\Link.h"\
 	".\include\Location.h"\
 	".\include\macros.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
 	".\include\Owner.h"\
 	".\include\OwnerTable.h"\
 	".\include\PointerTable.h"\
@@ -4216,11 +4232,15 @@ DEP_CPP_RTFFO=\
 	".\include\StorageManager.h"\
 	".\include\StringC.h"\
 	".\include\StringOf.h"\
+	".\include\SubstTable.h"\
+	".\include\Text.h"\
 	".\include\Vector.h"\
 	".\include\XcharMap.h"\
 	".\include\xnew.h"\
 	".\jade\RtfFOTBuilder.h"\
 	".\jade\RtfFOTBuilder_inst.cxx"\
+	".\style\dsssl_ns.h"\
+	".\style\FOTBuilder.h"\
 	
 
 "$(INTDIR)\RtfFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_RTFFO) "$(INTDIR)"
@@ -4582,10 +4602,7 @@ DEP_CPP_HTMLF=\
 	
 
 "$(INTDIR)\HtmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_HTMLF) "$(INTDIR)"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "style" /I "grove" /I\
- "spgrove" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP\
- /D DSSSL_NAMESPACE=James_Clark_DSSSL /D GROVE_NAMESPACE=James_Clark_GROVE /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/jade.pch" /YX /Fo"$(INTDIR)/" /c $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "jade - Win32 Debug"
@@ -4597,6 +4614,8 @@ DEP_CPP_HTMLF=\
 	"..\sp\include\IListIterBase.h"\
 	"..\sp\include\MessageBuilder.h"\
 	"..\sp\include\MessageReporter.h"\
+	"..\sp\include\Owner.cxx"\
+	"..\sp\include\Ptr.cxx"\
 	"..\sp\include\rtti.h"\
 	"..\sp\include\StringOf.cxx"\
 	"..\sp\include\SubstTable.cxx"\
@@ -4636,11 +4655,7 @@ DEP_CPP_HTMLF=\
 	
 
 "$(INTDIR)\HtmlFOTBuilder.obj" : $(SOURCE) $(DEP_CPP_HTMLF) "$(INTDIR)"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "style" /I "grove" /I\
- "spgrove" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP\
- /D DSSSL_NAMESPACE=James_Clark_DSSSL /D GROVE_NAMESPACE=James_Clark_GROVE /D\
- "SP_MULTI_BYTE" /Fp"$(INTDIR)/jade.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
+   $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ENDIF 
@@ -4878,7 +4893,7 @@ DEP_CPP_TEXFO=\
 !IF  "$(CFG)" == "jadedist - Win32 Release"
 
 ".\jadedist\jade.zip" : 
-   CD E:\users\jjc\projects\SP\jadedist
+   CD E:\users\jjc\projects\work\SP\jadedist
    cd .. & zip  -q -@ <jadedist\files.txt jadedist\jade.zip & zip -q\
  jadedist\jade.zip jadedist\files.txt & zip -q -j -@ <jadedist\bin-files.txt\
  jadedist\jadew.zip

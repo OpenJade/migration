@@ -1,1 +1,1 @@
-#define JADE_VERSION SP_T("0.3")
+#define JADE_VERSION SP_T("0.4")

@@ -39,7 +39,7 @@ public:
   public:
     virtual ~Qualifier();
     virtual bool satisfies(const NodePtr &, MatchContext &) const = 0;
-    virtual void contributeSpecificity(int *) const = 0;
+    virtual void contributeSpecificity(long *) const = 0;
     virtual bool vacuous() const;
   protected:
     static bool matchAttribute(const StringC &name,
@@ -51,24 +51,24 @@ public:
   public:
     NodeQualifier(Owner<Expression> &, Owner<Expression> &, ProcessingMode *, Interpreter *, Location &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
     void trace(Collector &) const;
   private:
     void computePriority() const;
     ProcessingMode *pm_;
     Interpreter *interp_;
-    Location &loc_;
+    Location loc_;
     Owner<Expression> nlExpr_;
     Owner<Expression> priorityExpr_;
     mutable NodeListObj *nl_;
-    mutable long int priority_;
-    mutable Boolean priorityCompiled_;
+    mutable long priority_;
+    mutable bool priorityCompiled_;
   };
   class IdQualifier : public Qualifier {
   public:
     IdQualifier(const StringC &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     StringC id_;
   };
@@ -76,7 +76,7 @@ public:
   public:
     ClassQualifier(const StringC &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     StringC class_;
   };
@@ -84,7 +84,7 @@ public:
   public:
     AttributeHasValueQualifier(const StringC &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     StringC name_;
   };
@@ -92,7 +92,7 @@ public:
   public:
     AttributeMissingValueQualifier(const StringC &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     StringC name_;
   };
@@ -100,14 +100,14 @@ public:
   public:
     AttributeQualifier(const StringC &, const StringC &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     StringC name_;
     StringC value_;
   };
   class PositionQualifier : public Qualifier {
   public:
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   };
   class FirstOfTypeQualifier : public PositionQualifier {
   public:
@@ -127,7 +127,7 @@ public:
   };
   class OnlyQualifier : public Qualifier {
   public:
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   };
   class OnlyOfTypeQualifier : public OnlyQualifier {
   public:
@@ -144,7 +144,7 @@ public:
   class PriorityQualifier : public VacuousQualifier {
   public:
     PriorityQualifier(long);
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
     bool satisfies(const NodePtr &, MatchContext &) const;
   private:
     long n_;
@@ -152,14 +152,14 @@ public:
   class ImportanceQualifier : public VacuousQualifier {
   public:
     ImportanceQualifier(long);
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
     bool satisfies(const NodePtr &, MatchContext &) const;
   private:
     long n_;
   };
   class IsElementQualifier : public VacuousQualifier {
   public:
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
     bool satisfies(const NodePtr &, MatchContext &) const;
   };
   typedef unsigned Repeat;
@@ -167,7 +167,7 @@ public:
   public:
     Element(const StringC &, bool forceGi = 1);
     bool matches(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
     void addQualifier(Qualifier *);
     void setRepeat(Repeat minRepeat, Repeat maxRepeat);
     Repeat minRepeat() const;
@@ -184,7 +184,7 @@ public:
   public:
     ChildrenQualifier(IList<Element> &);
     bool satisfies(const NodePtr &, MatchContext &) const;
-    void contributeSpecificity(int *) const;
+    void contributeSpecificity(long *) const;
   private:
     IList<Element> children_;
   };
@@ -202,6 +202,7 @@ public:
   static int compareSpecificity(const Pattern &, const Pattern &);
   enum {
     nodeSpecificity,
+    queryPriority,
     importanceSpecificity,
     idSpecificity,
     classSpecificity,
@@ -216,7 +217,7 @@ public:
 private:
   Pattern(const Pattern &);	// undefined
   void operator=(const Pattern &); // undefined
-  void computeSpecificity(int *) const;
+  void computeSpecificity(long *) const;
   static bool computeTrivial(const IList<Element> &);
 
   static bool matchAncestors(const IListIter<Element> &,

@@ -143,6 +143,7 @@ void Interpreter::compile()
       break;
     mode->compile(*this);
   }
+  compileDefaultLanguage();
 }
 
 void Interpreter::compileInitialValues()
@@ -511,10 +512,10 @@ void Interpreter::addStandardChar(const StringC &name, const StringC &num)
   int n;
   size_t i = 0;
   if (!scanSignDigits(num, i, n)) {
-    message(InterpreterMessages::badCharNumber, StringMessageArg(num));
+    message(InterpreterMessages::invalidCharNumber, StringMessageArg(num));
     return;
   }
-
+  
   const CharPart *def = namedCharTable_.lookup(name);
   CharPart ch;
   ch.c = n;
@@ -1347,7 +1348,7 @@ ELObj *Interpreter::convertNumberFloat(const StringC &str)
   if (endPtr == buf.data())
     return 0;
   int unitExp;
-  Unit *unit = scanUnit(str, endPtr - buf.data(), unitExp);
+  Unit *unit = scanUnit(str, endPtr - buf.data() + i0, unitExp);
   if (!unit)
     return 0;
   return new (*this) UnresolvedQuantityObj(val, unit, unitExp);
@@ -2018,14 +2019,48 @@ void Interpreter::installBuiltins()
   partIndex_ = 1;
 }
 
-void Interpreter::setDefaultLanguage(ELObj *lang)
+void Interpreter::setDefaultLanguage(Owner<Expression> &expr,
+				     unsigned part,
+				     const Location &loc)
 {
-  defaultLanguage_ = (lang->asLanguage()) ? lang : theFalseObj_;
+  defaultLanguageDef_.swap(expr);
+  defaultLanguageDefPart_ = part;
+  defaultLanguageDefLoc_ = loc;
 }
 
 ELObj *Interpreter::defaultLanguage() const
 {
   return defaultLanguage_;
+}
+
+bool Interpreter::defaultLanguageSet(unsigned &part,Location &loc) const
+{
+  if(defaultLanguageDef_) {
+    part = defaultLanguageDefPart_;
+    loc = defaultLanguageDefLoc_;
+    return true;
+  }
+  return false;
+}
+
+void Interpreter::compileDefaultLanguage()
+{
+  if(defaultLanguageDef_) {
+    InsnPtr insn = Expression::optimizeCompile(defaultLanguageDef_, *this,
+					       Environment(), 0, InsnPtr());
+    VM vm(*this);
+    ELObj *obj = vm.eval(insn.pointer());
+    if(!obj->asLanguage()) {
+      if(!isError(obj)) {
+	setNextLocation(defaultLanguageDefLoc_);
+	message(InterpreterMessages::defLangDeclRequiresLanguage,
+		ELObjMessageArg(obj, *this));
+      }
+      return;
+    }
+    makePermanent(obj);
+    defaultLanguage_ = obj;
+  }
 }
 
 #ifdef DSSSL_NAMESPACE

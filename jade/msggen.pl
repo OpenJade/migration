@@ -6,6 +6,9 @@ $prog = $0;
 $prog =~ s@.*/@@;
 
 $gen_c = 0;
+$gen_po = 0;
+
+undef $opt_l;
 do 'getopts.pl';
 &Getopts('l');
 
@@ -246,6 +249,32 @@ foreach $i (0 .. $#message) {
 }
 
 print "END\n";
+close(OUT);
+
+if ($gen_po) {
+  # this is needed for GNU gettext 
+  chmod 0666, "$file_base.po";
+  unlink("$file_base.po");
+  open(OUT, ">$file_base.po");
+  chmod 0444, "$file_base.po";
+  select(OUT);
+
+  printf "# %s\n\n", $file_base;
+
+  foreach $i (0 .. $#message) {
+    if (defined($message[$i])) {
+	$str = $message[$i];
+	$str =~ s/"/""/g;
+	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
+    }
+    elsif (defined($message2[$i])) {
+	$str = $message2[$i];
+	$str =~ s/"/""/g;
+	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
+    }
+ }
+}
+
 close(OUT);
 
 sub error {

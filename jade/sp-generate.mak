@@ -1,6 +1,6 @@
 # This is a Makefile for nmake that makes all the .cxx and .h files that
 # are automatically generated.  It's too painful to do in the IDE.
-# You'll need m4 and perl to use this.
+# You'll need perl in your PATH to use this.
 
 M4=m4
 PERL=perl
@@ -38,31 +38,31 @@ all: $(GENSRCS)
 
 
 .m4.cxx:
-	rm -f $@
-	$(M4) lib\instmac.m4 $< >$@
-	chmod -w $@
+	del /f $@ 2> nul
+	$(PERL) lib\instmac.pl $< >$@
+	attrib +r $@
 
 {lib}.msg{lib}.h:
-	rm -f $@
+	del /f $@ 2> nul
 	$(PERL) -w msggen.pl -l $<
-	chmod -w $@
+	attrib +r $@
 
 {nsgmls}.msg{nsgmls}.h:
-	rm -f $@
+	del /f $@ 2> nul
 	$(PERL) -w msggen.pl $<
-	chmod -w $@
+	attrib +r $@
 
 {spam}.msg{spam}.h:
-	rm -f $@
+	del /f $@ 2> nul
 	$(PERL) -w msggen.pl $<
-	chmod -w $@
+	attrib +r $@
 
 {sx}.msg{sx}.h:
-	rm -f $@
+	del /f $@ 2> nul
 	$(PERL) -w msggen.pl $<
-	chmod -w $@
+	attrib +r $@
 
 lib\version.h: lib\mkversion.pl VERSION
-	rm -f $@
+	del /f $@ 2> nul
 	$(PERL) -w lib\mkversion.pl VERSION >$@
-	chmod -w $@
+	attrib +r $@

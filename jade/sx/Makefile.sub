@@ -3,3 +3,6 @@ OBJS=sx.o XmlOutputEventHandler.o sx_inst.o
 INCLUDE=
 XLIBS=../lib/libsp.a
 GENSRCS=XmlOutputMessages.h SxMessages.h sx_inst.cxx
+
+sx.o: SxMessages.h
+XmlOutputEventHandler.o: XmlOutputMessages.h

@@ -366,14 +366,25 @@ private:
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
 			       CmdLineApp *app,
-			       const FOTBuilder::Extension *&ext)
+			       const FOTBuilder::Description *&descr)
 {
   static const FOTBuilder::Extension extensions[] = {
     { "UNREGISTERED::James Clark//Characteristic::scroll-title", 0,
       (void (FOTBuilder::*)(const StringC &))&HtmlFOTBuilder::setScrollTitle },
     { 0, 0, 0}
   };
-  ext = extensions;
+
+  static const FOTBuilder::Feature features[] = {
+    { "online", 1},
+    { 0, 0}
+  };
+  static const FOTBuilder::Description description = {
+    extensions,
+    features,
+    false
+  };
+  descr = &description;
+
   return new HtmlFOTBuilder(outputFilename, app);
 }
 

@@ -4,11 +4,14 @@
 #include "stylelib.h"
 #include "StyleEngine.h"
 #include "Interpreter.h"
+#include "InterpreterMessages.h"
 #include "SchemeParser.h"
 #include "FOTBuilder.h"
 #include "DssslSpecEventHandler.h"
 #include "ArcEngine.h"
 #include "ProcessContext.h"
+#include "macros.h"
+#include "InternalInputSource.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -19,9 +22,11 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
-			 const FOTBuilder::Extension *extensionTable)
-: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, debugMode, dsssl2,
-			       extensionTable))
+                         bool strictMode,
+			 const FOTBuilder::Description &fotbDescr)
+: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
+                               debugMode, dsssl2, 1, strictMode, 
+			       fotbDescr))
 {
 }
 
@@ -33,6 +38,75 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   DssslSpecEventHandler specHandler(mgr);
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
+  
+  for (int phase = 0; phase < 3; phase++) {
+    for (size_t i = 0; i < parts.size(); i++) {
+      DssslSpecEventHandler::Part::DIter diter(parts[i]->doc()->diter());
+      bool local = 0;
+      do {
+	if (local) 
+    	  diter = parts[i]->diter();
+	local = !local;
+	for (; !diter.done(); diter.next()) {
+          // parse in three phases:
+          // 1. features
+          // 2. char-repertoire, standard-chars, other-chars
+          // 3. the rest
+	  if (diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::features ? phase == 0 : 
+              ((diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::charRepertoire ||
+               diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::standardChars)
+	      ? phase == 1 
+	      : phase == 2)) {
+            if (diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::sgmlGrovePlan) {
+              Owner<InputSource> in(new InternalInputSource(
+                           diter.cur()->modadd(), InputSourceOrigin::make()));
+	      SchemeParser scm(*interpreter_, in);
+              scm.parseGrovePlan();
+            } 
+            else {
+	      Owner<InputSource> in;
+	      diter.cur()->makeInputSource(specHandler, in);
+	      SchemeParser scm(*interpreter_, in);
+	      switch (diter.cur()->type()) {
+              case DssslSpecEventHandler::DeclarationElement::charRepertoire:
+                interpreter_->setCharRepertoire(diter.cur()->name());
+                break;
+              case DssslSpecEventHandler::DeclarationElement::standardChars:
+                scm.parseStandardChars(); 
+                break;
+              case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
+                scm.parseMapSdataEntity(diter.cur()->name(), diter.cur()->text());
+                break;
+              case DssslSpecEventHandler::DeclarationElement::addNameChars:
+                scm.parseNameChars();
+                break;
+              case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
+                scm.parseSeparatorChars();
+                break;
+              case DssslSpecEventHandler::DeclarationElement::features:
+                scm.parseFeatures(); 
+                break;
+              default:
+                interpreter_->message(
+                       InterpreterMessages::unsupportedDeclaration);
+               break;
+              }
+            }   
+          }
+	}
+      } while (local);
+      interpreter_->dEndPart();
+    }
+  }
+
+  if (cmdline.size() > 0) {  
+    Owner<InputSource> in(new InternalInputSource(cmdline,
+                          InputSourceOrigin::make()));
+    SchemeParser scm(*interpreter_, in);
+    scm.parse();
+    interpreter_->endPart();
+  }
+ 
   for (size_t i = 0; i < parts.size(); i++) {
     for (DssslSpecEventHandler::Part::Iter iter(parts[i]->iter());
          !iter.done();
@@ -49,9 +123,33 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   interpreter_->compile();
 }
 
-void StyleEngine::defineVariable(const StringC &ident)
+void StyleEngine::defineVariable(const StringC &str)
 {
-  interpreter_->defineVariable(ident);
+  // Dk: Interpret "name=value" as a string variable Setting.
+  if (str[0] == '(') {
+    cmdline += str;
+  } 
+  else {
+    int i;
+    for (i = 0; (i < str.size()) && (str[i] != '='); i++)
+      ;
+
+    // Dk: Not name=value?
+    if (!i || (i >= (str.size()))) {  
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += str;
+      cmdline += interpreter_->makeStringC(" #t)");
+    }
+    else {  
+      // Dk: name=value.
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += StringC(str.begin(), i);
+      cmdline += interpreter_->makeStringC(" \"");
+      if (str.size() - (i + 1) > 0);
+        cmdline += StringC(str.begin() + i + 1, str.size() - (i + 1));
+      cmdline += interpreter_->makeStringC("\")");
+    }
+  }
 }
 
 StyleEngine::~StyleEngine()

@@ -42,7 +42,59 @@ void MessageReporter::addOption(Option option)
 {
   options_ |= option;
 }
+void XMLMessageReporter::dispatchMessage(const Message& message) {
+  static long unsigned int id = 0 ;
+  Offset off ;
 
+  const ExternalInfo *externalInfo = locationHeader(message.loc, off);
+
+  os() << "<sp:message sp:id=\"mid" << id++ << '"' ;
+  if (externalInfo)
+    printLocation(externalInfo, off);
+  switch (message.type->severity()) {
+    case MessageType::info:
+      XMLformatFragment(MessageReporterMessages::infoTag, os());
+      break;
+    case MessageType::warning:
+      XMLformatFragment(MessageReporterMessages::warningTag, os());
+      break;
+    case MessageType::quantityError:
+      XMLformatFragment(MessageReporterMessages::quantityErrorTag, os());
+      break;
+    case MessageType::idrefError:
+      XMLformatFragment(MessageReporterMessages::idrefErrorTag, os());
+      break;
+    case MessageType::error:
+      XMLformatFragment(MessageReporterMessages::errorTag, os());
+      break;
+    default:
+      CANNOT_HAPPEN();
+  }
+  formatMessage(*message.type, message.args, os());
+
+  if (options_ & openEntities)
+    showOpenEntities(message.loc, off) ;
+
+  if ((options_ & clauses) && message.type->clauses() != 0) {
+    os() << "\n  <sp:clause> " << message.type->clauses()
+	<< " </sp:clause>" ;
+  }
+  if (!message.auxLoc.origin().isNull()) {
+    os() << "\n  <sp:reference " ;
+    Offset off;
+    const ExternalInfo *externalInfo = locationHeader(message.auxLoc, off);
+    if (externalInfo) {
+      printLocation(externalInfo, off);
+    }
+    formatMessage(message.type->auxFragment(), message.args, os());
+    os() << "\n  </sp:reference>" ;
+  }
+  if ((options_ & openElements) && message.openElementInfo.size() > 0) {
+    formatOpenElements(message.openElementInfo, os());
+  }
+  os() << "\n</sp:message>\n" ;
+  os().flush();
+}
 void MessageReporter::dispatchMessage(const Message &message)
 {
   Offset off;
@@ -123,6 +175,50 @@ const ExternalInfo *MessageReporter::locationHeader(const Location &loc,
   return locationHeader(loc.origin().pointer(), loc.index(), off);
 }
 
+const ExternalInfo* XMLMessageReporter::locationHeader(
+	const Origin *origin, Index index, Offset &off) {
+// take out the context printing 'cos we'll do that later
+    while (origin) {
+      const ExternalInfo *externalInfo = origin->externalInfo();
+      if (externalInfo) {
+  	off = origin->startOffset(index);
+	return externalInfo;
+      }
+      const Location &loc = origin->parent();
+      if (loc.origin().isNull()) {
+	if (!origin->defLocation(origin->startOffset(index), origin, index))
+	  break;
+      }
+      else {
+	index = loc.index() + origin->refLength();
+	origin = loc.origin().pointer();
+      }
+    }
+  return 0 ;
+}
+void XMLMessageReporter::showOpenEntities(
+	const Origin *origin, Index index, Offset &off) {
+  while (origin) {
+   if (origin->entityName() || origin->parent().origin().isNull()) {
+      Offset parentOff;
+      const Location &parentLoc = origin->parent();
+      const ExternalInfo *parentInfo
+	    = locationHeader(parentLoc.origin().pointer(),
+		     parentLoc.index() + origin->refLength(), parentOff);
+      if ( parentInfo ) {
+	os() << "\n  <sp:context" ;
+	printLocation(parentInfo, parentOff);
+	os() << "\n	sp:entity=\"" << *origin->entityName()
+		<< "\" />" ;
+      }
+      break ;
+    } else {
+	const Location &loc = origin->parent();
+	index = loc.index() + origin->refLength();
+	origin = loc.origin().pointer();
+    }
+  }
+}
 const ExternalInfo *MessageReporter::locationHeader(const Origin *origin,
 						    Index index,
 						    Offset &off)
@@ -201,6 +297,43 @@ const ExternalInfo *MessageReporter::locationHeader(const Origin *origin,
   return 0;
 }
 
+void XMLMessageReporter::printLocation(const ExternalInfo *externalInfo,
+				    Offset off)
+{
+  if (!externalInfo) {
+    return;
+  }
+  StorageObjectLocation soLoc;
+  if (!ExtendEntityManager::externalize(externalInfo, off, soLoc)) {
+    return;
+  }
+/* Ugly hack to suppress full pathnames for local files
+	on general principles for security for Site Valet
+
+  Since jjc's String class is rather primitive, we have to do the work here
+*/
+  if ( soLoc.actualStorageId[0] == '/' ) {
+    StringC filename ;
+    StringC nullname ;
+    for (int i=0; i<soLoc.actualStorageId.size(); ++i) {
+      if ( soLoc.actualStorageId[i] == '/' )
+	filename = nullname ;
+      else
+	filename += soLoc.actualStorageId[i] ;
+    }
+    os() << "\n	sp:location=\"" << filename << '"' ;
+  } else {
+    os() << "\n	sp:location=\"" << soLoc.actualStorageId << '"' ;
+  }
+  if (soLoc.lineNumber == (unsigned long)-1) {
+    formatFragment(MessageReporterMessages::offset, os());
+    os() << soLoc.storageObjectOffset;
+  } else {
+    os() << "\n	sp:line=\"" << soLoc.lineNumber << '"' ;
+    if (soLoc.columnNumber != 0 && soLoc.columnNumber != (unsigned long)-1)
+      os() << "\n	sp:column=\"" << soLoc.columnNumber - 1 << '"' ;
+  }
+}
 void MessageReporter::printLocation(const ExternalInfo *externalInfo,
 				    Offset off)
 {
@@ -213,6 +346,7 @@ void MessageReporter::printLocation(const ExternalInfo *externalInfo,
     formatFragment(MessageReporterMessages::invalidLocation, os());
     return;
   }
+  
   if (strcmp(soLoc.storageObjectSpec->storageManager->type(), "OSFILE") != 0)
     os() << '<' << soLoc.storageObjectSpec->storageManager->type() << '>';
   os() << soLoc.actualStorageId;
@@ -243,6 +377,76 @@ Boolean MessageReporter::getMessageText(const MessageFragment &frag,
     str += Char((unsigned char)*p);
   return 1;
 }
+Boolean XMLMessageReporter::XMLformatFragment(const MessageFragment &frag,
+	OutputCharStream &os) {
+  StringC text;
+  if (!getMessageText(frag, text))
+	return 0 ;
+  os << "\n	sp:severity=\"" << text << '"' ;
+  return 1 ;
+}
+void XMLMessageReporter::formatMessage(const MessageFragment &frag,
+	const Vector<CopyOwner<MessageArg> > &args,
+	OutputCharStream &os, bool noquote) {
+  StringC text;
+  if (!getMessageText(frag, text)) {
+//    XMLformatFragment(MessageFormatterMessages::invalidMessage, os);
+    os << "\n>(Invalid Message)\n" ;
+    return;
+  }
+  os << "\n>\n" ;
+  Builder builder(this, os, noquote || (text.size() == 2));
+  size_t i = 0;
+  while (i < text.size()) {
+    if (text[i] == '%') {
+      i++;
+      if (i >= text.size())
+        break;
+      if (text[i] >= '1' && text[i] <= '9') {
+        if (unsigned(text[i] - '1') < args.size())
+          args[text[i] - '1']->append(builder);
+      }
+      else
+        os.put(text[i]);
+      i++;
+    }
+    else {
+      os.put(text[i]);
+      i++;
+    }
+  }
+}
+void XMLMessageReporter::formatOpenElements(
+	const Vector<OpenElementInfo> &openElementInfo ,
+	OutputCharStream &os) {
+  unsigned nOpenElements = openElementInfo.size();
+  for (unsigned i = 0;; i++) {
+    if (i > 0
+      && (i == nOpenElements || openElementInfo[i].included)) {
+      // describe last match in previous open element
+      const OpenElementInfo &prevInfo = openElementInfo[i - 1];
+      if (prevInfo.matchType.size() != 0) {
+	os << "\n  <sp:prevelement" ;
+	int n = prevInfo.matchIndex ;
+	if (n != 0)
+	  os << " sp:matchindex=\"" << n << '"' ;
+	os << "> " << prevInfo.matchType;
+	os << " </sp:prevelement>" ;
+      }
+    }
+    if (i == nOpenElements)
+      break;
+    const OpenElementInfo &e = openElementInfo[i];
+    os << "\n  <sp:openelement" ;
+    if (i > 0 && !e.included) {
+      unsigned long n = openElementInfo[i - 1].matchIndex;
+      if (n != 0)
+	os << " sp:matchindex=\"" << n << '"' ;
+    }
+    os << "> " << e.gi << " </sp:openelement>" ;
+  }
+}
+
 
 #ifdef SP_NAMESPACE
 }

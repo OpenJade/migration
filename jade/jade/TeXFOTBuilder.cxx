@@ -329,8 +329,11 @@ private:
   void set(const char *,bool);
   void set(const char *,long);
   void set(const char *,long unsigned int);
+  void set(const char *name,unsigned int n) {
+    set(name, (unsigned long)n);
+  }
   void set(const char *,PublicId);
-  void set(const char *,Letter2);
+  void setletter2(const char *,Letter2);
   void set(const char *,const DisplaySpace &);
   void set(const char *,const GlyphId &);
 
@@ -446,16 +449,18 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
 	os() << char(*s);
 	break;
       case '\\':
+      case '^':
+      case '_':
+	os() << "\\char" << int(*s) << "{}";
+	break;
       case '{':
       case '}':
       case '$':
       case '&':
       case '#':
-      case '^':
-      case '_':
       case '~':
       case '%':
-	os() << "\\char" << int(*s) << "{}";
+	os() << "\\" << char(*s) << " ";
 	break;
       case '\r':
 	os() << '\n';
@@ -561,13 +566,17 @@ void TeXFOTBuilder::currentNodePageNumber(const NodePtr &node)
   // only to elements.
   if (node->getId(id) == accessOK) {
     set("Label",id);
-    insertAtomic("CurrentNodePageNumber");
   } else if (node->elementIndex(ei) == accessOK) {
     set("ElementIndex",ei);
-    insertAtomic("CurrentNodePageNumber");
   } else {
     message(TeXMessages::unsupportedPageNumberNonElement);
+    return;
   }
+  unsigned long g = node->groveIndex();
+  if (g) {
+    set("GroveIndex",g);
+  }
+  insertAtomic("CurrentNodePageNumber");
 }
 
 
@@ -1173,6 +1182,13 @@ void TeXFOTBuilder::startNode(const NodePtr &node,
   else if (node->elementIndex(ei) == accessOK) {
     set("ElementIndex", ei);
   }
+  unsigned long g = node->groveIndex();
+  if (g) {
+    set("GroveIndex", g);
+  }
+  if (processingMode.size()) {
+    set("ProcessingMode", processingMode);
+  }
   startGroup("Node");
 }
 
@@ -1224,6 +1240,12 @@ void TeXFOTBuilder::startLink(const Address &addr)
   case Address::html:
     message(TeXMessages::unsupportedLinkHtml);
     break;
+  }
+  if (addr.node) {
+    unsigned long g = addr.node->groveIndex();
+    if (g) {
+      set("GroveIndex",g);
+    }
   }
   startGroup("Link");
 }
@@ -1753,12 +1775,12 @@ void TeXFOTBuilder::setFontName(PublicId id)
 // Two-letter code
 void TeXFOTBuilder::setLanguage(Letter2 language)
 {
-  set("Language",language);
+  setletter2("Language",language);
 }
 
 void TeXFOTBuilder::setCountry(Letter2 country)
 {
-  set("Country",country);
+  setletter2("Country",country);
 }
 
 // For simple page sequence
@@ -2370,7 +2392,7 @@ void TeXFOTBuilder::set(const char *name,PublicId id)
 //
 // Set a Letter2.
 //
-void TeXFOTBuilder::set(const char *name,Letter2 code)
+void TeXFOTBuilder::setletter2(const char *name,Letter2 code)
 {
   char letter1 = (code & 0xff00) >> 8;
   char letter2 = (code & 0xff);

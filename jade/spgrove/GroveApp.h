@@ -9,6 +9,7 @@
 
 #include "ParserApp.h"
 #include "GroveBuilder.h"
+#include "HashTable.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -34,10 +35,7 @@ public:
   friend class GenerateEventArgs;
   void dispatchMessage(const Message &);
 protected:
-#ifdef GROVE_NAMESPACE
-  GROVE_NAMESPACE::
-#endif
-    NodePtr rootNode_;
+  GROVE_NAMESPACE_SCOPE NodePtr rootNode_;
 private:
   int inheritedGenerateEvents(ErrorCountEventHandler *eceh) {
     return ParserApp::generateEvents(eceh);

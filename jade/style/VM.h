@@ -6,6 +6,7 @@
 
 #include "Collector.h"
 #include "EvalContext.h"
+#include "Location.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -26,6 +27,7 @@ public:
   ELObj *protectClosure;
   ELObj **frame;
   int nActualArgs;
+  Location closureLoc;
   ELObj *eval(const Insn *, ELObj **display = 0, ELObj *arg = 0);
   void initStack();
   void needStack(int);
@@ -36,6 +38,7 @@ public:
 private:
   void growStack(int);
   void init();
+  void stackTrace();
 
   ELObj **slim;
   ELObj **sbase;
@@ -44,6 +47,7 @@ private:
     int frameSize;		// before pushing args
     ELObj **closure;
     ELObj *protectClosure;
+    Location closureLoc;
     const Insn *next;
   };
 

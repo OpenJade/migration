@@ -29,6 +29,7 @@ __instantiate(`HashTableIter<StringC,int>')
 __instantiate(IList<RtfFOTBuilder::ReorderFlowObject>)
 __instantiate(IList<RtfFOTBuilder::Grid>)
 __instantiate(Vector<Vector<String<char> > >)
+__instantiate(Vector<Vector<char> >)
 
 #ifdef DSSSL_NAMESPACE
 }

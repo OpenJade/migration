@@ -21,6 +21,7 @@
 #include "FOTBuilder.h"
 #include "Owner.h"
 #include "Node.h"
+#include "GroveManager.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -137,7 +138,9 @@ public:
     keyGridNColumns,
     keyRadical,
     keyNull,
-    keyIsRcs
+    keyIsRcs,
+    keyParent,
+    keyActive
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
@@ -237,7 +240,8 @@ public:
     portFooter
   };
   enum { nPortNames = portFooter + 1 };
-  Interpreter(const NodePtr &rootNode, Messenger *, int unitsPerInch, const FOTBuilder::Extension *);
+  Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
+	      const FOTBuilder::Extension *);
   void defineVariable(const StringC &);
   void parse(Owner<InputSource> &);
   void endPart();
@@ -272,9 +276,8 @@ public:
   ELObj *cValueSymbol(FOTBuilder::Symbol);
   ELObj *convertNumber(const StringC &, bool giveError, int radix = 10);
   ELObj *convertAfiiGlyphId(const StringC &);
-  void normalizeGeneralName(StringC &);
-  void normalizeEntityName(StringC &);
-  const NodePtr &rootNode() const;
+  static void normalizeGeneralName(const NodePtr &, StringC &);
+  GroveManager *groveManager() const;
   StyleObj *initialStyle() const;
   StyleObj *borderTrueStyle() const;
   StyleObj *borderFalseStyle() const;
@@ -301,6 +304,8 @@ public:
   const char *storePublicId(const Char *, size_t, const Location &);
   unsigned allocGlyphSubstTableUniqueId();
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
+  bool debugMode() const;
+  void setNodeLocation(const NodePtr &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -313,7 +318,7 @@ private:
     allowCloseParen = 020,
     allowIdentifier = 040,
     allowPeriod = 0100,
-    allowOtherDatum = 0200,  // number, character, glyph-id quote backquote
+    allowOtherDatum = 0200,  // number, character, glyph-id, quote, backquote
     allowExpressionKey = 0400,
     allowKeyDefine = 01000,
     allowKeyElse = 02000,
@@ -322,6 +327,9 @@ private:
     allowHashOptional = 020000,
     allowHashKey = 040000,
     allowHashRest = 0100000,
+    allowUnquote = 0200000,
+    allowUnquoteSplicing = 0400000,
+    allowQuasiquoteKey = 01000000,
     allowDatum = (allowFalse|allowKeyword|allowOpenParen|allowIdentifier
 		  |allowString|allowHashOptional|allowHashKey|allowHashRest
 		  |allowOtherDatum)
@@ -340,6 +348,9 @@ private:
     tokenCloseParen,
     tokenPeriod,
     tokenQuote,
+    tokenQuasiquote,
+    tokenUnquote,
+    tokenUnquoteSplicing,
     tokenHashRest,
     tokenHashOptional,
     tokenHashKey
@@ -406,6 +417,15 @@ private:
 		    int &, bool &, int &);
   bool parseDatum(unsigned otherAllowed, ELObj *&, Location &, Token &);
   bool parseSelfEvaluating(unsigned otherAllowed, ELObj *&, Token &);
+  bool parseAbbreviation(const char *, ELObj *&);
+  bool parseQuasiquote(Owner<Expression> &);
+  bool parseQuasiquoteTemplate(unsigned level,
+			       unsigned allowed,
+			       Owner<Expression> &,
+			       Identifier::SyntacticKey &,
+			       Token &,
+			       bool &spliced);
+  void createQuasiquoteAbbreviation(const char *, Owner<Expression> &);
   bool getToken(unsigned, Token &);
   bool isDelimiter(Xchar);
   void extendToken();
@@ -441,9 +461,7 @@ private:
   unsigned partIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
-  NodePtr rootNode_;
-  NamedNodeListPtr elementsNamedNodeList_;
-  NamedNodeListPtr entitiesNamedNodeList_;
+  GroveManager *groveManager_;
   ProcessingMode initialProcessingMode_;
   NamedTable<ProcessingMode> processingModeTable_;
   ProcessingMode *defMode_;
@@ -480,6 +498,7 @@ private:
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
+  bool debugMode_;
   friend class Identifier;
 };
 
@@ -610,9 +629,9 @@ StyleObj *Interpreter::borderFalseStyle() const
 }
 
 inline
-const NodePtr &Interpreter::rootNode() const
+GroveManager *Interpreter::groveManager() const
 {
-  return rootNode_;
+  return groveManager_;
 }
 
 inline
@@ -662,6 +681,12 @@ inline
 unsigned Interpreter::allocGlyphSubstTableUniqueId()
 {
   return nextGlyphSubstTableUniqueId_++;
+}
+
+inline
+bool Interpreter::debugMode() const
+{
+  return debugMode_;
 }
 
 inline

@@ -5,6 +5,7 @@
 #include "Interpreter.h"
 #include "Insn.h"
 #include "InterpreterMessages.h"
+#include "LocNode.h"
 #include "VM.h"
 #include "macros.h"
 #include <stdlib.h>
@@ -41,9 +42,12 @@ size_t maxObjSize()
   return n;
 }
 
-Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unitsPerInch,
+Interpreter::Interpreter(GroveManager *groveManager,
+			 Messenger *messenger,
+			 int unitsPerInch,
+			 bool debugMode,
 			 const FOTBuilder::Extension *extensionTable)
-: rootNode_(rootNode),
+: groveManager_(groveManager),
   messenger_(messenger),
   extensionTable_(extensionTable),
   Collector(maxObjSize()),
@@ -55,7 +59,8 @@ Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unit
   lexCategory_(lexOther),
   currentPartFirstInitialValue_(0),
   initialStyle_(0),
-  nextGlyphSubstTableUniqueId_(0)
+  nextGlyphSubstTableUniqueId_(0),
+  debugMode_(debugMode)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -295,7 +300,6 @@ bool Interpreter::doElement()
     if (!getToken(allowString|allowIdentifier, tok))
       return 0;
     for (;;) {
-      normalizeGeneralName(currentToken_);
       gis.push_back(currentToken_);
       if (!getToken(allowString|allowIdentifier|allowCloseParen, tok))
 	return 0;
@@ -303,10 +307,8 @@ bool Interpreter::doElement()
 	break;
     }
   }
-  else {
-    normalizeGeneralName(currentToken_);
+  else
     gis.push_back(currentToken_);
-  }
   Identifier::SyntacticKey key;
   Owner<Expression> expr;
   if (!parseExpression(0, expr, key, tok))
@@ -324,7 +326,6 @@ bool Interpreter::doId()
   if (!getToken(allowString|allowIdentifier, tok))
     return 0;
   StringC id(currentToken_);
-  normalizeGeneralName(id);
   Identifier::SyntacticKey key;
   Owner<Expression> expr;
   if (!parseExpression(0, expr, key, tok))
@@ -570,6 +571,11 @@ bool Interpreter::parseExpression(unsigned allowed,
       expr = new ConstantExpression(obj, loc);
       break;
     }
+  case tokenQuasiquote:
+    {
+      bool spliced;
+      return parseQuasiquoteTemplate(0, 0, expr, key, tok, spliced);
+    }
   case tokenOpenParen:
     {
       Location loc(in_->currentLocation());
@@ -617,11 +623,7 @@ bool Interpreter::parseExpression(unsigned allowed,
 	case Identifier::keyWithMode:
 	  return parseWithMode(expr);
 	case Identifier::keyQuasiquote:
-	case Identifier::keyUnquote:
-	case Identifier::keyUnquoteSplicing:
-	  message(InterpreterMessages::expressionNotImplemented,
-	          StringMessageArg(currentToken_));
-	  return 0;
+	  return parseQuasiquote(expr);
 	default:
 	  CANNOT_HAPPEN();
 	}
@@ -644,6 +646,9 @@ bool Interpreter::parseExpression(unsigned allowed,
 	case Identifier::keyElse:
 	  if (allowed & allowKeyElse)
 	    return 1;
+	  break;
+	case Identifier::keyUnquote:
+	case Identifier::keyUnquoteSplicing:
 	  break;
 	default:
 	  if (allowed & allowExpressionKey)
@@ -798,6 +803,8 @@ void Interpreter::installSyntacticKeys()
     { "radical", Identifier::keyRadical },
     { "null", Identifier::keyNull },
     { "rcs?", Identifier::keyIsRcs },
+    { "parent", Identifier::keyParent },
+    { "active", Identifier::keyActive },
   };
   for (size_t i = 0; i < SIZEOF(keys); i++)
     lookup(makeStringC(keys[i].name))->setSyntacticKey(keys[i].key);
@@ -2676,6 +2683,156 @@ bool Interpreter::parseQuote(Owner<Expression> &expr)
   return 1;
 }
 
+bool Interpreter::parseQuasiquote(Owner<Expression> &expr)
+{
+  bool spliced;
+  Token tok;
+  Identifier::SyntacticKey key;
+  if (!parseQuasiquoteTemplate(0, 0, expr, key, tok, spliced))
+    return 0;
+  return getToken(allowCloseParen, tok);
+}
+
+bool Interpreter::parseQuasiquoteTemplate(unsigned level,
+					  unsigned allowed,
+					  Owner<Expression> &expr,
+					  Identifier::SyntacticKey &key,
+					  Token &tok,
+					  bool &spliced)
+{
+  key = Identifier::notKey;
+  spliced = 0;
+  ELObj *obj;
+  if (!parseSelfEvaluating(allowed|allowUnquote, obj, tok))
+    return 0;
+  switch (tok) {
+  case tokenQuasiquote:
+    if (!parseQuasiquoteTemplate(level + 1, 0, expr, key, tok, spliced))
+      return 0;
+    createQuasiquoteAbbreviation("quasiquote", expr);
+    break;
+  case tokenQuote:
+    if (!parseQuasiquoteTemplate(level, 0, expr, key, tok, spliced))
+      break;
+    createQuasiquoteAbbreviation("quote", expr);
+    break;
+  case tokenUnquote:
+  case tokenUnquoteSplicing:
+    if (level == 0) {
+      spliced = (tok == tokenUnquoteSplicing);
+      if (!parseExpression(0, expr, key, tok))
+	return 0;
+    }
+    else {
+      Token tem;
+      if (!parseQuasiquoteTemplate(level - 1, 0, expr, key, tem, spliced))
+	break;
+      createQuasiquoteAbbreviation(tok == tokenUnquote ? "unquote" : "unquote-splicing", expr);
+    }
+    break;
+  case tokenOpenParen:
+    {
+      Location loc(in_->currentLocation());
+      NCVector<Owner<Expression> > exprs(1);
+      Vector<PackedBoolean> exprsSpliced;
+      bool temSpliced;
+      if (!parseQuasiquoteTemplate(level,
+				   allowCloseParen|allowQuasiquoteKey|allowUnquoteSplicing,
+				   exprs[0], key, tok, temSpliced))
+	return 0;
+      if (!exprs[0]) {
+	switch (key) {
+	case Identifier::keyQuasiquote:
+	  if (!parseQuasiquoteTemplate(level + 1, 0, expr, key, tok, spliced))
+	    return 0;
+	  createQuasiquoteAbbreviation("quasiquotation", expr);
+	  break;
+	case Identifier::keyUnquoteSplicing:
+	  spliced = 1;
+	  // fall through
+	case Identifier::keyUnquote:
+	  if (level == 0) {
+	    if (!parseExpression(0, expr, key, tok))
+	      return 0;
+	  }
+	  else {
+	    if (!parseQuasiquoteTemplate(level - 1, 0, expr, key, tok, temSpliced))
+	      return 0;
+	    createQuasiquoteAbbreviation(spliced ? "unquote-splicing" : "unquote", expr);
+	    spliced = 0;
+	  }
+	  break;
+	default:
+	   expr = new ConstantExpression(makeNil(), loc);
+	   return 1;
+	}
+	return getToken(allowCloseParen, tok);
+      }
+      exprsSpliced.push_back(temSpliced);
+      bool improper = 0;
+      for (;;) {
+	Owner<Expression> tem;
+	if (!parseQuasiquoteTemplate(level,
+				     allowCloseParen|allowPeriod|allowUnquoteSplicing,
+				     tem, key, tok, temSpliced))
+	  return 0;
+	if (!tem) {
+	  if (tok == tokenCloseParen)
+	    break;
+	  exprs.resize(exprs.size() + 1);
+	  improper = 1;
+	  if (!parseQuasiquoteTemplate(level, 0, exprs.back(), key, tok, temSpliced))
+	    return 0;
+	  if (!getToken(allowCloseParen, tok))
+	    return 0;
+	  exprsSpliced.push_back(0);
+	  break;
+	}
+	exprs.resize(exprs.size() + 1);
+	exprs.back().swap(tem);
+	exprsSpliced.push_back(temSpliced);
+      }
+      expr = new QuasiquoteExpression(exprs, exprsSpliced, improper, loc);
+    }
+    break;
+  case tokenIdentifier:
+    if (allowed & allowQuasiquoteKey) {
+      const Identifier *ident = lookup(currentToken_);
+      if (ident->syntacticKey(key)) {
+	switch (key) {
+	case Identifier::keyUnquoteSplicing:
+	case Identifier::keyUnquote:
+	case Identifier::keyQuasiquote:
+	  return 1;
+	default:
+	  break;
+	}
+      }
+    }
+    obj = makeSymbol(currentToken_);
+    // fall through
+  default:
+    if (obj) {
+      makePermanent(obj);
+      expr = new ConstantExpression(obj, in_->currentLocation());
+    }
+    break;
+  }
+  return 1;
+}
+
+void Interpreter::createQuasiquoteAbbreviation(const char *sym, Owner<Expression> &expr)
+{
+  Location loc(expr->location());
+  NCVector<Owner<Expression> > v(2);
+  v[1].swap(expr);
+  v[0] = new ConstantExpression(makeSymbol(makeStringC(sym)), loc);
+  Vector<PackedBoolean> spliced;
+  spliced.push_back(0);
+  spliced.push_back(0);
+  expr = new QuasiquoteExpression(v, spliced, 0, loc);
+}
+
 bool Interpreter::parseIf(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
@@ -3097,7 +3254,7 @@ bool Interpreter::parseDatum(unsigned otherAllowed,
 			     Location &loc,
 			     Token &tok)
 {
-  if (!parseSelfEvaluating(otherAllowed, result, tok))
+  if (!parseSelfEvaluating(otherAllowed|allowUnquote|allowUnquoteSplicing, result, tok))
     return 0;
   loc = in_->currentLocation();
   if (result)
@@ -3107,19 +3264,13 @@ bool Interpreter::parseDatum(unsigned otherAllowed,
     result = makeSymbol(currentToken_);
     break;
   case tokenQuote:
-    {
-      static Char quote[] = { 'q', 'u', 'o', 't', 'e' };
-      StringC tem(quote, 5);
-      SymbolObj *quoteSym = makeSymbol(tem);
-      ELObj *obj;
-      Location ignore;
-      if (!parseDatum(0, obj, ignore, tok))
-	return 0;
-      ELObjDynamicRoot protect(*this, obj);
-      protect = new (*this) PairObj(protect, makeNil());
-      result = makePair(quoteSym, protect);
-      break;
-    }
+    return parseAbbreviation("quote", result);
+  case tokenQuasiquote:
+    return parseAbbreviation("quasiquote", result);
+  case tokenUnquote:
+    return parseAbbreviation("unquote", result);
+  case tokenUnquoteSplicing:
+    return parseAbbreviation("unquote-splicing", result);
   case tokenOpenParen:
     {
       ELObj *tem;
@@ -3194,6 +3345,20 @@ bool Interpreter::parseSelfEvaluating(unsigned otherAllowed,
     result = 0;
     break;
   }
+  return 1;
+}
+
+bool Interpreter::parseAbbreviation(const char *sym, ELObj *&result)
+{
+  SymbolObj *quoteSym = makeSymbol(makeStringC(sym));
+  ELObj *obj;
+  Location ignore;
+  Token tok;
+  if (!parseDatum(0, obj, ignore, tok))
+    return 0;
+  ELObjDynamicRoot protect(*this, obj);
+  protect = new (*this) PairObj(protect, makeNil());
+  result = makePair(quoteSym, protect);
   return 1;
 }
 
@@ -3495,6 +3660,25 @@ bool Interpreter::getToken(unsigned allowed, Token &tok)
       if (!(allowed & allowOtherDatum))
 	return tokenRecover(allowed, tok);
       tok = tokenQuote;
+      return 1;
+    case '`':
+      if (!(allowed & allowOtherDatum))
+	return tokenRecover(allowed, tok);
+      tok = tokenQuasiquote;
+      return 1;
+    case ',':
+      c = in->tokenChar(*this);
+      if (c == '@') {
+	if (!(allowed & allowUnquoteSplicing))
+	  return tokenRecover(allowed, tok);
+	tok = tokenUnquoteSplicing;
+      }
+      else {
+	if (!(allowed & allowUnquote))
+	  return tokenRecover(allowed, tok);
+	tok = tokenUnquote;
+	in->endToken(1);
+      }
       return 1;
     case ' ':
     case '\r':
@@ -3947,26 +4131,13 @@ void Interpreter::endPart()
   partIndex_++;
 }
 
-void Interpreter::normalizeGeneralName(StringC &str)
+void Interpreter::normalizeGeneralName(const NodePtr &nd, StringC &str)
 {
-  if (!elementsNamedNodeList_) {
-    if (rootNode_->getElements(elementsNamedNodeList_) != accessOK) {
-      elementsNamedNodeList_.clear();
-      return;
-    }
-  }
-  str.resize(elementsNamedNodeList_->normalize(str.begin(), str.size()));
-}
-
-void Interpreter::normalizeEntityName(StringC &str)
-{
-  if (!entitiesNamedNodeList_) {
-    if (rootNode_->getEntities(entitiesNamedNodeList_) != accessOK) {
-      entitiesNamedNodeList_.clear();
-      return;
-    }
-  }
-  str.resize(entitiesNamedNodeList_->normalize(str.begin(), str.size()));
+  NamedNodeListPtr nnl;
+  NodePtr root;
+  if (nd->getGroveRoot(root) == accessOK
+      && root->getElements(nnl) == accessOK)
+    str.resize(nnl->normalize(str.begin(), str.size()));
 }
 
 ELObj *Interpreter::makeLengthSpec(const FOTBuilder::LengthSpec &ls)
@@ -4159,6 +4330,15 @@ void Interpreter::invalidCharacteristicValue(const Identifier *ident, const Loca
   setNextLocation(loc);
   message(InterpreterMessages::invalidCharacteristicValue,
 	  StringMessageArg(ident->name()));
+}
+
+void Interpreter::setNodeLocation(const NodePtr &nd)
+{
+  const LocNode *lnp;
+  Location nodeLoc;
+  if ((lnp = LocNode::convert(nd)) != 0
+      && lnp->getLocation(nodeLoc) == accessOK)
+    setNextLocation(nodeLoc);
 }
 
 void Interpreter::dispatchMessage(Message &msg)

@@ -1387,6 +1387,11 @@ void SgmlFOTBuilder::startLink(const Address &addr)
   default:
     break;
   }
+  if (addr.node) {
+    unsigned long n = addr.node->groveIndex();
+    if (n)
+      os() << " destination.grove-index=" << n;
+  }
   os() << '>' << RE;
 }
 
@@ -2093,6 +2098,9 @@ void SgmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
   unsigned long n;
   if (node->elementIndex(n) == accessOK) {
     os() << "<element index=" << n;
+    n = node->groveIndex();
+    if (n)
+      os() << " grove-index=" << n;
     GroveString id; 
     if (node->getId(id) == accessOK)
       os() << " id=\"" << id << '"'; // FIXME handle possibility of quotes/non-SGML characters
@@ -2140,6 +2148,9 @@ void SgmlFOTBuilder::currentNodePageNumber(const NodePtr &node)
   unsigned long n;
   if (node->elementIndex(n) == accessOK)
     os() << " element-index=" << n;
+  n = node->groveIndex();
+  if (n)
+    os() << " grove-index=" << n;
   os() << ">";
 }
 

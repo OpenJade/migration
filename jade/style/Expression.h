@@ -254,6 +254,22 @@ private:
   Owner<Expression> body_;
 };
 
+class QuasiquoteExpression : public Expression {
+public:
+  QuasiquoteExpression(NCVector<Owner<Expression> > &,
+		       Vector<PackedBoolean> &spliced,
+		       bool improper,
+		       const Location &);
+  InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
+  void markBoundVars(BoundVarList &vars);
+  bool canEval(bool maybeCall) const;
+  void optimize(Interpreter &, const Environment &, Owner<Expression> &);
+private:
+  NCVector<Owner<Expression> > members_;
+  Vector<PackedBoolean> spliced_;
+  bool improper_;
+};
+
 class ProcessingMode;
 
 class WithModeExpression : public Expression {

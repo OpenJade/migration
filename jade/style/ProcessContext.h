@@ -31,8 +31,9 @@ public:
   ProcessContext(Interpreter &, FOTBuilder &);
   FOTBuilder &currentFOTBuilder();
   StyleStack &currentStyleStack();
-  void process(Interpreter &);
+  void process(const NodePtr &);
   void processNode(const NodePtr &, const ProcessingMode *, bool chunk = 1);
+  void processNodeSafe(const NodePtr &, const ProcessingMode *, bool chunk = 1);
   void nextMatch(StyleObj *);
   void processChildren(const ProcessingMode *);
   void processChildrenTrim(const ProcessingMode *);
@@ -117,7 +118,11 @@ private:
     StyleObj *rowStyle;
     bool inTableRow;
   };
-
+  struct NodeStackEntry {
+    unsigned long elementIndex;
+    unsigned groveIndex;
+    const ProcessingMode *processingMode;
+  };
   FOTBuilder ignoreFotb_;
   IList<Connection> connectionStack_;
   IList<Connectable> connectableStack_;
@@ -128,6 +133,7 @@ private:
   unsigned flowObjLevel_;
   bool havePageType_;
   unsigned pageType_;
+  Vector<NodeStackEntry> nodeStack_;
   friend class CurrentNodeSetter;
   friend struct Connection;
   friend struct Connectable;

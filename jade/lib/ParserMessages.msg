@@ -397,7 +397,7 @@ W0+refc++reference not terminated by refc delimiter
 W0+pcdataNotFirstInGroup++#PCDATA not first in model group
 W0+pcdataInSeqGroup++#PCDATA in seq group
 W0+pcdataInNestedModelGroup++#PCDATA in nested model group
-W0+pcdataGroupNotRep++#PCDATA in model group that is not repeatable
+W0+pcdataGroupNotRep++#PCDATA in model group that does not have rep occurrence indicator
 W0+nameGroupNotOr++name group or name token group used connector other than OR
 W0+piMissingName++processing instruction does not start with name
 W0+statusKeywordSpecS++s separator in status keyword specification

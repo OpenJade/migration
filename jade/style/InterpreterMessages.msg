@@ -103,3 +103,7 @@ E0+tableCellOutsideTable++table-cell flow object not inside a table
 E0+tableRowOutsideTable++table-row flow object not inside a table
 E1+noNodePropertyValue++no value for node property %1
 E0+returnNotNodeList++value returned by procedure was not a node-list
+I0+stackTrace++called from here
+I1+stackTraceEllipsis++called from here...(%1 calls omitted)
+E0+processNodeLoop++node processing loop detected
+E0+spliceNotList++unquote-splicing expression does not evaluate to a list

@@ -41,7 +41,7 @@ Syntax::Syntax(const Sd &sd)
   categoryTable_(otherCategory),
   shuncharControls_(0),
   multicode_(0),
-  markupScanTable_(MarkupScan::normal)
+  hasMarkupScanTable_(0)
 {
   static const char lcletter[] = "abcdefghijklmnopqrstuvwxyz";
   static const char ucletter[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -213,14 +213,26 @@ void Syntax::addFunctionChar(const StringC &str, FunctionClass fun, Char c)
     break;
   case cMSOCHAR:
     multicode_ = 1;
+    if (!hasMarkupScanTable_) {
+      markupScanTable_ = XcharMap<unsigned char>(MarkupScan::normal);
+      hasMarkupScanTable_ = 1;
+    }
     markupScanTable_.setChar(c, MarkupScan::out);
     break;
   case cMSICHAR:
     // don't need to do anything special if we just have MSICHARs
+    if (!hasMarkupScanTable_) {
+      markupScanTable_ = XcharMap<unsigned char>(MarkupScan::normal);
+      hasMarkupScanTable_ = 1;
+    }
     markupScanTable_.setChar(c, MarkupScan::in);
     break;
   case cMSSCHAR:
     multicode_ = 1;
+    if (!hasMarkupScanTable_) {
+      markupScanTable_ = XcharMap<unsigned char>(MarkupScan::normal);
+      hasMarkupScanTable_ = 1;
+    }
     markupScanTable_.setChar(c, MarkupScan::suppress);
     break;
   }

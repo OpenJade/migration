@@ -283,6 +283,7 @@ private:
   XcharMap<unsigned char> categoryTable_;
   Boolean multicode_;
   XcharMap<unsigned char> markupScanTable_;
+  Boolean hasMarkupScanTable_;
   Vector<StringC> entityNames_;
   StringC entityChars_;
   static const int referenceQuantity_[];

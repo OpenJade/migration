@@ -7,7 +7,7 @@
 #
 
 TOP=@TOP@
-top_builddir=@TOP@
+top_builddir=..
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@

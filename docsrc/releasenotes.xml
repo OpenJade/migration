@@ -7,9 +7,10 @@
 	<subtitle>Release Notes</subtitle>
 	<corpauthor>OpenJade Project</corpauthor>
         <edition>Release 1.5.1</edition>
-        <pubdate>November 2002</pubdate>
+        <pubdate>September 2003</pubdate>
         <copyright>
                 <year>2002</year>
+                <year>2003</year>
                 <holder>OpenJade Project</holder>
         </copyright>
 </bookinfo>
@@ -27,21 +28,23 @@ can be built as either a dynamic or static library.
 </sect1>
 
 <sect1><title>Obtaining OpenSP</title>
-<para>OpenJade is a project hosted at sourceforge.net and is available
+<para>OpenSP is a project hosted at sourceforge.net and is available
 from the OpenJade web site at http://openjade.sourceforge.net or directly
 from the OpenJade project page at http://sourceforge.net/projects/openjade</para>
-<para>OpenJade is provided in source code form. However as a courtesy
-to Win32 users, where development tools are not always available, a binary release for the Win32 platform is usually available.</para>
+<para>OpenSP is provided in source code form. However the project is moving towards
+the provision of pre-compiled binary packages for common platforms. These can be expected
+to appear shortly after a given source release. Any help to ensure that the widest array
+of platforms is support is always greatly appreciated.</para>
 </sect1>
 <sect1><title>Supported Platforms</title>
 <para>OpenSP is intended to be as portable as possible. It should be
 possible to compile and build on most contemporary UNIX type platforms. In
-addition OpenSP will also build on Microsoft's Win32 based operating systems.
+addition OpenSP should also build on Microsoft's Win32 based operating systems.
 </para>
 <para>OpenSP is known to compile with both the GNU gcc c++ compiler and
 Microsoft Visual C++. Other compilers have not been extensively tested.</para>
-<para>OpenSP 1.5.1 has been successfully built with the following compilers: 
-Red Hat gcc 2.96, GNU gcc 2.95.3 and gcc 3.2</para>
+<para>OpenSP 1.5.1 should build with the GNU gcc c++ compiler from version 2.95
+up to version 3.3. </para>
 <para>OpenSP has been built on a number of architectures including Intel i386 and ia64, Alpha AXP, Sparc, PPC and S/390.</para>
 <para>The following table details known successful builds</para>
 <table id="platforms" frame="topbot"><title>Platforms on which OpenSP 1.5 is known to build</title>
@@ -149,9 +152,9 @@ Red Hat gcc 2.96, GNU gcc 2.95.3 and gcc 3.2</para>
 will require around 10Mb to 20Mb depending on architecture.</para>
 <para>On UNIX platforms, OpenSP makes use of the GNU software configuration tools (autoconf, libtool, automake etc).
 The GNU C++ compiler and make utility should also be used.
-The steps required to build the OpenSP tools (<command>onsgmls</command>, <command>osgmlnorm</command>, <command>ospam</command>, <command>ospent</command>, <command>osx</command>) and libraries are as follows:
-<screen>gzip -d OpenSP-1.5.tar.gz | tar xvf -
-cd OpenSP-1.5
+The steps required to build the OpenSP tools (<command>onsgmls</command>, <command>osgmlnorm</command>, <command>ospam</command>, <command>ospcat</command>, <command>ospent</command>, <command>osx</command>) and libraries are as follows:
+<screen>gzip -d OpenSP-1.5.1.tar.gz | tar xvf -
+cd OpenSP-1.5.1
 ./configure <optional><option><replaceable>options&hellip;</replaceable></option></optional>
 make
 </screen>
@@ -192,13 +195,18 @@ In addition to the standard options, the following table describes options speci
   <entry>Not enabled</entry>
   <entry>Provide a default value for <varname>SGML_SEARCH_PATH</varname></entry>
 </row>
+<row>
+  <entry><option>--enable-xml-messages</option></entry>
+  <entry>Not enabled</entry>
+  <entry>Include support for XML Formatted Messages</entry>
+</row>
 </tbody>
 </tgroup>
 </table>
 <para>Please refer to the system documentation for details on building on the Win32 platform.</para>
 </sect1>
 <sect1><title>Binary Distributions</title>
-<para>Although the OpenJade project does not make binary distributions available, OpenSP has been a part of many software distributions, including the major Linux distributions as well as FreeBSD. Expect pre-compiled and packaged versions of the latest version of OpenSP to be available from your distributor in due course.</para>
+<para>In addition to binary packages availble from the project, OpenSP has been a part of many software distributions, including the major Linux distributions as well as FreeBSD. Expect pre-compiled and packaged versions of the latest version of OpenSP to be available from your distributor in due course.</para>
 </sect1>
 <sect1><title>Installation</title>
 <para>In addition to the OpenSP executables and libraries you will also need various DTDs and declaration files.
@@ -238,17 +246,194 @@ It is always worth searching for your problem first, as it is often the case tha
 
 </sect1>
 <sect1><title>Version 1.5.1</title>
-<formalpara><title>Released September 2003.</title>
-<para></para>
+<formalpara><title>Released October 2003.</title>
+<para>The release contains a number of new features together with support for version 3.3 for the GNU C++ compiler.</para>
 </formalpara>
+<para>The following table details the major improvements in OpenSP 1.5</para>
+<table id="opensp151fixes" frame="topbot"><title>Changes for release 1.5</title>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 1</entry>
+	<entry>Runtime selection of message format</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Nick Kew</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>Enable run time selection of message format with <envar>SP_MESSAGE_FORMAT</envar> environment variable.
+Value is one of <constant>XML</constant>, <constant>NONE</constant>, <constant>TRADITIONAL</constant>.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 2</entry>
+	<entry>Support for HTTP redirection</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Nick Kew</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>When validating/parseing a document using http, OpenSP will now
+follow any redirects headers/requests from the server</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 3</entry>
+	<entry>Specification of http user agent header</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Nick Kew</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>The environment variable <envar>SP_HTTP_USER_AGENT</envar>
+can be used to specify a UserAgent: header.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 4</entry>
+	<entry>Specification of http Accept: headers</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Nick Kew</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>The environment variable <envar>SP_HTTP_ACCEPT</envar>
+can be used to specify Accept: headers.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 5</entry>
+	<entry>Enhancements to <command>osx</command></entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Jessica Perry Hekman</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>A number of enhancements have been made to the <command>osx</command> tool: security fixes in the handling of output files; addition of the "preserve case option".</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 6</entry>
+	<entry>Addition of a test suite</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Karl Eichwalder</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>A testing framework together with some initial tests have been added.
+Currently there are 22 tests. 6 of which fail.</para></entry>
+</row>
+</tbody>
+</tgroup>
+<tgroup cols="2" align="left" colsep="0" rowsep="0">
+<colspec colname="c1" colwidth="1*" />
+<colspec colname="c2" colwidth="3*" />
+<thead>
+<row rowsep="1">
+	<entry>Item 7</entry>
+	<entry>Sundry build improvments</entry>
+</row>
+</thead>
+<tbody>
+<row>
+	<entry><para>Contributor</para></entry>
+	<entry><para>Neil Roeth, Peter O'Gorman et al</para></entry>
+</row>
+<row>
+	<entry><para>Category</para></entry>
+	<entry><para>Enhancement/Fixes</para></entry>
+</row>
+<row>
+<entry><para>Description</para></entry>
+<entry><para>Support for Mac OS/X, Darwin has been improved. Build infrastructure and localisation fixes and enhancements. Improved compiler support</para></entry>
+</row>
+</tbody>
+</tgroup>
+</table>
 </sect1>
+
 <sect1><title>Version 1.5</title>
 <formalpara><title>Released November 2002.</title>
 <para>In addition to many new features this version also supports the latest GNU C++ compiler: gcc 3.2 at the time of writing.</para>
 </formalpara>
 <para>The following table details the major improvements in OpenSP 1.5</para>
 
-<table id="opensp15fixes" frame="topbot"><title>Changes for release 1.5</title>
+<table id="opensp15fixes" frame="topbot"><title>Changes for release 1.5.1</title>
 <tgroup cols="2" align="left" colsep="0" rowsep="0">
 <colspec colname="c1" colwidth="1*" />
 <colspec colname="c2" colwidth="3*" />

@@ -104,11 +104,12 @@ dist: FORCE
 	rm -fr sp-$$version
 
 mrproper:
-	-rm -f Makefile Makefile.comm Makefile.lib Makefile.prog \
-		config.cache config.log config.status
-	-test -f Makefile.dist && mv Makefile.dist Makefile
-	-test -f Makefile.comm.dist && mv Makefile.comm.dist Makefile.comm
-	-test -f Makefile.prog.dist && mv Makefile.prog.dist Makefile.prog
-	-test -f Makefile.lib.dist && mv Makefile.lib.dist Makefile.lib
+	rm -f Makefile Makefile.comm Makefile.lib Makefile.prog \
+		config.cache config.log config.status libtool
+	find . -name Makefile.dep | xargs rm -f
+	test ! -f Makefile.dist || mv Makefile.dist Makefile
+	test ! -f Makefile.comm.dist || mv Makefile.comm.dist Makefile.comm
+	test ! -f Makefile.prog.dist || mv Makefile.prog.dist Makefile.prog
+	test ! -f Makefile.lib.dist || mv Makefile.lib.dist Makefile.lib
 
 FORCE:

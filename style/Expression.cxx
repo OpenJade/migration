@@ -1309,9 +1309,9 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     if (cFlowObj)
       return new SetDefaultContentInsn(cFlowObj, location(), rest);
     else
-      return new CopyFlowObjInsn(flowObj, rest);
+      return new CopyFlowObjInsn(flowObj, location(), rest);
   }
-  rest = new SetContentInsn(cFlowObj, rest);
+  rest = new SetContentInsn(cFlowObj, location(), rest);
   if (contentMapExpr) {
     rest = optimizeCompile(*contentMapExpr, interp, env, stackPos + 1,
 			   new ContentMapSosofoInsn((*contentMapExpr)->location(), rest));
@@ -1381,7 +1381,7 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
 						           code));
   InsnPtr rest(new SetNonInheritedCsSosofoInsn(code, boundVars.size(), next));
   if (flowObj->isCharacter()) 
-    rest = new SetImplicitCharInsn(Location(), rest); 
+    rest = new SetImplicitCharInsn(location(), rest); 
   return compilePushVars(interp, env, stackPos, boundVars, 0, rest);
 }
 

@@ -1615,7 +1615,7 @@ DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
     return argError(interp, loc, InterpreterMessages::notAString,
 		      0, argv[0]);
   if (argc == 1)
-    return new (interp) LiteralSosofoObj(argv[0]);
+    return new (interp) LiteralSosofoObj(argv[0], loc);
   StringObj *strObj = new (interp) StringObj(s, n);
   for (int i = 1; i < argc; i++) {
     if (!argv[i]->stringData(s, n))
@@ -1624,7 +1624,7 @@ DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
     strObj->append(s, n);
   }
   ELObjDynamicRoot protect(interp, strObj);
-  return new (interp) LiteralSosofoObj(strObj);
+  return new (interp) LiteralSosofoObj(strObj, loc);
 }
 
 DEFPRIMITIVE(ProcessChildren, argc, argv, context, interp, loc)
@@ -1634,7 +1634,7 @@ DEFPRIMITIVE(ProcessChildren, argc, argv, context, interp, loc)
     interp.message(InterpreterMessages::noCurrentProcessingMode);
     return interp.makeError();
   }
-  return new (interp) ProcessChildrenSosofoObj(context.processingMode);
+  return new (interp) ProcessChildrenSosofoObj(context.processingMode, loc);
 }
 
 DEFPRIMITIVE(ProcessChildrenTrim, argc, argv, context, interp, loc)
@@ -1644,7 +1644,8 @@ DEFPRIMITIVE(ProcessChildrenTrim, argc, argv, context, interp, loc)
     interp.message(InterpreterMessages::noCurrentProcessingMode);
     return interp.makeError();
   }
-  return new (interp) ProcessChildrenTrimSosofoObj(context.processingMode);
+  return new (interp) ProcessChildrenTrimSosofoObj(context.processingMode,
+						   loc);
 }
 
 DEFPRIMITIVE(SosofoAppend, argc, argv, context, interp, loc)
@@ -1675,7 +1676,7 @@ DEFPRIMITIVE(NextMatch, argc, argv, context, interp, loc)
     if (!style)
       return argError(interp, loc, InterpreterMessages::notAStyle, 0, argv[0]);
   }
-  return new (interp) NextMatchSosofoObj(style);
+  return new (interp) NextMatchSosofoObj(style, loc);
 }
 
 DEFPRIMITIVE(EmptySosofo, argc, argv, context, interp, loc)
@@ -1771,7 +1772,8 @@ DEFPRIMITIVE(ProcessElementWithId, argc, argv, context, interp, loc)
       && root->getElements(elements) == accessOK) {
     NodePtr node;
     if (elements->namedNode(GroveString(s, n), node) == accessOK)
-      return new (interp) ProcessNodeSosofoObj(node, context.processingMode);
+      return new (interp) ProcessNodeSosofoObj(node, context.processingMode,
+					       loc);
   }
   return new (interp) EmptySosofoObj;
 }
@@ -1798,7 +1800,7 @@ DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
   NodePtr nd(nl->nodeListFirst(context, interp));
   if (!nd)
     return new (interp) EmptySosofoObj;
-  return new (interp) ProcessNodeSosofoObj(nd, context.processingMode);
+  return new (interp) ProcessNodeSosofoObj(nd, context.processingMode, loc);
 }
 
 DEFPRIMITIVE(ProcessMatchingChildren, argc, argv, context, interp, loc)
@@ -1823,7 +1825,8 @@ DEFPRIMITIVE(ProcessMatchingChildren, argc, argv, context, interp, loc)
   ELObjDynamicRoot protect(interp, nl);
   nl = new (interp) SelectElementsNodeListObj(nl, patterns);
   protect = nl;
-  return new (interp) ProcessNodeListSosofoObj(nl, context.processingMode);
+  return new (interp) ProcessNodeListSosofoObj(nl, context.processingMode,
+					       loc);
 }
 
 DEFPRIMITIVE(SelectElements, argc, argv, context, interp, loc)
@@ -1863,7 +1866,7 @@ DEFPRIMITIVE(ProcessNodeList, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  return new (interp) ProcessNodeListSosofoObj(nl, context.processingMode);
+  return new (interp) ProcessNodeListSosofoObj(nl, context.processingMode, loc);
 }
 
 static

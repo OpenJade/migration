@@ -29,16 +29,20 @@ class Expression;
 class ProcessContext : public Collector::DynamicRoot {
 public:
   ProcessContext(Interpreter &, FOTBuilder &);
+  ~ProcessContext();
   FOTBuilder &currentFOTBuilder();
   StyleStack &currentStyleStack();
   void process(const NodePtr &);
-  void processNode(const NodePtr &, const ProcessingMode *, bool chunk = 1);
-  void processNodeSafe(const NodePtr &, const ProcessingMode *, bool chunk = 1);
-  void nextMatch(StyleObj *);
-  void processChildren(const ProcessingMode *);
-  void processChildrenTrim(const ProcessingMode *);
-  void characters(const Char *, size_t);
-  void charactersFromNode(const NodePtr &, const Char *, size_t);
+  void processNode(const NodePtr &, const ProcessingMode *,
+		   const Location &, bool chunk = 1);
+  void processNodeSafe(const NodePtr &, const ProcessingMode *,
+		       const Location &, bool chunk = 1);
+  void nextMatch(StyleObj *, const Location &loc);
+  void processChildren(const ProcessingMode *, const Location &);
+  void processChildrenTrim(const ProcessingMode *, const Location &);
+  void characters(const Char *, size_t, const Location &);
+  void charactersFromNode(const NodePtr &, const Char *, size_t,
+			  const Location &);
   void trace(Collector &) const;
   void startFlowObj();
   void endFlowObj();
@@ -50,37 +54,25 @@ public:
   // and can validate flow objects according to this information.
   class Validator : public Resource {
   public:
-    enum {
-      aAny,
-      aRoot,  // Accept FOs accepted at the root
-      aInline,
-      aDisplay,
-      aDisplayOrInline,
-      aMathSequence,  // All FOS accepted by a math-sequence.
-      aSingleChar,
-      aTableHF,
-    };
-    Validator(unsigned accept)
-      : accept_(accept), hadScroll_(false) {}
-
     // If the flow object specified by the argument is valid in the current
     // position in this stream, this function returns true and updates
     // state information as if the flow object was added to the stream.
-    bool isValid(const FlowObj &, const Location &, Interpreter &);
-    bool charsValid(size_t, const Location &, Interpreter &);
-  private:
-    unsigned accept_;
-    bool hadScroll_;
+    // If the FO isn't valid, this method reports it with a message.
+    // Default implementation returns true.
+    virtual bool isValid(const FlowObj &, ProcessContext &);
+    virtual bool charsValid(size_t, const Location &, ProcessContext &);
   };
+
   void validate(const FlowObj &);
+  void endValidate();
   // happens only for object with a non-principal port
   void pushPorts(bool hasPrincipalPort,
 		 const Vector<SymbolObj *> &ports,
 		 const Vector<FOTBuilder *> &fotbs,
-		 const Vector<Validator *> validators);
+		 const Vector<Validator *> validators,
+		 Validator *principalPortValidator = 0);
   void popPorts();
-  void pushPrincipalPort(FOTBuilder *principalPort,
-			 Validator *);
+  void pushPrincipalPort(Validator *);
   void popPrincipalPort();
   // Used by SpS headers and footers.
   void pushPseudoPort(FOTBuilder *principalPort,
@@ -108,6 +100,9 @@ public:
   void clearPageType();
   void setPageType(unsigned);
   bool getPageType(unsigned &) const;
+  void startParagraph();
+  void endParagraph();
+  bool paragraphAncestor() const;
 
   VM &vm();
  private:
@@ -140,10 +135,9 @@ public:
   struct Connection;
   friend struct Connection;
   struct Connection : public Link {
-    Connection(FOTBuilder *,Validator *, const StyleStack & = StyleStack());
+    Connection(FOTBuilder *, const StyleStack & = StyleStack());
     Connection(const StyleStack &, Port *, unsigned connectableLevel);
     FOTBuilder *fotb;
-    Validator *validator;
     StyleStack styleStack;
     Port *port;
     unsigned connectableLevel;
@@ -179,8 +173,10 @@ public:
   unsigned flowObjLevel_;
   bool havePageType_;
   unsigned pageType_;
+  unsigned paragraphLevel_;
   Vector<NodeStackEntry> nodeStack_;
   Vector<unsigned> invalidLevels_;
+  Vector<Ptr<Validator> > validatorStack_;
   friend class CurrentNodeSetter;
   friend struct Table;
 };
@@ -235,6 +231,24 @@ inline
 bool ProcessContext::inTable() const
 {
   return !tableStack_.empty();
+}
+
+inline
+void ProcessContext::startParagraph()
+{
+  paragraphLevel_++;
+}
+
+inline
+void ProcessContext::endParagraph()
+{
+  paragraphLevel_--;
+}
+
+inline
+bool ProcessContext::paragraphAncestor() const
+{
+  return paragraphLevel_ > 0;
 }
 
 #ifdef DSSSL_NAMESPACE

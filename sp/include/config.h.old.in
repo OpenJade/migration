@@ -304,8 +304,7 @@
 #endif
 
 // NOTE: This is processed as a Makefile, not as a header by autoconf.
-#define SP_PACKAGE "@PACKAGE@"
-#define SP_VERSION "@VERSION@"
-#define SP_LOCALE_DIR ""
+#define SP_PACKAGE "@SP_PACKAGE@"
+#define SP_VERSION "@SP_VERSION@"
 
 #endif /* not config_INCLUDED */

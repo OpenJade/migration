@@ -55,6 +55,14 @@
 #endif
 #endif /* not SP_DEFAULT_ENCODING */
 
+#ifndef SP_MESSAGE_DOMAIN
+#define SP_MESSAGE_DOMAIN ""
+#endif /* not SP_MESSAGE_DOMAIN */
+
+#ifndef SP_LOCALE_DIR
+#define SP_LOCALE_DIR ""
+#endif /* not SP_LOCALE_DIR */
+
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif

@@ -6,10 +6,6 @@
 #include <OpenSP/macros.h>
 #include <OpenSP/Vector.h>
 #include "Interpreter.h"
-#include "InterpreterMessages.h"
-#include "ProcessingMode.h"
-#include "VM.h"
-#include "ELObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -39,24 +35,25 @@ bool Pattern::computeTrivial(const IList<Element> &ancestors)
   return 1;
 }
 
-Pattern::Element::Element(const StringC &gi, bool forceGi)
+Pattern::Element::Element(const StringC &gi)
 : gi_(gi), minRepeat_(1), maxRepeat_(1)
 {
-  if (forceGi) 
-    addQualifier(new IsElementQualifier);
 }
 
 bool Pattern::Element::matches(const NodePtr &nd, MatchContext &context) const
 {
   if (gi_.size()) {
-    if (!nd->hasGi(GroveString(gi_.data(), gi_.size()))) {
-      return 0;
-    }
-  }
-  for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next()) {
-    if (!iter.cur()->satisfies(nd, context)) 
+    if (!nd->hasGi(GroveString(gi_.data(), gi_.size())))
       return 0;
   }
+  else {
+    GroveString tem;
+    if (nd->getGi(tem) != accessOK)
+      return 0;
+  }
+  for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next())
+    if (!iter.cur()->satisfies(nd, context))
+      return 0;
   return 1;
 }
 
@@ -70,7 +67,7 @@ bool Pattern::Element::trivial() const
   return 1;
 }
 
-void Pattern::Element::contributeSpecificity(long *s) const
+void Pattern::Element::contributeSpecificity(int *s) const
 {
   if (gi_.size())
     s[giSpecificity] += minRepeat_;
@@ -166,102 +163,10 @@ bool Pattern::ChildrenQualifier::satisfies(const NodePtr &nd,
   return 0;
 }
 
-void Pattern::ChildrenQualifier::contributeSpecificity(long *s) const
+void Pattern::ChildrenQualifier::contributeSpecificity(int *s) const
 {
   for (IListIter<Element> iter(children_); !iter.done(); iter.next())
     iter.cur()->contributeSpecificity(s);
-}
-
-Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &nlExpr, 
-				      Owner<Expression> &priorityExpr,
-                                      ProcessingMode *pm, Interpreter *interp,
-				      const Location &loc)
-: interp_(interp), pm_(pm), nl_(0), priority_(0), priorityCompiled_(0),
-  loc_(loc), Collector::DynamicRoot(*interp)
-{
-  nlExpr_.swap(nlExpr);
-  priorityExpr_.swap(priorityExpr);
-}
-
-void Pattern::NodeQualifier::computePriority() const
-{
-  if (priorityCompiled_)
-    return;
-#ifndef HAVE_MUTABLE
-  ((NodeQualifier *)this)->
-#endif
-    priorityCompiled_ = 1;
-  
-  if (!priorityExpr_) {
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-      priority_ = 0;
-    return;
-  }
-
-  InsnPtr insn = priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
-  EvalContext ec;
-  VM vm(ec, *interp_);
-  ELObj *val = vm.eval(insn.pointer());
-  double tem;
-  if (!val || !val->realValue(tem)) {
-    interp_->setNextLocation(loc_);
-    interp_->message(InterpreterMessages::priorityNotNumber);
-    return;
-  }  
-  if (!val->exactIntegerValue(
-#ifndef HAVE_MUTABLE
-			      ((NodeQualifier *)this)->
-#endif
-			      priority_)) {
-    interp_->setNextLocation(loc_);
-    interp_->message(InterpreterMessages::sorryPriority);
-    return;
-  }
-}
-
-bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
-{
-  NodePtr root;
-  m->getGroveRoot(root);
-  EvalContext ec;
-  EvalContext::CurrentNodeSetter cns(root, pm_, ec);  
-  if (!nl_) {
-    InsnPtr insn = nlExpr_->compile(*interp_, Environment(), 0, InsnPtr());
-    VM vm(ec, *interp_);
-    ELObj *val = vm.eval(insn.pointer());
-    if (!val || !val->asNodeList()) {
-      interp_->setNextLocation(loc_);
-      interp_->message(InterpreterMessages::queryNotNodelist);
-      return 0;
-    }
-#ifndef HAVE_MUTABLE
-    ((NodeQualifier *)this)->
-#endif
-    nl_ = val->asNodeList();
-    interp_->makeReadOnly(
-#ifndef HAVE_MUTABLE
-      ((NodeQualifier *)this)->
-#endif
-      nl_);
-  }
-
-  return nl_->contains(ec, *interp_, m);
-}
-
-void Pattern::NodeQualifier::contributeSpecificity(long *s) const
-{
-  computePriority();
-  s[nodeSpecificity] = 1;
-  s[queryPriority] += priority_;
-}
-
-void
-Pattern::NodeQualifier::trace(Collector &c) const
-{
-  if (nl_)
-    c.trace(nl_);
 }
 
 Pattern::IdQualifier::IdQualifier(const StringC &id)
@@ -289,7 +194,7 @@ bool Pattern::IdQualifier::satisfies(const NodePtr &nd, MatchContext &context) c
   return 0;
 }
 
-void Pattern::IdQualifier::contributeSpecificity(long *s) const
+void Pattern::IdQualifier::contributeSpecificity(int *s) const
 {
   s[idSpecificity] += 1;
 }
@@ -308,7 +213,7 @@ bool Pattern::ClassQualifier::satisfies(const NodePtr &nd, MatchContext &context
   return 0;
 }
 
-void Pattern::ClassQualifier::contributeSpecificity(long *s) const
+void Pattern::ClassQualifier::contributeSpecificity(int *s) const
 {
   s[classSpecificity] += 1;
 }
@@ -332,7 +237,7 @@ bool Pattern::AttributeHasValueQualifier::satisfies(const NodePtr &nd, MatchCont
   return 1;
 }
 
-void Pattern::AttributeHasValueQualifier::contributeSpecificity(long *s) const
+void Pattern::AttributeHasValueQualifier::contributeSpecificity(int *s) const
 {
   s[attributeSpecificity] += 1;
 }
@@ -356,7 +261,7 @@ bool Pattern::AttributeMissingValueQualifier::satisfies(const NodePtr &nd, Match
   return 0;
 }
 
-void Pattern::AttributeMissingValueQualifier::contributeSpecificity(long *s) const
+void Pattern::AttributeMissingValueQualifier::contributeSpecificity(int *s) const
 {
   s[attributeSpecificity] += 1;
 }
@@ -371,12 +276,12 @@ bool Pattern::AttributeQualifier::satisfies(const NodePtr &nd, MatchContext &con
   return matchAttribute(name_, value_, nd, context);
 }
 
-void Pattern::AttributeQualifier::contributeSpecificity(long *s) const
+void Pattern::AttributeQualifier::contributeSpecificity(int *s) const
 {
   s[attributeSpecificity] += 1;
 }
 
-void Pattern::PositionQualifier::contributeSpecificity(long *s) const
+void Pattern::PositionQualifier::contributeSpecificity(int *s) const
 {
   s[positionSpecificity] += 1;
 }
@@ -441,7 +346,7 @@ bool Pattern::LastOfAnyQualifier::satisfies(const NodePtr &nd, MatchContext &con
   return 1;
 }
 
-void Pattern::OnlyQualifier::contributeSpecificity(long *s) const
+void Pattern::OnlyQualifier::contributeSpecificity(int *s) const
 {
   s[onlySpecificity] += 1;
 }
@@ -490,7 +395,7 @@ Pattern::PriorityQualifier::PriorityQualifier(long n)
 {
 }
 
-void Pattern::PriorityQualifier::contributeSpecificity(long *s) const
+void Pattern::PriorityQualifier::contributeSpecificity(int *s) const
 {
   s[prioritySpecificity] += n_;
 }
@@ -505,7 +410,7 @@ Pattern::ImportanceQualifier::ImportanceQualifier(long n)
 {
 }
 
-void Pattern::ImportanceQualifier::contributeSpecificity(long *s) const
+void Pattern::ImportanceQualifier::contributeSpecificity(int *s) const
 {
   s[importanceSpecificity] += n_;
 }
@@ -513,19 +418,6 @@ void Pattern::ImportanceQualifier::contributeSpecificity(long *s) const
 bool Pattern::ImportanceQualifier::satisfies(const NodePtr &, MatchContext &) const
 {
   return 1;
-}
-
-void Pattern::IsElementQualifier::contributeSpecificity(long *s) const
-{
-}
-
-bool Pattern::IsElementQualifier::satisfies(const NodePtr &nd, MatchContext &) const
-{
-  GroveString tem;
-  if (nd->getGi(tem) == accessOK) 
-    return 1; 
-  else
-    return 0;
 }
 
 bool Pattern::matchAncestors1(const IListIter<Element> &ancestors,
@@ -555,7 +447,7 @@ bool Pattern::matchAncestors1(const IListIter<Element> &ancestors,
   return 1;
 }
 
-void Pattern::computeSpecificity(long *s) const
+void Pattern::computeSpecificity(int *s) const
 {
   for (int i = 0; i < nSpecificity; i++)
     s[i] = 0;
@@ -565,8 +457,8 @@ void Pattern::computeSpecificity(long *s) const
 
 int Pattern::compareSpecificity(const Pattern &pattern1, const Pattern &pattern2)
 {
-  long s1[nSpecificity];
-  long s2[nSpecificity];
+  int s1[nSpecificity];
+  int s2[nSpecificity];
   int i;  // declare here to avoid gcc bug
   pattern1.computeSpecificity(s1);
   pattern2.computeSpecificity(s2);

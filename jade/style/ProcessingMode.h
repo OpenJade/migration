@@ -42,6 +42,7 @@ public:
     bool toInitial_; // 1 if the match fell through from a named processing mode to
 	             // the initial processing mode
     RuleType ruleType_;
+    bool query_;
     size_t nextRuleIndex_;
     friend class ProcessingMode;
   };
@@ -82,14 +83,33 @@ public:
     int compareSpecificity(const Rule &) const;
   };
 
+  class QueryRule : public Rule, private Collector::DynamicRoot {
+  public:
+    QueryRule(const Ptr<Action> &, Owner<Expression> &, Owner<Expression> &,
+              ProcessingMode *, Interpreter *);
+    int compareSpecificity(const Rule &) const;
+    void trace(Collector &) const;
+    bool matches(const NodePtr &) const;
+  private:
+    long priority() const;
+    ProcessingMode *pm_;
+    Interpreter *interp_;
+    Owner<Expression> nlExpr_;
+    mutable Owner<Expression> priorityExpr_;
+    mutable NodeListObj *nl_;
+    mutable long priority_;
+  };
+
   ProcessingMode(const StringC &, const ProcessingMode *initial = 0);
   void addElementRule(NCVector<Pattern> &, Owner<Expression> &expr,
-		      RuleType, const Location &, Interpreter &);
-  void addRootRule(Owner<Expression> &expr,
-		   RuleType, const Location &, Interpreter &);
-  void addQueryRule(Owner<Expression> &query, Owner<Expression> &expr,
-		    Owner<Expression> &priority,
-		    RuleType, const Location &, Interpreter &);
+	       RuleType, const Location &, Interpreter &);
+  void addRootRule(Owner<Expression> &expr, 
+               RuleType, const Location &, Interpreter &);
+  void addQueryRule(Owner<Expression> &query,
+               Owner<Expression> &expr,
+               Owner<Expression> &priority,
+               RuleType,
+               const Location &, Interpreter &);
   // Specificity gives specificity of last match; gets specificity of current match.
   const Rule *findMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
 			Specificity &) const;
@@ -118,17 +138,22 @@ private:
 			       Specificity &) const;
   const Rule *findRootMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
 			    Specificity &) const;
+  const Rule *findQueryMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
+			    Specificity &) const;
   const GroveRules &groveRules(const NodePtr &, Messenger &) const;
   static void elementRuleAdvance(const NodePtr &nd, Pattern::MatchContext &context,
 		          Messenger &mgr, Specificity &specificity,
 			  const Vector<const ElementRule *> &vec);
+  static void queryRuleAdvance(const NodePtr &nd,
+		          Messenger &mgr, Specificity &specificity,
+			  const Vector<QueryRule *> &vec);
 
   Vector<Rule> rootRules_[nRuleType];
+  Vector<QueryRule *> queryRules_[nRuleType];
   IList<ElementRule> elementRules_[nRuleType];
   NCVector<GroveRules> groveRules_;
   const ProcessingMode *initial_; // 0 for initial mode
   bool defined_;
-  bool hasQuery_; // 1 if there are any query rules
 };
 
 
@@ -147,12 +172,17 @@ void ProcessingMode::setDefined()
 inline
 bool ProcessingMode::hasQuery() const
 {
-  return hasQuery_ || (initial_ && initial_->hasQuery());
+  for (int ruleType = 0; ruleType < nRuleType; ruleType++)
+    if (queryRules_[ruleType].size() > 0)
+      return 1;
+  if (initial_)
+    return initial_->hasQuery(); 
+  return 0;
 }
 
 inline
 ProcessingMode::Specificity::Specificity()
-: toInitial_(0), nextRuleIndex_(0), ruleType_(styleRule)
+: query_(1), toInitial_(0), nextRuleIndex_(0), ruleType_(styleRule)
 {
 }
 

@@ -2693,6 +2693,17 @@ DEFPRIMITIVE(NodeListAddress, argc, argv, context, interp, loc)
   return new (interp) AddressObj(FOTBuilder::Address::resolvedNode, node);
 }
 
+DEFPRIMITIVE(UriRefAddress, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  return new (interp) AddressObj(FOTBuilder::Address::html, NodePtr(),
+				 StringC(s, n));
+}
+
 DEFPRIMITIVE(CharScriptCase, argc, argv, context, interp, loc)
 {
   if (!context.styleStack) {

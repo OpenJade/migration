@@ -233,6 +233,7 @@ SPRIMITIVE(MapConstructor, "map-constructor", 2, 0, 0, query)
 XXPRIMITIVE(Language, "language", 2, 0, 0)
 XXPRIMITIVE(XSgmlParse, "sgml-parse", 1, 0, 1)
 XXPRIMITIVE(XExpt, "expt", 2, 0, 0)
+XXPRIMITIVE(UriRefAddress, "uri-ref-address", 1, 0, 0)
 // transformation language
 TPRIMITIVE(SubgroveSpec, "subgrove-spec", 0, 0, 1, noFeature)
 TPRIMITIVE(IsCreateSpec, "create-spec?", 1, 0, 0, noFeature)

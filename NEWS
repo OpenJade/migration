@@ -6,8 +6,8 @@ Changes in OpenSP 1.5
 
 Changes in OpenSP 1.5pre9
 
-* Support for "-restricted" option to restrict parsing of web based documents
-  to local files only
+* Support for "--restricted" option to restrict parsing of web based documents
+  to local files only.
 
 Changes in OpenSP 1.5pre8
 
@@ -38,7 +38,7 @@ Changes in OpenSP 1.5pre7
   defined by Amendment 1 to ISO/IEC 10744:1997 (HyTime).  This makes
   it possible to specify architectural support attributes when using
   architectures with XML, and is generally simpler than the original
-  syntax.  See http://www.ornl.gov/sgml/wg8/document/1985.htm for
+  syntax.  See http://www.y12.doe.gov/sgml/wg8/document/1985.htm for
   details.  Patch contributed by Peter Newcomb of Epremis Corp.
 
 * Adds the architecture public id to the information passed to
@@ -73,8 +73,8 @@ Changes in OpenSP 1.5pre5
 
 * Re-instate the '-widref' option which was accidentally removed.
 
-* New -output options: comment, omitted, tagomit and attromit; this
-  shows comments and implied elements and/or attributes.  
+* New output options (--option): comment, omitted, tagomit and attromit;
+  this shows comments and implied elements and/or attributes.  
   Patch from Robert Braddock.
 
 * German translation updates

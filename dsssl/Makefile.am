@@ -1,5 +1,5 @@
 pkgdata_DATA = builtins.dsl catalog style-sheet.dtd spec.dtd fot.dtd \
-	extensions.dsl features.dsl
+	extensions.dsl
 
 docdir = $(prefix)/doc
 pkgdocdir = $(docdir)/@PACKAGE@

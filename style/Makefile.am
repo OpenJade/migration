@@ -19,7 +19,8 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	Style.cxx Style.h StyleEngine.cxx StyleEngine.h VM.h charNames.h \
 	charProps.h dsssl_ns.h primitive.cxx primitive.h \
 	primitive_inst.cxx sdata.h style_inst.cxx style_pch.h stylelib.cxx \
-	stylelib.h
+	stylelib.h TransformationMode.h TransformationMode.cxx \
+	DocumentGenerator.h DocumentGenerator.cxx
 
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove
 

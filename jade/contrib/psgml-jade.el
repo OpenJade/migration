@@ -76,9 +76,9 @@
 ;	   ("\\(error\\|warning\\) at \\([^,]+\\), line \\([0-9]+\\)" 2 3)
 ;	   ("\n[a-zA-Z]?:?[^0-9 \n\t:]+:[ \t]*\\([^ \n\t:]+\\):\
 ;\\([0-9]+\\):\\(\\([0-9]+\\)[: \t]\\)?" 1 2 4)))
-   (list "Jade" "cd %dir; jade -c%catalogs -t%backend -d%stylesheet %file" 
+   (list "Jade" "cd %dir; openjade -c%catalogs -t%backend -d%stylesheet %file" 
 	 'sgml-run-command nil
-	 '(("jade:\\(.*\\):\\(.*\\):\\(.*\\):E:" 1 2 3)))
+	 '(("openjade:\\(.*\\):\\(.*\\):\\(.*\\):E:" 1 2 3)))
    (list "JadeTeX" "cd %dir; jadetex '\\nonstopmode\\input %tex'" 
          'sgml-run-command nil)
    (list "View dvi" "cd %dir; xdvi %dvi" 

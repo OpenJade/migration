@@ -1,6 +1,9 @@
 * Further cleanups of the query implementation: remove the need
   to store ProcessingMode * and Interpreter * in QueryRule
    
+* Fix bug in calculation of query nl_: must make sure we use the root
+  of the `grove being processed'.
+
 * Think about optimizations to speed up ProcessingMode::find...Rule()
   in the presence of many query rules.
 

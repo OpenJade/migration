@@ -237,4 +237,4 @@ AC_OUTPUT([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl style/Makefile 
 	jade/Makefile dsssl/Makefile jadedoc/Makefile 
 	jadedoc/images/Makefile intl/Makefile po/Makefile.in],
 	[echo creating po/Makefile
-	sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])
+	test ! -f po/Makefile.in || sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

@@ -1,5 +1,9 @@
 * Fix doctypes-and-linktypes to return a list of all dtds.
 
+* Free Expressions when they are no longer needed. Later, maybe replace the
+  allocation mechanism with a simpler one that does not actually free
+  individual objects.
+
 * Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message
 

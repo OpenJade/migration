@@ -309,6 +309,8 @@ public:
   long getValue(Char) const;
   void setRange(Char, Char, long);
 private:
+  IntegerCharPropValues(const IntegerCharPropValues &); // Undefined.
+  IntegerCharPropValues &operator=(const IntegerCharPropValues &); // Undefined
   long def_;
   struct ValT_ {
     long l_;
@@ -339,6 +341,9 @@ public:
   void setRange(Char, Char, long);
   void setValue(Char, long);
 private:
+  MaybeIntegerCharPropValues(const MaybeIntegerCharPropValues &); // Undefined.
+  MaybeIntegerCharPropValues &operator=(const MaybeIntegerCharPropValues &);
+  // Above undefined.
   long def_;
   bool defFalse_;
   struct ValT_ {
@@ -369,6 +374,8 @@ public:
   bool getValue(Char) const;
   void setRange(Char, Char, bool);
 private:
+  BooleanCharPropValues(const BooleanCharPropValues &); // Undefined.
+  BooleanCharPropValues &operator=(const BooleanCharPropValues &); // Undefined.
   bool def_;
   struct ValT_ {
     bool b_:1;
@@ -397,6 +404,8 @@ public:
   FOTBuilder::PublicId getValue(Char) const;
   void setRange(Char, Char, FOTBuilder::PublicId);
 private:
+  PublicIdCharPropValues(const PublicIdCharPropValues &); // Undefined.
+  PublicIdCharPropValues &operator=(const PublicIdCharPropValues &); // Undefined.
   FOTBuilder::PublicId def_;
   struct ValT_ {
     FOTBuilder::PublicId p_;
@@ -425,6 +434,8 @@ public:
   FOTBuilder::Symbol getValue(Char) const;
   void setRange(Char, Char, FOTBuilder::Symbol);
 private:
+  SymbolCharPropValues(const SymbolCharPropValues &); // Undefined.
+  SymbolCharPropValues &operator=(const SymbolCharPropValues &); // Undefined.
   FOTBuilder::Symbol def_;
   struct ValT_ {
     FOTBuilder::Symbol s_;
@@ -498,6 +509,9 @@ protected:
   void compileDef_(Interpreter &);
   void compileAdded_(addedProp_ &,Interpreter &);
   const addedProp_ *added_(Char) const;
+private:
+  CharProp(const CharProp &); // Undefined.
+  CharProp &operator=(const CharProp &); // Undefined.
 };
 
 class Interpreter : 

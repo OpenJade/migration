@@ -111,6 +111,8 @@ public:
 			    unsigned &) const;
   void buildDesc(AttributeDefinitionDesc &) const;
   DeclaredValue *copy() const;
+protected:
+  void checkNormalizedLength(Text &, AttributeContext &, unsigned &) const; 
 };
 
 

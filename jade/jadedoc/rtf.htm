@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type"
 content="text/html; charset=iso-8859-1">
 <meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
-<title>Jade MIF backend</title>
+<title>Jade RTFbackend</title>
 </head>
 
 <body background="../Arts/Background.gif">
@@ -14,17 +14,16 @@ src="../Arts/DSSSLTitle.gif" alt="OpenJade title" vspace="10"
 width="750" height="60"> </font></p>
 
 <p align="left">&nbsp; </p>
-<div align="left">
-
-<table border="0">
+<div align="left"> <table border="0" width="780">
     <tr>
         <td><img src="../Arts/space.gif" width="145" height="10"></td>
-        <td><h1><font face="Geneva, Arial">OpenJade MIF</font></h1>
-        <h3><font face="Geneva, Arial">Created by Kathleen
-        Marszalek and Paul Prescod.<br>
-        Sponsored by ISOGEN International Corp.</font></h3>
-
-        <h2><font face="Geneva, Arial">Contents</font></h2>
+        <td><h1><font face="Arial">OpenJade RTF</font></h1>
+        <h3><font face="Arial">Created by James Clark</font></h3>
+       
+	<!.......................................................
+		table of content
+	.........................................................>
+	<h2><font face="Geneva, Arial">Contents</font></h2>
         <ul>
             <li><font face="Geneva, Arial">Supported Flow Objects</font>
                 <ul>
@@ -42,8 +41,8 @@ width="750" height="60"> </font></p>
                         face="Geneva, Arial">leader</font></a></li>
                     <li><a href="#link"><font
                         face="Geneva, Arial">link</font></a></li>
-                    <li><a href="#index-entry"><font
-                        face="Geneva, Arial">index-entry</font></a></li>
+ 			  <li><a href="#box"><font
+                        face="Geneva, Arial">box</font></a></li>
                     <li><font face="Geneva, Arial">sequence</font></li>
                     <li><a href="#external-graphic"><font
                         face="Geneva, Arial">external-graphic</font></a></li>
@@ -64,43 +63,19 @@ width="750" height="60"> </font></p>
                         face="Geneva, Arial">table-cell</font></a></li>
                     <li><a href="#table-border"><font
                         face="Geneva, Arial">table-border</font></a></li>
+ 			  <li><a href="#table-border"><font
+                        face="Geneva, Arial">table-border</font></a></li>
+			  <li><a href="#table-border"><font
+                        face="Geneva, Arial">math objects to be included</font></a></li>
+
+
+			
                 </ul>
             </li>
-            <li><a href="#problems_and_limitations"><font
-                face="Geneva, Arial">Problems &amp; Limitations</font></a>
-                <ul>
-                    <li><a href="#table_border_resolution"><font
-                        face="Geneva, Arial">Table border
-                        resolution</font></a></li>
-                    <li><a href="#external_graphic_width"><font
-                        face="Geneva, Arial">External graphic
-                        width and height</font></a></li>
-                    <li><a href="#space_before_non-paragraph"><font
-                        face="Geneva, Arial">Space before non-paragraph
-                        displayed objects</font></a></li>
-                    <li><a href="#the_vertical_positioning"><font
-                        face="Geneva, Arial">The vertical
-                        positioning of the displayed rule flow
-                        object</font></a></li>
-                    <li><a href="#the_box_flow_object"><font
-                        face="Geneva, Arial">The box flow object</font></a></li>
-                </ul>
-            </li>
-            <li><a href="#tips"><font face="Geneva, Arial">Tips</font></a>
-                <ul>
-                    <li><a href="#using_hypertext"><font
-                        face="Geneva, Arial">Creating hypertext
-                        documents</font></a> </li>
-                    <li><a href="#updating_page_numbering"><font
-                        face="Geneva, Arial">Updating page
-                        numbering</font></a> </li>
-                    <li><a href="#using_colors"><font
-                        face="Geneva, Arial">Specifying colors</font></a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-        <h2><font face="Geneva, Arial">Supported Flow Objects</font></h2>
+	  </ul>
+
+      <h2><font face="Geneva, Arial">Supported Flow Objects</font></h2>
+
 
 	<!..........................................................
 		 the character flow object
@@ -132,6 +107,7 @@ width="750" height="60"> </font></p>
                     <li>color </li>
                 </ul>
                 </td>
+                <td valign="top">&nbsp;</td>
             </tr>
         </table>
 
@@ -230,6 +206,10 @@ width="750" height="60"> </font></p>
                     <li>may-violate-keep-before? </li>
                     <li>may-violate-keep-after? </li>
                 </ul>
+                </td>
+            </tr>
+            <tr><td valign="top" colspan="2">
+		    <P>Only the horizontal orientation is supported. Rules only show up in Page Layout View</P>
                 </td>
             </tr>
         </table>
@@ -344,12 +324,12 @@ width="750" height="60"> </font></p>
             </tr>
             <tr>
                 <td colspan="2"><font size="2"><sup>*</sup></font>
-                <p>On the last line of paragraph only. The principal
+                On the last line of paragraph only. The principal
                 port (the leader string itself) can contain
-                characters only. </p>
+                characters only. 
 		    <p>The content of the flow object is ignored: 
-		    a dotted leader will always be used. The specified length is ignored: 
-	          it always fills out the line. </p> </td
+		     a dotted leader will always be used. The specified length 
+		     is ignored: it always fills out the line.</p> </td>
             </tr>
         </table>
 
@@ -386,6 +366,13 @@ width="750" height="60"> </font></p>
                 </ul>
                 </td>
             </tr>
+		<tr>
+                <td colspan="2"><font size="2"><sup>*</sup></font>
+                Only destinations that are
+                single elements in the same RTF output file. </td>
+            </tr>
+
+
         </table>
 
 	<!.. top of page ..>
@@ -456,12 +443,8 @@ width="750" height="60"> </font></p>
                 </td>
             </tr>
             <tr>
-                <td valign="top" colspan="2"><b>Here's how to
-                enable the above extension:</b><br>
-                (declare-flow-object-class index-entry<br>
-                &nbsp;&nbsp;&nbsp; &quot;UNREGISTERED::ISOGEN//Flow
-                Object Class::index-entry&quot;)<br>
-                &nbsp; </td>
+                <td valign="top" colspan="2">Only destinations that are
+                single elements in the same RTF output file.</td>
             </tr>
         </table>
 
@@ -517,7 +500,23 @@ width="750" height="60"> </font></p>
                     <li>may-violate-keep-after? </li>
                 </ul>
                 </td>
+		</tr>
+		<tr>
+                <td valign="top" colspan="2"><p>On Windows platforms, this can
+                be used to embed OLE objects, by making the the
+                value of the <code>notation-system-id:</code> a
+                formal system identifier whose storage manager is
+                <code>CLSID</code> and whose storage object
+                identifier is the COM CLSID (including
+                surrounding braces). The system identifier may
+                also be just <code>&lt;CLSID&gt;</code> (that is,
+                the storage object identifier may be empty); in
+                this case, the OLE default CLSID for the file (usually
+                chosen based on the file's extension) will be
+                used.</p>
+                &nbsp; </td>
             </tr>
+
         </table>
 
 	<!.. top of page ..>
@@ -975,92 +974,125 @@ width="750" height="60"> </font></p>
 		&nbsp;
 	</p>
 
-        </div><h2>Problems &amp; Limitations</h2>
-        <p><a name="table_border_resolution"></a> </p>
-        <h3><b>Table border resolution</b></h3>
-        <p>It's not clear how to predictably enforce cell borders
-        that have mixed line styles. I've posted a question about
-        this to comp.text.frame, but there were no responses so
-        far.</p>
-        <p><a name="external_graphic_width"></a> </p>
-        <h3><b>External graphic width and height</b></h3>
-        <p>In order to place external graphics inside a text flow
-        one must use an anchored frame containing the &lt;ImportObject...&gt;
-        statement. The ImportObject within the frame can shrink-wrap
-        the referenced graphics, however the anchored frame
-        itself cannot - in general the size of an anchored frame
-        has to be specified explicitly. I've asked about this in
-        comp.text.frame, but the only solutions involved using
-        external programs to read the graphic size from graphic
-        files.</p>
-        <p><a name="space_before_non-paragraph"></a> </p>
-        <h3><b>Space before non-paragraph displayed objects</b></h3>
-        <p>Flow objects like external-graphic need to be anchored
-        to empty paragraphs so that that frame can determine
-        their position on the page automatically. Since the
-        smallest paragraph height is 2pt (smallest font size that
-        can be used), the total space before such objects should
-        be larger than that. This does not apply to the paragraph
-        flow objects themselves, and to the rule flow object. The
-        rule flow object has the placement direction display size
-        of 0 and it's possible to use negative PgfLeading to let
-        the next paragraph move up if necessary.</p>
-        <p><a name="the_vertical_positioning"></a> </p>
-        <h3><b>The vertical positioning of the displayed rule
-        flow object</b></h3>
-        <p>Since the rule is position using inlined anchored
-        frame, the placement is relative to the font baseline. It's
-        assumed that the baseline is 1/3 the font size from the
-        bottom.</p>
-        <p><a name="the_box_flow_object"></a> </p>
-        <h3><b>The box flow object</b></h3>
-        <p>Not sure how to implement it since anchored frames
-        must have fixed height. Maybe using tables would work
-        here(?)</p>
-        <p><a name="tips"></a> </p>
-        <h2>Tips</h2>
-        <p><a name="using_hypertext"></a> </p>
-        <h3>Creating hypertext documents</h3>
-        <p>You must decide on the filename extension you'll use
-        at the stage when you run jade. If you don't want the .mif
-        extension for your final document, feel free to use other
-        extension when specifying the file name using the <b>-o</b>
-        option.</p>
+
+
+
+	  
+
+        <p><font face="Arial">Many DSSSL characteristics cannot
+        be implemented in RTF. The backend does the best it can. </font></p>
+        <p><font face="Arial">In order to get correct page
+        numbers in Microsoft Word, type the following after
+        opening the document: </font></p>
         <ol>
-            <li>Open the book file. </li>
-            <li>While holding <i>SHIFT</i>, select <b>File-&gt;Open
-                All Files in Book</b> from the menu. </li>
-            <li>Save each file using <b>View Only</b> format -
-                make sure you use original filenames. </li>
+            <li><font face="Arial">CTRL+END </font></li>
+            <li><font face="Arial">CTRL+A </font></li>
+            <li><font face="Arial">F9 </font></li>
         </ol>
-        <p><a name="updating_page_numbering"></a> </p>
-        <h3>Updating page numbering</h3>
+        <p><font face="Arial">In Word Viewer 97, you must instead
+        do: </font></p>
         <ol>
-            <li>Open the book file. </li>
-            <li>While holding <i>SHIFT</i>, select <b>File-&gt;Open
-                All Files in Book</b> from the menu. </li>
-            <li>Select <b>File-&gt;Generate/Update...</b> and
-                then press <b>Update</b>. </li>
+            <li><font face="Arial">CTRL+END </font></li>
+            <li><font face="Arial">ALT </font></li>
+            <li><font face="Arial">V </font></li>
+            <li><font face="Arial">N </font></li>
+            <li><font face="Arial">ALT </font></li>
+            <li><font face="Arial">V </font></li>
+            <li><font face="Arial">P </font></li>
         </ol>
-        <p><a name="using_colors"></a> </p>
-        <h3>Specifying colors</h3>
-        <p>OpenJade supports all color spaces specified in DSSSL. 
-        The following example uses the RGB color space to create
-        a red rule:</p>
-        <div align="center"><center><table border="0"
-        cellpadding="10" bgcolor="#CCCCCC">
-            <tr>
-                <td>(make rule<br>
-                &nbsp;&nbsp;&nbsp; color: (color (color-space
-                &quot;ISO/IEC 10179:1996//Color-Space Family::Device
-                RGB&quot;)<br>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                1 0 0)<br>
-                &nbsp;&nbsp;&nbsp; ...<br>
-                )</td>
-            </tr>
-        </table>
-        </center></div></td>
+        <p><font face="Arial">Page numbers also get updated
+        automatically when you print. </font></p>
+        <p><font face="Arial">The RTF backend supports some
+        additional characteristics. To use a characteristic named
+        here as <code><var>C</var></code>, declare it using <code>declare-characteristic</code>
+        with the public identifier: </font></p>
+        <pre>&quot;UNREGISTERED::James Clark//Characteristic::<var>C</var>&quot;
+</pre>
+        <dl>
+            <dt><font size="4"><code>heading-level</code> </font></dt>
+            <dd><font face="Arial">Value is an integer. It
+                applies to paragraph flow objects. If the value
+                is between 1 and 9, then the paragraph is output
+                as a header of this level, otherwise it is output
+                as body text. Using this characteristic allows
+                Word to provide useful outline views and a
+                document map. (Note that Word's handling of
+                document maps for RTF documents is buggy: if you
+                load an RTF document, and the previous document
+                was using the Online Layout view, then RTF will
+                attempt to guess what paragraphs are headings,
+                which it will almost always do wrong. To avoid
+                this, switch to the Normal view before loading an
+                RTF document.) The initial value is <code>0</code>
+                </font></dd>
+            <dt><font size="4"><code>page-number-format</code> </font></dt>
+            <dd><font face="Arial">Value is a string as for
+                format-number procedure. This controls the format
+                of the number used by page-number-sosofo and
+                current-page-number-sosofo for references to
+                pages in the simple-page-sequence. The initial
+                value is <code>&quot;1&quot;</code>. It applies
+                to simple-page-sequence flow objects. </font></dd>
+            <dt><font size="4"><code>page-number-restart?</code> </font></dt>
+            <dd><font face="Arial">Value is a boolean. If true,
+                then for the purposes of page-number-sosofo and
+                current-page-number-sosofo, the page numbers for
+                this simple-page-sequence will restart from 1.
+                The initial value is <code>#f</code>. It applies
+                to simple-page-sequence flow objects. </font></dd>
+            <dt><font size="4"><code>page-n-columns</code></font>
+            </dt>
+            <dd><font face="Arial">Value is a strictly positive
+                integer, specifying the number of columns. The
+                initial value is 1. It applies to simple-page-sequence
+                flow objects. </font></dd>
+            <dt><font size="4"><code>page-column-sep</code> </font></dt>
+            <dd><font face="Arial">Value is a length, specifying
+                the separation between columns. The initial value
+                is <code>.5in</code>. It applies to simple-page-sequence
+                flow objects. </font></dd>
+            <dt><font size="4"><code>page-balance-columns?</code>
+                </font></dt>
+            <dd><font face="Arial">Value is a boolean. If true,
+                the columns on the final page of the page-sequence
+                should be balanced. The initial value is <code>#f</code>.
+                It applies to simple-page-sequence flow objects. </font></dd>
+            <dt><font size="4"><code>superscript-height</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the height of the baseline of a superscript above
+                its parent's baseline. It applies to superscript
+                and script flow objects. </font></dd>
+            <dt><font size="4"><code>subscript-depth</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the depth of the baseline of a subscript below
+                its parent's baseline. It applies to subscript
+                and script flow objects. </font></dd>
+            <dt><font size="4"><code>over-mark-height</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the height of the baseline of the contents of the
+                over-mark area of a mark flow object above the
+                baseline of the contents of the main area. It
+                also controls the height of the contents of the
+                mid-sup area of the script flow object. It
+                applies to mark and script flow objects. </font></dd>
+            <dt><font size="4"><code>under-mark-depth</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the depth of the baseline of the contents of the
+                under-mark area of a mark flow object below the
+                baseline of the contents of the main area. It
+                also controls the depth of the contents of the
+                mid-sub area of the script flow object. It
+                applies to mark and script flow objects. </font></dd>
+            <dt><font size="4"><code>grid-row-sep</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the separation between rows of a grid flow object.
+                </font></dd>
+            <dt><font size="4"><code>grid-column-sep</code> </font></dt>
+            <dd><font face="Arial">Value is a length. Specifies
+                the separation between columns of a grid flow
+                object. </font></dd>
+        </dl>
+        </td>
     </tr>
 </table>
 </div>

@@ -247,7 +247,7 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
       nl_);
   }
 
-  return nl_->contains(m);
+  return nl_->contains(ec, *interp_, m);
 }
 
 void Pattern::NodeQualifier::contributeSpecificity(long *s) const

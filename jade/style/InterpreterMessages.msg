@@ -136,4 +136,4 @@ E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
 E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
 E3+notACharList++%2 argument for primitive %1 of wrong type: %3 not a list of characters
 E3+lengthError++%2 argument for primitive %1 has wrong length
-
+W1+noExactRepresentation++quantity %1 can't be represented exactly

@@ -788,7 +788,7 @@ ConstPtr<Entity> ArcProcessor::makeDtdEntity(const Notation *)
   if (entity.isNull()) {
     mgr_->message(arcDtdIsParam_
 		  ? ArcEngineMessages::arcDtdNotDeclaredParameter
-		  : ArcEngineMessages::arcDtdNotDeclaredParameter,
+		  : ArcEngineMessages::arcDtdNotDeclaredGeneral,
 		  StringMessageArg(supportAtts_[rArcDTD]));
     return 0;
   }

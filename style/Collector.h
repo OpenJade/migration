@@ -83,6 +83,7 @@ public:
   void makePermanent(Object *);
   // Returns the number of live objects.
   unsigned long collect();
+  bool objectMaybeLive(Object *);
 protected:
   virtual void traceStaticRoots() const { }
 private:
@@ -216,6 +217,12 @@ inline
 Collector::Block::~Block()
 {
   ::operator delete(firstObj);
+}
+
+inline
+bool Collector::objectMaybeLive(Object *obj)
+{
+  return obj->color() == currentColor_ || obj->color() == Object::permanentColor;
 }
 
 #endif /* not Collector_INCLUDED */

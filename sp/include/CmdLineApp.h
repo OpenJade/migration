@@ -41,7 +41,7 @@ public:
   virtual int processArguments(int argc, AppChar **files) = 0;
   static const MessageType2 &openFileErrorMessage();
   static const MessageType2 &closeFileErrorMessage();
-  StringC usageString();
+  void usage();
   const CodingSystem *codingSystem();
   const CodingSystem *outputCodingSystem();
   const CharsetInfo &systemCharset();
@@ -50,17 +50,23 @@ public:
   OutputCharStream *makeStdOut();
   OutputCharStream *makeStdErr();
 protected:
-  virtual void registerOption(AppChar c, const AppChar *argName = 0);
-  virtual void registerLongOption(const AppChar *option, AppChar c, const AppChar *argName = 0);
+  virtual void registerOption(AppChar c, const AppChar *name, 
+                              const MessageType1 &doc);
+  virtual void registerOption(AppChar c, const AppChar *name, 
+                              const MessageFragment &arg, 
+                              const MessageType1 &doc);
+  virtual void registerUsage(const MessageType1 &u);
+  virtual void registerInfo(const MessageType0 &i);
   virtual int init(int argc, AppChar **argv);
   void resetCodingSystemKit();
   static Boolean stringMatches(const AppChar *s, const char *key);
   const AppChar *errorFile_;
   const CodingSystem *outputCodingSystem_;
-  String<AppChar> optstr_;
-  Vector<const AppChar *> optArgNames_;
-  Vector<LongOption<AppChar> > longOpts_;
-  Vector<const AppChar *> longOptArgNames_;
+  Vector<LongOption<AppChar> > opts_;
+  Vector<MessageType1> optDocs_;
+  Vector<MessageFragment> optArgs_;
+  Vector<MessageType1> usages_;
+  Vector<MessageType0> infos_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;
 private:

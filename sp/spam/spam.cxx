@@ -71,26 +71,21 @@ SpamApp::SpamApp()
 {
   options_.eventsWanted.addInstanceMarkup();
   options_.eventsWanted.addPrologMarkup();
-  registerOption('h');
-  registerOption('l');
-  registerOption('m', SP_T("omittag|shortref|net|emptytag|unclosed|attname|attvalue|attspec|current|shorttag|rank|reserved"));
-  registerOption('o', SP_T("entity_name"));
-  registerOption('p');
-  registerOption('r');
-  registerOption('x');
-  registerLongOption(SP_T("hoist-omitted-tags"), 'h');
-  registerLongOption(SP_T("lowercase"), 'l');
-  registerLongOption(SP_T("markup-option"), 'm', SP_T("omittag|shortref|net|emptytag|unclosed|attname|attvalue|attspec|current|shorttag|rank|reserved"));
-  registerLongOption(SP_T("output-entity"), 'o', SP_T("name"));
-  registerLongOption(SP_T("output-prolog"), 'p');
-  registerLongOption(SP_T("raw"), 'r');
-  registerLongOption(SP_T("expand-references"), 'x');
+  registerOption(200, SP_T("hoist-omitted-tags"), SpamMessages::hHelp);
+  registerOption('l', SP_T("lowercase"), SpamMessages::lHelp);
+  registerOption('m', SP_T("markup-option"), SpamMessages::option, 
+                 SpamMessages::mHelp);
+  registerOption('o', SP_T("output-entity"), SpamMessages::name, 
+                 SpamMessages::oHelp);
+  registerOption('p', SP_T("output-prolog"), SpamMessages::pHelp);
+  registerOption('r', SP_T("raw"), SpamMessages::rHelp);
+  registerOption('x', SP_T("expand-references"), SpamMessages::xHelp);
 }
 
 void SpamApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
-  case 'h':
+  case 200:
     // hoist omitted tags out of entities
     normalizeFlags_ |= CopyEventHandler::normalizeOmittagHoist;
     break;

@@ -34,6 +34,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	OffsetOrderedList.h OpenElement.cxx OutputByteStream.cxx \
 	OutputCharStream.cxx OutputState.cxx OutputState.h Param.cxx Param.h \
 	Parser.cxx Parser.h ParserApp.cxx ParserAppMessages.h \
+	EntityAppMessages.h \
 	ParserEventGeneratorKit.cxx ParserMessages.h ParserMessages.cxx \
 	ParserOptions.cxx ParserState.cxx ParserState.h Partition.cxx \
 	Partition.h PosixStorage.cxx PosixStorageMessages.h Priority.h \
@@ -63,6 +64,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 EXTRA_DIST = ArcEngineMessages.msg ArgEngineMessages.rc \
 	CatalogMessages.msg CatalogMessages.rc \
 	CmdLineAppMessages.msg CmdLineAppMessages.rc \
+	EntityAppMessages.msg EntityAppMessages.rc \
 	EntityManagerMessages.msg EntityManagerMessages.rc \
 	MessageFormatterMessages.msg MessageFormatterMessages.rc \
 	MessageReporterMessages.msg MessageReporterMessages.rc \
@@ -82,6 +84,7 @@ MSGGENFLAGS = -l libModule
 BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	CatalogMessages.h CatalogMessages.rc \
 	CmdLineAppMessages.h CmdLineAppMessages.rc \
+	EntityAppMessages.h EntityAppMessages.rc \
 	EntityManagerMessages.h EntityManagerMessages.rc \
 	MessageFormatterMessages.h MessageFormatterMessages.rc \
 	MessageReporterMessages.h MessageReporterMessages.rc \

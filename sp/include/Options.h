@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef Options_INCLUDED
@@ -16,34 +16,35 @@ namespace SP_NAMESPACE {
 // It never prints any message.
 
 template<class T>
-struct LongOption {
+class LongOption {
+public:
   const T *name;
-  T val;
-  bool arg;
+  T key;
+  T value;
+  bool hasArgument;
 };
  
 template<class T>
 class Options {
 public:
-  Options(int argc, T *const *, const T *, const Vector<LongOption<T> > &);
+  Options(int argc, T *const *, const Vector<LongOption<T> > &);
   // Returns false if there are no more options.
   bool get(T &);
   T *arg() const { return arg_; } // optarg
   T opt() const { return opt_; }  // optopt
   int ind() const { return ind_; } // optind
-  int longIndex() const { return longInd_; } // longindex
+  int longIndex() const { return optInd_; } // longindex
 private:
-  const T *search(T) const;
-  bool searchLong();
-  const T *opts_;
+  bool search(T);
+  bool searchLong(const T *);
   T *const *argv_;
   int argc_;
   int ind_;
   T opt_;
   T *arg_;
   int sp_;
-  Vector<LongOption<T> > longOpts_;
-  int longInd_;
+  Vector<LongOption<T> > opts_;
+  int optInd_;
 };
 
 #ifdef SP_NAMESPACE

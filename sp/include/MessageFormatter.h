@@ -25,7 +25,7 @@ public:
   MessageFormatter();
   void formatMessage(const MessageFragment &,
 		     const Vector<CopyOwner<MessageArg> > &args,
-		     OutputCharStream &);
+		     OutputCharStream &, bool noquote = 0);
   void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
 			  OutputCharStream &os);
   virtual Boolean getMessageText(const MessageFragment &, StringC &) = 0;

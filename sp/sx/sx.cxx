@@ -51,8 +51,8 @@ SxApp::SxApp()
 : ParserApp("unicode")
 {
   outputCodingSystem_ = codingSystemKit_->makeCodingSystem("UTF-8", 0);
-  registerOption('x', SP_T("xml_output_option"));
-  registerLongOption(SP_T("xml-output-option"), 'x', SP_T("option"));
+  registerOption('x', SP_T("xml-output-option"), SxMessages::option,  
+                 SxMessages::xHelp);
   outputOptions_.nlInTag = 1;
 }
 

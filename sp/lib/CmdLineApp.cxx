@@ -67,22 +67,22 @@ static FileOutputByteStream standardError(2, 0);
 CmdLineApp::CmdLineApp(const char *requiredInternalCode)
 : errorFile_(0),
   outputCodingSystem_(0),
-  // Colon at beginning is Posix.2ism that says to return : rather than ? for
-  // missing option argument.
-  optstr_(SP_T(":"), 1),
   MessageReporter(0),
   internalCharsetIsDocCharset_(1),
   codingSystem_(0)
 {
   initCodingSystem(requiredInternalCode);
   setMessageStream(makeStdErr());
-  registerOption('b', internalCharsetIsDocCharset_ ? SP_T("bctf") : SP_T("encoding"));
-  registerOption('f', SP_T("error_file"));
-  registerOption('v');
-  registerLongOption(internalCharsetIsDocCharset_ ? SP_T("bctf") 
-                     : SP_T("encoding"), 'b', SP_T("name"));
-  registerLongOption(SP_T("error-file"), 'f', SP_T("error_file"));
-  registerLongOption(SP_T("version"), 'v');
+  if (internalCharsetIsDocCharset_) 
+    registerOption('b', SP_T("bctf"), 
+                   CmdLineAppMessages::name, CmdLineAppMessages::bHelp);
+  else
+    registerOption('b', SP_T("encoding"), 
+                   CmdLineAppMessages::name, CmdLineAppMessages::eHelp);
+  registerOption('f', SP_T("error-file"), 
+                 CmdLineAppMessages::file, CmdLineAppMessages::fHelp);
+  registerOption('v', SP_T("version"), CmdLineAppMessages::vHelp);
+  registerOption('h', SP_T("help"), CmdLineAppMessages::hHelp);
 }
 
 void CmdLineApp::resetCodingSystemKit()
@@ -90,73 +90,140 @@ void CmdLineApp::resetCodingSystemKit()
   codingSystemKit_ = codingSystemKit_->copy();
 }
 
-void CmdLineApp::registerOption(AppChar c, const AppChar *argName)
+void CmdLineApp::registerOption(AppChar c, const AppChar *name,
+                                const MessageType1 &doc)
 {
-  optstr_ += c;
-  if (argName) {
-    optstr_ += SP_T(':');
-    optArgNames_.push_back(argName);
-  }
+  registerOption(c, name, CmdLineAppMessages::noArg, doc);
 }
 
-void CmdLineApp::registerLongOption(const AppChar *option, AppChar c, const AppChar *argName)
+void CmdLineApp::registerOption(AppChar c, const AppChar *name,
+				const MessageFragment &arg,
+                                const MessageType1 &doc)
 {
-  LongOption<AppChar> o;
-  o.name = option;
-  o.val = c;
-  o.arg = 0;
-  if (argName) {
-    o.arg = 1;
-    longOptArgNames_.push_back(argName);
-  }
-  longOpts_.push_back(o);
+  // these four are used for signals from Options<>::get()
+  ASSERT((c != '-') && (c != ':') && (c != '?') && (c != '=')); 
+  LongOption<AppChar> opt;
+  opt.value = c;
+  char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
+  setlocale(LC_CTYPE, "C");
+  opt.key = istalnum(c) ? c : 0;
+  setlocale(LC_CTYPE, savedLocale);
+  if (savedLocale)
+    free(savedLocale);
+  opt.name = name;
+  opt.hasArgument = (arg.module() != CmdLineAppMessages::noArg.module()
+                    || arg.number() != CmdLineAppMessages::noArg.number());
+  size_t i;
+  for (i = 0; i < opts_.size(); i++) 
+    if (opts_[i].value == c) { 
+      opts_[i] = opt;
+      optArgs_[i] = arg;
+      optDocs_[i] = doc;
+      return;
+    }
+  opts_.push_back(opt);
+  optArgs_.push_back(arg);
+  optDocs_.push_back(doc);
 }
 
-StringC CmdLineApp::usageString()
+void CmdLineApp::registerUsage(const MessageType1 &u)
 {
-  String<AppChar> result;
-  if (progName)
-    result.assign(progName, tcslen(progName));
-  PackedBoolean hadOption[128];
-  for (int i = 0; i < 128; i++)
-    hadOption[i] = 0;
-  Boolean hadNoArgOption = 0;
-  for (size_t i = 1; i < optstr_.size(); i++) {
-    if (optstr_[i] == 0)
-      break;
-    if (i + 1 < optstr_.size() && optstr_[i + 1] == ':')
-      i++;
-    else if (!hadOption[optstr_[i]]) {
-      hadOption[optstr_[i]] = 1;
-      if (!hadNoArgOption) {
-	hadNoArgOption = 1;
-	result.append(SP_T(" [-"), 3);
-      }
-      result += optstr_[i];
-    }
+  usages_.push_back(u);
+}
+
+void CmdLineApp::registerInfo(const MessageType0 &i)
+{
+  infos_.push_back(i);
+}
+
+void CmdLineApp::usage()
+{
+  String<AppChar> tmp;
+  if (progName) {
+    StringMessageArg arg(convertInput(progName));
+    Vector<CopyOwner<MessageArg> > args(1);
+    args[0] = arg.copy();
+    if (usages_.size() == 0) 
+      usages_.push_back(CmdLineAppMessages::defaultUsage);
+    for (size_t i = 0; i < usages_.size(); i++) {
+      StrOutputCharStream ostr;
+      StringC tem;
+      formatMessage(usages_[i], args, ostr, 1);
+      ostr.extractString(tem); 
+      message(i ? CmdLineAppMessages::usageCont 
+                : CmdLineAppMessages::usage, StringMessageArg(tem));
+    } 
   }
-  if (hadNoArgOption)
-    result += SP_T(']');
-  size_t j = 0;
-  for (size_t i = 1; i < optstr_.size(); i++) {
-    if (i + 1 < optstr_.size() && optstr_[i + 1] == ':') {
-      if (!hadOption[optstr_[i]]) {
-	hadOption[optstr_[i]] = 1;
-	result += SP_T(' ');
-	result += SP_T('[');
-	result += SP_T('-');
-	result += optstr_[i];
-	result += SP_T(' ');
-	result.append(optArgNames_[j], tcslen(optArgNames_[j]));
-	result += SP_T(']');
-      }
-      i++;
-      j++;
+  message(CmdLineAppMessages::usageStart);
+  Vector<StringC> leftSide;
+  size_t leftSize = 0;
+  for (size_t i = 0; i < opts_.size(); i++) {
+    Vector<CopyOwner<MessageArg> > args(3);
+    if (opts_[i].key) {
+      AppChar buf[2];
+      buf[0] = opts_[i].key;
+      buf[1] = SP_T('\0');
+      StringMessageArg arg(convertInput(buf));
+      args[0] = arg.copy(); 
     }
+    if (opts_[i].name) { 
+      StringMessageArg arg(convertInput(opts_[i].name));
+      args[1] = arg.copy(); 
+    }
+    StringC t;
+    for (const char *c = optArgs_[i].text(); *c != 0; c++)
+      t += *c;
+    StringMessageArg arg2(t);
+    args[2] = arg2.copy(); 
+    StrOutputCharStream ostr;
+    const char *a = "";
+    if (opts_[i].key) {
+      if (opts_[i].name) 
+        a = opts_[i].hasArgument ? "  -%1, --%2=%3"
+                         : "  -%1, --%2"; 
+      else  
+        a = opts_[i].hasArgument ? "  -%1 %3" 
+                         :  "  -%1"; 
+    } 
+    else if (opts_[i].name) {
+     a = opts_[i].hasArgument ? "  --%2=%3"
+                      : "  --%2"; 
+    }
+    formatMessage(MessageType3(MessageType::info, MessageFragment::libModule, 0
+#ifndef SP_NO_MESSAGE_TEXT
+                         ,a
+#endif
+           ), args, ostr, 1);
+    StringC tem;
+    ostr.extractString(tem);
+    leftSide.push_back(tem);
+    if (tem.size() > leftSize)
+      leftSize = tem.size(); 
   }
-  result.append(SP_T(" sysid..."), tcslen(SP_T(" sysid...")));
-  result += 0;
-  return convertInput(result.data());
+  leftSize += 2;
+  for (size_t i = 0; i < opts_.size(); i++) {
+    for (size_t j = leftSide[i].size(); j <= leftSize; j++)
+      leftSide[i] += ' ';
+    StrOutputCharStream ostr;
+    Vector<CopyOwner<MessageArg> > args(1);
+    StringC t;
+    for (const char *c = optArgs_[i].text(); *c != 0; c++)
+      t += *c;
+    StringMessageArg arg(t);
+    args[0] = arg.copy(); 
+    formatMessage(optDocs_[i], args, ostr, 1);
+    StringC tem;
+    ostr.extractString(tem);
+    leftSide[i] += tem;
+    message(
+      MessageType1(MessageType::info, MessageFragment::libModule, 0
+#ifndef SP_NO_MESSAGE_TEXT
+                   , "%1"
+#endif
+      ), StringMessageArg(leftSide[i]));
+  }
+  for (size_t i = 0; i < infos_.size(); i++)
+    message(infos_[i]);
 }
 
 static
@@ -245,35 +312,35 @@ catch (
 
 int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
 {
-  AppChar ostrbuf[2];
-  const AppChar *ostr;
-  optstr_ += SP_T('\0');
-  Options<AppChar> options(argc, argv, optstr_.data(), longOpts_);
+  AppChar ostr[80];
+  Options<AppChar> options(argc, argv, opts_);
   AppChar opt;
   while (options.get(opt)) {
     switch (opt) {
     case '-':
+    case '?':
     case '=':
     case ':':
-    case '?':
       if (options.opt() == 0) {
-        if (opt == '-' || opt == '?') 
-          ostr = &argv[options.ind() - 1][2];
-        else 
-          ostr = longOpts_[options.longIndex()].name;
+        size_t i;
+        const AppChar *t;
+        for (i = 0, t = &argv[options.ind()][2]; i < 79; i++, t++) {
+          if  ((*t == '=') || (*t == '\0'))
+            break;
+          ostr[i] = *t;
+        }
+        ostr[i] = '\0';
       } 
       else {
-        ostr = ostrbuf;
-        ostrbuf[0] = options.opt();
-        ostrbuf[1] = SP_T('\0');
+        ostr[0] = options.opt();
+        ostr[1] = SP_T('\0');
       }
       message((opt == '-') ? CmdLineAppMessages::ambiguousOptionError
                : ((opt == '=') ? CmdLineAppMessages::erroneousOptionArgError
                : ((opt == ':') ? CmdLineAppMessages::missingOptionArgError
                : CmdLineAppMessages::invalidOptionError)),
 	      StringMessageArg(convertInput(ostr)));
-      message(CmdLineAppMessages::usage,
-	      StringMessageArg(usageString()));
+      usage();
       return 1;
     default:
       processOption(opt, options.arg());
@@ -315,6 +382,9 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
     message(CmdLineAppMessages::versionInfo,
 	    StringMessageArg(convertInput(SP_T(SP_PACKAGE))),
 	    StringMessageArg(convertInput(SP_T(SP_VERSION))));
+    break;
+  case 'h':
+    usage();
     break;
   default:
     CANNOT_HAPPEN();

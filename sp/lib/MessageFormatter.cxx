@@ -61,14 +61,14 @@ void MessageFormatter::formatOpenElements(const Vector<OpenElementInfo> &openEle
 
 void MessageFormatter::formatMessage(const MessageFragment &frag,
 				     const Vector<CopyOwner<MessageArg> > &args,
-				     OutputCharStream &os)
+				     OutputCharStream &os, bool noquote)
 {
   StringC text;
   if (!getMessageText(frag, text)) {
     formatFragment(MessageFormatterMessages::invalidMessage, os);
     return;
   }
-  Builder builder(this, os, text.size() == 2);
+  Builder builder(this, os, noquote || (text.size() == 2));
   size_t i = 0;
   while (i < text.size()) {
     if (text[i] == '%') {

@@ -77,21 +77,19 @@ NsgmlsApp::NsgmlsApp()
   outputFlags_(0),
   rastOption_(0)
 {
-  registerOption('B');
-  registerOption('d');
-  registerOption('l');
-  registerOption('m', SP_T("catalog_sysid"));
-  registerOption('o', SP_T("output_option"));
-  registerOption('p');
-  registerOption('r');
-  registerOption('s');
-  registerOption('t', SP_T("rast_file"));
-  registerOption('u');
-  registerLongOption(SP_T("batch-mode"), 'B');
-  registerLongOption(SP_T("output-option"), 'o', SP_T("option"));
-  registerLongOption(SP_T("only-prolog"), 'p');
-  registerLongOption(SP_T("no-output"), 's');
-  registerLongOption(SP_T("rast-file"), 't', SP_T("file"));
+  registerOption('B', SP_T("batch-mode"), NsgmlsMessages::BHelp);
+  registerOption('o', SP_T("option"), NsgmlsMessages::option,
+                 NsgmlsMessages::oHelp);
+  registerOption('p', SP_T("only-prolog"), NsgmlsMessages::pHelp);
+  registerOption('s', SP_T("no-output"), NsgmlsMessages::sHelp);
+  registerOption('t', SP_T("rast-file"), NsgmlsMessages::file,
+                 NsgmlsMessages::tHelp);
+  // FIXME treat these as aliases
+  registerOption('d', 0, NsgmlsMessages::dHelp);
+  registerOption('l', 0, NsgmlsMessages::lHelp);
+  registerOption('m', 0, NsgmlsMessages::mHelp);
+  registerOption('r', 0, NsgmlsMessages::rHelp);
+  registerOption('u', 0, NsgmlsMessages::uHelp);
 }
 
 void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)

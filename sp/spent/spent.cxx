@@ -7,6 +7,7 @@
 #include "EntityApp.h"
 #include "InputSource.h"
 #include "OutputCharStream.h"
+#include "SpentMessages.h"
 
 #ifdef SP_NAMESPACE
 using namespace SP_NAMESPACE;
@@ -27,10 +28,8 @@ SP_DEFINE_APP(SpentApp)
 SpentApp::SpentApp()
 : rawOutput_(0), isNdata_(0)
 {
-  registerOption('n');
-  registerOption('r');
-  registerLongOption(SP_T("non-sgml"), 'n');
-  registerLongOption(SP_T("raw"), 'r');
+  registerOption('n', SP_T("non-sgml"), SpentMessages::nHelp);
+  registerOption('r', SP_T("raw"), SpentMessages::rHelp);
 }
 
 void SpentApp::processOption(AppChar opt, const AppChar *arg)

@@ -8,6 +8,7 @@
 #pragma interface
 #endif
 
+#include <limits.h>
 #include <stddef.h>
 
 #ifndef SP_API
@@ -17,10 +18,10 @@
 class SP_API SGMLApplication {
 public:
 #ifdef SP_MULTI_BYTE
-#ifdef SP_WCHAR_T_USHORT
-  typedef wchar_t Char;
+#if UINT_MAX >= 0xffffffffL /* 2^32 - 1 */
+  typedef unsigned int Char;
 #else
-  typedef unsigned short Char;
+  typedef unsigned long Char;
 #endif
 #else
   typedef unsigned char Char;

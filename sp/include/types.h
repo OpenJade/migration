@@ -13,8 +13,10 @@ namespace SP_NAMESPACE {
 
 #if UINT_MAX >= 0xffffffffL /* 2^32 - 1 */
 typedef unsigned int Unsigned32;
+typedef int Signed32;
 #else
 typedef unsigned long Unsigned32;
+typedef long Signed32;
 #endif
 
 // Number holds values between 0 and 99999999 (eight nines).
@@ -24,17 +26,8 @@ typedef Unsigned32 Index;
 
 #ifdef SP_MULTI_BYTE
 
-#ifdef SP_WCHAR_T_USHORT
-typedef wchar_t Char;
-#else
-typedef unsigned short Char;
-#endif
-
-#if INT_MAX > 65535L
-typedef int Xchar;
-#else /* INT_MAX <= 65535L */
-typedef long Xchar;
-#endif /* INT_MAX <= 65535L */
+typedef Unsigned32 Char;
+typedef Signed32 Xchar;
 
 #else /* not SP_MULTI_BYTE */
 

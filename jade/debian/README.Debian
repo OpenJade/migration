@@ -1,7 +1,7 @@
 openjade and opensp for Debian
 ------------------------------
 
-This document covers the Debian version of OpenJade and the OpenSP suite.
+This document covers the Debian version of the OpenSP suite.
 
 Note that the default search paths compiled into this system are
 equivalent to setting the following environment variables as shown:

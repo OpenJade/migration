@@ -1,8 +1,0 @@
-Makefile
-Makefile.in
-POTFILES
-*.pot
-*.gmo
-*.mo
-cat-id-tbl.c
-stamp-cat-id

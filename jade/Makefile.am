@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-AUTOMAKE_OPTIONS = check-news dist-zip
+AUTOMAKE_OPTIONS = check-news
 
 ## FIXME groveoa is missing, since an .am with only EXTRA_DIST doesn't work.
 SUBDIRS = jadedoc dsssl grove spgrove style jade intl po
@@ -25,3 +25,7 @@ dist-hook:
 	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
         fi
 	
+dist-zip: dist-dir
+	-chmod -R a+r $(distdir)
+	zip -rql $(distdir).zip $(distdir)
+	-rm -rf $(distdir)

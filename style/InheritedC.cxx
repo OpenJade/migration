@@ -1487,6 +1487,41 @@ void Interpreter::installInheritedCs()
 
   // #f or inline-space
   INHERITED_C("inline-space-space", GenericOptInlineSpaceInheritedC, &FOTBuilder::setInlineSpaceSpace);
+
+  //page-sequence IC 
+  INHERITED_C("page-category", GenericSymbolInheritedC, &FOTBuilder::setPageCategory);
+  INHERITED_C("force-last-page", GenericSymbolInheritedC, &FOTBuilder::setForceLastPage);
+  INHERITED_C("force-first-page", GenericSymbolInheritedC, &FOTBuilder::setForceFirstPage);
+  INHERITED_C("first-page-type", GenericSymbolInheritedC, &FOTBuilder::setFirstPageType);
+  INHERITED_C2("justify-spread?", GenericBoolInheritedC, &FOTBuilder::setJustifySpread, 0);
+  INHERITED_C("binding-edge", GenericSymbolInheritedC, &FOTBuilder::setBindingEdge);
+
+  //anchor IC 
+  INHERITED_C2("anchor-keep-with-previous?", GenericBoolInheritedC, &FOTBuilder::setAnchorKeepWithPrevious, 0);
+  
+  //included-container-area IC
+  INHERITED_C("contents-alignment", GenericSymbolInheritedC, &FOTBuilder::setContentsAlignment);
+  INHERITED_C("overflow-action", GenericSymbolInheritedC, &FOTBuilder::setOverflowAction);
+
+  //glyph-annotation IC
+  INHERITED_C("annotation-glyph-placement", GenericSymbolInheritedC, &FOTBuilder::setAnnotationGlyphPlacement);
+  INHERITED_C("annotation-glyph-style", GenericPublicIdInheritedC, &FOTBuilder::setAnnotationGlyphStyle);
+
+  //multi-line-inline-note IC
+  INHERITED_C2("inline-note-line-count", GenericIntegerInheritedC, &FOTBuilder::setInlineNoteLineCount, 2);
+  INHERITED_C("inline-note-style", GenericPublicIdInheritedC, &FOTBuilder::setInlineNoteStyle);
+
+  //emphasizing-mark IC
+  INHERITED_C("mark-distribution", GenericSymbolInheritedC, &FOTBuilder::setMarkDistribution);
+  INHERITED_C("mark-style", GenericPublicIdInheritedC, &FOTBuilder::setMarkStyle);
+
+  //side-by-side IC
+  INHERITED_C("side-by-side-overlap-control", GenericSymbolInheritedC, &FOTBuilder::setSideBySideOverlapControl);
+  
+  //side-by-side-item IC
+  INHERITED_C("side-by-side-pre-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePreAlign);
+  INHERITED_C("side-by-side-post-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePostAlign);
+ 
   // integers
   // float
   IGNORED_C("line-miter-limit", makeInteger(10));

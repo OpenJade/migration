@@ -152,6 +152,32 @@ public:
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
+  //page-sequence IC
+  void setPageCategory(Symbol);
+  void setForceLastPage(Symbol);
+  void setForceFirstPage(Symbol);
+  void setFirstPageType(Symbol);
+  void setJustifySpread(bool);
+  void setBindingEdge(Symbol);
+  //For anchor
+  void setAnchorKeepWithPrevious(bool);
+  //For included-container-area
+  void setContentsAlignment(Symbol);
+  void setOverflowAction(Symbol);
+  //For glyph-annotation
+  void setAnnotationGlyphPlacement(Symbol);
+  void setAnnotationGlyphStyle(PublicId);
+  //For multi-line-inline-note
+  void setInlineNoteLineCount(long);
+  void setInlineNoteStyle(PublicId);
+  //For emphasizing-mark
+  void setMarkDistribution(Symbol);
+  void setMarkStyle(PublicId);
+  //For side-by-side
+  void setSideBySideOverlapControl(Symbol);
+  //For side-by-side-item
+  void setSideBySidePreAlign(Symbol);
+  void setSideBySidePostAlign(Symbol);
 
   void paragraphBreak(const ParagraphNIC &);
   void characters(const Char *, size_t);
@@ -163,6 +189,51 @@ public:
 
   void startSimplePageSequenceSerial();
   void endSimplePageSequenceSerial();
+
+  //column-set-sequence
+  void startColumnSetSequenceSerial(const DisplayNIC &); 
+  void endColumnSetSequenceSerial();
+  //page-sequence
+  void startPageSequenceSerial();
+  void endPageSequenceSerial();
+  //emphasizing-mark
+  void startEmphasizingMarkSerial(const EmphasizingMarkNIC &);
+  void endEmphasizingMarkSerial();
+  void startEmphasizingMarkMark();
+  void endEmphasizingMarkMark();
+  void endAllEmphasizingMarkMark();
+  
+  //glyph-annotation
+  void startGlyphAnnotation(const GlyphAnnotationNIC &);
+  void endGlyphAnnotation();
+
+  //embedded-text  
+  void startEmbeddedText(const EmbeddedTextNIC &);
+  void endEmbeddedText();
+  //included-container-area
+  void startIncludedContainerArea(const IncludedContainerAreaNIC &nic);
+  void endIncludedContainerArea();
+  //aligned-column
+  void startAlignedColumn(const DisplayNIC &nic);
+  void endAlignedColumn();
+  //multi-line-inline-note
+  //llamadas desde serial:
+  void startMultiLineInlineNoteSerial(const MultiLineInlineNoteNIC &nic);
+  void endMultiLineInlineNoteSerial();
+  //multi-line-inline-note.open/close
+  void startMultiLineInlineNoteOpenClose(int);
+  void endMultiLineInlineNoteOpenClose(int);
+  void endAllMultiLineInlineNoteOpenClose();
+  //side-by-side
+  void startSideBySide(const DisplayNIC &nic);
+  void endSideBySide();
+  //side-by-side-item
+  void startSideBySideItem();
+  void endSideBySideItem();
+
+  //anchor
+  void anchor(const AnchorNIC &);
+
   void pageNumber();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
@@ -311,6 +382,21 @@ private:
   void flushPendingElements();
   void outputElementName(unsigned long groveIndex, const Char *, size_t);
   void outputElementName(const NodePtr &node);
+
+  //embedded-text
+  void embeddedTextNIC(const EmbeddedTextNIC &nic);
+  //anchor
+  void anchorNIC(const AnchorNIC &nic);
+  //included-container-area
+  void includedContainerAreaNIC(const IncludedContainerAreaNIC &nic);
+  //multi-line-inline-note
+  void multiLineInlineNoteNIC(const MultiLineInlineNoteNIC &nic);
+  //emphasizing-mark
+  void emphasizingMarkNIC(const EmphasizingMarkNIC &nic);
+  //glyph-annotation
+  void glyphAnnotationNIC(const GlyphAnnotationNIC &nic);
+
+
   static bool nodeIsElement(const NodePtr &node) {
     GroveString gi;
     return node->getGi(gi) == accessOK;
@@ -328,7 +414,8 @@ private:
   unsigned nPendingElementsNonEmpty_;
   unsigned nodeLevel_;
   bool suppressAnchors_;
-  StringC hf_[nHF];
+  //array de strings donde se guardaran los unlabeled sosofos
+  StringC hf_[nHF], oc_[2], em[1];
 };
 
 const char RE = '\r';
@@ -1192,7 +1279,7 @@ void SgmlFOTBuilder::setBorderPresent(bool b)
 
 void SgmlFOTBuilder::setInhibitLineBreaks(bool b)
 {
-  boolC("border-present", b);
+  boolC("inhibit-line-breaks?", b);
 }
 
 void SgmlFOTBuilder::setHyphenate(bool b)
@@ -1350,6 +1437,106 @@ void SgmlFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> >
   ics_ << quot;
 }
 
+
+//For page-sequence
+void SgmlFOTBuilder::setPageCategory(Symbol sym)
+{
+ symbolC("page-category", sym);
+}
+
+void SgmlFOTBuilder::setForceLastPage(Symbol sym)
+{
+  symbolC("force-last-page", sym);
+}
+
+void SgmlFOTBuilder::setForceFirstPage(Symbol sym)
+{
+  symbolC("force-first-page", sym);
+}
+
+void SgmlFOTBuilder::setFirstPageType(Symbol sym)
+{
+  symbolC("first-page-type", sym);
+}
+
+void SgmlFOTBuilder::setJustifySpread(bool b)
+{
+  boolC("jystify-spread", b);
+}
+
+void SgmlFOTBuilder::setBindingEdge(Symbol sym)
+{
+  symbolC("binding-edge", sym);
+}
+
+//For anchor
+void SgmlFOTBuilder::setAnchorKeepWithPrevious(bool b)
+{
+  boolC("anchor-keep-with-previous", b);
+}
+
+//For included-container-area
+void SgmlFOTBuilder::setContentsAlignment(Symbol sym)
+{
+  symbolC("contents-alignment", sym);
+}
+
+void SgmlFOTBuilder::setOverflowAction(Symbol sym)
+{
+  symbolC("overflow-action", sym);
+}
+
+//For glyph-annotation
+void SgmlFOTBuilder::setAnnotationGlyphPlacement(Symbol sym)
+{
+  symbolC("annotation-glyph-placement", sym);
+}
+
+void SgmlFOTBuilder::setAnnotationGlyphStyle(PublicId pubid)
+{
+  publicIdC("annotation-glyph-style", pubid);
+}
+
+//For multi-line-inline-note
+void SgmlFOTBuilder::setInlineNoteLineCount(long n)
+{
+  integerC("inline-note-line-count", n);
+}
+
+void SgmlFOTBuilder::setInlineNoteStyle(PublicId pubid)
+{
+  publicIdC("inline-note-style", pubid);
+}
+
+//For emphasizing-mark
+void SgmlFOTBuilder::setMarkDistribution(Symbol sym)
+{
+  symbolC("mark-distribution", sym);
+}
+
+void SgmlFOTBuilder::setMarkStyle(PublicId pubid)
+{
+  publicIdC("mark-style", pubid);
+}
+
+//For side-by-side
+void SgmlFOTBuilder::setSideBySideOverlapControl(Symbol sym)
+{
+  symbolC("side-by-side-overlap-control", sym);
+}
+
+//For side-by-side-item
+void SgmlFOTBuilder::setSideBySidePreAlign(Symbol sym)
+{
+  symbolC("side-by-side-pre-align", sym);
+}
+
+void SgmlFOTBuilder::setSideBySidePostAlign(Symbol sym)
+{
+  symbolC("side-by-side-post-align", sym);
+}
+
+
 void SgmlFOTBuilder::inlineSpaceC(const char *s, const InlineSpace &is)
 {
   if (is.nominal || is.min || is.max) {
@@ -1404,6 +1591,110 @@ void SgmlFOTBuilder::displaySpaceNIC(const char *s, const DisplaySpace &ds)
 }
 
 void SgmlFOTBuilder::inlineNIC(const InlineNIC &nic)
+{
+  if (nic.breakBeforePriority)
+    os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
+  if (nic.breakAfterPriority)
+    os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
+}
+
+//embedded-text
+void SgmlFOTBuilder::embeddedTextNIC(const EmbeddedTextNIC &nic)
+{
+  if (nic.Direction != symbolFalse)
+    os() << " direction=" << quot << nic.Direction  << quot;
+}
+
+//anchor
+void SgmlFOTBuilder::anchorNIC(const AnchorNIC &nic)
+{
+  if (nic.IsDisplay)
+    os() << " display=" << quot << trueString  << quot;
+  inlineNIC(nic); 
+}
+
+//included-container-area
+void SgmlFOTBuilder::includedContainerAreaNIC(const IncludedContainerAreaNIC &nic)
+{
+  if (nic.EscapementDirection != symbolFalse)
+    os() << " escapement-direction=" << quot << nic.EscapementDirection  << quot;
+  if (nic.IsDisplay)
+    os() << " display=" << quot << trueString  << quot;
+  if (nic.scaleType != symbolFalse)
+    os() << " scale=" << quot << nic.scaleType << quot;
+  else
+    os() << " scale-x=" << quot << nic.scale[0] << quot
+         << " scale-y=" << quot << nic.scale[1] << quot;
+  switch (nic.widthType) {
+   case IncludedContainerAreaNIC::widthExplicit:
+     os() << " width=" << quot << nic.width << quot;
+     break;
+   case IncludedContainerAreaNIC::widthMinimum:
+     os() << " minimum-width=" << quot << trueString << quot;
+     break;
+   default:
+     break;
+  }
+  switch (nic.heightType) {
+   case IncludedContainerAreaNIC::heightExplicit:
+     os() << " height=" << quot << nic.height << quot;
+     break;
+   case IncludedContainerAreaNIC::heightMinimum:
+     os() << " minimum-height=" << quot << trueString << quot;
+     break;
+   default:
+     break;
+  }
+  if (nic.contentsRotation)
+    os() << " contents-rotation=" << quot << nic.contentsRotation << quot;
+  if (nic.positionPointX)
+    os() << " position-point-x=" << quot << nic.positionPointX << quot;
+  if (nic.positionPointY)
+    os() << " position-point-y=" << quot << nic.positionPointY << quot;
+  if (nic.breakBeforePriority)
+    os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
+  if (nic.breakAfterPriority)
+    os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
+  if (nic.keepWithPrevious)
+    os() << " keep-with-previous=" << quot << trueString << quot;
+  if (nic.keepWithNext)
+    os() << " keep-with-next=" << quot << trueString << quot;
+  if (nic.mayViolateKeepBefore)
+    os() << " may-violate-keep-before=" << quot << trueString << quot;
+  if (nic.mayViolateKeepAfter)
+    os() << " may-violate-keep-after=" << quot << trueString << quot;
+  if (nic.positionPreference != symbolFalse)
+    os() << " position-preference=" << quot << nic.positionPreference << quot;
+  if (nic.keep != symbolFalse)
+    os() << " keep=" << quot << nic.keep << quot;
+  if (nic.breakBefore != symbolFalse)
+    os() << " break-before=" << quot << nic.breakBefore << quot;
+  if (nic.breakAfter != symbolFalse)
+    os() << " break-after=" << quot << nic.breakAfter << quot;
+  displaySpaceNIC("space-before", nic.spaceBefore);
+  displaySpaceNIC("space-after", nic.spaceAfter);
+}
+
+//multi-line-inline-note
+void SgmlFOTBuilder::multiLineInlineNoteNIC(const MultiLineInlineNoteNIC &nic)
+{
+  if (nic.breakBeforePriority)
+    os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
+  if (nic.breakAfterPriority)
+    os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
+}
+
+//emphasizing-mark
+void SgmlFOTBuilder::emphasizingMarkNIC(const EmphasizingMarkNIC &nic)
+{
+  if (nic.breakBeforePriority)
+    os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
+  if (nic.breakAfterPriority)
+    os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
+}
+
+//glyph-annotation
+void SgmlFOTBuilder::glyphAnnotationNIC(const GlyphAnnotationNIC &nic)
 {
   if (nic.breakBeforePriority)
     os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
@@ -1676,6 +1967,210 @@ void SgmlFOTBuilder::endAllSimplePageSequenceHeaderFooter()
     }
   }
 
+}
+
+//column-set-sequence
+void SgmlFOTBuilder::startColumnSetSequenceSerial(const DisplayNIC &nic)
+{
+  os() << "<column-set-sequence";
+  displayNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endColumnSetSequenceSerial()
+{
+  endFlow("column-set-sequence");
+}
+
+//embedded-text
+void SgmlFOTBuilder::startEmbeddedText(const EmbeddedTextNIC &nic)
+{
+  os() << "<embedded-text";
+  embeddedTextNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endEmbeddedText()
+{
+  endFlow("embedded-text");
+}
+
+//included-container-area
+void SgmlFOTBuilder::startIncludedContainerArea(const IncludedContainerAreaNIC &nic)
+{
+  os() << "<included-container-area";
+  includedContainerAreaNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endIncludedContainerArea()
+{
+  endFlow("included-container-area");
+}
+
+//aligned-column
+void SgmlFOTBuilder::startAlignedColumn(const DisplayNIC &nic)
+{
+  os() << "<aligned-column";
+  displayNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endAlignedColumn()
+{
+  endFlow("aligned-column");
+}
+
+//multi-line-inline-note
+void SgmlFOTBuilder::startMultiLineInlineNoteSerial(const MultiLineInlineNoteNIC &nic)
+{
+  os() << "<multi-line-inline-note";
+  multiLineInlineNoteNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+  suppressAnchors_ = 1;
+  curOs_ = &hfs_;
+}
+
+void SgmlFOTBuilder::startMultiLineInlineNoteOpenClose(int cual)
+{
+}
+
+void SgmlFOTBuilder::endMultiLineInlineNoteOpenClose(int cual)
+{
+  //en oc_ se guarda el string actual, saber si hay o no
+  hfs_.extractString(oc_[cual]);
+}
+
+void SgmlFOTBuilder::endAllMultiLineInlineNoteOpenClose()
+{
+ curOs_ = os_.pointer();
+ suppressAnchors_ = 0;
+ for (int i = 0; i < 2; i++){
+  const StringC &str = oc_[i];
+  if ((str.size() != 0) && (i == 0)){
+   startSimpleFlowObj("multi-line-inline-note.open");
+   os() << str ;
+   endFlow("multi-line-inline-note.open");
+  }
+  else{
+   if (str.size() != 0) {
+    startSimpleFlowObj("multi-line-inline-note.close");
+    os() << str ;
+    endFlow("multi-line-inline-note.close");
+   }
+  }
+ }
+}
+
+void SgmlFOTBuilder::endMultiLineInlineNoteSerial()
+{
+  endFlow("multi-line-inline-note");
+}
+
+//side-by-side
+void SgmlFOTBuilder::startSideBySide(const DisplayNIC &nic)
+{
+  os() << "<side-by-side";
+  displayNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endSideBySide()
+{
+  endFlow("side-by-side");
+}
+
+//side-by-side-itme
+void SgmlFOTBuilder::startSideBySideItem()
+{
+  os() << "<side-by-side-item";
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endSideBySideItem()
+{
+  endFlow("side-by-side-item");
+}
+
+//anchor
+void SgmlFOTBuilder::anchor(const AnchorNIC &nic)
+{
+  //flushPendingElements();
+  os() << "<anchor";
+  anchorNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+//page-sequence
+void SgmlFOTBuilder::startPageSequenceSerial()
+{
+  os() << "<page-sequence";
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endPageSequenceSerial()
+{
+  endFlow("page-sequence");
+}
+
+//glyph-annotation
+void SgmlFOTBuilder::startGlyphAnnotation(const GlyphAnnotationNIC &nic)
+{
+  os() << "<glyph-annotation";
+  glyphAnnotationNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+}
+
+void SgmlFOTBuilder::endGlyphAnnotation()
+{
+  endFlow("glyph-annotation");
+}
+
+//emphasizing-mark
+void SgmlFOTBuilder::startEmphasizingMarkSerial(const EmphasizingMarkNIC &nic)
+{
+  os() << "<emphasizing-mark";
+  emphasizingMarkNIC(nic);
+  outputIcs();
+  os() << "/>" << RE;
+  suppressAnchors_ = 1;
+  curOs_ = &hfs_;
+}
+
+void SgmlFOTBuilder::startEmphasizingMarkMark()
+{
+}
+
+void SgmlFOTBuilder::endEmphasizingMarkMark()
+{
+  hfs_.extractString(em[0]);
+}
+
+void SgmlFOTBuilder::endAllEmphasizingMarkMark()
+{
+  curOs_ = os_.pointer();
+  suppressAnchors_ = 0;
+  const StringC &str = em[0];
+  if (str.size() != 0){
+   startSimpleFlowObj("emphasizing-mark.mark");
+   os() << str;
+   endFlow("emphasizing-mark.mark");
+  } 
+}
+
+void SgmlFOTBuilder::endEmphasizingMarkSerial()
+{
+  endFlow("emphasizing-mark");
 }
 
 void SgmlFOTBuilder::pageNumber()

@@ -368,6 +368,12 @@ void Interpreter::installSyntacticKeys()
     { "matrix-lmn", Identifier::keyMatrixLmn },
     { "matrix-a", Identifier::keyMatrixA },
     { "architecture", Identifier::keyArchitecture },
+    { "height", Identifier::keyHeight },
+    { "contents-rotation", Identifier::keyContentsRotation },
+    { "open", Identifier::keyOpen },
+    { "close", Identifier::keyClose },
+    { "mark", Identifier::keyMark },
+    { "direction", Identifier::keyDirection },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },

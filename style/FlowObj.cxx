@@ -6,6 +6,17 @@
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
 #include "SosofoObj.h"
+#include "ColumnSetSequence.h"
+#include "PageSequence.h"
+#include "Anchor.h"
+#include "EmbeddedText.h"
+#include "GlyphAnnotation.h"
+#include "MultiLineInlineNote.h"
+#include "IncludedContainerArea.h"
+#include "AlignedColumn.h"
+#include "EmphasizingMark.h"
+#include "SideBySide.h"
+#include "SideBySideItem.h"
 #include "macros.h"
 
 #ifdef DSSSL_NAMESPACE
@@ -99,6 +110,7 @@ bool FlowObj::setDisplayNIC(FOTBuilder::DisplayNIC &nic,
   static FOTBuilder::Symbol breakVals[] = {
     FOTBuilder::symbolFalse,
     FOTBuilder::symbolPage,
+    FOTBuilder::symbolPageRegion,
     FOTBuilder::symbolColumnSet,
     FOTBuilder::symbolColumn
   };
@@ -2980,6 +2992,28 @@ void Interpreter::installFlowObjs()
   FLOW_OBJ(SidelineFlowObj, "sideline");
   // simple-page
   FLOW_OBJ(SimplePageSequenceFlowObj, "simple-page-sequence");
+  //page-sequence
+  FLOW_OBJ(PageSequenceFlowObj, "page-sequence");
+  //column-set-sequence
+  FLOW_OBJ(ColumnSetSequenceFlowObj, "column-set-sequence");
+  //embedded-text
+  FLOW_OBJ(EmbeddedTextFlowObj, "embedded-text");
+  //anchor
+  FLOW_OBJ(AnchorFlowObj, "anchor");
+  //include-container-area
+  FLOW_OBJ(IncludedContainerAreaFlowObj, "included-container-area");
+  //glyph-annotation
+  FLOW_OBJ(GlyphAnnotationFlowObj, "glyph-annotation");
+  //side-by-side
+  FLOW_OBJ(SideBySideFlowObj, "side-by-side");
+  //side-by-side-item
+  FLOW_OBJ(SideBySideItemFlowObj, "side-by-side-item");
+  //aligned-column
+  FLOW_OBJ(AlignedColumnFlowObj, "aligned-column");
+  //multi-line-inline-note
+  FLOW_OBJ(MultiLineInlineNoteFlowObj, "multi-line-inline-note");
+  //emphasizing-mark
+  FLOW_OBJ(EmphasizingMarkFlowObj, "emphasizing-mark");
   // tables
   FLOW_OBJ(TableFlowObj, "table");
   FLOW_OBJ(TablePartFlowObj, "table-part");

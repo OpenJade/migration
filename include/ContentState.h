@@ -41,7 +41,8 @@ public:
   Mode contentMode() const;
   ElementType *lookupCreateUndefinedElement(const StringC &,
 					    const Location &,
-					    Dtd &);
+					    Dtd &,
+					    Boolean allowImmediateRecursion = 1);
   Boolean checkImplyLoop(unsigned);
   static const ShortReferenceMap theEmptyMap;
 private:

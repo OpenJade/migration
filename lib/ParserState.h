@@ -183,7 +183,7 @@ public:
   IdTableIter idTableIter();
   const ParserOptions &options() const;
   void enableImplydef();
-  Boolean implydefElement();
+  Sd::ImplydefElement implydefElement();
   Boolean implydefAttlist();
   void keepMessages();
   void releaseKeptMessages();
@@ -287,7 +287,7 @@ private:
   Markup markup_;
   Location markupLocation_;
   Boolean hadAfdrDecl_;
-  Boolean implydefElement_;
+  Sd::ImplydefElement implydefElement_;
   Boolean implydefAttlist_;
   const volatile sig_atomic_t *cancelPtr_;
   static sig_atomic_t dummyCancel_;
@@ -695,7 +695,7 @@ const ParserOptions &ParserState::options() const
 }
 
 inline
-Boolean ParserState::implydefElement()
+Sd::ImplydefElement ParserState::implydefElement()
 {
   return implydefElement_;
 }
@@ -709,7 +709,7 @@ Boolean ParserState::implydefAttlist()
 inline
 void ParserState::enableImplydef()
 {
-  implydefElement_ = 1;
+  implydefElement_ = Sd::implydefElementYes;
   implydefAttlist_ = 1;
 }
 

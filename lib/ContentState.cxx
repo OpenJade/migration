@@ -145,15 +145,18 @@ void ContentState::getOpenElementInfo(Vector<OpenElementInfo> &v,
 ElementType *
 ContentState::lookupCreateUndefinedElement(const StringC &name,
 					   const Location &loc,
-					   Dtd &dtd)
+					   Dtd &dtd,
+					   Boolean allowImmediateRecursion)
 {
   ElementType *p = new ElementType(name,
 				   dtd.allocElementTypeIndex());
   dtd.insertUndefinedElementType(p);
   p->setElementDefinition(new ElementDefinition(loc,
 						size_t(ElementDefinition::undefinedIndex),
-						0,
-						ElementDefinition::any),
+						ElementDefinition::omitEnd,
+						ElementDefinition::any,
+						allowImmediateRecursion
+						),
 			  0);
   p->setAttributeDef(dtd.implicitElementAttributeDef());
 

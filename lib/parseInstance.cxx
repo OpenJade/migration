@@ -336,6 +336,18 @@ void Parser::handleShortref(int index)
   const ConstPtr<Entity> &entity
     = currentElement().map()->entity(index);
   if (!entity.isNull()) {
+    switch (sd().entityRef()) {
+    case Sd::entityRefNone:
+      if (!entity->isPredefined())
+	message(ParserMessages::entityRefNone);
+      break;
+    case Sd::entityRefInternal:
+      if (entity->asExternalEntity()) 
+	message(ParserMessages::entityRefInternal);
+      break;
+    default:
+      break;
+    }
     Owner<Markup> markupPtr;
     if (eventsWanted().wantInstanceMarkup()) {
       markupPtr = new Markup;
@@ -429,7 +441,7 @@ void Parser::parseStartTag()
       handleRankedElement(e);
   }
   if (!e)
-    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst());
+    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst(), (implydefElement() != Sd::implydefElementAnyother));
   Boolean netEnabling;
   AttributeList *attributes = allocAttributeList(e->attributeDef(), 0);
   Token closeToken = getToken(tagMode);
@@ -621,7 +633,7 @@ void Parser::acceptStartTag(const ElementType *e,
 			    StartElementEvent *event,
 			    Boolean netEnabling)
 {
-  if (e->definition()->undefined() && !implydefElement())
+  if (e->definition()->undefined() && (implydefElement() == Sd::implydefElementNo))
     message(ParserMessages::undefinedElement, StringMessageArg(e->name()));
   if (elementIsExcluded(e)) {
     keepMessages();
@@ -653,7 +665,7 @@ void Parser::acceptStartTag(const ElementType *e,
   if (validate() && !e->definition()->undefined())
     handleBadStartTag(e, event, netEnabling);
   else {
-    if (validate() ? implydefElement() : afterDocumentElement())
+    if (validate() ? (implydefElement() != Sd::implydefElementNo) : afterDocumentElement())
       message(ParserMessages::elementNotAllowed, StringMessageArg(e->name()));
     // If element couldn't occur because it was excluded, then
     // do the transition here.
@@ -996,7 +1008,7 @@ EndElementEvent *Parser::parseEndTag()
       e = completeRankStem(name);
   }
   if (!e) 
-    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst());
+    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst(), (implydefElement() != Sd::implydefElementAnyother));
   parseEndTagClose();
   return new (eventAllocator())
 	       EndElementEvent(e,

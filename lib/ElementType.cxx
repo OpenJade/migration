@@ -21,11 +21,13 @@ ElementType::ElementType(const StringC &name, size_t index)
 ElementDefinition::ElementDefinition(const Location &location,
 				     size_t index,
 				     unsigned char omitFlags,
-				     DeclaredContent declaredContent)
+				     DeclaredContent declaredContent,
+				     Boolean allowImmediateRecursion)
 : location_(location),
   index_(index),
   omitFlags_(omitFlags),
-  declaredContent_(declaredContent)
+  declaredContent_(declaredContent),
+  allowImmediateRecursion_(allowImmediateRecursion)
 {
   computeMode();
 }

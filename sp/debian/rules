@@ -188,7 +188,7 @@ install-opensp:	$(install-common) debian/README.Debian
 
 #	 install man pages
 	dh_undocumented -p$(pkg) onsgmls.1 osgmlnorm.1 ospam.1 ospcat.1	\
-	    ospent.1 osx.1
+	    ospent.1 osx.1 ospcat.1
 
 #	 install control files
 	dh_installdeb -p$(pkg)

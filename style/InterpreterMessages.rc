@@ -130,4 +130,6 @@ BEGIN
   127, "characteristic %1 already defined in same part"
   128, "first definition was here"
   129, "flow object class %1 already defined in same part"
+  130, "first definition was here"
+  131, "mode %1 not defined"
 END

@@ -88,6 +88,8 @@ public:
   const Rule *findMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
 			Specificity &) const;
   void compile(Interpreter &);
+  bool defined() const;
+  void setDefined();
 
   struct ElementRules : public Named {
   public:
@@ -118,7 +120,21 @@ private:
   IList<ElementRule> elementRules_[nRuleType];
   NCVector<GroveRules> groveRules_;
   const ProcessingMode *initial_; // 0 for initial mode
+  bool defined_;
 };
+
+
+inline
+bool ProcessingMode::defined() const
+{
+  return defined_;
+}
+
+inline
+void ProcessingMode::setDefined()
+{
+  defined_ = 1;
+}
 
 inline
 ProcessingMode::Specificity::Specificity()

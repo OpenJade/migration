@@ -824,7 +824,7 @@ RtfFOTBuilder::RtfFOTBuilder(OutputByteStream *os,
       if (c) {
 	if (!charTable_[c])
 	  charTable_.setChar(c, (j + 0x80) | (1 << (i + CHAR_TABLE_CHAR_BITS)));
-	else if ((charTable_[i] & ((1 << CHAR_TABLE_CHAR_BITS) - 1)) == (j + 0x80))
+	else if ((charTable_[c] & ((1 << CHAR_TABLE_CHAR_BITS) - 1)) == (j + 0x80))
 	  charTable_.setChar(c, charTable_[c] | (1 << (i + CHAR_TABLE_CHAR_BITS)));
       }
     }
@@ -2244,6 +2244,7 @@ void RtfFOTBuilder::startSimplePageSequence()
   outputFormat_ = OutputFormat();
   doBreak_ = breakNone;
   suppressBookmarks_ = 1;
+  accumSpace_ = 0;
 }
 
 void RtfFOTBuilder::endSimplePageSequence()

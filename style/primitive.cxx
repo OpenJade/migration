@@ -2138,13 +2138,34 @@ DEFPRIMITIVE(StringToNumber, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NumberToString, argc, argv, context, interp, loc)
 {
-  // FIXME use optional radix
   double x;
   if (!argv[0]->realValue(x))
     return argError(interp, loc,
 		    InterpreterMessages::notANumber, 0, argv[0]);
+  unsigned radix;
+  if (argc > 1) {
+    long r;
+    if (!argv[1]->exactIntegerValue(r))
+      return argError(interp, loc,
+		      InterpreterMessages::notAnExactInteger, 1, argv[1]);
+    switch (r) {
+    case 2:
+    case 8:
+    case 10:
+    case 16:
+      radix = unsigned(r);
+      break;
+    default:
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::invalidRadix);
+      radix = 10;
+      break;
+    }
+  }
+  else
+    radix = 10;
   StrOutputCharStream os;
-  argv[0]->print(interp, os);
+  argv[0]->print(interp, os, radix);
   StringC tem;
   os.extractString(tem);
   return new (interp) StringObj(tem);
@@ -2152,15 +2173,36 @@ DEFPRIMITIVE(NumberToString, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(QuantityToString, argc, argv, context, interp, loc)
 {
-  // FIXME use optional radix
   long lResult;
   double dResult;
   int dim;
   if (argv[0]->quantityValue(lResult, dResult, dim) == ELObj::noQuantity)
     return argError(interp, loc,
 		    InterpreterMessages::notAQuantity, 0, argv[0]);
+  unsigned radix;
+  if (argc > 1) {
+    long r;
+    if (!argv[1]->exactIntegerValue(r))
+      return argError(interp, loc,
+		      InterpreterMessages::notAnExactInteger, 1, argv[1]);
+    switch (r) {
+    case 2:
+    case 8:
+    case 10:
+    case 16:
+      radix = unsigned(r);
+      break;
+    default:
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::invalidRadix);
+      radix = 10;
+      break;
+    }
+  }
+  else
+    radix = 10;
   StrOutputCharStream os;
-  argv[0]->print(interp, os);
+  argv[0]->print(interp, os, radix);
   StringC tem;
   os.extractString(tem);
   return new (interp) StringObj(tem);
@@ -3236,7 +3278,7 @@ DEFPRIMITIVE(EntityAttributeString, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   const Char *attName;
   size_t attNameLen;
-  if (!argv[0]->stringData(attName, attNameLen))
+  if (!argv[1]->stringData(attName, attNameLen))
     return argError(interp, loc,
 		    InterpreterMessages::notAString, 1, argv[1]);
   NodePtr node;

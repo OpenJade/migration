@@ -949,6 +949,7 @@ public:
   }
   bool same(const BaseNode &node) const;
   bool same2(const CdataAttributeValueNode *node) const;
+  unsigned long hash() const;
 private:
   const AttributeValue *value_;
   size_t attIndex_;
@@ -3463,6 +3464,13 @@ void CdataAttributeValueNode::accept(NodeVisitor &visitor)
     visitor.sdata(*this);
   else
     visitor.dataChar(*this);
+}
+
+unsigned long CdataAttributeValueNode::hash() const
+{
+  unsigned long n;
+  CdataAttributeValueNode::siblingsIndex(n);
+  return secondHash(secondHash((unsigned long)attributeOriginId() + attIndex_) + n);
 }
 
 const ClassDef &CdataAttributeValueNode::classDef() const

@@ -8,8 +8,8 @@
 <P>
 The entity manager generates a system identifier for every external
 entity using catalog entry files in the format defined by <A
-HREF="http://www.sgmlopen.org/sgml/docs/library/9401.htm">SGML Open
-Technical Resolution TR9401:1995</A>.  The entity manager will give an
+HREF="http://www.oasis-open.org/a401.htm">SGML Open
+Technical Resolution TR9401:1997</A>.  The entity manager will give an
 error if it is unable to generate a system identifier for an external
 entity.  Normally if the external identifier for an entity includes a
 system identifier then the entity manager will use that as the
@@ -59,8 +59,8 @@ link type declaration whose link type name is <VAR>name</VAR>.
 <DD>
 This specifies that <SAMP><VAR>sysid</VAR></SAMP> should be used as
 the effective system identifier for a notation whose name is
-<SAMP><VAR>name</VAR></SAMP>.  This is an extension to the SGML Open
-format.  This is relevant only with the <SAMP>-n</SAMP> option.
+<SAMP><VAR>name</VAR></SAMP>.
+This is relevant only with the <SAMP>-n</SAMP> option.
 <DT>
 <SAMP>OVERRIDE <VAR>bool</VAR></SAMP>
 <DD>
@@ -72,14 +72,14 @@ A PUBLIC, ENTITY, DOCTYPE, LINKTYPE or NOTATION entry with an
 overriding mode of YES will be used whether or not the external
 identifier has an explicit system identifier; those with an overriding
 mode of NO will be ignored if external identifier has an explicit
-system identifier.  This is an extension to the SGML Open format.
+system identifier.
 <DT>
 <SAMP>SYSTEM <VAR>sysid1</VAR> <VAR>sysid2</VAR></SAMP>
 <DD>
 This specifies that <VAR>sysid2</VAR> should be used as the effective
 system identifier if the system identifier specified in the external
-identifier was <SAMP><VAR>sysid1</VAR></SAMP>.  This is an extension
-to the SGML Open format.  <VAR>sysid2</VAR> should always be quoted to
+identifier was <SAMP><VAR>sysid1</VAR></SAMP>.
+<VAR>sysid2</VAR> should always be quoted to
 ensure that it is not misinterpreted when parsed by a system that does
 not support this extension.
 <DT>
@@ -98,7 +98,7 @@ This entry is used only with the <SAMP>-C</SAMP> option.
 This specifies that <SAMP><VAR>sysid</VAR></SAMP> is the system
 identifier of an additional catalog entry file to be read after this
 one.  Multiple <SAMP>CATALOG</SAMP> entries are allowed and will be
-read in order.  This is an extension to the SGML Open format.
+read in order.
 <DT>
 <SAMP>BASE <VAR>sysid</VAR></SAMP>
 <DD>
@@ -107,10 +107,7 @@ identifiers in the catalog entry file following this entry should be
 resolved using first storage object identifier in
 <SAMP><VAR>sysid</VAR></SAMP> as the base, instead of the storage
 object identifiers of the storage objects comprising the catalog entry
-file.  This is an extension to the SGML Open format.  This extension
-is proposed in <A HREF=
-"ftp://ftp.internic.net/internet-drafts/draft-ietf-mimesgml-exch-02.txt">Using
-SGML Open Catalogs and MIME to Exchange SGML Documents</A>.
+file.
 Note that the <CODE><VAR>sysid</VAR></CODE> must exist.
 <DT>
 <SAMP>DELEGATE <VAR>pubid-prefix</VAR> <VAR>sysid</VAR></SAMP>
@@ -120,8 +117,7 @@ This specifies that entities with a public identifier that has
 using a catalog whose system identfier is
 <SAMP><VAR>sysid</VAR></SAMP>.  For more details, see <A
 HREF="http://www.entmp.org/fpi-urn/delegate.html">A Proposal for
-Delegating SGML Open Catalogs</A>.  This is an extension to the SGML
-Open format.
+Delegating SGML Open Catalogs</A>.
 </DL>
 <P>
 The delimiters can be omitted from the <SAMP><VAR>sysid</VAR></SAMP>

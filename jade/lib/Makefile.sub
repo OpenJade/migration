@@ -12,7 +12,7 @@ XENTMGR_OBJS=LiteralStorage.o URLStorage.o RewindStorageObject.o \
   UTF8CodingSystem.o Fixed2CodingSystem.o UnicodeCodingSystem.o \
   EUCJPCodingSystem.o SJISCodingSystem.o TranslateCodingSystem.o \
   Big5CodingSystem.o SearchResultMessageArg.o SOEntityCatalog.o \
-  CodingSystemKit.o xentmgr_inst.o
+  CodingSystemKit.o OutputByteStream.o xentmgr_inst.o
 PARSER_OBJS=ContentState.o ParserState.o parser_inst.o parseSd.o Parser.o \
   parseInstance.o parseMode.o parseAttribute.o \
   LinkProcess.o Lpd.o parseDecl.o ShortReferenceMap.o \
@@ -24,7 +24,7 @@ PARSER_OBJS=ContentState.o ParserState.o parser_inst.o parseSd.o Parser.o \
   Markup.o Text.o ContentToken.o ElementType.o Event.o \
   InternalInputSource.o OutputState.o ParserMessages.o \
   SdText.o NumericCharRefOrigin.o Id.o StringVectorMessageArg.o
-APP_OBJS=ErrorCountEventHandler.o MessageEventHandler.o \
+APP_OBJS=ErrorCountEventHandler.o MessageEventHandler.o MessageFormatter.o \
   MessageReporter.o MessageTable.o OutputCharStream.o ConsoleOutput.o \
   CmdLineApp.o EntityApp.o ParserApp.o app_inst.o \
   ArcEngine.o arc_inst.o
@@ -39,7 +39,8 @@ GENSRCS=version.h entmgr_inst.cxx \
   PosixStorageMessages.h URLStorageMessages.h StdioStorageMessages.h \
   ParserMessages.h parser_inst.cxx app_inst.cxx \
   ParserAppMessages.h CmdLineAppMessages.h \
-  ArcEngineMessages.h arc_inst.cxx MessageReporterMessages.h
+  ArcEngineMessages.h arc_inst.cxx MessageReporterMessages.h \
+  MessageFormatterMessages.h
 
 $(srcdir)/version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@

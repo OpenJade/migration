@@ -13,18 +13,18 @@
 #include "ParserEventGeneratorKit.h"
 #include "GenericEventHandler.h"
 
-#ifdef SP_NAMESPACE
-using namespace SP_NAMESPACE;
-#endif
-
-class ParserEventGeneratorKitImpl : public ParserApp {
+class ParserEventGeneratorKitImpl : public SP_NAMESPACE_SCOPE ParserApp {
 public:
-  ParserOptions &options() { return options_; }
+  SP_NAMESPACE_SCOPE ParserOptions &options() { return options_; }
   bool generalEntities;
   unsigned refCount;
 private:
-  ErrorCountEventHandler *makeEventHandler() { return 0; }
+  SP_NAMESPACE_SCOPE ErrorCountEventHandler *makeEventHandler() { return 0; }
 };
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
 
 class ParserEventGenerator : public EventGenerator {
 public:
@@ -52,6 +52,10 @@ private:
   ParserEventGeneratorKitImpl *kit_;
 };
 
+#ifdef SP_NAMESPACE
+}
+#endif
+
 ParserEventGeneratorKit::ParserEventGeneratorKit()
 {
   impl_ = new ParserEventGeneratorKitImpl;
@@ -68,17 +72,17 @@ ParserEventGeneratorKit::~ParserEventGeneratorKit()
 
 EventGenerator *
 ParserEventGeneratorKit::makeEventGenerator(int nFiles,
-					    ParserApp::AppChar *const *files)
+					    SP_NAMESPACE_SCOPE ParserApp::AppChar *const *files)
 {
-  StringC sysid;
+  SP_NAMESPACE_SCOPE StringC sysid;
   if (impl_->makeSystemId(nFiles, files, sysid))
     impl_->initParser(sysid);
-  return new ParserEventGenerator(impl_->parser(),
-				  impl_->generalEntities,
-				  impl_);
+  return new SP_NAMESPACE_SCOPE ParserEventGenerator(impl_->parser(),
+						     impl_->generalEntities,
+						     impl_);
 }
 
-void ParserEventGeneratorKit::setProgramName(const ParserApp::AppChar *prog)
+void ParserEventGeneratorKit::setProgramName(const SP_NAMESPACE_SCOPE ParserApp::AppChar *prog)
 {
   if (prog)
     impl_->setProgramName(impl_->convertInput(prog));
@@ -109,7 +113,7 @@ void ParserEventGeneratorKit::setOption(Option opt)
 }
 
 void ParserEventGeneratorKit::setOption(OptionWithArg opt,
-					const ParserApp::AppChar *arg)
+					const SP_NAMESPACE_SCOPE ParserApp::AppChar *arg)
 {
   switch (opt) {
   case addCatalog:
@@ -132,6 +136,10 @@ void ParserEventGeneratorKit::setOption(OptionWithArg opt,
     break;
   }
 }
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
 
 ParserEventGenerator::ParserEventGenerator(SgmlParser &parser,
 					   bool generalEntities,
@@ -196,3 +204,7 @@ ParserEventGenerator::makeSubdocEventGenerator(const SGMLApplication::Char *s,
   return new ParserEventGenerator(parser_, s, n, generalEntities_,
 				  messagesInhibited_, kit_);
 }
+
+#ifdef SP_NAMESPACE
+}
+#endif

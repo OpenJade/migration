@@ -1,5 +1,4 @@
 PROG=spent
-OBJS=spent.o spent_inst.o
+OBJS=spent.o
 INCLUDE=
 XLIBS=../lib/libsp.a
-GENSRCS=spent_inst.cxx

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
 
 #include "config.h"
@@ -10,13 +10,15 @@
 #include "OutputCharStream.h"
 #include "Ptr.h"
 #include "Resource.h"
-#include "NCVector.h"
 #include "macros.h"
 #include "HtmlMessages.h"
 #include "MessageArg.h"
 #include "ErrnoMessageArg.h"
 #include "StringResource.h"
-#include <fstream.h>
+#include "OwnerTable.h"
+#include "Hash.h"
+#include "OutputByteStream.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -37,48 +39,154 @@ const char RE = '\r';
 class HtmlFOTBuilder : public SerialFOTBuilder {
 public:
   class OutputState;
+  struct CharProps {
+    CharProps();
+    static unsigned long hash(const CharProps &) { return 17; }
+    bool operator==(const CharProps &cp) const {
+      return (fontWeight == cp.fontWeight
+	      && fontStyle == cp.fontStyle
+	      && fontSize == cp.fontSize
+	      && fontFamily == cp.fontFamily
+	      && color == cp.color);
+    }
+    bool operator!=(const CharProps &cp) const { return !(*this == cp); }
+    char fontWeight;
+    enum { styleNormal, styleItalic, styleOblique };
+    char fontStyle;
+    unsigned color;
+    Length fontSize;
+    StringC fontFamily;
+  };
+  struct InheritParaProps {
+    InheritParaProps();
+    enum {
+      alignLeft,
+      alignCenter,
+      alignRight,
+      alignJustify
+    };
+    Length leftMargin;
+    Length rightMargin;
+    Length lineHeight;
+    Length textIndent;
+    char align;
+  };
+  struct ParaProps : public InheritParaProps {
+    ParaProps(const InheritParaProps &props)
+      : InheritParaProps(props), topMargin(0) { }
+    static unsigned long hash(const ParaProps &) { return 17; }
+    bool operator==(const ParaProps &pp) const {
+      return (leftMargin == pp.leftMargin
+	      && rightMargin == pp.rightMargin
+	      && lineHeight == pp.lineHeight
+	      && textIndent == pp.textIndent
+	      && topMargin == pp.topMargin
+	      && align == pp.align);
+    }
+    bool operator!=(const ParaProps &pp) const { return !(*this == pp); }
+    Length topMargin;
+  };
+
+  struct ClassPrefix {
+    ClassPrefix(const StringC &s) : prefix(s), nCharClasses(0), nParaClasses(0) { }
+    StringC prefix;
+    unsigned nCharClasses;
+    unsigned nParaClasses;
+    static const StringC &key(const ClassPrefix &cp) { return cp.prefix; }
+  };
+
+  struct StyleClass : public Link {
+    StyleClass(const StringC &, ClassPrefix *);
+    void outputName(OutputCharStream &) const;
+    StringC gi;
+    const ClassPrefix *prefix;
+    unsigned prefixIndex;
+   };
+
+  struct CharStyle;
+
+  struct CharStyleClass : public StyleClass {
+     CharStyleClass(const StringC &, ClassPrefix *, const CharStyle *);
+     const CharStyle *style;
+  };
+
+  struct CharStyle : public CharProps {
+    CharStyle(const CharProps &cp) : CharProps(cp) { }
+    void output(OutputCharStream &) const;
+    static const CharProps &key(const CharStyle &style) { return style; }
+    IList<CharStyleClass> classes;
+  };
+
+  struct ParaStyle;
+
+  struct ParaStyleClass : public StyleClass {
+     ParaStyleClass(const StringC &, ClassPrefix *, const ParaStyle *);
+     const ParaStyle *style;
+  };
+
+  struct ParaStyle : public ParaProps {
+    ParaStyle(const ParaProps &pp) : ParaProps(pp) { }
+    void output(OutputCharStream &) const;
+    static const ParaProps &key(const ParaStyle &style) { return style; }
+    IList<ParaStyleClass> classes;
+  };
+
+  struct FlowObjectInfo : public CharProps, public InheritParaProps {
+    FlowObjectInfo();
+    unsigned docIndex;
+    ConstPtr<StringResource<Char> > scrollTitle;
+    Length parentLeftMargin;
+    Length parentRightMargin;
+  };
+
   // An address that has been referenced.
   class AddressRef {
   public:
-    virtual void outputRef(bool end, OutputCharStream &, OutputState &) = 0;
+    virtual void outputRef(bool end, OutputCharStream &, OutputState &) const = 0;
     virtual ~AddressRef();
   };
-  struct CharStyle : public Resource {
-    CharStyle() : aref(0), isBold(0), isItalic(0), color(0)
-      { }
-    unsigned color;
-    bool isBold;
-    bool isItalic;
-    AddressRef *aref;
-  };
-  struct ParaStyle : public Resource {
-    ParaStyle() : quadding(symbolStart) { }
-    Symbol quadding;
-  };
+
   class OutputState {
   public:
     OutputState(const String<CmdLineApp::AppChar> *outputFilename,
+		const StringC &styleSheetFilename,
                 CmdLineApp *app)
      : outputFilename_(outputFilename),
+       styleSheetFilename_(styleSheetFilename),
        app_(app),
+       curAref_(0),
+       specAref_(0),
+       curCharStyleClass_(0),
        outputDocIndex_(unsigned(-1)) { }
-    void setCharStyle(const ConstPtr<CharStyle> &, OutputCharStream &);
     unsigned setOutputDocIndex(unsigned i) {
       unsigned tem = outputDocIndex_;
       outputDocIndex_ = i;
       return tem;
     }
+    const AddressRef *setAddress(const AddressRef *aref) {
+      const AddressRef *tem = specAref_;
+      specAref_ = aref;
+      return tem;
+    }
+    void syncChar(const CharStyleClass *, OutputCharStream &);
     unsigned outputDocIndex() const { return outputDocIndex_; }
     String<CmdLineApp::AppChar> outputFilename(unsigned i) const;
+    const String<CmdLineApp::AppChar> &outputFilename() const {
+      return *outputFilename_;
+    }
     CmdLineApp &app() { return *app_; }
+    const StringC &styleSheetFilename() const { return styleSheetFilename_; }
     const OutputCodingSystem *codingSystem() const { return app_->outputCodingSystem(); }
     Messenger &messenger() { return *app_; }
   private:
     const String<CmdLineApp::AppChar> *outputFilename_;
 
     CmdLineApp *app_;
-    ConstPtr<CharStyle> style_;
     unsigned outputDocIndex_;
+    const AddressRef *curAref_;
+    const AddressRef *specAref_;
+    const CharStyleClass *curCharStyleClass_;
+    StringC styleSheetFilename_;
   };
   class Item : public Link {
   public:
@@ -94,7 +202,7 @@ public:
   public:
     Addressable(size_t i)
       : elementIndex_(i), referenced_(0), docIndex_(unsigned(-1)) { }
-    void outputRef(bool end, OutputCharStream &, OutputState &);
+    void outputRef(bool end, OutputCharStream &, OutputState &) const;
     void output(OutputCharStream &, OutputState &);
     bool defined() const { return docIndex_ != unsigned(-1); }
     bool referenced() const { return referenced_; }
@@ -113,32 +221,31 @@ public:
   };
   class Markup : public Item {
   public:
-    Markup(const StringC &str, AddressRef *aref) : str_(str), aref_(aref) { }
+    Markup(const StringC &str) : str_(str) { }
     void output(OutputCharStream &, OutputState &);
   private:
     StringC str_;
-    AddressRef *aref_;
   };
   class Pcdata : public Item {
   public:
-    Pcdata(const Ptr<CharStyle> &style) : style_(style) { }
+    Pcdata(const CharStyleClass *styleClass) : styleClass_(styleClass) { }
     void output(OutputCharStream &, OutputState &);
   private:
+    const CharStyleClass *styleClass_;
     virtual const Char *data(size_t &) const = 0;
-    ConstPtr<CharStyle> style_;
   };
   class ImmediatePcdata : public Pcdata {
   public:
-    ImmediatePcdata(const Char *s, size_t n, const Ptr<CharStyle> &style)
-      : Pcdata(style), str_(s, n) { }
+    ImmediatePcdata(const Char *s, size_t n, const CharStyleClass *styleClass)
+      : Pcdata(styleClass), str_(s, n) { }
   private:
     const Char *data(size_t &n) const { n = str_.size(); return str_.data(); }
     StringC str_;
   };
   class NodePcdata : public Pcdata {
   public:
-    NodePcdata(const NodePtr &node, const Char *s, size_t n, const Ptr<CharStyle> &style)
-      : Pcdata(style), node_(node), s_(s), n_(n) { }
+    NodePcdata(const NodePtr &node, const Char *s, size_t n, const CharStyleClass *styleClass)
+      : Pcdata(styleClass), node_(node), s_(s), n_(n) { }
   private:
     const Char *data(size_t &n) const { n = n_; return s_; }
     NodePtr node_;
@@ -158,12 +265,19 @@ public:
     Container(const Container &);
     void operator=(const Container &);
   };
-  class Block : public Container {
+  class Ref : public Container {
   public:
-    Block(const Ptr<ParaStyle> &style) : style_(style) { }
+    Ref(AddressRef *aref) : aref_(aref) { }
     void output(OutputCharStream &, OutputState &);
   private:
-    ConstPtr<ParaStyle> style_;
+    AddressRef *aref_;
+  };
+  class Block : public Container {
+  public:
+    Block(const ParaStyleClass *styleClass) : styleClass_(styleClass) { }
+    void output(OutputCharStream &, OutputState &);
+  private:
+    const ParaStyleClass *styleClass_;
   };
   class Document : public Container {
   public:
@@ -179,8 +293,14 @@ public:
   ~HtmlFOTBuilder();
   void setFontWeight(Symbol);
   void setFontPosture(Symbol);
+  void setFontFamilyName(const StringC &);
+  void setFontSize(Length);
   void setColor(const DeviceRGBColor &);
   void setQuadding(Symbol);
+  void setLineSpacing(const LengthSpec &);
+  void setFirstLineStartIndent(const LengthSpec &);
+  void setStartIndent(const LengthSpec &);
+  void setEndIndent(const LengthSpec &);
   void setScrollTitle(const StringC &);
   void formattingInstruction(const StringC &);
   void start();
@@ -191,6 +311,7 @@ public:
   void startParagraph(const ParagraphNIC &nic);
   void endParagraph();
   void startLink(const Address &);
+  void endLink();
   void startScroll();
   void endScroll();
   void startNode(const NodePtr &, const StringC &, RuleType);
@@ -200,59 +321,43 @@ public:
   static void outputCdata(const StringC &s, OutputCharStream &os) {
     outputCdata(s.data(), s.size(), os);
   }
+  static void outputLength(FOTBuilder::Length n, OutputCharStream &);
 private:
   HtmlFOTBuilder(const HtmlFOTBuilder &);
   void operator=(const HtmlFOTBuilder &);
-  struct FlowObjectInfo : public Link {
-    FlowObjectInfo(const Ptr<CharStyle> &cs,
-                   const Ptr<ParaStyle> &ps,
-		   unsigned i,
-		   const ConstPtr<StringResource<Char> > &st)
-     : charStyle(cs), paraStyle(ps), docIndex(i), scrollTitle(st) { }
-    Ptr<CharStyle> charStyle;
-    Ptr<ParaStyle> paraStyle;
-    unsigned docIndex;
-    ConstPtr<StringResource<Char> > scrollTitle;
-  };
+  
   struct DestInfo : public Link {
     DestInfo(IList<Item> *p) : list(p) { }
     IList<Item> *list;
   };
 
-  // These implement copy-on-write
-  CharStyle &charStyle() {
-    if (charStyle_->count() > 1)
-      charStyle_ = new CharStyle(*charStyle_);
-    return *charStyle_;
-  }
-  ParaStyle &paraStyle() {
-    if (paraStyle_->count() > 1)
-      paraStyle_ = new ParaStyle(*paraStyle_);
-    return *paraStyle_;
-  }
   void insertAddr(size_t);
+  void outputStyleSheet(StringC &);
+  void startDisplay(const DisplayNIC &);
+  void endDisplay();
   Addressable *elementAddress(size_t n);
 
-  Ptr<CharStyle> charStyle_;
-  Ptr<ParaStyle> paraStyle_;
-  Ptr<CharStyle> parentCharStyle_;
-  Ptr<ParaStyle> parentParaStyle_;
+  const CharStyleClass *makeCharStyleClass();
+  const ParaStyleClass *makeParaStyleClass();
+  ClassPrefix *makeClassPrefix(const StringC &);
+
+  OwnerTable<CharStyle, CharProps, CharProps, CharStyle> charStyleTable_;
+  OwnerTable<ParaStyle, ParaProps, ParaProps, ParaStyle> paraStyleTable_;
+  OwnerTable<ClassPrefix, StringC, Hash, ClassPrefix> prefixTable_;
+  Vector<FlowObjectInfo> flowObjectStack_;
+  FlowObjectInfo nextFlowObject_;
   IList<DestInfo> destStack_;
   IList<Item> *dest_;
   Container root_;
-  // Index of the current HTML document
-  unsigned docIndex_;
   // Number of HTML documents
   unsigned nDocuments_;
-  ConstPtr<StringResource<Char> > scrollTitle_;
-  ConstPtr<StringResource<Char> > parentScrollTitle_;
-  IList<FlowObjectInfo> flowObjectStack_;
   Vector<Addressable *> elements_;
   Vector<Vector<size_t> > pendingAddr_;
-  int nOpenElements_;
   String<CmdLineApp::AppChar> outputFilename_;
   CmdLineApp *app_;
-  enum { basePointSize = 12, sizeIncPercent = 20 };
+  Vector<StringC> giStack_;
+  Length topMargin_;
+  Vector<Length> spaceAfterStack_;
 };
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
@@ -282,14 +387,12 @@ HtmlFOTBuilder::HtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename
 : outputFilename_(outputFilename),
   app_(app),
   nDocuments_(0),
-  docIndex_(unsigned(-1)),
-  charStyle_(new CharStyle),
-  paraStyle_(new ParaStyle),
-  nOpenElements_(0)
+  giStack_(1),
+  topMargin_(0)
 {
-  parentCharStyle_ = charStyle_;
-  parentParaStyle_ = paraStyle_;
+  flowObjectStack_.push_back(nextFlowObject_);
   dest_ = root_.contentPtr();
+  giStack_[0] += 'S';
 }
 
 HtmlFOTBuilder::~HtmlFOTBuilder()
@@ -299,7 +402,9 @@ HtmlFOTBuilder::~HtmlFOTBuilder()
     reverse(*destStack_.head()->list);
     delete destStack_.get();
   }
-  OutputState state(&outputFilename_, app_);
+  StringC styleSheetFilename;
+  outputStyleSheet(styleSheetFilename);
+  OutputState state(&outputFilename_, styleSheetFilename, app_);
   DiscardOutputCharStream os;
   root_.output(os, state);
   for (size_t i = 0; i < elements_.size(); i++)
@@ -307,58 +412,262 @@ HtmlFOTBuilder::~HtmlFOTBuilder()
      delete elements_[i];
 }
 
-void HtmlFOTBuilder::start()
+void HtmlFOTBuilder::outputStyleSheet(StringC &styleSheetFilename)
 {
-  flowObjectStack_.insert(new FlowObjectInfo(parentCharStyle_, parentParaStyle_,
-                                             docIndex_, parentScrollTitle_));
-  parentCharStyle_ = charStyle_;
-  parentParaStyle_ = paraStyle_;
-  parentScrollTitle_ = scrollTitle_;
+  String<CmdLineApp::AppChar> filename(outputFilename_);
+  for (size_t j = 0; j < 5; j++) {
+    if (filename.size() < j + 1)
+      break;
+    Char c = filename[filename.size() - j - 1];
+    if (c == '/' || c == '\\')
+      break;
+    if (c == '.') {
+      filename.resize(filename.size() - j - 1);
+      break;
+    }
+  }
+  filename += '.';
+  filename += 'c';
+  filename += 's';
+  filename += 's';
+  filename += 0;
+  FileOutputByteStream file;
+  if (!file.open(filename.data())) {
+    app_->message(HtmlMessages::cannotOpenOutputError,
+		  StringMessageArg(app_->convertInput(filename.data())),
+		  ErrnoMessageArg(errno));
+    return;
+  }
+  styleSheetFilename = app_->convertInput(filename.data());
+  RecordOutputCharStream os(new EncodeOutputCharStream(&file,
+						       app_->outputCodingSystem()));
+
+  {
+    OwnerTableIter<CharStyle, CharProps, CharProps, CharStyle> iter(charStyleTable_);
+    for (;;) {
+      const CharStyle *style = iter.next();
+      if (!style)
+	break;
+      style->output(os);
+    }
+  }
+  os << "DIV { margin-top: 0pt; margin-bottom: 0pt; margin-left: 0pt; margin-right: 0pt }"
+     << RE;
+  {
+    OwnerTableIter<ParaStyle, ParaProps, ParaProps, ParaStyle> iter(paraStyleTable_);
+    for (;;) {
+      const ParaStyle *style = iter.next();
+      if (!style)
+	break;
+      style->output(os);
+    }
+  }
 }
 
+void HtmlFOTBuilder::CharStyle::output(OutputCharStream &os) const
+{
+  bool first = 1;
+  for (IListIter<CharStyleClass> iter(classes); !iter.done(); iter.next()) {
+    if (first)
+      first = 0;
+    else
+      os << ", ";
+    os << "SPAN.";
+    iter.cur()->outputName(os);
+  }
+  if (!first) {
+    os << " {" << RE;
+    static const char indent[] = "  ";
+    // Netscape Communicator preview release 2 can't handle quoted font family names.
+    os << indent << "font-family: " << fontFamily << ';' << RE;
+    os << indent << "font-weight: " << int(fontWeight) << "00;" << RE;
+    static const char *styleNames[3] = {
+      "normal", "italic", "oblique"
+    };
+    os << indent << "font-style: " << styleNames[fontStyle] << ';' << RE;
+    os << indent << "font-size: ";
+    outputLength(fontSize, os);
+    os << ';' << RE;
+    os << indent << "color: #";
+    for (int i = 20; i >= 0; i -= 4)
+      os << "0123456789abcdef"[(color >> i) & 0xf];
+    os << ';' << RE;
+    os << '}' << RE;
+  }
+}
+
+void HtmlFOTBuilder::ParaStyle::output(OutputCharStream &os) const
+{
+  bool first = 1;
+  for (IListIter<ParaStyleClass> iter(classes); !iter.done(); iter.next()) {
+    if (first)
+      first = 0;
+    else
+      os << ", ";
+    os << "DIV.";
+    iter.cur()->outputName(os);
+  }
+  if (!first) {
+    os << " {" << RE;
+    static const char indent[] = "  ";
+    if (leftMargin) {
+      os << indent << "margin-left: ";
+      outputLength(leftMargin, os);
+      os << ';' << RE;
+    }
+    if (rightMargin) {
+      os << indent << "margin-right: ";
+      outputLength(rightMargin, os);
+      os << ';' << RE;
+    }
+    if (topMargin) {
+      os << indent << "margin-top: ";
+      outputLength(topMargin, os);
+      os << ';' << RE;
+    }
+    static const char *alignNames[4] = {
+      "left", "center", "right", "justify"
+    };
+    os << indent << "text-align: " << alignNames[align] << ';' << RE;
+    os << indent << "line-height: ";
+    outputLength(lineHeight, os);
+    os << ';' << RE;
+    os << indent << "text-indent: ";
+    outputLength(textIndent, os);
+    os << ';' << RE;
+    os << '}' << RE;
+  }
+}
+
+void HtmlFOTBuilder::outputLength(FOTBuilder::Length n, OutputCharStream &os)
+{
+  char buf[32];
+  sprintf(buf, "%04ld", long(n));
+  char *end = strchr(buf, '\0');
+  for (int i = 0; i < 4; i++)
+    end[1 - i] = end[-i];
+  end[-3] = '.';
+  while (*end == '0')
+    *end-- = '\0';
+  if (*end == '.')
+    *end = '\0';
+  strcat(buf, "pt");
+  os << buf;
+}
+
+void HtmlFOTBuilder::start()
+{
+  flowObjectStack_.push_back(nextFlowObject_);
+}
 
 void HtmlFOTBuilder::end()
 {
-  parentCharStyle_ = charStyle_ = flowObjectStack_.head()->charStyle;
-  parentParaStyle_ = paraStyle_ = flowObjectStack_.head()->paraStyle;
-  parentScrollTitle_ = scrollTitle_ = flowObjectStack_.head()->scrollTitle;
-  docIndex_ = flowObjectStack_.head()->docIndex;
-  delete flowObjectStack_.get();
+  flowObjectStack_.resize(flowObjectStack_.size() - 1);
+  nextFlowObject_ = flowObjectStack_.back();
 }
 
 void HtmlFOTBuilder::atomic()
 {
-  charStyle_ = parentCharStyle_;
-  paraStyle_ = parentParaStyle_;
-  scrollTitle_ = parentScrollTitle_;
+  nextFlowObject_ = flowObjectStack_.back();
 }
 
 void HtmlFOTBuilder::formattingInstruction(const StringC &s)
 {
-  dest_->insert(new Markup(s, charStyle_->aref));
+  dest_->insert(new Markup(s));
   atomic();
+}
+
+const HtmlFOTBuilder::CharStyleClass *HtmlFOTBuilder::makeCharStyleClass()
+{
+  CharStyle *style = charStyleTable_.lookup(nextFlowObject_);
+  if (!style) {
+    style = new CharStyle(nextFlowObject_);
+    charStyleTable_.insert(style);
+  }
+  for (IListIter<CharStyleClass> iter(style->classes); !iter.done(); iter.next())
+    if (iter.cur()->gi == giStack_.back())
+      return iter.cur();
+  ClassPrefix *prefix = makeClassPrefix(giStack_.back());
+  CharStyleClass *sc = new CharStyleClass(giStack_.back(), prefix, style);
+  style->classes.insert(sc);
+  return sc;
+}
+
+const HtmlFOTBuilder::ParaStyleClass *HtmlFOTBuilder::makeParaStyleClass()
+{
+  ParaProps props(nextFlowObject_);
+  props.topMargin = topMargin_;
+  topMargin_ = 0;
+  ParaStyle *style = paraStyleTable_.lookup(props);
+  if (!style) {
+    style = new ParaStyle(props);
+    paraStyleTable_.insert(style);
+  }
+  for (IListIter<ParaStyleClass> iter(style->classes); !iter.done(); iter.next())
+    if (iter.cur()->gi == giStack_.back())
+      return iter.cur();
+  ClassPrefix *prefix = makeClassPrefix(giStack_.back());
+  ParaStyleClass *sc = new ParaStyleClass(giStack_.back(), prefix, style);
+  style->classes.insert(sc);
+  return sc;
+}
+
+HtmlFOTBuilder::StyleClass::StyleClass(const StringC &g, ClassPrefix *pfx)
+: gi(g), prefix(pfx), prefixIndex(pfx->nCharClasses + pfx->nParaClasses + 1)
+{
+
+  
+}
+
+HtmlFOTBuilder::CharStyleClass::CharStyleClass(const StringC &g, ClassPrefix *pfx,
+					       const CharStyle *s)
+: StyleClass(g, pfx), style(s)
+{
+  pfx->nCharClasses += 1;
+}
+
+HtmlFOTBuilder::ParaStyleClass::ParaStyleClass(const StringC &g, ClassPrefix *pfx,
+					       const ParaStyle *s)
+: StyleClass(g, pfx), style(s)
+{
+  pfx->nParaClasses += 1;
+}
+
+HtmlFOTBuilder::ClassPrefix *HtmlFOTBuilder::makeClassPrefix(const StringC &gi)
+{
+  // FIXME strip illegal characters
+  ClassPrefix *prefix = prefixTable_.lookup(gi);
+  if (!prefix) {
+    prefix = new ClassPrefix(gi);
+    prefixTable_.insert(prefix);
+  }
+  return prefix;
 }
 
 void HtmlFOTBuilder::charactersFromNode(const NodePtr &node, const Char *s, size_t n)
 {
   flushPendingAddresses();
-  dest_->insert(new NodePcdata(node, s, n, charStyle_));
+  dest_->insert(new NodePcdata(node, s, n, makeCharStyleClass()));
 }
 
 void HtmlFOTBuilder::characters(const Char *s, size_t n)
 {
   flushPendingAddresses();
-  dest_->insert(new ImmediatePcdata(s, n, charStyle_));
+  dest_->insert(new ImmediatePcdata(s, n, makeCharStyleClass()));
 }
 
-void HtmlFOTBuilder::startParagraph(const ParagraphNIC &)
+void HtmlFOTBuilder::startParagraph(const ParagraphNIC &nic)
 {
-  // handle space-before and after
-  start();
-  Block *block = new Block(paraStyle_);
+  startDisplay(nic);
+  Block *block = new Block(makeParaStyleClass());
+  nextFlowObject_.parentLeftMargin += nextFlowObject_.leftMargin;
+  nextFlowObject_.parentRightMargin += nextFlowObject_.rightMargin;
+  nextFlowObject_.leftMargin = 0;
+  nextFlowObject_.rightMargin = 0;
   dest_->insert(block);
   destStack_.insert(new DestInfo(dest_));
   dest_ = block->contentPtr();
+  start();
 }
 
 void HtmlFOTBuilder::endParagraph()
@@ -367,22 +676,40 @@ void HtmlFOTBuilder::endParagraph()
   dest_ = destStack_.head()->list;
   delete destStack_.get();
   end();
+  endDisplay();
+}
+
+void HtmlFOTBuilder::startDisplay(const DisplayNIC &nic)
+{
+  Length spaceBefore = nic.spaceBefore.nominal.length;
+  if (spaceBefore > topMargin_)
+    topMargin_ = spaceBefore;
+  spaceAfterStack_.push_back(nic.spaceAfter.nominal.length);
+}
+
+void HtmlFOTBuilder::endDisplay()
+{
+  const Length &spaceAfter = spaceAfterStack_.back();
+  if (spaceAfter > topMargin_)
+    topMargin_ = spaceAfter;
+  spaceAfterStack_.resize(spaceAfterStack_.size() - 1);
 }
 
 void HtmlFOTBuilder::startScroll()
 {
+  nextFlowObject_.docIndex = nDocuments_++;
   start();
-  docIndex_ = nDocuments_++;
-  Document *doc = new Document(docIndex_, scrollTitle_);
+  Document *doc = new Document(nextFlowObject_.docIndex,
+			       nextFlowObject_.scrollTitle);
   dest_->insert(doc);
   destStack_.insert(new DestInfo(dest_));
   dest_ = doc->contentPtr();
   if (pendingAddr_.size()) {
     for (size_t i = 0; i < pendingAddr_.back().size(); i++) {
       Addressable *tem = elementAddress(pendingAddr_.back()[i]);
-      if (!tem->defined() && docIndex_ != (unsigned)-1) {
+      if (!tem->defined()) {
         dest_->insert(tem);
-	tem->setDefined(docIndex_, 1);
+	tem->setDefined(nextFlowObject_.docIndex, 1);
       }
     }
     pendingAddr_.back().resize(0);
@@ -399,7 +726,8 @@ void HtmlFOTBuilder::endScroll()
 
 void HtmlFOTBuilder::startLink(const Address &addr)
 {
-  charStyle().aref = 0;
+  start();
+  AddressRef *aref = 0;
   switch (addr.type) {
   case Address::resolvedNode:
     {
@@ -407,7 +735,7 @@ void HtmlFOTBuilder::startLink(const Address &addr)
       if (addr.node->elementIndex(n) == accessOK) {
 	Addressable *tem = elementAddress(n);
 	tem->setReferenced();
-	charStyle().aref = tem;
+	aref = tem;
       }
       break;
     }
@@ -427,14 +755,25 @@ void HtmlFOTBuilder::startLink(const Address &addr)
 	  && node->elementIndex(n) == accessOK) {
 	Addressable *tem = elementAddress(n);
 	tem->setReferenced();
-	charStyle().aref = tem;
+	aref = tem;
       }
       break;
     }
   default:
     break;
   }
-  start();
+  Ref *ref = new Ref(aref);
+  dest_->insert(ref);
+  destStack_.insert(new DestInfo(dest_));
+  dest_ = ref->contentPtr();
+}
+
+void HtmlFOTBuilder::endLink()
+{
+  reverse(*dest_);
+  dest_ = destStack_.head()->list;
+  delete destStack_.get();
+  end();
 }
 
 HtmlFOTBuilder::Addressable *HtmlFOTBuilder::elementAddress(size_t n)
@@ -457,55 +796,137 @@ void HtmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
     if (node->elementIndex(n) == accessOK && mode.size() == 0)
       pendingAddr_.back().push_back(size_t(n));
   }
+  giStack_.resize(giStack_.size() + 1);
+  GroveString str;
+  if (node->getGi(str) == accessOK)
+    giStack_.back().assign(str.data(), str.size());
+  else if (giStack_.size() >= 2)
+    giStack_.back() = giStack_[giStack_.size() - 2];
 }
 
 void HtmlFOTBuilder::endNode()
 {
   pendingAddr_.resize(pendingAddr_.size() - 1);
+  giStack_.resize(giStack_.size() - 1);
 }
 
 void HtmlFOTBuilder::insertAddr(size_t n)
 {
   Addressable *tem = elementAddress(n);
-  if (!tem->defined() && docIndex_ != (unsigned)-1) {
+  if (!tem->defined() && nextFlowObject_.docIndex != (unsigned)-1) {
     dest_->insert(tem);
-    tem->setDefined(docIndex_);
+    tem->setDefined(nextFlowObject_.docIndex);
   }
+}
+
+void HtmlFOTBuilder::setLineSpacing(const LengthSpec &val)
+{
+  nextFlowObject_.lineHeight = val.length;
 }
 
 void HtmlFOTBuilder::setQuadding(Symbol sym)
 {
-  if (sym == symbolJustify)
-    sym = symbolStart;
-  paraStyle().quadding = sym;
+  switch (sym) {
+  case symbolStart:
+    nextFlowObject_.align = ParaProps::alignLeft;
+    break;
+  case symbolEnd:
+    nextFlowObject_.align = ParaProps::alignRight;
+    break;
+  case symbolCenter:
+    nextFlowObject_.align = ParaProps::alignCenter;
+    break;
+  case symbolJustify:
+    nextFlowObject_.align = ParaProps::alignJustify;
+    break;
+  default:
+    break;
+  }
+}
+
+void HtmlFOTBuilder::setFirstLineStartIndent(const LengthSpec &ls)
+{
+  nextFlowObject_.textIndent = ls.length;
+}
+
+void HtmlFOTBuilder::setStartIndent(const LengthSpec &ls)
+{
+  nextFlowObject_.leftMargin = ls.length - nextFlowObject_.parentLeftMargin;
+}
+
+void HtmlFOTBuilder::setEndIndent(const LengthSpec &ls)
+{
+  nextFlowObject_.rightMargin = ls.length - nextFlowObject_.parentRightMargin;
+}
+
+void HtmlFOTBuilder::setFontFamilyName(const StringC &name)
+{
+  nextFlowObject_.fontFamily = name;
 }
 
 void HtmlFOTBuilder::setFontWeight(Symbol weight)
 {
-  charStyle().isBold = (weight > symbolMedium);
+  switch (weight) {
+  case symbolUltraLight:
+    nextFlowObject_.fontWeight = 1;
+    break;
+  case symbolExtraLight:
+    nextFlowObject_.fontWeight = 2;
+    break;
+  case symbolLight:
+    nextFlowObject_.fontWeight = 3;
+    break;
+  case symbolSemiLight:
+    nextFlowObject_.fontWeight = 4;
+    break;
+  case symbolMedium:
+    nextFlowObject_.fontWeight = 5;
+    break;
+  case symbolSemiBold:
+    nextFlowObject_.fontWeight = 6;
+    break;
+  case symbolBold:
+    nextFlowObject_.fontWeight = 7;
+    break;
+  case symbolExtraBold:
+    nextFlowObject_.fontWeight = 8;
+    break;
+  case symbolUltraBold:
+    nextFlowObject_.fontWeight = 9;
+    break;
+  default:
+    break;
+  }
 }
 
 void HtmlFOTBuilder::setFontPosture(Symbol posture)
 {
   switch (posture) {
   case symbolOblique:
+    nextFlowObject_.fontStyle = CharProps::styleOblique;
+    break;
   case symbolItalic:
-    charStyle().isItalic = 1;
+    nextFlowObject_.fontStyle = CharProps::styleItalic;
     break;
   default:
-    charStyle().isItalic = 0;
+    nextFlowObject_.fontStyle = CharProps::styleNormal;
     break;
   }
 }
 
+void HtmlFOTBuilder::setFontSize(Length n)
+{
+  nextFlowObject_.fontSize = n;
+}
+
 void HtmlFOTBuilder::setColor(const DeviceRGBColor &color)
 {
-  charStyle().color = (color.red << 16) | (color.green << 8) | color.blue;
+  nextFlowObject_.color = (color.red << 16) | (color.green << 8) | color.blue;
 }
 
 void HtmlFOTBuilder::setScrollTitle(const StringC &s)
 {
-  scrollTitle_ = new StringResource<Char>(s);
+  nextFlowObject_.scrollTitle = new StringResource<Char>(s);
 }
 
 void HtmlFOTBuilder::flushPendingAddresses()
@@ -545,22 +966,36 @@ void HtmlFOTBuilder::outputCdata(const Char *s, size_t n, OutputCharStream &os)
   }
 }
 
-void HtmlFOTBuilder::Document::output(OutputCharStream &, OutputState &state)
+void HtmlFOTBuilder::Document::output(OutputCharStream &, OutputState &oldState)
 {
-  filebuf file;
+  OutputState state(&oldState.outputFilename(),
+                    oldState.styleSheetFilename(),
+		    &oldState.app());
+  FileOutputByteStream file;
   String<CmdLineApp::AppChar> filename(state.outputFilename(index_));
   filename += 0;
-  if (!state.app().openFilebufWrite(file, filename.data())) {
+  if (!file.open(filename.data())) {
     state.messenger()
       .message(HtmlMessages::cannotOpenOutputError,
                StringMessageArg(state.app().convertInput(filename.data())),
 	       ErrnoMessageArg(errno));
     return;
   }
-  RecordOutputCharStream os(new IosOutputCharStream(&file,
+  RecordOutputCharStream os(new EncodeOutputCharStream(&file,
 						    state.app().outputCodingSystem()));
+  // FIXME setEscaper
   unsigned oldDocIndex = state.setOutputDocIndex(index_);
   os << "<HTML>" << RE;
+  const StringC &styleSheetFilename = state.styleSheetFilename();
+  if (styleSheetFilename.size()) {
+    os << "<LINK REL=STYLESHEET TYPE=\"text/css\" HREF=\"";
+    size_t i = styleSheetFilename.size();
+    for (; i > 0; i--)
+      if (styleSheetFilename[i - 1] == '\\' || styleSheetFilename[i - 1] == '/')
+    	break;
+    os.write(styleSheetFilename.data() + i, styleSheetFilename.size() - i);
+    os << "\">" << RE;
+  }
   if (!title_.isNull()) {
     os << "<TITLE>";
     HtmlFOTBuilder::outputCdata(*title_, os);
@@ -581,46 +1016,37 @@ void HtmlFOTBuilder::Container::output(OutputCharStream &os, OutputState &state)
 
 void HtmlFOTBuilder::Block::output(OutputCharStream &os, OutputState &state)
 {
-  switch (style_->quadding) {
-  case symbolCenter:
-    os << "<center>";
-    break;
-  case symbolEnd:
-    os << "<div align=right>";
-    break;
-  default:
-    os << "<div>";
-    break;
-  }
+  const AddressRef *addr = state.setAddress(0);
+  state.syncChar(0, os);
+  os << "<DIV CLASS=";
+  styleClass_->outputName(os);
+  os << RE <<'>';
+  state.setAddress(addr);
   Container::output(os, state);
-  state.setCharStyle(ConstPtr<CharStyle>(0), os);
-  switch (style_->quadding) {
-  case symbolCenter:
-    os << "</center>";
-    break;
-  default:
-    os << "</div>";
-    break;
-  }
+  state.setAddress(0);
+  state.syncChar(0, os);
+  os << "</DIV>";
+  state.setAddress(addr);
+}
+
+void HtmlFOTBuilder::Ref::output(OutputCharStream &os, OutputState &state)
+{
+  const AddressRef *oldAref = state.setAddress(aref_);
+  Container::output(os, state);
+  state.setAddress(oldAref);
 }
 
 void HtmlFOTBuilder::Pcdata::output(OutputCharStream &os, OutputState &state)
 {
-  state.setCharStyle(style_, os);
   size_t n;
   const Char *s = data(n);
+  state.syncChar(styleClass_, os);
   HtmlFOTBuilder::outputCdata(s, n, os);
 }
 
 void HtmlFOTBuilder::Markup::output(OutputCharStream &os, OutputState &state)
 {
-  if (!aref_)
-    state.setCharStyle(ConstPtr<CharStyle>(0), os);
-  else {
-    Ptr<CharStyle> style(new CharStyle);
-    style->aref = aref_;
-    state.setCharStyle(style, os);
-  }
+  state.syncChar(0, os);
   os << str_;
 }
 
@@ -632,7 +1058,7 @@ void HtmlFOTBuilder::Addressable::output(OutputCharStream &os, OutputState &)
 }
 
 void HtmlFOTBuilder::Addressable::outputRef(bool end, OutputCharStream &os,
-					    OutputState &state)
+					    OutputState &state) const
 {
   ASSERT(referenced_);
   if (defined()) {
@@ -682,49 +1108,31 @@ String<CmdLineApp::AppChar> HtmlFOTBuilder::OutputState::outputFilename(unsigned
   return base;
 }
 
-void HtmlFOTBuilder
-::OutputState::setCharStyle(const ConstPtr<CharStyle> &style, OutputCharStream &os)
+void HtmlFOTBuilder::OutputState::syncChar(const CharStyleClass *styleClass,
+					   OutputCharStream &os)
 {
-  // We nest like this <A><FONT><I><B></B></I></FONT></A>
-  if (style == style_)
-    return;
-  if (!style_.isNull()) {
-    if (style_->isBold)
-      os << "</B>";
-    if (style_->isItalic)
-      os << "</I>";
-    if (style_->color != 0)
-      os << "</FONT>";
-  }
-  AddressRef *oldRef;
-  if (style_.isNull())
-    oldRef = 0;
-  else
-    oldRef = style_->aref;
-  AddressRef *newRef;
-  if (style.isNull())
-    newRef = 0;
-  else
-    newRef = style->aref;
-  if (oldRef != newRef) {
-    if (oldRef)
-      oldRef->outputRef(1, os, *this);
-    if (newRef)
-      newRef->outputRef(0, os, *this);
-  }
-  if (!style.isNull()) {
-    if (style->color != 0) {
-      os << "<FONT COLOR=\"#";
-      for (int i = 20; i >= 0; i -= 4)
-	os << "0123456789abcdef"[(style->color >> i) & 0xf];
-      os << '"' << '>';
+  // <A><SPAN>...</SPAN></A>
+  if (curAref_ != specAref_) {
+    if (curCharStyleClass_) {
+      os << "</SPAN>";
+      curCharStyleClass_ = 0;
     }
-    if (style->isItalic)
-      os << "<I>";
-    if (style->isBold)
-      os << "<B>";
+    if (curAref_)
+      curAref_->outputRef(1, os, *this);
+    if (specAref_)
+      specAref_->outputRef(0, os, *this);
+    curAref_ = specAref_;
   }
-  style_ = style;
+  if (curCharStyleClass_ != styleClass) {
+    if (curCharStyleClass_)
+      os << "</SPAN>";
+    if (styleClass) {
+      os << "<SPAN CLASS=";
+      styleClass->outputName(os);
+      os << '>';
+    }
+    curCharStyleClass_ = styleClass;
+  }
 }
 
 HtmlFOTBuilder::AddressRef::~AddressRef()
@@ -737,6 +1145,31 @@ HtmlFOTBuilder::Item::~Item()
 
 HtmlFOTBuilder::Document::~Document()
 {
+}
+
+HtmlFOTBuilder::CharProps::CharProps()
+: fontWeight(5), color(0), fontStyle(styleNormal), fontSize(10*1000)
+{
+  for (const char *p = "Times New Roman,serif"; *p; p++)
+    fontFamily += *p;
+}
+
+HtmlFOTBuilder::InheritParaProps::InheritParaProps()
+: leftMargin(0), rightMargin(0), align(alignLeft), lineHeight(12*1000),
+  textIndent(0)
+{
+}
+
+HtmlFOTBuilder::FlowObjectInfo::FlowObjectInfo()
+: docIndex(unsigned(-1)), parentLeftMargin(0), parentRightMargin(0)
+{
+}
+
+void HtmlFOTBuilder::StyleClass::outputName(OutputCharStream &os) const
+{
+  os << prefix->prefix;
+  if (prefix->nCharClasses > 1 || prefix->nParaClasses > 1)
+    os << (unsigned long)prefixIndex;
 }
 
 #ifdef DSSSL_NAMESPACE

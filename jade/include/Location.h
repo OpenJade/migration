@@ -44,6 +44,34 @@ public:
   virtual Boolean isNumericCharRef(const Markup *&markup) const;
   virtual Boolean isNamedCharRef(Index ind, NamedCharRef &ref) const;
   virtual const EntityDecl *entityDecl() const;
+  virtual Boolean defLocation(Offset off, const Origin *&, Index &) const;
+  virtual const Markup *markup() const;
+  virtual const Entity *entity() const;
+  virtual const ExternalInfo *externalInfo() const;
+  virtual Offset startOffset(Index ind) const;
+  const StringC *entityName() const;
+};
+
+class SP_API ProxyOrigin : public Origin {
+public:
+  ProxyOrigin(const Origin *origin);
+  const EntityOrigin *asEntityOrigin() const;
+  const InputSourceOrigin *asInputSourceOrigin() const;
+  const Location &parent() const;
+  Index refLength() const;
+  Boolean origChars(const Char *&) const;
+  Boolean inBracketedTextOpenDelim() const;
+  Boolean inBracketedTextCloseDelim() const;
+  Boolean isNumericCharRef(const Markup *&markup) const;
+  Boolean isNamedCharRef(Index ind, NamedCharRef &ref) const;
+  const EntityDecl *entityDecl() const;
+  Boolean defLocation(Offset off, const Origin *&, Index &) const;
+  const Markup *markup() const;
+  const Entity *entity() const;
+  const ExternalInfo *externalInfo() const;
+  Offset startOffset(Index ind) const;
+private:
+  const Origin *origin_;
 };
 
 class SP_API Location {
@@ -101,26 +129,11 @@ struct SP_API InputSourceOriginNamedCharRef {
 
 class SP_API InputSourceOrigin : public Origin {
 public:
-  InputSourceOrigin();
-  InputSourceOrigin(const Location &refLocation);
-  const Location &parent() const;
-  const ExternalInfo *externalInfo() const;
-  Offset startOffset(Index ind) const;
-  void noteCharRef(Index replacementIndex, const NamedCharRef &);
-  Boolean isNamedCharRef(Index ind, NamedCharRef &ref) const;
-  void setExternalInfo(ExternalInfo *);
-  virtual Boolean defLocation(Offset off, Location &) const;
-  virtual InputSourceOrigin *copy() const;
-  const InputSourceOrigin *asInputSourceOrigin() const;
-  virtual const StringC *entityName() const;
-private:
-  InputSourceOrigin(const InputSourceOrigin &); // undefined
-  void operator=(const InputSourceOrigin &);	// undefined
-  size_t nPrecedingCharRefs(Index ind) const;
-  Vector<InputSourceOriginNamedCharRef> charRefs_;
-  StringC charRefOrigNames_;
-  Owner<ExternalInfo> externalInfo_; // 0 for internal entities
-  Location refLocation_;	// where referenced from
+  virtual void noteCharRef(Index replacementIndex, const NamedCharRef &) = 0;
+  virtual void setExternalInfo(ExternalInfo *) = 0;
+  virtual InputSourceOrigin *copy() const = 0;
+  static InputSourceOrigin *make();
+  static InputSourceOrigin *make(const Location &refLocation);
 };
 
 // a delimiter specified in bracketed text
@@ -173,12 +186,6 @@ inline
 const StringC &NamedCharRef::origName() const
 {
   return origName_;
-}
-
-inline
-const ExternalInfo *InputSourceOrigin::externalInfo() const
-{
-  return externalInfo_.pointer();
 }
 
 #ifdef SP_NAMESPACE

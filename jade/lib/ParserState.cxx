@@ -30,7 +30,6 @@ static const size_t eventSizes[] = {
 
 static const size_t internalSizes[] = {
   sizeof(InternalInputSource),
-  sizeof(EntityOrigin),
   sizeof(OpenElement),
   sizeof(UndoStartTag),
   sizeof(UndoEndTag),
@@ -38,9 +37,8 @@ static const size_t internalSizes[] = {
 };
 
 static
-size_t maxSize(const size_t *v, size_t n)
+size_t maxSize(const size_t *v, size_t n, size_t max = 0)
 {
-  size_t max = 0;
   for (size_t i = 0; i < n; i++) {
     if (v[i] > max)
       max = v[i];
@@ -54,10 +52,11 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
 			 Phase finalPhase)
 : entityManager_(em),
   options_(opt),
+  validate_(opt.errorValid),
   inInstance_(0),
   keepingMessages_(0),
   eventAllocator_(maxSize(eventSizes, SIZEOF(eventSizes)), 50),
-  internalAllocator_(maxSize(internalSizes, SIZEOF(internalSizes)), 50),
+  internalAllocator_(maxSize(internalSizes, SIZEOF(internalSizes), EntityOrigin::allocSize), 50),
   handler_(&eventQueue_),
   subdocLevel_(subdocLevel),
   inputLevel_(0),
@@ -75,7 +74,8 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
   currentMarkup_(0),
   cancelPtr_(&dummyCancel_),
   finalPhase_(finalPhase),
-  hadAfdrDecl_(0)
+  hadAfdrDecl_(0),
+  stupidNetTrick_(0)
 {
 }
 
@@ -174,6 +174,7 @@ Boolean ParserState::maybeStartPass2()
   dtd_.clear();
   dsEntity_.clear();
   currentDtd_.clear();
+  currentDtdConst_.clear();
   phase_ = noPhase;
   pass2_ = 1;
   lpd_.clear();
@@ -186,7 +187,7 @@ Boolean ParserState::referenceDsEntity(const Location &loc)
   if (dsEntity_.isNull())
     return 0;
   Ptr<EntityOrigin> origin
-    = new (internalAllocator()) EntityOrigin(dsEntity_, loc);
+    = EntityOrigin::make(internalAllocator(), dsEntity_, loc);
   dsEntity_->dsReference(*this, origin);
   dsEntity_.clear();
   return inputLevel() > 1;
@@ -213,6 +214,7 @@ void ParserState::startDtd(const StringC &name)
     defDtd_->insertEntity(entity);
   }
   currentDtd_ = defDtd_;
+  currentDtdConst_ = defDtd_;
   currentMode_ = dsMode;
 }
 
@@ -221,6 +223,7 @@ void ParserState::endDtd()
   dtd_.push_back(defDtd_);
   defDtd_.clear();
   currentDtd_.clear();
+  currentDtdConst_.clear();
   currentMode_ = proMode;
 }
 
@@ -229,6 +232,7 @@ void ParserState::startLpd(Ptr<Lpd> &lpd)
   defLpd_ = lpd;
   defDtd_ = defLpd_->sourceDtd();
   currentDtd_ = defLpd_->sourceDtd();
+  currentDtdConst_ = defLpd_->sourceDtd();
   currentMode_ = dsMode;
 }
 
@@ -240,6 +244,7 @@ void ParserState::endLpd()
   allLpd_.push_back(defLpd_);
   defLpd_.clear();
   currentDtd_.clear();
+  currentDtdConst_.clear();
   currentMode_ = proMode;
 }
 
@@ -389,7 +394,7 @@ Boolean ParserState::entityIsOpen(const Entity *entity) const
   for (IListIter<InputSource> iter(inputStack_); !iter.done(); iter.next()) {
     const EntityOrigin *eo
       = iter.cur()->currentLocation().origin()->asEntityOrigin();
-    if (eo && eo->entity().pointer() == entity)
+    if (eo && eo->entity() == entity)
       return 1;
   }
   return 0;
@@ -401,6 +406,7 @@ void ParserState::startInstance()
     syntax_ = instanceSyntax_;
   currentMode_ = econMode;
   currentDtd_ = dtd_[0];
+  currentDtdConst_ = dtd_[0];
   startContent(currentDtd());
   inInstance_ = 1;
   if (sd().rank())
@@ -408,6 +414,13 @@ void ParserState::startInstance()
   currentAttributes_.clear();
   currentAttributes_.resize(currentDtd().nCurrentAttribute());
   idTable_.clear();
+  const StringC &net = syntax().delimGeneral(Syntax::dNET);
+  const StringC &tagc = syntax().delimGeneral(Syntax::dTAGC);
+  if (net.size() > tagc.size()
+      && memcmp(net.data() + net.size() - tagc.size(),
+		tagc.data(),
+		tagc.size() * sizeof(Char)) == 0)
+    stupidNetTrick_ = 1;
 }
 
 Id *ParserState::lookupCreateId(const StringC &name)
@@ -430,7 +443,7 @@ ParserState::lookupEntity(Boolean isParameter,
   if (resultAttributeSpecMode_)
     dtd = defComplexLpd().resultDtd().pointer();
   else
-    dtd = (Dtd *)currentDtd_.pointer();
+    dtd = currentDtd_.pointer();
   if (dtd) {
     Ptr<Entity> entity(dtd->lookupEntity(isParameter, name));
     // Did we find it in pass1Dtd?
@@ -500,10 +513,30 @@ ParserState::lookupEntity(Boolean isParameter,
 	if (note)
 	  noteReferencedEntity(entity, usedPass1, 1);
       }
+      else
+	entity = undefinedEntityTable_.lookupConst(name);
       return entity;
     }
   }
   return (Entity *)0;
+}
+
+ConstPtr<Entity> ParserState::createUndefinedEntity(const StringC &name, const Location &loc,
+						    Boolean &known)
+{
+  known = 0;
+  Text text;
+  const Vector<StringC> &v = options().recoveryEntities;
+  for (size_t i = 0; i < v.size(); i += 2) {
+    if (v[i] == name) {
+      known = 1;
+      text.addChars(v[i + 1], loc);
+      break;
+    }
+  }
+  Ptr<Entity> entity(new InternalCdataEntity(name, loc, text));
+  undefinedEntityTable_.insert(entity);
+  return entity;
 }
 
 void ParserState::noteReferencedEntity(const ConstPtr<Entity> &entity,

@@ -27,10 +27,9 @@ __instantiate(Owner<FOTBuilder::DisplayNIC>)
 __instantiate(Owner<FOTBuilder::InlineNIC>)
 __instantiate(Owner<FOTBuilder::CharacterNIC>)
 __instantiate(Owner<FOTBuilder::ExternalGraphicNIC>)
-__instantiate(Owner<FOTBuilder::DocumentTypeNIC>)
-__instantiate(Owner<FOTBuilder::ElementNIC>)
 __instantiate(Owner<MultiModeFlowObj::NIC>)
-
+__instantiate(Owner<FOTBuilder::GridNIC>)
+__instantiate(Owner<FOTBuilder::GridCellNIC>)
 
 #ifdef DSSSL_NAMESPACE
 }

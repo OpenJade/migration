@@ -1223,7 +1223,7 @@ MarkedSectionEvent::Status MarkedSectionEvent::status() const
 inline
 const Entity *EntityStartEvent::entity() const
 {
-  return origin_->entity().pointer();
+  return origin_->entity();
 }
 
 inline

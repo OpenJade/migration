@@ -34,12 +34,13 @@ void ProcessContext::process(Interpreter &interp)
 }
 
 void ProcessContext::processNode(const NodePtr &nodePtr,
-				 const ProcessingMode *processingMode)
+				 const ProcessingMode *processingMode,
+				 bool chunk)
 {
   ASSERT(processingMode != 0);
   GroveString str;
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
-    currentFOTBuilder().charactersFromNode(nodePtr, str.data(), str.size());
+    currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
   else {
     EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
     SosofoObj *sosofoObj;
@@ -434,6 +435,26 @@ bool SosofoObj::tableBorderStyle(StyleObj *&)
   return 0;
 }
 
+bool SosofoObj::isRule()
+{
+  return 0;
+}
+
+bool SosofoObj::ruleStyle(ProcessContext &, StyleObj *&)
+{
+  return 0;
+}
+
+bool SosofoObj::isCharacter()
+{
+  return 0;
+}
+
+bool SosofoObj::characterStyle(ProcessContext &, StyleObj *&, FOTBuilder::CharacterNIC &)
+{
+  return 0;
+}
+
 void AppendSosofoObj::process(ProcessContext &context)
 {
   for (size_t i = 0; i < v_.size(); i++)
@@ -497,16 +518,17 @@ ProcessNodeListSosofoObj::ProcessNodeListSosofoObj(NodeListObj *nodeList,
 
 void ProcessNodeListSosofoObj::process(ProcessContext &context)
 {
-  NodeListObj *tem = nodeList_;
+  NodeListObj *nl = nodeList_;
   Interpreter &interp = *context.vm().interp;
-  ELObjDynamicRoot protect(interp, tem);
+  ELObjDynamicRoot protect(interp, nl);
   for (;;) {
-    NodePtr node = tem->nodeListFirst(interp);
+    NodePtr node = nl->nodeListFirst(context.vm(), interp);
     if (!node)
       break;
-    tem = tem->nodeListRest(interp);
-    protect = tem;
-    context.processNode(node, mode_);
+    bool chunk;
+    nl = nl->nodeListChunkRest(context.vm(), interp, chunk);
+    protect = nl;
+    context.processNode(node, mode_, chunk);
   }
 }
 
@@ -547,7 +569,7 @@ SetNonInheritedCsSosofoObj::~SetNonInheritedCsSosofoObj()
   delete [] display_;
 }
 
-void SetNonInheritedCsSosofoObj::process(ProcessContext &context)
+ELObj *SetNonInheritedCsSosofoObj::resolve(ProcessContext &context)
 {
   VM &vm = context.vm();
   vm.styleStack = &context.currentStyleStack();
@@ -555,10 +577,48 @@ void SetNonInheritedCsSosofoObj::process(ProcessContext &context)
   vm.actualDependencies = &dep;
   ELObj *obj = vm.eval(code_.pointer(), display_, flowObj_->copy(*vm.interp));
   vm.styleStack = 0;
-  if (!vm.interp->isError(obj)) {
-    ELObjDynamicRoot protect(*vm.interp, obj);
+  if (vm.interp->isError(obj))
+    return 0;
+  return obj;
+}
+
+void SetNonInheritedCsSosofoObj::process(ProcessContext &context)
+{
+  ELObj *obj = resolve(context);
+  if (obj) {
+    ELObjDynamicRoot protect(*context.vm().interp, obj);
     ((FlowObj *)obj)->process(context);
   }
+}
+
+bool SetNonInheritedCsSosofoObj::isCharacter()
+{
+  return flowObj_->isCharacter();
+}
+
+bool SetNonInheritedCsSosofoObj::isRule()
+{
+  return flowObj_->isRule();
+}
+
+bool SetNonInheritedCsSosofoObj::characterStyle(ProcessContext &context, StyleObj *&style, FOTBuilder::CharacterNIC &nic)
+{
+  ELObj *obj = resolve(context);
+  if (obj) {
+    ELObjDynamicRoot protect(*context.vm().interp, obj);
+    return ((SosofoObj *)obj)->characterStyle(context, style, nic);
+  }
+  return 0;
+}
+
+bool SetNonInheritedCsSosofoObj::ruleStyle(ProcessContext &context, StyleObj *&style)
+{
+  ELObj *obj = resolve(context);
+  if (obj) {
+    ELObjDynamicRoot protect(*context.vm().interp, obj);
+    return ((SosofoObj *)obj)->ruleStyle(context, style);
+  }
+  return 0;
 }
 
 void SetNonInheritedCsSosofoObj::traceSubObjects(Collector &c) const

@@ -11,10 +11,10 @@
 #include "types.h"
 #include "Boolean.h"
 #include "StringC.h"
+#include "OutputByteStream.h"
 
 #include <stddef.h>
 
-class streambuf;
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -38,23 +38,23 @@ class SP_API Encoder {
 public:
   class SP_API Handler {
   public:
-    virtual void handleUnencodable(Char, streambuf *) = 0;
+    virtual void handleUnencodable(Char, OutputByteStream *) = 0;
   };
   Encoder();
   virtual ~Encoder();
-  virtual void output(const Char *, size_t, streambuf *) = 0;
+  virtual void output(const Char *, size_t, OutputByteStream *) = 0;
   // This outputs a byte order mark with Unicode.
-  virtual void startFile(streambuf *);
-  virtual void output(Char *, size_t, streambuf *);
+  virtual void startFile(OutputByteStream *);
+  virtual void output(Char *, size_t, OutputByteStream *);
   virtual void setUnencodableHandler(Handler *);
-  virtual void handleUnencodable(Char, streambuf *);
+  virtual void handleUnencodable(Char, OutputByteStream *);
 };
 
 class SP_API RecoveringEncoder : public Encoder {
 public:
   RecoveringEncoder();
   void setUnencodableHandler(Handler *);
-  void handleUnencodable(Char, streambuf *);
+  void handleUnencodable(Char, OutputByteStream *);
 private:
   Handler *unencodableHandler_;
 };

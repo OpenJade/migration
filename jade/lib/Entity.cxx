@@ -449,6 +449,9 @@ void ExternalTextEntity::litReference(Text &text,
 				      const Ptr<EntityOrigin> &origin,
 				      Boolean) const
 {
+  if (parser.options().warnAttributeValueExternalEntityRef
+      && declType() == generalEntity)
+    parser.message(ParserMessages::attributeValueExternalEntityRef);
   text.addEntityStart(Location(origin.pointer(), 0));
   normalReference(parser, origin, 0);
 }
@@ -461,6 +464,8 @@ const ExternalDataEntity *ExternalDataEntity::asExternalDataEntity() const
 void ExternalDataEntity::contentReference(ParserState &parser,
 					  const Ptr<EntityOrigin> &origin) const
 {
+  if (parser.options().warnExternalDataEntityRef)
+    parser.message(ParserMessages::externalDataEntityRef);
   checkEntlvl(parser);
   parser.noteData();
   parser.eventHandler().externalDataEntity(new (parser.eventAllocator())
@@ -572,80 +577,6 @@ Boolean Entity::checkNotOpen(ParserState &parser) const
   return 1;
 }
 
-EntityOrigin::EntityOrigin()
-: refLength_(0)
-{
-}
-
-EntityOrigin::EntityOrigin(const Location &refLocation)
-: InputSourceOrigin(refLocation), refLength_(0)
-{
-}
-
-EntityOrigin::EntityOrigin(const ConstPtr<Entity> &entity)
-: refLength_(0), entity_(entity)
-{
-}
-
-EntityOrigin::EntityOrigin(const ConstPtr<Entity> &entity,
-			   const Location &refLocation)
-: InputSourceOrigin(refLocation), refLength_(0), entity_(entity)
-{
-}
-
-EntityOrigin::EntityOrigin(const ConstPtr<Entity> &entity,
-			   const Location &refLocation,
-			   Index refLength,
-			   Owner<Markup> &markup)
-: InputSourceOrigin(refLocation), refLength_(refLength), entity_(entity)
-{
-  markup.swap(markup_);
-}
-
-EntityOrigin::~EntityOrigin()
-{
-}
-
-InputSourceOrigin *EntityOrigin::copy() const
-{
-  Owner<Markup> m;
-  if (markup_)
-    m = new Markup(*markup_);
-  return new EntityOrigin(entity_, parent(), refLength_, m);
-}
-
-const StringC *EntityOrigin::entityName() const
-{
-  if (entity_.isNull())
-    return 0;
-  return entity_->namePointer();
-}
-
-Index EntityOrigin::refLength() const
-{
-  return refLength_;
-}
-
-const EntityOrigin *EntityOrigin::asEntityOrigin() const
-{
-  return this;
-}
-
-Boolean EntityOrigin::defLocation(Offset off, Location &loc) const
-{
-  if (entity_.isNull())
-    return 0;
-  const InternalEntity *internal = entity_->asInternalEntity();
-  if (!internal)
-    return 0;
-  loc = internal->text().charLocation(off);
-  return 1;
-}
-
-const EntityDecl *EntityOrigin::entityDecl() const
-{
-  return entity_.pointer();
-}
 
 #ifdef SP_NAMESPACE
 }

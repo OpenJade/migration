@@ -45,15 +45,6 @@ Boolean EntityCatalog::lookupPublic(const StringC &,
   return 0;
 }
 
-Boolean EntityCatalog::defaultDoctype(const CharsetInfo &,
-				      Messenger &,
-				      StringC &,
-				      StringC &) const
-{
-  return 0;
-}
-
-
 #ifdef SP_NAMESPACE
 }
 #endif

@@ -372,7 +372,7 @@ Boolean Text::fixedEqual(const Text &text) const
   return 1;
 }
 
-Location Text::charLocation(size_t ind) const
+Boolean Text::charLocation(size_t ind, const ConstPtr<Origin> *&origin, Index &index) const
 {
   // Find the last item whose index <= ind.
   // Invariant:
@@ -394,13 +394,12 @@ Location Text::charLocation(size_t ind) const
       break;
 #endif
   i--;
-  Location loc;
   // If items_.size() == 0, then i == lim.
   if (i < lim) {
-    loc = items_[i].loc;
-    loc += ind - items_[i].index;
+    origin = &items_[i].loc.origin();
+    index = items_[i].loc.index() + (ind - items_[i].index);
   }
-  return loc;
+  return 1;
 }
 
 #ifdef SP_NAMESPACE

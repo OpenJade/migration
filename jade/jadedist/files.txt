@@ -1,3 +1,5 @@
+grove/LocNode.h
+grove/LocNode.cxx
 grove/Node.h
 grove/Node.cxx
 spgrove/GroveApp.h
@@ -36,6 +38,8 @@ style/Interpreter.cxx
 style/InterpreterMessages.cxx
 style/NumberCache.cxx
 style/primitive.cxx
+style/primitive_inst.cxx
+style/primitive_inst.m4
 style/ProcessContext.cxx
 style/ProcessingMode.cxx
 style/Style.cxx
@@ -68,6 +72,8 @@ jade/SgmlFOTBuilder.cxx
 jade/SgmlFOTBuilder.h
 jade/TransformFOTBuilder.cxx
 jade/TransformFOTBuilder.h
+jade/TransformFOTBuilder_inst.cxx
+jade/TransformFOTBuilder_inst.m4
 jade.mak
 dsssl/demo.dsl
 dsssl/demo.sgm
@@ -98,6 +104,9 @@ jade/RtfMessages.msg
 jade/RtfMessages.rc
 jade/TeXFOTBuilder.cxx
 jade/TeXFOTBuilder.h
+jade/TeXMessages.h
+jade/TeXMessages.msg
+jade/TeXMessages.rc
 dsssl/FOT.tex
 dsssl/demoMaster.tex
 jadedoc/copying.txt

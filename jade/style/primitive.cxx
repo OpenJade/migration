@@ -9,6 +9,7 @@
 #include "Style.h"
 #include "macros.h"
 #include "ELObjMessageArg.h"
+#include "LocNode.h"
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>
@@ -24,9 +25,9 @@ public:
     return c.allocateObject(1);
   }
   DescendantsNodeListObj(const NodePtr &, unsigned = 0);
-  NodePtr nodeListFirst(QueryContext &);
-  NodeListObj *nodeListRest(QueryContext &);
-  NodeListObj *nodeListChunkRest(QueryContext &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
 private:
   static void advance(NodePtr &, unsigned &);
   static void chunkAdvance(NodePtr &, unsigned &);
@@ -35,11 +36,87 @@ private:
   unsigned depth_;
 };
 
+class SiblingNodeListObj : public NodeListObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SiblingNodeListObj(const NodePtr &first, const NodePtr &end);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+private:
+  NodePtr first_;
+  NodePtr end_;
+};
+
+class SelectByClassNodeListObj : public NodeListObj {
+public:
+  SelectByClassNodeListObj(NodeListObj *nl, ComponentName::Id);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+  void traceSubObjects(Collector &) const;
+private:
+  NodeListObj *nodeList_;
+  ComponentName::Id cls_;
+};
+
+class MapNodeListObj : public NodeListObj {
+public:
+  class Context : public Resource {
+  public:
+    Context(const EvalContext &, const Location &);
+    void set(EvalContext &) const;
+    void traceSubObjects(Collector &) const;
+    Location loc;
+  private:
+    NodePtr currentNode_;
+    const ProcessingMode *processingMode_;
+    StyleObj *overridingStyle_;
+    bool haveStyleStack_;
+  };
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  MapNodeListObj(FunctionObj *func, NodeListObj *nl, const ConstPtr<Context> &, NodeListObj *mapped = 0);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  void traceSubObjects(Collector &) const;
+  bool suppressError();
+private:
+  void mapNext(EvalContext &, Interpreter &);
+  FunctionObj *func_;
+  NodeListObj *nl_;
+  NodeListObj *mapped_;
+  ConstPtr<Context> context_;
+};
+
+class ElementPattern : public Resource {
+public:
+  virtual ~ElementPattern();
+  virtual bool matches(const NodePtr &, SdataMapper &) const = 0;
+};
+
+class SelectElementsNodeListObj : public NodeListObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SelectElementsNodeListObj(NodeListObj *, const ConstPtr<ElementPattern> &);
+  void traceSubObjects(Collector &) const;
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+private:
+  NodeListObj *nodeList_;
+  ConstPtr<ElementPattern> pattern_;
+};
+
 class UnionElementPattern : public ElementPattern {
 public:
   UnionElementPattern(const ConstPtr<ElementPattern> &,
 		      const ConstPtr<ElementPattern> &);
-  bool matches(const NodePtr &, QueryContext &) const;
+  bool matches(const NodePtr &, SdataMapper &) const;
 private:
   ConstPtr<ElementPattern> pat1_;
   ConstPtr<ElementPattern> pat2_;
@@ -48,9 +125,10 @@ private:
 class SimpleElementPattern : public ElementPattern {
 public:
   SimpleElementPattern(Vector<StringC> &);
-  bool matches(const NodePtr &, QueryContext &) const;
+  bool matches(const NodePtr &, SdataMapper &) const;
 private:
   // gi followed by att name/value pairs.
+  // empty gi matches any gi
   Vector<StringC> giAtts_;
 };
 
@@ -58,10 +136,16 @@ class ParentElementPattern : public ElementPattern {
 public:
   ParentElementPattern(const ConstPtr<ElementPattern> &pat,
 		       const ConstPtr<ElementPattern> &parentPat);
-  bool matches(const NodePtr &, QueryContext &) const;
+  bool matches(const NodePtr &, SdataMapper &) const;
 private:
   ConstPtr<ElementPattern> pat_;
   ConstPtr<ElementPattern> parentPat_;
+};
+
+class NoElementPattern : public ElementPattern {
+public:
+  NoElementPattern() { }
+  bool matches(const NodePtr &, SdataMapper &) const;
 };
 
 #define PRIMITIVE(name, string, nRequired, nOptional, rest) \
@@ -69,8 +153,7 @@ class name ## PrimitiveObj : public PrimitiveObj { \
 public: \
   static const Signature signature_; \
   name ## PrimitiveObj() : PrimitiveObj(&signature_) { } \
-  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &) \
-    const; \
+  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &); \
 }; \
 const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
@@ -83,7 +166,7 @@ const Signature name ## PrimitiveObj::signature_ \
 #define DEFPRIMITIVE(name, argc, argv, context, interp, loc) \
  ELObj *name ## PrimitiveObj \
   ::primitiveCall(int argc, ELObj **argv, EvalContext &context, Interpreter &interp, \
-                  const Location &loc) const
+                  const Location &loc)
 
 DEFPRIMITIVE(Cons, argc, argv, context, interp, loc)
 {
@@ -426,6 +509,16 @@ DEFPRIMITIVE(SymbolToString, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notASymbol, 0, argv[0]);
   return obj->name();
+}
+
+DEFPRIMITIVE(StringToSymbol, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  return interp.makeSymbol(StringC(s, n));
 }
 
 DEFPRIMITIVE(IsString, argc, argv, context, interp, loc)
@@ -1686,21 +1779,29 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
     const Char *s;
     size_t n;
     str->stringData(s, n);
+    if (!n)
+      return new NoElementPattern;
     giAtts[0].assign(s, n);
     interp.normalizeGeneralName(giAtts[0]);
     return new SimpleElementPattern(giAtts);
   }
+  else if (obj == interp.makeTrue() || obj->isNil())
+    return new SimpleElementPattern(giAtts);
   PairObj *pair = obj->asPair();
   if (!pair)
     return 0;
   str = pair->car()->convertToString();
-  if (!str)
+  if (str) {
+    const Char *s;
+    size_t n;
+    str->stringData(s, n);
+    if (!n)
+      return new NoElementPattern;
+    giAtts[0].assign(s, n);
+    interp.normalizeGeneralName(giAtts[0]);
+  }
+  else if (pair->car() != interp.makeTrue())
     return 0;
-  const Char *s;
-  size_t n;
-  str->stringData(s, n);
-  giAtts[0].assign(s, n);
-  interp.normalizeGeneralName(giAtts[0]);
   obj = pair->cdr();
   if (!obj->isNil()) {
     pair = obj->asPair();
@@ -1716,6 +1817,8 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
 	  str = atts->car()->convertToString();
 	  if (!str)
 	    return 0;
+	  const Char *s;
+	  size_t n;
 	  str->stringData(s, n);
 	  giAtts.push_back(StringC(s, n));
 	  if (atts->cdr()->isNil())
@@ -1764,7 +1867,7 @@ DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
   ELObjDynamicRoot protect(interp, nl);
   nl = new (interp) SelectElementsNodeListObj(nl, pattern);
   protect = nl;
-  NodePtr nd(nl->nodeListFirst(interp));
+  NodePtr nd(nl->nodeListFirst(context, interp));
   if (!nd)
     return new (interp) EmptySosofoObj;
   return new (interp) ProcessNodeSosofoObj(nd, context.processingMode);
@@ -2431,7 +2534,7 @@ DEFPRIMITIVE(EntityAddress, argc, argv, context, interp, loc)
 DEFPRIMITIVE(NodeListAddress, argc, argv, context, interp, loc)
 {
   NodePtr node;
-  if (!argv[0]->optSingletonNodeList(interp, node) || !node)
+  if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
     return argError(interp, loc,
 		    InterpreterMessages::notASingletonNode, 0, argv[0]);
   return new (interp) AddressObj(FOTBuilder::Address::resolvedNode, node);
@@ -2537,8 +2640,15 @@ DEFPRIMITIVE(NodeListError, argc, argv, context, interp, loc)
   if (!argv[1]->asNodeList())
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 1, argv[1]);
-  // FIXME
-  interp.setNextLocation(loc);
+  NodePtr nd;
+  const LocNode *lnp;
+  Location nodeLoc;
+  if (argv[1]->optSingletonNodeList(context, interp, nd)
+      && (lnp = LocNode::convert(nd)) != 0
+      && lnp->getLocation(nodeLoc) == accessOK)
+    interp.setNextLocation(nodeLoc);
+  else
+    interp.setNextLocation(loc);
   interp.message(InterpreterMessages::errorProc,
 		 StringMessageArg(StringC(s, n)));
   return interp.makeError();
@@ -2550,7 +2660,7 @@ DEFPRIMITIVE(IsNodeListEmpty, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  if (nl->nodeListFirst(interp))
+  if (nl->nodeListFirst(context, interp))
     return interp.makeFalse();
   else
     return interp.makeTrue();
@@ -2568,7 +2678,7 @@ DEFPRIMITIVE(Parent, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node))
+    if (!argv[0]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
     if (!node)
@@ -2580,7 +2690,7 @@ DEFPRIMITIVE(Parent, argc, argv, context, interp, loc)
       return noCurrentNodeError(interp, loc);
   }
   if (node->getParent(node) != accessOK)
-    return new (interp) NodePtrNodeListObj;
+    return interp.makeEmptyNodeList();
   return new (interp) NodePtrNodeListObj(node);
 }
 
@@ -2604,7 +2714,7 @@ DEFPRIMITIVE(Ancestor, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -2622,14 +2732,14 @@ DEFPRIMITIVE(Ancestor, argc, argv, context, interp, loc)
     if (node->getGi(str) == accessOK && str == GroveString(gi.data(), gi.size()))
       return new (interp) NodePtrNodeListObj(node);
   }
-  return new (interp) NodePtrNodeListObj;
+  return interp.makeEmptyNodeList();
 }
 
 DEFPRIMITIVE(Gi, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node))
+    if (!argv[0]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
   }
@@ -2649,7 +2759,7 @@ DEFPRIMITIVE(FirstChildGi, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node))
+    if (!argv[0]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
     if (!node)
@@ -2676,7 +2786,7 @@ DEFPRIMITIVE(Id, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node))
+    if (!argv[0]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
   }
@@ -2726,7 +2836,7 @@ DEFPRIMITIVE(AttributeString, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node))
+    if (!argv[1]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 1, argv[1]);
     if (!node)
@@ -2751,7 +2861,7 @@ DEFPRIMITIVE(InheritedAttributeString, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node))
+    if (!argv[1]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 1, argv[1]);
     if (!node)
@@ -2778,7 +2888,7 @@ DEFPRIMITIVE(InheritedElementAttributeString, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 2) {
-    if (!argv[2]->optSingletonNodeList(interp, node))
+    if (!argv[2]->optSingletonNodeList(context, interp, node))
       return argError(interp, loc,
 		      InterpreterMessages::notAnOptSingletonNode, 2, argv[2]);
     if (!node)
@@ -2812,7 +2922,7 @@ DEFPRIMITIVE(IsFirstSibling, argc, argv, context, interp, loc)
 {
   NodePtr nd;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, nd) || !nd)
+    if (!argv[0]->optSingletonNodeList(context, interp, nd) || !nd)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -2840,7 +2950,7 @@ DEFPRIMITIVE(IsAbsoluteFirstSibling, argc, argv, context, interp, loc)
 {
   NodePtr nd;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, nd) || !nd)
+    if (!argv[0]->optSingletonNodeList(context, interp, nd) || !nd)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -2866,7 +2976,7 @@ DEFPRIMITIVE(IsLastSibling, argc, argv, context, interp, loc)
 {
   NodePtr nd;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, nd) || !nd)
+    if (!argv[0]->optSingletonNodeList(context, interp, nd) || !nd)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -2890,7 +3000,7 @@ DEFPRIMITIVE(IsAbsoluteLastSibling, argc, argv, context, interp, loc)
 {
   NodePtr nd;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, nd) || !nd)
+    if (!argv[0]->optSingletonNodeList(context, interp, nd) || !nd)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -2936,7 +3046,7 @@ DEFPRIMITIVE(IsHaveAncestor, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -2968,7 +3078,7 @@ DEFPRIMITIVE(ChildNumber, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -2987,7 +3097,7 @@ DEFPRIMITIVE(AncestorChildNumber, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3016,7 +3126,7 @@ DEFPRIMITIVE(HierarchicalNumber, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3077,7 +3187,7 @@ DEFPRIMITIVE(HierarchicalNumberRecursive, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3109,7 +3219,7 @@ DEFPRIMITIVE(ElementNumber, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 0) {
-    if (!argv[0]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 0, argv[0]);
   }
@@ -3130,7 +3240,7 @@ DEFPRIMITIVE(ElementNumberList, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3192,7 +3302,7 @@ DEFPRIMITIVE(EntityAttributeString, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 1, argv[1]);
   NodePtr node;
   if (argc > 2) {
-    if (!argv[2]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[2]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 2, argv[2]);
   }
@@ -3220,7 +3330,7 @@ DEFPRIMITIVE(EntityGeneratedSystemId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3249,7 +3359,7 @@ DEFPRIMITIVE(EntitySystemId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3278,7 +3388,7 @@ DEFPRIMITIVE(EntityPublicId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3310,7 +3420,7 @@ DEFPRIMITIVE(EntityNotation, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3339,7 +3449,7 @@ DEFPRIMITIVE(EntityText, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3367,7 +3477,7 @@ DEFPRIMITIVE(EntityType, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3419,7 +3529,7 @@ DEFPRIMITIVE(NotationSystemId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3449,7 +3559,7 @@ DEFPRIMITIVE(NotationPublicId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3479,7 +3589,7 @@ DEFPRIMITIVE(NotationGeneratedSystemId, argc, argv, context, interp, loc)
 		    InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
 		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3504,7 +3614,7 @@ DEFPRIMITIVE(GeneralNameNormalize, argc, argv, context, interp, loc)
 {
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
     		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3527,7 +3637,7 @@ DEFPRIMITIVE(EntityNameNormalize, argc, argv, context, interp, loc)
     return argError(interp, loc, InterpreterMessages::notAString, 0, argv[0]);
   NodePtr node;
   if (argc > 1) {
-    if (!argv[1]->optSingletonNodeList(interp, node) || !node)
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
       return argError(interp, loc,
     		      InterpreterMessages::notASingletonNode, 1, argv[1]);
   }
@@ -3551,7 +3661,7 @@ DEFPRIMITIVE(NodeListFirst, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  NodePtr nd = nl->nodeListFirst(interp);
+  NodePtr nd = nl->nodeListFirst(context, interp);
   return new (interp) NodePtrNodeListObj(nd);
 }
 
@@ -3561,7 +3671,33 @@ DEFPRIMITIVE(NodeListRest, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  return nl->nodeListRest(interp);
+  return nl->nodeListRest(context, interp);
+}
+
+DEFPRIMITIVE(NodeList, argc, argv, context, interp, loc)
+{
+  if (argc == 0)
+    return interp.makeEmptyNodeList();
+  int i = argc - 1;
+  NodeListObj *nl = argv[i]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, i, argv[i]);
+  if (i > 0) {
+    ELObjDynamicRoot protect(interp, nl);
+    for (;;) {
+      i--;
+      NodeListObj *tem = argv[i]->asNodeList();
+      if (!tem)
+        return argError(interp, loc,
+	                InterpreterMessages::notANodeList, i, argv[i]);
+      nl = new (interp) PairNodeListObj(tem, nl);
+      if (i == 0)
+	break;
+      protect = nl;
+    }
+  }
+  return nl;
 }
 
 DEFPRIMITIVE(NodeListNoOrder, argc, argv, context, interp, loc)
@@ -3585,9 +3721,11 @@ DEFPRIMITIVE(IsNodeListEqual, argc, argv, context, interp, loc)
   if (!nl2)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 1, argv[1]);
+  ELObjDynamicRoot protect1(interp, nl1);
+  ELObjDynamicRoot protect2(interp, nl2);
   for (;;) {
-    NodePtr nd1 = nl1->nodeListFirst(interp);
-    NodePtr nd2 = nl2->nodeListFirst(interp);
+    NodePtr nd1 = nl1->nodeListFirst(context, interp);
+    NodePtr nd2 = nl2->nodeListFirst(context, interp);
     if (!nd1) {
       if (nd2)
 	return interp.makeFalse();
@@ -3598,8 +3736,10 @@ DEFPRIMITIVE(IsNodeListEqual, argc, argv, context, interp, loc)
       return interp.makeFalse();
     else if (*nd1 != *nd2)
       return interp.makeFalse();
-    nl1 = nl1->nodeListRest(interp);
-    nl2 = nl2->nodeListRest(interp);
+    nl1 = nl1->nodeListRest(context, interp);
+    protect1 = nl1;
+    nl2 = nl2->nodeListRest(context, interp);
+    protect2 = nl2;
   }
   return interp.makeTrue();
 }
@@ -3626,6 +3766,24 @@ DEFPRIMITIVE(NamedNode, argc, argv, context, interp, loc)
   return new (interp) NodePtrNodeListObj(nnl->namedNode(s, n));
 }
 
+DEFPRIMITIVE(NamedNodeListNormalize, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc, InterpreterMessages::notAString, 0, argv[0]);
+  NamedNodeListObj *nnl = argv[1]->asNamedNodeList();
+  if (!nnl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANamedNodeList, 1, argv[1]);
+  if (!argv[2]->asSymbol())
+    return argError(interp, loc,
+		    InterpreterMessages::notASymbol, 2, argv[2]);
+  StringC result(s, n);
+  result.resize(nnl->normalize(result.begin(), result.size()));
+  return new (interp) StringObj(result);
+}
+
 DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
 {
   NamedNodeListObj *nnl = argv[0]->asNamedNodeList();
@@ -3638,7 +3796,7 @@ DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
   ELObjDynamicRoot protect(interp, head);
   for (;;) {
     ELObjDynamicRoot protect(interp, nl);
-    NodePtr nd = nl->nodeListFirst(interp);
+    NodePtr nd = nl->nodeListFirst(context, interp);
     if (!nd)
       break;
     GroveString str;
@@ -3649,7 +3807,7 @@ DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
       tail->setCdr(newTail);
       tail = newTail;
     }
-    nl = nl->nodeListRest(interp);
+    nl = nl->nodeListRest(context, interp);
   }
   tail->setCdr(interp.makeNil());
   return head->cdr();
@@ -3658,37 +3816,83 @@ DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
 DEFPRIMITIVE(Children, argc, argv, context, interp, loc)
 {
   NodePtr node;
-  if (!argv[0]->optSingletonNodeList(interp, node))
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
     return argError(interp, loc,
-		    InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
   if (!node)
     return argv[0];
   NodeListPtr nl;
   if (node->children(nl) != accessOK)
-    return new (interp) NodePtrNodeListObj;
+    return interp.makeEmptyNodeList();
+  return new (interp) NodeListPtrNodeListObj(nl);
+}
+
+DEFPRIMITIVE(Follow, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
+  if (!node)
+    return argv[0];
+  NodeListPtr nl;
+  if (node->follow(nl) != accessOK)
+    return interp.makeEmptyNodeList();
   return new (interp) NodeListPtrNodeListObj(nl);
 }
 
 DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
 {
   NodePtr node;
-  if (!argv[0]->optSingletonNodeList(interp, node))
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
     return argError(interp, loc,
-		    InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
   return new (interp) DescendantsNodeListObj(node);
+}
+
+DEFPRIMITIVE(Preced, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
+  NodePtr first;
+  if (!node || node->firstSibling(first) != accessOK)
+    return interp.makeEmptyNodeList();
+  return new (interp) SiblingNodeListObj(first, node);
 }
 
 DEFPRIMITIVE(Attributes, argc, argv, context, interp, loc)
 {
   NodePtr node;
-  if (!argv[0]->optSingletonNodeList(interp, node))
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
     return argError(interp, loc,
-		    InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
   if (!node)
     return argv[0];
   NamedNodeListPtr nnl;
   if (node->getAttributes(nnl) != accessOK)
-    return new (interp) NodePtrNodeListObj;
+    return interp.makeEmptyNodeList();
   return new (interp) NamedNodeListPtrNodeListObj(nnl);
 }
 
@@ -3724,16 +3928,244 @@ DEFPRIMITIVE(Data, argc, argv, context, interp, loc)
 		    InterpreterMessages::notANodeList, 0, argv[0]);
   StringObj *s = new (interp) StringObj;
   ELObjDynamicRoot protect(interp, s);
-  bool chunkComplete = nl->chunkComplete();
   for (;;) {
     ELObjDynamicRoot protect(interp, nl);
-    NodePtr nd = nl->nodeListFirst(interp);
+    NodePtr nd = nl->nodeListFirst(context, interp);
     if (!nd)
       break;
-    nodeData(nd, interp, chunkComplete, *s);
-    nl = chunkComplete ? nl->nodeListChunkRest(interp) : nl->nodeListRest(interp);
+    bool chunk;
+    nl = nl->nodeListChunkRest(context, interp, chunk);
+    nodeData(nd, interp, chunk, *s);
   }
   return s;
+}
+
+DEFPRIMITIVE(ElementWithId, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc, InterpreterMessages::notAString, 0, argv[0]);
+  NodePtr node;
+  if (argc > 1) {
+    if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
+      return argError(interp, loc,
+		      InterpreterMessages::notASingletonNode, 1, argv[1]);
+  }
+  else {
+    node = context.currentNode;
+    if (!node)
+      return noCurrentNodeError(interp, loc);
+  }
+  NamedNodeListPtr elements;
+  if (node->getGroveRoot(node) == accessOK
+      && node->getElements(elements) == accessOK
+      && elements->namedNode(GroveString(s, n), node) == accessOK)
+    return new (interp) NodePtrNodeListObj(node);
+  return interp.makeEmptyNodeList();
+}
+
+DEFPRIMITIVE(EmptyNodeList, argc, argv, context, interp, loc)
+{
+  return interp.makeEmptyNodeList();
+}
+
+static
+bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
+		   int nKeys, Interpreter &interp, const Location &loc, ELObj **values)
+{
+  if ((argc & 1) == 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::oddKeyArgs);
+    return 0;
+  }
+  for (int i = 0; i < nKeys; i++)
+    values[i] = interp.makeUnspecified();
+  // First has priority, so scan in reverse order
+  for (int i = argc - 1; i > 0; i -= 2) {
+    KeywordObj *keyObj = argv[i - 1]->asKeyword();
+    if (!keyObj) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::keyArgsNotKey);
+      return 0;
+    }
+    bool found = 0;
+    Identifier::SyntacticKey key;
+    if (keyObj->identifier()->syntacticKey(key)) {
+      for (int j = 0; j < nKeys; j++) {
+	if (key == keys[j]) {
+	  values[j] = argv[i];
+	  found = 1;
+	}
+      }
+    }
+    if (!found) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::invalidKeyArg,
+		     StringMessageArg(keyObj->identifier()->name()));
+      return 0;
+    }
+  }
+  return 1;
+}
+
+class ELObjPropertyValue : public PropertyValue {
+public:
+  ELObjPropertyValue(Interpreter &interp, bool rcs) : interp_(&interp), rcs_(rcs), obj(0) { }
+  void set(const NodePtr &nd) {
+    obj = new (*interp_) NodePtrNodeListObj(nd);
+  }
+  void set(const NodeListPtr &nl) {
+    obj = new (*interp_) NodeListPtrNodeListObj(nl);
+  }
+  void set(const NamedNodeListPtr &nnl) {
+    obj = new (*interp_) NamedNodeListPtrNodeListObj(nnl);
+  }
+  void set(bool b) {
+    if (b)
+      obj = interp_->makeTrue();
+    else
+      obj = interp_->makeFalse();
+  }
+  void set(GroveChar c) {
+    obj = interp_->makeChar(c);
+  }
+  void set(GroveString s) {
+    obj = new (*interp_) StringObj(s.data(), s.size());
+  }
+  void set(ComponentName::Id id) {
+    const char *s = rcs_ ? ComponentName::rcsName(id) : ComponentName::sdqlName(id);
+    obj = interp_->makeSymbol(interp_->makeStringC(s));
+  }
+  void set(const ComponentName::Id *names) {
+    PairObj *head = new (*interp_) PairObj(0, 0);
+    ELObjDynamicRoot protect(*interp_, head);
+    PairObj *tail = head;
+    for (int i = 0; names[i] != ComponentName::noId; i++) {
+      const char *s = (rcs_
+	               ? ComponentName::rcsName(names[i])
+		       : ComponentName::sdqlName(names[i]));
+      SymbolObj *sym = interp_->makeSymbol(interp_->makeStringC(s));
+      tail->setCdr(sym); // in case we ever gc symbols
+      PairObj *tem = new (*interp_) PairObj(sym, 0);
+      tail->setCdr(tem);
+      tail = tem;
+    }
+    tail->setCdr(interp_->makeNil());
+    obj = head->cdr();
+  }
+  ELObj *obj;
+private:
+  Interpreter *interp_;
+  bool rcs_;
+};
+
+DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
+{
+  StringObj *str = argv[0]->convertToString();
+  if (!str)
+    return argError(interp, loc,
+		    InterpreterMessages::notAStringOrSymbol, 0, argv[0]);
+  NodePtr node;
+  if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+		    InterpreterMessages::notASingletonNode, 1, argv[1]);
+  static const Identifier::SyntacticKey keys[3] = {
+    Identifier::keyDefault, Identifier::keyNull, Identifier::keyIsRcs
+  };
+  ELObj *keyArgValues[3];
+  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 3, interp, loc, keyArgValues))
+    return interp.makeError();
+  ComponentName::Id id;
+  if (interp.lookupNodeProperty(*str, id)) {
+    ELObjPropertyValue value(interp,
+			     keyArgValues[2] != interp.makeUnspecified()
+			     && keyArgValues[2] != interp.makeFalse());
+    AccessResult ret = node->property(id, interp, value);
+    if (ret == accessOK)
+      return value.obj;
+    if (ret == accessNull && keyArgValues[1] != interp.makeUnspecified())
+      return keyArgValues[1];
+  }
+  if (keyArgValues[0] == interp.makeUnspecified()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::noNodePropertyValue,
+		   StringMessageArg(*str));
+    return interp.makeError();
+  }
+  return keyArgValues[0];
+}
+
+DEFPRIMITIVE(SelectByClass, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  StringObj *str = argv[1]->convertToString();
+  if (!str)
+    return argError(interp, loc,
+		    InterpreterMessages::notAStringOrSymbol, 1, argv[1]);
+  ComponentName::Id id;
+  if (!interp.lookupNodeProperty(*str, id))
+    return interp.makeEmptyNodeList();
+  return new (interp) SelectByClassNodeListObj(nl, id);
+}
+
+DEFPRIMITIVE(NodeListMap, argc, argv, context, interp, loc)
+{
+  FunctionObj *func = argv[0]->asFunction();
+  if (!func)
+    return argError(interp, loc,
+		    InterpreterMessages::notAProcedure, 0, argv[0]);
+  if (func->nRequiredArgs() > 1) {
+    interp.setNextLocation(loc);
+    // FIXME
+    interp.message(InterpreterMessages::missingArg);
+    return interp.makeError();
+  }
+  if (func->nRequiredArgs() + func->nOptionalArgs() + func->restArg() == 0) {
+    interp.setNextLocation(loc);
+    // FIXME
+    interp.message(InterpreterMessages::tooManyArgs);
+    return interp.makeError();
+  }
+  NodeListObj *nl = argv[1]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 1, argv[1]);
+  return new (interp) MapNodeListObj(func, nl, new MapNodeListObj::Context(context, loc));
+}
+
+DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  long k;
+  if (!argv[1]->exactIntegerValue(k))
+    return argError(interp, loc,
+		    InterpreterMessages::notAnExactInteger, 1, argv[1]);
+  return new (interp) NodePtrNodeListObj(nl->nodeListRef(k, context, interp));
+}
+
+DEFPRIMITIVE(NodeListReverse, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  return nl->nodeListReverse(context, interp);
+}
+
+DEFPRIMITIVE(NodeListLength, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  return interp.makeInteger(nl->nodeListLength(context, interp));
 }
 
 DEFPRIMITIVE(Debug, argc, argv, context, interp, loc)
@@ -3806,14 +4238,18 @@ SimpleElementPattern::SimpleElementPattern(Vector<StringC> &giAtts)
   giAtts.swap(giAtts_);
 }
 
-bool SimpleElementPattern::matches(const NodePtr &node, QueryContext &qc) const
+bool SimpleElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
 {
   GroveString tem;
   if (node->getGi(tem) != accessOK)
     return 0;
-  GroveString gi(giAtts_[0].data(), giAtts_[0].size());
-  if (gi != tem)
-    return 0;
+  // An empty gi in the pattern matches any gi.
+  size_t len = giAtts_[0].size();
+  if (len) {
+    GroveString gi(giAtts_[0].data(), len);
+    if (gi != tem)
+      return 0;
+  }
   if (giAtts_.size() > 1) {
     NamedNodeListPtr atts;
     if (node->getAttributes(atts) != accessOK)
@@ -3848,7 +4284,7 @@ bool SimpleElementPattern::matches(const NodePtr &node, QueryContext &qc) const
 	if (att->firstChild(tem) == accessOK) {
 	  do {
 	    GroveString chunk;
-	    if (tem->charChunk(qc, chunk) == accessOK)
+	    if (tem->charChunk(mapper, chunk) == accessOK)
 	      value.append(chunk.data(), chunk.size());
 	  } while (tem.assignNextChunkSibling() == accessOK);
 	}
@@ -3866,9 +4302,9 @@ UnionElementPattern::UnionElementPattern(const ConstPtr<ElementPattern> &pat1,
 {
 }
 
-bool UnionElementPattern::matches(const NodePtr &node, QueryContext &qc) const
+bool UnionElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
 {
-  return pat1_->matches(node, qc) || pat2_->matches(node, qc);
+  return pat1_->matches(node, mapper) || pat2_->matches(node, mapper);
 }
 
 ParentElementPattern::ParentElementPattern(const ConstPtr<ElementPattern> &pat,
@@ -3877,14 +4313,19 @@ ParentElementPattern::ParentElementPattern(const ConstPtr<ElementPattern> &pat,
 {
 }
 
-bool ParentElementPattern::matches(const NodePtr &node, QueryContext &qc) const
+bool ParentElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
 {
-  if (!pat_->matches(node, qc))
+  if (!pat_->matches(node, mapper))
     return 0;
   NodePtr parentNode;
   if (node->getParent(parentNode) != accessOK)
     return 0;
-  return parentPat_->matches(parentNode, qc);
+  return parentPat_->matches(parentNode, mapper);
+}
+
+bool NoElementPattern::matches(const NodePtr &, SdataMapper &) const
+{
+  return 0;
 }
 
 DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start, unsigned depth)
@@ -3893,22 +4334,23 @@ DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start, unsigned de
   advance(start_, depth_);
 }
 
-NodePtr DescendantsNodeListObj::nodeListFirst(QueryContext &)
+NodePtr DescendantsNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   return start_;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListRest(QueryContext &c)
+NodeListObj *DescendantsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  DescendantsNodeListObj *obj = new (c) DescendantsNodeListObj(*this);
+  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
   advance(obj->start_, obj->depth_);
   return obj;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListChunkRest(QueryContext &c)
+NodeListObj *DescendantsNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
-  DescendantsNodeListObj *obj = new (c) DescendantsNodeListObj(*this);
+  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
   chunkAdvance(obj->start_, obj->depth_);
+  chunk = 1;
   return obj;
 }
 
@@ -3946,6 +4388,248 @@ void DescendantsNodeListObj::chunkAdvance(NodePtr &nd, unsigned &depth)
   }
 }
 
+SelectByClassNodeListObj::SelectByClassNodeListObj(NodeListObj *nl, ComponentName::Id cls)
+: nodeList_(nl), cls_(cls)
+{
+  hasSubObjects_ = 1;
+}
+
+NodePtr SelectByClassNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    if (!nd || nd->classDef().className == cls_)
+      return nd;
+    // All nodes in a chunk have the same class
+    bool chunk;
+    nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
+  }
+  // not reached
+  return NodePtr();
+}
+
+NodeListObj *SelectByClassNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    if (!nd || nd->classDef().className == cls_)
+      break;
+    // All nodes in a chunk have the same class
+    bool chunk;
+    nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
+  }
+  NodeListObj *tem = nodeList_->nodeListRest(context, interp);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) SelectByClassNodeListObj(tem, cls_);
+}
+
+NodeListObj *SelectByClassNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
+{
+  for (;;) {
+    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    if (!nd)
+      return interp.makeEmptyNodeList();
+    if (nd->classDef().className == cls_)
+      break;
+    bool tem;
+    nodeList_ = nodeList_->nodeListChunkRest(context, interp, tem);
+  }
+  NodeListObj *tem = nodeList_->nodeListChunkRest(context, interp, chunk);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) SelectByClassNodeListObj(tem, cls_);
+}
+
+void SelectByClassNodeListObj::traceSubObjects(Collector &c) const
+{
+  c.trace(nodeList_);
+}
+
+MapNodeListObj::MapNodeListObj(FunctionObj *func, NodeListObj *nl,
+			       const ConstPtr<Context> &context,
+			       NodeListObj *mapped)
+: func_(func), nl_(nl), context_(context), mapped_(mapped)
+{
+  hasSubObjects_ = 1;
+}
+
+NodePtr MapNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    if (!mapped_) {
+      mapNext(context, interp);
+      if (!mapped_)
+	break;
+    }
+    NodePtr nd = mapped_->nodeListFirst(context, interp);
+    if (nd)
+      return nd;
+    mapped_ = 0;
+  }
+  return NodePtr();
+}
+
+NodeListObj *MapNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    if (!mapped_) {
+      mapNext(context, interp);
+      if (!mapped_)
+	break;
+    }
+    NodePtr nd = mapped_->nodeListFirst(context, interp);
+    if (nd) {
+      NodeListObj *tem = mapped_->nodeListRest(context, interp);
+      ELObjDynamicRoot protect(interp, tem);
+      return new (interp) MapNodeListObj(func_, nl_, context_, tem);
+    }
+    mapped_ = 0;
+  }
+  return interp.makeEmptyNodeList();
+}
+
+void MapNodeListObj::mapNext(EvalContext &context, Interpreter &interp)
+{
+  if (!func_)
+    return;
+  NodePtr nd = nl_->nodeListFirst(context, interp);
+  if (!nd)
+    return;
+  VM vm(context, interp);
+  context_->set(vm);
+  InsnPtr insn(func_->makeCallInsn(1, interp, context_->loc, InsnPtr()));
+  ELObj *ret = vm.eval(insn.pointer(), 0, new (interp) NodePtrNodeListObj(nd));
+  if (interp.isError(ret)) {
+    func_ = 0;
+    return;
+  }
+  mapped_ = ret->asNodeList();
+  if (!mapped_) {
+    interp.setNextLocation(context_->loc);
+    interp.message(InterpreterMessages::returnNotNodeList);
+    func_ = 0;
+    return;
+  }
+  nl_ = nl_->nodeListRest(context, interp);
+}
+
+void MapNodeListObj::traceSubObjects(Collector &c) const
+{
+  c.trace(nl_);
+  c.trace(func_);
+  c.trace(mapped_);
+  context_->traceSubObjects(c);
+}
+
+bool MapNodeListObj::suppressError()
+{
+  return func_ == 0;
+}
+
+MapNodeListObj::Context::Context(const EvalContext &context, const Location &l)
+: loc(l),
+  haveStyleStack_(context.styleStack != 0),
+  processingMode_(context.processingMode),
+  currentNode_(context.currentNode),
+  overridingStyle_(context.overridingStyle)
+{
+}
+
+void MapNodeListObj::Context::set(EvalContext &context) const
+{
+  context.processingMode = processingMode_;
+  context.currentNode = currentNode_;
+  context.overridingStyle = overridingStyle_;
+  if (!haveStyleStack_)
+    context.styleStack = 0;
+}
+
+void MapNodeListObj::Context::traceSubObjects(Collector &c) const
+{
+  c.trace(overridingStyle_);
+}
+
+SelectElementsNodeListObj::SelectElementsNodeListObj(NodeListObj *nodeList,
+						     const ConstPtr<ElementPattern> &pattern)
+: nodeList_(nodeList), pattern_(pattern)
+{
+  hasSubObjects_ = 1;
+}
+
+void SelectElementsNodeListObj::traceSubObjects(Collector &c) const
+{
+  c.trace(nodeList_);
+}
+
+NodePtr SelectElementsNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    if (!nd || pattern_->matches(nd, interp))
+      return nd;
+    bool chunk;
+    nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
+  }
+  // not reached
+  return NodePtr();
+}
+
+NodeListObj *SelectElementsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  ASSERT(!pattern_.isNull());
+  for (;;) {
+    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    if (!nd || pattern_->matches(nd, interp))
+      break;
+    bool chunk;
+    nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
+  }
+  bool chunk;
+  NodeListObj *tem = nodeList_->nodeListChunkRest(context, interp, chunk);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) SelectElementsNodeListObj(tem, pattern_);
+}
+
+SiblingNodeListObj::SiblingNodeListObj(const NodePtr &first, const NodePtr &end)
+: first_(first), end_(end)
+{
+}
+
+NodePtr SiblingNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
+{
+  if (*first_ == *end_)
+    return NodePtr();
+  return first_;
+}
+
+NodeListObj *SiblingNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  if (*first_ == *end_)
+    return interp.makeEmptyNodeList();
+  NodePtr nd;
+  if (first_->nextSibling(nd) != accessOK)
+    CANNOT_HAPPEN();
+  return new (interp) SiblingNodeListObj(nd, end_);
+}
+
+NodeListObj *SiblingNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
+{
+  if (first_->chunkContains(*end_)) {
+    chunk = 0;
+    return nodeListRest(context, interp);
+  }
+  NodePtr nd;
+  if (first_->nextChunkSibling(nd) != accessOK)
+    CANNOT_HAPPEN();
+  chunk = 1;
+  return new (interp) SiblingNodeListObj(nd, end_);
+}
+
+ElementPattern::~ElementPattern()
+{
+}
+
 #ifdef DSSSL_NAMESPACE
 }
 #endif
+
+#include "primitive_inst.cxx"

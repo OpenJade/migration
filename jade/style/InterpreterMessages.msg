@@ -32,6 +32,7 @@ E3+notAPair++%2 argument for primitive %1 of wrong type: %3 not a pair
 E3+notAList++%2 argument for primitive %1 of wrong type: %3 not a list
 E3+notASymbol++%2 argument for primitive %1 of wrong type: %3 not a symbol
 E3+notAString++%2 argument for primitive %1 of wrong type: %3 not a string
+E3+notAStringOrSymbol++%2 argument for primitive %1 of wrong type: %3 not a string or symbol
 E3+notASymbolOrString++%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol
 E3+notAChar++%2 argument for primitive %1 of wrong type: %3 not a char
 E3+notAStyle++%2 argument for primitive %1 of wrong type: %3 not a style
@@ -52,6 +53,7 @@ E3+notAnAddress++%2 argument for primitive %1 of wrong type: %3 not an address
 E3+notAGlyphId++%2 argument for primitive %1 of wrong type: %3 not a glyph-id
 E3+notAGlyphSubstTable++%2 argument for primitive %1 of wrong type: %3 not a glyph-subst-table
 E3+notAGlyphIdPairList++%2 argument for primitive %1 of wrong type: %3 not a list of pairs of glyph-ids
+E3+notAProcedure++%2 argument for primitive %1 of wrong type: %3 not a procedure
 E0+duplicateDefaultRule++default rule already defined in same part+first definition was here
 E0+duplicateRootRule++root rule already defined in same part+first definition was here
 E1+duplicateIdRule++rule for ID %1 already defined in same part+first definition was here
@@ -70,7 +72,7 @@ E0+condFail++no clause in cond expression matched
 E1+caseFail++no clause in case expression matched %1
 E1+caseElse++expected "else" not %1
 E0+caseUnresolvedQuantities++sorry, cannot handle unresolvable quantities in datums in case expression
-E1+errorProc++user error %1
+E1+errorProc++%1
 E0+divideBy0++division by zero
 E1+invalidKeyArg++procedure does not have %1 keyword argument
 E0+keyArgsNotKey++argument not a keyword
@@ -99,3 +101,5 @@ E1+missingPart++no style-specification or external-specification with ID %1
 E0+noParts++document did not contain any style-specifications or external-specifications
 E0+tableCellOutsideTable++table-cell flow object not inside a table
 E0+tableRowOutsideTable++table-row flow object not inside a table
+E1+noNodePropertyValue++no value for node property %1
+E0+returnNotNodeList++value returned by procedure was not a node-list

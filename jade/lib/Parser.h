@@ -199,7 +199,7 @@ private:
 			  Ptr<ElementDefinition> &def);
   void parsePcdata();
   void parseStartTag();
-  const ElementType *completeRankStem(const StringC &);
+  ElementType *completeRankStem(const StringC &);
   void handleRankedElement(const ElementType *);
   void parseEmptyStartTag();
   void acceptPcdata(const Location &);
@@ -220,7 +220,9 @@ private:
   void queueElementEvents(IList<Event> &);
   Boolean parseAttributeSpec(Boolean inDeclaration,
 			     AttributeList &,
-			     Boolean &netEnabling);
+			     Boolean &netEnabling,
+			     Ptr<AttributeDefinitionList> &);
+
   Boolean handleAttributeNameToken(Text &text,
 				   AttributeList &,
 				   unsigned &specLength);
@@ -243,7 +245,8 @@ private:
   Boolean parseAttributeValueSpec(Boolean inDecl,
 				  const StringC &name,
 				  AttributeList &atts,
-				  unsigned &specLength);
+				  unsigned &specLength,
+				  Ptr<AttributeDefinitionList> &newAttDefList);
 
   void parseEndTag();
   void parseEndTagClose();
@@ -371,7 +374,7 @@ private:
 				 const ElementType *&resultType,
 				 AttributeList &attributes);
   LinkSet *lookupCreateLinkSet(const StringC &name);
-  const ElementType *lookupResultElementType(const StringC &name);
+  ElementType *lookupResultElementType(const StringC &name);
   void endProlog();
   Boolean parseEntityReferenceNameGroup(Boolean &ignore);
   Boolean parseTagNameGroup(Boolean &active);
@@ -379,7 +382,7 @@ private:
   void parseGroupEndTag();
   Boolean skipAttributeSpec();
   Boolean lookingAtStartTag(StringC &gi);
-  Boolean implyDtd(const StringC &gi);
+  void implyDtd(const StringC &gi);
   void findMissingTag(const ElementType *e, Vector<const ElementType *> &);
   unsigned paramsSubdocLevel(const SgmlParser::Params &);
   void addCommonAttributes(Dtd &dtd);

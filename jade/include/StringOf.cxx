@@ -46,9 +46,10 @@ String<T> &String<T>::operator=(const String<T> &s)
 {
   if (&s != this) {
     if (s.length_ > alloc_) {
-      if (ptr_)
-	delete [] ptr_;
+      T *oldPtr = ptr_;
       ptr_ = new T[alloc_ = s.length_];
+      if (oldPtr)
+	delete [] oldPtr;
     }
     memcpy(ptr_, s.ptr_, s.length_*sizeof(T));
     length_ = s.length_;
@@ -81,14 +82,16 @@ String<T> &String<T>::append(const T *p, size_t length)
 template<class T>
 void String<T>::grow(size_t n)
 {
+  size_t newAlloc = alloc_;
   if (alloc_ < n)
-    alloc_ += n + 16;
+    newAlloc += n + 16;
   else
-    alloc_ += alloc_;
-  T *s = new T[alloc_];
+    newAlloc += alloc_;
+  T *s = new T[newAlloc];
   memcpy(s, ptr_, length_*sizeof(T));
   delete [] ptr_;
   ptr_ = s;
+  alloc_ = newAlloc;
 }
 
 template<class T>
@@ -115,9 +118,11 @@ template<class T>
 String<T> &String<T>::assign(const T *p, size_t n)
 {
   if (alloc_ < n) {
-    if (ptr_)
-      delete [] ptr_;
-    ptr_ = new T[alloc_ = n];
+    T *oldPtr = ptr_;
+    ptr_ = new T[n];
+    alloc_ = n;
+    if (oldPtr)
+      delete [] oldPtr;
   }
   length_ = n;
   for(T *to = ptr_; n > 0; n--, to++, p++)
@@ -129,11 +134,12 @@ template<class T>
 void String<T>::resize(size_t n)
 {
   if (alloc_ < n) {
-    T *oldPtr_ = ptr_;
-    ptr_ = new T[alloc_ = n];
+    T *oldPtr = ptr_;
+    ptr_ = new T[n];
+    alloc_ = n;
     if (length_ > 0) {
-      memcpy(ptr_, oldPtr_, length_*sizeof(T));
-      delete [] oldPtr_;
+      memcpy(ptr_, oldPtr, length_*sizeof(T));
+      delete [] oldPtr;
     }
   }
   length_ = n;

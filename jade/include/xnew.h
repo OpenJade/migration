@@ -16,7 +16,11 @@ void set_new_handler(VFP);
 
 #else /* not SP_NEW_H_MISSING */
 
+#ifdef SP_ANSI_LIB
+#include <new>
+#else
 #include <new.h>
+#endif
 
 #endif /* not SP_NEW_H_MISSING */
 

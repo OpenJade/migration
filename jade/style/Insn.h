@@ -313,8 +313,7 @@ public:
   const Insn *tailCall(VM &vm, const Location &, int nCallerArgs);
   InsnPtr makeCallInsn(int nArgs, Interpreter &, const Location &, InsnPtr next);
   virtual ELObj *primitiveCall(int nArgs, ELObj **args, EvalContext &, Interpreter &,
-			       const Location &)
-    const = 0;
+			       const Location &) = 0;
   void setIdentifier(const Identifier *ident);
 protected:
   ELObj *argError(Interpreter &, const Location &,

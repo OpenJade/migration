@@ -415,6 +415,21 @@ This command indicates that the document was a conforming SGML document.
 If this command is output, it will be the last command.
 An SGML document is not conforming if it references a subdocument entity
 that is not conforming.
+<DT>
+<CODE>i</CODE>
+<DD>
+The next element to start is an included subelement.
+This will be output only if the
+<CODE>-oincluded</CODE>
+option is specified.
+<DT>
+<CODE>e</CODE>
+<DD>
+The next element to start has a declared content of EMPTY or a content
+reference attribute, and so its end-tag must be omitted.
+This will be output only if the
+<CODE>-oempty</CODE>
+option is specified.
 </DL>
 <P>
 <ADDRESS>

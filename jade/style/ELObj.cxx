@@ -14,6 +14,21 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class ReverseNodeListObj : public NodeListObj {
+public:
+  ReverseNodeListObj(NodeListObj *);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListReverse(EvalContext &context, Interpreter &interp);
+  NodePtr nodeListRef(long, EvalContext &, Interpreter &);
+  long nodeListLength(EvalContext &context, Interpreter &interp);
+  void traceSubObjects(Collector &) const;
+private:
+  NodeListObj *reversed(EvalContext &context, Interpreter &interp);
+  NodeListObj *nl_;
+  NodeListObj *reversed_;
+};
+
 ELObj::ELObj()
 {
   hasSubObjects_ = 0;
@@ -99,7 +114,7 @@ GlyphSubstTableObj *ELObj::asGlyphSubstTable()
   return 0;
 }
 
-bool ELObj::optSingletonNodeList(QueryContext &, NodePtr &)
+bool ELObj::optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &)
 {
   return 0;
 }
@@ -815,29 +830,84 @@ NodeListObj *NodeListObj::asNodeList()
   return this;
 }
 
-NodeListObj *NodeListObj::nodeListNoOrder(QueryContext &)
+NodeListObj *NodeListObj::nodeListNoOrder(Collector &)
 {
   return this;
 }
 
-NodeListObj *NodeListObj::nodeListChunkRest(QueryContext &c)
+NodeListObj *NodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
-  return nodeListRest(c);
+  chunk = 0;
+  return nodeListRest(context, interp);
 }
 
-bool NodeListObj::optSingletonNodeList(QueryContext &c, NodePtr &node)
+bool NodeListObj::optSingletonNodeList(EvalContext &context, Interpreter &interp, NodePtr &node)
 {
-  NodeListObj *rest = nodeListRest(c);
-  ELObjDynamicRoot protect(c, rest);
-  if (rest->nodeListFirst(c))
+  NodeListObj *rest = nodeListRest(context, interp);
+  ELObjDynamicRoot protect(interp, rest);
+  if (rest->nodeListFirst(context, interp))
     return 0;
-  node = nodeListFirst(c);
+  node = nodeListFirst(context, interp);
   return 1;
 }
 
-bool NodeListObj::chunkComplete()
+NodePtr NodeListObj::nodeListRef(long n, EvalContext &context, Interpreter &interp)
 {
-  return 1;
+  if (n < 0)
+    return NodePtr();
+  NodeListObj *nl = this;
+  ELObjDynamicRoot protect(interp, nl);
+  while (n > 0) {
+    NodePtr nd(nl->nodeListFirst(context, interp));
+    if (!nd)
+      return NodePtr();
+    GroveString str;
+    if (nd->charChunk(interp, str) == accessOK && str.size() <= n) {
+      bool chunk;
+      nl = nodeListChunkRest(context, interp, chunk);
+      if (chunk)
+	n -= str.size();
+      else
+	n--;
+    }
+    else {
+      nl = nl->nodeListRest(context, interp);
+      n--;
+    }
+    protect = nl;
+  }
+  return nl->nodeListFirst(context, interp);
+}
+
+NodeListObj *NodeListObj::nodeListReverse(EvalContext &, Interpreter &interp)
+{
+  return new (interp) ReverseNodeListObj(this);
+}
+
+long NodeListObj::nodeListLength(EvalContext &context, Interpreter &interp)
+{
+  NodeListObj *nl = this;
+  long n = 0;
+  ELObjDynamicRoot protect(interp, nl);
+  for (;;) {
+    NodePtr nd(nl->nodeListFirst(context, interp));
+    if (!nd)
+      break;
+    bool chunk;
+    nl = nl->nodeListChunkRest(context, interp, chunk);
+    protect = nl;
+    GroveString str;
+    if (chunk && nd->charChunk(interp, str) == accessOK)
+      n += str.size();
+    else
+      n += 1;
+  }
+  return n;
+}
+
+bool NodeListObj::suppressError()
+{
+  return 0;
 }
 
 NamedNodeListObj *NamedNodeListObj::asNamedNodeList()
@@ -854,28 +924,23 @@ NodePtrNodeListObj::NodePtrNodeListObj(const NodePtr &node)
 {
 }
 
-bool NodePtrNodeListObj::optSingletonNodeList(QueryContext &, NodePtr &node)
+bool NodePtrNodeListObj::optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &node)
 {
   node = node_;
   return 1;
 }
 
-NodePtr NodePtrNodeListObj::nodeListFirst(QueryContext &)
+NodePtr NodePtrNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   return node_;
 }
 
-NodeListObj *NodePtrNodeListObj::nodeListRest(QueryContext &c)
+NodeListObj *NodePtrNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   if (node_)
-    return new (c) NodePtrNodeListObj;
+    return new (interp) NodePtrNodeListObj;
   else
     return this;
-}
-
-bool NodePtrNodeListObj::chunkComplete()
-{
-  return 0;
 }
 
 NodeListPtrNodeListObj::NodeListPtrNodeListObj(const NodeListPtr &nodeList)
@@ -883,7 +948,7 @@ NodeListPtrNodeListObj::NodeListPtrNodeListObj(const NodeListPtr &nodeList)
 {
 }
 
-NodePtr NodeListPtrNodeListObj::nodeListFirst(QueryContext &)
+NodePtr NodeListPtrNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   NodePtr nd;
   if (nodeList_->first(nd) == accessOK)
@@ -892,22 +957,34 @@ NodePtr NodeListPtrNodeListObj::nodeListFirst(QueryContext &)
     return NodePtr();
 }
 
-NodeListObj *NodeListPtrNodeListObj::nodeListRest(QueryContext &c)
+NodeListObj *NodeListPtrNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   NodeListPtr nl;
   if (nodeList_->rest(nl) == accessOK)
-    return new (c) NodeListPtrNodeListObj(nl);
+    return new (interp) NodeListPtrNodeListObj(nl);
   else
-    return new (c) NodePtrNodeListObj;
+    return interp.makeEmptyNodeList();
 }
 
-NodeListObj *NodeListPtrNodeListObj::nodeListChunkRest(QueryContext &c)
+NodeListObj *NodeListPtrNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
   NodeListPtr nl;
-  if (nodeList_->chunkRest(nl) == accessOK)
-    return new (c) NodeListPtrNodeListObj(nl);
-  else
-    return new (c) NodePtrNodeListObj;
+  if (nodeList_->chunkRest(nl) == accessOK) {
+    chunk = 1;
+    return new (interp) NodeListPtrNodeListObj(nl);
+  }
+  else {
+    chunk = 0;
+    return interp.makeEmptyNodeList();
+  }
+}
+
+NodePtr NodeListPtrNodeListObj::nodeListRef(long i, EvalContext &, Interpreter &interp)
+{
+  NodePtr nd;
+  if (i < 0 || nodeList_->ref(i, nd) != accessOK)
+    return NodePtr();
+  return nd;
 }
 
 NamedNodeListPtrNodeListObj
@@ -929,7 +1006,12 @@ bool NamedNodeListPtrNodeListObj::nodeName(const NodePtr &nd, GroveString &str)
   return namedNodeList_->nodeName(nd, str) == accessOK;
 }
 
-NodePtr NamedNodeListPtrNodeListObj::nodeListFirst(QueryContext &)
+size_t NamedNodeListPtrNodeListObj::normalize(Char *s, size_t n)
+{
+  return namedNodeList_->normalize(s, n);
+}
+
+NodePtr NamedNodeListPtrNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   if (!nodeList_)
     nodeList_ = namedNodeList_->nodeList();
@@ -940,62 +1022,130 @@ NodePtr NamedNodeListPtrNodeListObj::nodeListFirst(QueryContext &)
     return NodePtr();
 }
  
-NodeListObj *NamedNodeListPtrNodeListObj::nodeListRest(QueryContext &c)
+NodeListObj *NamedNodeListPtrNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   if (!nodeList_)
     nodeList_ = namedNodeList_->nodeList();
   NodeListPtr nl;
   if (nodeList_->rest(nl) == accessOK)
-    return new (c) NodeListPtrNodeListObj(nl);
+    return new (interp) NodeListPtrNodeListObj(nl);
   else
-    return new (c) NodePtrNodeListObj;
+    return new (interp) NodePtrNodeListObj;
 }
 
-NodeListObj *NamedNodeListPtrNodeListObj::nodeListNoOrder(QueryContext &c)
+NodeListObj *NamedNodeListPtrNodeListObj::nodeListNoOrder(Collector &c)
 {
   return new (c) NodeListPtrNodeListObj(namedNodeList_->nodeListNoOrder());
 }
 
-SelectElementsNodeListObj::SelectElementsNodeListObj(NodeListObj *nodeList,
-						     const ConstPtr<ElementPattern> &pattern)
-: nodeList_(nodeList), pattern_(pattern)
+PairNodeListObj::PairNodeListObj(NodeListObj *head, NodeListObj *tail)
+: head_(head), tail_(tail)
 {
   hasSubObjects_ = 1;
 }
 
-void SelectElementsNodeListObj::traceSubObjects(Collector &c) const
+NodePtr PairNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
 {
-  c.trace(nodeList_);
-}
-
-NodePtr SelectElementsNodeListObj::nodeListFirst(QueryContext &c)
-{
-  for (;;) {
-    NodePtr nd = nodeList_->nodeListFirst(c);
-    if (!nd || pattern_->matches(nd, c))
+  if (head_) {
+    NodePtr nd(head_->nodeListFirst(context, interp));
+    if (nd)
       return nd;
-    nodeList_ = nodeList_->nodeListChunkRest(c);
+    head_ = 0;
   }
-  // not reached
-  return NodePtr();
+  return tail_->nodeListFirst(context, interp);
 }
 
-NodeListObj *SelectElementsNodeListObj::nodeListRest(QueryContext &c)
+NodeListObj *PairNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  ASSERT(!pattern_.isNull());
-  for (;;) {
-    NodePtr nd = nodeList_->nodeListFirst(c);
-    if (!nd || pattern_->matches(nd, c))
-      break;
-    nodeList_ = nodeList_->nodeListChunkRest(c);
-  }
-  NodeListObj *tem = nodeList_->nodeListChunkRest(c);
-  ELObjDynamicRoot protect(c, tem);
-  return new (c) SelectElementsNodeListObj(tem, pattern_);
+  if (!head_ || !head_->nodeListFirst(context, interp))
+    return tail_->nodeListRest(context, interp);
+  NodeListObj *tem = head_->nodeListRest(context, interp);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) PairNodeListObj(tem, tail_);
 }
 
-ElementPattern::~ElementPattern()
+NodeListObj *PairNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
+  if (!head_ || !head_->nodeListFirst(context, interp))
+    return tail_->nodeListChunkRest(context, interp, chunk);
+  NodeListObj *tem = head_->nodeListChunkRest(context, interp, chunk);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) PairNodeListObj(tem, tail_);
+}
+
+void PairNodeListObj::traceSubObjects(Collector &c) const
+{
+  c.trace(head_);
+  c.trace(tail_);
+}
+
+ReverseNodeListObj::ReverseNodeListObj(NodeListObj *nl)
+: nl_(nl), reversed_(0)
+{
+}
+
+NodePtr ReverseNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
+{
+  return reversed_->nodeListFirst(context, interp);
+}
+
+NodeListObj *ReverseNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  return reversed_->nodeListRest(context, interp);
+}
+
+NodePtr ReverseNodeListObj::nodeListRef(long n, EvalContext &context, Interpreter &interp)
+{
+  if (reversed_)
+    return reversed_->nodeListRef(n, context, interp);
+  if (n < 0)
+    return NodePtr();
+  size_t len = nl_->nodeListLength(context, interp);
+  if (n >= len)
+    return 0;
+  return nl_->nodeListRef(len - n - 1, context, interp);
+}
+
+NodeListObj *ReverseNodeListObj::reversed(EvalContext &context, Interpreter &interp)
+{
+  if (!reversed_) {
+    NodePtr nd(nl_->nodeListFirst(context, interp));
+    if (nd) {
+      reversed_ = new (interp) NodePtrNodeListObj(nd);
+      NodeListObj *tem = this;
+      ELObjDynamicRoot protect(interp, tem);
+      ELObjDynamicRoot protect2(interp, reversed_);
+      for (;;) {
+	tem = tem->nodeListRest(context, interp);
+	protect = tem;
+	nd = tem->nodeListFirst(context, interp);
+	if (!nd)
+	  break;
+	NodeListObj *single = new (interp) NodePtrNodeListObj(nd);
+	protect2 = single;
+	reversed_ = new (interp) PairNodeListObj(single, reversed_);
+      }
+    }
+    else
+      reversed_ = nl_;
+  }
+  return reversed_;
+}
+
+NodeListObj *ReverseNodeListObj::nodeListReverse(EvalContext &, Interpreter &)
+{
+  return nl_;
+}
+
+long ReverseNodeListObj::nodeListLength(EvalContext &context, Interpreter &interp)
+{
+  return nl_->nodeListLength(context, interp);
+}
+
+void ReverseNodeListObj::traceSubObjects(Collector &c) const
+{
+  c.trace(nl_);
+  c.trace(reversed_);
 }
 
 #ifdef DSSSL_NAMESPACE

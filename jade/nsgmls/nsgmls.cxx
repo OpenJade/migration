@@ -15,8 +15,6 @@
 #include "sptchar.h"
 #include "macros.h"
 
-#include <iostream.h>
-#include <fstream.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -65,8 +63,8 @@ public:
 private:
   Messenger *messenger_;
   // file_ must come before os_ so it gets inited first
-  filebuf file_;
-  IosOutputCharStream os_;
+  FileOutputByteStream file_;
+  EncodeOutputCharStream os_;
   const NsgmlsApp::AppChar *filename_;
   const StringC filenameStr_;
   CmdLineApp *app_;
@@ -121,6 +119,7 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
 	{ SP_T("included"), SgmlsEventHandler::outputIncluded },
 	{ SP_T("notation-sysid"), SgmlsEventHandler::outputNotationSysid },
 	{ SP_T("nonsgml"), SgmlsEventHandler::outputNonSgml },
+	{ SP_T("empty"), SgmlsEventHandler::outputEmpty },
       };
       Boolean found = 0;
       for (size_t i = 0; i < SIZEOF(outputOptions); i++)
@@ -225,10 +224,10 @@ XRastEventHandler::XRastEventHandler(SgmlParser *parser,
   app_(app)
 {
   errno = 0;
-  if (!app_->openFilebufWrite(file_, filename)) {
-    messenger->message(NsgmlsMessages::cannotOpenOutputError,
-		      StringMessageArg(filenameStr),
-		      ErrnoMessageArg(errno));
+  if (!file_.open(filename)) {
+    messenger->message(CmdLineApp::openFileErrorMessage(),
+		       StringMessageArg(filenameStr),
+		       ErrnoMessageArg(errno));
     exit(1);
   }
   os_.open(&file_, codingSystem);
@@ -245,12 +244,12 @@ void XRastEventHandler::truncateOutput()
   os_.flush();
   errno = 0;
   if (!file_.close())
-    messenger_->message(NsgmlsMessages::closeOutputError,
+    messenger_->message(CmdLineApp::closeFileErrorMessage(),
 			StringMessageArg(filenameStr_),
 			ErrnoMessageArg(errno));
   errno = 0;
-  if (!app_->openFilebufWrite(file_, filename_)) {
-    messenger_->message(NsgmlsMessages::cannotOpenOutputError,
+  if (!file_.open(filename_)) {
+    messenger_->message(CmdLineApp::openFileErrorMessage(),
 			StringMessageArg(filenameStr_),
 			ErrnoMessageArg(errno));
     exit(1);

@@ -7,7 +7,6 @@
 
 #include "UTF8CodingSystem.h"
 #include "constant.h"
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -56,7 +55,7 @@ private:
 class UTF8Encoder : public Encoder {
 public:
   UTF8Encoder();
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 };
 
 Decoder *UTF8CodingSystem::makeDecoder() const
@@ -209,9 +208,7 @@ UTF8Encoder::UTF8Encoder()
 {
 }
 
-// FIXME handle errors from streambuf::sputc
-
-void UTF8Encoder::output(const Char *s, size_t n, streambuf *sb)
+void UTF8Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   for (; n > 0; s++, n--) {
     Char c = *s;

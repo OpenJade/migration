@@ -68,6 +68,8 @@ public:
     SosofoObj *obj_;
   };
 private:
+  struct Part;
+  friend struct Part;
   struct IdRule : public Rule, public Named {
     IdRule(const StringC &, Owner<Expression> &, const Location &);
   };

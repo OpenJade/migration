@@ -171,7 +171,7 @@ void Parser::doInit()
     if (entityCatalog().sgmlDecl(initCharset, messenger(), systemId)) {
       InputSource *in = entityManager().open(systemId,
 					     sd().docCharset(),
-					     new InputSourceOrigin,
+					     InputSourceOrigin::make(),
 					     0,
 					     messenger());
       if (in) {
@@ -1074,7 +1074,9 @@ Boolean Parser::referencePublic(const PublicId &id,
 						      entityType,
 						      sysid,
 						      loc));
-    Ptr<EntityOrigin> origin(new EntityOrigin(loc));
+    Ptr<EntityOrigin> origin(EntityOrigin::make(internalAllocator(),
+						ConstPtr<Entity>(0),
+						loc));
     if (currentMarkup())
       currentMarkup()->addEntityStart(origin);
     InputSource *in = entityManager().open(sysid,
@@ -1791,10 +1793,14 @@ void Parser::intersectCharSets(const ISet<Char> &s1, const ISet<Char> &s2,
       Char min = min1 > min2 ? min1 : min2;
       Char max = max1 < max2 ? max1 : max2;
       inter.addRange(min, max);
-      if (!i1.next(min1, max1))
-	break;
-      if (!i2.next(min2, max2))
-	break;
+      if (max2 > max) {
+	if (!i1.next(min1, max1))
+	  break;
+      }
+      else {
+	if (!i2.next(min2, max2))
+	  break;
+      }
     }
   }
 }
@@ -2704,10 +2710,18 @@ Boolean Parser::parseSdParamLiteral(Boolean lita, String<SyntaxChar> &str)
 	    break;
 	  case tokenRe:
 	    markupPtr->addRefEndRe();
+	    if (options().warnRefc)
+	      message(ParserMessages::refc);
 	    break;
 	  default:
+	    if (options().warnRefc)
+	      message(ParserMessages::refc);
 	    break;
 	  }
+	}
+	else if (options().warnRefc) {
+	  if (getToken(refMode) != tokenRefc)
+	    message(ParserMessages::refc);
 	}
 	else
 	  (void)getToken(refMode);

@@ -22,6 +22,7 @@
 #include "CodingSystem.h"
 #include "CodingSystemKit.h"
 #include "InputSource.h"
+#include "Mutex.h"
 #include "macros.h"
 #include "EntityCatalog.h"
 #include "CharMap.h"
@@ -92,7 +93,7 @@ public:
   Boolean parseSystemId(const StringC &str,
 			const CharsetInfo &idCharset,
 			Boolean isNdata,
-			const StorageObjectSpec *defSpec,
+			const StorageObjectLocation *def,
 			Messenger &mgr,
 			ParsedSystemId &parsedSysid) const;
   const CharsetInfo &internalCharset(const CharsetInfo &docCharset) const {
@@ -104,7 +105,7 @@ public:
 private:
   EntityManagerImpl(const EntityManagerImpl &); // undefined
   void operator=(const EntityManagerImpl &); // undefined
-  static const StorageObjectSpec *defStorageObject(const Location &);
+  static Boolean defLocation(const Location &, StorageObjectLocation &);
   static Boolean matchKey(const StringC &type, const char *s,
 			  const CharsetInfo &internalCharset);
   NCVector<Owner<StorageManager> > storageManagers_;
@@ -127,7 +128,7 @@ public:
   void noteStorageObjectEnd(Offset);
   void noteInsertedRSs();
   void setDecoder(size_t i, Decoder *);
-  StringC &id(size_t i);
+  void setId(size_t i, StringC &);
   Boolean convertOffset(Offset, StorageObjectLocation &) const;
 private:
   ParsedSystemId parsedSysid_;
@@ -136,6 +137,7 @@ private:
   // list of inserted RSs
   OffsetOrderedList rsList_;
   Boolean notrack_;
+  Mutex mutex_;
 };
 
 class ExternalInputSource : public InputSource {
@@ -203,7 +205,7 @@ class FSIParser {
 public:
   FSIParser(const StringC &, const CharsetInfo &idCharset,
 	    Boolean isNdata,
-	    const StorageObjectSpec *defSpec,
+	    const StorageObjectLocation *defLoc,
 	    const EntityManagerImpl *em,
 	    Messenger &mgr);
   Boolean parse(ParsedSystemId &parsedSysid);
@@ -236,6 +238,7 @@ private:
   Messenger &mgr_;
   const EntityManagerImpl *em_;
   const StorageObjectSpec *defSpec_;
+  const StringC *defId_;
   const CharsetInfo &idCharset_;
   Boolean isNdata_;
   static RecordType recordTypeTable[];
@@ -279,7 +282,6 @@ ExtendEntityManager::externalInfoParsedSystemId(const ExternalInfo *info)
     return 0;
   return &p->parsedSystemId();
 }
-
 
 EntityManagerImpl::EntityManagerImpl(StorageManager *defaultStorageManager,
 				     const InputCodingSystem *defaultCodingSystem,
@@ -356,7 +358,7 @@ EntityManagerImpl::mergeSystemIds(const Vector<StringC> &sysids,
 
 Boolean
 EntityManagerImpl::expandSystemId(const StringC &str,
-				  const Location &defLocation,
+				  const Location &defLoc,
 				  Boolean isNdata,
 				  const CharsetInfo &docCharset,
 				  const StringC *mapCatalogPublic,
@@ -364,8 +366,13 @@ EntityManagerImpl::expandSystemId(const StringC &str,
 				  StringC &result)
 {
   ParsedSystemId parsedSysid;
-  const StorageObjectSpec *defSpec = defStorageObject(defLocation);
-  if (!parseSystemId(str, docCharset, isNdata, defSpec, mgr, parsedSysid))
+  StorageObjectLocation defSoLoc;
+  const StorageObjectLocation *defSoLocP;
+  if (defLocation(defLoc, defSoLoc))
+    defSoLocP = &defSoLoc;
+  else
+    defSoLocP = 0;
+  if (!parseSystemId(str, docCharset, isNdata, defSoLocP, mgr, parsedSysid))
     return 0;
   if (mapCatalogPublic) {
     ParsedSystemId::Map map;
@@ -380,11 +387,11 @@ EntityManagerImpl::expandSystemId(const StringC &str,
 Boolean EntityManagerImpl::parseSystemId(const StringC &str,
 					 const CharsetInfo &docCharset,
 					 Boolean isNdata,
-					 const StorageObjectSpec *defSpec,
+					 const StorageObjectLocation *defLoc,
 					 Messenger &mgr,
 					 ParsedSystemId &parsedSysid) const
 {
-  FSIParser fsiParser(str, internalCharset(docCharset), isNdata, defSpec, this, mgr);
+  FSIParser fsiParser(str, internalCharset(docCharset), isNdata, defLoc, this, mgr);
   return fsiParser.parse(parsedSysid);
 }
 
@@ -459,31 +466,33 @@ void EntityManagerImpl::setCatalogManager(CatalogManager *catalogManager)
   catalogManager_ = catalogManager;
 }
 
-const StorageObjectSpec *
-EntityManagerImpl::defStorageObject(const Location &defLocation)
+Boolean
+EntityManagerImpl::defLocation(const Location &defLocation,
+			       StorageObjectLocation &soLoc)
 {
   Offset off;
   const ExternalInfo *info;
-  Location loc(defLocation);
+  const Origin *origin = defLocation.origin().pointer();
+  Index index = defLocation.index();
   for (;;) {
-    if (loc.origin().isNull())
+    if (!origin)
       return 0;
-    const InputSourceOrigin *inputSourceOrigin = loc.origin()->asInputSourceOrigin();
+    const InputSourceOrigin *inputSourceOrigin = origin->asInputSourceOrigin();
     if (inputSourceOrigin) {
-      off = inputSourceOrigin->startOffset(loc.index());
+      off = inputSourceOrigin->startOffset(index);
       info = inputSourceOrigin->externalInfo();
       if (info)
 	break;
-      if (!inputSourceOrigin->defLocation(off, loc))
+      if (!inputSourceOrigin->defLocation(off, origin, index))
 	return 0;
     }
-    else
-      loc = loc.origin()->parent();
+    else {
+      const Location &parentLoc = origin->parent();
+      origin = parentLoc.origin().pointer();
+      index = parentLoc.index();
+    }
   }
-  StorageObjectLocation soLoc;
-  if (!ExtendEntityManager::externalize(info, off, soLoc))
-    return 0;
-  return soLoc.storageObjectSpec;
+  return ExtendEntityManager::externalize(info, off, soLoc);
 }
 
 class UnbufferingStorageObject : public StorageObject {
@@ -734,6 +743,7 @@ Xchar ExternalInputSource::fill(Messenger &mgr)
       if (soIndex_ > 0)
 	info_->noteStorageObjectEnd(bufLimOffset_ - (bufLim_ - end()));
       const StorageObjectSpec &spec = info_->spec(soIndex_);
+      StringC id;
       if (sov_[soIndex_])
 	;
       else if (mayNotExist_) {
@@ -741,15 +751,14 @@ Xchar ExternalInputSource::fill(Messenger &mgr)
 	sov_[soIndex_]
 	  = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
 						   spec.search,
-						   mayRewind_, nullMgr,
-						   info_->id(soIndex_));
+						   mayRewind_, nullMgr, id);
       }
       else
 	sov_[soIndex_]
 	  = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
 						   spec.search,
-						   mayRewind_, mgr,
-						   info_->id(soIndex_));
+						   mayRewind_, mgr, id);
+      info_->setId(soIndex_, id);
       so_ = sov_[soIndex_].pointer();
       if (so_) {
 	decoder_ = spec.codingSystem->makeDecoder();
@@ -1089,13 +1098,15 @@ ExternalInfoImpl::ExternalInfoImpl(ParsedSystemId &parsedSysid)
     notrack_ = parsedSysid_[0].notrack;
 }
 
-StringC &ExternalInfoImpl::id(size_t i)
+void ExternalInfoImpl::setId(size_t i, StringC &id)
 {
-  return parsedSysid_[i].id;
+  Mutex::Lock lock(&mutex_);
+  id.swap(position_[i].id);
 }
 
 void ExternalInfoImpl::setDecoder(size_t i, Decoder *decoder)
 {
+  Mutex::Lock lock(&mutex_);
   position_[i].decoder = decoder;
 }
 
@@ -1106,6 +1117,7 @@ void ExternalInfoImpl::noteInsertedRSs()
 
 void ExternalInfoImpl::noteRS(Offset offset)
 {
+  // We do the locking in OffsetOrderedList.
   if (!notrack_)
     rsList_.append(offset);
   if (offset
@@ -1115,6 +1127,7 @@ void ExternalInfoImpl::noteRS(Offset offset)
 
 void ExternalInfoImpl::noteStorageObjectEnd(Offset offset)
 {
+  Mutex::Lock lock(&mutex_);
   ASSERT(currentIndex_ < position_.size());
   // The last endOffset_ must be -1.
   if (currentIndex_ < position_.size() - 1) {
@@ -1127,7 +1140,7 @@ void ExternalInfoImpl::noteStorageObjectEnd(Offset offset)
 Boolean ExternalInfoImpl::convertOffset(Offset off,
 					StorageObjectLocation &ret) const
 {
-  ret.storageObjectSpec = 0;
+  Mutex::Lock lock(&((ExternalInfoImpl *)this)->mutex_);
   if (off == Offset(-1) || position_.size() == 0)
     return false;
   // the last endOffset_ is Offset(-1), so this will
@@ -1135,10 +1148,11 @@ Boolean ExternalInfoImpl::convertOffset(Offset off,
   int i;
   for (i = 0; off >= position_[i].endOffset; i++)
     ;
-  for (; parsedSysid_[i].id.size() == 0; i--)
+  for (; position_[i].id.size() == 0; i--)
     if (i == 0)
       return false;
   ret.storageObjectSpec = &parsedSysid_[i];
+  ret.actualStorageId = position_[i].id;
   Offset startOffset = i == 0 ? 0 : position_[i - 1].endOffset;
   ret.storageObjectOffset = off - startOffset;
   ret.byteIndex = ret.storageObjectOffset;
@@ -1216,14 +1230,15 @@ StorageObjectPosition::StorageObjectPosition()
 FSIParser::FSIParser(const StringC &str,
 		     const CharsetInfo &idCharset,
 		     Boolean isNdata,
-		     const StorageObjectSpec *defSpec,
+		     const StorageObjectLocation *defLoc,
 		     const EntityManagerImpl *em,
 		     Messenger &mgr)
 : str_(str),
   strIndex_(0),
   idCharset_(idCharset),
   isNdata_(isNdata),
-  defSpec_(defSpec),
+  defSpec_(defLoc ? defLoc->storageObjectSpec : 0),
+  defId_(defLoc ? &defLoc->actualStorageId : 0),
   em_(em),
   mgr_(mgr)
 {
@@ -1817,8 +1832,8 @@ void FSIParser::setDefaults(StorageObjectSpec &sos)
   if (isNdata_ || (defSpec_ && !defSpec_->zapEof))
     sos.zapEof = 0;
   if (defSpec_ && defSpec_->storageManager == sos.storageManager) {
-    if (defSpec_->id.size())
-      sos.baseId = defSpec_->id;
+    if (defId_)
+      sos.baseId = *defId_;
     else {
       sos.baseId = defSpec_->specId;
       sos.storageManager->resolveRelative(defSpec_->baseId,

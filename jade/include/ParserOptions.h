@@ -16,7 +16,67 @@
 namespace SP_NAMESPACE {
 #endif
 
-struct SP_API ParserOptions {
+struct Warnings {
+  Warnings();
+  PackedBoolean warnSgmlDecl;
+  PackedBoolean warnDuplicateEntity;
+  PackedBoolean warnShould;
+  PackedBoolean warnUndefinedElement;
+  PackedBoolean warnDefaultEntityReference;
+  PackedBoolean warnMixedContent;
+  PackedBoolean warnUnclosedTag;
+  PackedBoolean warnNet;
+  PackedBoolean warnEmptyTag;
+  PackedBoolean warnUnusedMap;
+  PackedBoolean warnUnusedParam;
+  PackedBoolean warnNotationSystemId;
+  PackedBoolean warnInclusion;
+  PackedBoolean warnExclusion;
+  PackedBoolean warnRcdataContent;
+  PackedBoolean warnCdataContent;
+  PackedBoolean warnPsComment;
+  PackedBoolean warnElementGroupDecl;
+  PackedBoolean warnAttlistGroupDecl;
+  PackedBoolean warnPiEntity;
+  PackedBoolean warnInternalSdataEntity;
+  PackedBoolean warnInternalCdataEntity;
+  PackedBoolean warnExternalSdataEntity;
+  PackedBoolean warnExternalCdataEntity;
+  PackedBoolean warnBracketEntity;
+  PackedBoolean warnDataAttributes;
+  PackedBoolean warnMissingSystemId;
+  PackedBoolean warnConref;
+  PackedBoolean warnCurrent;
+  PackedBoolean warnNutokenDeclaredValue;
+  PackedBoolean warnNumberDeclaredValue;
+  PackedBoolean warnNameDeclaredValue;
+  PackedBoolean warnNamedCharRef;
+  PackedBoolean warnRefc;
+  PackedBoolean warnTempMarkedSection;
+  PackedBoolean warnRcdataMarkedSection;
+  PackedBoolean warnInstanceIncludeMarkedSection;
+  PackedBoolean warnInstanceIgnoreMarkedSection;
+  PackedBoolean warnAndGroup;
+  PackedBoolean warnRank;
+  PackedBoolean warnEmptyCommentDecl;
+  PackedBoolean warnNetEmptyElement;
+  PackedBoolean warnAttributeValueNotLiteral;
+  PackedBoolean warnMissingAttributeName;
+  PackedBoolean warnCommentDeclS;
+  PackedBoolean warnCommentDeclMultiple;
+  PackedBoolean warnMissingStatusKeyword;
+  PackedBoolean warnMultipleStatusKeyword;
+  PackedBoolean warnInstanceParamEntityRef;
+  PackedBoolean warnMinimizationParam;
+  PackedBoolean warnMixedContentRepOrGroup;
+  PackedBoolean warnNameGroupNotOr;
+  PackedBoolean warnPiMissingName;
+  PackedBoolean warnStatusKeywordSpecS;
+  PackedBoolean warnExternalDataEntityRef;
+  PackedBoolean warnAttributeValueExternalEntityRef;
+};
+
+struct SP_API ParserOptions : public Warnings {
   ParserOptions();
   EventsWanted eventsWanted;
   PackedBoolean datatag;
@@ -53,19 +113,9 @@ struct SP_API ParserOptions {
   PackedBoolean errorSignificant;
   PackedBoolean errorAfdr;	// error if AFDR extensions are used
   PackedBoolean errorLpdNotation;
-  PackedBoolean warnSgmlDecl;
-  PackedBoolean warnDuplicateEntity;
-  PackedBoolean warnShould;
-  PackedBoolean warnUndefinedElement;
-  PackedBoolean warnDefaultEntityReference;
-  PackedBoolean warnMixedContent;
-  PackedBoolean warnUnclosedTag;
-  PackedBoolean warnNet;
-  PackedBoolean warnEmptyTag;
-  PackedBoolean warnUnusedMap;
-  PackedBoolean warnUnusedParam;
-  PackedBoolean warnNotationSystemId;
+  PackedBoolean errorValid;
   Vector<StringC> includes;
+  Vector<StringC> recoveryEntities;
 };
 
 #ifdef SP_NAMESPACE

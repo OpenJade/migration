@@ -17,7 +17,7 @@ NSGMLS_OBJS=nsgmls.obj SgmlsEventHandler.obj RastEventHandler.obj &
   StringSet.obj nsgmls_inst.obj
 SPAM_OBJS=spam.obj CopyEventHandler.obj MarkupEventHandler.obj spam_inst.obj
 SGMLNORM_OBJS=sgmlnorm.obj SGMLGenerator.obj
-SPENT_OBJS=spent.obj spent_inst.obj
+SPENT_OBJS=spent.obj
 LIB_OBJS=Allocator.obj &
   ArcEngine.obj &
   Attribute.obj &
@@ -63,6 +63,7 @@ LIB_OBJS=Allocator.obj &
   Message.obj &
   MessageArg.obj &
   MessageEventHandler.obj &
+  MessageFormatter.obj &
   MessageReporter.obj &
   MessageTable.obj &
   ModeInfo.obj &
@@ -70,6 +71,7 @@ LIB_OBJS=Allocator.obj &
   NumericCharRefOrigin.obj &
   OffsetOrderedList.obj &
   OpenElement.obj &
+  OutputByteStream.obj &
   OutputCharStream.obj &
   OutputState.obj &
   Param.obj &

@@ -110,6 +110,15 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "with",
     "against",
     "force",
+    "independent",
+    "pile",
+    "sup-out",
+    "sub-out",
+    "lead-edge",
+    "trail-edge",
+    "explicit",
+    "row-major",
+    "column-major",
   };
   ASSERT(SIZEOF(names) == nSymbols - 2);
   return names[sym - 2];
@@ -251,9 +260,11 @@ void FOTBuilder::endMarginalia()
 
 void FOTBuilder::startMultiMode(const FOTBuilder::MultiMode *,
 				const Vector<FOTBuilder::MultiMode> &,
-      				Vector<FOTBuilder *> &)
+      				Vector<FOTBuilder *> &ports)
 {
   start();
+  for (size_t i = 0; i < ports.size(); i++)
+    ports[i] = this;
 }
 
 void FOTBuilder::endMultiMode()
@@ -421,6 +432,16 @@ void FOTBuilder::tableCellAfterColumnBorder()
   atomic();
 }
 
+void FOTBuilder::startMathSequence()
+{
+  start();
+}
+
+void FOTBuilder::endMathSequence()
+{
+  end();
+}
+
 void FOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
   start();
@@ -431,31 +452,152 @@ void FOTBuilder::endFraction()
 {
   end();
 }
- 
-void FOTBuilder::startElement(const ElementNIC &)
+
+void FOTBuilder::fractionBar()
+{
+  atomic();
+}
+
+void FOTBuilder::startUnmath()
 {
   start();
 }
 
-void FOTBuilder::endElement()
+void FOTBuilder::endUnmath()
 {
   end();
 }
 
-void FOTBuilder::emptyElement(const ElementNIC &)
+void FOTBuilder::startSuperscript()
+{
+  start();
+}
+
+void FOTBuilder::endSuperscript()
+{
+  end();
+}
+
+void FOTBuilder::startSubscript()
+{
+  start();
+}
+
+void FOTBuilder::endSubscript()
+{
+  end();
+}
+
+void FOTBuilder::startScript(FOTBuilder *&preSup,
+			     FOTBuilder *&preSub,
+			     FOTBuilder *&postSup,
+			     FOTBuilder *&postSub,
+			     FOTBuilder *&midSup,
+			     FOTBuilder *&midSub)
+{
+  start();
+  preSup = preSub = postSup = postSub = midSup = midSub = this;
+}
+
+void FOTBuilder::endScript()
+{
+  end();
+}
+
+void FOTBuilder::startMark(FOTBuilder *&overMark, FOTBuilder *&underMark)
+{
+  start();
+  overMark = underMark = this;
+}
+
+void FOTBuilder::endMark()
+{
+  end();
+}
+
+void FOTBuilder::startFence(FOTBuilder *&open, FOTBuilder *&close)
+{
+  start();
+  open = close = this;
+}
+
+void FOTBuilder::endFence()
+{
+  end();
+}
+
+void FOTBuilder::startRadical(FOTBuilder *&degree)
+{
+  start();
+  degree = this;
+}
+
+void FOTBuilder::endRadical()
+{
+  end();
+}
+
+void FOTBuilder::radicalRadical(const CharacterNIC &)
 {
   atomic();
 }
 
-void FOTBuilder::documentType(const DocumentTypeNIC &)
+void FOTBuilder::radicalRadicalDefaulted()
 {
-  atomic();
 }
 
-void FOTBuilder::processingInstruction(const StringC &)
+void FOTBuilder::startMathOperator(FOTBuilder *&oper,
+				   FOTBuilder *&lowerLimit,
+				   FOTBuilder *&upperLimit)
+{
+  start();
+  oper = lowerLimit = upperLimit = this;
+}
+
+void FOTBuilder::endMathOperator()
+{
+  end();
+}
+
+void FOTBuilder::startGrid(const GridNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endGrid()
+{
+  end();
+}
+
+void FOTBuilder::startGridCell(const GridCellNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endGridCell()
+{
+  end();
+}
+
+void FOTBuilder::extension(const ExtensionFlowObj &, const NodePtr &)
 {
   atomic();
 }
+ 
+void FOTBuilder::startExtension(const CompoundExtensionFlowObj &,
+				const NodePtr &,
+				Vector<FOTBuilder *> &ports)
+{
+  for (size_t i = 0; i < ports.size(); i++)
+    ports[i] = this;
+  start();
+}
+
+void FOTBuilder::endExtension(const CompoundExtensionFlowObj &)
+{
+  end();
+}
+
 
 void FOTBuilder::setFontSize(Length)
 {
@@ -737,6 +879,14 @@ void FOTBuilder::setMarginaliaKeepWithPrevious(bool)
 {
 }
 
+void FOTBuilder::setGridEquidistantRows(bool)
+{
+}
+ 
+void FOTBuilder::setGridEquidistantColumns(bool)
+{
+}
+
 void FOTBuilder::setLineJoin(Symbol)
 {
 }
@@ -770,6 +920,42 @@ void FOTBuilder::setLastLineQuadding(Symbol)
 }
 
 void FOTBuilder::setMathDisplayMode(Symbol)
+{
+}
+
+void FOTBuilder::setScriptPreAlign(Symbol)
+{
+}
+
+void FOTBuilder::setScriptPostAlign(Symbol)
+{
+}
+
+void FOTBuilder::setScriptMidSupAlign(Symbol)
+{
+}
+
+void FOTBuilder::setScriptMidSubAlign(Symbol)
+{
+}
+
+void FOTBuilder::setNumeratorAlign(Symbol)
+{
+}
+
+void FOTBuilder::setDenominatorAlign(Symbol)
+{
+}
+
+void FOTBuilder::setGridPositionCellType(Symbol)
+{
+}
+
+void FOTBuilder::setGridColumnAlignment(Symbol)
+{
+}
+
+void FOTBuilder::setGridRowAlignment(Symbol)
 {
 }
 
@@ -1017,6 +1203,16 @@ FOTBuilder::TableCellNIC::TableCellNIC()
 {
 }
 
+FOTBuilder::GridNIC::GridNIC()
+: nColumns(0), nRows(0)
+{
+}
+
+FOTBuilder::GridCellNIC::GridCellNIC()
+: columnNumber(0), rowNumber(0)
+{
+}
+
 FOTBuilder::MultiMode::MultiMode()
 : hasDesc(0)
 {
@@ -1028,10 +1224,6 @@ FOTBuilder::GlyphId FOTBuilder::GlyphSubstTable::subst(const FOTBuilder::GlyphId
     if (gid == pairs[i])
       return pairs[i + 1];
   return gid;
-}
-
-FOTBuilder::DocumentTypeNIC::DocumentTypeNIC()
-{
 }
 
 SaveFOTBuilder::SaveFOTBuilder()
@@ -1114,7 +1306,6 @@ NO_ARG_CALL(endBox)
 NO_ARG_CALL(startSideline)
 NO_ARG_CALL(endSideline)
 NO_ARG_CALL(endNode)
-NO_ARG_CALL(endFraction)
 NO_ARG_CALL(startSimplePageSequence)
 NO_ARG_CALL(endSimplePageSequence)
 NO_ARG_CALL(endAllSimplePageSequenceHeaderFooter)
@@ -1132,7 +1323,24 @@ NO_ARG_CALL(tableCellBeforeRowBorder)
 NO_ARG_CALL(tableCellAfterRowBorder)
 NO_ARG_CALL(tableCellBeforeColumnBorder)
 NO_ARG_CALL(tableCellAfterColumnBorder)
-NO_ARG_CALL(endElement)
+NO_ARG_CALL(startMathSequence)
+NO_ARG_CALL(endMathSequence)
+NO_ARG_CALL(endFraction)
+NO_ARG_CALL(fractionBar)
+NO_ARG_CALL(startUnmath)
+NO_ARG_CALL(endUnmath)
+NO_ARG_CALL(startSuperscript)
+NO_ARG_CALL(endSuperscript)
+NO_ARG_CALL(startSubscript)
+NO_ARG_CALL(endSubscript)
+NO_ARG_CALL(endScript)
+NO_ARG_CALL(endMark)
+NO_ARG_CALL(endFence)
+NO_ARG_CALL(endRadical)
+NO_ARG_CALL(radicalRadicalDefaulted)
+NO_ARG_CALL(endMathOperator)
+NO_ARG_CALL(endGrid)
+NO_ARG_CALL(endGridCell)
 
 #define LENGTH_SPEC_ARG_CALL(F) \
   void SaveFOTBuilder::F(const LengthSpec &lengthSpec) { \
@@ -1230,6 +1438,8 @@ BOOL_ARG_CALL(setTablePartOmitMiddleFooter)
 BOOL_ARG_CALL(setBorderOmitAtBreak)
 BOOL_ARG_CALL(setPrincipalModeSimultaneous)
 BOOL_ARG_CALL(setMarginaliaKeepWithPrevious)
+BOOL_ARG_CALL(setGridEquidistantRows)
+BOOL_ARG_CALL(setGridEquidistantColumns)
 
 #define SYMBOL_ARG_CALL(F) \
   void SaveFOTBuilder::F(Symbol sym) { \
@@ -1251,6 +1461,15 @@ SYMBOL_ARG_CALL(setFillingDirection)
 SYMBOL_ARG_CALL(setWritingMode)
 SYMBOL_ARG_CALL(setLastLineQuadding)
 SYMBOL_ARG_CALL(setMathDisplayMode)
+SYMBOL_ARG_CALL(setScriptPreAlign)
+SYMBOL_ARG_CALL(setScriptPostAlign)
+SYMBOL_ARG_CALL(setScriptMidSupAlign)
+SYMBOL_ARG_CALL(setScriptMidSubAlign)
+SYMBOL_ARG_CALL(setNumeratorAlign)
+SYMBOL_ARG_CALL(setDenominatorAlign)
+SYMBOL_ARG_CALL(setGridPositionCellType)
+SYMBOL_ARG_CALL(setGridColumnAlignment)
+SYMBOL_ARG_CALL(setGridRowAlignment)
 SYMBOL_ARG_CALL(setBoxType)
 SYMBOL_ARG_CALL(setGlyphAlignmentMode)
 SYMBOL_ARG_CALL(setBoxBorderAlignment)
@@ -1297,7 +1516,6 @@ UNSIGNED_ARG_CALL(endSimplePageSequenceHeaderFooter)
 
 STRING_ARG_CALL(setFontFamilyName)
 STRING_ARG_CALL(formattingInstruction)
-STRING_ARG_CALL(processingInstruction)
 
 #define INLINE_SPACE_ARG_CALL(F) \
   void SaveFOTBuilder::F(const InlineSpace &is) { \
@@ -1577,29 +1795,68 @@ void SaveFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denomina
   tail_ = &(*tail_)->next;
 }
 
+void SaveFOTBuilder::startScript(FOTBuilder *&preSup,
+				 FOTBuilder *&preSub,
+				 FOTBuilder *&postSup,
+				 FOTBuilder *&postSub,
+				 FOTBuilder *&midSup,
+				 FOTBuilder *&midSub)
+{
+  *tail_ = new StartScriptCall(preSup, preSub,
+			       postSup, postSub,
+			       midSup, midSub);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::startMark(FOTBuilder *&overMark, FOTBuilder *&underMark)
+{
+  *tail_ = new StartMarkCall(overMark, underMark);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::startFence(FOTBuilder *&open, FOTBuilder *&close)
+{
+  *tail_ = new StartFenceCall(open, close);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::startRadical(FOTBuilder *&degree)
+{
+  *tail_ = new StartRadicalCall(degree);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::radicalRadical(const CharacterNIC &nic)
+{
+  *tail_ = new RadicalRadicalCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::startMathOperator(FOTBuilder *&oper,
+				       FOTBuilder *&lowerLimit,
+				       FOTBuilder *&upperLimit)
+{
+  *tail_ = new StartMathOperatorCall(oper, lowerLimit, upperLimit);
+  tail_ = &(*tail_)->next;
+}
+ 
+void SaveFOTBuilder::startGrid(const GridNIC &nic)
+{
+  *tail_ = new StartGridCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::startGridCell(const GridCellNIC &nic)
+{
+  *tail_ = new StartGridCellCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
 void SaveFOTBuilder::startMultiMode(const MultiMode *principalMode,
 				    const Vector<MultiMode> &namedModes,
 				    Vector<FOTBuilder *> &namedPorts)
 {
   *tail_ = new StartMultiModeCall(principalMode, namedModes, namedPorts);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::startElement(const ElementNIC &nic)
-{
-  *tail_ = new StartElementCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::emptyElement(const ElementNIC &nic)
-{
-  *tail_ = new EmptyElementCall(nic);
-  tail_ = &(*tail_)->next;
-}
-
-void SaveFOTBuilder::documentType(const DocumentTypeNIC &nic)
-{
-  *tail_ = new DocumentTypeCall(nic);
   tail_ = &(*tail_)->next;
 }
 
@@ -1627,6 +1884,25 @@ void SaveFOTBuilder::extensionSet(void (FOTBuilder::*func)(long), long arg)
   tail_ = &(*tail_)->next;
 }
 
+void SaveFOTBuilder::startExtension(const CompoundExtensionFlowObj &fo,
+				    const NodePtr &node,
+				    Vector<FOTBuilder *> &ports)
+{
+  *tail_ = new StartExtensionCall(fo, node, ports);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::endExtension(const CompoundExtensionFlowObj &fo)
+{
+  *tail_ = new EndExtensionCall(fo);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::extension(const ExtensionFlowObj &fo, const NodePtr &node)
+{
+  *tail_ = new ExtensionCall(fo, node);
+  tail_ = &(*tail_)->next;
+}
 
 SaveFOTBuilder::CharactersCall::CharactersCall(const Char *s, size_t n)
 : str(s, n)
@@ -1652,6 +1928,91 @@ void StartFractionCall::emit(FOTBuilder &fotb)
   denominator.emit(*d);
 }
 
+StartScriptCall::StartScriptCall(FOTBuilder *&p0,
+				 FOTBuilder *&p1,
+				 FOTBuilder *&p2,
+				 FOTBuilder *&p3,
+				 FOTBuilder *&p4,
+				 FOTBuilder *&p5)
+{
+  p0 = &preSup;
+  p1 = &preSub;
+  p2 = &postSup;
+  p3 = &postSub;
+  p4 = &midSup;
+  p5 = &midSub;
+}
+
+void StartScriptCall::emit(FOTBuilder &fotb)
+{
+  FOTBuilder *v[6];
+  fotb.startScript(v[0], v[1], v[2], v[3], v[4], v[5]);
+  preSup.emit(*v[0]);
+  preSub.emit(*v[1]);
+  postSup.emit(*v[2]);
+  postSub.emit(*v[3]);
+  midSup.emit(*v[4]);
+  midSub.emit(*v[5]);
+}
+
+StartMarkCall::StartMarkCall(FOTBuilder *&o, FOTBuilder *&u)
+{
+  o = &overMark;
+  u = &underMark;
+}
+
+void StartMarkCall::emit(FOTBuilder &fotb)
+{
+  FOTBuilder *o, *u;
+  fotb.startMark(o, u);
+  overMark.emit(*o);
+  underMark.emit(*u);
+}
+
+StartFenceCall::StartFenceCall(FOTBuilder *&o, FOTBuilder *&c)
+{
+  o = &open;
+  c = &close;
+}
+
+void StartFenceCall::emit(FOTBuilder &fotb)
+{
+  FOTBuilder *o, *c;
+  fotb.startFence(o, c);
+  open.emit(*o);
+  close.emit(*c);
+}
+
+StartRadicalCall::StartRadicalCall(FOTBuilder *&d)
+{
+  d = &degree;
+}
+
+void StartRadicalCall::emit(FOTBuilder &fotb)
+{
+  FOTBuilder *d;
+  fotb.startRadical(d);
+  degree.emit(*d);
+}
+
+StartMathOperatorCall::StartMathOperatorCall(FOTBuilder *&o,
+					     FOTBuilder *&l,
+					     FOTBuilder *&u)
+{
+  o = &oper;
+  l = &lowerLimit;
+  u = &upperLimit;
+}
+
+void StartMathOperatorCall::emit(FOTBuilder &fotb)
+{
+  FOTBuilder *o, *l, *u;
+  fotb.startMathOperator(o, l, u);
+  oper.emit(*o);
+  lowerLimit.emit(*l);
+  upperLimit.emit(*u);
+}
+
 StartMultiModeCall::StartMultiModeCall(const FOTBuilder::MultiMode *pm,
 				       const Vector<FOTBuilder::MultiMode> &nm,
 				       Vector<FOTBuilder *> &v)
@@ -1674,7 +2035,7 @@ void StartMultiModeCall::emit(FOTBuilder &fotb)
   Vector<FOTBuilder *> v(namedModes.size());
   fotb.startMultiMode(hasPrincipalMode ? &principalMode : 0, namedModes, v);
   for (size_t i = 0; i < v.size(); i++) {
-    Owner<SaveFOTBuilder> tem = ports.get();
+    Owner<SaveFOTBuilder> tem(ports.get());
     tem->emit(*v[i]);
   }
 }
@@ -1776,19 +2137,52 @@ void SaveFOTBuilder::SetGlyphSubstTableCall::emit(FOTBuilder &fotb)
   fotb.setGlyphSubstTable(arg);
 }
 
-void SaveFOTBuilder::StartElementCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::StartGridCall::emit(FOTBuilder &fotb)
 {
-  fotb.startElement(arg);
+  fotb.startGrid(arg);
 }
 
-void SaveFOTBuilder::EmptyElementCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::StartGridCellCall::emit(FOTBuilder &fotb)
 {
-  fotb.emptyElement(arg);
+  fotb.startGridCell(arg);
 }
 
-void SaveFOTBuilder::DocumentTypeCall::emit(FOTBuilder &fotb)
+void SaveFOTBuilder::RadicalRadicalCall::emit(FOTBuilder &fotb)
 {
-  fotb.documentType(arg);
+  fotb.radicalRadical(arg);
+}
+
+void SaveFOTBuilder::ExtensionCall::emit(FOTBuilder &fotb)
+{
+  fotb.extension(*arg, node);
+}
+
+void SaveFOTBuilder::EndExtensionCall::emit(FOTBuilder &fotb)
+{
+  fotb.endExtension(*arg);
+}
+
+StartExtensionCall::StartExtensionCall(const FOTBuilder::CompoundExtensionFlowObj &fo,
+				       const NodePtr &nd,
+				       Vector<FOTBuilder *> &v)
+: flowObj(fo.copy()->asCompoundExtensionFlowObj()), node(nd)
+{
+  for (size_t i = v.size(); i > 0; i--) {
+    ports.insert(new SaveFOTBuilder);
+    v[i - 1] = ports.head();
+  }
+}
+
+void StartExtensionCall::emit(FOTBuilder &fotb)
+{
+  Vector<StringC> portNames;
+  flowObj->portNames(portNames);
+  Vector<FOTBuilder *> v(portNames.size());
+  fotb.startExtension(*flowObj, node, v);
+  for (size_t i = 0; i < v.size(); i++) {
+    Owner<SaveFOTBuilder> tem(ports.get());
+    tem->emit(*v[i]);
+  }
 }
 
 SerialFOTBuilder::SerialFOTBuilder()
@@ -1797,21 +2191,195 @@ SerialFOTBuilder::SerialFOTBuilder()
 
 void SerialFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
-  numerator = this;
   save_.insert(new SaveFOTBuilder);
   denominator = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  numerator = save_.head();
   startFractionSerial();
-  startFractionNumerator();
 }
 
 void SerialFOTBuilder::endFraction()
 {
-  endFractionNumerator();
-  Owner<SaveFOTBuilder> denominator = save_.get();
-  startFractionDenominator();
-  denominator->emit(*this);
-  endFractionDenominator();
+  {
+    Owner<SaveFOTBuilder> numerator(save_.get());
+    startFractionNumerator();
+    numerator->emit(*this);
+    endFractionNumerator();
+  }
+  {
+    Owner<SaveFOTBuilder> denominator(save_.get());
+    startFractionDenominator();
+    denominator->emit(*this);
+    endFractionDenominator();
+  }
   endFractionSerial();
+}
+
+void SerialFOTBuilder::startScript(FOTBuilder *&preSup,
+				   FOTBuilder *&preSub,
+				   FOTBuilder *&postSup,
+				   FOTBuilder *&postSub,
+				   FOTBuilder *&midSup,
+				   FOTBuilder *&midSub)
+{
+  save_.insert(new SaveFOTBuilder);
+  midSub = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  midSup = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  postSub = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  postSup = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  preSub = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  preSup = save_.head();
+  startScriptSerial();
+}
+
+void SerialFOTBuilder::endScript()
+{
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptPreSup();
+    tem->emit(*this);
+    endScriptPreSup();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptPreSub();
+    tem->emit(*this);
+    endScriptPreSub();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptPostSup();
+    tem->emit(*this);
+    endScriptPostSup();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptPostSub();
+    tem->emit(*this);
+    endScriptPostSub();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptMidSup();
+    tem->emit(*this);
+    endScriptMidSup();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startScriptMidSub();
+    tem->emit(*this);
+    endScriptMidSub();
+  }
+  endScriptSerial();
+}
+
+void SerialFOTBuilder::startMark(FOTBuilder *&overMark, FOTBuilder *&underMark)
+{
+  save_.insert(new SaveFOTBuilder);
+  underMark = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  overMark = save_.head();
+  startMarkSerial();
+}
+
+void SerialFOTBuilder::endMark()
+{
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startMarkOver();
+    tem->emit(*this);
+    endMarkOver();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startMarkUnder();
+    tem->emit(*this);
+    endMarkUnder();
+  }
+  endMarkSerial();
+}
+
+void SerialFOTBuilder::startFence(FOTBuilder *&open, FOTBuilder *&close)
+{
+  save_.insert(new SaveFOTBuilder);
+  close = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  open = save_.head();
+  startFenceSerial();
+}
+
+void SerialFOTBuilder::endFence()
+{
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startFenceOpen();
+    tem->emit(*this);
+    endFenceOpen();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startFenceClose();
+    tem->emit(*this);
+    endFenceClose();
+  }
+  endFenceSerial();
+}
+
+void SerialFOTBuilder::startRadical(FOTBuilder *&degree)
+{
+  save_.insert(new SaveFOTBuilder);
+  degree = save_.head();
+  startRadicalSerial();
+}
+
+void SerialFOTBuilder::endRadical()
+{
+  Owner<SaveFOTBuilder> tem(save_.get());
+  startRadicalDegree();
+  tem->emit(*this);
+  endRadicalDegree();
+  endRadicalSerial();
+}
+
+void SerialFOTBuilder::startMathOperator(FOTBuilder *&oper,
+					 FOTBuilder *&lowerLimit,
+					 FOTBuilder *&upperLimit)
+{
+  save_.insert(new SaveFOTBuilder);
+  upperLimit = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  lowerLimit = save_.head();
+  save_.insert(new SaveFOTBuilder);
+  oper = save_.head();
+  startMathOperatorSerial();
+}
+
+void SerialFOTBuilder::endMathOperator()
+{
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startMathOperatorOperator();
+    tem->emit(*this);
+    endMathOperatorOperator();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startMathOperatorLowerLimit();
+    tem->emit(*this);
+    endMathOperatorLowerLimit();
+  }
+  {
+    Owner<SaveFOTBuilder> tem(save_.get());
+    startMathOperatorUpperLimit();
+    tem->emit(*this);
+    endMathOperatorUpperLimit();
+  }
+  endMathOperatorSerial();
 }
 
 void SerialFOTBuilder::startFractionSerial()
@@ -1840,6 +2408,168 @@ void SerialFOTBuilder::endFractionDenominator()
 {
 }
 
+void SerialFOTBuilder::startScriptSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endScriptSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startScriptPreSup()
+{
+}
+
+void SerialFOTBuilder::endScriptPreSup()
+{
+}
+
+void SerialFOTBuilder::startScriptPreSub()
+{
+}
+
+void SerialFOTBuilder::endScriptPreSub()
+{
+}
+
+void SerialFOTBuilder::startScriptPostSup()
+{
+}
+
+void SerialFOTBuilder::endScriptPostSup()
+{
+}
+
+void SerialFOTBuilder::startScriptPostSub()
+{
+}
+
+void SerialFOTBuilder::endScriptPostSub()
+{
+}
+
+void SerialFOTBuilder::startScriptMidSup()
+{
+}
+
+void SerialFOTBuilder::endScriptMidSup()
+{
+}
+
+void SerialFOTBuilder::startScriptMidSub()
+{
+}
+
+void SerialFOTBuilder::endScriptMidSub()
+{
+}
+
+void SerialFOTBuilder::startMarkSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endMarkSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startMarkOver()
+{
+}
+
+void SerialFOTBuilder::endMarkOver()
+{
+}
+
+void SerialFOTBuilder::startMarkUnder()
+{
+}
+
+void SerialFOTBuilder::endMarkUnder()
+{
+}
+
+void SerialFOTBuilder::startFenceSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endFenceSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startFenceOpen()
+{
+}
+
+void SerialFOTBuilder::endFenceOpen()
+{
+}
+
+void SerialFOTBuilder::startFenceClose()
+{
+}
+
+void SerialFOTBuilder::endFenceClose()
+{
+}
+
+void SerialFOTBuilder::startRadicalSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endRadicalSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startRadicalDegree()
+{
+}
+
+void SerialFOTBuilder::endRadicalDegree()
+{
+}
+
+void SerialFOTBuilder::startMathOperatorSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endMathOperatorSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startMathOperatorOperator()
+{
+}
+
+void SerialFOTBuilder::endMathOperatorOperator()
+{
+}
+
+void SerialFOTBuilder::startMathOperatorLowerLimit()
+{
+}
+
+void SerialFOTBuilder::endMathOperatorLowerLimit()
+{
+}
+
+void SerialFOTBuilder::startMathOperatorUpperLimit()
+{
+}
+
+void SerialFOTBuilder::endMathOperatorUpperLimit()
+{
+}
+
 void SerialFOTBuilder::startTablePart(const FOTBuilder::TablePartNIC &nic,
 				      FOTBuilder *&header, FOTBuilder *&footer)
 {
@@ -1852,11 +2582,11 @@ void SerialFOTBuilder::startTablePart(const FOTBuilder::TablePartNIC &nic,
 
 void SerialFOTBuilder::endTablePart()
 {
-  Owner<SaveFOTBuilder> header = save_.get();
+  Owner<SaveFOTBuilder> header(save_.get());
   startTablePartHeader();
   header->emit(*this);
   endTablePartHeader();
-  Owner<SaveFOTBuilder> footer = save_.get();
+  Owner<SaveFOTBuilder> footer(save_.get());
   startTablePartFooter();
   footer->emit(*this);
   endTablePartFooter();
@@ -1905,7 +2635,7 @@ void SerialFOTBuilder::endMultiMode()
 {
   const Vector<MultiMode> &namedModes = multiModeStack_.back();
   for (size_t i = 0; i < namedModes.size(); i++) {
-    Owner<SaveFOTBuilder> mode = save_.get();
+    Owner<SaveFOTBuilder> mode(save_.get());
     startMultiModeMode(namedModes[i]);
     mode->emit(*this);
     endMultiModeMode();
@@ -1929,6 +2659,95 @@ void SerialFOTBuilder::startMultiModeMode(const MultiMode &)
 }
 
 void SerialFOTBuilder::endMultiModeMode()
+{
+}
+
+void SerialFOTBuilder::startExtension(const CompoundExtensionFlowObj &flowObj,
+				      const NodePtr &nd,
+				      Vector<FOTBuilder *> &ports)
+{
+  for (size_t i = ports.size(); i > 0; i--) {
+    save_.insert(new SaveFOTBuilder);
+    ports[i - 1] = save_.head();
+  }
+  startExtensionSerial(flowObj, nd);
+}
+
+void SerialFOTBuilder::endExtension(const CompoundExtensionFlowObj &flowObj)
+{
+  Vector<StringC> portNames;
+  flowObj.portNames(portNames);
+  for (size_t i = 0; i < portNames.size(); i++) {
+    Owner<SaveFOTBuilder> stream(save_.get());
+    startExtensionStream(portNames[i]);
+    stream->emit(*this);
+    endExtensionStream(portNames[i]);
+  }
+  endExtensionSerial(flowObj);
+}
+
+void SerialFOTBuilder::startExtensionSerial(const CompoundExtensionFlowObj &, const NodePtr &)
+{
+  start();
+}
+
+void SerialFOTBuilder::endExtensionSerial(const CompoundExtensionFlowObj &)
+{
+  end();
+}
+
+void SerialFOTBuilder::startExtensionStream(const StringC &)
+{
+}
+
+void SerialFOTBuilder::endExtensionStream(const StringC &)
+{
+}
+
+FOTBuilder::ExtensionFlowObj::~ExtensionFlowObj()
+{
+}
+
+FOTBuilder::CompoundExtensionFlowObj *
+FOTBuilder::ExtensionFlowObj::asCompoundExtensionFlowObj()
+{
+  return 0;
+}
+
+const FOTBuilder::CompoundExtensionFlowObj *
+FOTBuilder::ExtensionFlowObj::asCompoundExtensionFlowObj() const
+{
+  return 0;
+}
+
+bool FOTBuilder::ExtensionFlowObj::hasNIC(const StringC &) const
+{
+  return 0;
+}
+
+void FOTBuilder::ExtensionFlowObj::setNIC(const StringC &, const Value &)
+{
+  CANNOT_HAPPEN();
+}
+
+FOTBuilder::CompoundExtensionFlowObj *
+FOTBuilder::CompoundExtensionFlowObj::asCompoundExtensionFlowObj()
+{
+  return this;
+}
+
+const FOTBuilder::CompoundExtensionFlowObj *
+FOTBuilder::CompoundExtensionFlowObj::asCompoundExtensionFlowObj() const
+{
+  return this;
+}
+
+bool FOTBuilder::CompoundExtensionFlowObj::hasPrincipalPort() const
+{
+  return 1;
+}
+ 
+void FOTBuilder::CompoundExtensionFlowObj::portNames(Vector<StringC> &) const
 {
 }
 

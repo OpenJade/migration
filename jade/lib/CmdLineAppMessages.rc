@@ -7,4 +7,5 @@ BEGIN
   4004, "unknown BCTF %1"
   4005, "unknown encoding %1"
   4006, "cannot open output file %1 (%2)"
+  4007, "cannot close output file %1 (%2)"
 END

@@ -1,14 +1,13 @@
 // TeXFOTBuilder.cxx: a Generic TeX backend for Jade
 // Written by David Megginson <dmeggins@microstar.com>
 
+// This backend ignores classes for online display other than link.
+
 #include "config.h"
 #include "TeXFOTBuilder.h"
-
-#ifdef SP_SHORT_HEADERS
-#include <strstrea.h>
-#else
-#include <strstream.h>
-#endif
+#include "TeXMessages.h"
+#include "MessageArg.h"
+#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -22,7 +21,7 @@ public:
   // Constructor and destructor.
   //////////////////////////////////////////////////////////////////////
 
-  TeXFOTBuilder(streambuf *);
+  TeXFOTBuilder(OutputByteStream *, Messenger *mgr);
   ~TeXFOTBuilder();
 
   //////////////////////////////////////////////////////////////////////
@@ -35,7 +34,20 @@ public:
   void externalGraphic(const ExternalGraphicNIC &);
   void rule(const RuleNIC &);
   void alignmentPoint();
+  void pageNumber();
   void formattingInstruction(const StringC &);
+  void tableColumn(const TableColumnNIC &);
+  void tableCellBeforeRowBorder();
+  void tableCellAfterRowBorder();
+  void tableCellBeforeColumnBorder();
+  void tableCellAfterColumnBorder();
+
+				// New atomic flow-objects added
+				// 1 March/97 with math support.
+  void fractionBar();
+  void radicalRadical(const CharacterNIC &);
+  void radicalRadicalDefaulted();
+  void currentNodePageNumber(const NodePtr &);
 
   //////////////////////////////////////////////////////////////////////
   // Non-atomic flow objects
@@ -51,16 +63,6 @@ public:
   void endDisplayGroup();
   void startScroll();
   void endScroll();
-  void startLink(const Address &);
-  void endLink();
-  void startMarginalia();
-  void endMarginalia();
-#if 0
-  void startMultiMode(const MultiMode *principalPort,  // null if no principal port
-			      const Vector<MultiMode> &namedPorts,
-			      Vector<FOTBuilder *> &);
-  void endMultiMode();
-#endif
   void startScore(Char);
   void startScore(const LengthSpec &);
   void startScore(Symbol);
@@ -82,26 +84,84 @@ public:
   void tableAfterColumnBorder();
   void startTablePartSerial(const TablePartNIC &);
   void endTablePartSerial();
-  void tableColumn(const TableColumnNIC &);
   void startTableRow();
   void endTableRow();
   void startTableCell(const TableCellNIC &);
   void endTableCell();
-  void tableCellBeforeRowBorder();
-  void tableCellAfterRowBorder();
-  void tableCellBeforeColumnBorder();
-  void tableCellAfterColumnBorder();
-  // Implementation must set numerator and denominator
-  // must be set to non-null values.
-  void startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator);
-  void endFraction();
   void startSimplePageSequence();
   void endSimplePageSequence();
   // Headers and footers are treated like a separate port.
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
   // page-number sosofo
-  void pageNumber();
+
+				// New non-atomic flow-objects added
+				// 1 March/97 with math support.
+  void startTablePartHeader();
+  void endTablePartHeader();
+  void startTablePartFooter();
+  void endTablePartFooter();
+  void startMathSequence();
+  void endMathSequence();
+  void startFractionSerial();
+  void endFractionSerial();
+  void startFractionNumerator();
+  void endFractionNumerator();
+  void startFractionDenominator();
+  void endFractionDenominator();
+  void startUnmath();
+  void endUnmath();
+  void startSuperscript();
+  void endSuperscript();
+  void startSubscript();
+  void endSubscript();
+  void startScriptSerial();
+  void endScriptSerial();
+  void startScriptPreSup();
+  void endScriptPreSup();
+  void startScriptPreSub();
+  void endScriptPreSub();
+  void startScriptPostSup();
+  void endScriptPostSup();
+  void startScriptPostSub();
+  void endScriptPostSub();
+  void startScriptMidSup();
+  void endScriptMidSup();
+  void startScriptMidSub();
+  void endScriptMidSub();
+  void startMarkSerial();
+  void endMarkSerial();
+  void startMarkOver();
+  void endMarkOver();
+  void startMarkUnder();
+  void endMarkUnder();
+  void startFenceSerial();
+  void endFenceSerial();
+  void startFenceOpen();
+  void endFenceOpen();
+  void startFenceClose();
+  void endFenceClose();
+  void startRadicalSerial();
+  void endRadicalSerial();
+  void startRadicalDegree();
+  void endRadicalDegree();
+  void startMathOperatorSerial();
+  void endMathOperatorSerial();
+  void startMathOperatorOperator();
+  void endMathOperatorOperator();
+  void startMathOperatorLowerLimit();
+  void endMathOperatorLowerLimit();
+  void startMathOperatorUpperLimit();
+  void endMathOperatorUpperLimit();
+  void startGrid(const GridNIC &);
+  void endGrid();
+  void startGridCell(const GridCellNIC &);
+  void endGridCell();
+  void startNode(const NodePtr &, const StringC &, RuleType);
+  void endNode();
+  void startLink(const Address &);
+  void endLink();
+
 
   //////////////////////////////////////////////////////////////////////
   // Inherited characteristics
@@ -226,19 +286,42 @@ public:
   void setHeaderMargin(Length);
   void setFooterMargin(Length);
 
+				// New Inherited Characteristics
+				// added 1 March/97 with math support.
+  void setMinPreLineSpacing(const OptLengthSpec &);
+  void setMinPostLineSpacing(const OptLengthSpec &);
+  void setMinLeading(const OptLengthSpec &);
+  void setScriptPreAlign(Symbol);
+  void setScriptPostAlign(Symbol);
+  void setScriptMidSupAlign(Symbol);
+  void setScriptMidSubAlign(Symbol);
+  void setNumeratorAlign(Symbol);
+  void setDenominatorAlign(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowAlignment(Symbol);
+  void setGridEquidistantRows(bool);
+  void setGridEquidistantColumns(bool);
+  void setEscapementSpaceBefore(const InlineSpace &);
+  void setEscapementSpaceAfter(const InlineSpace &);
+  void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
+
 
 private:
 				// Variables.
-  ostream fileout_;
-  ostrstream * stringout_;
+  OutputByteStream *fileout_;
+  StrOutputByteStream stringout_;
+  Messenger *mgr_;
 
 				// Functions.
-  ostream &os();
+  OutputByteStream &os();
   void insertAtomic(const char *name);
   void startGroup(const char *name);
   void endGroup(const char *name);
+
   void setlength(const char *,Length);
   void set(const char *,const StringC &);
+  void set(const char *,const GroveString &);
   void set(const char *,Symbol);
   void set(const char *,const LengthSpec &);
   void set(const char *,double);
@@ -251,10 +334,32 @@ private:
   void set(const char *,const DisplaySpace &);
   void set(const char *,const GlyphId &);
 
-  void setInlineNIC(const InlineNIC &);
+  void set(const char *,const OptLengthSpec &);
+  void set(const char *,const InlineSpace &);
+
+  // Structures for non-inherited characteristics,
+  // in the order specified in style/FOTBuilder.h.
+
   void setDisplayNIC(const DisplayNIC &);
+  void setInlineNIC(const InlineNIC &);
+  void setDisplayGroupNIC(const DisplayGroupNIC &);
+  void setExternalGraphicNIC(const ExternalGraphicNIC &);
+  void setBoxNIC(const BoxNIC &);
+  void setRuleNIC(const RuleNIC &);
+  void setLeaderNIC(const LeaderNIC &);
+  void setParagraphNIC(const ParagraphNIC &);
+  void setCharacterNIC(const CharacterNIC &);
+  void setLineFieldNIC(const LineFieldNIC &);
+  void setTableNIC(const TableNIC &);
+  void setTablePartNIC(const TablePartNIC &);
+  void setTableColumnNIC(const TableColumnNIC &);
+  void setTableCellNIC(const TableCellNIC &);
+  void setGridNIC(const GridNIC &);
+  void setGridCellNIC(const GridCellNIC &);
 
   void dumpInherited();
+
+  void message(const MessageType0 &);
 };
 
 #define MAYBESET(name,value,default) (value!=default?(set(name,value),0):0)
@@ -264,16 +369,18 @@ private:
 // Get the current output stream.
 //
 inline
-ostream &TeXFOTBuilder::os()
+OutputByteStream &TeXFOTBuilder::os()
 {
-  return fileout_;
+  return *fileout_;
 }
 
 
 //
 // Define an output operator for StringC
 //
-static ostream &operator<<(ostream &os, const StringC &s)
+// FIXME This won't work for Unicode characters.
+
+static OutputByteStream &operator<<(OutputByteStream &os, const StringC &s)
 {
   for (size_t i = 0; i < s.size(); i++)
     os << char(s[i]);
@@ -281,24 +388,41 @@ static ostream &operator<<(ostream &os, const StringC &s)
 }
 
 
-FOTBuilder *makeTeXFOTBuilder(streambuf *sbuf)
+//
+// Define an output operator for GroveString
+//
+static OutputByteStream &operator<<(OutputByteStream &os, const GroveString &s)
 {
-  return new TeXFOTBuilder(sbuf);
+  for (size_t i = 0; i < s.size(); i++)
+    os << char(s[i]);
+  return os;
+}
+
+static OutputByteStream &operator<<(OutputByteStream &os, double d)
+{
+  char buf[64];
+  sprintf(buf, "%g", d);
+  return os << buf;
+}
+
+FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr)
+{
+  return new TeXFOTBuilder(os, mgr);
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Constructor and Destructor
 ////////////////////////////////////////////////////////////////////////
 
-TeXFOTBuilder::TeXFOTBuilder(streambuf *sbuf)
-: fileout_(sbuf), stringout_(new ostrstream)
+TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
+: fileout_(o), mgr_(mgr)
 {
-  os() << "\\startFOT{}\n";
+  os() << "\\startFOT{}";
 }
 
 TeXFOTBuilder::~TeXFOTBuilder()
 {
-  os() << "\\endFOT{}\n";
+  os() << "\\endFOT{}";
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -343,77 +467,25 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
 
 void TeXFOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & nic.cChar)
-    set("Ch",(unsigned long)nic.ch);
-  if (nic.specifiedC & nic.cGlyphId)
-    set("GlyphId",nic.glyphId);
-  if (nic.specifiedC & nic.cBreakBeforePriority)
-    set("BreakBeforePriority",nic.breakBeforePriority);
-  if (nic.specifiedC & nic.cBreakAfterPriority)
-    set("BreakAfterPriority",nic.breakAfterPriority);
-  if (nic.specifiedC & nic.cMathClass)
-    set("MathClass",nic.mathClass);
-  if (nic.specifiedC & nic.cMathFontPosture)
-    set("MathFontPosture",nic.mathFontPosture);
-  if (nic.specifiedC & nic.cScript)
-    set("Script",(long unsigned int)nic.script);
-  if (nic.specifiedC & nic.cIsDropAfterLineBreak)
-    set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
-  if (nic.specifiedC & nic.cIsDropUnlessBeforeLineBreak)
-    set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
-  if (nic.specifiedC & nic.cIsPunct)
-    set("IsPunct",nic.isPunct);
-  if (nic.specifiedC & nic.cIsInputWhitespace)
-    set("IsInputWhiteSpace",nic.isInputWhitespace);
-  if (nic.specifiedC & nic.cIsInputTab)
-    set("IsInputTab",nic.isInputTab);
-  if (nic.specifiedC & nic.cIsRecordEnd)
-    set("IsRecordEnd",nic.isRecordEnd);
-  if (nic.specifiedC & nic.cIsSpace)
-    set("IsSpace",nic.isSpace);
-  MAYBESET("StretchFactor",nic.stretchFactor,0L);
+  setCharacterNIC(nic);
   insertAtomic("Character");
 }
 
 void TeXFOTBuilder::paragraphBreak(const ParagraphNIC &nic)
 {
-  setDisplayNIC(nic);
+  setParagraphNIC(nic);
   insertAtomic("ParagraphBreak");
 }
 
 void TeXFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
 {
-  setDisplayNIC(nic);
-  setInlineNIC(nic);
-				// ExternalGraphicNIC
-  MAYBESET("IsDisplay",nic.isDisplay,symbolFalse);
-  MAYBESET("ScaleType",nic.scaleType,symbolMaxUniform);
-  if (nic.scaleType == symbolFalse) {
-    set("ScaleX",nic.scale[0]);
-    set("ScaleY",nic.scale[1]);
-  }
-  set("EntitySystemId",nic.entitySystemId);
-  set("NotationSystemId",nic.notationSystemId);
-  if(nic.hasMaxWidth)
-    set("MaxWidth",nic.maxWidth);
-  if (nic.hasMaxHeight)
-    set("MaxHeight",nic.maxHeight);
-  if (!nic.isDisplay) {
-    set("EscapementDirection",nic.escapementDirection);
-    set("PositionPointX",nic.positionPointX);
-    set("PositionPointY",nic.positionPointY);
-  }
+  setExternalGraphicNIC(nic);
   insertAtomic("ExternalGraphic");
 }
 
 void TeXFOTBuilder::rule(const RuleNIC &nic)
 {
-  setDisplayNIC(nic);
-  setInlineNIC(nic);
-				// Rule NIC
-  set("Orientation",nic.orientation);
-  if (nic.hasLength)
-    set("Length",nic.length);
+  setRuleNIC(nic);
   insertAtomic("Rule");
 }
 
@@ -422,11 +494,82 @@ void TeXFOTBuilder::alignmentPoint()
   insertAtomic("AlignmentPoint");
 }
 
+// page-number sosofo
+void TeXFOTBuilder::pageNumber()
+{
+  insertAtomic("PageNumber");
+}
+
 void TeXFOTBuilder::formattingInstruction (const StringC &instr)
 {
   os() << instr;
 }
   
+void TeXFOTBuilder::tableColumn(const TableColumnNIC &nic)
+{
+  setTableColumnNIC(nic);
+  insertAtomic("TableColumn");
+}
+
+
+void TeXFOTBuilder::tableCellBeforeRowBorder()
+{
+  insertAtomic("TableCellBeforeRowBorder");
+}
+
+void TeXFOTBuilder::tableCellAfterRowBorder()
+{
+  insertAtomic("TableCellAfterRowBorder");
+}
+
+void TeXFOTBuilder::tableCellBeforeColumnBorder()
+{
+  insertAtomic("TableCellBeforeColumnBorder");
+}
+
+void TeXFOTBuilder::tableCellAfterColumnBorder()
+{
+  insertAtomic("TableCellAfterColumnBorder");
+}
+
+
+				// New atomic flow-objects added
+				// 1 March/97 with math support.
+void TeXFOTBuilder::fractionBar()
+{
+  insertAtomic("FractionBar");
+}
+
+void TeXFOTBuilder::radicalRadical(const CharacterNIC &c)
+{
+  setCharacterNIC(c);
+  insertAtomic("RadicalRadical");
+}
+
+void TeXFOTBuilder::radicalRadicalDefaulted()
+{
+  insertAtomic("RadicalRadicalDefaulted");
+}
+
+void TeXFOTBuilder::currentNodePageNumber(const NodePtr &node)
+{
+  GroveString id;
+  unsigned long ei;
+
+  // FIX ME!
+  // Only PARTIALLY supported -- I currently allow cross-references
+  // only to elements.
+  if (node->getId(id) == accessOK) {
+    set("Label",id);
+    insertAtomic("CurrentNodePageNumber");
+  } else if (node->elementIndex(ei) == accessOK) {
+    set("ElementIndex",ei);
+    insertAtomic("CurrentNodePageNumber");
+  } else {
+    message(TeXMessages::unsupportedPageNumberNonElement);
+  }
+}
+
 
 //////////////////////////////////////////////////////////////////////
 // Non-atomic flow objects
@@ -444,7 +587,7 @@ void TeXFOTBuilder::endSequence()
 
 void TeXFOTBuilder::startLineField(const LineFieldNIC &nic)
 {
-  setInlineNIC(nic);
+  setLineFieldNIC(nic);
   startGroup("LineField");
 }
 
@@ -455,7 +598,7 @@ void TeXFOTBuilder::endLineField()
 
 void TeXFOTBuilder::startParagraph(const ParagraphNIC &nic)
 {
-  setDisplayNIC(nic);
+  setParagraphNIC(nic);
   startGroup("Paragraph");
 }
 
@@ -466,10 +609,7 @@ void TeXFOTBuilder::endParagraph()
 
 void TeXFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
 {
-  setDisplayNIC(nic);
-				// DisplayGroupNIC
-  if (nic.hasCoalesceId) 
-    set("CoalesceId",nic.coalesceId);
+  setDisplayGroupNIC(nic);
   startGroup("DisplayGroup");
 }
 
@@ -488,29 +628,9 @@ void TeXFOTBuilder::endScroll()
   endGroup("Scroll");
 }
 
-void TeXFOTBuilder::startLink(const Address &)
+void TeXFOTBuilder::startScore(Char ch)
 {
-  // Incomplete
-  startGroup("Link");
-}
-
-void TeXFOTBuilder::endLink()
-{
-  endGroup("Link");
-}
-
-void TeXFOTBuilder::startMarginalia()
-{
-  startGroup("Marginalia");
-}
-
-void TeXFOTBuilder::endMarginalia()
-{
-  endGroup("Marginalia");
-}
-
-void TeXFOTBuilder::startScore(Char score)
-{
+  set("ScoreCharacter",(unsigned long)ch);
   startGroup("Score");
 }
 
@@ -533,9 +653,7 @@ void TeXFOTBuilder::endScore()
 
 void TeXFOTBuilder::startLeader(const LeaderNIC &nic)
 {
-  setInlineNIC(nic);
-  if (nic.hasLength)
-    set("Length",nic.length);
+  setLeaderNIC(nic);
   startGroup("Leader");
 }
 
@@ -556,10 +674,7 @@ void TeXFOTBuilder::endSideline()
 
 void TeXFOTBuilder::startBox(const BoxNIC &nic)
 {
-  setDisplayNIC(nic);
-  setInlineNIC(nic);
-				// BoxNIC
-  MAYBESET("IsDisplay",nic.isDisplay,symbolFalse);
+  setBoxNIC(nic);
   startGroup("Box");
 }
 
@@ -571,19 +686,7 @@ void TeXFOTBuilder::endBox()
 // Tables
 void TeXFOTBuilder::startTable(const TableNIC &nic)
 {
-  setDisplayNIC(nic);
-				// TableNIC
-  switch (nic.widthType) {
-  case TableNIC::widthFull:
-    set("TableWidth","full");
-    break;
-  case TableNIC::widthMinimum:
-    set("TableWidth","minimum");
-    break;
-  case TableNIC::widthExplicit:
-    set("TableWidth",nic.width);
-    break;
-  }
+  setTableNIC(nic);
   startGroup("Table");
 }
 
@@ -616,22 +719,13 @@ void TeXFOTBuilder::tableAfterColumnBorder()
 
 void TeXFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
 {
-  setDisplayNIC(nic);
+  setTablePartNIC(nic);
   startGroup("TablePart");
 }
 
 void TeXFOTBuilder::endTablePartSerial()
 {
   endGroup("TablePart");
-}
-
-void TeXFOTBuilder::tableColumn(const TableColumnNIC &nic)
-{
-  MAYBESET("ColumnIndex",long(nic.columnIndex),0);
-  MAYBESET("NColumnsSpanned",long(nic.nColumnsSpanned),1);
-  if (nic.hasWidth)
-    set("Width",nic.width);
-  insertAtomic("TableColumn");
 }
 
 void TeXFOTBuilder::startTableRow()
@@ -646,48 +740,13 @@ void TeXFOTBuilder::endTableRow()
 
 void TeXFOTBuilder::startTableCell(const TableCellNIC &nic)
 {
-  MAYBESET("ColumnIndex",long(nic.columnIndex),0);
-  MAYBESET("NColumnsSpanned",long(nic.nColumnsSpanned),1);
-  MAYBESET("NRowsSpanned",long(nic.nRowsSpanned),1);
+  setTableCellNIC(nic);
   startGroup("TableCell");
 }
 
 void TeXFOTBuilder::endTableCell()
 {
   endGroup("TableCell");
-}
-
-void TeXFOTBuilder::tableCellBeforeRowBorder()
-{
-  insertAtomic("TableCellBeforeRowBorder");
-}
-
-void TeXFOTBuilder::tableCellAfterRowBorder()
-{
-  insertAtomic("TableCellAfterRowBorder");
-}
-
-void TeXFOTBuilder::tableCellBeforeColumnBorder()
-{
-  insertAtomic("TableCellBeforeColumnBorder");
-}
-
-void TeXFOTBuilder::tableCellAfterColumnBorder()
-{
-  insertAtomic("TableCellAfterColumnBorder");
-}
-
-// Implementation must set numerator and denominator
-// must be set to non-null values.
-void TeXFOTBuilder::startFraction(FOTBuilder *&numerator,
-				  FOTBuilder *&denominator)
-{
-  startGroup("Fraction");
-}
-
-void TeXFOTBuilder::endFraction()
-{
-  endGroup("Fraction");
 }
 
 void TeXFOTBuilder::startSimplePageSequence()
@@ -704,7 +763,7 @@ void TeXFOTBuilder::endSimplePageSequence()
 // differently.
 void TeXFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned flags)
 {
-  os() << "  \\SimplePageSequence";
+  os() << "\n\\SimplePageSequence";
   if ((flags & (firstHF|otherHF)) == firstHF)
     os() << "First";
   else
@@ -728,19 +787,453 @@ void TeXFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned flags)
     os() << "Header";
   else
     os() << "Footer";
-  os() << '{';
+  os() << "%\n{";
 }
 
-void TeXFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
+void TeXFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned flags)
 {
-  os() << "}%\n";
+  os() << '}';
 }
 
-// page-number sosofo
-void TeXFOTBuilder::pageNumber()
+				// Non-atomic flow objects added
+				// 1 March/97 with math support.
+
+void TeXFOTBuilder::startTablePartHeader()
 {
-  insertAtomic("PageNumber");
+  startGroup("TablePartHeader");
 }
+
+
+void TeXFOTBuilder::endTablePartHeader()
+{
+  endGroup("TablePartHeader");
+}
+
+
+void TeXFOTBuilder::startTablePartFooter()
+{
+  startGroup("TablePartFooter");
+}
+
+
+void TeXFOTBuilder::endTablePartFooter()
+{
+  endGroup("TablePartFooter");
+}
+
+
+void TeXFOTBuilder::startMathSequence()
+{
+  startGroup("MathSequence");
+}
+
+
+void TeXFOTBuilder::endMathSequence()
+{
+  endGroup("MathSequence");
+}
+
+
+void TeXFOTBuilder::startFractionSerial()
+{
+  startGroup("FractionSerial");
+}
+
+
+void TeXFOTBuilder::endFractionSerial()
+{
+  endGroup("FractionSerial");
+}
+
+
+void TeXFOTBuilder::startFractionNumerator()
+{
+  startGroup("FractionNumerator");
+}
+
+
+void TeXFOTBuilder::endFractionNumerator()
+{
+  endGroup("FractionNumerator");
+}
+
+
+void TeXFOTBuilder::startFractionDenominator()
+{
+  startGroup("FractionDenominator");
+}
+
+
+void TeXFOTBuilder::endFractionDenominator()
+{
+  endGroup("FractionDenominator");
+}
+
+
+void TeXFOTBuilder::startUnmath()
+{
+  startGroup("Unmath");
+}
+
+
+void TeXFOTBuilder::endUnmath()
+{
+  endGroup("Unmath");
+}
+
+
+void TeXFOTBuilder::startSuperscript()
+{
+  startGroup("Superscript");
+}
+
+
+void TeXFOTBuilder::endSuperscript()
+{
+  endGroup("Superscript");
+}
+
+
+void TeXFOTBuilder::startSubscript()
+{
+  startGroup("Subscript");
+}
+
+
+void TeXFOTBuilder::endSubscript()
+{
+  endGroup("Subscript");
+}
+
+
+void TeXFOTBuilder::startScriptSerial()
+{
+  startGroup("ScriptSerial");
+}
+
+
+void TeXFOTBuilder::endScriptSerial()
+{
+  endGroup("ScriptSerial");
+}
+
+
+void TeXFOTBuilder::startScriptPreSup()
+{
+  startGroup("ScriptPreSup");
+}
+
+
+void TeXFOTBuilder::endScriptPreSup()
+{
+  endGroup("ScriptPreSup");
+}
+
+
+void TeXFOTBuilder::startScriptPreSub()
+{
+  startGroup("ScriptPreSub");
+}
+
+
+void TeXFOTBuilder::endScriptPreSub()
+{
+  endGroup("ScriptPreSub");
+}
+
+
+void TeXFOTBuilder::startScriptPostSup()
+{
+  startGroup("ScriptPostSup");
+}
+
+
+void TeXFOTBuilder::endScriptPostSup()
+{
+  endGroup("ScriptPostSup");
+}
+
+
+void TeXFOTBuilder::startScriptPostSub()
+{
+  startGroup("ScriptPostSub");
+}
+
+
+void TeXFOTBuilder::endScriptPostSub()
+{
+  endGroup("ScriptPostSub");
+}
+
+
+void TeXFOTBuilder::startScriptMidSup()
+{
+  startGroup("ScriptMidSup");
+}
+
+
+void TeXFOTBuilder::endScriptMidSup()
+{
+  endGroup("ScriptMidSup");
+}
+
+
+void TeXFOTBuilder::startScriptMidSub()
+{
+  startGroup("ScriptMidSub");
+}
+
+
+void TeXFOTBuilder::endScriptMidSub()
+{
+  endGroup("ScriptMidSub");
+}
+
+
+void TeXFOTBuilder::startMarkSerial()
+{
+  startGroup("MarkSerial");
+}
+
+
+void TeXFOTBuilder::endMarkSerial()
+{
+  endGroup("MarkSerial");
+}
+
+
+void TeXFOTBuilder::startMarkOver()
+{
+  startGroup("MarkOver");
+}
+
+
+void TeXFOTBuilder::endMarkOver()
+{
+  endGroup("MarkOver");
+}
+
+
+void TeXFOTBuilder::startMarkUnder()
+{
+  startGroup("MarkUnder");
+}
+
+
+void TeXFOTBuilder::endMarkUnder()
+{
+  endGroup("MarkUnder");
+}
+
+
+void TeXFOTBuilder::startFenceSerial()
+{
+  startGroup("FenceSerial");
+}
+
+
+void TeXFOTBuilder::endFenceSerial()
+{
+  endGroup("FenceSerial");
+}
+
+
+void TeXFOTBuilder::startFenceOpen()
+{
+  startGroup("FenceOpen");
+}
+
+
+void TeXFOTBuilder::endFenceOpen()
+{
+  endGroup("FenceOpen");
+}
+
+
+void TeXFOTBuilder::startFenceClose()
+{
+  startGroup("FenceClose");
+}
+
+
+void TeXFOTBuilder::endFenceClose()
+{
+  endGroup("FenceClose");
+}
+
+
+void TeXFOTBuilder::startRadicalSerial()
+{
+  startGroup("RadicalSerial");
+}
+
+
+void TeXFOTBuilder::endRadicalSerial()
+{
+  endGroup("RadicalSerial");
+}
+
+
+void TeXFOTBuilder::startRadicalDegree()
+{
+  startGroup("RadicalDegree");
+}
+
+
+void TeXFOTBuilder::endRadicalDegree()
+{
+  endGroup("RadicalDegree");
+}
+
+
+void TeXFOTBuilder::startMathOperatorSerial()
+{
+  startGroup("MathOperatorSerial");
+}
+
+
+void TeXFOTBuilder::endMathOperatorSerial()
+{
+  endGroup("MathOperatorSerial");
+}
+
+
+void TeXFOTBuilder::startMathOperatorOperator()
+{
+  startGroup("MathOperatorOperator");
+}
+
+
+void TeXFOTBuilder::endMathOperatorOperator()
+{
+  endGroup("MathOperatorOperator");
+}
+
+
+void TeXFOTBuilder::startMathOperatorLowerLimit()
+{
+  startGroup("MathOperatorLowerLimit");
+}
+
+
+void TeXFOTBuilder::endMathOperatorLowerLimit()
+{
+  endGroup("MathOperatorLowerLimit");
+}
+
+
+void TeXFOTBuilder::startMathOperatorUpperLimit()
+{
+  startGroup("MathOperatorUpperLimit");
+}
+
+
+void TeXFOTBuilder::endMathOperatorUpperLimit()
+{
+  endGroup("MathOperatorUpperLimit");
+}
+
+
+void TeXFOTBuilder::startGrid(const GridNIC &nic)
+{
+  setGridNIC(nic);
+  startGroup("Grid");
+}
+
+
+void TeXFOTBuilder::endGrid()
+{
+  endGroup("Grid");
+}
+
+
+void TeXFOTBuilder::startGridCell(const GridCellNIC &nic)
+{
+  setGridCellNIC(nic);
+  startGroup("GridCell");
+}
+
+
+void TeXFOTBuilder::endGridCell()
+{
+  endGroup("GridCell");
+}
+
+
+void TeXFOTBuilder::startNode(const NodePtr &node,
+			      const StringC &processingMode, 
+			      RuleType ruleType)
+{
+  GroveString id;
+  unsigned long ei;
+
+  if (node->getId(id) == accessOK) {
+    set("Label",id);
+  }
+  else if (node->elementIndex(ei) == accessOK) {
+    set("ElementIndex", ei);
+  }
+  startGroup("Node");
+}
+
+
+void TeXFOTBuilder::endNode()
+{
+  endGroup("Node");
+}
+
+
+void TeXFOTBuilder::startLink(const Address &addr)
+{
+  GroveString id;
+  unsigned long ei;
+
+  // FIX ME!
+  // This needs a lot of work -- for now, it supports only links to
+  // elements.
+
+  switch (addr.type) {
+  case Address::none:
+    break;
+  case Address::resolvedNode:
+    if (addr.node->getId(id) == accessOK) {
+      set("Label",id);
+    } else if (addr.node->elementIndex(ei) == accessOK) {
+      set("ElementIndex", ei);
+    }
+    else {
+      message(TeXMessages::unsupportedLinkNonElement);
+    }
+    break;
+  case Address::idref:
+				// just the first IDREF for now
+    set("Label",addr.params[0]);
+    break;
+  case Address::entity:
+    message(TeXMessages::unsupportedLinkEntity);
+    break;
+  case Address::sgmlDocument:
+    message(TeXMessages::unsupportedLinkSgmlDoc);
+    break;
+  case Address::hytimeLinkend:
+    message(TeXMessages::unsupportedLinkHyTime);
+    break;
+  case Address::tei:
+    message(TeXMessages::unsupportedLinkTei);
+    break;
+  case Address::html:
+    message(TeXMessages::unsupportedLinkHtml);
+    break;
+  }
+  startGroup("Link");
+}
+
+
+void TeXFOTBuilder::endLink()
+{
+  endGroup("Link");
+}
+
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1309,6 +1802,115 @@ void TeXFOTBuilder::setFooterMargin(Length margin)
   setlength("FooterMargin",margin);
 }
 
+				// New inherited characteristics
+				// added 1 March/97 with math support.
+void TeXFOTBuilder::setMinPreLineSpacing(const OptLengthSpec &len)
+{
+  set("MinPreLineSpacing",len);
+}
+
+
+void TeXFOTBuilder::setMinPostLineSpacing(const OptLengthSpec &len)
+{
+  set("MinPostLineSpacing",len);
+}
+
+
+void TeXFOTBuilder::setMinLeading(const OptLengthSpec &len)
+{
+  set("MinLeading",len);
+}
+
+
+void TeXFOTBuilder::setScriptPreAlign(Symbol sym)
+{
+  set("ScriptPreAlign",sym);
+}
+
+
+void TeXFOTBuilder::setScriptPostAlign(Symbol sym)
+{
+  set("ScriptPostAlign",sym);
+}
+
+
+void TeXFOTBuilder::setScriptMidSupAlign(Symbol sym)
+{
+  set("ScriptMidSupAlign",sym);
+}
+
+
+void TeXFOTBuilder::setScriptMidSubAlign(Symbol sym)
+{
+  set("ScriptMidSubAlign",sym);
+}
+
+
+void TeXFOTBuilder::setNumeratorAlign(Symbol sym)
+{
+  set("NumeratorAlign",sym);
+}
+
+
+void TeXFOTBuilder::setDenominatorAlign(Symbol sym)
+{
+  set("DenominatorAlign",sym);
+}
+
+
+void TeXFOTBuilder::setGridPositionCellType(Symbol sym)
+{
+  set("GridPositionCellType",sym);
+}
+
+
+void TeXFOTBuilder::setGridColumnAlignment(Symbol sym)
+{
+  set("GridColumnAlignment",sym);
+}
+
+
+void TeXFOTBuilder::setGridRowAlignment(Symbol sym)
+{
+  set("GridRowAlignment",sym);
+}
+
+
+void TeXFOTBuilder::setGridEquidistantRows(bool flag)
+{
+  set("GridEquidistantRows",flag);
+}
+
+
+void TeXFOTBuilder::setGridEquidistantColumns(bool flag)
+{
+  set("GridEquidistantColumns",flag);
+}
+
+
+void TeXFOTBuilder::setEscapementSpaceBefore(const InlineSpace &space)
+{
+  set("EscapementSpaceBefore",space);
+}
+
+
+void TeXFOTBuilder::setEscapementSpaceAfter(const InlineSpace &space)
+{
+  set("EscapementSpaceAfter",space);
+}
+
+
+void TeXFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
+{
+  // FIX ME!
+  message(TeXMessages::unsupportedGlyphSubstTable);
+  // set("GlyphSubstTable",tables);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////
 // Private member functions.
 ////////////////////////////////////////////////////////////////////////
@@ -1318,9 +1920,9 @@ void TeXFOTBuilder::setFooterMargin(Length margin)
 //
 void TeXFOTBuilder::insertAtomic(const char *name)
 {
-  os() << "\\insert" << name << '{';
+  os() << "\\insert" << name << "%\n{";
   dumpInherited();
-  os() << "}%\n";
+  os() << '}';
 }
 
 //
@@ -1328,9 +1930,9 @@ void TeXFOTBuilder::insertAtomic(const char *name)
 //
 void TeXFOTBuilder::startGroup(const char *name)
 {
-  os() << "\\start" << name << '{';
+  os() << "\\start" << name << "%\n{";
   dumpInherited();
-  os() << "}%\n";
+  os() << '}';
 }
 
 //
@@ -1338,7 +1940,7 @@ void TeXFOTBuilder::startGroup(const char *name)
 //
 void TeXFOTBuilder::endGroup(const char *name)
 {
-  os() << "\\end" << name << "%\n";
+  os() << "\\end" << name << "{}";
 }
 
 //
@@ -1347,9 +1949,9 @@ void TeXFOTBuilder::endGroup(const char *name)
 //
 void TeXFOTBuilder::setlength(const char *name,Length size)
 {
-  *stringout_ << "\\def\\" << name << '{'
+  stringout_ << "\\def\\" << name << "%\n{"
 	      << float(size/1000.0)
-	      << "pt}%\n";
+	      << "pt}";
 }
 
 //
@@ -1357,19 +1959,29 @@ void TeXFOTBuilder::setlength(const char *name,Length size)
 //
 void TeXFOTBuilder::set(const char *name,const StringC &value)
 {
-  *stringout_ << "\\def\\" << name << '{'
+  stringout_ << "\\def\\" << name << "%\n{"
 	      << value
-	      << "}%\n";
+	      << '}';
+}
+
+//
+// Set a GroveString
+//
+void TeXFOTBuilder::set(const char *name,const GroveString &value)
+{
+  stringout_ << "\\def\\" << name << "%\n{"
+	      << value
+	      << '}';
 }
 
 //
 // Set a Symbol.
 //
-void TeXFOTBuilder::set(const char *name,Symbol symbol)
+void TeXFOTBuilder::set(const char *name,Symbol sym)
 {
-  const char * symbolName;
+  const char * symbolName = "";
 
-  switch (symbol) {
+  switch (sym) {
   case symbolFalse:
     symbolName = "false";
     break;
@@ -1556,6 +2168,9 @@ void TeXFOTBuilder::set(const char *name,Symbol symbol)
   case symbolPage:
     symbolName = "page";
     break;
+  case symbolPageRegion:
+    symbolName = "pageregion";
+    break;
   case symbolColumnSet:
     symbolName = "columnset";
     break;
@@ -1655,9 +2270,36 @@ void TeXFOTBuilder::set(const char *name,Symbol symbol)
   case symbolForce:
     symbolName = "force";
     break;
+  case symbolIndependent:
+    symbolName = "independent";
+    break;
+  case symbolPile:
+    symbolName = "pile";
+    break;
+  case symbolSupOut:
+    symbolName = "supout";
+    break;
+  case symbolSubOut:
+    symbolName = "subout";
+    break;
+  case symbolLeadEdge:
+    symbolName = "leadedge";
+    break;
+  case symbolTrailEdge:
+    symbolName = "trailedge";
+    break;
+  case symbolExplicit:
+    symbolName = "explicit";
+    break;
+  case symbolRowMajor:
+    symbolName = "rowmajor";
+    break;
+  case symbolColumnMajor:
+    symbolName = "columnmajor";
+    break;
   }
 
-  *stringout_ << "\\def\\" << name << '{' << symbolName << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << symbolName << '}';
 }
 
 //
@@ -1665,12 +2307,12 @@ void TeXFOTBuilder::set(const char *name,Symbol symbol)
 //
 void TeXFOTBuilder::set(const char *name,const LengthSpec &spec)
 {
-  *stringout_ << "\\def\\" << name << '{'
+  stringout_ << "\\def\\" << name << "%\n{"
 	      << float(spec.length/1000.0)
 	      << "pt}";
-  *stringout_ << "\\def\\" << name << "Factor{"
+  stringout_ << "\\def\\" << name << "Factor%\n{"
 	      << spec.displaySizeFactor
-	      << "}%\n";
+	      << '}';
 }
 
 //
@@ -1678,7 +2320,7 @@ void TeXFOTBuilder::set(const char *name,const LengthSpec &spec)
 //
 void TeXFOTBuilder::set(const char *name,double n)
 {
-  *stringout_ << "\\def\\" << name << '{' << n << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << n << '}';
 }
 
 //
@@ -1686,9 +2328,9 @@ void TeXFOTBuilder::set(const char *name,double n)
 //
 void TeXFOTBuilder::set(const char *name, const DeviceRGBColor &color)
 {
-  *stringout_ << "\\def\\" << name << "Red{" << color.red << "}%\n";
-  *stringout_ << "\\def\\" << name << "Green{" << color.green << "}%\n";
-  *stringout_ << "\\def\\" << name << "Blue{" << color.blue << "}%\n";
+  stringout_ << "\\def\\" << name << "Red%\n{" << int(color.red) << '}';
+  stringout_ << "\\def\\" << name << "Green%\n{" << int(color.green) << '}';
+  stringout_ << "\\def\\" << name << "Blue%\n{" << int(color.blue) << '}';
 }
 
 //
@@ -1696,9 +2338,9 @@ void TeXFOTBuilder::set(const char *name, const DeviceRGBColor &color)
 //
 void TeXFOTBuilder::set(const char *name,bool flag)
 {
-  *stringout_ << "\\def\\" << name << '{'
+  stringout_ << "\\def\\" << name << "%\n{"
 	      << (flag ? 1 : 0)
-	      << "}%\n";
+	      << '}';
 }
 
 //
@@ -1706,7 +2348,7 @@ void TeXFOTBuilder::set(const char *name,bool flag)
 //
 void TeXFOTBuilder::set(const char *name,long n)
 {
-  *stringout_ << "\\def\\" << name << '{' << n << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << n << '}';
 }
 
 //
@@ -1714,7 +2356,7 @@ void TeXFOTBuilder::set(const char *name,long n)
 //
 void TeXFOTBuilder::set(const char *name,long unsigned int n)
 {
-  *stringout_ << "\\def\\" << name << '{' << n << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << n << '}';
 }
 
 //
@@ -1722,7 +2364,7 @@ void TeXFOTBuilder::set(const char *name,long unsigned int n)
 //
 void TeXFOTBuilder::set(const char *name,PublicId id)
 {
-  *stringout_ << "\\def\\" << name << '{' << id << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << id << '}';
 }
 
 //
@@ -1732,7 +2374,7 @@ void TeXFOTBuilder::set(const char *name,Letter2 code)
 {
   char letter1 = (code & 0xff00) >> 8;
   char letter2 = (code & 0xff);
-  *stringout_ << "\\def\\" << name << '{' << letter1 << letter2 << "}%\n";
+  stringout_ << "\\def\\" << name << "%\n{" << letter1 << letter2 << '}';
 }
 
 //
@@ -1743,55 +2385,82 @@ void TeXFOTBuilder::set(const char *name,const DisplaySpace &space)
 {
   if (space.nominal.length != 0 || space.min.length != 0
       || space.max.length != 0) {
-    *stringout_ << "\\def\\" << name << "Nominal{"
+    stringout_ << "\\def\\" << name << "Nominal%\n{"
 		<< (space.nominal.length/1000.0) << "pt}";
     if (space.nominal.displaySizeFactor != 0)
-      *stringout_ << "\\def\\" << name << "NominalFactor{"
-		  << space.nominal.displaySizeFactor << "}%\n";
+      stringout_ << "\\def\\" << name << "NominalFactor%\n{"
+		  << space.nominal.displaySizeFactor << '}';
     if (space.min.length != 0)
-      *stringout_ << "\\def\\" << name << "Min{"
+      stringout_ << "\\def\\" << name << "Min%\n{"
 		  << (space.min.length/1000.0) << "pt}";
     if (space.min.displaySizeFactor != 0)
-      *stringout_ << "\\def\\" << name << "MinFactor{"
-		  << space.min.displaySizeFactor << "}%\n";
-    if (space.max != 0)
-      *stringout_ << "\\def\\" << name << "Max{"
+      stringout_ << "\\def\\" << name << "MinFactor%\n{"
+		  << space.min.displaySizeFactor << '}';
+    if (space.max.length != 0)
+      stringout_ << "\\def\\" << name << "Max%\n{"
 		  << (space.max.length/1000.0) << "pt}";
     if (space.max.displaySizeFactor != 0)
-      *stringout_ << "\\def\\" << name << "MaxFactor{"
-		  << space.max.displaySizeFactor << "}%\n";
+      stringout_ << "\\def\\" << name << "MaxFactor%\n{"
+		  << space.max.displaySizeFactor << '}';
     if (space.priority != 0)
-      *stringout_ << "\\def\\" << name << "Priority{"
-		  << space.priority << "}%\n";
+      stringout_ << "\\def\\" << name << "Priority%\n{"
+		  << space.priority << '}';
     if (space.conditional)
-      *stringout_ << "\\def\\" << name << "Conditional{"
-		  << (space.conditional ? 1 : 0) << "}%\n";
+      stringout_ << "\\def\\" << name << "Conditional%\n{"
+		  << (space.conditional ? 1 : 0) << '}';
     if (space.force)
-      *stringout_ << "\\def\\" << name << "Force{"
-		  << (space.force ? 1 : 0) << "}%\n";
+      stringout_ << "\\def\\" << name << "Force%\n{"
+		  << (space.force ? 1 : 0) << '}';
   }
 }
 
 void TeXFOTBuilder::set(const char *name,const GlyphId &glyphId)
 {
-  *stringout_ << "\\def\\" << name << '{';
+  stringout_ << "\\def\\" << name << "%\n{";
   if (glyphId.publicId) {
-    *stringout_ << glyphId.publicId;
+    stringout_ << glyphId.publicId;
     if (glyphId.suffix)
-      *stringout_ << "::" << glyphId.suffix;
+      stringout_ << "::" << glyphId.suffix;
   }
-  *stringout_ << "}%\n";
+  stringout_ << '}';
 }
 
-//
-// NIC classes which are inherited by others.
-//
-
-void TeXFOTBuilder::setInlineNIC(const InlineNIC &nic)
+void TeXFOTBuilder::set(const char *name,const OptLengthSpec &spec)
 {
-  MAYBESET("BreakBeforePriority",nic.breakBeforePriority,0);
-  MAYBESET("BreakAfterPriority",nic.breakAfterPriority,0);
+  if (spec.hasLength) {
+    set(name,spec.length);
+  }
 }
+
+// This one is also a problem because it duplicates functionality.
+void TeXFOTBuilder::set(const char *name,const InlineSpace &space)
+{
+  if (space.nominal.length != 0 || space.min.length != 0
+      || space.max.length != 0) {
+    stringout_ << "\\def\\" << name << "Nominal%\n{"
+		<< (space.nominal.length/1000.0) << "pt}";
+    if (space.nominal.displaySizeFactor != 0)
+      stringout_ << "\\def\\" << name << "NominalFactor%\n{"
+		  << space.nominal.displaySizeFactor << '}';
+    if (space.min.length != 0)
+      stringout_ << "\\def\\" << name << "Min%\n{"
+		  << (space.min.length/1000.0) << "pt}";
+    if (space.min.displaySizeFactor != 0)
+      stringout_ << "\\def\\" << name << "MinFactor%\n{"
+		  << space.min.displaySizeFactor << '}';
+    if (space.max.length != 0)
+      stringout_ << "\\def\\" << name << "Max%\n{"
+		  << (space.max.length/1000.0) << "pt}";
+    if (space.max.displaySizeFactor != 0)
+      stringout_ << "\\def\\" << name << "MaxFactor%\n{"
+		  << space.max.displaySizeFactor << '}';
+  }
+}
+
+//
+// Structures for non-inherited characters, in the order specified
+// in /style/FOTBuilder.h.
+//
 
 void TeXFOTBuilder::setDisplayNIC(const DisplayNIC &nic)
 {
@@ -1806,16 +2475,176 @@ void TeXFOTBuilder::setDisplayNIC(const DisplayNIC &nic)
   MAYBESET("MayViolateKeepAfter",nic.mayViolateKeepAfter,symbolFalse);
 }
 
-//
+void TeXFOTBuilder::setInlineNIC(const InlineNIC &nic)
+{
+  MAYBESET("BreakBeforePriority",nic.breakBeforePriority,0);
+  MAYBESET("BreakAfterPriority",nic.breakAfterPriority,0);
+}
+
+void TeXFOTBuilder::setDisplayGroupNIC(const DisplayGroupNIC &nic)
+{
+  setDisplayNIC(nic);
+  if (nic.hasCoalesceId) 
+    set("CoalesceId",nic.coalesceId);
+}
+
+void TeXFOTBuilder::setExternalGraphicNIC(const ExternalGraphicNIC &nic)
+{
+  setDisplayNIC(nic);
+  setInlineNIC(nic);
+
+  MAYBESET("IsDisplay",nic.isDisplay,symbolFalse);
+  MAYBESET("ScaleType",nic.scaleType,symbolMaxUniform);
+  if (nic.scaleType == symbolFalse) {
+    set("ScaleX",nic.scale[0]);
+    set("ScaleY",nic.scale[1]);
+  }
+  set("EntitySystemId",nic.entitySystemId);
+  set("NotationSystemId",nic.notationSystemId);
+  if(nic.hasMaxWidth)
+    set("MaxWidth",nic.maxWidth);
+  if (nic.hasMaxHeight)
+    set("MaxHeight",nic.maxHeight);
+  if (!nic.isDisplay) {
+    set("EscapementDirection",nic.escapementDirection);
+    set("PositionPointX",nic.positionPointX);
+    set("PositionPointY",nic.positionPointY);
+  }
+}
+
+void TeXFOTBuilder::setBoxNIC(const BoxNIC &nic)
+{
+  setDisplayNIC(nic);
+  setInlineNIC(nic);
+				// BoxNIC
+  MAYBESET("IsDisplay",nic.isDisplay,symbolFalse);
+}
+
+void TeXFOTBuilder::setRuleNIC(const RuleNIC &nic)
+{
+  setDisplayNIC(nic);
+  setInlineNIC(nic);
+				// Rule NIC
+  set("Orientation",nic.orientation);
+  if (nic.hasLength)
+    set("Length",nic.length);
+}
+
+void TeXFOTBuilder::setLeaderNIC(const LeaderNIC &nic)
+{
+  setInlineNIC(nic);
+  if (nic.hasLength)
+    set("Length",nic.length);
+}
+
+void TeXFOTBuilder::setParagraphNIC(const ParagraphNIC &nic)
+{
+  setDisplayNIC(nic);
+}
+
+void TeXFOTBuilder::setCharacterNIC(const CharacterNIC &nic)
+{
+  if (nic.specifiedC & nic.cChar)
+    set("Ch",(unsigned long)nic.ch);
+  if (nic.specifiedC & nic.cGlyphId)
+    set("GlyphId",nic.glyphId);
+  if (nic.specifiedC & nic.cBreakBeforePriority)
+    set("BreakBeforePriority",nic.breakBeforePriority);
+  if (nic.specifiedC & nic.cBreakAfterPriority)
+    set("BreakAfterPriority",nic.breakAfterPriority);
+  if (nic.specifiedC & nic.cMathClass)
+    set("MathClass",nic.mathClass);
+  if (nic.specifiedC & nic.cMathFontPosture)
+    set("MathFontPosture",nic.mathFontPosture);
+  if (nic.specifiedC & nic.cScript)
+    set("Script",(long unsigned int)nic.script);
+  if (nic.specifiedC & nic.cIsDropAfterLineBreak)
+    set("IsDropAfterLineBreak",nic.isDropAfterLineBreak);
+  if (nic.specifiedC & nic.cIsDropUnlessBeforeLineBreak)
+    set("IsDropUnlessBeforeLineBreak",nic.isDropUnlessBeforeLineBreak);
+  if (nic.specifiedC & nic.cIsPunct)
+    set("IsPunct",nic.isPunct);
+  if (nic.specifiedC & nic.cIsInputWhitespace)
+    set("IsInputWhiteSpace",nic.isInputWhitespace);
+  if (nic.specifiedC & nic.cIsInputTab)
+    set("IsInputTab",nic.isInputTab);
+  if (nic.specifiedC & nic.cIsRecordEnd)
+    set("IsRecordEnd",nic.isRecordEnd);
+  if (nic.specifiedC & nic.cIsSpace)
+    set("IsSpace",nic.isSpace);
+  MAYBESET("StretchFactor",nic.stretchFactor,0L);
+}
+
+void TeXFOTBuilder::setLineFieldNIC(const LineFieldNIC &nic)
+{
+  setInlineNIC(nic);
+}
+
+void TeXFOTBuilder::setTableNIC(const TableNIC &nic)
+{
+  setDisplayNIC(nic);
+				// TableNIC
+  switch (nic.widthType) {
+  case TableNIC::widthFull:
+    set("TableWidth","full");
+    break;
+  case TableNIC::widthMinimum:
+    set("TableWidth","minimum");
+    break;
+  case TableNIC::widthExplicit:
+    set("TableWidth",nic.width);
+    break;
+  }
+}
+
+void TeXFOTBuilder::setTablePartNIC(const TablePartNIC &nic)
+{
+  setDisplayNIC(nic);
+}
+
+void TeXFOTBuilder::setTableColumnNIC(const TableColumnNIC &nic)
+{
+  MAYBESET("ColumnIndex",long(nic.columnIndex),0);
+  MAYBESET("NColumnsSpanned",long(nic.nColumnsSpanned),1);
+  if (nic.hasWidth)
+    set("Width",nic.width);
+}
+
+void TeXFOTBuilder::setTableCellNIC(const TableCellNIC &nic)
+{
+  // FIX ME!
+  // does not deal with "missing" bool yet.
+  MAYBESET("ColumnIndex",long(nic.columnIndex),0);
+  MAYBESET("NColumnsSpanned",long(nic.nColumnsSpanned),1);
+  MAYBESET("NRowsSpanned",long(nic.nRowsSpanned),1);
+}
+
+void TeXFOTBuilder::setGridNIC(const GridNIC &nic)
+{
+  set("NColumns",nic.nColumns);
+  set("NRows",nic.nRows);
+}
+
+void TeXFOTBuilder::setGridCellNIC(const GridCellNIC &nic)
+{
+  set("ColumnNumber",nic.columnNumber);
+  set("RowNumber",nic.rowNumber);
+}
+
+
 // Dump all accumulated inherited characteristics.
-//
+
 void TeXFOTBuilder::dumpInherited()
 {
-  *stringout_ << '\0';
-  os() << stringout_->str();
-  stringout_->rdbuf()->freeze(0);
-  delete stringout_;
-  stringout_ = new ostrstream;	// should probably check...
+  String<char> tem;
+  stringout_.extractString(tem);
+  os() << tem;
+}
+
+
+void TeXFOTBuilder::message(const MessageType0 &msg)
+{
+  mgr_->message(msg);
 }
 
 #ifdef DSSSL_NAMESPACE

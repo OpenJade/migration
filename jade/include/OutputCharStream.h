@@ -9,8 +9,7 @@
 #include "StringC.h"
 #include "Owner.h"
 #include "CodingSystem.h"
-
-class streambuf;
+#include "OutputByteStream.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -43,25 +42,25 @@ protected:
   Char *end_;
 };
 
-class SP_API IosOutputCharStream : public OutputCharStream,
+class SP_API EncodeOutputCharStream : public OutputCharStream,
                             private Encoder::Handler {
 public:
-  IosOutputCharStream();
-  // the streambuf will not be deleted
-  IosOutputCharStream(streambuf *, const OutputCodingSystem *);
-  ~IosOutputCharStream();
-  void open(streambuf *, const OutputCodingSystem *);
+  EncodeOutputCharStream();
+  // the OutputByteStream will not be deleted
+  EncodeOutputCharStream(OutputByteStream *, const OutputCodingSystem *);
+  ~EncodeOutputCharStream();
+  void open(OutputByteStream *, const OutputCodingSystem *);
   void flush();
   void setEscaper(Escaper);
 private:
-  IosOutputCharStream(const IosOutputCharStream &); // undefined
-  void operator=(const IosOutputCharStream &);	    // undefined
-  IosOutputCharStream(streambuf *, Encoder *);
+  EncodeOutputCharStream(const EncodeOutputCharStream &); // undefined
+  void operator=(const EncodeOutputCharStream &);	    // undefined
+  EncodeOutputCharStream(OutputByteStream *, Encoder *);
   void allocBuf(int bytesPerChar);
   void flushBuf(Char);
-  void handleUnencodable(Char c, streambuf *);
+  void handleUnencodable(Char c, OutputByteStream *);
   Char *buf_;
-  streambuf *byteStream_;
+  OutputByteStream *byteStream_;
   Encoder *encoder_;
   Owner<Encoder> ownedEncoder_;
   Escaper escaper_;

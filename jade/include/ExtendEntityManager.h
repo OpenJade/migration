@@ -33,7 +33,6 @@ struct SP_API StorageObjectSpec {
   const InputCodingSystem *codingSystem;
   StringC specId;		// specified id
   StringC baseId;		// id that specified id is relative to
-  StringC id;			// actual id used (filled in after opening)
   enum Records {
     find,
     cr,
@@ -70,6 +69,7 @@ struct SP_API ParsedSystemId : public Vector<StorageObjectSpec> {
 
 struct SP_API StorageObjectLocation {
   const StorageObjectSpec *storageObjectSpec;
+  StringC actualStorageId;
   unsigned long lineNumber;
   unsigned long columnNumber;
   unsigned long byteIndex;
@@ -109,14 +109,13 @@ public:
   virtual Boolean parseSystemId(const StringC &str,
 				const CharsetInfo &docCharset,
 				Boolean isNdata,
-				const StorageObjectSpec *defSpec,
+				const StorageObjectLocation *defLoc,
 				Messenger &mgr,
 				ParsedSystemId &parsedSysid) const = 0;
+  static const ParsedSystemId *externalInfoParsedSystemId(const ExternalInfo *);
   static Boolean externalize(const ExternalInfo *,
 			     Offset,
 			     StorageObjectLocation &);
-  static const ParsedSystemId *
-    externalInfoParsedSystemId(const ExternalInfo *);
   static ExtendEntityManager *make(StorageManager *,
 				   const InputCodingSystem *,
 				   const ConstPtr<InputCodingSystemKit> &,

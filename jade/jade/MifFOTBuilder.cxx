@@ -4293,7 +4293,8 @@ FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
                                const Ptr<ExtendEntityManager> &entityManager,
  			                   const CharsetInfo &systemCharset,
                                CmdLineApp *app,
-                               const FOTBuilder::Extension *&ext ) {
+                               const FOTBuilder::Extension *&ext,
+                               const FOTBuilder::Feature *&f ) {
 
     
     MifFOTBuilder::IndexEntryFlowObj *indexEntryFlowObject
@@ -4331,6 +4332,14 @@ FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
     { 0, 0, 0}
   };
   ext = extensions;
+
+  static const FOTBuilder::Feature features[] = {
+    { "table", 0},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  f = features;
+
   return new MifFOTBuilder( fileLoc, entityManager, systemCharset, app );
 }
 

@@ -114,7 +114,7 @@ private:
   ConstPtr<PatternSet> patterns_;
 };
 
-#define PRIMITIVE(name, string, nRequired, nOptional, rest) \
+#define PRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
 class name ## PrimitiveObj : public PrimitiveObj { \
 public: \
   static const Signature signature_; \
@@ -124,11 +124,14 @@ public: \
 const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
 
-#define XPRIMITIVE PRIMITIVE
-#define XXPRIMITIVE PRIMITIVE
-#define PRIMITIVE2 PRIMITIVE
+#define SPRIMITIVE PRIMITIVE
+#define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
+  PRIMITIVE(name, string, nRequired, nOptional, rest, noFeature) 
+#define XXPRIMITIVE XPRIMITIVE
+#define PRIMITIVE2 XPRIMITIVE
 #include "primitive.h"
 #undef PRIMITIVE
+#undef SPRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
@@ -5226,8 +5229,8 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
 
 void Interpreter::installPrimitives()
 {
-#define PRIMITIVE(name, string, nRequired, nOptional, rest) \
-  installPrimitive(string, new (*this) name ## PrimitiveObj);
+#define PRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
+  installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
 #define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
   installXPrimitive("UNREGISTERED::James Clark//Procedure::", \
                     string, new (*this) name ## PrimitiveObj);
@@ -5236,12 +5239,17 @@ void Interpreter::installPrimitives()
                     string, new (*this) name ## PrimitiveObj);
 
 #define PRIMITIVE2(name, string, nRequired, nOptional, rest) \
-  if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj);
+  if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj, noFeature);
+
+#define SPRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
+  if (style()) installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
+
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
+#undef SPRIMITIVE
   FunctionObj *apply = new (*this) ApplyPrimitiveObj;
   makePermanent(apply);
   lookup(makeStringC("apply"))->setValue(apply);
@@ -5255,11 +5263,13 @@ void Interpreter::installPrimitives()
       ->setValue(lookup(makeStringC("string->number"))->computeValue(0, *this));
 }
 
-void Interpreter::installPrimitive(const char *s, PrimitiveObj *value)
+void Interpreter::installPrimitive(const char *s, PrimitiveObj *value,
+				Interpreter::Feature feature)
 {
   makePermanent(value);
   Identifier *ident = lookup(makeStringC(s));
   ident->setValue(value);
+  ident->setFeature(feature);
   value->setIdentifier(ident);
   StringC pubid(makeStringC("ISO/IEC 10179:1996//Procedure::"));
   pubid += makeStringC(s);

@@ -60,8 +60,10 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+			 bool style,
                          bool strictMode,
-			 const FOTBuilder::Extension *extensionTable)
+			 const FOTBuilder::Extension *extensionTable,
+			 const FOTBuilder::Feature *backendFeatures)
 : groveManager_(groveManager),
   messenger_(messenger),
   extensionTable_(extensionTable),
@@ -77,7 +79,10 @@ Interpreter::Interpreter(GroveManager *groveManager,
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
   dsssl2_(dsssl2),
-  strictMode_(strictMode)
+  style_(style),
+  strictMode_(strictMode),
+  explicitFeatures_(0),
+  explicitModules_(0)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -94,10 +99,10 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installPortNames();
   installPrimitives();
   installUnits();
-  if (!strictMode_) {
-    installCharNames();
-    installSdata();
-  }
+  installFeatures(backendFeatures);
+  installModules();
+  installCharNames();
+  installSdata();
   installFlowObjs();
   installInheritedCs();
   installNodeProperties();
@@ -146,6 +151,7 @@ void Interpreter::compile()
   }
   compileCharProperties();
   compileDefaultLanguage();
+  checkGrovePlan();
 }
 
 void Interpreter::compileInitialValues()
@@ -245,13 +251,30 @@ void Interpreter::installSyntacticKeys()
     { "for-all?", Identifier::keyForAll },
     { "select-each", Identifier::keySelectEach },
     { "union-for-each", Identifier::keyUnionForEach },
+    { "define-unit", Identifier::keyDefineUnit },
+    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
+    { "declare-char-property", Identifier::keyDeclareCharProperty },
+    { "define-language", Identifier::keyDefineLanguage },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
+    { "add-char-properties", Identifier::keyAddCharProperties },
+    { "architecture", Identifier::keyArchitecture },
+    { "default", Identifier::keyDefault },
+    { "null", Identifier::keyNull },
+    { "rcs?", Identifier::keyIsRcs },
+    { "parent", Identifier::keyParent },
+    { "active", Identifier::keyActive },
+   }, styleKeys[] = {
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
-    { "define-unit", Identifier::keyDefineUnit },
     { "query", Identifier::keyQuery },
     { "element", Identifier::keyElement },
-    { "default", Identifier::keyDefault },
     { "root", Identifier::keyRoot },
     { "id", Identifier::keyId },
     { "mode", Identifier::keyMode },
@@ -260,12 +283,8 @@ void Interpreter::installSyntacticKeys()
     { "declare-flow-object-class", Identifier::keyDeclareFlowObjectClass },
     { "declare-char-characteristic+property", Identifier::keyDeclareCharCharacteristicAndProperty },
     { "declare-reference-value-type", Identifier::keyDeclareReferenceValueType },
-    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
-    { "declare-char-property", Identifier::keyDeclareCharProperty },
     { "define-page-model", Identifier::keyDefinePageModel },
     { "define-column-set-model", Identifier::keyDefineColumnSetModel },
-    { "define-language", Identifier::keyDefineLanguage },
-    { "add-char-properties", Identifier::keyAddCharProperties },
     { "use", Identifier::keyUse },
     { "label", Identifier::keyLabel },
     { "content-map", Identifier::keyContentMap },
@@ -334,10 +353,6 @@ void Interpreter::installSyntacticKeys()
     { "grid-n-rows", Identifier::keyGridNRows },
     { "grid-n-columns", Identifier::keyGridNColumns },
     { "radical", Identifier::keyRadical },
-    { "null", Identifier::keyNull },
-    { "rcs?", Identifier::keyIsRcs },
-    { "parent", Identifier::keyParent },
-    { "active", Identifier::keyActive },
     { "attributes", Identifier::keyAttributes },
     { "children", Identifier::keyChildren },
     { "repeat", Identifier::keyRepeat },
@@ -346,13 +361,6 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
-    { "collate", Identifier::keyCollate },
-    { "toupper", Identifier::keyToupper },
-    { "tolower", Identifier::keyTolower },
-    { "symbol", Identifier::keySymbol },
-    { "order", Identifier::keyOrder },
-    { "forward", Identifier::keyForward },
-    { "backward", Identifier::keyBackward },
     { "white-point", Identifier::keyWhitePoint },
     { "black-point", Identifier::keyBlackPoint },
     { "range", Identifier::keyRange },
@@ -365,7 +373,6 @@ void Interpreter::installSyntacticKeys()
     { "matrix-abc", Identifier::keyMatrixAbc },
     { "matrix-lmn", Identifier::keyMatrixLmn },
     { "matrix-a", Identifier::keyMatrixA },
-    { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -380,6 +387,16 @@ void Interpreter::installSyntacticKeys()
     if (dsssl2() && tem[tem.size() - 1] == '?') {
       tem.resize(tem.size() - 1);
       lookup(tem)->setSyntacticKey(keys[i].key);
+    }
+  }
+  if (style()) {
+    for (size_t i = 0; i < SIZEOF(styleKeys); i++) {
+      StringC tem(makeStringC(styleKeys[i].name));
+      lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      if (dsssl2() && tem[tem.size() - 1] == '?') {
+        tem.resize(tem.size() - 1);
+        lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      }
     }
   }
   if (dsssl2()) {
@@ -429,36 +446,40 @@ void Interpreter::installPortNames()
 
 void Interpreter::installCharNames()
 {
-  static struct {
-    Char c;
-    const char *name;
-  } chars[] = {
+  if (!strictMode()) {
+    static struct {
+      Char c;
+      const char *name;
+    } chars[] = {
 #include "charNames.h"
-  };
-  for (size_t i = 0; i < SIZEOF(chars); i++) {
-    CharPart ch;
-    ch.c = chars[i].c;
-    ch.defPart = unsigned(-1);
-    namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+    };
+    for (size_t i = 0; i < SIZEOF(chars); i++) {
+      CharPart ch;
+      ch.c = chars[i].c;
+      ch.defPart = unsigned(-1);
+      namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+    }
   }
 }
 
 void Interpreter::installSdata()
 {
-  // This comes from uni2sgml.txt on ftp://unicode.org.
-  // It is marked there as obsolete, so it probably ought to be checked.
-  // The definitions of apos and quot have been fixed for consistency with XML.
-  static struct {
-    Char c;
-    const char *name;
-  } entities[] = {
+  if (!strictMode()) {
+    // This comes from uni2sgml.txt on ftp://unicode.org.
+    // It is marked there as obsolete, so it probably ought to be checked.
+    // The definitions of apos and quot have been fixed for consistency with XML.
+    static struct {
+      Char c;
+      const char *name;
+    } entities[] = {
 #include "sdata.h"
-  };
-  for (size_t i = 0; i < SIZEOF(entities); i++) { 
-    CharPart ch;
-    ch.c = entities[i].c;
-    ch.defPart = unsigned(-1);
-    sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+    };
+    for (size_t i = 0; i < SIZEOF(entities); i++) { 
+      CharPart ch;
+      ch.c = entities[i].c;
+      ch.defPart = unsigned(-1);
+      sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+    }
   }
 }
 
@@ -1726,7 +1747,8 @@ bool Identifier::preferBuiltin_ = 0;
 
 Identifier::Identifier(const StringC &name)
 : Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
-  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0)
+  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0), 
+  feature_(Interpreter::noFeature)
 {
 }
 
@@ -2085,193 +2107,195 @@ void Interpreter::installCharProperties()
     }
   charProperties_.insert(makeStringC("numeric-equiv"), cp);
   
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+  if (style()) {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define SPACE 
 #include "charProps.h"
 #undef SPACE
-    };
+      };
    
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("space?"), cp);
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+  		       ELObjPart(makeTrue(), unsigned(-1)));
+    }
+    charProperties_.insert(makeStringC("space?"), cp);
     
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define RECORD_END
 #include "charProps.h"
 #undef RECORD_END
-    };
+      };
     
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("record-end?"), cp);
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+                         ELObjPart(makeTrue(), unsigned(-1)));
+    }
+    charProperties_.insert(makeStringC("record-end?"), cp);
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define BLANK
 #include "charProps.h"
 #undef BLANK
-    };
+      };
     
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("blank?"), cp);
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+                         ELObjPart(makeTrue(), unsigned(-1)));
+    }
+    charProperties_.insert(makeStringC("blank?"), cp);
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define INPUT_TAB
 #include "charProps.h"
 #undef INPUT_TAB
-    };
+      };
     
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("input-tab?"), cp);
-    
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+  		       ELObjPart(makeTrue(), unsigned(-1)));
+    }
+    charProperties_.insert(makeStringC("input-tab?"), cp);
+     
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define INPUT_WHITESPACE
 #include "charProps.h"
 #undef INPUT_WHITESPACE
-    };
+      };
     
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
-		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("input-whitespace?"), cp);
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+  		       ELObjPart(makeTrue(), unsigned(-1)));
+    }
+    charProperties_.insert(makeStringC("input-whitespace?"), cp);
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c;
-      unsigned num;
-    } chars[] = {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c;
+        unsigned num;
+      } chars[] = {
 #define PUNCT
 #include "charProps.h"
 #undef PUNCT
-    };
+      };
     
-    for (size_t i = 0; i < SIZEOF(chars); i++) 
-      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+      for (size_t i = 0; i < SIZEOF(chars); i++) 
+        cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
 		       ELObjPart(makeTrue(), unsigned(-1)));
-  }
-  charProperties_.insert(makeStringC("punct?"), cp);
+    }
+    charProperties_.insert(makeStringC("punct?"), cp);
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if (!strictMode_) {
-    static struct {
-      Char c1, c2;
-      char *script;
-    } chars[] = {
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if (!strictMode_) {
+      static struct {
+        Char c1, c2;
+        char *script;
+      } chars[] = {
 #define SCRIPT
 #include "charProps.h"
 #undef SCRIPT
-    };
+      };
     
-    StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
-    for (size_t i = 0; i < SIZEOF(chars); i++) { 
-      StringC tem(prefix);
-      tem += makeStringC(chars[i].script);
-      StringObj *obj = new (*this) StringObj(tem);
-      makePermanent(obj);  
-      cp.map->setRange(chars[i].c1, chars[i].c2,
+      StringC prefix = makeStringC("ISO/IEC 10179::1996//Script::");
+      for (size_t i = 0; i < SIZEOF(chars); i++) { 
+        StringC tem(prefix);
+        tem += makeStringC(chars[i].script);
+        StringObj *obj = new (*this) StringObj(tem);
+        makePermanent(obj);  
+        cp.map->setRange(chars[i].c1, chars[i].c2,
 		       ELObjPart(obj, unsigned(-1)));
+      }
     }
-  }
-  charProperties_.insert(makeStringC("script"), cp);
+    charProperties_.insert(makeStringC("script"), cp);
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("glyph-id"), cp);  
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    charProperties_.insert(makeStringC("glyph-id"), cp);  
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("drop-after-line-break?"), cp);  
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    charProperties_.insert(makeStringC("drop-after-line-break?"), cp);  
 
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("drop-unless-before-line-break?"), cp);  
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    charProperties_.insert(makeStringC("drop-unless-before-line-break?"), cp);  
 
-  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
-  makePermanent(cp.def.obj);
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  CharProp cp2;
-  cp2.def = ELObjPart(cp.def.obj, unsigned(-1));
-  cp2.loc = Location();
-  cp2.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  if(!strictMode_) {
-    static struct {
-      Char c;
-      unsigned short num;
-      unsigned short bbp;
-      unsigned short bap;
-    } chars[] ={
+    cp.def = ELObjPart(makeInteger(0), unsigned(-1));
+    makePermanent(cp.def.obj);
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    CharProp cp2;
+    cp2.def = ELObjPart(cp.def.obj, unsigned(-1));
+    cp2.loc = Location();
+    cp2.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    if(!strictMode_) {
+      static struct {
+        Char c;
+        unsigned short num;
+        unsigned short bbp;
+        unsigned short bap;
+      } chars[] ={
 #define BREAK_PRIORITIES
 #include "charProps.h"
 #undef BREAK_PRIORITIES
-    };
-    for(size_t i = 0; i<SIZEOF(chars); ++i) {
-      ELObj *obj = makeInteger(chars[i].bbp);
-      makePermanent(obj);
-      cp.map->setRange(chars[i].c, chars[i].c + chars[i].num-1,
+      };
+      for(size_t i = 0; i < SIZEOF(chars); ++i) {
+        ELObj *obj = makeInteger(chars[i].bbp);
+        makePermanent(obj);
+        cp.map->setRange(chars[i].c, chars[i].c + chars[i].num-1,
 		       ELObjPart(obj, unsigned(-1)));
-      if(chars[i].bap!=chars[i].bbp) {
-	obj = makeInteger(chars[i].bap);
-	makePermanent(obj);
-      }
-      cp2.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+        if (chars[i].bap != chars[i].bbp) {
+	  obj = makeInteger(chars[i].bap);
+	  makePermanent(obj);
+        }
+        cp2.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
 			ELObjPart(obj, unsigned(-1)));
+      } 
     }
+
+    charProperties_.insert(makeStringC("break-before-priority"), cp);  
+    charProperties_.insert(makeStringC("break-after-priority"), cp2);  
+
+    cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
+    makePermanent(cp.def.obj);
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    charProperties_.insert(makeStringC("math-class"), cp);  
+
+    cp.def = ELObjPart(makeFalse(), unsigned(-1));
+    cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+    charProperties_.insert(makeStringC("math-font-posture"), cp);  
   }
-
-  charProperties_.insert(makeStringC("break-before-priority"), cp);  
-  charProperties_.insert(makeStringC("break-after-priority"), cp2);  
-
-  cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
-  makePermanent(cp.def.obj);
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("math-class"), cp);  
-
-  cp.def = ELObjPart(makeFalse(), unsigned(-1));
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("math-font-posture"), cp);  
 }
 
 // return 1 if the character has the property, return 0 if no such property
@@ -2377,6 +2401,267 @@ void Interpreter::installExtensionCharNIC(Identifier *ident,
 					  const Location &loc)
 {
   ident->setCharNIC(currentPartIndex(), loc);
+}
+
+void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)
+{
+  feature_[combineChar].rcsname =          makeStringC("combine-char");
+  feature_[keyword].rcsname =              makeStringC("keyword");
+  feature_[multiSource].rcsname =          makeStringC("multi-source");
+  feature_[multiResult].rcsname =          makeStringC("multi-result");
+  feature_[regexp].rcsname =               makeStringC("regexp");
+  feature_[word].rcsname =                 makeStringC("word");
+  feature_[hytime].rcsname =               makeStringC("hytime");
+  feature_[charset].rcsname =              makeStringC("charset");
+  feature_[expression].rcsname =           makeStringC("expression");
+  feature_[multiProcess].rcsname =         makeStringC("multi-process");
+  feature_[query].rcsname =                makeStringC("query");
+  feature_[sideBySide].rcsname =           makeStringC("side-by-side");
+  feature_[sideline].rcsname =             makeStringC("sideline");
+  feature_[alignedColumn].rcsname =        makeStringC("aligned-column");
+  feature_[bidi].rcsname =                 makeStringC("bidi");
+  feature_[vertical].rcsname =             makeStringC("vertical");
+  feature_[math].rcsname =                 makeStringC("math");
+  feature_[table].rcsname =                makeStringC("table");
+  feature_[tableAutoWidth].rcsname =       makeStringC("table-auto-width");
+  feature_[simplePage].rcsname =           makeStringC("simple-page");
+  feature_[page].rcsname =                 makeStringC("page");
+  feature_[multiColumn].rcsname =          makeStringC("multi-column");
+  feature_[nestedColumnSet].rcsname =      makeStringC("nested-column-set");
+  feature_[generalIndirect].rcsname =      makeStringC("general-indirect");
+  feature_[inlineNote].rcsname =           makeStringC("inline-note");
+  feature_[glyphAnnotation].rcsname =      makeStringC("glyph-annotation");
+  feature_[emphasizingMark].rcsname =      makeStringC("emphasizing-mark");
+  feature_[includedContainer].rcsname =    makeStringC("included-container");
+  feature_[actualCharacteristic].rcsname = makeStringC("actual-characteristic");
+  feature_[online].rcsname =               makeStringC("online");
+  feature_[fontInfo].rcsname =             makeStringC("font-info");
+  feature_[crossReference].rcsname =       makeStringC("cross-reference");
+
+  for (int i = 0; i < nFeatures; i++) 
+    feature_[i].supported = notSupported;
+  feature_[charset].supported = partiallySupported;
+  feature_[expression].supported = supported;
+  feature_[multiProcess].supported = supported;
+  feature_[query].supported = partiallySupported;
+  feature_[actualCharacteristic].supported = supported;
+  feature_[crossReference].supported = supported;
+  if (backendFeatures) 
+    for (const FOTBuilder::Feature *b = backendFeatures; b->name; b++) {
+      StringC name = makeStringC(b->name);
+      for (int i = 0; i < nFeatures; i++) 
+	if (name == feature_[i].rcsname) {
+	  feature_[i].supported = b->partial ? partiallySupported : supported;
+	  break;
+	}
+    }
+
+  feature_[noFeature].declared = 1;
+  for (int i = 1; i < nFeatures; i++) 
+    feature_[i].declared = 0;
+  if (!strictMode_) 
+    for (int i = 0; i < nFeatures; i++) 
+      if (feature_[i].supported != notSupported)
+	feature_[i].declared = 1;
+  if (!style()) {
+    declareFeature(query);
+    declareFeature(expression);
+  }
+}
+
+bool Interpreter::requireFeature(const Interpreter::Feature &f,
+                                 const Location &loc)
+{
+   //FIXME: Hack to avoid warnings about features used in builtins.dsl
+   if (!feature_[f].declared 
+       && !Identifier::preferBuiltin_  
+       && (partIndex_ != unsigned(-1))) {
+     setNextLocation(loc);
+     message(InterpreterMessages::missingFeature,
+             StringMessageArg(feature_[f].rcsname));
+   }
+   return feature_[f].declared;
+}
+
+bool Interpreter::convertFeature(const StringC &name, Interpreter::Feature &f)
+{
+  for (int i = 1; i < nFeatures; i++) 
+    if (feature_[i].rcsname == name) {
+      f = Feature(i);
+      return 1;
+    }
+  return 0;
+}
+
+void Interpreter::explicitFeatures()
+{
+  if (!explicitFeatures_) {
+    explicitFeatures_ = 1;
+    for (int i = 1; i < nFeatures; i++) 
+      feature_[i].declared = 0;
+  }
+}
+
+void Interpreter::declareFeature(const StringC &name)
+{  
+  Feature feature;
+  if (!convertFeature(name, feature)) {
+    message(InterpreterMessages::unknownFeature,
+	     StringMessageArg(name));
+    return;
+  }
+  declareFeature(feature);
+}
+
+void Interpreter::declareFeature(const Feature &feature)
+{
+  Status &f = feature_[feature];
+  f.declared = 1;
+  if (f.supported == notSupported) 
+    message(InterpreterMessages::unsupportedFeature,
+	    StringMessageArg(f.rcsname));
+  else if (f.supported == partiallySupported) 
+    message(InterpreterMessages::partiallySupportedFeature,
+	    StringMessageArg(f.rcsname));
+  // Handle implied features
+  switch (feature) {
+  case query:
+    declareFeature(multiProcess);
+    break;
+  case tableAutoWidth:
+    declareFeature(table);
+    break;
+  case nestedColumnSet:
+    declareFeature(multiColumn);
+    break;
+  case multiColumn:
+    declareFeature(page);
+    break;
+  default:; // do nothing
+  }
+}
+
+
+bool Identifier::requireFeature(Interpreter &interp, const Location &loc, bool fo) const
+{
+  if ((fo ? flowObjPart_ : defPart_) == unsigned(-1))
+    return interp.requireFeature(Interpreter::Feature(feature_), loc);
+  else
+    return 1;
+}
+
+void Identifier::setFeature(int f)
+{
+  feature_ = f;
+}
+
+void Interpreter::installModules()
+{
+  module_[baseabs].rcsname = makeStringC("BASEABS"); 
+  module_[prlgabs0].rcsname = makeStringC("PRLGABS0"); 
+  module_[prlgabs1].rcsname = makeStringC("PRLGABS1"); 
+  module_[instabs].rcsname = makeStringC("INSTABS"); 
+  module_[basesds0].rcsname = makeStringC("BASESDS0"); 
+  module_[basesds1].rcsname = makeStringC("BASESDS1"); 
+  module_[instsds0].rcsname = makeStringC("INSTSDS0"); 
+  module_[subdcabs].rcsname = makeStringC("SUBDCABS"); 
+  module_[sdclabs].rcsname = makeStringC("SDCLABS"); 
+  module_[sdclsds].rcsname = makeStringC("SDCLSDS"); 
+  module_[prlgsds].rcsname = makeStringC("PRLGSDS"); 
+  module_[instsds1].rcsname = makeStringC("INSTSDS1"); 
+  module_[dtgabs].rcsname = makeStringC("DTGABS"); 
+  module_[rankabs].rcsname = makeStringC("RANKABS"); 
+  module_[srabs].rcsname = makeStringC("SRABS"); 
+  module_[srsds].rcsname = makeStringC("SRSDS"); 
+  module_[linkabs].rcsname = makeStringC("LINKABS"); 
+  module_[linksds].rcsname = makeStringC("LINKSDS"); 
+  module_[subdcsds].rcsname = makeStringC("SUBDCSDS"); 
+  module_[fpiabs].rcsname = makeStringC("FPIABS"); 
+
+  module_[baseabs].appname = makeStringC("base abstract"); 
+  module_[prlgabs0].appname = makeStringC("prolog abstract level 0"); 
+  module_[prlgabs1].appname = makeStringC("prolog abstract level 1"); 
+  module_[instabs].appname = makeStringC("instance abstract"); 
+  module_[basesds0].appname = makeStringC("base SGML document string level 0"); 
+  module_[basesds1].appname = makeStringC("base SGML document string level 1"); 
+  module_[instsds0].appname = makeStringC("instance SGML document string"); 
+  module_[subdcabs].appname = makeStringC("subdoc abstract"); 
+  module_[sdclabs].appname = makeStringC("SGML declaration abstract"); 
+  module_[sdclsds].appname = makeStringC("SGML declaration SGML document string"); 
+  module_[prlgsds].appname = makeStringC("prolog SGML document string"); 
+  module_[instsds1].appname = makeStringC("instance SGML document string level 1"); 
+  module_[dtgabs].appname = makeStringC("datatag abstract"); 
+  module_[rankabs].appname = makeStringC("rank abstract"); 
+  module_[srabs].appname = makeStringC("shortref abstract"); 
+  module_[srsds].appname = makeStringC("shortref SGML document string"); 
+  module_[linkabs].appname = makeStringC("link abstract"); 
+  module_[linksds].appname = makeStringC("link SGML document string"); 
+  module_[subdcsds].appname = makeStringC("subdoc SGML document string"); 
+  module_[fpiabs].appname = makeStringC("formal public identifier abstract"); 
+
+  for (int i = 0; i < nModules; i++) 
+    module_[i].supported = notSupported;
+  module_[baseabs].supported = supported; 
+  module_[prlgabs0].supported = supported; 
+  module_[instabs].supported = supported; 
+  module_[prlgabs1].supported = supported; 
+  module_[basesds0].supported = supported;
+  module_[instsds0].supported = supported;
+  module_[subdcabs].supported = supported;
+
+  for (int i = 0; i < nModules; i++) 
+    module_[i].declared = 0;
+  module_[baseabs].declared = 1;
+  module_[prlgabs0].declared = 1;
+  module_[instabs].declared = 1;
+  if (!style()) 
+    module_[prlgabs1].declared = 1; 
+  if (!strictMode()) {
+    module_[basesds0].declared = 1;
+    module_[instsds0].declared = 1;
+    module_[subdcabs].declared = 1;
+    module_[prlgabs1].declared = 1;
+  }
+}
+
+void Interpreter::explicitModules()
+{
+  if (!explicitModules_) {
+    explicitModules_ = 1;
+    for (int i = 0; i < nModules; i++)
+      module_[i].declared = 0;
+
+    module_[baseabs].declared = 1; 
+    module_[prlgabs0].declared = 1; 
+    module_[instabs].declared = 1; 
+    if (!style()) 
+      module_[prlgabs1].declared = 1; 
+  }
+}
+
+void Interpreter::addModule(const StringC &name)
+{
+  for (int i = 0; i < nModules; i++)
+    if (module_[i].rcsname == name) {
+      module_[i].declared = 1;
+      return;
+    }   
+  message(InterpreterMessages::unknownModule, StringMessageArg(name));
+}
+
+void Interpreter::checkGrovePlan()
+{
+  for (int i = 0; i < nModules; i++) 
+    if (module_[i].supported != notSupported) {
+      if (!module_[i].declared) 
+        message(InterpreterMessages::cantOmitModule, 
+                StringMessageArg(module_[i].appname));
+    }
+    else {
+      if (module_[i].declared) 
+        message(InterpreterMessages::cantAddModule, 
+                StringMessageArg(module_[i].appname));
+    }
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -146,13 +146,19 @@ E3+lengthError++%2 argument for primitive %1 has wrong length
 W1+noExactRepresentation++quantity %1 can't be represented exactly
 E0+duplicateDefLangDecl++default language already declared in this part+first declaration was here
 E1+defLangDeclRequiresLanguage++%1 not a language as required in a default-language-declaration
-E1+invalidUnitName++%1 is not a valid unit name
-E1+invalidCharName++%1 is not a valid character name
-E1+invalidCharNumber++%1 is not a valid character number
+E1+invalidUnitName++%1 not a valid unit name
+E1+invalidCharName++%1 not a valid character name
+E1+invalidCharNumber++%1 not a valid character number
 E1+unknownCharProperty++unknown character property %1
 E0+badAddCharProperty++error in character property declaration
 E1+duplicateCharPropertyDecl++duplicate definition for character property %1+first definition was here
 E2+duplicateAddCharProperty++duplicate character property declaration %1 for character %2
-E0+returnNotSosofo++value returned by procedure was not a sosofo
-
-
+E0+returnNotSosofo++value returned by procedure not a sosofo
+E1+unknownFeature++%1 not a style or transformation language feature
+E1+missingFeature++undeclared use of feature %1
+W1+unsupportedFeature++feature %1 not supported
+W1+partiallySupportedFeature++feature %1 only partially supported 
+E0+styleLanguage++only allowed in style language
+W1+cantOmitModule++grove plan excluding module %1 not supported 
+W1+cantAddModule++grove plan including module %1 not supported 
+E1+unknownModule++%1 not an SGML property set module

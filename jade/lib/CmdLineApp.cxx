@@ -203,7 +203,11 @@ int CmdLineApp::run(int argc, AppChar **argv)
   return ret;
 #ifdef SP_ANSI_LIB
   }
-  catch (bad_alloc) {
+catch (
+#ifndef SP_NO_STD_NAMESPACE
+       std::
+#endif
+	    bad_alloc) {
 #ifdef SP_FANCY_NEW_HANDLER
     outOfMemory(0);
 #else

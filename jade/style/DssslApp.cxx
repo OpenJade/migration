@@ -32,7 +32,6 @@ DssslApp::DssslApp(int unitsPerInch)
   registerOption('G');
   registerOption('d', SP_T("dsssl_spec"));
   registerOption('V', SP_T("variable"));
-  registerAdditionalStorageManagers();
 }
 
 void DssslApp::registerAdditionalStorageManagers()
@@ -52,6 +51,7 @@ int DssslApp::init(int argc, AppChar **argv)
 
 int DssslApp::processSysid(const StringC &sysid)
 {
+  registerAdditionalStorageManagers();
   rootSystemId_ = sysid;
   ParsedSystemId v;
   if (!entityManager()->parseSystemId(sysid, systemCharset(), 0, 0,

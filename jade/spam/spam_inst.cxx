@@ -26,14 +26,10 @@ namespace SP_NAMESPACE {
 #ifdef __DECCXX
 #pragma define_template NCVector<CopyEventHandlerEntityInfo>
 #else
-#ifdef __xlC__
-#pragma define(NCVector<CopyEventHandlerEntityInfo>)
-#else
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<CopyEventHandlerEntityInfo>;
 #else
 typedef NCVector<CopyEventHandlerEntityInfo> Dummy_0;
-#endif
 #endif
 #endif
 

@@ -2,10 +2,10 @@
 // See the file copying.txt for copying permission.
 
 #include "config.h"
-#include "RtfOle.h"
-#include "StringC.h"
 #define STRICT
 #include <windows.h>
+#include "RtfOle.h"
+#include "StringC.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

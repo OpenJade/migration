@@ -1775,8 +1775,20 @@ DEFPRIMITIVE(ProcessElementWithId, argc, argv, context, interp, loc)
   return new (interp) EmptySosofoObj;
 }
 
+inline
+ConstPtr<ElementPattern> makePattern(Vector<StringC> &giAtts,
+				     const ConstPtr<ElementPattern> &parentPat)
+{
+  if (parentPat.isNull())
+    return new SimpleElementPattern(giAtts);
+  else
+    return new ParentElementPattern(new SimpleElementPattern(giAtts), parentPat);
+}
+
 static
-ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
+ConstPtr<ElementPattern> convertToPattern(ELObj *obj,
+					  const ConstPtr<ElementPattern> &parentPat,
+					  Interpreter &interp)
 {
   Vector<StringC> giAtts(1);
   StringObj *str = obj->convertToString();
@@ -1787,10 +1799,10 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
     if (!n)
       return new NoElementPattern;
     giAtts[0].assign(s, n);
-    return new SimpleElementPattern(giAtts);
+    return makePattern(giAtts, parentPat);
   }
   else if (obj == interp.makeTrue() || obj->isNil())
-    return new SimpleElementPattern(giAtts);
+    return makePattern(giAtts, parentPat);
   PairObj *pair = obj->asPair();
   if (!pair)
     return 0;
@@ -1834,14 +1846,16 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
 	  return 0;
       }
     }
-    if (!obj->isNil()) {
-      ConstPtr<ElementPattern> parentPat = convertToPattern(obj, interp);
-      if (parentPat.isNull())
-	return parentPat;
-      return new ParentElementPattern(new SimpleElementPattern(giAtts), parentPat);
-    }
+    if (!obj->isNil())
+      return convertToPattern(obj, makePattern(giAtts, parentPat), interp);
   }
-  return new SimpleElementPattern(giAtts);
+  return makePattern(giAtts, parentPat);
+}
+
+inline
+ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
+{
+  return convertToPattern(obj, ConstPtr<ElementPattern>(), interp);
 }
 
 DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)

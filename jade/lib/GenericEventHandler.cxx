@@ -20,6 +20,7 @@ public:
   SGMLApplication::Location location(SGMLApplication::Position) const;
 private:
   ConstPtr<Origin> origin_;
+  StorageObjectLocation soLoc_;
 };
 
 inline
@@ -796,14 +797,13 @@ SpOpenEntity::location(SGMLApplication::Position pos) const
     GenericEventHandler::setString(loc.entityName, *entityName);
   Offset off = inputSourceOrigin->startOffset(index);
   loc.entityOffset = off;
-  StorageObjectLocation soLoc;
-  if (!ExtendEntityManager::externalize(externalInfo, off, soLoc))
+  if (!ExtendEntityManager::externalize(externalInfo, off, ((SpOpenEntity *)this)->soLoc_))
     return loc;
-  loc.lineNumber = soLoc.lineNumber;
-  GenericEventHandler::setString(loc.filename, soLoc.actualStorageId);
-  loc.columnNumber = soLoc.columnNumber;
-  loc.byteOffset = soLoc.byteIndex;
-  loc.other = soLoc.storageObjectSpec;
+  loc.lineNumber = soLoc_.lineNumber;
+  GenericEventHandler::setString(loc.filename, soLoc_.actualStorageId);
+  loc.columnNumber = soLoc_.columnNumber;
+  loc.byteOffset = soLoc_.byteIndex;
+  loc.other = soLoc_.storageObjectSpec;
   return loc;
 }
 

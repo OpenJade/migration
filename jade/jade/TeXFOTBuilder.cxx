@@ -1,7 +1,6 @@
 // TeXFOTBuilder.cxx: a Generic TeX backend for Jade
 // Written by David Megginson <dmeggins@microstar.com>
-
-// This backend ignores classes for online display other than link.
+// With changes from Sebastian Rahtz <s.rahtz@elsevier.co.uk>
 
 #include "config.h"
 #include "TeXFOTBuilder.h"
@@ -14,9 +13,49 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 class TeXFOTBuilder : public SerialFOTBuilder {
-
 public:
-
+  struct PageFloatNIC {
+    ~PageFloatNIC();
+    StringC placement;
+  };
+  class TeXExtensionFlowObj : public FOTBuilder::ExtensionFlowObj {
+  public:
+    virtual void atomic(TeXFOTBuilder &, const NodePtr &) const = 0;
+  };
+  class TeXCompoundExtensionFlowObj : public FOTBuilder::CompoundExtensionFlowObj {
+  public:
+    virtual void start(TeXFOTBuilder &, const NodePtr &) const = 0;
+    virtual void end(TeXFOTBuilder &) const = 0;
+  };
+  class PageFloatFlowObj : public TeXCompoundExtensionFlowObj {
+    void start(TeXFOTBuilder &fotb, const NodePtr &nd) const {
+      fotb.startPageFloat(nic_);
+    }
+    void end(TeXFOTBuilder &fotb) const {
+      fotb.endPageFloat();
+    }
+    bool hasNIC(const StringC &name) const {
+      return name == "placement" ;
+    }
+    void setNIC(const StringC &name, const Value &value) {
+      value.convertString(nic_.placement);
+      }
+    ExtensionFlowObj *copy() const { return new PageFloatFlowObj(*this); }
+  private:
+    PageFloatNIC nic_;
+    StringC name_;
+    StringC placement;
+  };
+  class PageFootnoteFlowObj : public TeXCompoundExtensionFlowObj {
+    void start(TeXFOTBuilder &fotb, const NodePtr &nd) const {
+      fotb.startPageFootnote();
+    }
+    void end(TeXFOTBuilder &fotb) const {
+      fotb.endPageFootnote();
+    }
+    ExtensionFlowObj *copy() const { return new PageFootnoteFlowObj(*this); }
+  private:
+  };
   //////////////////////////////////////////////////////////////////////
   // Constructor and destructor.
   //////////////////////////////////////////////////////////////////////
@@ -27,6 +66,18 @@ public:
   //////////////////////////////////////////////////////////////////////
   // Atomic flow objects
   //////////////////////////////////////////////////////////////////////
+  void extension(const ExtensionFlowObj &fo, const NodePtr &);
+  void startExtensionSerial(const CompoundExtensionFlowObj &fo, const NodePtr &nd);
+  void endExtensionSerial(const CompoundExtensionFlowObj &fo);
+  void start();
+  void end();
+  void charactersFromNode(const NodePtr &, const Char *, size_t);
+  void setPreserveSdata(bool);
+  void startPageFloat(const PageFloatNIC &);
+  void endPageFloat();
+  void setPageFloatNIC(const PageFloatNIC &);
+  void startPageFootnote();
+  void endPageFootnote();
 
   void characters(const Char *, size_t);
   void character(const CharacterNIC &);
@@ -42,8 +93,6 @@ public:
   void tableCellBeforeColumnBorder();
   void tableCellAfterColumnBorder();
 
-				// New atomic flow-objects added
-				// 1 March/97 with math support.
   void fractionBar();
   void radicalRadical(const CharacterNIC &);
   void radicalRadicalDefaulted();
@@ -95,8 +144,6 @@ public:
   void endSimplePageSequenceHeaderFooter(unsigned);
   // page-number sosofo
 
-				// New non-atomic flow-objects added
-				// 1 March/97 with math support.
   void startTablePartHeader();
   void endTablePartHeader();
   void startTablePartFooter();
@@ -286,8 +333,19 @@ public:
   void setHeaderMargin(Length);
   void setFooterMargin(Length);
 
-				// New Inherited Characteristics
-				// added 1 March/97 with math support.
+  void setPageNumberRestart(bool);
+  void setPageNumberFormat(const StringC &);
+  void setPageNColumns(long);
+  void setPageColumnSep(Length);
+  void setPageBalanceColumns(bool);
+  void setGridRowSep(Length);
+  void setGridColumnSep(Length);
+  void setSubscriptDepth(Length);
+  void setSuperscriptHeight(Length);
+  void setUnderMarkDepth(Length);
+  void setOverMarkHeight(Length);
+  void setHeadingLevel(long);
+
   void setMinPreLineSpacing(const OptLengthSpec &);
   void setMinPostLineSpacing(const OptLengthSpec &);
   void setMinLeading(const OptLengthSpec &);
@@ -312,11 +370,15 @@ private:
   OutputByteStream *fileout_;
   StrOutputByteStream stringout_;
   Messenger *mgr_;
+  bool preserveSdata_;
+
 
 				// Functions.
   OutputByteStream &os();
   void insertAtomic(const char *name);
   void startGroup(const char *name);
+  void startBrace(const char *name);
+  void endBrace(const char *name);
   void endGroup(const char *name);
 
   void setlength(const char *,Length);
@@ -408,8 +470,122 @@ static OutputByteStream &operator<<(OutputByteStream &os, double d)
   return os << buf;
 }
 
-FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr)
-{
+FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
+			      const FOTBuilder::Extension *&ext)
+{  
+  static const TeXFOTBuilder::PageFloatFlowObj pageFloat;
+  static const TeXFOTBuilder::PageFootnoteFlowObj pageFootnote;
+  static const FOTBuilder::Extension extensions[] = {
+    {
+      "UNREGISTERED::Sebastian Rahtz//Flow Object Class::page-float",
+      0,
+      0,
+      0,
+      0,
+      &pageFloat
+    },
+    {
+      "UNREGISTERED::Sebastian Rahtz//Flow Object Class::page-footnote",
+      0,
+      0,
+      0,
+      0,
+      &pageFootnote
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::page-number-format",
+      0,
+      (void (FOTBuilder::*)(const StringC &))&TeXFOTBuilder::setPageNumberFormat,
+      0,
+      0
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::page-number-restart?",
+      (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setPageNumberRestart,
+      0,
+      0
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::page-n-columns",
+      0,
+      0,
+      (void (FOTBuilder::*)(long))&TeXFOTBuilder::setPageNColumns,
+      0
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::page-column-sep",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setPageColumnSep,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::page-balance-columns?",
+      (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setPageBalanceColumns,
+      0,
+      0
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::subscript-depth",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setSubscriptDepth,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::over-mark-height",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setOverMarkHeight,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::under-mark-depth",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setUnderMarkDepth,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::superscript-height",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setSuperscriptHeight,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::grid-row-sep",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setGridRowSep,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::grid-column-sep",
+      0,
+      0,
+      0,
+      (void (FOTBuilder::*)(FOTBuilder::Length))&TeXFOTBuilder::setGridColumnSep,
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::heading-level",
+      0,
+      0,
+      (void (FOTBuilder::*)(long))&TeXFOTBuilder::setHeadingLevel,
+      0
+    },
+    {
+      "UNREGISTERED::James Clark//Characteristic::preserve-sdata?",
+      (void (FOTBuilder::*)(bool))&TeXFOTBuilder::setPreserveSdata,
+      0,
+      0,
+      0,
+      0
+    },
+
+    { 0, 0, 0}
+  };
+  ext = extensions;
   return new TeXFOTBuilder(os, mgr);
 }
 
@@ -420,7 +596,7 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr)
 TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
 : fileout_(o), mgr_(mgr)
 {
-  os() << "\\startFOT{}";
+  os() << "\\FOT{}";
 }
 
 TeXFOTBuilder::~TeXFOTBuilder()
@@ -537,9 +713,6 @@ void TeXFOTBuilder::tableCellAfterColumnBorder()
   insertAtomic("TableCellAfterColumnBorder");
 }
 
-
-				// New atomic flow-objects added
-				// 1 March/97 with math support.
 void TeXFOTBuilder::fractionBar()
 {
   insertAtomic("FractionBar");
@@ -567,7 +740,7 @@ void TeXFOTBuilder::currentNodePageNumber(const NodePtr &node)
   if (node->getId(id) == accessOK) {
     set("Label",id);
   } else if (node->elementIndex(ei) == accessOK) {
-    set("ElementIndex",ei);
+    set("Element",ei);
   } else {
     message(TeXMessages::unsupportedPageNumberNonElement);
     return;
@@ -586,12 +759,12 @@ void TeXFOTBuilder::currentNodePageNumber(const NodePtr &node)
 
 void TeXFOTBuilder::startSequence()
 {
-  startGroup("Sequence");
+  startGroup("Seq");
 }
 
 void TeXFOTBuilder::endSequence()
 {
-  endGroup("Sequence");
+  endGroup("Seq");
 }
 
 void TeXFOTBuilder::startLineField(const LineFieldNIC &nic)
@@ -608,12 +781,12 @@ void TeXFOTBuilder::endLineField()
 void TeXFOTBuilder::startParagraph(const ParagraphNIC &nic)
 {
   setParagraphNIC(nic);
-  startGroup("Paragraph");
+  startGroup("Par");
 }
 
 void TeXFOTBuilder::endParagraph()
 {
-  endGroup("Paragraph");
+  endGroup("Par");
 }
 
 void TeXFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
@@ -684,12 +857,12 @@ void TeXFOTBuilder::endSideline()
 void TeXFOTBuilder::startBox(const BoxNIC &nic)
 {
   setBoxNIC(nic);
-  startGroup("Box");
+  startGroup("BOX");
 }
 
 void TeXFOTBuilder::endBox()
 {
-  endGroup("Box");
+  endGroup("BOX");
 }
 
 // Tables
@@ -760,19 +933,19 @@ void TeXFOTBuilder::endTableCell()
 
 void TeXFOTBuilder::startSimplePageSequence()
 {
-  startGroup("SimplePageSequence");
+  startGroup("SpS");
 }
 
 void TeXFOTBuilder::endSimplePageSequence()
 {
-  endGroup("SimplePageSequence");
+  endGroup("SpS");
 }
 
 // These aren't real flow objects, so handle them a little
 // differently.
 void TeXFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned flags)
 {
-  os() << "\n\\SimplePageSequence";
+  os() << "\n\\SpS";
   if ((flags & (firstHF|otherHF)) == firstHF)
     os() << "First";
   else
@@ -804,344 +977,293 @@ void TeXFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned flags)
   os() << '}';
 }
 
-				// Non-atomic flow objects added
-				// 1 March/97 with math support.
-
 void TeXFOTBuilder::startTablePartHeader()
 {
   startGroup("TablePartHeader");
 }
-
 
 void TeXFOTBuilder::endTablePartHeader()
 {
   endGroup("TablePartHeader");
 }
 
-
 void TeXFOTBuilder::startTablePartFooter()
 {
   startGroup("TablePartFooter");
 }
-
 
 void TeXFOTBuilder::endTablePartFooter()
 {
   endGroup("TablePartFooter");
 }
 
-
 void TeXFOTBuilder::startMathSequence()
 {
-  startGroup("MathSequence");
+  startGroup("MathSeq");
 }
-
 
 void TeXFOTBuilder::endMathSequence()
 {
-  endGroup("MathSequence");
+  endGroup("MathSeq");
 }
-
 
 void TeXFOTBuilder::startFractionSerial()
 {
   startGroup("FractionSerial");
 }
 
-
 void TeXFOTBuilder::endFractionSerial()
 {
   endGroup("FractionSerial");
 }
-
 
 void TeXFOTBuilder::startFractionNumerator()
 {
   startGroup("FractionNumerator");
 }
 
-
 void TeXFOTBuilder::endFractionNumerator()
 {
   endGroup("FractionNumerator");
 }
-
 
 void TeXFOTBuilder::startFractionDenominator()
 {
   startGroup("FractionDenominator");
 }
 
-
 void TeXFOTBuilder::endFractionDenominator()
 {
   endGroup("FractionDenominator");
 }
-
 
 void TeXFOTBuilder::startUnmath()
 {
   startGroup("Unmath");
 }
 
-
 void TeXFOTBuilder::endUnmath()
 {
   endGroup("Unmath");
 }
-
 
 void TeXFOTBuilder::startSuperscript()
 {
   startGroup("Superscript");
 }
 
-
 void TeXFOTBuilder::endSuperscript()
 {
   endGroup("Superscript");
 }
-
 
 void TeXFOTBuilder::startSubscript()
 {
   startGroup("Subscript");
 }
 
-
 void TeXFOTBuilder::endSubscript()
 {
   endGroup("Subscript");
 }
-
 
 void TeXFOTBuilder::startScriptSerial()
 {
   startGroup("ScriptSerial");
 }
 
-
 void TeXFOTBuilder::endScriptSerial()
 {
   endGroup("ScriptSerial");
 }
-
 
 void TeXFOTBuilder::startScriptPreSup()
 {
   startGroup("ScriptPreSup");
 }
 
-
 void TeXFOTBuilder::endScriptPreSup()
 {
   endGroup("ScriptPreSup");
 }
-
 
 void TeXFOTBuilder::startScriptPreSub()
 {
   startGroup("ScriptPreSub");
 }
 
-
 void TeXFOTBuilder::endScriptPreSub()
 {
   endGroup("ScriptPreSub");
 }
-
 
 void TeXFOTBuilder::startScriptPostSup()
 {
   startGroup("ScriptPostSup");
 }
 
-
 void TeXFOTBuilder::endScriptPostSup()
 {
   endGroup("ScriptPostSup");
 }
-
 
 void TeXFOTBuilder::startScriptPostSub()
 {
   startGroup("ScriptPostSub");
 }
 
-
 void TeXFOTBuilder::endScriptPostSub()
 {
   endGroup("ScriptPostSub");
 }
-
 
 void TeXFOTBuilder::startScriptMidSup()
 {
   startGroup("ScriptMidSup");
 }
 
-
 void TeXFOTBuilder::endScriptMidSup()
 {
   endGroup("ScriptMidSup");
 }
-
 
 void TeXFOTBuilder::startScriptMidSub()
 {
   startGroup("ScriptMidSub");
 }
 
-
 void TeXFOTBuilder::endScriptMidSub()
 {
   endGroup("ScriptMidSub");
 }
-
 
 void TeXFOTBuilder::startMarkSerial()
 {
   startGroup("MarkSerial");
 }
 
-
 void TeXFOTBuilder::endMarkSerial()
 {
   endGroup("MarkSerial");
 }
-
 
 void TeXFOTBuilder::startMarkOver()
 {
   startGroup("MarkOver");
 }
 
-
 void TeXFOTBuilder::endMarkOver()
 {
   endGroup("MarkOver");
 }
-
 
 void TeXFOTBuilder::startMarkUnder()
 {
   startGroup("MarkUnder");
 }
 
-
 void TeXFOTBuilder::endMarkUnder()
 {
   endGroup("MarkUnder");
 }
 
-
 void TeXFOTBuilder::startFenceSerial()
 {
   startGroup("FenceSerial");
+  // Extra brace to ensure body of fence is inside 
+  // a TeX group. Otherwise nested fences go wrong
+  os() << "{";
 }
-
 
 void TeXFOTBuilder::endFenceSerial()
 {
-  endGroup("FenceSerial");
+    //  endGroup("FenceSerial");
 }
-
 
 void TeXFOTBuilder::startFenceOpen()
 {
-  startGroup("FenceOpen");
+  // Extra closing brace for end of fence body
+  os() << "}{";
+  //  startGroup("FenceOpen");
 }
-
 
 void TeXFOTBuilder::endFenceOpen()
 {
-  endGroup("FenceOpen");
+  os() << "}";
+  // endGroup("FenceOpen");
 }
-
 
 void TeXFOTBuilder::startFenceClose()
 {
-  startGroup("FenceClose");
+  os() << "{";
+  // startGroup("FenceClose");
 }
-
 
 void TeXFOTBuilder::endFenceClose()
 {
-  endGroup("FenceClose");
+  os() << "}";
+  //  endGroup("FenceClose");
 }
-
 
 void TeXFOTBuilder::startRadicalSerial()
 {
   startGroup("RadicalSerial");
 }
 
-
 void TeXFOTBuilder::endRadicalSerial()
 {
   endGroup("RadicalSerial");
 }
-
 
 void TeXFOTBuilder::startRadicalDegree()
 {
   startGroup("RadicalDegree");
 }
 
-
 void TeXFOTBuilder::endRadicalDegree()
 {
   endGroup("RadicalDegree");
 }
-
 
 void TeXFOTBuilder::startMathOperatorSerial()
 {
   startGroup("MathOperatorSerial");
 }
 
-
 void TeXFOTBuilder::endMathOperatorSerial()
 {
   endGroup("MathOperatorSerial");
 }
-
 
 void TeXFOTBuilder::startMathOperatorOperator()
 {
   startGroup("MathOperatorOperator");
 }
 
-
 void TeXFOTBuilder::endMathOperatorOperator()
 {
   endGroup("MathOperatorOperator");
 }
-
 
 void TeXFOTBuilder::startMathOperatorLowerLimit()
 {
   startGroup("MathOperatorLowerLimit");
 }
 
-
 void TeXFOTBuilder::endMathOperatorLowerLimit()
 {
   endGroup("MathOperatorLowerLimit");
 }
-
 
 void TeXFOTBuilder::startMathOperatorUpperLimit()
 {
   startGroup("MathOperatorUpperLimit");
 }
 
-
 void TeXFOTBuilder::endMathOperatorUpperLimit()
 {
   endGroup("MathOperatorUpperLimit");
 }
-
 
 void TeXFOTBuilder::startGrid(const GridNIC &nic)
 {
@@ -1149,12 +1271,10 @@ void TeXFOTBuilder::startGrid(const GridNIC &nic)
   startGroup("Grid");
 }
 
-
 void TeXFOTBuilder::endGrid()
 {
   endGroup("Grid");
 }
-
 
 void TeXFOTBuilder::startGridCell(const GridCellNIC &nic)
 {
@@ -1162,12 +1282,10 @@ void TeXFOTBuilder::startGridCell(const GridCellNIC &nic)
   startGroup("GridCell");
 }
 
-
 void TeXFOTBuilder::endGridCell()
 {
   endGroup("GridCell");
 }
-
 
 void TeXFOTBuilder::startNode(const NodePtr &node,
 			      const StringC &processingMode, 
@@ -1180,7 +1298,7 @@ void TeXFOTBuilder::startNode(const NodePtr &node,
     set("Label",id);
   }
   else if (node->elementIndex(ei) == accessOK) {
-    set("ElementIndex", ei);
+    set("Element", ei);
   }
   unsigned long g = node->groveIndex();
   if (g) {
@@ -1192,12 +1310,10 @@ void TeXFOTBuilder::startNode(const NodePtr &node,
   startGroup("Node");
 }
 
-
 void TeXFOTBuilder::endNode()
 {
   endGroup("Node");
 }
-
 
 void TeXFOTBuilder::startLink(const Address &addr)
 {
@@ -1215,7 +1331,7 @@ void TeXFOTBuilder::startLink(const Address &addr)
     if (addr.node->getId(id) == accessOK) {
       set("Label",id);
     } else if (addr.node->elementIndex(ei) == accessOK) {
-      set("ElementIndex", ei);
+      set("Element", ei);
     }
     else {
       message(TeXMessages::unsupportedLinkNonElement);
@@ -1250,15 +1366,12 @@ void TeXFOTBuilder::startLink(const Address &addr)
   startGroup("Link");
 }
 
-
 void TeXFOTBuilder::endLink()
 {
   endGroup("Link");
 }
 
-
-
-//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 // Inherited characteristics
 // Set the value of the characteristic for the next flow object.
 // Inherited characteristics that are not explicitly set have
@@ -1267,22 +1380,34 @@ void TeXFOTBuilder::endLink()
 
 void TeXFOTBuilder::setFontSize(Length size)
 {
-  setlength("FontSize",size);
+  setlength("fSize",size);
 }
 
 void TeXFOTBuilder::setFontFamilyName(const StringC &name)
 {
-  set("FontFamilyName",name);
+  stringout_ << "\\def\\fFamName{";
+  for (size_t i = 0; i < name.size(); i++)
+    {
+      switch(name[i]) {
+      case ' ': 
+	stringout_ << '-';
+        break;
+      default:
+	stringout_ << char(name[i]);
+	break;
+       }
+      }
+      stringout_ << "}";
 }
 
 void TeXFOTBuilder::setFontWeight(Symbol weight)
 {
-  set("FontWeight",weight);
+  set("fWeight",weight);
 }
 
 void TeXFOTBuilder::setFontPosture(Symbol posture)
 {
-  set("FontPosture",posture);
+  set("fPosture",posture);
 }
 
 void TeXFOTBuilder::setStartIndent(const LengthSpec &indent)
@@ -1647,12 +1772,12 @@ void TeXFOTBuilder::setPositionPreference(Symbol pref)
 
 void TeXFOTBuilder::setFontStructure(Symbol structure)
 {
-  set("FontStructure",structure);
+  set("fStructure",structure);
 }
 
 void TeXFOTBuilder::setFontProportionateWidth(Symbol width)
 {
-  set("FontProportionateWidth",width);
+  set("fProportionateWidth",width);
 }
 
 void TeXFOTBuilder::setCellCrossed(Symbol crossed)
@@ -1769,7 +1894,7 @@ void TeXFOTBuilder::setTableAutoWidthMethod(PublicId id)
 
 void TeXFOTBuilder::setFontName(PublicId id)
 {
-  set("FontName",id);
+  set("fName",id);
 }
 
 // Two-letter code
@@ -1929,10 +2054,6 @@ void TeXFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > 
   // set("GlyphSubstTable",tables);
 }
 
-
-
-
-
 ////////////////////////////////////////////////////////////////////////
 // Private member functions.
 ////////////////////////////////////////////////////////////////////////
@@ -1952,9 +2073,27 @@ void TeXFOTBuilder::insertAtomic(const char *name)
 //
 void TeXFOTBuilder::startGroup(const char *name)
 {
-  os() << "\\start" << name << "%\n{";
+  os() << "\\" << name << "%\n{";
   dumpInherited();
   os() << '}';
+}
+
+//
+// Start a non-atomic flow object, with the content delimited by braces
+//
+void TeXFOTBuilder::startBrace(const char *name)
+{
+  os() << "\\" << name << "%\n{";
+  dumpInherited();
+  os() << "}{";
+}
+
+//
+// End a non-atomic flow object with just a closing brace
+//
+void TeXFOTBuilder::endBrace(const char *name)
+{
+  os() << "}";
 }
 
 //
@@ -1973,7 +2112,7 @@ void TeXFOTBuilder::setlength(const char *name,Length size)
 {
   stringout_ << "\\def\\" << name << "%\n{"
 	      << float(size/1000.0)
-	      << "pt}";
+	      << "\\p@}";
 }
 
 //
@@ -2331,7 +2470,7 @@ void TeXFOTBuilder::set(const char *name,const LengthSpec &spec)
 {
   stringout_ << "\\def\\" << name << "%\n{"
 	      << float(spec.length/1000.0)
-	      << "pt}";
+	      << "\\p@}";
   stringout_ << "\\def\\" << name << "Factor%\n{"
 	      << spec.displaySizeFactor
 	      << '}';
@@ -2407,20 +2546,20 @@ void TeXFOTBuilder::set(const char *name,const DisplaySpace &space)
 {
   if (space.nominal.length != 0 || space.min.length != 0
       || space.max.length != 0) {
-    stringout_ << "\\def\\" << name << "Nominal%\n{"
-		<< (space.nominal.length/1000.0) << "pt}";
+    stringout_ << "\\def\\" << name << "Nom%\n{"
+		<< (space.nominal.length/1000.0) << "\\p@}";
     if (space.nominal.displaySizeFactor != 0)
-      stringout_ << "\\def\\" << name << "NominalFactor%\n{"
+      stringout_ << "\\def\\" << name << "NomFactor%\n{"
 		  << space.nominal.displaySizeFactor << '}';
     if (space.min.length != 0)
       stringout_ << "\\def\\" << name << "Min%\n{"
-		  << (space.min.length/1000.0) << "pt}";
+		  << (space.min.length/1000.0) << "\\p@}";
     if (space.min.displaySizeFactor != 0)
       stringout_ << "\\def\\" << name << "MinFactor%\n{"
 		  << space.min.displaySizeFactor << '}';
     if (space.max.length != 0)
       stringout_ << "\\def\\" << name << "Max%\n{"
-		  << (space.max.length/1000.0) << "pt}";
+		  << (space.max.length/1000.0) << "\\p@}";
     if (space.max.displaySizeFactor != 0)
       stringout_ << "\\def\\" << name << "MaxFactor%\n{"
 		  << space.max.displaySizeFactor << '}';
@@ -2459,20 +2598,20 @@ void TeXFOTBuilder::set(const char *name,const InlineSpace &space)
 {
   if (space.nominal.length != 0 || space.min.length != 0
       || space.max.length != 0) {
-    stringout_ << "\\def\\" << name << "Nominal%\n{"
-		<< (space.nominal.length/1000.0) << "pt}";
+    stringout_ << "\\def\\" << name << "Nom%\n{"
+		<< (space.nominal.length/1000.0) << "\\p@}";
     if (space.nominal.displaySizeFactor != 0)
-      stringout_ << "\\def\\" << name << "NominalFactor%\n{"
+      stringout_ << "\\def\\" << name << "NomFactor%\n{"
 		  << space.nominal.displaySizeFactor << '}';
     if (space.min.length != 0)
       stringout_ << "\\def\\" << name << "Min%\n{"
-		  << (space.min.length/1000.0) << "pt}";
+		  << (space.min.length/1000.0) << "\\p@}";
     if (space.min.displaySizeFactor != 0)
       stringout_ << "\\def\\" << name << "MinFactor%\n{"
 		  << space.min.displaySizeFactor << '}';
     if (space.max.length != 0)
       stringout_ << "\\def\\" << name << "Max%\n{"
-		  << (space.max.length/1000.0) << "pt}";
+		  << (space.max.length/1000.0) << "\\p@}";
     if (space.max.displaySizeFactor != 0)
       stringout_ << "\\def\\" << name << "MaxFactor%\n{"
 		  << space.max.displaySizeFactor << '}';
@@ -2486,8 +2625,8 @@ void TeXFOTBuilder::set(const char *name,const InlineSpace &space)
 
 void TeXFOTBuilder::setDisplayNIC(const DisplayNIC &nic)
 {
-  set("SpaceBefore",nic.spaceBefore);
-  set("SpaceAfter",nic.spaceAfter);
+  set("sb",nic.spaceBefore);
+  set("sa",nic.spaceAfter);
   MAYBESET("Keep",nic.keep,symbolFalse);
   MAYBESET("BreakBefore",nic.breakBefore,symbolFalse);
   MAYBESET("BreakAfter",nic.breakAfter,symbolFalse);
@@ -2663,10 +2802,135 @@ void TeXFOTBuilder::dumpInherited()
   os() << tem;
 }
 
-
 void TeXFOTBuilder::message(const MessageType0 &msg)
 {
   mgr_->message(msg);
+}
+
+void TeXFOTBuilder::setPageNumberFormat(const String<unsigned short> &name)
+{
+  set("PageNumberFormat",name);
+}
+
+void TeXFOTBuilder::setPageNColumns(long n)
+{
+ set("PageNColumns",n);
+}
+
+void TeXFOTBuilder::setPageColumnSep(Length w)
+{
+ setlength("PageColumnSep",w);
+}
+
+void TeXFOTBuilder::setPageBalanceColumns(bool flag)
+{
+ set("PageBalanceColumns",flag);
+}
+
+void TeXFOTBuilder::setSubscriptDepth(Length w)
+{
+ setlength("SubScriptDepth",w);
+}
+
+void TeXFOTBuilder::setOverMarkHeight(Length w)
+{
+ setlength("OverMarkHeight",w);
+}
+
+void TeXFOTBuilder::setUnderMarkDepth(Length w)
+{
+ setlength("UnderMarkDepth",w);
+}
+
+void TeXFOTBuilder::setSuperscriptHeight(Length w)
+{
+ setlength("SuperscriptHeight",w);
+}
+
+void TeXFOTBuilder::setGridRowSep(Length  w)
+{
+ setlength("GridRowsep",w);
+}
+
+void TeXFOTBuilder::setGridColumnSep(Length w)
+{
+ setlength("GridColumnSep",w);
+}
+
+void TeXFOTBuilder::setHeadingLevel(long n)
+{
+ set("HeadingLevel",n);
+}
+
+void TeXFOTBuilder::setPageNumberRestart(bool flag)
+{
+ set("PageNumberRestart",flag);
+}
+
+void TeXFOTBuilder::startPageFloat(const PageFloatNIC &nic)
+{
+  setPageFloatNIC(nic);
+  startGroup("PageFloat");
+}
+
+void TeXFOTBuilder::endPageFloat()
+{
+  endGroup("PageFloat");
+}
+
+void TeXFOTBuilder::startPageFootnote()
+{
+  startBrace("PageFootnote");
+}
+
+void TeXFOTBuilder::endPageFootnote()
+{
+  endBrace("PageFootnote");
+}
+
+void TeXFOTBuilder::setPageFloatNIC(const PageFloatNIC &nic)
+{
+  set("placement",nic.placement);
+}
+
+TeXFOTBuilder::PageFloatNIC::~PageFloatNIC()
+{
+}
+
+void TeXFOTBuilder::extension(const ExtensionFlowObj &fo, const NodePtr &nd)
+{
+  ((const TeXExtensionFlowObj &)fo).atomic(*this, nd);
+}
+
+void TeXFOTBuilder::startExtensionSerial(const CompoundExtensionFlowObj &fo, const NodePtr &nd)
+{
+  ((const TeXCompoundExtensionFlowObj &)fo).start(*this, nd);
+}
+
+void TeXFOTBuilder::endExtensionSerial(const CompoundExtensionFlowObj &fo)
+{
+  ((const TeXCompoundExtensionFlowObj &)fo).end(*this);
+}
+
+void TeXFOTBuilder::start()
+{
+}
+
+void TeXFOTBuilder::end()
+{
+}
+void TeXFOTBuilder::setPreserveSdata(bool b)
+{
+  preserveSdata_ = b;
+}
+
+void TeXFOTBuilder::charactersFromNode(const NodePtr &nd, const Char *s, size_t n)
+{
+  GroveString name;
+  if (preserveSdata_ && n == 1 && nd->getEntityName(name) == accessOK)
+    os() << "\\Entity{" << name << '}';
+  else
+    TeXFOTBuilder::characters(s, n);
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -120,7 +120,7 @@ ELObj *PublicIdInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) 
 {
   Interpreter &interp = *vm.interp;
   if (pubid_)
-    return interp.makeSymbol(interp.makeStringC(pubid_));
+    return new (interp) StringObj(interp.makeStringC(pubid_));
   else
     return interp.makeFalse();
 }
@@ -1230,6 +1230,8 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
     return interp.makeError();
   }
   ELObj *obj = ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  const Char *s;
+  size_t n;
   interp.makeReadOnly(obj);
   return obj;
 }

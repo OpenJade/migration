@@ -14,7 +14,6 @@
 #include "MessageArg.h"
 #include "ErrnoMessageArg.h"
 #include "Options.h"
-#include "version.h"
 #include "xnew.h"
 #include "macros.h"
 #include "sptchar.h"

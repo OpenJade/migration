@@ -431,6 +431,8 @@ public:
   virtual long nodeListLength(EvalContext &, Interpreter &);
   virtual bool suppressError();
   virtual bool contains(EvalContext &, Interpreter &, const NodePtr &);
+ // check for a node of class id
+  virtual bool contains(EvalContext &, Interpreter &, ComponentName::Id id);
   void print(Interpreter &, OutputCharStream &);
 };
 

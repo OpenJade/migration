@@ -5,15 +5,17 @@ Build Instructions
 
    OpenSP and OpenJade now use the GNU configuration tools autoconf,
 automake, and libtool for compilation.  To create a configure script
-you will need to run the following commands in order:
+you will need to run './autogen.sh'. Alternatively, you can run the
+following commands in order:
 
 /cvs/sp$ aclocal
 /cvs/sp$ autoheader
 /cvs/sp$ automake --add-missing
 /cvs/sp$ autoconf
 
-   This should create a useable 'configure' shell script that you can
-use to compile the application.
+   The 'autogen.sh' script or the above commands should create a
+useable 'configure' shell script that you can use to compile the
+application.
 
 /cvs/sp$ ./configure
 /cvs/sp$ make

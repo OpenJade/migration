@@ -32,6 +32,10 @@ public:
     Vector<unsigned> attMapFrom;
     // corresponding list of indexes in form's attlist
     Vector<unsigned> attMapTo;
+    // corresponding list of pointers in the token maps
+    Vector<size_t> attTokenMapBase;
+    Vector<StringC> tokenMapFrom;
+    Vector<StringC> tokenMapTo;
   };
   struct MetaMapCache {
     MetaMapCache();
@@ -125,7 +129,8 @@ private:
 			       const AttributeList &atts,
 			       const AttributeList *linkAtts,
 			       Vector<PackedBoolean> &attRenamed,
-			       Vector<PackedBoolean> &attSubstituted);
+			       Vector<PackedBoolean> &attSubstituted,
+                               Boolean isNotation);
   void buildAttributeMapRest(MetaMap &map,
 			     const AttributeList &atts,
 			     const AttributeList *linkAtts,
@@ -169,7 +174,6 @@ private:
     rArcBridF,
     rArcDataF,
     rArcAuto,
-    rArcIndr,
     rArcDTD,
     rArcQuant
   };

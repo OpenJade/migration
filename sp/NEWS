@@ -1,5 +1,7 @@
 Changes in OpenSP 1.4
 
+* The architecture engine supports #MAPTOKEN.
+
 * The multibyte version of OpenSP now uses 32bit chars and supports
   the full UTF-16 range 0x0000-0x10ffff.
 

@@ -771,11 +771,9 @@ Boolean ArcProcessor::mungeDataEntity(ExternalDataEntity &entity)
   const Notation *notation = (const Notation *)map.attributed;
   ConstPtr<AttributeValue> arcContent;
   if (mapAttributes(entity.attributes(), 0, 0, atts, arcContent, map)) {
-    // FIXME check arcContent
     entity.setNotation((Notation *)notation, atts);
     return 1;
   }
-  // FIXME error tried to use #CONTENT
   return 0;
 }
 
@@ -854,7 +852,6 @@ void ArcProcessor::supportAttributes(const AttributeList &atts)
     "ArcBridF",
     "ArcDataF",
     "ArcAuto",
-    "ArcIndr",
     "ArcDTD",
     "ArcQuant",
     };
@@ -882,18 +879,6 @@ void ArcProcessor::supportAttributes(const AttributeList &atts)
 	    else
 	      Messenger::message(ArcEngineMessages::invalidArcAuto,
 				 StringMessageArg(supportAtts_[i]));
-	    break;
-	  case rArcIndr:
-	    docSyntax_->generalSubstTable()->subst(supportAtts_[i]);
-	    if (supportAtts_[i] == docSd_->execToInternal("ARCINDR")) {
-	      Messenger::setNextLocation(textP->charLocation(0));
-	      Messenger::message(ArcEngineMessages::arcIndrNotSupported);
-	    }
-	    else if (supportAtts_[i] != docSd_->execToInternal("NARCINDR")) {
-	      Messenger::setNextLocation(textP->charLocation(0));
-	      Messenger::message(ArcEngineMessages::invalidArcIndr,
-				 StringMessageArg(supportAtts_[i]));
-	    }
 	    break;
 	  case rArcFormA:
 	  case rArcNamrA:
@@ -1174,6 +1159,7 @@ Boolean ArcProcessor::mapAttributes(const AttributeList &from,
 				    ConstPtr<AttributeValue> &arcContent,
 				    const MetaMap &map)
 {
+  arcContent = 0;
   if (map.attributed)
     to.init(map.attributed->attributeDef());
   for (size_t i = 0; i < map.attMapFrom.size(); i++) {
@@ -1183,10 +1169,8 @@ Boolean ArcProcessor::mapAttributes(const AttributeList &from,
       fromList = fromLink;
       fromIndex -= from.size();
     }
-    if (map.attMapTo[i] == contentPseudoAtt) {
-      if (fromIndex != contentPseudoAtt)
-	arcContent = fromList->valuePointer(fromIndex);
-    }
+    if (map.attMapTo[i] == contentPseudoAtt)
+      arcContent = fromList->valuePointer(fromIndex);
     else {
       const Text *fromText = 0;
       Boolean fromTextTokenized = 0;
@@ -1194,6 +1178,12 @@ Boolean ArcProcessor::mapAttributes(const AttributeList &from,
 	if (!content)
 	  return 0;
 	fromText = content;
+	if (arcContent.isNull()) {
+	  // if #CONTENT is specified, the architectural content 
+          // will be empty unless #ARCCONT is specified
+	  Text empty;
+	  arcContent = new CdataAttributeValue(empty);
+	}
       }
       else {
 	const AttributeValue *value = fromList->value(fromIndex);
@@ -1210,6 +1200,29 @@ Boolean ArcProcessor::mapAttributes(const AttributeList &from,
       }
       if (fromText) {
 	unsigned specLength = 0;
+        Text tem1;
+        if (map.attTokenMapBase[i] < map.attTokenMapBase[i + 1]) {
+          Vector<StringC> tokens;
+          Vector<size_t> tokensPos;
+	  split(*fromText, docSyntax_->space(), tokens, tokensPos);
+          Boolean replaced = 0; 
+          for (size_t k = 0; k < tokens.size(); k++) 
+	    for (size_t l = map.attTokenMapBase[i]; l < map.attTokenMapBase[i + 1]; l++) 
+              if (tokens[k] == map.tokenMapFrom[l]) {
+                tokens[k] = map.tokenMapTo[l];
+                replaced = 1;
+                break;
+              }
+          if (replaced) {
+            for (size_t k = 0; k < tokens.size(); k++) {
+              if (k > 0)
+                tem1.addChar(docSyntax_->space(), fromText->charLocation(tokensPos[k + 1] - 1));
+              tem1.addChars(tokens[k].data(), tokens[k].size(), fromText->charLocation(tokensPos[k]));
+            }
+            fromText = &tem1;
+            fromTextTokenized = 1;
+          }
+        }
 	Text tem;
 	if (!fromTextTokenized && to.tokenized(map.attMapTo[i]))
 	  fromText->tokenize(docSyntax_->space(), tem);
@@ -1338,10 +1351,10 @@ ArcProcessor::buildMetaMap(const ElementType *docElementType,
       unsigned index;
       const Text *linkNamerText = considerNamer(*linkAtts, specified, index);
       if (linkNamerText)
-	buildAttributeMapRename(*mapP, *linkNamerText, atts, linkAtts, renamed, substituted);
+	buildAttributeMapRename(*mapP, *linkNamerText, atts, linkAtts, renamed, substituted, isNotation);
     }
     if (namerText)
-      buildAttributeMapRename(*mapP, *namerText, atts, 0, renamed, substituted);
+      buildAttributeMapRename(*mapP, *namerText, atts, 0, renamed, substituted, isNotation);
     buildAttributeMapRest(*mapP, atts, linkAtts, renamed);
   }
   return *mapP;
@@ -1384,11 +1397,6 @@ void ArcProcessor::considerSupr(const AttributeList &atts,
   newSuppressFlags &= ~(suppressForm|suppressSupr);
   if (matchName(token, "sArcForm"))
     newSuppressFlags |= suppressForm;
-#if 0
-  // I don't think this is useful
-  else if (matchName(token, "sArcSupr"))
-    newSuppressFlags |= suppressSupr;
-#endif
   else if (matchName(token, "sArcAll"))
     newSuppressFlags |= (suppressSupr|suppressForm);
   else if (!matchName(token, "sArcNone")) {
@@ -1568,7 +1576,8 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 					   const AttributeList &atts,
 					   const AttributeList *linkAtts,
 					   Vector<PackedBoolean> &attRenamed,
-					   Vector<PackedBoolean> &attSubstituted)
+					   Vector<PackedBoolean> &attSubstituted,
+					   Boolean isNotation)
 {
   Vector<StringC> tokens;
   Vector<size_t> tokensPos;
@@ -1576,12 +1585,11 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
   ConstPtr<AttributeDefinitionList> metaAttDef;
   if (map.attributed)
     metaAttDef = map.attributed->attributeDef();
-  // FIXME Should check that ARCCONT doesn't appear more than once.
   for (size_t i = 0; i < tokens.size(); i += 2) {
     unsigned fromIndex = invalidAtt;
     unsigned toIndex = invalidAtt;
     metaSyntax_->generalSubstTable()->subst(tokens[i]);
-    if (tokens[i] == rniArcCont_) {    
+    if (!isNotation && tokens[i] == rniArcCont_) {
       if (attRenamed[contentPseudoAtt + 1]) {
 	setNextLocation(rename.charLocation(tokensPos[i]));
 	Messenger::message(ArcEngineMessages::arcContDuplicate);
@@ -1607,7 +1615,7 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
     }
     else {
       docSyntax_->generalSubstTable()->subst(tokens[i + 1]);
-      if (tokens[i + 1] == rniContent_) {
+      if (!isNotation && tokens[i + 1] == rniContent_) {
 	if (toIndex == contentPseudoAtt) {
 	  setNextLocation(rename.charLocation(tokensPos[i + 1]));
 	  Messenger::message(ArcEngineMessages::arcContInvalid,
@@ -1662,18 +1670,16 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 	  Messenger::message(ArcEngineMessages::idMismatch,
 			     StringMessageArg(metaAttDef->def(toIndex)
 					      ->name()));
-	Vector<StringC> fromTokens;
-	Vector<StringC> toTokens;
 	for (;i + 4 < tokens.size(); i += 3) {
 	  docSyntax_->generalSubstTable()->subst(tokens[i + 2]);
  	  if (tokens[i + 2] != rniMaptoken_) 
 	    break;
-	  fromTokens.push_back(tokens[i + 3]);
-	  toTokens.push_back(tokens[i + 4]);
+          // FIXME: should we check for duplicate from tokens ?
+	  map.tokenMapTo.push_back(tokens[i + 3]);
+	  map.tokenMapFrom.push_back(tokens[i + 4]);
 	}
-	if (fromTokens.size() > 0) 
-	  Messenger::message(ArcEngineMessages::sorryMaptoken);
       }
+      map.attTokenMapBase.push_back(map.tokenMapFrom.size());
     }
   }
 }
@@ -1797,13 +1803,18 @@ void ArcProcessor::MetaMapCache::clear()
 ArcProcessor::MetaMap::MetaMap()
 : attributed(0)
 {
+  attTokenMapBase.push_back(0);
 }
 
 void ArcProcessor::MetaMap::clear()
 {
   attMapFrom.clear();
   attMapTo.clear();
+  attTokenMapBase.clear();
+  tokenMapFrom.clear();
+  tokenMapTo.clear();
   attributed = 0;
+  attTokenMapBase.push_back(0);
 }
 
 #ifdef SP_NAMESPACE

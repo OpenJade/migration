@@ -179,9 +179,9 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Description *&descr)
                                       outputCodingSystem_)), descr);
   case sgmlType:
   case xmlType:
-    return makeTransformFOTBuilder(this, outputType_ == xmlType, descr);
+    return makeTransformFOTBuilder(this, outputType_ == xmlType, outputOptions_, descr);
   case txtType:
-//    return makeTextFOTBuilder(&outputFile_, this, descr);
+    return makeTextFOTBuilder(&outputFile_, this, descr);
   default:
     break;
   }

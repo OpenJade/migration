@@ -1,7 +1,3 @@
-* FIX links to NEWS and ChangeLog in docs and www.
-  And fix make install so that these files get installed in
-  pkgdocdir.
-
 * Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message
 

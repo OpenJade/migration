@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: sp 1.5pre9\n"
-"POT-Creation-Date: 2002-11-15 23:13+0000\n"
-"PO-Revision-Date: 2002-11-17 08:00-0500\n"
+"Project-Id-Version: sp 1.5.1pre1\n"
+"POT-Creation-Date: 2003-09-03 15:12+0000\n"
+"PO-Revision-Date: 2003-10-14 08:00-0500\n"
 "Last-Translator: Michel Robitaille <robitail@IRO.UMontreal.CA>\n"
 "Language-Team: French <traduc@traduc.org>\n"
 "MIME-Version: 1.0\n"
@@ -38,7 +38,7 @@ msgid "substitute for non-existent architecture attribute %1"
 msgstr "substitut pour un attribut d'architecture inexistente %1"
 
 msgid "substitute name for %1 already defined"
-msgstr "nom de substitution pour %1 déjà défini"
+msgstr "nom de substitution pour %1 est déjà défini"
 
 msgid "substitute name %1 is not the name of an attribute"
 msgstr "nom de substitution %1 n'est pas un nom pour une attribut"
@@ -104,16 +104,16 @@ msgid "invalid value %1 for #ARCCONT"
 msgstr "valeur invalide %1 pour l'attribut #ARCCONT"
 
 msgid "%1 already used as a substitute name"
-msgstr "%1 est déjà utilisé comme un nom subsitutut"
+msgstr "%1 est déjà utilisé comme nom substitut"
 
 msgid "substitute name #CONTENT already specified"
-msgstr "nom de substitution #CONTENT déjà défini"
+msgstr "nom de substitution #CONTENT est déjà spécifié"
 
 msgid "IS10744 PI keyword missing"
-msgstr "IS10744 PI mot clé manquant"
+msgstr "mot clé IS10744 PI manquant"
 
 msgid "invalid IS10744 PI keyword %1"
-msgstr "mot clé IS10744 PI %1"
+msgstr "mot clé IS10744 PI %1 invalide"
 
 msgid "architecture %1 already defined"
 msgstr "architecture %1 est déjà définie"
@@ -122,16 +122,16 @@ msgid "the first definition"
 msgstr "la première définition"
 
 msgid "ignoring PI declaration of architecture %1"
-msgstr "déclaration PI ignorée pour l'architecture %1"
+msgstr "déclaration PI de l'architecture %1 est ignorée"
 
 msgid "the ArcBase definition"
 msgstr "la définition ArcBase"
 
 msgid "ignoring ArcBase declaration of architecture %1"
-msgstr "déclaration ArcBase ignorée pour l'architecture %1"
+msgstr "déclaration ArcBase de l'architecture %1 est ignorée"
 
 msgid "the PI definition"
-msgstr "la définition de PI"
+msgstr "la définition PI"
 
 msgid "name expected"
 msgstr "nom attendu"
@@ -251,7 +251,7 @@ msgid "Search files in directory %1."
 msgstr "Rechercher les fichiers dans le répertoire %1."
 
 msgid "Restrict file reading (for use in Web apps)."
-msgstr "Restiction sur la lecture du fichier (pour l'utilisation par les logiciel Web)"
+msgstr "Restriction de la lecture du fichier (pour un usage par les applications du Web)"
 
 msgid "DIRECTORY"
 msgstr "RÉPERTOIRE"
@@ -1697,7 +1697,7 @@ msgid "can't use #IMPLICIT doctype unless CONCUR NO and LINK EXPLICIT NO"
 msgstr "ne peut utiliser #IMPLICIT doctypes à moins que CONCUR NO et LINK EXPLICIT NO"
 
 msgid "Sorry, #IMPLIED doctypes not implemented"
-msgstr "Désolé, #IMPLIED doctypes pas implanté"
+msgstr "Désolé, #IMPLIED doctypes n'est pas implanté"
 
 msgid "reference to DTD data entity ignored"
 msgstr "référence à l'entité donnée de la DTD est ignorée"
@@ -1712,19 +1712,19 @@ msgid "attribute %1 can't be redeclared"
 msgstr "attribut %1 ne peut être redéclaré"
 
 msgid "#IMPLICIT attributes have already been specified for notation %1"
-msgstr "attributs #IMPLICIT ont déjà été définis pour la notation %1"
+msgstr "attributs #IMPLICIT ont déjà été spécifiés pour la notation %1"
 
 msgid "a name group is not allowed in a parameter entity reference in a start tag"
-msgstr "un nom de groupe n'est pas permis dans un paramètre de référence d'entité au début d'une étiquette"
+msgstr "un nom de groupe n'est pas permis dans paramètre de référence d'entité dans une étiquette de début"
 
 msgid "name group in a parameter entity reference in an end tag (SGML forbids them in start tags)"
-msgstr "un nom de groupe dans un paramètre d'entité dans un fin d'étiquette (SGML les interdit au début d'une étiquette)"
+msgstr "un nom de groupe n'est pas permis dans paramètre de référence d'entité dans une étiquette de fin (SGML les interdit dans les étiquettes de début)"
 
 msgid "if the declared value is NOTATION a default value of CONREF is useless"
-msgstr "si la valeur déclarée est NOTATION une valeur par défaut CONREF est inutile"
+msgstr "si la valeur déclarée est NOTATION une valeur par défaut de CONREF est inutile"
 
 msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
-msgstr "Désolé, les contenus des jetons  #ALL et #IMPLICIT pas implantés"
+msgstr "Désolé, les jetons de contenu pour #ALL et #IMPLICIT ne sont pas implantés"
 
 msgid "delimiter "
 msgstr "délimiteur "
@@ -1924,6 +1924,9 @@ msgstr "version incompatible des Sockets de Windows"
 msgid "error number "
 msgstr "numéro d'erreur "
 
+msgid "URL Redirected to %1"
+msgstr "URL redirigé vers %1"
+
 msgid "cannot open URL %1 (%2)"
 msgstr "ne peut ouvrir le URL %1 (%2)"
 
@@ -2084,10 +2087,25 @@ msgid "cannot open output file %1"
 msgstr "ne peut ouvrir le fichier de sortie %1"
 
 msgid "missing system ID for entity %1"
-msgstr "identificateur système manquant pour l'entité %1."
+msgstr "l'identificateur système est manquant pour l'entité %1"
 
 msgid "unexpected entity type for entity named %1"
-msgstr "type d'entité inattendu pour l'entité de nom %1"
+msgstr "type d'entité inattendue pour l'entité nommé %1"
+
+msgid "cannot create directory %1"
+msgstr "ne peut créer le répertoire %1"
+
+msgid "already wrote 99 versions of %1; will not overwrite"
+msgstr "a déjà produit 99 versions de %1; ne va pas écraser"
+
+msgid "already wrote output file %1; will not overwrite"
+msgstr "déjà produit le fichier de sortie %1; ne va pas écraser"
+
+msgid "removing leading slashes from output filename %1"
+msgstr "enlèvement des barres obliques en en-tête dans le nom du ficheir %1"
+
+msgid "path %1 outside output directory"
+msgstr "chemin %1 en dehors du répertoire de sortie"
 
 msgid "Output a document type declaration."
 msgstr "Sortie de la déclaration du type de document."

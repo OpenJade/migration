@@ -1,3 +1,12 @@
+2003-11-03  Karl Eichwalder  <ke@suse.de>
+
+	* po/LINGUAS (Tag): Add 'tr'
+	* po/tr.po (Tag): New file from
+	http://www.iro.umontreal.ca/~gnutra/maint/sp/ .
+	* po/de.po (Tag): Update from
+	http://www.iro.umontreal.ca/~gnutra/maint/sp/ .
+	* po/fr.po (Tag): Likewise.
+
 2003-10-19  Karl Eichwalder  <ke@suse.de>
 
 	* tests/onsgmls-2: New file.  Test --restricted and --directory= .

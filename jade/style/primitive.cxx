@@ -3631,29 +3631,29 @@ DEFPRIMITIVE(EntityType, argc, argv, context, interp, loc)
       return noCurrentNodeError(interp, loc);
   }
   NamedNodeListPtr entities;
-  Node::EntityType type;
+  Node::EntityType::Enum type;
   if (node->getGroveRoot(node) == accessOK
       && node->getEntities(entities) == accessOK
       && entities->namedNode(GroveString(s, n), node) == accessOK
       && node->getEntityType(type) == accessOK) {
     const char *s;
     switch (type) {
-    case Node::text:
+    case Node::EntityType::text:
       s = "text";
       break;
-    case Node::cdata:
+    case Node::EntityType::cdata:
       s = "cdata";
       break;
-    case Node::sdata:
+    case Node::EntityType::sdata:
       s = "sdata";
       break;
-    case Node::ndata:
+    case Node::EntityType::ndata:
       s = "ndata";
       break;
-    case Node::subdocument:
+    case Node::EntityType::subdocument:
       s = "subdocument";
       break;
-    case Node::pi:
+    case Node::EntityType::pi:
       s = "pi";
       break;
     default:

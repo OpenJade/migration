@@ -11,7 +11,7 @@ INCLUDES = -I$(top_srcdir)/include
 EXTRA_DIST = spent.dsp SpentMessages.msg SpentMessages.rc \
 	.cvsignore
 
-BUILT_SOURCES = SpentMessages.msg SpentMessages.rc
+BUILT_SOURCES = SpentMessages.rc
 
 MSGGENFLAGS = -l appModule
 

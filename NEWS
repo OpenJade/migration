@@ -17,7 +17,7 @@ Changes in OpenJade 1.2.2
   is a length-spec
 
 * Most of the non-core expression language:
-  c...r,  keyword->string, string->keyword, exact?, inexact?,
+  c...r, assoc, keyword->string, string->keyword, exact?, inexact?,
   zero?, positive?, negative?, odd?, even?, exp, log, sin, cos,
   tan, asin, acos, atan, expt, exact->inexact, inexact->exact,
   quantity->number, string->list, list->string, map, time<?,

@@ -4790,7 +4790,9 @@ DEFPRIMITIVE(InexactToExact, argc, argv, context, interp, loc)
    if (argv[0]->realValue(d) && modf(d, &d) == 0.0
 	&& fabs(d) < LONG_MAX && dim == 0) 
       return interp.makeInteger((long)d);
-    // FIXME: report that no exact representation is possible
+   interp.setNextLocation(loc);
+   interp.message(InterpreterMessages::noExactRepresentation,
+                  ELObjMessageArg(argv[0], interp));
   case ELObj::longQuantity:  // fall through
     return argv[0]; 
   default:
@@ -4976,6 +4978,7 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAProcedure, 0, argv[0]);
   if (func->totalArgs() > 0) {
+    interp.setNextLocation(loc);
     interp.message(InterpreterMessages::tooManyArgs);
     return interp.makeError();
   }
@@ -4988,19 +4991,13 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
   ELObj *ret;
   while (nd = nl->nodeListFirst(context, interp)) {
     nl = nl->nodeListRest(context, interp);
-    {
-      EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
-      InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
-      VM vm(context, interp);
-      ret = vm.eval(insn.pointer());
-    }
-    if (interp.isError(ret)) {
-      return interp.makeError();
-    }
+    EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
+    InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
+    VM vm(context, interp);
+    ret = vm.eval(insn.pointer());
     SosofoObj *sosofo = ret->asSosofo();
-    if (!sosofo) {
+    if (!sosofo) 
       return interp.makeError();
-    }
     obj->append(sosofo);
   }
   return obj;

@@ -37,7 +37,7 @@ namespace GROVE_NAMESPACE {
 #ifdef SP_WCHAR_T_USHORT
 typedef wchar_t GroveChar;
 #else
-typedef unsigned short GroveChar;
+typedef unsigned int GroveChar;
 #endif
 #else /* not SP_MULTI_BYTE */
 typedef unsigned char GroveChar;

@@ -98,9 +98,10 @@ void DssslSpecEventHandler::loadDoc(SgmlParser &parser, Doc &doc)
 
 
 EventHandler *
-DssslSpecEventHandler::arcEventHandler(const Notation *notation,
+DssslSpecEventHandler::arcEventHandler(const StringC *arcPublicId,
+                                       const Notation *notation,
 				       const Vector<StringC> &,
-				       const SubstTable<Char> *)
+				       const SubstTable *)
 {
   if (!notation)
     return 0;

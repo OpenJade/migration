@@ -1,31 +1,40 @@
 #! /usr/bin/perl
-# Copyright (c) 1994 James Clark
+# Copyright (c) 1994 James Clark, 2000 Matthias Clasen
+# Copyright (c) 2000 Peter Nilsson
 # See the file COPYING for copying permission.
+
+use POSIX;
+
+# Package and version.
+$package = 'openjade';
+$version = '1.3.2';
+$package = $package; $version = $version; # be quiet, -w
 
 $prog = $0;
 $prog =~ s@.*/@@;
 
 $gen_c = 0;
-$gen_po = 0;
 
 undef $opt_l;
+undef $opt_p;
+undef $opt_t;
 do 'getopts.pl';
-&Getopts('l');
+&Getopts('l:p:t:');
+$module = $opt_l;
+$pot_file = $opt_p;
 
-die "Usage: $prog file\n" unless $#ARGV == 0;
+if (defined($opt_t)) {
+  # don't try to read translations for English
+  $opt_t =~ /.*en.*/ || &read_po_translations($opt_t);
+}
 
-$def_file = $ARGV[0];
+$num = 0; 
 
-$file_base = $def_file;
-$file_base =~ s/\.[^.]*$//;
-$config_h = $opt_l ? "splib.h" : "config.h";
+foreach $def_file (@ARGV) {
 
-$class = $file_base;
-$class =~ s|.*[\\/]||;
+@tag_used = ();
 
 open(DEF, $def_file) || die "can't open \`$def_file': $!\n";
-
-$num = 0;
 
 while (<DEF>) {
     chop;
@@ -34,9 +43,11 @@ while (<DEF>) {
 	next;
     }
     if (/^=/) {
-	$n = substr($_, 1);
-	&error("= directive must increase message num") if ($n < $num);
-	$num = $n;
+        if (!defined($opt_p)) {
+	    $n = substr($_, 1);
+	    &error("= directive must increase message num") if ($n < $num);
+	    $num = $n;
+        }
 	next;
     }
     if (/^-/) {
@@ -66,11 +77,13 @@ while (<DEF>) {
     $nargs[$num] = $argc;
     $field[1] =~ /^[a-zA-Z_][a-zA-Z0-9_]+$/ || &error("invalid tag");
     $tag[$num] = $field[1];
-    &error("duplicate tag $field[1]") if defined($tag_used{$field[1]});
+    &error("duplicate tag $field[1]") 
+      if (!defined($opt_p) && defined($tag_used{$field[1]}));
     $tag_used{$field[1]} = 1;
-    $field[2] =~ /^([0-9]+(\.[0-9]+)*(p[0-9]+)?( [0-9]+(\.[0-9]+)*(p[0-9]+)?)*)?$/
+    $field[2] =~ /^((ISO(\/IEC)? [0-9]+:[0-9]+ )?(([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)|(\[[0-9]+(\.[0-9]*)?\]))( (ISO(\/IEC)? [0-9]+:[0-9]+ )?(([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)|(\[[0-9]+(\.[0-9]*)?\])))*)?$/
 	|| &error("invalid clauses field");
     # push @clauses, $field[2];
+    $clauses[$num] = $field[2];
     if ($argc == 0) {
 	if ($field[0] ne "") {
 	    $field[3] =~ /^([^%]|%%)*$/ || &error("invalid character after %");
@@ -89,6 +102,14 @@ while (<DEF>) {
 }
 
 close(DEF);
+
+if (!defined($opt_p)) {
+
+$file_base = $ARGV[0];
+$file_base =~ s/\.[^.]*$//;
+
+$class = $file_base;
+$class =~ s|.*[\\/]||;
 
 # this is needed on Windows NT
 chmod 0666, "$file_base.h";
@@ -110,7 +131,7 @@ print <<END if $gen_c;
 END
 
 print <<END;
-#include "Message.h"
+#include <OpenSP/Message.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -160,7 +181,7 @@ if ($gen_c) {
 #pragma implementation
 #endif
 
-#include "$config_h"
+#include "stylelib.h"
 #include "$class.h"
 
 #ifdef SP_NAMESPACE
@@ -168,6 +189,10 @@ namespace SP_NAMESPACE {
 #endif
 
 END
+}
+
+if (defined($opt_l)) {
+    print "extern MessageModule $module;\n\n";
 }
 
 foreach $i (0 .. $#message) {
@@ -195,20 +220,27 @@ foreach $i (0 .. $#message) {
 	    }
 	    print ",\n";
 	}
-	print <<END;
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
-END
+	if (defined($opt_l)) {
+	    print "&$module,\n";
+	} else {
+	    print "0,\n";
+	}
 	print "$i\n";
 	print "#ifndef SP_NO_MESSAGE_TEXT\n";
 	$str = $message[$i];
 	$str =~ s|\\|\\\\|g;
 	$str =~ s|"|\\"|g;
 	printf ",\"%s\"", $str; 
+	if ($clauses[$i]) {
+	  $str = $clauses[$i];
+	  $str =~ s|\\|\\\\|g;
+	  $str =~ s|"|\\"|g;
+	  printf "\n,\"%s\"", $str; 
+        }
 	if ($auxloc[$i]) {
+            if ($clauses[$i] eq "") {
+              print "\n,0";
+            }
 	    $str = $message2[$i + 1];
 	    $str =~ s|\\|\\\\|g;
 	    $str =~ s|"|\\"|g;
@@ -238,6 +270,9 @@ print "STRINGTABLE\nBEGIN\n";
 foreach $i (0 .. $#message) {
     if (defined($message[$i])) {
 	$str = $message[$i];
+	if ($translation{$str}) {
+	    $str = $translation{$str};
+	}
 	$str =~ s/"/""/g;
 	printf "  %d, \"%s\"\n", $i, $str;
     }
@@ -251,25 +286,51 @@ foreach $i (0 .. $#message) {
 print "END\n";
 close(OUT);
 
-if ($gen_po) {
+} # !opt_p
+
+} # foreach def_file
+
+if (defined($opt_p)) {
+
   # this is needed for GNU gettext 
-  chmod 0666, "$file_base.po";
-  unlink("$file_base.po");
-  open(OUT, ">$file_base.po");
-  chmod 0444, "$file_base.po";
+  chmod 0666, "$pot_file";
+  unlink("$pot_file");
+  open(OUT, ">$pot_file");
+  chmod 0444, "$pot_file";
   select(OUT);
 
-  printf "# %s\n\n", $file_base;
+  $crdate = POSIX::strftime "%Y-%m-%d %H:%M+0000", gmtime;
+  print <<END;
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR HOLDER
+# FIRST AUTHOR <EMAIL\@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\\n"
+"POT-Creation-Date: $crdate\\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
+"Last-Translator: FULL NAME <EMAIL\@ADDRESS>\\n"
+"Language-Team: LANGUAGE <LL\@li.org>\\n"
+"MIME-Version:: 1.0\\n"
+"Content-Type: text/plain; charset=CHARSET\\n"
+"Content-Transfer-Encoding: ENCODING\\n"
+
+END
 
   foreach $i (0 .. $#message) {
-    if (defined($message[$i])) {
+    if (defined($message[$i]) && !defined($written{$message[$i]})) {
+	next if $message[$i] eq "";
+	$written{$message[$i]} = 1;
 	$str = $message[$i];
-	$str =~ s/"/""/g;
+	$str =~ s/"/\\"/g;
 	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
     }
-    elsif (defined($message2[$i])) {
+    elsif (defined($message2[$i]) && ! defined($written{$message2[$i]})) {
+	$written{$message2[$i]} = 1;
 	$str = $message2[$i];
-	$str =~ s/"/""/g;
+	$str =~ s/"/\\"/g;
 	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
     }
  }
@@ -280,3 +341,86 @@ close(OUT);
 sub error {
     die "$def_file:$.: $_[0]\n";
 }
+
+# Read a PO file with message translations.
+# This doesn't accept every valid PO file, but it seems to work reasonably.
+sub read_po_translations {
+    my $po_in = $_[0];
+    open(PO_IN, "<$po_in") || die "Can't open file $po_in.";
+    my $id = "";
+    my $str = "";
+    my $catching_string = 0;
+
+    while(<PO_IN>) {
+	if (/^\s*msgid/) {
+	    if ($catching_string) {
+		&po_flush($id, $str);
+		$id = "";
+		$str = "";
+	    }
+	    $_ = $';
+	    $catching_string = 1;
+	}
+	elsif (/^\s*msgstr/) {
+	    die "No msgid." if !$catching_string or $id;
+	    $id = $str;
+	    $str = "";
+	    $_ = $';
+	}
+	
+	if ($catching_string) {
+	    my $in_string = 0;
+	    s/\s*//;
+	    while ($_) {
+		if (s/^\"//) {
+		    $in_string = !$in_string;
+		}
+		if ($in_string) {
+		    if (s/^[^\"\\]+//) {
+			$str .= $&;
+		    }
+		    elsif (s/^\\([ntbrf\\\"])//) {
+			$str .= "\n" if $1 eq "n";
+			$str .= "\t" if $1 eq "t";
+			$str .= "\b" if $1 eq "b";
+			$str .= "\r" if $1 eq "r";
+			$str .= "\f" if $1 eq "f";
+			$str .= "\\" if $1 eq "\\";
+			$str .= "\"" if $1 eq "\"";
+		    }
+		    elsif (s/\\([0-9]+)//) {
+			$str .= chr(oct($1));
+		    }
+		    elsif (s/\\[xX]([0-9a-fA-F]+)//) {
+			$str .= chr(hex($1));
+		    }
+		    else {
+			die "Invalid control sequence." if /^\\/;
+		    }
+		}
+		else {
+		    s/\s*//;
+		    last if /^[^"]/;
+	        }
+            }
+        }
+    }
+    if ($catching_string) {
+        &po_flush($id, $str);
+
+    }
+}
+
+sub po_flush {
+    my $id = $_[0];
+    my $str = $_[1];
+    # We use a translation only if $id is non-empty (we don't include the
+    # PO file header) and if $str is non-empty (the message is translated).
+    if ($id && $str) {
+	$translation{$id} = $str;
+    }
+    $id = "";
+    $str = "";
+}
+
+

@@ -4,6 +4,29 @@
 #ifndef config_INCLUDED
 #define config_INCLUDED 1
 
+// This is a nasty hack to make sure that we have
+// the same sort of setup as was used for 
+// building libosp
+#include "@SPINCLUDEDIR@/config.h"
+
+#ifdef SP_NAMESPACE
+#ifndef GROVE_NAMESPACE
+#define GROVE_NAMESPACE OpenJade_Grove
+#endif
+#ifndef DSSSL_NAMESPACE
+#define DSSSL_NAMESPACE OpenJade_DSSSL
+#endif
+#endif
+
+#define OPENJADE_PACKAGE PACKAGE
+#define OPENJADE_VERSION VERSION
+#ifndef OPENJADE_MESSAGE_DOMAIN
+#define OPENJADE_MESSAGE_DOMAIN ""
+#endif
+#ifndef OPENJADE_LOCALE_DIR
+#define OPENJADE_LOCALE_DIR ""
+#endif
+
 #define SP_INCLUDE_UNISTD_H
 #define SP_POSIX_FILENAMES
 

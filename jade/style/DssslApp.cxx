@@ -14,6 +14,7 @@
 #include "jade_version.h"
 #include "ArcEngine.h"
 #include "Entity.h"
+#include "MessageTable.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -49,6 +50,9 @@ int DssslApp::init(int argc, AppChar **argv)
   setlocale(LC_NUMERIC, "C");
 #endif
 #endif
+  MessageTable::instance()->registerMessageDomain(jstyleModule,
+		  				OPENJADE_MESSAGE_DOMAIN,
+						OPENJADE_LOCALE_DIR);
   return ret;
 }
 
@@ -110,7 +114,8 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'v':
     message(DssslAppMessages::versionInfo,
-	    StringMessageArg(convertInput(JADE_VERSION)));
+	    StringMessageArg(convertInput(SP_T(OPENJADE_PACKAGE))),
+	    StringMessageArg(convertInput(SP_T(OPENJADE_VERSION))));
     // fall through
   default:
     GroveApp::processOption(opt, arg);

@@ -1,4 +1,6 @@
-Changes in OpenJade 1.3.2 (March 2002)
+Changes in OpenJade 1.3.2 (October 2002)
+
+* Build against OpenSP 1.5
 
 * Minor fixes to MIF backend
 

@@ -15,6 +15,8 @@ bindir=@bindir@
 libdir=@libdir@
 datadir=@datadir@
 mandir=@mandir@
+spincludedir=@SPINCLUDEDIR@
+splibdir=@SPLIBDIR@
 
 CXX=@CXX@
 CC=@CC@
@@ -25,14 +27,13 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 
-LIBOBJS=@LIBOBJS@
 LIBS=@LIBS@
 DEFS=@DEFS@ -DDEFAULT_SCHEME_BUILTINS=\"${datadir}/builtins.dsl\"
-INCS=-I$(srcdir) -I$(srcdir)/../include $(INCLUDE)
+INCS=-I$(srcdir) -I$(srcdir)/../include -I$(spincludedir) $(INCLUDE)
 CXXFLAGS=@CXXFLAGS@ $(INCS) $(DEBUG) $(DEFS)
 CFLAGS=@CFLAGS@ $(DEBUG) $(DEFS)
 LDFLAGS=@LDFLAGS@
-MSGGENFLAGS=
+MSGGENFLAGS= -l jstyleModule
 CXXDEPGENFLAGS=-MM
 
 .SUFFIXES: .cxx .c .o .m4 .msg .lo

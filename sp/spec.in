@@ -66,7 +66,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %files lib
 %defattr(-, root, root)
 %{_libdir}/*.so.*
-%{_datadir}/locale/*/LC_MESSAGES/sp.mo
+%{_datadir}/locale/*/LC_MESSAGES/sp4.mo
 
 %files devel
 %defattr(-, root, root)
@@ -76,8 +76,11 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %{_includedir}/@PACKAGE@/*
 
 %changelog
-* Wed Feb 21 2001 Terje Bless <link@tss.no>
+* Fri Apr 09 2004 Terje Bless <link@pobox.com>
+- Tweak name of l10n files; they get the lib's major rev appended.
+
+* Wed Feb 21 2001 Terje Bless <link@pobox.com>
 - Fixed name of l10n message files ("OpenSP" -> "sp").
 
-* Tue Feb 20 2001 Terje Bless <link@tss.no>
+* Tue Feb 20 2001 Terje Bless <link@pobox.com>
 - Tweaked strings, moved to Sourceforge.

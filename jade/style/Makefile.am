@@ -34,15 +34,6 @@ EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
 BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 	InterpreterMessages.h DssslAppMessages.h 
 
-FlowObj.o: FlowObj_inst.cxx
-primitive.o: primitive_inst.cxx
-DssslApp.o: DssslAppMessages.h
-FlowObj.lo: FlowObj_inst.cxx
-primitive.lo: primitive_inst.cxx
-DssslApp.lo: DssslAppMessages.h
-InterpreterMessages.o: InterpreterMessages.h
-InterpreterMessages.lo: InterpreterMessages.h
-
 SUFFIXES = .m4 .msg 
 
 .m4.cxx:
@@ -50,3 +41,4 @@ SUFFIXES = .m4 .msg
 
 %.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
+

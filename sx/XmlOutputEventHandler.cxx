@@ -137,6 +137,15 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
     intEnts_ =
       new EncodeOutputCharStream(intEntFile_, app_->outputCodingSystem());
 
+    /* If we are expanding internal entities, we are definitely not
+       generating a reference in the internal subset to an internal
+       entities driver file. Likewise for external entities. */
+    if (options_.expInt)
+      options_.intDecl= false;
+
+    if (options_.expExt)
+      options_.extDecl= false;
+
     /* Make a NullOutputByteStream to write to when we want to throw
        things away. This is only used when we are not expanding internal
        entities. */
@@ -567,13 +576,13 @@ void XmlOutputEventHandler::maybeStartDoctype(Boolean &doctypeStarted, const Dtd
 
   /* If requested, include pointers in the instance's internal subset
      to driver files which define internal/external entities. */
-  if (! options_.expExt && options_.extDecl) {
+  if (options_.extDecl) {
     os() << "<!ENTITY % external-entities SYSTEM \""
 	 << EXT_ENT_FILE << "\">"
 	 << RE << "%external-entities;" << RE;
   }
 
-  if (! options_.expInt && options_.intDecl) {
+  if (options_.intDecl) {
     os() << "<!ENTITY % internal-entities SYSTEM \""
 	 << INT_ENT_FILE << "\">"
 	 << RE << "%internal-entities;" << RE;
@@ -584,6 +593,11 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
 {
   const Dtd &dtd = event->dtd();
   Boolean doctypeStarted = 0;
+
+  if (options_.expInt || options_.expExt) {
+    maybeStartDoctype(doctypeStarted, dtd);
+  }
+
   if (options_.notation) {
     Dtd::ConstNotationIter iter(dtd.notationIter());
     for (;;) {
@@ -618,7 +632,7 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
 	                StringMessageArg(entity->name()));
 	}
 	os() << " NDATA " << generalName(extDataEntity->notation()->name(), nameBuf_) << ">" << RE;
-      }	
+      }
     }
   }
   if (options_.id || options_.attlist) {

@@ -366,6 +366,7 @@ private:
   void checkIdrefs();
   void checkTaglen(Index tagStartIndex);
   void checkSyntaxNamelen(const Syntax &syn);
+  void checkSyntaxNames(const Syntax &syn);
   void checkElementAttribute(const ElementType *e, size_t checkFrom = 0);
   void checkDtd(Dtd &dtd);
   Boolean maybeStatusKeyword(const Entity &entity);

@@ -1053,7 +1053,6 @@ Boolean Parser::parseAttlistDecl()
 	  attributed[i]->setAttributeDef(adlCopy);
 	  curAdl = adlCopy.pointer();
 	}
-	// FIXME check for multiple ID and NOTATION attributes
 	for (size_t j = 0; j < adl->size(); j++) {
 	  size_t index;
 	  if (!curAdl->attributeIndex(adl->def(j)->name(), index)) {
@@ -1471,6 +1470,8 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
   case Param::indicatedReservedName + Syntax::rCONREF:
     if (declaredValue->isId())
       message(ParserMessages::idDeclaredValue);
+    if (declaredValue->isNotation())
+      message(ParserMessages::notationConref);
     def = new ConrefAttributeDefinition(attributeName,
 					declaredValue.extract());
     if (isNotation)
@@ -1694,23 +1695,29 @@ Boolean Parser::parseEntityDecl()
     StringC close;
     switch (bracketed) {
     case InternalTextEntity::starttag:
-      open = syntax().delimGeneral(Syntax::dSTAGO);
-      close = syntax().delimGeneral(Syntax::dTAGC);
+      open = instanceSyntax().delimGeneral(Syntax::dSTAGO);
+      close = instanceSyntax().delimGeneral(Syntax::dTAGC);
       break;
     case InternalTextEntity::endtag:
-      open = syntax().delimGeneral(Syntax::dETAGO);
-      close = syntax().delimGeneral(Syntax::dTAGC);
+      open = instanceSyntax().delimGeneral(Syntax::dETAGO);
+      close = instanceSyntax().delimGeneral(Syntax::dTAGC);
       break;
-    case InternalTextEntity::ms:
-      open = syntax().delimGeneral(Syntax::dMDO);
-      open += syntax().delimGeneral(Syntax::dDSO);
-      close = syntax().delimGeneral(Syntax::dMSC);
-      close += syntax().delimGeneral(Syntax::dMDC);
+    case InternalTextEntity::ms: {
+      const Syntax &syn = 
+	(declType == Entity::parameterEntity) ? syntax() : instanceSyntax();
+      open = syn.delimGeneral(Syntax::dMDO);
+      open += syn.delimGeneral(Syntax::dDSO);
+      close = syn.delimGeneral(Syntax::dMSC);
+      close += syn.delimGeneral(Syntax::dMDC);
       break;
-    case InternalTextEntity::md:
-      open = syntax().delimGeneral(Syntax::dMDO);
-      close = syntax().delimGeneral(Syntax::dMDC);
+    }
+    case InternalTextEntity::md: {
+      const Syntax &syn = 
+	(declType == Entity::parameterEntity) ? syntax() : instanceSyntax();
+      open = syn.delimGeneral(Syntax::dMDO);
+      close = syn.delimGeneral(Syntax::dMDC);
       break;
+    }
     default:
       CANNOT_HAPPEN();
     }

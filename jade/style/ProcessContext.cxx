@@ -113,68 +113,83 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
 {
   ASSERT(processingMode != 0);
   GroveString str;
-  if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
-    charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1, loc);
-  else {
-    EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
-    ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
-    matchSpecificity_ = ProcessingMode::Specificity();
-    bool hadStyle = 0;
-    currentFOTBuilder().startNode(nodePtr, processingMode->name());
-    for (;;) {
-      const ProcessingMode::Rule *rule
-       = vm().processingMode->findMatch(nodePtr, *vm_.interp, *vm_.interp,
+
+  if (nodePtr->charChunk(*vm_.interp, str) == accessOK) {
+    if (!processingMode->hasCharRules()) {
+      currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
+      return;
+    }
+    else if (chunk) {
+      NodePtr ptr = nodePtr;
+      for (int i = 0; i < str.size(); i++) {
+        processNode(ptr, processingMode, loc, 0);
+        ptr->nextSibling(ptr);
+      }
+      return;
+    }
+  }
+
+  EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
+  ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
+  matchSpecificity_ = ProcessingMode::Specificity();
+  bool hadStyle = 0;
+  currentFOTBuilder().startNode(nodePtr, processingMode->name());
+  for (;;) {
+    const ProcessingMode::Rule *rule
+     = vm().processingMode->findMatch(nodePtr, *vm_.interp, *vm_.interp,
 					matchSpecificity_);
-      if (!rule) {
-	if (hadStyle) {
-	  currentStyleStack().pushEnd(vm(), currentFOTBuilder());
-	  currentFOTBuilder().startSequence();
-	}
+    if (!rule) {
+      if (hadStyle) {
+        currentStyleStack().pushEnd(vm(), currentFOTBuilder());
+        currentFOTBuilder().startSequence();
+      }
+      if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
+        currentFOTBuilder().charactersFromNode(nodePtr, str.data(), 1);
+      else 
         processChildren(processingMode, loc);
-	break;
-      }
-      if (!matchSpecificity_.isStyle()) {
-	SosofoObj *sosofoObj;
-        InsnPtr insn;
-	rule->action().get(insn, sosofoObj);
-	if (hadStyle) {
-	  currentStyleStack().pushEnd(vm(), currentFOTBuilder());
-	  currentFOTBuilder().startSequence();
-	}
-	if (sosofoObj)
-	  sosofoObj->process(*this);
-	else {
-	  ELObj *obj = vm().eval(insn.pointer());
-	  if (vm_.interp->isError(obj)) {
-	    if (processingMode->name().size() == 0)
-	      processChildren(processingMode, loc);
-	  }
-	  else {
-	    ELObjDynamicRoot protect(*vm_.interp, obj);
-	    ((SosofoObj *)obj)->process(*this);
-	  }
-	}
-	break;
-      }
+      break;
+    }
+    if (!matchSpecificity_.isStyle()) {
       SosofoObj *sosofoObj;
       InsnPtr insn;
       rule->action().get(insn, sosofoObj);
-      ELObj *obj = vm().eval(insn.pointer());
-      if (!vm_.interp->isError(obj)) {
-	if (!hadStyle) {
-	  currentStyleStack().pushStart();
-	  hadStyle = 1;
-	}
-	currentStyleStack().pushContinue((StyleObj *)obj, rule, nodePtr, vm_.interp);
+      if (hadStyle) {
+	currentStyleStack().pushEnd(vm(), currentFOTBuilder());
+	currentFOTBuilder().startSequence();
       }
+      if (sosofoObj) 
+        sosofoObj->process(*this);
+      else {
+	ELObj *obj = vm().eval(insn.pointer());
+	if (vm_.interp->isError(obj)) {
+	  if (processingMode->name().size() == 0)
+	    processChildren(processingMode, loc);
+	}
+        else { 
+          ELObjDynamicRoot protect(*vm_.interp, obj);
+            ((SosofoObj *)obj)->process(*this);
+        }
+      }
+      break;
     }
-    if (hadStyle) {
-      currentFOTBuilder().endSequence();
-      currentStyleStack().pop();
+    SosofoObj *sosofoObj;
+    InsnPtr insn;
+    rule->action().get(insn, sosofoObj);
+    ELObj *obj = vm().eval(insn.pointer());
+    if (!vm_.interp->isError(obj)) {
+      if (!hadStyle) {
+        currentStyleStack().pushStart();
+        hadStyle = 1;
+      }
+      currentStyleStack().pushContinue((StyleObj *)obj, rule, nodePtr, vm_.interp);
     }
-    currentFOTBuilder().endNode();
-    matchSpecificity_ = saveSpecificity;
   }
+  if (hadStyle) {
+    currentFOTBuilder().endSequence();
+    currentStyleStack().pop();
+  }
+  currentFOTBuilder().endNode();
+  matchSpecificity_ = saveSpecificity;
 }
 
 void ProcessContext::nextMatch(StyleObj *overridingStyle, const Location &loc)

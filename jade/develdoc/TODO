@@ -1,4 +1,24 @@
+* Further cleanups of the query implementation: remove the need
+  to store ProcessingMode * and Interpreter * in QueryRule
+   
+* Fix bug in calculation of query nl_: must make sure we use the root
+  of the `grove being processed'.
+
+* Think about optimizations to speed up ProcessingMode::find...Rule()
+  in the presence of many query rules.
+
+* Relax msggen restrictions on the relevant clauses field; put
+  the relevant standard in there as well - we have at least
+  ISO 8879:1986 (SGML), 
+  IETF RFC2141 (URNs), 
+  ISO/IEC 10179:1996 (DSSSL), 
+  AFDR (architectures),
+  FSIDR (formal system identifiers) 
+
 * Allow different options for spec parser and doc parser ?
+  Idea: change semantics of cmdline so that parser options
+  before the -d flag apply only to the spec parser, options
+  after it only to the doc parser.
 
 Things which are missing and need a lot of work
 ===============================================
@@ -25,213 +45,14 @@ Things which are missing and need a lot of work
   groups. Also adjust the inclusions/exclusions. Optimization: recompile 
   only those which actually use #ALL/#IMPLICIT.
 
+* Annex K DTD data entities: add a DTD notation framework. Applications
+  should have a way to register DTD notation handlers which would then
+  be called for DTD data entities with the corresponding notation. They
+  would get a pointer to the entity and to the current Dtd and would
+  add the element and entity declarations they extract from the entity
+  to the Dtd.
+
 * check table-auto-width and multi-process features.
-
-* An XSLFO backend ? Would try to approximate the DSSSL FOT into an XSLFO
-  document. Then we could take advantage of existing XSL formatters. We could
-  also drop JadeTeX in favor of PassiveTeX (when it gets ready) then.
-
-* TeXFOTBuilder: Only output Start/EndNode pairs for nodes actually referred to
-  (see RtfFOTBuilder).
-
-* Do page feature in the front-end.
-
-* TeX backend: Implement general indirect FOs by outputting relevant info from
-  a TeX run and reading that info in the next OJ run.
-
-==============================================================================
-
-For reference, here is how some of this can be hacked in jadetex using 
-sgml-parse:
-
-cat >>jadetex.cfg <<EOF
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% page-number and category-page-number support
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%
-% We need a counter totalpages which truly counts the pages 
-% shipped out so far (unlike page, which counts something 
-% like the DSSSL category-page-number).  
-%
-\newcounter{totalpages}
-\setcounter{totalpages}{1}
-
-% Wow, changing the LaTeX output routine !
-\let\@@outputpage\@outputpage
-\def\@outputpage{\@@outputpage\stepcounter{totalpages}}
-
-% Produce an SGML file which can be read by sgml-parse
-\newwrite\@dssslindexfile
-\immediate\openout\@dssslindexfile=\jobname.index
-\begingroup
-  \catcode`\#=12
-  \immediate\write\@dssslindexfile
-  {<!doctype pagelist [^^J %
-<!element pagelist - - (node+) >^^J 
-<!element node - - (firstarea,node*,lastarea) >^^J 
-<!attlist node id ID #IMPLIED >^^J 
-<!element (firstarea,lastarea) - - EMPTY >^^J 
-<!attlist (firstarea,lastarea)^^J   
-page NUMBER #REQUIRED^^J   
-category NUMBER #REQUIRED >^^J%
-]>^^J%
-<pagelist>}
-\endgroup
-\typeout{Writing DSSSL page number information to \jobname.index.}
-
-\newcounter{elno}
-\let\@@Node\Node
-\def\Node#1{%
-  \@@Node{#1}%
-  \DEBUG{Label \Label}%
-  \DEBUG{Element \Element}%
-  \def\pgid{}%
-  \ifx\Label\@empty
-    \ifx\Element\@empty\else
-     \setcounter{elno}{\Element}%
-     \addtocounter{elno}{1}%
-     \edef\pgid{ELNO\arabic{elno}}%
-    \fi
-  \else
-    \let\pgid\Label
-  \fi
-    \immediate\write\@dssslindexfile
-    {<node\ifx\pgid\@empty\else\space id="\pgid"\fi>^^J
-       <firstarea page="\arabic{totalpages}" 
-                  category="\arabic{page}">}}
-\let\@@endNode\endNode
-\def\endNode#1{%
-  \DEBUG{endNode: \Label, \Element}%
-    \immediate\write\@dssslindexfile
-    { <lastarea page="\arabic{totalpages}"
-                category="\arabic{page}">^^J</node>}%
-  \@@endNode{#1}}
-\let\@@endFOT\endFOT
-\def\endFOT{%
- \immediate\write\@dssslindexfile{</pagelist>}%
- \immediate\closeout\@dssslindexfile
- \@@endFOT}
-
-EOF
-
-Explanation for the TeXagnostics: What this does is write an SGML file
-xyz.index (assuming you started with xyz.sgml from which jade -ttex produced 
-xyz.tex) with the following DTD
-
-<!element pagelist - - (node+) >
-<!element node - - (firstarea,node*,lastarea) >
-<!attlist node id ID #IMPLIED >
-<!element (firstarea,lastarea) - - EMPTY >
-<!attlist (firstarea,lastarea)
-	page NUMBER #REQUIRED
-	category NUMBER #REQUIRED >
- 
-jadetex emits a node element for each node in the FOT (in reality there
-are no nodes in the FOT, but the TeXFOTBuilder emits enough information
-for jadetex to know which node was current when a FO was created).
-
-The page and category attributes of the firstarea and lastarea elements 
-contain the values we want to get via 
-
-(page-number first-area-of-node: nd)
-(page-number last-area-of-node: nd)
-(category-page-number first-area-of-node: nd)
-(category-page-number last-area-of-node: nd)
-
-if nd is the node in question.
-
-Here is how to define page-number and category-page-number using sgml-parse.
-The ugly thing is that the name of the index file is hardcoded. This 
-could be improved using the -V extensions of OpenJade.
-
-cat >>page-numbers.dsl <<EOF
-
-(define index-sysid "xyz.index")
-(define index-page-grove (sgml-parse index-sysid))
-
-(define (page-number #!key first-area-of-node last-area-of-node) 
-  (wrap-generated-object
-  (if (and first-area-of-node last-area-of-node)
-     (error "page-number accepts at most one key argument")
-     (let* ((snl (or first-area-of-node last-area-of-node (current-node))) 
-            (area (if last-area-of-node "LASTAREA" "FIRSTAREA"))
-	    (tid (or (id snl) (string-append "ELNO" 
-					     (format-number
-					      (all-element-number snl) "1")))))
-       (if tid
-	   (string->number 
-	    (or (attribute-string 
-		 "PAGE" (select-elements 
-			 (children (element-with-id tid index-page-grove))
-			 area))
-		"0"))
-	   (error "page-number currently works only on elements 
-and nodes with id"))))))
-	   
-(define (category-page-number #!key first-area-of-node last-area-of-node) 
-  (wrap-generated-object
-  (if (and first-area-of-node last-area-of-node)
-     (error "category-page-number accepts at most one key argument")
-     (let* ((snl (or first-area-of-node last-area-of-node (current-node))) 
-            (area (if last-area-of-node "LASTAREA" "FIRSTAREA"))
-	    (tid (or (id snl) (string-append "ELNO" 
-					     (format-number
-					      (all-element-number snl) "1")))))
-       (if tid
-	   (string->number 
-	    (or (attribute-string 
-		 "CATEGORY" (select-elements 
-			 (children (element-with-id tid index-page-grove))
-			 area))
-		"0"))
-	   (error "category-page-number currently works only on elements 
-and nodes with id"))))))
-
-
-;; I used wrap-generated-object to fake a new type for generated objects.
-
-(define (wrap-generated-object x) (cons 'generated-object x))
-
-(define (generated-object? x) 
-  (and (pair? x) (equal? (car x) 'generated-object)))
-
-(define (unwrap-generated-object x) 
-  (if (generated-object? x) 
-      (cdr x)
-      (error "generated object required")))
-
-
-;; Of course we also need some of the DSSSL functions dealing with
-;; generated objects.
-
-; This is a *very* partial implementation of general-indirect-sosofo.
-(define (general-indirect-sosofo fun #!rest li) 
-  (fun (map unwrap-generated-object li)))
-
-(define (number-indirect-sosofo x #!key (format "1") (add 0) (multiple 1))
-  (let ((y (unwrap-generated-object x)))
-    (if (not (number? y))
-	(error "number-indirect-sosofo: kernel of generated object 
-not a number")
-	(let ((n (+ add y))) 
-	  (if (= 0 (remainder n multiple))
-	      (literal (format-number n format))
-	      (literal ""))))))
-
-(define (asis-indirect-sosofo x)
-  (let ((y (unwrap-generated-object x)))
-    (if (not (sosofo? y))
-	(error "asis-indirect-sosofo: kernel of generated object 
-not a sosofo")
-	y)))
-
-EOF
-
-==============================================================================
 
 
 Simple things
@@ -246,21 +67,26 @@ Simple things
   SchemeParserMessages (and more...). 
 
 * Set up framework for I18N: generating .po from .msg, po/OpenXYZ.pot from ../*.po,
-  generate and install .mo files. See GNU gettext Makefile.in.in.
+  generate and install .mo files. This has been done for OpenSP,
+  still to do for OpenJade. 
+  
+  If you add a new .msg file, you now have to remember to add it 
+  to po/POTFILES.in.
 
-* Remove FOTBuilder::characters(const Vector<CharacterNIC> &) and instead add
-  a procedure that lets the backend query character properties for a Char
-  array. Makes storing parts of the FOT more efficient (otherwise,
-  SaveFOTBuilder will have to store the NIC Vectors, for example.)
-  Should be done before next release.
+  Adding support for a new language is done by:
+  1) cp po/OpenSP.pot <lang>.po	
+  2) Add translations in po/<lang>.po
+  3) cvs add po/<lang>.po 
+  4) Add <lang> to ALL_LINGUAS in configure.in
+  5) cvs commit configure.in po/<lang>.po
+  Here <lang> stands for the proper 2-letter language code 
+  (is that ISO 639 ?)
 
-* A way for backends to declare/access extension character properties.
-  (Not needed until we have a backend that actually would do this.)
-
-* Validation of extension flow objects. (Not very important, since the backends
-  can handle these special cases without major effort.) Instead we could add a
-  FOTBuilder::FOMessage() non-virtual, so that backends may produce consistent
-  error messages without knowing about ProcessContext internals.
+  Still to do: figure out how to create translated .rc files from
+  the translations in <lang>.po. This will need some perl magic
+  to read in <lang>.po, then go over the .rc file and for each string,
+  look up the translation. Then write out a translated .rc file 
+  containing the proper language identification (ask Didier about this). 
 
 
 Things which have to be added to the jade internals documentation
@@ -283,13 +109,12 @@ Things which have to be added to the jade internals documentation
 
 * messages: module stuff, message numbers 
 
-
 Reorganization
 ==============
 
 * move the generated config.h files to toplevel.
 
-* clean up the mess of SP_ defines
+* clean up the mess of SP_ defines:
  
-* replace many SP_ defines by their more `standard' automake
+  replace many SP_ defines by their more `standard' automake
   names (see the bottom of acconfig.h)

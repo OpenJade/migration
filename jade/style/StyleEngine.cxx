@@ -168,7 +168,6 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
     }
     interpreter_->endPart();
   }
-  interpreter_->compile();
 }
 
 
@@ -179,18 +178,18 @@ StyleEngine::~StyleEngine()
 
 void StyleEngine::process(const NodePtr &node, FOTBuilder &fotb)
 {
+  interpreter_->compile(node);
   if (interpreter_->style()) {
     ProcessContext context(*interpreter_, fotb);
     context.process(node);
   }
   else {
-    interpreter_->transformationMode()->compile(*interpreter_, node);
     FileOutputByteStream outputFile_;
     if (outputFile_.open("jade-grove.out")) {
-      DocumentGenerator docg(interpreter_, new RecordOutputCharStream(
+      DocumentGenerator docgen(interpreter_, new RecordOutputCharStream(
                                  new EncodeOutputCharStream(&outputFile_,
                                    outputCodingSystem_)));
-      docg.emit(node);
+      docgen.emit(node);
     }
   }
 }

@@ -164,18 +164,19 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installCharProperties();
 }
 
-void Interpreter::compile()
+void Interpreter::compile(const NodePtr &root)
 {
   // FIXME compile all definitions
   compileInitialValues();
-  initialProcessingMode_.compile(*this);
+  initialProcessingMode_.compile(*this, root);
   NamedTableIter<ProcessingMode> iter(processingModeTable_);
   for (;;) {
     ProcessingMode *mode = iter.next();
     if (!mode)
       break;
-    mode->compile(*this);
+    mode->compile(*this, root);
   }
+  transformationMode_.compile(*this, root);
   compileCharProperties();
   compileDefaultLanguage();
   checkGrovePlan();

@@ -46,7 +46,8 @@ int DssslApp::init(int argc, AppChar **argv)
   setlocale(LC_NUMERIC, "C");
 #endif
   MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
-                                                  OPENJADE_PACKAGE);
+                                                  OPENJADE_PACKAGE,
+						  OPENJADE_LOCALE_DIR);
   return ret;
 }
 

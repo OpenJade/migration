@@ -196,3 +196,6 @@ E0+badTableContent++flow object not accepted by port; in a table, only either ta
 E0+badTablePartHF++flow object not accepted by port; only table-row or table-cell flow objects accepted
 E0+badTablePartBody++flow object not accepted by port; only table-column flow objects followed by table-row or table-cell flow objects allowd
 E0+badTableRow++flow object not accepted by port; only table-cell flow objects accepted
+E0+priorityNotNumber++priority-expression must be a number
+E0+queryNotNodelist++query-expression must be a node-list
+E0+sorryPriority++Sorry, non-integral priorities not implemented

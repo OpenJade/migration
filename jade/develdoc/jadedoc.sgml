@@ -540,10 +540,6 @@ __declspec(dllimport)
         before the &lt;identifier> field, it specifies a message fragment.
         Message fragments are used in building up messages.</para>
 
-      <para>Message numbers should be unique across all 
-        <filename>.msg</filename> files in a single library or 
-        application.</para>
-
       <para>Message arguments come from classes derived from
 	<classname>MessageArg</classname>.
 	<classname>StringMessageArg</classname> is a string, 

@@ -1,0 +1,11 @@
+<!doctype a [
+<!element a - o (b,i) >
+<!element b - o (c,f) >
+<!element c - o (d,e) > 
+<!element f - o (g,h) >
+<!element i - o (j,m) >
+<!element j - o (k,l) >
+<!element m - o (n,o) >
+<!element (d,e,g,h,k,l,n,o) - o empty >
+]>
+<a><b><c><d><e><f><g><h><i><j><k><l><m><n><o>

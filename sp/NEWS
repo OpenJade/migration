@@ -1,5 +1,9 @@
 Changes in OpenSP 1.4
 
+* OpenSP now supports long options. 
+
+* OpenSP is internationalized (currenly only German translations are provided).
+
 * New options -n and -x to see message numbers/relevant clauses with messages.
 
 * More of Annex K supported: SGML declarations on subdocs,

@@ -130,7 +130,7 @@ E2+attributeValueNumberToken+7.9.4p1+value of attribute %2 invalid: %1 cannot st
 E2+attributeValueName+7.9.4p1+value of attribute %2 invalid: %1 cannot start a name
 E1+attributeMissing+7.9p4+non-impliable attribute %1 not specified but OMITTAG NO and SHORTTAG NO
 E1+requiredAttributeMissing+7.9p4 7.9.1.1p2+required attribute %1 not specified
-E1+currentAttributeMissing+7.9.1.1p2+first occurrence of current attribute %1 not specified
+E1+currentAttributeMissing+7.9.1.1p2+first occurrence of CURRENT attribute %1 not specified
 E1+invalidNotationAttribute+7.9.4.4p1+%1 is not a notation name
 E1+invalidEntityAttribute+7.9.4.3p1+%1 is not a general entity name
 E3+attributeValueNotInGroup+7.9.4.1p2+value of attribute %2 cannot be %1; must be one of %3
@@ -247,7 +247,7 @@ E0+instanceStartOmittag+7.2p1+document instance must start with document element
 Q1+grplvl+11.2.4.5p1+content model nesting level exceeds GRPLVL (%1)
 Q1+grpgtcnt+11.2.4.5p2+grand total of content tokens exceeds GRPGTCNT (%1)
 E0+unclosedStartTagShorttag+7.4.1p2+unclosed start-tag requires SHORTTAG YES
-E0+netEnablingStartTagShorttag+7.4.1p2+net-enabling start-tag requires SHORTTAG YES
+E0+netEnablingStartTagShorttag+7.4.1p2+NET-enabling start-tag requires SHORTTAG YES
 E0+unclosedEndTagShorttag+7.5.1p2+unclosed end-tag requires SHORTTAG YES
 E0+multipleDtds+7.1p6+DTDs other than base allowed only if CONCUR YES or EXPLICIT YES
 E0+afterDocumentElementEntityEnd+7.2p1+end of entity other than document entity after document element
@@ -256,13 +256,13 @@ E0+characterReferenceAfterDocumentElement+7.2p1+character reference illegal afte
 E0+entityReferenceAfterDocumentElement+7.2p1+entity reference illegal after document element
 E0+markedSectionAfterDocumentElement+7.2p1+marked section illegal after document element
 E3+requiredElementExcluded+11.2.5.2p5+the %1 occurrence of %2 in the content model for %3 cannot be excluded at this point because it is contextually required
-E3+invalidExclusion+11.2.5.2p4+the %1 occurrence of %2 in the content model for %3 cannot be excluded because it is neither inherently optional nor a member of an or group
+E3+invalidExclusion+11.2.5.2p4+the %1 occurrence of %2 in the content model for %3 cannot be excluded because it is neither inherently optional nor a member of an OR group
 E0+attributeValueShorttag+7.9.3.1+an attribute value specification must be an attribute value literal unless SHORTTAG YES is specified
 E0+conrefNotation+7.9.4.4p2+value cannot be specified both for notation attribute and content reference attribute
 E1+duplicateNotationDeclaration+11.4p3+notation %1 already defined
 E1+duplicateShortrefDeclaration+11.5p3+short reference map %1 already defined+first defined here
 E1+duplicateDelimGeneral+13.4.6.1+general delimiter role %1 already defined
-Q1+idrefGrpcnt+7.9.4.5p5+number of id references in start-tag must not exceed GRPCNT (%1)
+Q1+idrefGrpcnt+7.9.4.5p5+number of ID references in start-tag must not exceed GRPCNT (%1)
 Q1+entityNameGrpcnt+7.9.4.5p6+number of entity names in attribute specification list must not exceed GRPCNT (%1)
 Q2+attsplen+7.9.2+normalized length of attribute specification list must not exceed ATTSPLEN (%1); length was %2
 E1+duplicateDelimShortref+13.4.6p2+short reference delimiter %1 already specified
@@ -321,7 +321,7 @@ E2+idlinkElementType+12.2.3p2+type %1 of element with ID %2 not associated eleme
 E0+datatagNotImplemented++DATATAG feature not implemented
 E0+startTagMissingName+7.4p1+generic identifier specification missing after document type specification in start-tag
 E0+endTagMissingName+7.5p1+generic identifier specification missing after document type specification in end-tag
-E0+startTagGroupNet+7.4.1.3p1+a net-enabling start-tag cannot include a document type specification
+E0+startTagGroupNet+7.4.1.3p1+a NET-enabling start-tag cannot include a document type specification
 E0+documentElementUndefined+11.1p10+DTD did not contain element declaration for document type name
 E0+badDefaultSgmlDecl++invalid default SGML declaration
 E1+nonExistentEntityRef++reference to entity %1 for which no system identifier could be generated+entity was defined here
@@ -352,7 +352,7 @@ E3+numericCharRefUnknownBase++cannot convert character reference to number %1 be
 E1+numericCharRefBadInternal++character reference to number %1 cannot be converted because of problem with internal character set
 E1+numericCharRefNoInternal++cannot convert character reference to number %1 because character not in internal character set
 E0+wwwRequired++Web SGML adaptations were used but minimum literal was not "ISO 8879:1986 (WWW)"
-E1+attributeTokenNotUnique++token %1 can be value for more multiple attributes so attribute name required
+E1+attributeTokenNotUnique++token %1 can be value for multiple attributes so attribute name required
 Q1+hexNumberLength++length of hex number must not exceed NAMELEN (%1)
 W1+entityNameSyntax++%1 is not a valid name in the declared concrete syntax
 
@@ -363,8 +363,8 @@ W0+exclusion++exclusion
 W0+numberDeclaredValue++NUMBER or NUMBERS declared value
 W0+nameDeclaredValue++NAME or NAMES declared value
 W0+nutokenDeclaredValue++NUTOKEN or NUTOKENS declared value
-W0+conrefAttribute++conref attribute
-W0+currentAttribute++current attribute
+W0+conrefAttribute++CONREF attribute
+W0+currentAttribute++CURRENT attribute
 W0+tempMarkedSection++TEMP marked section
 W0+instanceIncludeMarkedSection++included marked section in the instance
 W0+instanceIgnoreMarkedSection++ignored marked section in the instance
@@ -380,7 +380,7 @@ W0+rank++rank stem
 W0+missingSystemId++no system id specified
 W0+psComment++comment in parameter separator
 W0+namedCharRef++named character reference
-W0+andGroup++and group
+W0+andGroup++AND group
 W0+attributeValueNotLiteral++attribute value not a literal
 W0+missingAttributeName++attribute name missing
 W0+elementGroupDecl++element declaration for group of element types
@@ -391,7 +391,7 @@ W0+commentDeclMultiple++multiple comments in comment declaration
 W0+missingStatusKeyword++no status keyword
 W0+multipleStatusKeyword++multiple status keywords
 W0+instanceParamEntityRef++parameter entity reference in document instance
-W0+current++current attribute
+W0+current++CURRENT attribute
 W0+minimizationParam++element type minimization parameter
 W0+refc++reference not terminated by REFC delimiter
 W0+pcdataNotFirstInGroup++#PCDATA not first in model group
@@ -406,7 +406,7 @@ W0+attributeValueExternalEntityRef++reference to external entity in attribute va
 W1+dataCharDelim++character %1 is the first character of a delimiter but occurred as data
 W0+explicitSgmlDecl++SGML declaration was not implied
 W0+internalSubsetMarkedSection++marked section in internal DTD subset
-E0+nestcWithoutNet++net-enabling start-tag not immediately followed by null end-tag
+E0+nestcWithoutNet++NET-enabling start-tag not immediately followed by null end-tag
 E0+contentAsyncEntityRef++entity end in different element from entity reference
 E0+immednetRequiresEmptynrm++NETENABL IMMEDNET requires EMPTYNRM YES
 W0+nonSgmlCharRef++reference to non-SGML character

@@ -271,6 +271,14 @@ SOURCE=.\CmdLineApp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\DtdDeclEventHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DtdDeclEventHandler.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\CmdLineAppMessages.msg
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -947,10 +955,6 @@ SOURCE=.\StorageManager.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\StringVectorMessageArg.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\Syntax.cxx
 # End Source File
 # Begin Source File
@@ -1457,6 +1461,10 @@ SOURCE=.\ksc5601.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\koi8-r.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\Link.h
 # End Source File
 # Begin Source File
@@ -1825,10 +1833,6 @@ SOURCE=..\include\StringResource.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\StringVectorMessageArg.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\SubstTable.cxx
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1958,6 +1962,11 @@ SOURCE=.\CatalogMessages.rc
 # Begin Source File
 
 SOURCE=.\CmdLineAppMessages.rc
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\EntityAppMessages.rc
 # PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File

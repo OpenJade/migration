@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #include "splib.h"
@@ -6,7 +6,6 @@
 #include "ParserMessages.h"
 #include "MessageArg.h"
 #include "TokenMessageArg.h"
-#include "StringVectorMessageArg.h"
 #include "token.h"
 #include "macros.h"
 

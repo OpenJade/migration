@@ -23,4 +23,4 @@ SUFFIXES = .msg .m4 .rc
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_builddir)/msggen.pl $(MSGGENFLAGS) $<
+	 [ ! -f $(top_srcdir)/msggen.pl ] || $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifndef MessageArg_INCLUDED
@@ -8,6 +8,7 @@
 #endif
 
 #include "StringC.h"
+#include "Vector.h"
 #include "rtti.h"
 
 #ifdef SP_NAMESPACE
@@ -57,6 +58,16 @@ public:
   OtherMessageArg();
   void append(MessageBuilder &) const;
 };
+
+SP_API class StringVectorMessageArg : public MessageArg {
+public:
+  StringVectorMessageArg(const Vector<StringC> &);
+  MessageArg *copy() const;
+  void append(MessageBuilder &) const;
+private:
+  Vector<StringC> v_;
+};
+
 
 #ifdef SP_NAMESPACE
 }

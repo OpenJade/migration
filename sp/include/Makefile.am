@@ -25,7 +25,7 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 	SJISCodingSystem.h SOEntityCatalog.h Sd.h SdText.h \
 	SearchResultMessageArg.h SgmlParser.h ShortReferenceMap.h \
 	StdioStorage.h StorageManager.h StringC.h StringOf.cxx StringOf.h \
-	StringResource.h SubstTable.cxx SubstTable.h Syntax.h Text.h \
+	StringResource.h SubstTable.h Syntax.h Text.h \
 	TranslateCodingSystem.h TypeId.h URLStorage.h UTF8CodingSystem.h \
 	UnicodeCodingSystem.h UnivCharsetDesc.h Vector.cxx Vector.h \
 	XMLCodingSystem.h XcharMap.cxx XcharMap.h constant.h \

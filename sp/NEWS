@@ -7,6 +7,8 @@ Changes in OpenSP 1.5pre6
   when the DTD resides on a name-based "Virtual Host".
   Thanks to 'tbe'.
 
+* Some GCC >= 2.96 fixes
+
 Changes in OpenSP 1.5pre5
 
 * Fix 32-bit assumptions so we build on 64-bit platforms such

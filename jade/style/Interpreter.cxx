@@ -44,7 +44,9 @@ size_t maxObjSize()
     sizeof(MacroFlowObj),
     sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
     sizeof(LangObj),
+#ifdef SP_HAVE_LOCALE
     sizeof(RefLangObj),
+endif
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)

@@ -10,18 +10,20 @@
 # Original SP Makefile Copyright (c) 1994, 1995, 1996 James Clark
 
 TOP=@TOP@
+top_builddir=.
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
 datadir=@datadir@
 libdir=@libdir@
+includedir=@includedir@
 
 LIBTOOL=@LIBTOOL@
 
 SP_LIBDIRS=lib $(XLIBDIRS)
-LIBDIRS=lib grove spgrove style
-PROGDIRS=spcat jade nsgmls spam sgmlnorm spent sx 
+LIBDIRS=lib 
+PROGDIRS=spcat nsgmls spam sgmlnorm spent sx 
 dodirs=$(LIBDIRS) $(PROGDIRS)
 
 # Automatic template instantiation can cause compilers to generate
@@ -33,8 +35,8 @@ $(TARGETS): FORCE
 	@$(MAKE) -f Makefile do=$@ $(dodirs)
 	@if test $@ = 'install'; then \
 	  $(LIBTOOL) --finish $(libdir); \
-	  mkdir -p $(datadir); \
-	  cp -f dsssl/builtins.dsl $(datadir); \
+	  mkdir -p $(includedir)/OpenSP; \
+	  cp -f include/*.* generic/*.* $(includedir)/OpenSP; \
 	fi;
 
 $(LIBDIRS): FORCE

@@ -73,9 +73,6 @@ __instantiate(ISetIter<WideChar>)
 __instantiate(Vector<ISetRange<WideChar> >)
 __instantiate(SubstTable<Char>)
 __instantiate(SharedXcharMap<PackedBoolean>)
-#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
-__instantiate(SharedXcharMap<unsigned char>)
-#endif
 __instantiate(SharedXcharMap<EquivCode>)
 #if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
 __instantiate(String<EquivCode>)

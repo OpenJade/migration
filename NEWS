@@ -1,3 +1,7 @@
+Changes in OpenSP 1.5.1
+
+* Start adding testsuite.
+
 Changes in OpenSP 1.5
 
 * Fix crash when "-m" option specified.

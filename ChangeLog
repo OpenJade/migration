@@ -1,3 +1,13 @@
+2002-12-05  Karl Eichwalder  <ke@suse.de>
+
+	* configure.in: Add tests/Makefile.
+
+	* tests: New directory; start testsuite.
+	* tests/Makefile.am: New file.
+	* tests/onsgmls-1: Likewise.
+	* tests/osnorm-1: Likewise.
+	* tests/af-1: Likewise.
+
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 
 	* doc/Makefile.am (docdir): Set to $(datadir)/doc.

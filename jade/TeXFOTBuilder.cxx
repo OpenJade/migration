@@ -1915,8 +1915,9 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       case '>':
         os() << char(*s);   
 	if (!inMath_)
-          os() << "\/"; // break ligatures
+          os() << "\\/"; // break ligatures
         break;
+      }
     }
   }
 }

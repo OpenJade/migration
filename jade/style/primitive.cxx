@@ -1601,7 +1601,8 @@ DEFPRIMITIVE(CharProperty, argc, argv, context, interp, loc)
   if (!argv[1]->charValue(c))
     return argError(interp, loc,
 		    InterpreterMessages::notAChar, 1, argv[1]);
-  return interp.charProperty(*prop, c, loc, (argc > 2) ? argv[2] : 0);
+  return interp.lookupCharProperty(*prop)->
+    value(c, (argc > 2) ? argv[2] : 0, loc, interp);
 }
 
 DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)

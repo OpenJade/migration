@@ -23,11 +23,10 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 bool debugMode,
 			 bool dsssl2,
                          bool strictMode,
-			 const FOTBuilder::Extension *extensionTable,
-			 const FOTBuilder::Feature *features)
+			 const FOTBuilder::Description &fotbDescr)
 : interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
                                debugMode, dsssl2, 1, strictMode, 
-			       extensionTable, features))
+			       fotbDescr))
 {
 }
 

@@ -70,7 +70,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   ASSERT(processingMode != 0);
   GroveString str;
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
-    currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
+    charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
   else {
     EvalContext::CurrentNodeSetter cns(nodePtr, processingMode, vm());
     ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
@@ -179,9 +179,7 @@ void ProcessContext::processChildren(const ProcessingMode *processingMode)
 inline
 bool isWhiteSpace(Char c, Interpreter &interp)
 {
-  return 
-    interp.charProperty(
-      interp.makeStringC("input-whitespace?"), c, Location(), 0)->isTrue(); 
+  return interp.isInputWhitespace().getValue(c);
 }
 
 static
@@ -234,13 +232,13 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 	      && onlyWhiteSpaceFollows(curNode, *vm().interp)) {
 	    for (size_t n = str.size() - 1; n > 0; n--) {
 	      if (!isWhiteSpace(str[n - 1], *vm().interp)) {
-		currentFOTBuilder().charactersFromNode(curNode, str.data(), n);
+		charactersFromNode(curNode, str.data(), n);
 		return;
 	      }
 	    }
 	    return;
 	  }
-	  currentFOTBuilder().charactersFromNode(curNode, str.data(), str.size());
+	  charactersFromNode(curNode, str.data(), str.size());
 	}
       }
       else {
@@ -252,6 +250,31 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
   }
   else if (vm().currentNode->getDocumentElement(vm().currentNode) == accessOK)
     processNode(vm().currentNode, processingMode);
+}
+
+void ProcessContext::characters(const Char *ch, size_t n)
+{
+  if (vm().interp->fotbDescr().wantCharPropertyNICs) {
+    Vector<FOTBuilder::CharacterNIC> v(n);
+    // FIXME. Assumes Vector<T>::iterator is T*.
+    FlowObj::setImplicitCharNICs(ch, n, v.begin(), *vm().interp);
+    currentFOTBuilder().characters(v);
+  }
+  else
+    currentFOTBuilder().characters(ch, n);
+}
+
+void ProcessContext::charactersFromNode(const NodePtr &nd,
+					const Char *ch, size_t n)
+{
+  if (vm().interp->fotbDescr().wantCharPropertyNICs) {
+    Vector<FOTBuilder::CharacterNIC> v(n);
+    // FIXME. See prev. function.
+    FlowObj::setImplicitCharNICs(ch, n, v.begin(), *vm().interp);
+    currentFOTBuilder().characters(v);
+  }
+  else
+    currentFOTBuilder().charactersFromNode(nd, ch, n);
 }
 
 void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
@@ -559,7 +582,7 @@ void LiteralSosofoObj::process(ProcessContext &context)
   const Char *s;
   size_t n;
   if (str_->stringData(s, n))
-    context.currentFOTBuilder().characters(s, n);
+    context.characters(s, n);
 }
 
 void LiteralSosofoObj::traceSubObjects(Collector &c) const

@@ -22,8 +22,7 @@ class STYLE_API StyleEngine {
 public:
   StyleEngine(Messenger &, GroveManager &,
 	      int unitsPerInch, bool debugMode, bool dsssl2,
-	      bool strictMode, const FOTBuilder::Extension * = 0,
-	      const FOTBuilder::Feature * = 0);
+	      bool strictMode, const FOTBuilder::Description &);
   void defineVariable(const StringC &);
   void parseSpec(SgmlParser &specParser,
 		 const CharsetInfo &charset,

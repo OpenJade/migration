@@ -115,7 +115,11 @@ public:
   virtual bool hasNonInheritedC(const Identifier *) const;
   virtual bool hasPseudoNonInheritedC(const Identifier *) const;
   virtual void setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &);
-  virtual bool setImplicitChar(ELObj *, const Location &, Interpreter &);
+  // Char * is 0 if no implicit character.
+  virtual void setImplicitCharNICs(const Char *, const Location &,
+				   Interpreter &);
+  static void setImplicitCharNICs(const Char *, size_t,
+				  FOTBuilder::CharacterNIC *, Interpreter &);
   void traceSubObjects(Collector &) const;
   void setStyle(StyleObj *);
   void process(ProcessContext &);

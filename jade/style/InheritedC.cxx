@@ -1548,8 +1548,9 @@ void Interpreter::installExtensionInheritedC(Identifier *ident,
 					     const Location &loc)
 {
   ConstPtr<InheritedC> ic;
-  if (pubid.size() != 0 && extensionTable_) {
-    for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
+  if (pubid.size() != 0 && fotbDescr_.extensions) {
+    for (const FOTBuilder::Extension *ep = fotbDescr_.extensions;
+	 ep->pubid; ep++) {
       if (pubid == ep->pubid) {
 	if (ep->boolSetter)
 	  ic = new ExtensionBoolInheritedC(ident, nInheritedC_++, ep->boolSetter);

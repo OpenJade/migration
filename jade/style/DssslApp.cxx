@@ -332,13 +332,12 @@ void DssslApp::processGrove()
 {
   if (!initSpecParser())
     return;
-  const FOTBuilder::Extension *extensions = 0;
-  const FOTBuilder::Feature *features = 0;
-  Owner<FOTBuilder> fotb(makeFOTBuilder(extensions, features));
+  const FOTBuilder::Description *fotbDescr;
+  Owner<FOTBuilder> fotb(makeFOTBuilder(fotbDescr));
   if (!fotb)
     return;
   StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
-                 dsssl2_, strictMode_, extensions, features);
+                 dsssl2_, strictMode_, *fotbDescr);
   for (size_t i = 0; i < defineVars_.size(); i++)
     se.defineVariable(defineVars_[i]);
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this);

@@ -1319,12 +1319,14 @@ const Insn *SetImplicitCharInsn::execute(VM &vm) const
 {
   ASSERT(vm.sp[-1]->asSosofo() != 0);
 
+  Char *cp(0);
   if (vm.currentNode) {
-    ELObjPropertyValue value(*vm.interp, 0);
-    AccessResult ret = vm.currentNode->property(ComponentName::idChar, *vm.interp, value);
-    if (ret == accessOK) 
-      ((FlowObj *)vm.sp[-1])->setImplicitChar(value.obj, loc_, *vm.interp);
+    Char ch;
+    AccessResult ret = vm.currentNode->getChar(*vm.interp, ch);
+    if (ret == accessOK)
+      cp = &ch;
   }
+  ((FlowObj *)vm.sp[-1])->setImplicitCharNICs(cp, loc_, *vm.interp);
   return next_.pointer();
 }
 

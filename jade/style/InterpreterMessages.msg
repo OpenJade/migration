@@ -151,9 +151,14 @@ E1+invalidCharName++%1 not a valid character name
 E1+invalidCharNumber++%1 not a valid character number
 E1+unknownCharProperty++unknown character property %1
 E0+badAddCharProperty++error in character property declaration
-E1+duplicateCharPropertyDecl++duplicate definition for character property %1+first definition was here
-E2+duplicateAddCharProperty++duplicate character property declaration %1 for character %2
-E0+returnNotSosofo++value returned by procedure not a sosofo
+E1+duplicateCharPropertyDecl++character property %1 already declared in same part+first declaration was here
+# FIXME: Would like to report both property name and character, but there is
+# no MessageType2L in Message.h.
+E1+duplicateAddCharProperty++added value for character property %1 already declared in same part+previous declaration was here
+E0+returnNotSosofo++value returned by procedure was not a sosofo
+E1+charPropertyLoop++loop in specification of value of character property %1
+E2+charPropertyNotInteger++value for character property %1 of wrong type: %2 not an integer
+E2+charPropertyNotIntegerOrFalse++value for character property %1 of wrong type: %2 not an integer or the value "#f"
 E1+unknownFeature++%1 not a style or transformation language feature
 E1+missingFeature++undeclared use of feature %1
 W1+unsupportedFeature++feature %1 not supported

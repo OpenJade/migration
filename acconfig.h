@@ -91,9 +91,6 @@
 /* the location we install our messages */
 #undef SP_LOCALE_DIR
 
-/* whether we have the C++ bool type */
-#undef HAVE_BOOL
-
 @TOP@
 
 #error The stuff above TOP goes to the top of config.h.in

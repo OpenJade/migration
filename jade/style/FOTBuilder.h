@@ -80,11 +80,14 @@ public:
     symbolSpreadOutside,
     symbolPageInside,
     symbolPageOutside,
+    symbolInitial,
+    symbolFinal,
     symbolWrap,
     symbolAsis,
     symbolAsisWrap,
     symbolAsisTruncate,
     symbolNone,
+    symbolIndent,
     symbolBefore,
     symbolThrough,
     symbolAfter,
@@ -413,6 +416,10 @@ public:
   virtual void endSideline();
   virtual void startBox(const BoxNIC &);
   virtual void endBox();
+  virtual void startSideBySide(const DisplayNIC&);
+  virtual void endSideBySide();
+  virtual void startSideBySideItem();
+  virtual void endSideBySideItem();
   // Tables
   virtual void startTable(const TableNIC &);
   virtual void endTable();
@@ -544,6 +551,9 @@ public:
   virtual void setLineSep(Length);
   virtual void setBoxSizeBefore(Length);
   virtual void setBoxSizeAfter(Length);
+  virtual void setSideBySideOverlapControl(Symbol);
+  virtual void setSideBySidePreAlign(Symbol);
+  virtual void setSideBySidePostAlign(Symbol);
   virtual void setPositionPointShift(const LengthSpec &);
   virtual void setStartMargin(const LengthSpec &);
   virtual void setEndMargin(const LengthSpec &);
@@ -752,6 +762,10 @@ public:
   void endSideline();
   void startBox(const BoxNIC &);
   void endBox();
+  void startSideBySide(const DisplayNIC&);
+  void endSideBySide();
+  void startSideBySideItem();
+  void endSideBySideItem();
   void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
   void endSimplePageSequenceHeaderFooter();
   void endSimplePageSequence();
@@ -846,6 +860,9 @@ public:
   void setLineSep(Length);
   void setBoxSizeBefore(Length);
   void setBoxSizeAfter(Length);
+  void setSideBySideOverlapControl(Symbol);
+  void setSideBySidePreAlign(Symbol);
+  void setSideBySidePostAlign(Symbol);
   void setPositionPointShift(const LengthSpec &);
   void setStartMargin(const LengthSpec &);
   void setEndMargin(const LengthSpec &);

@@ -1373,6 +1373,12 @@ void Interpreter::installInheritedCs()
   INHERITED_C2("numbered-lines?", GenericBoolInheritedC, &FOTBuilder::setNumberedLines, 1);
   INHERITED_C2("hanging-punct?", GenericBoolInheritedC, &FOTBuilder::setHangingPunct, 0);
   INHERITED_C2("box-open-end?", GenericBoolInheritedC, &FOTBuilder::setBoxOpenEnd, 0);
+  INHERITED_C2("side-by-side-overlap-control", GenericSymbolInheritedC, &FOTBuilder::setSideBySideOverlapControl,
+	       FOTBuilder::symbolIndent);
+  INHERITED_C2("side-by-side-pre-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePreAlign,
+	       FOTBuilder::symbolInitial);
+  INHERITED_C2("side-by-side-post-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePostAlign,
+	       FOTBuilder::symbolInitial);
   INHERITED_C2("truncate-leader?", GenericBoolInheritedC, &FOTBuilder::setTruncateLeader, 0);
   INHERITED_C2("align-leader?", GenericBoolInheritedC, &FOTBuilder::setAlignLeader, 1);
   INHERITED_C2("table-part-omit-middle-header?", GenericBoolInheritedC,

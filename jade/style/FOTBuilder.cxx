@@ -48,11 +48,14 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "spread-outside",
     "page-inside",
     "page-outside",
+    "initial",
+    "final",
     "wrap",
     "asis",
     "asis-wrap",
     "asis-truncate",
     "none",
+    "indent",
     "before",
     "through",
     "after",
@@ -309,6 +312,26 @@ void FOTBuilder::startBox(const BoxNIC &)
 }
 
 void FOTBuilder::endBox()
+{
+  end();
+}
+
+void FOTBuilder::startSideBySide(const DisplayNIC&)
+{
+  start();
+}
+
+void FOTBuilder::endSideBySide()
+{
+  end();
+}
+  
+void FOTBuilder::startSideBySideItem()
+{
+  start();
+}
+
+void FOTBuilder::endSideBySideItem()
 {
   end();
 }
@@ -730,6 +753,18 @@ void FOTBuilder::setBoxSizeAfter(Length)
 {
 }
 
+void FOTBuilder::setSideBySideOverlapControl(Symbol)
+{
+}
+
+void FOTBuilder::setSideBySidePreAlign(Symbol)
+{
+}
+
+void FOTBuilder::setSideBySidePostAlign(Symbol)
+{
+}
+  
 void FOTBuilder::setPositionPointShift(const LengthSpec &)
 {
 }
@@ -1340,6 +1375,9 @@ NO_ARG_CALL(endMarginalia)
 NO_ARG_CALL(endMultiMode)
 NO_ARG_CALL(endScore)
 NO_ARG_CALL(endBox)
+NO_ARG_CALL(endSideBySide);
+NO_ARG_CALL(startSideBySideItem);
+NO_ARG_CALL(endSideBySideItem);
 NO_ARG_CALL(startSideline)
 NO_ARG_CALL(endSideline)
 NO_ARG_CALL(endNode)
@@ -1491,6 +1529,9 @@ SYMBOL_ARG_CALL(setGridPositionCellType)
 SYMBOL_ARG_CALL(setGridColumnAlignment)
 SYMBOL_ARG_CALL(setGridRowAlignment)
 SYMBOL_ARG_CALL(setBoxType)
+SYMBOL_ARG_CALL(setSideBySideOverlapControl)
+SYMBOL_ARG_CALL(setSideBySidePreAlign)
+SYMBOL_ARG_CALL(setSideBySidePostAlign)
 SYMBOL_ARG_CALL(setGlyphAlignmentMode)
 SYMBOL_ARG_CALL(setBoxBorderAlignment)
 SYMBOL_ARG_CALL(setCellRowAlignment)
@@ -1596,6 +1637,7 @@ ONEARG_CALL(startScore, Char)
 ONEREFARG_CALL(startScore, LengthSpec)
 ONEREFARG_CALL(startLineField, LineFieldNIC)
 ONEREFARG_CALL(startBox, BoxNIC)
+ONEREFARG_CALL(startSideBySide, DisplayNIC)
 typedef Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > VectorConstPtrFOTBuilderGlyphSubstTable;
 ONEREFARG_CALL(setGlyphSubstTable, VectorConstPtrFOTBuilderGlyphSubstTable)
 

@@ -1399,6 +1399,13 @@ void PairNodeListObj::traceSubObjects(Collector &c) const
   c.trace(tail_);
 }
 
+bool PairNodeListObj::contains(EvalContext &context, Interpreter &interp,
+                               const NodePtr &nd)
+{
+  return (head_ && head_->contains(context, interp, nd))
+          || tail_->contains(context, interp, nd);
+}
+
 ReverseNodeListObj::ReverseNodeListObj(NodeListObj *nl)
 : nl_(nl), reversed_(0)
 {

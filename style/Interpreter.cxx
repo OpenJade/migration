@@ -2244,12 +2244,37 @@ void Interpreter::installCharProperties()
   cp.def = ELObjPart(makeInteger(0), unsigned(-1));
   makePermanent(cp.def.obj);
   cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("break-before-priority"), cp);  
+  CharProp cp2;
+  cp2.def = ELObjPart(cp.def.obj, unsigned(-1));
+  cp2.loc = Location();
+  cp2.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
+  if(!strictMode_) {
+    static struct {
+      Char c;
+      unsigned short num;
+      unsigned short bbp;
+      unsigned short bap;
+    } chars[] ={
+#define BREAK_PRIORITIES
+#include "charProps.h"
+#undef BREAK_PRIORITIES
+    };
+    for(size_t i = 0; i<SIZEOF(chars); ++i) {
+      ELObj *obj = makeInteger(chars[i].bbp);
+      makePermanent(obj);
+      cp.map->setRange(chars[i].c, chars[i].c + chars[i].num-1,
+		       ELObjPart(obj, unsigned(-1)));
+      if(chars[i].bap!=chars[i].bbp) {
+	obj = makeInteger(chars[i].bap);
+	makePermanent(obj);
+      }
+      cp2.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+			ELObjPart(obj, unsigned(-1)));
+    }
+  }
 
-  cp.def = ELObjPart(makeInteger(0), unsigned(-1));
-  makePermanent(cp.def.obj);
-  cp.map = new CharMap<ELObjPart>(ELObjPart(0, 0));
-  charProperties_.insert(makeStringC("break-after-priority"), cp);  
+  charProperties_.insert(makeStringC("break-before-priority"), cp);  
+  charProperties_.insert(makeStringC("break-after-priority"), cp2);  
 
   cp.def = ELObjPart(makeSymbol(makeStringC("ordinary")), unsigned(-1));
   makePermanent(cp.def.obj);

@@ -100,8 +100,9 @@ public:
   void setPageColumnSep(Length);
   void setPageBalanceColumns(bool);
   void setSpan(long);
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  enum { nHF = FOTBuilder::nHF };
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
   void endAllSimplePageSequenceHeaderFooter();
@@ -918,6 +919,7 @@ RtfFOTBuilder::~RtfFOTBuilder()
 	 << ';';
   }
   os() << "}{\\stylesheet";
+  os() << "{\\s0 Normal;}";
   for (int i = 1; i <= 9; i++)
     os() << "{\\s" << i << " Heading " << i << ";}";
   os() << "}\n";
@@ -2158,7 +2160,7 @@ void RtfFOTBuilder::setSpan(long n)
   specFormat_.span = n > 1;
 }
 
-void RtfFOTBuilder::startSimplePageSequence()
+void RtfFOTBuilder::startSimplePageSequenceSerial()
 {
   inSimplePageSequence_++;
   start();
@@ -2209,7 +2211,7 @@ void RtfFOTBuilder::startSimplePageSequence()
   accumSpace_ = 0;
 }
 
-void RtfFOTBuilder::endSimplePageSequence()
+void RtfFOTBuilder::endSimplePageSequenceSerial()
 {
   if (inlineState_ != inlineFirst) {
     if (hyphenateSuppressed_) {

@@ -59,7 +59,7 @@ finddomain.o loadmsgcat.o localealias.o textdomain.o
 CATOBJS = cat-compat.o ../po/cat-id-tbl.o
 GETTOBJS = intl-compat.o
 DISTFILES.common = Makefile.in linux-msg.sed po2tbl.sed.in \
-xopen-msg.sed $(HEADERS) $(SOURCES)
+xopen-msg.sed $(HEADERS) $(SOURCES) .cvsignore
 DISTFILES = VERSION $(DISTFILES.common)
 DISTFILES.gettext = $(DISTFILES.common) libintl.glibc libintl.inst
 

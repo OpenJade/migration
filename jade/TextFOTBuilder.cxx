@@ -2,7 +2,7 @@
 // Copyright (c) 1999 Avi Kivity
 
 #include <stack>
-#include <algorithm>
+#include <stdlib.h>
 #include "config.h"
 #include "TextFOTBuilder.h"
 #include "macros.h"
@@ -525,12 +525,19 @@ TextArea::MeasuredArea::width() const
 {
   return width_;
 }
-
+                      
+template <class T>
+const T&
+stdmax(const T& a, const T& b) {
+  return a < b ? b : a;
+}
+                      
+                      
 void 
 TextArea::MeasuredArea::chars(Ordinate x, Ordinate y, const Char* chars, unsigned n)
 {
-  measuredHeight_ = max(Ordinate(y+1), measuredHeight_);
-  measuredWidth_ = max(Ordinate(x+n), measuredWidth_);
+  measuredHeight_ = stdmax(Ordinate(y+1), measuredHeight_);
+  measuredWidth_ = stdmax(Ordinate(x+n), measuredWidth_);
 }
 
 TextFOTBuilder::Output::FlowParaBuilder::FlowParaBuilder(FlowPort& flow, TextFOTBuilder& fotb)

@@ -39,6 +39,8 @@ const char fileCode = 'f';
 const char locationCode = 'L';
 const char includedElementCode = 'i';
 const char emptyElementCode = 'e';
+const char commentCode = '_';
+const char omissionCode = 'o';
 
 const OutputCharStream::Newline nl = OutputCharStream::newline;
 
@@ -83,7 +85,11 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
   outputNonSgml_((outputFlags & outputNonSgml) != 0),
   outputEmpty_((outputFlags & outputEmpty) != 0),
   outputDataAtt_((outputFlags & outputDataAtt) != 0),
-  haveData_(0), lastSos_(0)
+  outputComment_((outputFlags & outputComment) != 0),
+  outputTagOmission_((outputFlags & outputTagOmission) != 0),
+  outputAttributeOmission_((outputFlags & outputAttributeOmission) != 0),
+
+  haveData_(0), lastSos_(0), inDocument_(0)
 {
   os_->setEscaper(escape);
 }
@@ -128,6 +134,8 @@ void SgmlsEventHandler::endProlog(EndPrologEvent *event)
       defineEntity(entity);
     }
   }
+  if (outputComment_)
+    inDocument_ = true;
   if (!event->lpdPointer().isNull()) {
     linkProcess_.init(event->lpdPointer());
     haveLinkProcess_ = 1;
@@ -194,6 +202,23 @@ void SgmlsEventHandler::pi(PiEvent *event)
   delete event;
 }
 
+void SgmlsEventHandler::commentDecl(CommentDeclEvent *event)
+{
+  if (inDocument_) {  //only receive this event if outputComment_ true
+    outputLocation(event->location());
+    flushData();
+    MarkupIter iter(event->markup());
+    for (; iter.valid(); iter.advance()) {
+      if (iter.type() == Markup::comment) {
+        os() << commentCode;
+        outputString(iter.charsPointer(), iter.charsLength());
+        os() << nl;
+      }
+    }
+  }
+  delete event;
+}
+
 void SgmlsEventHandler::nonSgmlChar(NonSgmlCharEvent *event)
 {
   if (outputNonSgml_) {
@@ -222,6 +247,8 @@ void SgmlsEventHandler::startElement(StartElementEvent *event)
   }
   attributes(event->attributes(), attributeCode, 0);
   currentLocation_.clear();
+  if (outputTagOmission_ && !event->markupPtr())
+    os() << omissionCode << nl;
   if (outputIncluded_ && event->included())
     os() << includedElementCode << nl;
   if (outputEmpty_ && event->mustOmitEnd())
@@ -241,6 +268,11 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
     const StringC *string;
     const AttributeValue *value = attributes.value(i);
     if (value) {
+      if (outputAttributeOmission_) {
+        if (! attributes.specified(i)) {
+          os() << omissionCode << nl;
+        }
+      }
       switch (value->info(text, string)) {
       case AttributeValue::implied:
 	startAttribute(attributes.name(i), code, ownerName);
@@ -338,6 +370,8 @@ void SgmlsEventHandler::endElement(EndElementEvent *event)
   if (haveLinkProcess_)
     linkProcess_.endElement();
   outputLocation(event->location());
+  if (outputTagOmission_ && !event->markupPtr())
+    os() << omissionCode << nl;
   os() << endElementCode << event->name() << nl;
   delete event;
 }

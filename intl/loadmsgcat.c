@@ -1,19 +1,19 @@
-/* loadmsgcat.c -- load needed message catalogs
-   Copyright (C) 1995 Software Foundation, Inc.
+/* Load needed message catalogs.
+   Copyright (C) 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2, or (at your option)
-any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -31,8 +31,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 # include <unistd.h>
 #endif
 
-#if (defined HAVE_MMAP && defined HAVE_MUNMAP) || defined _LIBC
+#if (defined HAVE_MMAP && defined HAVE_MUNMAP && !defined DISALLOW_MMAP) \
+    || (defined _LIBC && defined _POSIX_MAPPED_FILES)
 # include <sys/mman.h>
+# undef HAVE_MMAP
+# define HAVE_MMAP	1
+#else
+# undef HAVE_MMAP
 #endif
 
 #include "gettext.h"
@@ -41,10 +46,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* @@ end of prolog @@ */
 
 #ifdef _LIBC
-/* Rename the non ANSI C functions.  This is required by the standard
-   because some ANSI C functions will require linking with this object
+/* Rename the non ISO C functions.  This is required by the standard
+   because some ISO C functions will require linking with this object
    file and the name space must not be polluted.  */
-# define fstat  __fstat
 # define open   __open
 # define close  __close
 # define read   __read
@@ -55,52 +59,52 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* We need a sign, whether a new catalog was loaded, which can be associated
    with all translations.  This is important if the translations are
    cached by one of GCC's features.  */
-int _nl_msg_cat_cntr;
+int _nl_msg_cat_cntr = 0;
 
 
 /* Load the message catalogs specified by FILENAME.  If it is no valid
    message catalog do nothing.  */
 void
-_nl_load_domain (domain)
-     struct loaded_domain *domain;
+internal_function
+_nl_load_domain (domain_file)
+     struct loaded_l10nfile *domain_file;
 {
   int fd;
+  size_t size;
   struct stat st;
   struct mo_file_header *data = (struct mo_file_header *) -1;
-#if (defined HAVE_MMAP && defined HAVE_MUNMAP && !defined DISALLOW_MMAP) \
-    || defined _LIBC
   int use_mmap = 0;
-#endif
+  struct loaded_domain *domain;
 
-  domain->decided = 1;
-  domain->data = NULL;
+  domain_file->decided = 1;
+  domain_file->data = NULL;
 
   /* If the record does not represent a valid locale the FILENAME
      might be NULL.  This can happen when according to the given
      specification the locale file name is different for XPG and CEN
      syntax.  */
-  if (domain->filename == NULL)
+  if (domain_file->filename == NULL)
     return;
 
   /* Try to open the addressed file.  */
-  fd = open (domain->filename, O_RDONLY);
+  fd = open (domain_file->filename, O_RDONLY);
   if (fd == -1)
     return;
 
   /* We must know about the size of the file.  */
   if (fstat (fd, &st) != 0
-      && st.st_size < (off_t) sizeof (struct mo_file_header))
+      || (size = (size_t) st.st_size) != st.st_size
+      || size < sizeof (struct mo_file_header))
     {
       /* Something went wrong.  */
       close (fd);
       return;
     }
 
-#if (defined HAVE_MMAP && defined HAVE_MUNMAP && !defined DISALLOW_MMAP) \
-    || defined _LIBC
+#ifdef HAVE_MMAP
   /* Now we are ready to load the file.  If mmap() is available we try
      this first.  If not available or it failed we try to load it.  */
-  data = (struct mo_file_header *) mmap (NULL, st.st_size, PROT_READ,
+  data = (struct mo_file_header *) mmap (NULL, size, PROT_READ,
 					 MAP_PRIVATE, fd, 0);
 
   if (data != (struct mo_file_header *) -1)
@@ -115,14 +119,14 @@ _nl_load_domain (domain)
      it manually.  */
   if (data == (struct mo_file_header *) -1)
     {
-      off_t to_read;
+      size_t to_read;
       char *read_ptr;
 
-      data = (struct mo_file_header *) malloc (st.st_size);
+      data = (struct mo_file_header *) malloc (size);
       if (data == NULL)
 	return;
 
-      to_read = st.st_size;
+      to_read = size;
       read_ptr = (char *) data;
       do
 	{
@@ -146,17 +150,24 @@ _nl_load_domain (domain)
   if (data->magic != _MAGIC && data->magic != _MAGIC_SWAPPED)
     {
       /* The magic number is wrong: not a message catalog file.  */
-#if (defined HAVE_MMAP && defined HAVE_MUNMAP && !defined DISALLOW_MMAP) \
-    || defined _LIBC
+#ifdef HAVE_MMAP
       if (use_mmap)
-	munmap ((caddr_t) data, st.st_size);
+	munmap ((caddr_t) data, size);
       else
 #endif
 	free (data);
       return;
     }
 
+  domain_file->data
+    = (struct loaded_domain *) malloc (sizeof (struct loaded_domain));
+  if (domain_file->data == NULL)
+    return;
+
+  domain = (struct loaded_domain *) domain_file->data;
   domain->data = (char *) data;
+  domain->use_mmap = use_mmap;
+  domain->mmap_size = size;
   domain->must_swap = data->magic != _MAGIC;
 
   /* Fill in the information about the available tables.  */
@@ -173,19 +184,37 @@ _nl_load_domain (domain)
 	((char *) data + W (domain->must_swap, data->hash_tab_offset));
       break;
     default:
-      /* This is an illegal revision.  */
-#if (defined HAVE_MMAP && defined HAVE_MUNMAP && !defined DISALLOW_MMAP) \
-    || defined _LIBC
+      /* This is an invalid revision.  */
+#ifdef HAVE_MMAP
       if (use_mmap)
-	munmap ((caddr_t) data, st.st_size);
+	munmap ((caddr_t) data, size);
       else
 #endif
 	free (data);
-      domain->data = NULL;
+      free (domain);
+      domain_file->data = NULL;
       return;
     }
 
   /* Show that one domain is changed.  This might make some cached
-     translation invalid.  */
+     translations invalid.  */
   ++_nl_msg_cat_cntr;
 }
+
+
+#ifdef _LIBC
+void
+internal_function
+_nl_unload_domain (domain)
+     struct loaded_domain *domain;
+{
+#ifdef _POSIX_MAPPED_FILES
+  if (domain->use_mmap)
+    munmap ((caddr_t) domain->data, domain->mmap_size);
+  else
+#endif	/* _POSIX_MAPPED_FILES */
+    free ((void *) domain->data);
+
+  free (domain);
+}
+#endif

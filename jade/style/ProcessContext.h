@@ -45,12 +45,47 @@ public:
   // Uses of label: do this
   void startConnection(SymbolObj *, const Location &);
   void endConnection();
+
+  // Contains information about which flow object classes a port shall accept
+  // and can validate flow objects according to this information.
+  class Validator : public Resource {
+  public:
+    enum {
+      aAny,
+      aRoot,  // Accept FOs accepted at the root
+      aInline,
+      aDisplay,
+      aDisplayOrInline,
+      aMathSequence,  // All FOS accepted by a math-sequence.
+      aSingleChar,
+      aTableHF,
+    };
+    Validator(unsigned accept)
+      : accept_(accept), hadScroll_(false) {}
+
+    // If the flow object specified by the argument is valid in the current
+    // position in this stream, this function returns true and updates
+    // state information as if the flow object was added to the stream.
+    bool isValid(const FlowObj &, const Location &, Interpreter &);
+    bool charsValid(size_t, const Location &, Interpreter &);
+  private:
+    unsigned accept_;
+    bool hadScroll_;
+  };
+  void validate(const FlowObj &);
   // happens only for object with a non-principal port
   void pushPorts(bool hasPrincipalPort,
-		 const Vector<SymbolObj *> &ports, const Vector<FOTBuilder *> &fotbs);
+		 const Vector<SymbolObj *> &ports,
+		 const Vector<FOTBuilder *> &fotbs,
+		 const Vector<Validator *> validators);
   void popPorts();
-  void pushPrincipalPort(FOTBuilder* principalPort);
+  void pushPrincipalPort(FOTBuilder *principalPort,
+			 Validator *);
   void popPrincipalPort();
+  // Used by SpS headers and footers.
+  void pushPseudoPort(FOTBuilder *principalPort,
+			 Validator *);
+  void popPseudoPort();
   // happens inside pushPorts() (if any)
   void startMapContent(ELObj *, const Location &);
   void endMapContent();
@@ -75,7 +110,7 @@ public:
   bool getPageType(unsigned &) const;
 
   VM &vm();
-private:
+ private:
   ProcessContext(const ProcessContext &); // undefined
   void operator=(const ProcessContext &); // undefined
   void badContentMap(bool &, const Location &);
@@ -86,6 +121,7 @@ private:
     FOTBuilder *fotb;
     IQueue<NodeSaveFOTBuilder> saveQueue;
     Vector<SymbolObj *> labels;
+    Ptr<Validator> validator;
     unsigned connected;
   };
   // A flow object with a port that can be connected to.
@@ -97,15 +133,17 @@ private:
     StyleStack styleStack;
     unsigned flowObjLevel;
     Vector<SymbolObj *> principalPortLabels;
+    Ptr<Validator> principalPortValidator;
   };
-  // An connection between a flow object and its flow parent
+  // A connection between a flow object and its flow parent
   // made with label:.
   struct Connection;
   friend struct Connection;
   struct Connection : public Link {
-    Connection(FOTBuilder *);
+    Connection(FOTBuilder *,Validator *, const StyleStack & = StyleStack());
     Connection(const StyleStack &, Port *, unsigned connectableLevel);
     FOTBuilder *fotb;
+    Validator *validator;
     StyleStack styleStack;
     Port *port;
     unsigned connectableLevel;
@@ -142,6 +180,7 @@ private:
   bool havePageType_;
   unsigned pageType_;
   Vector<NodeStackEntry> nodeStack_;
+  Vector<unsigned> invalidLevels_;
   friend class CurrentNodeSetter;
   friend struct Table;
 };

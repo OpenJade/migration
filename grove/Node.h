@@ -8,6 +8,7 @@
 #endif
 
 #include <stddef.h>
+#include "config.h"
 #include "IList.h"
 
 #ifdef SP_USE_DLL

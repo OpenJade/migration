@@ -6,6 +6,8 @@
 #endif
 
 #include "config.h"
+#include "ExtendEntityManager.h"
+#include "ParserApp.h"
 #include "XmlOutputEventHandler.h"
 #include "XmlOutputMessages.h"
 #include "Message.h"
@@ -17,10 +19,14 @@
 #include "InputSource.h"
 #include "StorageManager.h"
 #include <string.h>
+#include <stdlib.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
+
+#define EXT_ENT_FILE "extEntities.dtf"
+#define INT_ENT_FILE "intEntities.dtf"
 
 inline
 void operator+=(StringC &str, const char *s)
@@ -56,36 +62,117 @@ void escape(OutputCharStream &s, Char c)
 XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
 					     OutputCharStream *os,
 					     const StringC &encodingName,
+					     const char *outputDir,
+					     const char *dtdLoc,
 					     const Ptr<ExtendEntityManager> &entityManager,
 					     const CharsetInfo &systemCharset,
-					     Messenger *mgr)
+					     CmdLineApp *app)
 : options_(options),
   os_(os),
   entityManager_(entityManager),
   systemCharset_(&systemCharset),
-  mgr_(mgr),
+  app_(app),
+  outputDir_(outputDir),
+  dtdLoc_(dtdLoc),
   inDtd_(0),
   inCdata_(0),
   useCdata_(0),
   nCdataEndMatched_(0),
-  namecaseGeneral_(0)
+  namecaseGeneral_(0),
+  extEntFile_(0),
+  intEntFile_(0),
+  extEnts_(0),
+  intEnts_(0),
+  nullOut_(0)
 {
+  // Create output stream for main output
   os_->setEscaper(escape);
   *os_ << "<?xml version=\"1.0\"";
   if (encodingName.size())
     *os_ << " encoding=\"" << encodingName << '"';
   *os_ << "?>" << RE;
+
+  // Set directory for output files
+  if (outputDir_ == NULL || strlen(outputDir_) == 0)
+    outputDir_ = ".";
+
+  // Open file for writing external entity declarations if we are preserving
+  // any entities
+  if (! options_.expExt) {
+    char filePath[strlen(outputDir_) + 17];
+    strcpy (filePath, outputDir_);
+    strcat (filePath, "/");
+    strcat (filePath, EXT_ENT_FILE);
+    extEntFile_ = new FileOutputByteStream;
+
+    // Open the file, exiting if we fail to do so.
+    if (!extEntFile_->open(filePath)) {
+      app_->message(XmlOutputMessages::cannotOpenOutputFile,
+		    StringMessageArg
+		    (app_->codingSystem()->convertIn(filePath)));
+      exit(1);
+    }
+
+    extEnts_ =
+      new EncodeOutputCharStream(extEntFile_, app_->outputCodingSystem());
+  }
+
+  // Open file for writing external entity declarations if we are preserving
+  // any entities
+  if (! options_.expInt) {
+    char filePath[strlen(outputDir_) + 17];
+    strcpy (filePath, outputDir_);
+    strcat (filePath, "/");
+    strcat (filePath, INT_ENT_FILE);
+    intEntFile_ = new FileOutputByteStream;
+
+    // Open the file, exiting if we fail to do so.
+    if (!intEntFile_->open(filePath)) {
+      app_->message(XmlOutputMessages::cannotOpenOutputFile,
+		    StringMessageArg
+		    (app_->codingSystem()->convertIn(filePath)));
+      exit(1);
+    }
+
+    intEnts_ =
+      new EncodeOutputCharStream(intEntFile_, app_->outputCodingSystem());
+
+    /* Make a NullOutputByteStream to write to when we want to throw
+       things away. This is only used when we are not expanding internal
+       entities. */
+    NullOutputByteStream *nobs = new NullOutputByteStream;
+    const CodingSystem *outputCodingSystem = app_->outputCodingSystem();
+    nullOut_ = (OutputCharStream *)
+      new EncodeOutputCharStream(nobs, outputCodingSystem);
+  }
+
+    /* If we are expanding internal entities, we are definitely not
+       generating a reference in the internal subset to an internal
+       entities driver file. Likewise for external entities. */
+    if (options_.expInt)
+      options_.intDecl= false;
+
+    if (options_.expExt)
+      options_.extDecl= false;
 }
 
 XmlOutputEventHandler::~XmlOutputEventHandler()
 {
   os() << RE;
   delete os_;
+
+  if (! options_.expExt)
+    delete extEntFile_;
+
+  if (! options_.expExt) {
+    delete intEntFile_;
+    delete nullOut_;
+  }
 }
 
 void XmlOutputEventHandler::message(MessageEvent *event)
 {
-  mgr_->dispatchMessage(event->message());
+  app_->dispatchMessage(event->message());
   ErrorCountEventHandler::message(event);
 }
 
@@ -101,10 +188,44 @@ void XmlOutputEventHandler::sgmlDecl(SgmlDeclEvent *event)
 
 void XmlOutputEventHandler::data(DataEvent *event)
 {
+  const Entity *entity = event->entity();
+
+  if (! options_.expInt && entity != NULL) {
+    Boolean firstSeen = checkFirstSeen(entity->name());
+
+    // output entity reference
+    os() << "&" << entity->name() << ";";
+
+    // save old output stream
+    outputStack_.insert(os_);
+
+    // output beginning of entity declaration
+    if (firstSeen) {
+      // Point default output stream (os_) to the entities
+      // declaration file.
+      os_ = intEnts_;
+
+      os() << "<!ENTITY " << entity->name() << " CDATA \"";
+    } // end if firstSeen
+
+    else {
+      os_ = nullOut_;
+    } // end else (not firstSeen)
+  } // end if expanding internal entities
+
+  // Now, no matter what, output the entity's data
   if (useCdata_)
     outputCdata(event->data(), event->dataLength());
   else
     outputData(event->data(), event->dataLength(), 0);
+
+  // If necessary, end entity decl and replace old output stream
+  if (! options_.expInt && entity != NULL) {
+    os() << "\">" << RE;
+    os_->flush();
+    os_ = outputStack_.get();
+  }
+
   delete event;
 }
 
@@ -162,11 +283,47 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 	break;
       case TextItem::sdata:
 	{
-	  mgr_->setNextLocation(loc->origin()->parent());
+	  app_->setNextLocation(loc->origin()->parent());
 	  const Entity *entity = loc->origin()->asEntityOrigin()->entity();
-	  mgr_->message(XmlOutputMessages::sdataEntityReference,
-			StringMessageArg(entity->name()));
-	  os() << '&' << entity->name() << ';';
+
+	  if (! options_.expInt) {
+	    Boolean firstSeen = checkFirstSeen(entity->name());
+
+	    // output entity reference
+	    os() << "&" << entity->name() << ";";
+
+	    // save old output stream
+	    outputStack_.insert(os_);
+
+	    if (firstSeen) {
+	      // Point default output stream (os_) to the entities
+	      // declaration file and output start of declaration
+	      os_ = intEnts_;
+
+	      os() << "<!ENTITY " << entity->name()
+		   << "  \"<?sdataEntity " << entity->name() << " ";
+	    } else { // we've seen it before; throw away expansion data
+	      os_ = nullOut_;
+	    }
+	  }
+
+	  // We are expanding internal entities; expand this one as a PI,
+	  // since XML does not have SDATA entities
+	  else {
+	    os() << "<?sdataEntity " << entity->name() << " ";
+	  }
+
+	  // Now, no matter what, output the entity's data
+	  outputData(p, length, 1);
+
+	  // If necessary, end entity decl and replace old output stream
+	  if (! options_.expInt) {
+	    os() << " ?>\">" << RE;
+	    os_->flush();
+	    os_ = outputStack_.get();
+	  } else {
+	    os() << " ?>";
+	  }
 	}
 	break;
       case TextItem::nonSgml:
@@ -275,8 +432,8 @@ void XmlOutputEventHandler::pi(PiEvent *event)
            && (n == 3 || isXmlS(s[3])))
     ; // Probably came from an encoding PI.
   else if (!startsWithXmlName(s, n)) {
-    mgr_->setNextLocation(event->location());
-    mgr_->message(XmlOutputMessages::piNoName);
+    app_->setNextLocation(event->location());
+    app_->message(XmlOutputMessages::piNoName);
   }
   else if (options_.piEscape) {
     os() << "<?";
@@ -284,8 +441,8 @@ void XmlOutputEventHandler::pi(PiEvent *event)
     os() << "?>";
   }
   else if (containsQuestionLt(s, n)) {
-    mgr_->setNextLocation(event->location());
-    mgr_->message(XmlOutputMessages::piQuestionLt);
+    app_->setNextLocation(event->location());
+    app_->message(XmlOutputMessages::piQuestionLt);
   }
   else {
     os() << "<?";
@@ -297,30 +454,79 @@ void XmlOutputEventHandler::pi(PiEvent *event)
 
 void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
 {
-  mgr_->setNextLocation(event->location().origin()->parent());
-  mgr_->message(XmlOutputMessages::sdataEntityReference,
-                StringMessageArg(event->entity()->name()));
-  os() << '&' << event->entity()->name() << ';';
+  const Entity *entity = event->entity();
+  app_->setNextLocation(event->location().origin()->parent());
+
+  if (! options_.expInt) {
+    Boolean firstSeen = checkFirstSeen(entity->name());
+
+    // output entity reference
+    os() << "&" << entity->name() << ";";
+
+    // save old output stream
+    outputStack_.insert(os_);
+
+    if (firstSeen) {
+      // Point default output stream (os_) to the entities
+      // declaration file and output start of declaration
+      os_ = intEnts_;
+
+      os() << "<!ENTITY " << entity->name()
+	   << "  \"<?sdataEntity " << entity->name() << " ";
+    } else { // we've seen it before; throw away expansion data
+      os_ = nullOut_;
+    }
+  }
+
+  // We are expanding internal entities; expand this one as a PI,
+  // since XML does not have SDATA entities
+  else {
+    os() << "<?sdataEntity " << entity->name() << " ";
+  }
+
+  // Now, no matter what, output the entity's data
+  outputData(event->data(), event->dataLength(), 0);
+
+  // If necessary, end entity decl and replace old output stream
+  if (! options_.expInt) {
+    os() << " ?>\">" << RE;
+    os_->flush();
+    os_ = outputStack_.get();
+  } else {
+    os() << " ?>";
+  }
+
   delete event;
 }
 
+/** External data entities may be referenced in attributes only. If
+    one is referenced in content, error and exit. */
 void XmlOutputEventHandler::externalDataEntity(ExternalDataEntityEvent *event)
 {
-  mgr_->setNextLocation(event->location().origin()->parent());
-  mgr_->message(XmlOutputMessages::externalDataEntityReference,
+  app_->message(XmlOutputMessages::externalDataEntityReference,
                 StringMessageArg(event->entity()->name()));
-  os() << (options_.lower ? "<entity name=\"" : "<ENTITY NAME=\"")
-       << event->entity()->name() << "\"/>";
-  delete event;
+  exit (1);
 }
 
 void XmlOutputEventHandler::subdocEntity(SubdocEntityEvent *event)
 {
-  mgr_->setNextLocation(event->location().origin()->parent());
-  mgr_->message(XmlOutputMessages::subdocEntityReference,
-                StringMessageArg(event->entity()->name()));
-  os() << (options_.lower ? "<entity name=\"" : "<ENTITY NAME=\"")
-       << event->entity()->name() << "\"/>";
+  const SubdocEntity *entity = event->entity();
+  app_->setNextLocation(event->location().origin()->parent());
+
+  if (options_.expExt) {
+    SgmlParser::Params params;
+    params.subdocInheritActiveLinkTypes = 1;
+    params.subdocReferenced = 1;
+    params.origin = event->entityOrigin()->copy();
+    params.parent = & ((ParserApp *)app_)->parser();
+    params.sysid = entity->externalId().effectiveSystemId();
+    params.entityType = SgmlParser::Params::subdoc;
+    SgmlParser parser(params);
+    parser.parseAll(*this);
+  } else {
+    os() << "&" << entity->name() << ";";
+  }
+
   delete event;
 }
 
@@ -341,13 +547,56 @@ void XmlOutputEventHandler::maybeStartDoctype(Boolean &doctypeStarted, const Dtd
   if (doctypeStarted)
     return;
   doctypeStarted = 1;
-  os() << "<!DOCTYPE " << dtd.documentElementType()->name() << " [" << RE;
+  const StringC &name = dtd.documentElementType()->name();
+  StringC buf;
+
+  // if appropriate, lowercase the doctype name -jphekman
+  if (options_.lower) {
+    for (size_t i = 0; i < name.size(); i++) {
+      Char c = lowerSubst_[name[i]];
+      if (c != name[i]) {
+	buf = name;
+	buf[i] = c;
+	for (i++; i < name.size(); i++)
+	  lowerSubst_.subst(buf[i]);
+      }
+    }
+  } else {
+    buf = name;
+  }
+
+  /* Output the doctype declaration. If requested, specify a local
+     file containing the DTD. */
+  os() << "<!DOCTYPE " << buf;
+  if (dtdLoc_ != NULL) {
+    os() << " SYSTEM \"" << dtdLoc_ << "\"";
+  }
+  os() << " [" << RE;
+
+  /* If requested, include pointers in the instance's internal subset
+     to driver files which define internal/external entities. */
+  if (options_.extDecl) {
+    os() << "<!ENTITY % external-entities SYSTEM \""
+	 << EXT_ENT_FILE << "\">"
+	 << RE << "%external-entities;" << RE;
+  }
+
+  if (options_.intDecl) {
+    os() << "<!ENTITY % internal-entities SYSTEM \""
+	 << INT_ENT_FILE << "\">"
+	 << RE << "%internal-entities;" << RE;
+  }
 }
 
 void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
 {
   const Dtd &dtd = event->dtd();
   Boolean doctypeStarted = 0;
+
+  if (options_.extDecl || options_.intDecl) {
+    maybeStartDoctype(doctypeStarted, dtd);
+  }
+
   if (options_.notation) {
     Dtd::ConstNotationIter iter(dtd.notationIter());
     for (;;) {
@@ -359,8 +608,8 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
       outputExternalId(*notation);
       os() << ">" << RE;
       if (notation->attributeDefTemp()) {
-	mgr_->setNextLocation(notation->defLocation());
-	mgr_->message(XmlOutputMessages::notationAttributes,
+	app_->setNextLocation(notation->defLocation());
+	app_->message(XmlOutputMessages::notationAttributes,
 	              StringMessageArg(notation->name()));
       }
     }
@@ -377,12 +626,12 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
 	os() << "<!ENTITY " << entity->name();
 	outputExternalId(*entity);
 	if (extDataEntity->dataType() != EntityDecl::ndata) {
-	  mgr_->setNextLocation(entity->defLocation());
-	  mgr_->message(XmlOutputMessages::externalDataNdata,
+	  app_->setNextLocation(entity->defLocation());
+	  app_->message(XmlOutputMessages::externalDataNdata,
 	                StringMessageArg(entity->name()));
 	}
 	os() << " NDATA " << generalName(extDataEntity->notation()->name(), nameBuf_) << ">" << RE;
-      }	
+      }
     }
   }
   if (options_.id || options_.attlist) {
@@ -394,7 +643,7 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
       const AttributeDefinitionList *adl = elementType->attributeDefTemp();
       if (adl) {
 	if (options_.attlist) {
-            maybeStartDoctype(doctypeStarted, dtd);
+	    maybeStartDoctype(doctypeStarted, dtd);
 	    os() << "<!ATTLIST " << generalName(elementType->name(), nameBuf_);
 	    for (size_t i = 0; i < adl->size(); i++) {
 	      const AttributeDefinition *def = adl->def(i);
@@ -491,8 +740,8 @@ void XmlOutputEventHandler::outputExternalId(const EntityDecl &decl)
    case 0:
      break;
    default:
-     mgr_->setNextLocation(decl.defLocation());
-     mgr_->message(XmlOutputMessages::cannotConvertFsiToUrl,
+     app_->setNextLocation(decl.defLocation());
+     app_->message(XmlOutputMessages::cannotConvertFsiToUrl,
                    StringMessageArg(*sysIdP));
      break;
    }
@@ -505,7 +754,7 @@ void XmlOutputEventHandler::outputExternalId(const EntityDecl &decl)
 int XmlOutputEventHandler::fsiToUrl(const StringC &fsi, const Location &loc, StringC &url)
 {
   ParsedSystemId parsedBuf;
-  if (!entityManager_->parseSystemId(fsi, *systemCharset_, 0, 0, *mgr_, parsedBuf))
+  if (!entityManager_->parseSystemId(fsi, *systemCharset_, 0, 0, *app_, parsedBuf))
     return 0;
   if (parsedBuf.size() != 1)
     return -1;
@@ -517,10 +766,10 @@ int XmlOutputEventHandler::fsiToUrl(const StringC &fsi, const Location &loc, Str
 					     *systemCharset_,
 					     InputSourceOrigin::make(),
 					     0,
-					     *mgr_));
+					     *app_));
   if (!in)
     return 0;
-  Xchar c = in->get(*mgr_);
+  Xchar c = in->get(*app_);
   StorageObjectLocation soLoc;
   if (c == InputSource::eE && in->accessError()) {
     if (parsedBuf[0].baseId.size())
@@ -702,6 +951,224 @@ void XmlOutputEventHandler::outputData(const Char *s, size_t n, Boolean inLit)
   }
 }
 
+void XmlOutputEventHandler::entityDefaulted(EntityDefaultedEvent *event)
+{
+  if (options_.reportEnts) {
+    ConstPtr<Entity> entity = event->entityPointer();
+    const ExternalEntity *extEntity = entity->asExternalEntity();
+
+    // If we are dealing with an external entity (else it will be null)
+    // -jphekman
+    if (extEntity != 0) {
+      const StringC *systemIdPointer = extEntity->systemIdPointer();
+      if (systemIdPointer != 0) {
+	os () << "<?entityResolved " << *systemIdPointer << " ?>";
+      }
+    }
+  }
+}
+
+void XmlOutputEventHandler::inputOpened(InputSource *in)
+{
+  if (!inDtd_) {
+    const CodingSystem *outputCodingSystem = app_->outputCodingSystem();
+    const EntityDecl *entDecl = in->currentLocation().origin()->entityDecl();
+
+    if (entDecl == NULL ) {
+      if (options_.reportIS) {
+        os() << "<?inputOpened effectiveSystemID=\"NULL\" "
+             << "systemID=\"NULL\" publicID=\"NULL\" ?>";
+      }
+      return;
+    }
+
+    const Entity *ent = in->currentLocation().origin()->entity();
+    const StringC *effectiveSystemIdPointer =
+      entDecl->effectiveSystemIdPointer();
+    const StringC *systemIdPointer = entDecl->systemIdPointer();
+    const StringC *publicIdPointer = entDecl->publicIdPointer();
+
+    if (options_.reportIS && ent->asExternalEntity() != NULL) {
+      os() << "<?inputOpened effectiveSystemID=\"";
+
+      if (effectiveSystemIdPointer == 0)
+	os() << "NULL";
+      else
+	os () << *effectiveSystemIdPointer;
+
+      os() << "\" systemID=\"";
+      if (systemIdPointer == 0)
+	os() << "NULL";
+     else
+	os () << *systemIdPointer;
+
+      os() << "\" publicID=\"";
+      if (publicIdPointer == 0)
+	os() << "NULL";
+      else
+	os () << *publicIdPointer;
+
+      os() << "\" ?>";
+    }
+
+    /* Output entity declaration and, in the case of external
+       entities, write file containing entity replacement text. */
+
+    Boolean firstSeen = checkFirstSeen(ent->name());
+
+    if (ent->asExternalEntity() != NULL) {
+      if (! options_.expExt) {
+	// output entity reference
+	os() << "&" << entDecl->name() << ";";
+
+	// output entity declaration
+	if (systemIdPointer == 0) {
+	  app_->message(XmlOutputMessages::missingSystemId,
+			StringMessageArg(entDecl->name()));
+	  exit (1);
+	}
+
+	// save old output stream
+	outputStack_.insert(os_);
+
+	if (firstSeen) {
+	  *extEnts_ << "<!ENTITY " << entDecl->name() << " SYSTEM \""
+		    << *systemIdPointer << "\">\n";
+	  extEnts_->flush();
+
+	  /* Determine name of file. Allocate space for the length of the
+	     output directory's string; the "/"; the file name's string;
+	     and ".xml" */
+
+	  char filePath[strlen(outputDir_) + 5 +
+		       outputCodingSystem->convertOut(*systemIdPointer).size()];
+	  strcpy (filePath, outputDir_);
+	  strcat (filePath, "/");
+	  strcat(filePath,
+		 outputCodingSystem->convertOut(*systemIdPointer).data());
+	  // Set the suffix to ".xml"
+	  convertSuffix(filePath);
+
+	  // Open the file, exiting if we fail to do so.
+	  FileOutputByteStream *file = new FileOutputByteStream;
+	  outputFileStack_.insert(file);
+	  if (!file->open(filePath)) {
+	    app_->message(XmlOutputMessages::cannotOpenOutputFile,
+			  StringMessageArg
+			  (app_->codingSystem()->convertIn(filePath)));
+	    exit (1);
+	  }
+
+	  // Create output stream to file and set os_ to it.
+	  os_ = (OutputCharStream *)
+	    new EncodeOutputCharStream(file, outputCodingSystem);
+	} // end if firstSeen
+	else {
+	  // push null os onto file output stack, set os_ to it
+	  NullOutputByteStream *nobs = new NullOutputByteStream;
+	  outputFileStack_.insert(nobs);
+
+	  // Create output stream to file and set os_ to it.
+	  os_ = (OutputCharStream *)
+	    new EncodeOutputCharStream(nobs, outputCodingSystem);
+	} // end else (notfirst Seen)
+
+      } // end if not expanding external entities
+
+    } // end if asExternalEntity()
+
+    else if (ent->asInternalEntity() != NULL) {
+      if (! options_.expInt) {
+
+	// output entity reference
+	os() << "&" << entDecl->name() << ";";
+
+	// save old output stream
+	outputStack_.insert(os_);
+
+	// output beginning of entity declaration
+	if (firstSeen) {
+	  // Point default output stream (os_) to the entities
+	  // declaration file and output declaration start
+	  os_ = intEnts_;
+
+	  os() << "<!ENTITY " << entDecl->name() << " \"";
+	} // end if firstSeen
+
+	else {
+	  os_ = nullOut_;
+	} // end else (not firstSeen)
+      } // end if expanding internal entities
+    } // end if this is an internal entity
+
+    else {
+      // We should only get InternalText and ExternalText entities here.
+      app_->message(XmlOutputMessages::unexpectedEntityType,
+		    StringMessageArg (ent->name()));
+      exit(1);
+    }
+  }
+}
+
+void XmlOutputEventHandler::inputClosed(InputSource *in)
+  {
+  if (! inDtd_) {
+    const EntityDecl *entDecl = in->currentLocation().origin()->entityDecl();
+    const Entity *ent = in->currentLocation().origin()->entity();
+
+    if (entDecl == NULL || ent == NULL ) {
+      if ( options_.reportIS) {
+        os() << "<?inputOpened effectiveSystemID=\"NULL\" "
+             << "systemID=\"NULL\" publicID=\"NULL\" ?>";
+      }
+      return;
+    }
+
+    // Close external entity
+    if (ent->asExternalEntity() != NULL) {
+      if (! options_.expExt) {
+	// delete current output stream
+	os_->flush();
+	delete os_;
+
+	// restore previous output stream
+	os_ = outputStack_.get();
+
+	// close file
+	OutputByteStream *file = outputFileStack_.get();
+	delete file;
+      }
+    }
+
+    // Close internal entity
+    else if (ent->asInternalEntity() != NULL) {
+      if (! options_.expInt) {
+	// Write end of declaration to output stream
+	os() << "\">\n";
+
+	/* Do not delete current output stream: it is to a DTD stub
+	 * file which we will be reusing, or possible a null output
+	 byte stream which we will also be reusing. */
+	os_->flush();
+
+	// restore previous output stream
+	os_ = outputStack_.get();
+      }
+    }
+
+    else {
+      // We should only get InternalText and ExternalText entities here.
+      app_->message(XmlOutputMessages::unexpectedEntityType,
+		    StringMessageArg( ent->name() ));
+      exit(1);
+    }
+
+    if (options_.reportIS && ent->asExternalEntity() != NULL) {
+      os() << "<?inputClosed ?>";
+    }
+  }
+}
+
 const StringC &XmlOutputEventHandler::generalName(const StringC &name,
 					          StringC &buf)
 {
@@ -718,6 +1185,137 @@ const StringC &XmlOutputEventHandler::generalName(const StringC &name,
     }
   }
   return name;
+}
+
+/** Make this string's suffix ".xml", attempting to do the right thing
+    if we encounter ".sgm", ".sgml", or ".xml" as the original
+    suffix. */
+char *XmlOutputEventHandler::convertSuffix(char *name)
+{
+  // Get a pointer to the last occurrence of ".":
+  char *suffix = strrchr(name, '.');
+
+  // If there is no "." in "name", append ".xml" and return
+  if (suffix == NULL) {
+    strcat(name, ".xml");
+    return name;
+  }
+
+  // Suffix is "sgm[l]": subsitite ".xml"
+  if (strcmp(suffix, ".sgm") == 0 || strcmp (suffix, ".sgml") == 0) {
+    strcpy (suffix, ".xml");
+    return name;
+  }
+
+  // "xml": do nothing
+  if (strcmp(suffix, ".xml") == 0) {
+    return name;
+  }
+
+  // default: append ".xml"
+  strcat (name, ".xml");
+  return name;
+}
+
+/** If this is the first time we have encountered entity "name",
+    return true and add it to a list of entities we've seen. Else,
+    return false. */
+Boolean XmlOutputEventHandler::checkFirstSeen(const StringC &name)
+{
+  Named *id = entTable_.lookup(name);
+
+  if (!id) {
+    entTable_.insert(new Named(name));
+    return true;
+  }
+
+  return false;
+}
+
+
+/**
+ * NullOutputByteStream
+ */
+
+NullOutputByteStream::NullOutputByteStream()
+{
+}
+
+NullOutputByteStream::~NullOutputByteStream()
+{
+}
+
+void NullOutputByteStream::flush()
+{
+}
+
+void NullOutputByteStream::sputc(char c)
+{
+}
+
+void NullOutputByteStream::sputn(const char *, size_t)
+{
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(char)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(unsigned char)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(const char *)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(int)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(unsigned)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(long)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(unsigned long)
+{
+  return *this;
+}
+
+OutputByteStream &NullOutputByteStream::operator<<(const String<char> &)
+{
+  return *this;
+}
+
+/* Note: Returning NULL is probably not the best solution here, but as
+ * nothing actually uses getBufferPtr(), it is hard to see what sort
+ * of no-op behavior would actually be appropriate. */
+char *NullOutputByteStream::getBufferPtr() const
+{
+  return NULL;
+}
+
+size_t NullOutputByteStream::getBufferSize() const
+{
+  return 0;
+}
+
+void NullOutputByteStream::usedBuffer(size_t)
+{
+}
+
+void NullOutputByteStream::flushBuf(char)
+{
 }
 
 #ifdef SP_NAMESPACE

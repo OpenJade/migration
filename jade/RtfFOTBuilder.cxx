@@ -255,7 +255,7 @@ private:
     inlineTable			// just after \row
   };
   InlineState inlineState_;
-   enum UnderlineType {
+  enum UnderlineType {
      noUnderline,
      underlineSingle,
      underlineDouble,
@@ -2140,6 +2140,7 @@ void RtfFOTBuilder::endTable()
   if (inlineState_ == inlineTable) {
     outputFormat_ = OutputFormat();
     os() << "\\pard\\plain\\sl-1";
+    inlineState_ = inlineStart;
   }
   end();
   endDisplay();

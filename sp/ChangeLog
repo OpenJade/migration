@@ -1,6 +1,10 @@
 2002-12-08  Karl Eichwalder  <ke@suse.de>
 
-	* tests/af-16: New file
+	* tests/af-18: New file.
+	* tests/af-19: Likewise.
+	* tests/Makefile.am (TESTS): Add af-18 and af-19.
+
+	* tests/af-16: New file.
 	* tests/Makefile.am (TESTS): Add af-16.
 
 2002-12-07  Karl Eichwalder  <ke@suse.de>

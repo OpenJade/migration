@@ -1128,6 +1128,44 @@ void IgnoredC::trace(Collector &c) const
   c.trace(value_);
 }
 
+class CharMapC : public IgnoredC {
+public:
+  CharMapC(const Identifier *, unsigned index, ELObj *, Interpreter &);
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+};
+
+CharMapC::CharMapC(const Identifier *ident, unsigned index,
+		   ELObj *value, Interpreter &interp)
+: IgnoredC(ident, index, value, interp)
+{
+}
+
+ConstPtr<InheritedC> CharMapC::make(ELObj *obj, const Location &loc,
+				    Interpreter &interp) const
+{
+  if (obj == interp.makeFalse())
+    return new CharMapC(identifier(), index(), obj, interp);
+  FunctionObj *func = obj->asFunction();
+  if (func) {
+    if (func->nRequiredArgs() > 1) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::missingArg);
+      return ConstPtr<InheritedC>();
+    }
+    if ((func->nRequiredArgs() + func->nOptionalArgs()
+	      + func->restArg() ? 1 : 0) == 0) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::tooManyArgs);
+      return ConstPtr<InheritedC>();
+    }
+    return new CharMapC (identifier(), index(), obj, interp);
+  }
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::invalidCharacteristicValue,
+		 StringMessageArg(identifier()->name()));
+  return ConstPtr<InheritedC>();
+}
+
 class BorderC : public IgnoredC {
 public:
   BorderC(const Identifier *, unsigned index, ELObj *, Interpreter &);
@@ -1524,7 +1562,7 @@ void Interpreter::installInheritedCs()
   // integer or 'force
   IGNORED_C("line-spacing-priority", makeInteger(0));
   // procedure or #f
-  IGNORED_C("char-map", makeFalse());
+  STORE_INHERITED_C2(charMapC_, "char-map", CharMapC, makeFalse(), *this);
 }
 
 void Interpreter::installInheritedC(const char *s, InheritedC *ic)

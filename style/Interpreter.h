@@ -590,6 +590,7 @@ public:
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
   bool convertToPattern(ELObj *, const Location &, Pattern &);
+  const ConstPtr<InheritedC> &charMapC() const;
   const ConstPtr<InheritedC> &tableBorderC() const;
   const ConstPtr<InheritedC> &cellBeforeRowBorderC() const;
   const ConstPtr<InheritedC> &cellAfterRowBorderC() const;
@@ -786,6 +787,7 @@ private:
   StyleObj *initialStyle_;
   StyleObj *borderTrueStyle_;
   StyleObj *borderFalseStyle_;
+  ConstPtr<InheritedC> charMapC_;
   ConstPtr<InheritedC> tableBorderC_;
   ConstPtr<InheritedC> cellBeforeRowBorderC_;
   ConstPtr<InheritedC> cellAfterRowBorderC_;
@@ -981,6 +983,12 @@ inline
 GroveManager *Interpreter::groveManager() const
 {
   return groveManager_;
+}
+
+inline
+const ConstPtr<InheritedC> &Interpreter::charMapC() const
+{
+  return charMapC_;
 }
 
 inline

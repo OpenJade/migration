@@ -4662,59 +4662,6 @@ DEFPRIMITIVE(StringLessOrEqual, argc, argv, context, interp, loc)
     return interp.makeFalse();
 }
 
-#define DEFCAAR(NAME, PATH) \
-DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
-{ \
-  ELObj *e = argv[0]; \
-  PairObj *p; \
-  for (char *c = PATH; *c != 0; c++) { \
-    p = e->asPair(); \
-    if (!p) \
-      return argError(interp, loc, \
-                      InterpreterMessages::notAPair, 0, argv[0]); \
-    switch (*c) { \
-    case 'a': \
-       e = p->car(); \
-       break; \
-    case 'd': \
-       e = p->cdr(); \
-       break; \
-    default: \
-       CANNOT_HAPPEN(); \
-    } \
-  } \
-  return e; \
-}
-
-DEFCAAR(Caar, "aa")
-DEFCAAR(Cadr, "ad")
-DEFCAAR(Cdar, "da")
-DEFCAAR(Cddr, "dd")
-DEFCAAR(Caaar, "aaa")
-DEFCAAR(Caadr, "aad")
-DEFCAAR(Cadar, "ada")
-DEFCAAR(Caddr, "add")
-DEFCAAR(Cdaar, "daa")
-DEFCAAR(Cdadr, "dad")
-DEFCAAR(Cddar, "dda")
-DEFCAAR(Cdddr, "ddd")
-DEFCAAR(Caaaar, "aaaa")
-DEFCAAR(Caaadr, "aaad")
-DEFCAAR(Caadar, "aada")
-DEFCAAR(Caaddr, "aadd")
-DEFCAAR(Cadaar, "adaa")
-DEFCAAR(Cadadr, "adad")
-DEFCAAR(Caddar, "adda")
-DEFCAAR(Cadddr, "addd")
-DEFCAAR(Cdaaar, "daaa")
-DEFCAAR(Cdaadr, "daad")
-DEFCAAR(Cdadar, "dada")
-DEFCAAR(Cdaddr, "dadd")
-DEFCAAR(Cddaar, "ddaa")
-DEFCAAR(Cddadr, "ddad")
-DEFCAAR(Cdddar, "ddda")
-DEFCAAR(Cddddr, "dddd")
-
 DEFPRIMITIVE(Assoc, argc, argv, context, interp, loc)
 {
   ELObj *list = argv[1];
@@ -5124,75 +5071,6 @@ DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
   return obj;
 }
           
-/* What we're effectively doing here is the C++ equivalent of 
-   (modulo error checking)
-   (define (map proc li_1 ... li_n)
-     (if (null? li_1) 
-        '()
-        (cons (proc (car li_1) ... (car li_n))
-              (map proc (cdr li_1) ... (cdr li_n)))) 
-*/    
-DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
-{
-   FunctionObj *func = argv[0]->asFunction();
-   // Check argv[0] is a procedure
-   if (!func) 
-      return argError(interp, loc,
-                 InterpreterMessages::notAProcedure, 0, argv[0]);
-   // Check that we have enough arguments 
-   if (func->nRequiredArgs() > argc - 1) { 
-     interp.setNextLocation(loc);
-     interp.message(InterpreterMessages::missingArg);
-     return interp.makeError();
-   }
-   // Check that we don't have too few arguments
-   if (!func->restArg() 
-       && func->nRequiredArgs() + func->nOptionalArgs() < argc - 1) {
-     interp.setNextLocation(loc);
-     interp.message(InterpreterMessages::tooManyArgs);
-     return interp.makeError();
-   }
-   // Split off the cars of the arguments and
-   // check that they are proper lists of the same length
-   Vector<ELObj*> cars(argc);
-   Vector<ELObj*> cdrs(argc);
-   bool hasSeenNil = 0;
-   bool hasSeenNonNil = 0;
-   for (unsigned i = 1; i < argc; i++) {
-     PairObj *pair = argv[i]->asPair();
-     if (pair) {
-       hasSeenNonNil = 1;
-       cars[i] = pair->car();
-       cdrs[i] = pair->cdr();
-     } else if (argv[i]->isNil()) 
-       hasSeenNil = 1;
-     else 
-       return argError(interp, loc,
-                  InterpreterMessages::notAList, i, argv[i]);
-   }
-   if (hasSeenNil && hasSeenNonNil)   
-     return argError(interp, loc,
-               InterpreterMessages::lengthError, 1, argv[1]);
-   // End the recursion
-   if (hasSeenNil) 
-     return interp.makeNil();
-
-   // Recurse
-   cdrs[0] = func;
-   ELObj **rargv = cdrs.begin();
-   cars[0] = MapPrimitiveObj::primitiveCall(argc, rargv, context, interp, loc); 
- 
-   // Prepend the result of applying func to the cars
-   Vector<InsnPtr> insns(argc, InsnPtr());
-   insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
-   insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
-   for (unsigned i = 1; i <= argc; i++) 
-     insns[argc - i] = InsnPtr(new ConstantInsn(cars[argc - i], 
-                                                insns[argc - i + 1]));
-   VM vm(context, interp);
-   return vm.eval(insns[0].pointer());
-}
-
 static long timeConv(const Char *s, size_t n)
 {
   char buf[100];

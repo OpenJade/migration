@@ -2,7 +2,8 @@
 
 AUTOMAKE_OPTIONS = check-news dist-zip
 
-SUBDIRS = pubtext doc all \
+## FIXME: all is missing since a .am with only EXTRA_DIST doesn't work.
+SUBDIRS = pubtext doc \
           include generic \
           lib nsgmls spent spam sgmlnorm sx spcat 
 

@@ -17,10 +17,6 @@ BUILT_SOURCES = XmlOutputMessages.h XmlOutputMessages.rc \
 
 MSGGENFLAGS = -l appModule
 
-sx.o: SxMessages.h
-XmlOutputEventHandler.o: XmlOutputMessages.h
-
-
 SUFFIXES = .msg .m4 .rc
 
 .m4.cxx:

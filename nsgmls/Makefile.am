@@ -19,9 +19,6 @@ BUILT_SOURCES = nsgmls_inst.cxx NsgmlsMessages.h NsgmlsMessages.rc \
   
 MSGGENFLAGS = -l appModule 
 
-nsgmls.o: NsgmlsMessages.h
-RastEventHandler.o: RastEventHandlerMessages.h
-
 SUFFIXES = .msg .m4 .rc
 
 .m4.cxx:

@@ -2636,13 +2636,13 @@ ELObj *BooleanCharPropValues::value(Char ch, Interpreter &interp) const
 {
   ValT_ v(map_[ch]);
   if (v.hasValue_)
-    return v.b_ ? interp.makeTrue() : interp.makeFalse();
+    return v.b_ ? (ELObj *) interp.makeTrue() : (ELObj *) interp.makeFalse();
   return 0;
 }
 
 ELObj *BooleanCharPropValues::defaultValue(Interpreter &interp) const
 {
-  return def_ ? interp.makeTrue() : interp.makeFalse();
+  return def_ ? (ELObj *) interp.makeTrue() : (ELObj *) interp.makeFalse();
 }
 
 bool PublicIdCharPropValues::setDefault(const StringC &name,

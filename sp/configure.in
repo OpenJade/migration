@@ -12,10 +12,15 @@ dnl
 
 dnl Initialization.
 AC_INIT(pubtext)
-AM_INIT_AUTOMAKE(OpenSP, 1.4)
+AM_INIT_AUTOMAKE(OpenSP, 1.4, no-define)
 AM_CONFIG_HEADER(include/config.h)
 AM_SANITY_CHECK
 missing_dir=`cd $ac_aux_dir && pwd`
+
+dnl Since config.h gets included by user programs, we use special names
+dnl for PACKAGE and VERSION.
+AC_DEFINE_UNQUOTED(SP_PACKAGE, "$PACKAGE", [Package name])
+AC_DEFINE_UNQUOTED(SP_VERSION, "$VERSION", [Package version])
 
 dnl Check for programs.
 AC_PROG_CC
@@ -24,7 +29,7 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
-AC_PROG_RANLIB
+dnl AC_PROG_RANLIB
 AC_PROG_MAKE_SET
 AC_PATH_PROGS(PERL, perl, perl)
 AM_PROG_LIBTOOL

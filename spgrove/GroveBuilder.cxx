@@ -1464,7 +1464,7 @@ public:
   }
   AccessResult getCurrentGroup(NodeListPtr &) const;
   AccessResult getLocation(Location &) const;
-  //AccessResult getDefaultValue(NodeListPtr &) const;
+  AccessResult getDefaultValue(NodeListPtr &) const;
 };
 
 class BaseNodeList : public NodeList {
@@ -6163,6 +6163,14 @@ AccessResult NotationAttributeDefNode::getCurrentGroup(NodeListPtr &ptr) const
 AccessResult NotationAttributeDefNode::getLocation(Location &loc) const
 {
   return grove()->proxifyLocation(notation_->defLocation(), loc);
+}
+
+AccessResult NotationAttributeDefNode::getDefaultValue(NodeListPtr &ptr) const
+{
+  AttributeDefinitionDesc desc;
+  attDefList()->def(attIndex_)->getDesc(desc);
+  const AttributeValue *value = desc.defaultValue.pointer();
+  return makeAttributeValueNodeList(grove(), ptr, value);
 }
 
 // -- CLASS IMP: AttributeDefsNodeList

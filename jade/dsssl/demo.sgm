@@ -2,7 +2,9 @@
 <!element demo o o (p*)>
 <!element p - o (#pcdata)>
 ]>
+<demo>
 <p>
-The first paragraph.
+The first paragraph.</p>
 <p>
-The second paragraph.
+The second paragraph.</p>
+</demo>

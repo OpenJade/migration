@@ -28,6 +28,7 @@ class KeywordObj;
 class BoxObj;
 class StringObj;
 class SosofoObj;
+class AppendSosofoObj;
 class ColorObj;
 class ColorSpaceObj;
 class StyleObj;
@@ -40,6 +41,7 @@ class DisplaySpaceObj;
 class InlineSpaceObj;
 class GlyphSubstTableObj;
 class VectorObj;
+class LanguageObj;
 
 class ELObj : public Collector::Object {
 public:
@@ -63,6 +65,7 @@ public:
   virtual KeywordObj *asKeyword();
   virtual FunctionObj *asFunction();
   virtual SosofoObj *asSosofo();
+  virtual AppendSosofoObj *asAppendSosofo();
   virtual ColorObj *asColor();
   virtual ColorSpaceObj *asColorSpace();
   virtual StyleObj *asStyle();
@@ -75,6 +78,7 @@ public:
   virtual StringObj *convertToString();	// either symbol or string
   virtual BoxObj *asBox();
   virtual VectorObj *asVector();
+  virtual LanguageObj *asLanguage();
   virtual bool charValue(Char &);
   virtual bool stringData(const Char *&, size_t &);
   virtual void print(Interpreter &, OutputCharStream &);
@@ -107,6 +111,7 @@ protected:
 
 class ErrorObj : public ELObj {
 public:
+  void print(Interpreter &, OutputCharStream &);
 private:
   ErrorObj();
   friend class Interpreter;
@@ -114,6 +119,7 @@ private:
 
 class UnspecifiedObj : public ELObj {
 public:
+  void print(Interpreter &, OutputCharStream &);
 private:
   UnspecifiedObj();
   friend class Interpreter;

@@ -9,27 +9,56 @@
 # Original SP Makefile.in Copyright (C) 1996 Henry S. Thompson
 # Original SP Makefile Copyright (c) 1994, 1995, 1996 James Clark
 
+SHELL=@SHELL@
+top_builddir=@TOP@
 TOP=@TOP@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
+datadir=@datadir@
+libdir=@libdir@
+mandir=@mandir@
+includedir=@includedir@
+oldincludedir=/usr/include
+spincludedir=@SPINCLUDEDIR@
+splibdir=@SPLIBDIR@
+
+DESTDIR=
 
 LIBTOOL=@LIBTOOL@
+LIBTOOL_DEPS=@LIBTOOL_DEPS@
 
-LIBDIRS=lib grove spgrove style
-PROGDIRS=nsgmls spam sgmlnorm spent jade sx
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+mkinstalldirs = $(SHELL) $(TOP)/config/mkinstalldirs
+man1dir=$(mandir)/man1
+
+man_MANS = openjade.1
+
+MANS = $(man_MANS)
+
+SP_LIBDIRS=$(splibdir) $(XLIBDIRS)
+LIBDIRS=grove spgrove style
+PROGDIRS=jade
 dodirs=$(LIBDIRS) $(PROGDIRS)
 
 # Automatic template instantiation can cause compilers to generate
 # various extra files; the clean target won't delete these.
-TARGETS=all install depend gen clean pure
+TARGETS=all install depend gen clean pure 
 do=all
 
 $(TARGETS): FORCE
 	@$(MAKE) -f Makefile do=$@ $(dodirs)
-	if test $@ = 'install'; then $(LIBTOOL) --finish $(libdir); fi
-
+	@if test $@ = 'install'; then \
+	  $(LIBTOOL) --finish $(DESTDIR)$(libdir); \
+	  mkdir -p $(DESTDIR)$(datadir); \
+	  cp -f dsssl/builtins.dsl $(DESTDIR)$(datadir); \
+	fi;
 
 $(LIBDIRS): FORCE
 	@if test $(srcdir) = .; \
@@ -67,10 +96,19 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/Makefile.lt -f $$srcdir/../Makefile.prog \
 		-f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): lib
+$(PROGDIRS): $(SP_LIBDIRS)
+
+jade: grove spgrove style
+
+spgrove: grove
+
+style: grove spgrove
 
 # GNU tar
 TAR=tar
+
+distdir = $(PACKAGE)-$(VERSION)
+top_distdir = $(distdir)
 
 dist: FORCE
 	cd test; ./CLEAN
@@ -101,3 +139,24 @@ mrproper:
 	-test -f Makefile.lib.dist && mv Makefile.lib.dist Makefile.lib
 
 FORCE:
+
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
+
+install-man:
+	$(mkinstalldirs) $(DESTDIR)$(man1dir)
+	@list='$(man1_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+	    *.1*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  if test -f $(TOP)/docsrc/$$i; then file=$(TOP)/docsrc/$$i; \
+	  else file=$$i; fi; \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+          echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst"; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst; \
+	done

@@ -72,6 +72,7 @@ public:
     return c.allocateObject(1);
   }
   AppendSosofoObj() { hasSubObjects_ = 1; }
+  AppendSosofoObj *asAppendSosofo();
   void process(ProcessContext &);
   void append(SosofoObj *);
   void traceSubObjects(Collector &) const;
@@ -115,6 +116,7 @@ public:
   virtual bool hasNonInheritedC(const Identifier *) const;
   virtual bool hasPseudoNonInheritedC(const Identifier *) const;
   virtual void setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &);
+  virtual bool setImplicitChar(ELObj *, const Location &, Interpreter &);
   void traceSubObjects(Collector &) const;
   void setStyle(StyleObj *);
   void process(ProcessContext &);
@@ -173,7 +175,7 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  SetNonInheritedCsSosofoObj(FlowObj *, const InsnPtr &, ELObj **);
+  SetNonInheritedCsSosofoObj(FlowObj *, const InsnPtr &, ELObj **, const NodePtr &);
   ~SetNonInheritedCsSosofoObj();
   void process(ProcessContext &);
   void traceSubObjects(Collector &) const;
@@ -187,6 +189,7 @@ private:
   FlowObj *flowObj_;
   ELObj **display_;
   InsnPtr code_;
+  NodePtr node_;
 };
 
 class Expression;

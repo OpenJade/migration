@@ -12,6 +12,7 @@
 #include "StringOf.h"
 #include "Vector.h"
 #include "XcharMap.h"
+#include "CharMap.h"
 #include "Ptr.h"
 #include "PointerTable.h"
 #include "OwnerTable.h"
@@ -73,7 +74,10 @@ __instantiate(Owner<EventHandler>)
 __instantiate(Ptr<EntityManager>)
 __instantiate(Ptr<ExtendEntityManager>)
 __instantiate(Vector<StorageObjectSpec>)
-
+__instantiate(Ptr<EntityCatalog>)
+__instantiate(ConstPtr<EntityCatalog>)
+__instantiate(CharMap<Char>)
+__instantiate(CharMapPage<Char>)
 #ifdef SP_NAMESPACE
 }
 #endif

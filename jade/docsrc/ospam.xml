@@ -63,7 +63,7 @@
         <title>Description</title>
 
    <para><command>ospam</command> (Openjade SP Add Markup) is an SGML markup stream editor implemented using
-   the OpenSP parser. <command>ospam</command> parses the SGML document contained in <arg rep="repeat"><replaceable>sysid</replaceable></arg> and
+   the OpenSP parser. <command>ospam</command> parses the SGML document contained in <replaceable>sysid</replaceable> and
    copies to the standard output the portion of the document entity
    containing the document instance, adding or changing markup as
    specified by the <option>-m</option> options. The <option>-p</option> option can be used to include the

@@ -77,6 +77,7 @@ public:
     return c.allocateObject(1);
   }
   AppendSosofoObj() { hasSubObjects_ = 1; }
+  AppendSosofoObj *asAppendSosofo();
   void process(ProcessContext &);
   void append(SosofoObj *);
   void traceSubObjects(Collector &) const;

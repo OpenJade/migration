@@ -15,6 +15,9 @@ __instantiate(Vector<TeXFOTBuilder::Row>)
 __instantiate(Vector<TeXFOTBuilder::Cell>)
 __instantiate(Vector<TeXFOTBuilder::Column>)
 __instantiate(Vector<TeXFOTBuilder::TablePart>)
+__instantiate(Vector<TeXFOTBuilder::Table>)
+__instantiate(Vector<TeXFOTBuilder::FotElementState>)
+__instantiate(Vector<OutputByteStream *>)
 #ifdef OUTLINES
 __instantiate(Vector<TeXFOTBuilder::ParHead>)
 #endif

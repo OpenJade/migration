@@ -762,6 +762,11 @@ bool SosofoObj::characterStyle(ProcessContext &, StyleObj *&, FOTBuilder::Charac
   return 0;
 }
 
+AppendSosofoObj *AppendSosofoObj::asAppendSosofo()
+{
+  return this;
+}
+
 void AppendSosofoObj::process(ProcessContext &context)
 {
   for (size_t i = 0; i < v_.size(); i++)

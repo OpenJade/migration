@@ -28,6 +28,7 @@ class KeywordObj;
 class BoxObj;
 class StringObj;
 class SosofoObj;
+class AppendSosofoObj;
 class ColorObj;
 class ColorSpaceObj;
 class StyleObj;
@@ -66,6 +67,7 @@ public:
   virtual KeywordObj *asKeyword();
   virtual FunctionObj *asFunction();
   virtual SosofoObj *asSosofo();
+  virtual AppendSosofoObj *asAppendSosofo();
   virtual ColorObj *asColor();
   virtual ColorSpaceObj *asColorSpace();
   virtual StyleObj *asStyle();

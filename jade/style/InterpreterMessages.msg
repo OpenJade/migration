@@ -34,6 +34,7 @@ E3+notASymbol++%2 argument for primitive %1 of wrong type: %3 not a symbol
 E3+notAString++%2 argument for primitive %1 of wrong type: %3 not a string
 E3+notAStringOrSymbol++%2 argument for primitive %1 of wrong type: %3 not a string or symbol
 E3+notAChar++%2 argument for primitive %1 of wrong type: %3 not a char
+E3+notATimeString++%2 argument for primitive %1 of wrong type: %3 not an ISO8601 time string
 E3+notAStyle++%2 argument for primitive %1 of wrong type: %3 not a style
 E3+notAnExactInteger++%2 argument for primitive %1 of wrong type: %3 not an exact integer
 E3+notAQuantity++%2 argument for primitive %1 of wrong type: %3 not a quantity

@@ -60,6 +60,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 int unitsPerInch,
 			 bool debugMode,
 			 bool dsssl2,
+			 bool style,
                          bool strictMode,
 			 const FOTBuilder::Extension *extensionTable,
 			 const FOTBuilder::Feature *backendFeatures)
@@ -78,6 +79,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
   dsssl2_(dsssl2),
+  style_(style),
   strictMode_(strictMode),
   explicitFeatures_(0)
 {
@@ -248,13 +250,30 @@ void Interpreter::installSyntacticKeys()
     { "for-all?", Identifier::keyForAll },
     { "select-each", Identifier::keySelectEach },
     { "union-for-each", Identifier::keyUnionForEach },
+    { "define-unit", Identifier::keyDefineUnit },
+    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
+    { "declare-char-property", Identifier::keyDeclareCharProperty },
+    { "define-language", Identifier::keyDefineLanguage },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
+    { "add-char-properties", Identifier::keyAddCharProperties },
+    { "architecture", Identifier::keyArchitecture },
+    { "default", Identifier::keyDefault },
+    { "null", Identifier::keyNull },
+    { "rcs?", Identifier::keyIsRcs },
+    { "parent", Identifier::keyParent },
+    { "active", Identifier::keyActive },
+   }, styleKeys[] = {
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
-    { "define-unit", Identifier::keyDefineUnit },
     { "query", Identifier::keyQuery },
     { "element", Identifier::keyElement },
-    { "default", Identifier::keyDefault },
     { "root", Identifier::keyRoot },
     { "id", Identifier::keyId },
     { "mode", Identifier::keyMode },
@@ -263,12 +282,8 @@ void Interpreter::installSyntacticKeys()
     { "declare-flow-object-class", Identifier::keyDeclareFlowObjectClass },
     { "declare-char-characteristic+property", Identifier::keyDeclareCharCharacteristicAndProperty },
     { "declare-reference-value-type", Identifier::keyDeclareReferenceValueType },
-    { "declare-default-language", Identifier::keyDeclareDefaultLanguage },
-    { "declare-char-property", Identifier::keyDeclareCharProperty },
     { "define-page-model", Identifier::keyDefinePageModel },
     { "define-column-set-model", Identifier::keyDefineColumnSetModel },
-    { "define-language", Identifier::keyDefineLanguage },
-    { "add-char-properties", Identifier::keyAddCharProperties },
     { "use", Identifier::keyUse },
     { "label", Identifier::keyLabel },
     { "content-map", Identifier::keyContentMap },
@@ -337,10 +352,6 @@ void Interpreter::installSyntacticKeys()
     { "grid-n-rows", Identifier::keyGridNRows },
     { "grid-n-columns", Identifier::keyGridNColumns },
     { "radical", Identifier::keyRadical },
-    { "null", Identifier::keyNull },
-    { "rcs?", Identifier::keyIsRcs },
-    { "parent", Identifier::keyParent },
-    { "active", Identifier::keyActive },
     { "attributes", Identifier::keyAttributes },
     { "children", Identifier::keyChildren },
     { "repeat", Identifier::keyRepeat },
@@ -349,13 +360,6 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
-    { "collate", Identifier::keyCollate },
-    { "toupper", Identifier::keyToupper },
-    { "tolower", Identifier::keyTolower },
-    { "symbol", Identifier::keySymbol },
-    { "order", Identifier::keyOrder },
-    { "forward", Identifier::keyForward },
-    { "backward", Identifier::keyBackward },
     { "white-point", Identifier::keyWhitePoint },
     { "black-point", Identifier::keyBlackPoint },
     { "range", Identifier::keyRange },
@@ -368,7 +372,6 @@ void Interpreter::installSyntacticKeys()
     { "matrix-abc", Identifier::keyMatrixAbc },
     { "matrix-lmn", Identifier::keyMatrixLmn },
     { "matrix-a", Identifier::keyMatrixA },
-    { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
     { "declare-id-attribute", Identifier::keyDeclareIdAttribute },
@@ -383,6 +386,16 @@ void Interpreter::installSyntacticKeys()
     if (dsssl2() && tem[tem.size() - 1] == '?') {
       tem.resize(tem.size() - 1);
       lookup(tem)->setSyntacticKey(keys[i].key);
+    }
+  }
+  if (style()) {
+    for (size_t i = 0; i < SIZEOF(styleKeys); i++) {
+      StringC tem(makeStringC(styleKeys[i].name));
+      lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      if (dsssl2() && tem[tem.size() - 1] == '?') {
+        tem.resize(tem.size() - 1);
+        lookup(tem)->setSyntacticKey(styleKeys[i].key);
+      }
     }
   }
   if (dsssl2()) {
@@ -1729,7 +1742,8 @@ bool Identifier::preferBuiltin_ = 0;
 
 Identifier::Identifier(const StringC &name)
 : Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
-  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0)
+  flowObj_(0), builtin_(0), defPart_(0), charNIC_(0), 
+  feature_(Interpreter::noFeature)
 {
 }
 
@@ -2425,23 +2439,27 @@ void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)
   feature_[query].supported = partiallySupported;
   feature_[actualCharacteristic].supported = Supported;
   feature_[crossReference].supported = Supported;
-  feature_[style].supported = Supported;
   if (backendFeatures) 
     for (const FOTBuilder::Feature *b = backendFeatures; b->name; b++) {
       StringC name = makeStringC(b->name);
-      for (int i = 0; i < dssslFeatures; i++) 
+      for (int i = 0; i < nFeatures; i++) 
 	if (name == feature_[i].name) {
 	  feature_[i].supported = b->partial ? partiallySupported : Supported;
 	  break;
 	}
     }
 
-  for (int i = 0; i < nFeatures; i++) 
+  feature_[noFeature].declared = 1;
+  for (int i = 1; i < nFeatures; i++) 
     feature_[i].declared = 0;
   if (!strictMode_) 
-    for (int i = 0; i < dssslFeatures; i++) 
+    for (int i = 0; i < nFeatures; i++) 
       if (feature_[i].supported != notSupported)
 	feature_[i].declared = 1;
+  if (!style()) {
+    declareFeature(query);
+    declareFeature(expression);
+  }
 }
 
 bool Interpreter::requireFeature(const Interpreter::Feature &f,
@@ -2458,23 +2476,31 @@ bool Interpreter::requireFeature(const Interpreter::Feature &f,
    return feature_[f].declared;
 }
 
-void Interpreter::declareFeature(const StringC &f)
+bool Interpreter::convertFeature(const StringC &name, Interpreter::Feature &f)
+{
+  int i;
+  for (i = nFeatures - 1; i > noFeature; i--) 
+    if (feature_[i].name == name) 
+      break; 
+  f = Feature(i);
+  return (f != noFeature);
+}
+
+void Interpreter::declareFeature(const StringC &name)
 {  
   int i;
   if (!explicitFeatures_) {
     explicitFeatures_ = 1;
-    for (i = 0; i < dssslFeatures; i++) 
+    for (i = 1; i < nFeatures; i++) 
       feature_[i].declared = 0;
   }
-  for (i = 0; i < dssslFeatures; i++) 
-    if (feature_[i].name == f) 
-      break; 
-  if (i == dssslFeatures) {
+  Feature feature;
+  if (!convertFeature(name, feature)) {
     message(InterpreterMessages::unknownFeature,
-	     StringMessageArg(f));
+	     StringMessageArg(name));
     return;
   }
-  declareFeature(Feature(i));
+  declareFeature(feature);
 }
 
 void Interpreter::declareFeature(const Feature &feature)
@@ -2489,10 +2515,6 @@ void Interpreter::declareFeature(const Feature &feature)
 	    StringMessageArg(f.name));
   // Handle implied features
   switch (feature) {
-  case transformation:
-    declareFeature(query);
-    declareFeature(expression);
-    break;
   case query:
     declareFeature(multiProcess);
     break;
@@ -2508,6 +2530,21 @@ void Interpreter::declareFeature(const Feature &feature)
   default:; // do nothing
   }
 }
+
+
+bool Identifier::requireFeature(Interpreter &interp, const Location &loc, bool fo) const
+{
+  if ((fo ? flowObjPart_ : defPart_) == unsigned(-1))
+    return interp.requireFeature(Interpreter::Feature(feature_), loc);
+  else
+    return 1;
+}
+
+void Identifier::setFeature(int f)
+{
+  feature_ = f;
+}
+
 
 #ifdef DSSSL_NAMESPACE
 }

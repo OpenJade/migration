@@ -1,34 +1,34 @@
 ;; clause 8.5.3.5
-(define (caar x)  (car (car x)) )
-(define (cadr x)  (list-ref x 1) )
-(define (cdar x)  (cdr (car x)) )
-(define (cddr x)  (cdr (cdr x)) )
-(define (caaar x)  (car (car (car x))) )
-(define (caadr x)  (car (car (cdr x))) )
-(define (cadar x)  (car (cdr (car x))) )
-(define (caddr x)  (list-ref x 2) )
-(define (cdaar x)  (cdr (car (car x))) )
-(define (cdadr x)  (cdr (car (cdr x))) )
-(define (cddar x)  (cdr (cdr (car x))) )
-(define (cdddr x)  (cdr (cdr (cdr x))) )
-(define (caaaar x)  (car (car (car (car x)))) )
-(define (caaadr x)  (car (car (car (cdr x)))) )
-(define (caadar x)  (car (car (cdr (car x)))) )
-(define (cadaar x)  (car (cdr (car (car x)))) )
-(define (cadadr x)  (car (cdr (car (cdr x)))) )
-(define (caddar x)  (car (cdr (cdr (car x)))) )
-(define (cadddr x)  (list-ref x 3) )
-(define (cdaaar x)  (cdr (car (car (car x)))) )
-(define (cdaadr x)  (cdr (car (car (cdr x)))) )
-(define (cdadar x)  (cdr (car (cdr (car x)))) )
-(define (cddaar x)  (cdr (cdr (car (car x)))) )
-(define (cddadr x)  (cdr (cdr (car (cdr x)))) )
-(define (cdddar x)  (cdr (cdr (cdr (car x)))) )
-(define (cddddr x)  (cdr (cdr (cdr (cdr x)))) )
+(define feature: expression (caar x)  (car (car x)) )
+(define feature: expression (cadr x)  (list-ref x 1) )
+(define feature: expression (cdar x)  (cdr (car x)) )
+(define feature: expression (cddr x)  (cdr (cdr x)) )
+(define feature: expression (caaar x)  (car (car (car x))) )
+(define feature: expression (caadr x)  (car (car (cdr x))) )
+(define feature: expression (cadar x)  (car (cdr (car x))) )
+(define feature: expression (caddr x)  (list-ref x 2) )
+(define feature: expression (cdaar x)  (cdr (car (car x))) )
+(define feature: expression (cdadr x)  (cdr (car (cdr x))) )
+(define feature: expression (cddar x)  (cdr (cdr (car x))) )
+(define feature: expression (cdddr x)  (cdr (cdr (cdr x))) )
+(define feature: expression (caaaar x)  (car (car (car (car x)))) )
+(define feature: expression (caaadr x)  (car (car (car (cdr x)))) )
+(define feature: expression (caadar x)  (car (car (cdr (car x)))) )
+(define feature: expression (cadaar x)  (car (cdr (car (car x)))) )
+(define feature: expression (cadadr x)  (car (cdr (car (cdr x)))) )
+(define feature: expression (caddar x)  (car (cdr (cdr (car x)))) )
+(define feature: expression (cadddr x)  (list-ref x 3) )
+(define feature: expression (cdaaar x)  (cdr (car (car (car x)))) )
+(define feature: expression (cdaadr x)  (cdr (car (car (cdr x)))) )
+(define feature: expression (cdadar x)  (cdr (car (cdr (car x)))) )
+(define feature: expression (cddaar x)  (cdr (cdr (car (car x)))) )
+(define feature: expression (cddadr x)  (cdr (cdr (car (cdr x)))) )
+(define feature: expression (cdddar x)  (cdr (cdr (cdr (car x)))) )
+(define feature: expression (cddddr x)  (cdr (cdr (cdr (cdr x)))) )
 
 ;; clause 8.5.8.4
-(define (char>?  c1 c2) (char<?  c2 c1))
-(define (char>=? c1 c2) (char<=? c2 c1))
+(define feature: expression (char>?  c1 c2) (char<?  c2 c1))
+(define feature: expression (char>=? c1 c2) (char<=? c2 c1))
 
 ;; clause 8.5.8.5
 (define internal: (ci-equiv proc) 
@@ -36,11 +36,11 @@
         (proc (char-upcase c1) (char-upcase c2))
     )
 )
-(define char-ci=?   (ci-equiv char=?))
-(define char-ci<?   (ci-equiv char<?))
-(define char-ci>?   (ci-equiv char>?))
-(define char-ci<=?  (ci-equiv char<=?))
-(define char-ci>=?  (ci-equiv char>=?))
+(define feature: expression char-ci=?   (ci-equiv char=?))
+(define feature: expression char-ci<?   (ci-equiv char<?))
+(define feature: expression char-ci>?   (ci-equiv char>?))
+(define feature: expression char-ci<=?  (ci-equiv char<=?))
+(define feature: expression char-ci>=?  (ci-equiv char>=?))
 
 ;; clause 8.5.9.6
 (define internal: (upcase-string s) 
@@ -55,16 +55,16 @@
         (proc (upcase-string s1) (upcase-string s2))
     )
 )
-(define (string>?    s1 s2) (string<?  s2 s1))
-(define (string>=?   s1 s2) (string<=? s2 s1))
-(define string-ci=?  (ci-string-equiv string=?))
-(define string-ci<?  (ci-string-equiv string<?))
-(define string-ci>?  (ci-string-equiv string>?))
-(define string-ci<=? (ci-string-equiv string<=?))
-(define string-ci>=? (ci-string-equiv string>=?))
+(define feature: expression (string>?    s1 s2) (string<?  s2 s1))
+(define feature: expression (string>=?   s1 s2) (string<=? s2 s1))
+(define feature: expression string-ci=?  (ci-string-equiv string=?))
+(define feature: expression string-ci<?  (ci-string-equiv string<?))
+(define feature: expression string-ci>?  (ci-string-equiv string>?))
+(define feature: expression string-ci<=? (ci-string-equiv string<=?))
+(define feature: expression string-ci>=? (ci-string-equiv string>=?))
 
 ;; clause 8.5.10.3
- (define (map f #!rest xs)
+ (define feature: expression (map f #!rest xs)
    (let ((map1 (lambda (f xs)
                 (let loop ((xs xs))
                   (if (null? xs)
@@ -83,24 +83,24 @@
                       (loop (map1 cdr xs)))))))))
 
 ;; clause 10.1.1
-(define (current-root) (node-property 'grove-root (current-node)))
+(define feature: query (current-root) (node-property 'grove-root (current-node)))
 
 ;; clause 10.2.2
-(define (node-list-reduce nl combine init)
+(define feature: query (node-list-reduce nl combine init)
    (if (node-list-empty? nl)
        init
        (node-list-reduce (node-list-rest nl)
                          combine
                          (combine init (node-list-first nl)))))
 
-(define (node-list-contains? nl snl)
+(define feature: query (node-list-contains? nl snl)
   (node-list-reduce nl
 		    (lambda (result i)
 		      (or result
 			  (node-list=? snl i)))
 		    #f))
 
-(define (node-list-remove-duplicates nl)
+(define feature: query (node-list-remove-duplicates nl)
   (node-list-reduce nl
 		    (lambda (result snl)
 		      (if (node-list-contains? result snl)
@@ -116,7 +116,7 @@
 	(loop (combine result (car list))
 	      (cdr list)))))
 
-(define (node-list-union #!rest args)
+(define feature: query (node-list-union #!rest args)
   (reduce args
 	  (lambda (nl1 nl2)
 	    (node-list-reduce nl2
@@ -128,7 +128,7 @@
 			      nl1))
 	  (empty-node-list)))
 
-(define (node-list-intersection #!rest args)
+(define feature: query (node-list-intersection #!rest args)
   (if (null? args) 
       (empty-node-list)
       (reduce (cdr args)
@@ -141,7 +141,7 @@
 				  (empty-node-list)))
 	      (node-list-remove-duplicates (car args)))))
 
-(define (node-list-difference #!rest args)
+(define feature: query (node-list-difference #!rest args)
   (if (null? args)
       (empty-node-list)
       (reduce (cdr args)
@@ -154,7 +154,7 @@
 				  (empty-node-list)))
 	      (node-list-remove-duplicates (car args)))))
 
-(define (node-list-symmetric-difference #!rest args)
+(define feature: query (node-list-symmetric-difference #!rest args)
   (if (null? args)
       (empty-node-list)
       (reduce (cdr args)
@@ -163,14 +163,14 @@
 				      (node-list-intersection nl1 nl2)))
 	      (node-list-remove-duplicates (car args)))))
 
-(define (node-list-union-map proc nl)
+(define feature: query (node-list-union-map proc nl)
   (node-list-reduce nl
 		    (lambda (result snl)
 		      (node-list-union (proc snl)
 				       result))
 		    (empty-node-list)))
 
-(define (node-list-some? proc nl)
+(define feature: query (node-list-some? proc nl)
   (node-list-reduce nl
 		    (lambda (result snl)
 		      (if (or result (proc snl))
@@ -178,7 +178,7 @@
 			  #f))
 		    #f))
 
-(define (node-list-every? proc nl)
+(define feature: query (node-list-every? proc nl)
   (node-list-reduce nl
 		    (lambda (result snl)
 		      (if (and result (proc snl))
@@ -186,7 +186,7 @@
 			  #f))
 		    #t))
 
-(define (node-list-filter proc nl)
+(define feature: query (node-list-filter proc nl)
   (node-list-reduce nl
 		    (lambda (result snl)
 		      (if (proc snl)
@@ -194,20 +194,20 @@
 			  result))
 		    (empty-node-list)))
 
-(define (node-list->list nl)
+(define feature: query (node-list->list nl)
   (reverse (node-list-reduce nl
 			     (lambda (result snl)
 			       (cons snl result))
 			     '())))
 
-(define (node-list-tail nl k)
+(define feature: query (node-list-tail nl k)
   (cond 
    ((< k 0) (empty-node-list))
    ((zero? k) nl)
    (else
     (node-list-tail (node-list-rest nl) (- k 1)))))
 
-(define (node-list-head nl k)
+(define feature: query (node-list-head nl k)
   (if (zero? k)
       (empty-node-list)
       (node-list (node-list-first nl)
@@ -215,43 +215,43 @@
        ;;                         ^^^^^^^
        ;;                         missing in standard
 
-(define (node-list-sublist nl i j)
+(define feature: query (node-list-sublist nl i j)
   (node-list-head (node-list-tail nl i) (- j i)))
 
-(define (node-list-count nl)
+(define feature: query (node-list-count nl)
   (node-list-length (node-list-remove-duplicates nl)))
 
-(define (node-list-last nl)
+(define feature: query (node-list-last nl)
   (node-list-ref nl 
 		 (- (node-list-length nl) 1)))
 
 ;; clause 10.2.3
-(define (node-list-property prop nl)
+(define feature: query (node-list-property prop nl)
   (node-list-map (lambda (snl)
 		   (node-property prop snl default: (empty-node-list)))
 		 nl))
 
-(define (origin nl)
+(define feature: query (origin nl)
   (node-list-property 'origin nl))
 
-(define (origin-to-subnode-rel snl)
+(define feature: query (origin-to-subnode-rel snl)
   (node-property 'origin-to-subnode-rel-property-name snl default: #f))
 
-(define (tree-root nl)
+(define feature: query (tree-root nl)
   (node-list-property 'tree-root nl))
 
-(define (grove-root nl)
+(define feature: query (grove-root nl)
   (node-list-property 'grove-root nl))
 
-(define (source nl)
+(define feature: query (source nl)
   (node-list-property 'source nl))
 
-(define (subtree nl)
+(define feature: query (subtree nl)
   (node-list-map (lambda (snl)
 		   (node-list snl (subtree (children snl))))
 		 nl))
 
-(define (subgrove nl)
+(define feature: query (subgrove nl)
   (node-list-map
    (lambda (snl)
      (node-list snl
@@ -263,7 +263,7 @@
 					    snl))))))
    nl))
 
-(define (ancestors nl)
+(define feature: query (ancestors nl)
   (node-list-map (lambda (snl)
 		   (let loop ((cur (parent snl))
 			      (result (empty-node-list)))
@@ -273,7 +273,7 @@
 			       (node-list cur result)))))
 		 nl))
 
-(define (grove-root-path nl)
+(define feature: query (grove-root-path nl)
   (node-list-map (lambda (snl)
 		   (let loop ((cur (origin snl))
 			      (result (empty-node-list)))
@@ -283,7 +283,7 @@
 			       (node-list cur result)))))
 		 nl))
 
-(define (rsiblings nl)
+(define feature: query (rsiblings nl)
   (node-list-map (lambda (snl)
 		   (let ((rel (origin-to-subnode-rel snl)))
 		     (if rel 
@@ -293,7 +293,7 @@
 			 snl)))
 		 nl))
 
-(define (ipreced nl)
+(define feature: query (ipreced nl)
    (node-list-map (lambda (snl)
                   (let loop ((prev (empty-node-list))
                              (rest (rsiblings snl)))
@@ -306,7 +306,7 @@
                                  (node-list-rest rest))))))
                   nl))
 
-(define (ifollow nl)
+(define feature: query (ifollow nl)
   (node-list-map (lambda (snl)
 		   (let loop ((rest (rsiblings snl)))
 		     (cond ((node-list-empty? rest)
@@ -317,52 +317,52 @@
 			    (loop (node-list-rest rest))))))
 		 nl))
 
-(define (grove-before? snl1 snl2)
+(define feature: query (grove-before? snl1 snl2)
   (let ((sorted
 	 (node-list-intersection (subgrove (grove-root snl1))
 				 (node-list snl1 snl2))))
     (and (= (node-list-length sorted) 2)
 	 (node-list=? (node-list-first sorted) snl1))))
 
-(define (sort-in-tree-order nl)
+(define feature: query (sort-in-tree-order nl)
   (node-list-intersection (subtree (tree-root nl))
 			  nl))
 
-(define (tree-before? snl1 snl2)
+(define feature: query (tree-before? snl1 snl2)
   (let ((sorted 
 	 (sort-in-tree-order (node-list snl1 snl2))))
     (and (= (node-list-length sorted) 2)
 	 (node-list=? (node-list-first sorted) snl1))))
 
-(define (tree-before nl)
+(define feature: query (tree-before nl)
   (node-list-map (lambda (snl)
 		   (node-list-filter (lambda (x)
 				       (tree-before? x snl))
 				     (subtree (tree-root snl))))
 		 nl))
 
-(define (property-lookup prop snl if-present if-not-present)
+(define feature: query (property-lookup prop snl if-present if-not-present)
   (let ((val (node-property prop snl default: #f)))
     (cond
      (val (if-present val))
      ((node-property prop snl default: #t) (if-not-present val))
      (else (if-present val)))))
 
-(define (select-by-property nl prop proc)
+(define feature: query (select-by-property nl prop proc)
   (node-list-filter (lambda (snl)
 		      (let ((val (node-property prop snl default: #f)))
 			(and (not (node-list? val))
 			     (proc val))))
 		    nl))
 
-(define (select-by-null-property nl prop)
+(define feature: query (select-by-null-property nl prop)
   (node-list-filter (lambda (snl)
 		      (let ((val1 (node-property prop snl null: #f))
 			    (val2 (node-property prop snl null: #t)))
 			(and (not val1) val2)))
 		    nl))
 
-(define (select-by-missing-property nl prop)
+(define feature: query (select-by-missing-property nl prop)
   (node-list-filter (lambda (snl)
 		      (let ((val1 (node-property prop snl 
 						 default: #f 
@@ -374,23 +374,23 @@
 		    nl))
 
 ;; clause 10.2.5
-(define (attribute string nl)
+(define feature: query (attribute string nl)
   (node-list-map (lambda (snl)
 		   (named-node name (attributes snl)))
 		 nl))
 
-(define (referent nl)
+(define feature: query (referent nl)
   (node-list-property 'referent nl))
   
-(define (q-element pattern #!optional (nl (current-node)))
+(define feature: query (q-element pattern #!optional (nl (current-node)))
   (select-elements (subgrove nl) pattern))
 
-(define (q-class sym #!optional (nl (current-node)))
+(define feature: query (q-class sym #!optional (nl (current-node)))
   (node-list-filter (lambda (snl) 
 		      (equal? (node-property 'class-name snl) sym)) 
 		    (subgrove nl)))
 
-(define (q-sdata string #!optional (nl (current-node)))
+(define feature: query (q-sdata string #!optional (nl (current-node)))
   (node-list-filter (lambda (snl) 
 		      (and (equal? (node-property 'class-name snl) 'sdata)
 			   (equal? (node-property 'system-data snl) string)))

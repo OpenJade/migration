@@ -114,7 +114,7 @@ private:
   ConstPtr<PatternSet> patterns_;
 };
 
-#define PRIMITIVE(name, string, nRequired, nOptional, rest) \
+#define PRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
 class name ## PrimitiveObj : public PrimitiveObj { \
 public: \
   static const Signature signature_; \
@@ -124,11 +124,14 @@ public: \
 const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
 
-#define XPRIMITIVE PRIMITIVE
-#define XXPRIMITIVE PRIMITIVE
-#define PRIMITIVE2 PRIMITIVE
+#define SPRIMITIVE PRIMITIVE
+#define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
+  PRIMITIVE(name, string, nRequired, nOptional, rest, noFeature) 
+#define XXPRIMITIVE XPRIMITIVE
+#define PRIMITIVE2 XPRIMITIVE
 #include "primitive.h"
 #undef PRIMITIVE
+#undef SPRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
@@ -138,12 +141,8 @@ const Signature name ## PrimitiveObj::signature_ \
   ::primitiveCall(int argc, ELObj **argv, EvalContext &context, Interpreter &interp, \
                   const Location &loc)
 
-#define STYLEPRIMITIVE \
- if (!interp.requireFeature(Interpreter::style, loc)) return interp.makeError()
-
 DEFPRIMITIVE(Cons, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   return new (interp) PairObj(argv[0], argv[1]);
 }
 
@@ -204,7 +203,6 @@ DEFPRIMITIVE(IsEqv, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Car, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   PairObj *pair = argv[0]->asPair();
   if (!pair)
     return argError(interp, loc,
@@ -215,7 +213,6 @@ DEFPRIMITIVE(Car, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Cdr, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   PairObj *pair = argv[0]->asPair();
   if (!pair)
     return argError(interp, loc,
@@ -440,7 +437,6 @@ DEFPRIMITIVE(IsQuantity, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsPair, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   if (argv[0]->asPair())
     return interp.makeTrue();
   else
@@ -504,7 +500,6 @@ DEFPRIMITIVE(String, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SymbolToString, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   SymbolObj *obj = argv[0]->asSymbol();
   if (!obj)
     return argError(interp, loc,
@@ -514,7 +509,6 @@ DEFPRIMITIVE(SymbolToString, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringToSymbol, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -1612,7 +1606,6 @@ DEFPRIMITIVE(CharProperty, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argc == 0)
     return new (interp) EmptySosofoObj;
   const Char *s;
@@ -1635,7 +1628,6 @@ DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ProcessChildren, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE; 
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -1646,7 +1638,6 @@ DEFPRIMITIVE(ProcessChildren, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ProcessChildrenTrim, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -1657,7 +1648,6 @@ DEFPRIMITIVE(ProcessChildrenTrim, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SosofoAppend, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   AppendSosofoObj *obj = new (interp) AppendSosofoObj;
   for (int i = 0; i < argc; i++) {
     SosofoObj *sosofo = argv[i]->asSosofo();
@@ -1671,7 +1661,6 @@ DEFPRIMITIVE(SosofoAppend, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NextMatch, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -1690,13 +1679,11 @@ DEFPRIMITIVE(NextMatch, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(EmptySosofo, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   return new (interp) EmptySosofoObj;
 }
 
 DEFPRIMITIVE(SosofoLabel, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   SosofoObj *sosofo = argv[0]->asSosofo();
   if (!sosofo)
     return argError(interp, loc, InterpreterMessages::notASosofo,
@@ -1711,7 +1698,6 @@ DEFPRIMITIVE(SosofoLabel, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SosofoDiscardLabeled, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   SosofoObj *sosofo = argv[0]->asSosofo();
   if (!sosofo)
     return argError(interp, loc, InterpreterMessages::notASosofo,
@@ -1726,7 +1712,6 @@ DEFPRIMITIVE(SosofoDiscardLabeled, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsSosofo, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asSosofo())
     return interp.makeTrue();
   else
@@ -1735,7 +1720,6 @@ DEFPRIMITIVE(IsSosofo, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(MergeStyle, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   MergeStyleObj *merged = new (interp) MergeStyleObj;
   for (int i = 0; i < argc; i++) {
     StyleObj *style = argv[i]->asStyle();
@@ -1749,7 +1733,6 @@ DEFPRIMITIVE(MergeStyle, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsStyle, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asStyle())
     return interp.makeTrue();
   else
@@ -1758,7 +1741,6 @@ DEFPRIMITIVE(IsStyle, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CurrentNodePageNumberSosofo, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.currentNode)
     return noCurrentNodeError(interp, loc);
   return new (interp) CurrentNodePageNumberSosofoObj(context.currentNode);
@@ -1766,14 +1748,11 @@ DEFPRIMITIVE(CurrentNodePageNumberSosofo, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(PageNumberSosofo, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   return new (interp) PageNumberSosofoObj;
 }
 
 DEFPRIMITIVE(ProcessElementWithId, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
-  interp.requireFeature(Interpreter::crossReference, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -1798,7 +1777,6 @@ DEFPRIMITIVE(ProcessElementWithId, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -1824,7 +1802,6 @@ DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ProcessMatchingChildren, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -1876,7 +1853,6 @@ DEFPRIMITIVE(IsMatchElement, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ProcessNodeList, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.processingMode) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noCurrentProcessingMode);
@@ -2044,7 +2020,6 @@ bool formatNumber(long n, const Char *s, size_t len, StringC &result)
 
 DEFPRIMITIVE(FormatNumber, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   if (!argv[0]->exactIntegerValue(n))
     return argError(interp, loc,
@@ -2064,7 +2039,6 @@ DEFPRIMITIVE(FormatNumber, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(FormatNumberList, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   ELObj *numbers = argv[0];
   ELObj *formats = argv[1];
   ELObj *seps = argv[2];
@@ -2257,13 +2231,11 @@ DEFPRIMITIVE(QuantityToString, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(DisplaySize, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   return new (interp) LengthSpecObj(LengthSpec(LengthSpec::displaySize, 1.0));
 }
 
 DEFPRIMITIVE(TableUnit, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   long k;
   if (!argv[0]->exactIntegerValue(k))
     return argError(interp, loc,
@@ -2274,7 +2246,6 @@ DEFPRIMITIVE(TableUnit, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsDisplaySpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asDisplaySpace())
     return interp.makeTrue();
   else
@@ -2284,7 +2255,6 @@ DEFPRIMITIVE(IsDisplaySpace, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(DisplaySpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   FOTBuilder::DisplaySpace displaySpace;
   if (!interp.convertLengthSpec(argv[0], displaySpace.nominal))
     return argError(interp, loc,
@@ -2358,7 +2328,6 @@ DEFPRIMITIVE(DisplaySpace, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsInlineSpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asInlineSpace())
     return interp.makeTrue();
   else
@@ -2367,7 +2336,6 @@ DEFPRIMITIVE(IsInlineSpace, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(InlineSpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   FOTBuilder::InlineSpace inlineSpace;
   if (!interp.convertLengthSpec(argv[0], inlineSpace.nominal))
     return argError(interp, loc,
@@ -2421,7 +2389,6 @@ DEFPRIMITIVE(InlineSpace, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsColor, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asColor())
     return interp.makeTrue();
   else
@@ -2430,7 +2397,6 @@ DEFPRIMITIVE(IsColor, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsColorSpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asColorSpace())
     return interp.makeTrue();
   else
@@ -2472,7 +2438,6 @@ bool decodeFuncVector(FunctionObj **res, int len, ELObj *obj)
 
 DEFPRIMITIVE(ColorSpace, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -2606,7 +2571,6 @@ DEFPRIMITIVE(ColorSpace, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Color, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   ColorSpaceObj *colorSpace = argv[0]->asColorSpace();
   if (!colorSpace)
     return argError(interp, loc,
@@ -2616,7 +2580,6 @@ DEFPRIMITIVE(Color, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsAddress, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asAddress())
     return interp.makeTrue();
   else
@@ -2625,7 +2588,6 @@ DEFPRIMITIVE(IsAddress, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsAddressLocal, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   AddressObj *address = argv[0]->asAddress();
   if (!address)
     return argError(interp, loc,
@@ -2650,7 +2612,6 @@ DEFPRIMITIVE(IsAddressLocal, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsAddressVisited, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   AddressObj *address = argv[0]->asAddress();
   if (!address)
     return argError(interp, loc,
@@ -2661,7 +2622,6 @@ DEFPRIMITIVE(IsAddressVisited, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CurrentNodeAddress, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.currentNode)
     return noCurrentNodeError(interp, loc);
   return new (interp) AddressObj(FOTBuilder::Address::resolvedNode, context.currentNode);
@@ -2669,7 +2629,6 @@ DEFPRIMITIVE(CurrentNodeAddress, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(HytimeLinkend, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.currentNode)
     return noCurrentNodeError(interp, loc);
   return new (interp) AddressObj(FOTBuilder::Address::hytimeLinkend, context.currentNode);
@@ -2677,7 +2636,6 @@ DEFPRIMITIVE(HytimeLinkend, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SgmlDocumentAddress, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -2696,7 +2654,6 @@ DEFPRIMITIVE(IdrefAddress, argc, argv, context, interp, loc)
   // is that when it's a forward reference we don't have to
   // wait for the node.  It might be cleaner to use a ProxyNode class
   // for this.
-  STYLEPRIMITIVE;
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -2711,7 +2668,6 @@ DEFPRIMITIVE(EntityAddress, argc, argv, context, interp, loc)
 {
   // Note that multiple space separated entity names are allowed;
   // currently Address doesn't support multiple nodes, so we can't resolve here.
-  STYLEPRIMITIVE;
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -2724,7 +2680,6 @@ DEFPRIMITIVE(EntityAddress, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListAddress, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
     return argError(interp, loc,
@@ -2734,7 +2689,6 @@ DEFPRIMITIVE(NodeListAddress, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharScriptCase, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (!context.styleStack) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::notInCharacteristicValue);
@@ -2753,7 +2707,6 @@ DEFPRIMITIVE(CharScriptCase, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsGlyphId, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->glyphId())
     return interp.makeTrue();
   else
@@ -2762,7 +2715,6 @@ DEFPRIMITIVE(IsGlyphId, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(GlyphId, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -2773,7 +2725,6 @@ DEFPRIMITIVE(GlyphId, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsGlyphSubstTable, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   if (argv[0]->asGlyphSubstTable())
     return interp.makeTrue();
   else
@@ -2782,7 +2733,6 @@ DEFPRIMITIVE(IsGlyphSubstTable, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(GlyphSubstTable, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   ELObj *p = argv[0];
   Ptr<FOTBuilder::GlyphSubstTable> table = new FOTBuilder::GlyphSubstTable;
   table->uniqueId = interp.allocGlyphSubstTableUniqueId();
@@ -2807,7 +2757,6 @@ DEFPRIMITIVE(GlyphSubstTable, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(GlyphSubst, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   GlyphSubstTableObj *table = argv[0]->asGlyphSubstTable();
   if (!table)
     return argError(interp, loc,
@@ -3855,7 +3804,6 @@ DEFPRIMITIVE(EntityNameNormalize, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListFirst, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -3866,7 +3814,6 @@ DEFPRIMITIVE(NodeListFirst, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListRest, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -3876,7 +3823,6 @@ DEFPRIMITIVE(NodeListRest, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeList, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   if (argc == 0)
     return interp.makeEmptyNodeList();
   int i = argc - 1;
@@ -3903,7 +3849,6 @@ DEFPRIMITIVE(NodeList, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListNoOrder, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -3913,7 +3858,6 @@ DEFPRIMITIVE(NodeListNoOrder, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsNodeListEqual, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl1 = argv[0]->asNodeList();
   if (!nl1)
     return argError(interp, loc,
@@ -3949,7 +3893,6 @@ DEFPRIMITIVE(IsNodeListEqual, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsNamedNodeList, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   if (argv[0]->asNamedNodeList())
     return interp.makeTrue();
   else
@@ -3958,7 +3901,6 @@ DEFPRIMITIVE(IsNamedNodeList, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NamedNode, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -3973,7 +3915,6 @@ DEFPRIMITIVE(NamedNode, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NamedNodeListNormalize, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -3992,7 +3933,6 @@ DEFPRIMITIVE(NamedNodeListNormalize, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NamedNodeListObj *nnl = argv[0]->asNamedNodeList();
   if (!nnl)
     return argError(interp, loc,
@@ -4022,7 +3962,6 @@ DEFPRIMITIVE(NamedNodeListNames, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Children, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node)) {
     NodeListObj *nl = argv[0]->asNodeList();
@@ -4041,7 +3980,6 @@ DEFPRIMITIVE(Children, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Follow, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node)) {
     NodeListObj *nl = argv[0]->asNodeList();
@@ -4060,7 +3998,6 @@ DEFPRIMITIVE(Follow, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node)) {
     NodeListObj *nl = argv[0]->asNodeList();
@@ -4074,7 +4011,6 @@ DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Preced, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node)) {
     NodeListObj *nl = argv[0]->asNodeList();
@@ -4091,7 +4027,6 @@ DEFPRIMITIVE(Preced, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Attributes, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodePtr node;
   if (!argv[0]->optSingletonNodeList(context, interp, node)) {
     NodeListObj *nl = argv[0]->asNodeList();
@@ -4134,7 +4069,6 @@ void nodeData(const NodePtr &nd, const SdataMapper &mapper, bool chunk, StringC 
 
 DEFPRIMITIVE(Data, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4155,7 +4089,6 @@ DEFPRIMITIVE(Data, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ElementWithId, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -4225,7 +4158,6 @@ bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
 
 DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   StringObj *str = argv[0]->convertToString();
   if (!str)
     return argError(interp, loc,
@@ -4262,7 +4194,6 @@ DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SelectByClass, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4279,7 +4210,6 @@ DEFPRIMITIVE(SelectByClass, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListMap, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   FunctionObj *func = argv[0]->asFunction();
   if (!func)
     return argError(interp, loc,
@@ -4306,7 +4236,6 @@ DEFPRIMITIVE(NodeListMap, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4322,7 +4251,6 @@ DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListReverse, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4332,7 +4260,6 @@ DEFPRIMITIVE(NodeListReverse, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(NodeListLength, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4342,7 +4269,6 @@ DEFPRIMITIVE(NodeListLength, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -4387,7 +4313,6 @@ DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(XSgmlParse, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::query, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -4455,7 +4380,6 @@ DEFPRIMITIVE(Debug, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IfFirstPage, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   SosofoObj *sosofo[2];
   for (int i = 0; i < 2; i++) {
     sosofo[i] = argv[i]->asSosofo();
@@ -4468,7 +4392,6 @@ DEFPRIMITIVE(IfFirstPage, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IfFrontPage, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   SosofoObj *sosofo[2];
   for (int i = 0; i < 2; i++) {
     sosofo[i] = argv[i]->asSosofo();
@@ -4691,7 +4614,6 @@ DEFPRIMITIVE(WithLanguage, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharLess, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   Char c[2];
   for (unsigned i = 0; i < 2; i++)
@@ -4706,7 +4628,6 @@ DEFPRIMITIVE(CharLess, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharLessOrEqual, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   Char c[2];
   for (unsigned i = 0; i < 2; i++)
@@ -4721,7 +4642,6 @@ DEFPRIMITIVE(CharLessOrEqual, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharUpcase, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   Char c;
   if (!argv[0]->charValue(c))
@@ -4732,7 +4652,6 @@ DEFPRIMITIVE(CharUpcase, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharDowncase, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   Char c;
   if (!argv[0]->charValue(c))
@@ -4743,7 +4662,6 @@ DEFPRIMITIVE(CharDowncase, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringEquiv, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   const Char *s[2];
   size_t n[2];
@@ -4763,7 +4681,6 @@ DEFPRIMITIVE(StringEquiv, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringLess, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   const Char *s[2];
   size_t n[2];
@@ -4779,7 +4696,6 @@ DEFPRIMITIVE(StringLess, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringLessOrEqual, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   GETCURLANG(lang, context, interp);
   const Char *s[2];
   size_t n[2];
@@ -4795,7 +4711,6 @@ DEFPRIMITIVE(StringLessOrEqual, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Assoc, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   ELObj *list = argv[1];
   for (;;) {
     PairObj *pair = list->asPair();
@@ -4818,7 +4733,6 @@ DEFPRIMITIVE(Assoc, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(KeywordToString, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   KeywordObj *obj = argv[0]->asKeyword();
   if (!obj)
     return argError(interp, loc,
@@ -4828,7 +4742,6 @@ DEFPRIMITIVE(KeywordToString, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringToKeyword, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -4839,7 +4752,6 @@ DEFPRIMITIVE(StringToKeyword, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsExact, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -4858,7 +4770,6 @@ DEFPRIMITIVE(IsExact, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsInexact, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -4878,7 +4789,6 @@ DEFPRIMITIVE(IsInexact, argc, argv, context, interp, loc)
 #define DEFNUMPRED(NAME, OP) \
 DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
 { \
-  interp.requireFeature(Interpreter::expression, loc); \
   long n; \
   double d; \
   int dim; \
@@ -4907,7 +4817,6 @@ DEFNUMPRED(IsNegative, < )
 
 DEFPRIMITIVE(IsOdd, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -4928,7 +4837,6 @@ DEFPRIMITIVE(IsOdd, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsEven, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -4949,7 +4857,6 @@ DEFPRIMITIVE(IsEven, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Exp, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -4959,7 +4866,6 @@ DEFPRIMITIVE(Exp, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Log, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -4974,7 +4880,6 @@ DEFPRIMITIVE(Log, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Sin, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
   return argError(interp, loc,
@@ -4984,7 +4889,6 @@ DEFPRIMITIVE(Sin, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Cos, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -4994,7 +4898,6 @@ DEFPRIMITIVE(Cos, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Tan, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -5004,7 +4907,6 @@ DEFPRIMITIVE(Tan, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Asin, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -5019,7 +4921,6 @@ DEFPRIMITIVE(Asin, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Acos, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -5034,7 +4935,6 @@ DEFPRIMITIVE(Acos, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Atan, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long lResult;
   double dResult;
   int dim;
@@ -5099,7 +4999,6 @@ DEFPRIMITIVE(Atan, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(XExpt, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n1, n2;
   double d1, d2;
   int dim1, dim2;
@@ -5131,7 +5030,6 @@ DEFPRIMITIVE(XExpt, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(Expt, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   double d, d2;
   if (!argv[0]->realValue(d)) 
     return argError(interp, loc,
@@ -5150,7 +5048,6 @@ DEFPRIMITIVE(Expt, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ExactToInexact, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -5170,7 +5067,6 @@ DEFPRIMITIVE(ExactToInexact, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(InexactToExact, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -5196,7 +5092,6 @@ DEFPRIMITIVE(QuantityToNumber, argc, argv, context, interp, loc)
 {
   // FIXME this is wrong, but what exactly is the
   // `number of the quantity' ???
-  interp.requireFeature(Interpreter::expression, loc);
   long n;
   double d;
   int dim;
@@ -5221,7 +5116,6 @@ DEFPRIMITIVE(QuantityToNumber, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(StringToList, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   const Char *s;
   size_t n;
   if (!argv[0]->stringData(s, n))
@@ -5235,7 +5129,6 @@ DEFPRIMITIVE(StringToList, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
 {
-  interp.requireFeature(Interpreter::expression, loc);
   StringObj *obj = new (interp) StringObj;
   ELObj *list = argv[0];
   for (;;) {
@@ -5278,7 +5171,6 @@ static long timeConv(const Char *s, size_t n)
 #define DEFTIMECOMP(NAME, OP) \
 DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
 { \
-  interp.requireFeature(Interpreter::expression, loc); \
   const Char *s1, *s2; \
   size_t n1, n2; \
   if (!argv[0]->stringData(s1, n1)) \
@@ -5300,7 +5192,6 @@ DEFTIMECOMP(TimeGreaterOrEqual, >= )
 
 DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
 {
-  STYLEPRIMITIVE;
   FunctionObj *func = argv[0]->asFunction();
   if (!func)
     return argError(interp, loc,
@@ -5338,8 +5229,8 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
 
 void Interpreter::installPrimitives()
 {
-#define PRIMITIVE(name, string, nRequired, nOptional, rest) \
-  installPrimitive(string, new (*this) name ## PrimitiveObj);
+#define PRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
+  installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
 #define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
   installXPrimitive("UNREGISTERED::James Clark//Procedure::", \
                     string, new (*this) name ## PrimitiveObj);
@@ -5348,12 +5239,17 @@ void Interpreter::installPrimitives()
                     string, new (*this) name ## PrimitiveObj);
 
 #define PRIMITIVE2(name, string, nRequired, nOptional, rest) \
-  if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj);
+  if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj, noFeature);
+
+#define SPRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
+  if (style()) installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
+
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
+#undef SPRIMITIVE
   FunctionObj *apply = new (*this) ApplyPrimitiveObj;
   makePermanent(apply);
   lookup(makeStringC("apply"))->setValue(apply);
@@ -5367,11 +5263,13 @@ void Interpreter::installPrimitives()
       ->setValue(lookup(makeStringC("string->number"))->computeValue(0, *this));
 }
 
-void Interpreter::installPrimitive(const char *s, PrimitiveObj *value)
+void Interpreter::installPrimitive(const char *s, PrimitiveObj *value,
+				Interpreter::Feature feature)
 {
   makePermanent(value);
   Identifier *ident = lookup(makeStringC(s));
   ident->setValue(value);
+  ident->setFeature(feature);
   value->setIdentifier(ident);
   StringC pubid(makeStringC("ISO/IEC 10179:1996//Procedure::"));
   pubid += makeStringC(s);

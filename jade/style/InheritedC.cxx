@@ -1195,7 +1195,7 @@ ELObj *InheritedCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec,
 					     Interpreter &interp,
 					     const Location &loc)
 {
-  if (!interp.requireFeature(Interpreter::style, loc))
+  if (!interp.style())
     return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
@@ -1227,7 +1227,7 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
 					  const Location &loc)
 {
   interp.requireFeature(Interpreter::actualCharacteristic, loc);
-  if (!interp.requireFeature(Interpreter::style, loc))
+  if (!interp.style())
     return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);

@@ -206,6 +206,8 @@ public:
   bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
   void setFlowObj(FlowObj *, unsigned part, const Location &);
+  void setFeature(int);
+  bool requireFeature(Interpreter &, const Location &, bool fo = 0) const;
 private:
   unsigned defPart_;
   Owner<Expression> def_;
@@ -226,6 +228,8 @@ private:
   Identifier *builtin_;
   static bool preferBuiltin_;
   friend class Interpreter;
+  // FIXME This should be Interpreter::Feature
+  int feature_;
 };
 
 class Unit : public Named {
@@ -320,8 +324,8 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *,
-	      const FOTBuilder::Feature *);
+	      bool dsssl2, bool style, bool strictMode, 
+	      const FOTBuilder::Extension *, const FOTBuilder::Feature *);
   void endPart();
   void dEndPart();
   FalseObj *makeFalse();
@@ -394,6 +398,7 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool style() const;
   bool strictMode() const;
   void setNodeLocation(const NodePtr &);
   void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
@@ -430,6 +435,7 @@ public:
   void addSeparatorChar(const StringC &);
   void setCharRepertoire(const StringC &);
   enum Feature {
+    noFeature,
     combineChar,
     keyword,
     multiSource,
@@ -461,12 +467,9 @@ public:
     actualCharacteristic,
     online,
     fontInfo,
-    crossReference,
-    style,
-    transformation
+    crossReference
   };
-  enum { dssslFeatures = crossReference + 1 };
-  enum { nFeatures = transformation + 1 };
+  enum { nFeatures = crossReference + 1 };
   enum FeatureSupport {
     notSupported,
     partiallySupported,
@@ -477,6 +480,7 @@ public:
     FeatureSupport supported;
     StringC name;
   };
+  bool convertFeature(const StringC &, Feature &);
   void declareFeature(const StringC &);
   void declareFeature(const Feature &);
   bool requireFeature(const Feature &, const Location &);
@@ -487,7 +491,7 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *, PrimitiveObj *);
+  void installPrimitive(const char *, PrimitiveObj *, Feature f);
   void installXPrimitive(const char *, const char *, PrimitiveObj *);
   void installBuiltins();
   void installUnits();
@@ -571,6 +575,7 @@ private:
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool style_;
   bool strictMode_;
   ELObj *defaultLanguage_;
   Owner<Expression> defaultLanguageDef_;
@@ -773,6 +778,12 @@ inline
 bool Interpreter::dsssl2() const
 {
   return dsssl2_;
+}
+
+inline
+bool Interpreter::style() const
+{
+  return style_;
 }
 
 inline

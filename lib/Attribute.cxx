@@ -72,6 +72,11 @@ const Vector<StringC> *DeclaredValue::getTokens() const
   return 0;
 }
 
+const Vector<StringC> *DeclaredValue::getOrigTokens() const
+{
+  return 0;
+}
+
 
 CdataDeclaredValue::CdataDeclaredValue()
 {
@@ -329,11 +334,17 @@ GroupDeclaredValue::GroupDeclaredValue(TokenType type,
 void GroupDeclaredValue::buildDesc(AttributeDefinitionDesc &desc) const
 {
   desc.allowedValues = allowedValues_;
+  desc.origAllowedValues = origAllowedValues_;
 }
 
 DeclaredValue *GroupDeclaredValue::copy() const
 {
   return new GroupDeclaredValue(*this);
+}
+
+void GroupDeclaredValue::setOrigAllowedValues(Vector<StringC> &origAllowedValues)
+{
+  origAllowedValues.swap(origAllowedValues_);
 }
 
 AttributeValue *GroupDeclaredValue::makeValue(Text &text,
@@ -383,6 +394,11 @@ Boolean GroupDeclaredValue::containsToken(const StringC &token) const
 const Vector<StringC> *GroupDeclaredValue::getTokens() const
 {
   return &allowedValues_;
+}
+
+const Vector<StringC> *GroupDeclaredValue::getOrigTokens() const
+{
+  return &origAllowedValues_;
 }
 
 NameTokenGroupDeclaredValue::NameTokenGroupDeclaredValue(Vector<StringC> &vec)
@@ -586,6 +602,12 @@ Boolean AttributeDefinition::isSpecified(Boolean &implicit)
 {
   implicit = implicit_;
   return implicit_ || all_;
+}
+
+void AttributeDefinition::setOrigName(StringC &origName)
+{
+  if (&origName != NULL)
+    origName.swap(origName_);
 }
 
 AttributeDefinition::~AttributeDefinition()

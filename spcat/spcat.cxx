@@ -9,6 +9,7 @@
 #include "Sd.h"
 #include "sptchar.h"
 #include "OutputCharStream.h"
+#include "SpcatMessages.h"
 
 #ifdef SP_NAMESPACE
 using namespace SP_NAMESPACE;
@@ -29,22 +30,22 @@ SP_DEFINE_APP(SpcatApp)
 SpcatApp::SpcatApp()
  : lastFound_(true)
 {
-  registerOption('P', SP_T("public_id"));
-  registerOption('S', SP_T("system_id"));
-  registerOption('p', SP_T("parameter_entity"));
-  registerOption('d', SP_T("doctype"));
-  registerOption('l', SP_T("linktype"));
-  registerOption('e', SP_T("entity"));
-  registerOption('n', SP_T("notation"));
-  registerOption('s', SP_T("doctype"));
-  registerLongOption(SP_T("public-id"), 'P', SP_T("literal"));
-  registerLongOption(SP_T("system-id"), 'S', SP_T("literal"));
-  registerLongOption(SP_T("parameter-entity"), 'p', SP_T("name"));
-  registerLongOption(SP_T("doctype"), 'd', SP_T("name"));
-  registerLongOption(SP_T("linktype"), 'l', SP_T("name"));
-  registerLongOption(SP_T("entity"), 'e', SP_T("name"));
-  registerLongOption(SP_T("notation"), 'n', SP_T("name"));
-  registerLongOption(SP_T("declaration"), 's', SP_T("doctype"));
+  registerOption('P', SP_T("public-id"), 
+                 SpcatMessages::literal, SpcatMessages::PHelp);
+  registerOption('S', SP_T("system-id"), 
+                 SpcatMessages::literal, SpcatMessages::SHelp);
+  registerOption('p', SP_T("parameter-entity"), 
+                 SpcatMessages::name, SpcatMessages::pHelp);
+  registerOption('d', SP_T("doctype"), 
+                 SpcatMessages::name, SpcatMessages::dHelp);
+  registerOption('l', SP_T("linktype"),
+                 SpcatMessages::name, SpcatMessages::lHelp);
+  registerOption('e', SP_T("entity"), 
+                 SpcatMessages::name, SpcatMessages::eHelp);
+  registerOption('n', SP_T("notation"), 
+                 SpcatMessages::name, SpcatMessages::nHelp);
+  registerOption('s', SP_T("declaration"), 
+                 SpcatMessages::name, SpcatMessages::sHelp);
 }
 
 void SpcatApp::processOption(AppChar opt, const AppChar *arg)

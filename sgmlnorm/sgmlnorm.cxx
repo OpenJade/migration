@@ -6,6 +6,7 @@
 #include "ParserApp.h"
 #include "GenericEventHandler.h"
 #include "SGMLGenerator.h"
+#include "SgmlnormMessages.h"
 
 #ifdef SP_NAMESPACE
 using namespace SP_NAMESPACE;
@@ -34,14 +35,10 @@ SP_DEFINE_APP(SgmlnormApp)
 SgmlnormApp::SgmlnormApp()
 : rawOutput_(0), genFlags_(0)
 {
-  registerOption('d');
-  registerOption('m');
-  registerOption('n');
-  registerOption('r');
-  registerLongOption(SP_T("dtd"), 'd');
-  registerLongOption(SP_T("marked-sections"), 'm');
-  registerLongOption(SP_T("comments"), 'n');
-  registerLongOption(SP_T("raw"), 'r');
+  registerOption('d', SP_T("dtd"), SgmlnormMessages::dHelp);
+  registerOption('m', SP_T("marked-sections"), SgmlnormMessages::mHelp);
+  registerOption('n', SP_T("comments"), SgmlnormMessages::nHelp);
+  registerOption('r', SP_T("raw"), SgmlnormMessages::rHelp);
 }
 
 void SgmlnormApp::processOption(AppChar opt, const AppChar *arg)

@@ -23,6 +23,7 @@
 #include "SOEntityCatalog.h"
 #include "CodingSystem.h"
 #include "macros.h"
+#include "EntityAppMessages.h"
 
 #ifndef SGML_SEARCH_PATH_DEFAULT
 #define SGML_SEARCH_PATH_DEFAULT SP_T("")
@@ -42,12 +43,11 @@ EntityApp::EntityApp(const char *requiredInternalCode)
 : CmdLineApp(requiredInternalCode),
   mapCatalogDocument_(0)
 {
-  registerOption('c', SP_T("catalog_sysid"));
-  registerOption('C');
-  registerOption('D', SP_T("dir"));
-  registerLongOption(SP_T("catalog-sysid"), 'c', SP_T("file"));
-  registerLongOption(SP_T("catalog-document"), 'C');
-  registerLongOption(SP_T("directory"), 'D', SP_T("path"));
+  registerOption('c', SP_T("catalog-sysid"), 
+                 EntityAppMessages::file, EntityAppMessages::cHelp);
+  registerOption('C', SP_T("catalogs"), EntityAppMessages::CHelp);
+  registerOption('D', SP_T("directory"), 
+                 EntityAppMessages::path, EntityAppMessages::DHelp); 
 }
 
 void EntityApp::processOption(AppChar opt, const AppChar *arg)

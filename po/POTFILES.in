@@ -1,6 +1,7 @@
 lib/ArcEngineMessages.msg 
 lib/CatalogMessages.msg 
 lib/CmdLineAppMessages.msg 
+lib/EntityAppMessages.msg 
 lib/EntityManagerMessages.msg 
 lib/MessageFormatterMessages.msg 
 lib/MessageReporterMessages.msg 
@@ -15,3 +16,6 @@ nsgmls/RastEventHandlerMessages.msg
 spam/SpamMessages.msg 
 sx/SxMessages.msg 
 sx/XmlOutputMessages.msg
+sgmlnorm/SgmlnormMessages.msg
+spcat/SpcatMessages.msg
+spent/SpentMessages.msg

@@ -30,24 +30,20 @@ ParserApp::ParserApp(const char *requiredInternalCode)
 : EntityApp(requiredInternalCode),
   errorLimit_(DEFAULT_ERROR_LIMIT)
 {
-  registerOption('a', SP_T("type"));
-  registerOption('A', SP_T("arch"));
-  registerOption('e');
-  registerOption('E', SP_T("max_errors"));
-  registerOption('g');
-  registerOption('n');
-  registerOption('x');
-  registerOption('i', SP_T("entity"));
-  registerOption('w', SP_T("warning_type"));
-  registerLongOption(SP_T("activate"), 'a', SP_T("type"));
-  registerLongOption(SP_T("architecture"), 'A', SP_T("name"));
-  registerLongOption(SP_T("show-open-entities"), 'e');
-  registerLongOption(SP_T("max-errors"), 'E', SP_T("number"));
-  registerLongOption(SP_T("show-open-elements"), 'g');
-  registerLongOption(SP_T("show-error-numbers"), 'n');
-  registerLongOption(SP_T("show-references"), 'x');
-  registerLongOption(SP_T("include"), 'i', SP_T("name"));
-  registerLongOption(SP_T("warning"), 'w', SP_T("type"));
+  registerOption('a', SP_T("activate"), ParserAppMessages::type,
+                 ParserAppMessages::aHelp);
+  registerOption('A', SP_T("architecture"), ParserAppMessages::name,
+                 ParserAppMessages::AHelp);
+  registerOption('E', SP_T("max-errors"), ParserAppMessages::number,
+                 ParserAppMessages::EHelp);
+  registerOption('e', SP_T("open-entities"), ParserAppMessages::eHelp);
+  registerOption('g', SP_T("open-elements"), ParserAppMessages::gHelp);
+  registerOption('n', SP_T("error-numbers"), ParserAppMessages::nHelp);
+  registerOption('x', SP_T("references"), ParserAppMessages::xHelp);
+  registerOption('i', SP_T("include"), ParserAppMessages::name,
+                 ParserAppMessages::iHelp);
+  registerOption('w', SP_T("warning"), ParserAppMessages::type, 
+                 ParserAppMessages::wHelp);
 }
 
 void ParserApp::initParser(const StringC &sysid)

@@ -80,6 +80,12 @@ int totupper(wint_t c)
   return towupper(c);
 }
 
+inline
+bool istalnum(wint_t c)
+{
+  return iswalnum(c);
+}
+ 
 #else /* not SP_WIDE_SYSTEM */
 
 typedef char SP_TCHAR;
@@ -145,6 +151,12 @@ inline
 int totupper(int c)
 {
   return toupper(c);
+}
+
+inline
+bool istalnum(int c)
+{
+  return isalnum(c);
 }
 
 #endif /* not SP_WIDE_SYSTEM */

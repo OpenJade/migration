@@ -12,47 +12,49 @@ namespace SP_NAMESPACE {
 #endif
 
 template<class T>
-Options<T>::Options(int argc, T *const *argv, const T *opts, const Vector<LongOption<T> > &l)
-: argc_(argc), argv_(argv), opts_(opts), ind_(1), sp_(1), longOpts_(l), longInd_(-1)
+Options<T>::Options(int argc, T *const *argv, const Vector<LongOption<T> > &l)
+: argc_(argc), argv_(argv), ind_(1), sp_(1), opts_(l), optInd_(-1)
 {
 }
 
 template<class T>
-const T *Options<T>::search(T c) const
+bool Options<T>::search(T c)
 {
-  for (const T *s = opts_; *s; s++)
-    if (*s == c)
-      return s;
+  for (optInd_ = 0; optInd_ < opts_.size(); optInd_++) 
+    if (opts_[optInd_].key == c) 
+      return 1;
+  optInd_ = -1;
   return 0;
 }
 
 template<class T>
-bool Options<T>::searchLong()
+bool Options<T>::searchLong(const T *arg)
 {
   /* return true if a unique match is found 
      set sp_ to the char ending the option name ('\0' or '=')
-     set longInd_ to the index of the first match 
+     set optInd_ to the index of the first match 
    */
-  longInd_ = -1;
-  for (size_t i = 0; i < longOpts_.size(); i++) {
-    const T *t;
-    for (sp_ = 2, t = longOpts_[i].name; ; sp_++, t++) {
-      if ((argv_[ind_][sp_] == T('\0')) || (argv_[ind_][sp_] == T('='))) {
-        if (longInd_ >= 0)
-          return 0; // ambiguous
-        else {
-          longInd_ = i;
-          if (*t == T('\0'))
-            return 1; // exact match
-          else 
-            break; // match, continue with next option
+  optInd_ = -1;
+  for (size_t i = 0; i < opts_.size(); i++) 
+    if (opts_[i].name) {
+      const T *t;
+      for (sp_ = 2, t = opts_[i].name; ; sp_++, t++) {
+        if ((arg[sp_] == T('\0')) || (arg[sp_] == T('='))) {
+          if (optInd_ >= 0)
+            return 0; // ambiguous
+          else {
+            optInd_ = i;
+            if (*t == T('\0'))
+              return 1; // exact match
+            else 
+              break; // match, continue with next option
+          }
         }
+        else if (arg[sp_] != *t)
+          break;  // no match, continue with next option
       }
-      else if (argv_[ind_][sp_] != *t)
-        break;  // no match, continue with next option
     }
-  }
-  return (longInd_ >= 0);
+  return (optInd_ >= 0);
 }
 
 template<class T>
@@ -71,20 +73,20 @@ bool Options<T>::get(T &c)
       }
       else {
         opt_ = 0; // this marks a long option
-        if (searchLong()) {
-          c = longOpts_[longInd_].val;
-          if (longOpts_[longInd_].arg) {
+        if (searchLong(argv_[ind_])) {
+          c = opts_[optInd_].value;
+          if (opts_[optInd_].hasArgument) {
             if (argv_[ind_][sp_] == T('='))
               arg_ = &argv_[ind_][sp_ + 1];
             else if (ind_ + 1 < argc_)
               arg_ = argv_[++ind_];
             else
-              c = (*opts_ == T(':') ? T(':') : T('?')); // missing argument
+              c = T('?'); // missing argument
           }
           else if (argv_[ind_][sp_] == T('='))
             c = T('='); // erroneous argument
         }
-        else if (longInd_ >= 0)
+        else if (optInd_ >= 0)
           c = T('-'); // ambiguous option
         else
           c = T('?'); // unknown option
@@ -95,7 +97,7 @@ bool Options<T>::get(T &c)
     }
   }
   opt_ = c = argv_[ind_][sp_];
-  if (c == T(':') || (cp = search(c)) == 0) {
+  if (!search(c)) {
     if (argv_[ind_][++sp_] == 0) {
       ind_++;
       sp_ = 1;
@@ -103,12 +105,12 @@ bool Options<T>::get(T &c)
     c = T('?');
     return true;
   }
-  if (*++cp == T(':')) {
+  if (optInd_ >= 0 && opts_[optInd_].hasArgument) {
     if (argv_[ind_][sp_ + 1] != 0)
       arg_ = &argv_[ind_++][sp_ + 1];
     else if (++ind_ >= argc_) {
       sp_ = 1;
-      c = (*opts_ == T(':') ? T(':') : T('?'));
+      c = T('?');
       return true;
     }
     else

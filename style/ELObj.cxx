@@ -1087,6 +1087,24 @@ bool NodeListObj::contains(EvalContext &context, Interpreter &interp, const Node
   return 0;
 }
 
+bool NodeListObj::contains(EvalContext &context, Interpreter &interp, ComponentName::Id id)
+{
+  NodeListObj *nl = this;
+  for (;;) {
+    ELObjDynamicRoot protect(interp, nl);
+    NodePtr nd(nl->nodeListFirst(context, interp));
+    if (!nd)
+      return 0;
+    ComponentName::Id cls;
+    nd->getClassName(cls);
+    if (cls == id)
+      return 1;
+    bool chunk;
+    nl->nodeListChunkRest(context, interp, chunk);
+  }
+  return 0;
+}
+
 class OutputPropertyValue : public PropertyValue {
 public:
   // Does NOT own the OUtputCharsTream.

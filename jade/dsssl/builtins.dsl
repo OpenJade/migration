@@ -212,7 +212,7 @@
 (define (ipreced nl)
    (node-list-map (lambda (snl)
                   (let loop ((prev (empty-node-list))
-                             (rest (siblings snl)))
+                             (rest (rsiblings snl)))
                     (cond ((node-list-empty? rest)
                            (empty-node-list))
                           ((node-list=? (node-list-first rest) snl)
@@ -224,7 +224,7 @@
 
 (define (ifollow nl)
   (node-list-map (lambda (snl)
-		   (let loop ((rest (siblings snl)))
+		   (let loop ((rest (rsiblings snl)))
 		     (cond ((node-list-empty? rest)
 			    (empty-node-list))
 			   ((node-list=? (node-list-first rest) snl)

@@ -1,3 +1,11 @@
+* Relax msggen restrictions on the relevant clauses field; put
+  the relevant standard in there as well - we have at least
+  ISO 8879:1986 (SGML), 
+  IETF RFC2141 (URNs), 
+  ISO/IEC 10179:1996 (DSSSL), 
+  AFDR (architectures),
+  FSIDR (formal system identifiers) 
+
 * Allow different options for spec parser and doc parser ?
   Idea: change semantics of cmdline so that parser options
   before the -d flag apply only to the spec parser, options
@@ -101,5 +109,3 @@ Reorganization
  
   replace many SP_ defines by their more `standard' automake
   names (see the bottom of acconfig.h)
-
-  replace SP_ANSI_LIB by HAVE_NEW / HAVE_CASSERT

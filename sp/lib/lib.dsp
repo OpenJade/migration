@@ -1461,6 +1461,10 @@ SOURCE=.\ksc5601.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\koi8-r.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\include\Link.h
 # End Source File
 # Begin Source File

@@ -30,7 +30,15 @@ ParserOptions::ParserOptions()
   errorSignificant(1),
   errorAfdr(1),
   noUnclosedTag(0),
-  noNet(0)
+  noNet(0),
+  fullyDeclared(0),
+  fullyTagged(0),
+  amplyTagged(0),
+  amplyTaggedAnyother(0),
+  valid(0),
+  entityRef(0),
+  externalEntityRef(0),
+  integral(0)
 {
   for (int i = 0; i < nQuantity; i++)
     quantity[i] = 99999999;

@@ -336,18 +336,6 @@ void Parser::handleShortref(int index)
   const ConstPtr<Entity> &entity
     = currentElement().map()->entity(index);
   if (!entity.isNull()) {
-    switch (sd().entityRef()) {
-    case Sd::entityRefNone:
-      if (!entity->isPredefined())
-	message(ParserMessages::entityRefNone);
-      break;
-    case Sd::entityRefInternal:
-      if (entity->asExternalEntity()) 
-	message(ParserMessages::entityRefInternal);
-      break;
-    default:
-      break;
-    }
     Owner<Markup> markupPtr;
     if (eventsWanted().wantInstanceMarkup()) {
       markupPtr = new Markup;
@@ -870,6 +858,9 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
     const ShortReferenceMap *map = e->map();
     if (!map)
       map = currentElement().map();
+    if (options().warnImmediateRecursion
+        && e == currentElement().type())
+      message(ParserMessages::immediateRecursion);
     pushElement(new (internalAllocator()) OpenElement(e,
 						      netEnabling,
 						      event->included(),

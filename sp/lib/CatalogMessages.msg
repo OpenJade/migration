@@ -14,4 +14,3 @@ E0+inLoop++CATALOG entries cause loop
 W0+systemShouldQuote++second argument for SYSTEM entry should be quoted to avoid ambiguity
 E1+noDocumentEntry++no DOCUMENT entry in catalog %1
 E2+noPublicEntry++no entry for public identifier %1 in catalog %2
-W0+dtddeclNotSupported++DTDDECL catalog entries are not supported

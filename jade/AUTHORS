@@ -1,6 +1,9 @@
 James Clark:
 Author of Jade, upon which OpenJade is based.
 
+Cees A. de Groot:
+Autoconf support for Jade.
+
 Matthias Clasen:
 Pthreads support, automake setup, scheme builtins, declaration
 element type forms parsing, character properties, language-dependent 

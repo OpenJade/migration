@@ -30,7 +30,8 @@ spam\SpamMessages.h \
 spam\spam_inst.cxx \
 sx\SxMessages.h \
 sx\XmlOutputMessages.h \
-sx\sx_inst.cxx
+sx\sx_inst.cxx \
+include\version.h
 
 .SUFFIXES: .m4 .msg
 
@@ -39,30 +40,28 @@ all: $(GENSRCS)
 
 .m4.cxx:
 	del /f $@ 2> nul
-	$(PERL) lib\instmac.pl $< >$@
+	$(PERL) instmac.pl $< >$@
 	attrib +r $@
 
 {lib}.msg{lib}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl -l $<
+	$(PERL) -w msggen.pl -l libModule $<
 	attrib +r $@
 
 {nsgmls}.msg{nsgmls}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl $<
+	$(PERL) -w msggen.pl -l appModule $<
 	attrib +r $@
 
 {spam}.msg{spam}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl $<
+	$(PERL) -w msggen.pl -l appModule $<
 	attrib +r $@
 
 {sx}.msg{sx}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl $<
+	$(PERL) -w msggen.pl -l appModule $<
 	attrib +r $@
 
-lib\version.h: lib\mkversion.pl VERSION
-	del /f $@ 2> nul
-	$(PERL) -w lib\mkversion.pl VERSION >$@
-	attrib +r $@
+include\config.h: include\config.h.old
+	copy /f include\config.h.old include\config.h 

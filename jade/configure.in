@@ -10,7 +10,7 @@ dnl  Credits: this autoconf script was largely "inspired" <g> by the
 dnl  autoconf script around SP made by Henry Thompson.
 dnl
 AC_INIT(dsssl)
-AM_INIT_AUTOMAKE(OpenJade, 1.4, no-define)
+AM_INIT_AUTOMAKE(OpenJade, 1.4devel, no-define)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
@@ -26,6 +26,7 @@ AC_PROG_CXXCPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_RANLIB
+AC_PROG_MAKE_SET
 AC_PATH_PROGS(PERL, perl, perl)
 AM_PROG_LIBTOOL
 
@@ -33,11 +34,11 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
+AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(OPENJADE_LOCALE_DIR, datadir/locale)
-dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
-dnl rely on PACKAGE and VERSION substitutions.
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
+OPENJADE_MESSAGE_DOMAIN=jade
+AC_DEFINE_UNQUOTED(OPENJADE_MESSAGE_DOMAIN, "$OPENJADE_MESSAGE_DOMAIN", [Message domain])
+AC_SUBST(OPENJADE_MESSAGE_DOMAIN)
 
 
 dnl Checks for header files.

@@ -22,6 +22,15 @@
 #include <locale.h>
 #endif
 
+#ifndef OPENJADE_MESSAGE_DOMAIN
+#define OPENJADE_MESSAGE_DOMAIN ""
+#endif /* not OPENJADE_MESSAGE_DOMAIN */
+
+#ifndef OPENJADE_LOCALE_DIR
+#define OPENJADE_LOCALE_DIR ""
+#endif /* not OPENJADE_LOCALE_DIR */
+
+
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
@@ -80,7 +89,7 @@ int DssslApp::init(int argc, AppChar **argv)
   setlocale(LC_NUMERIC, "C");
 #endif
   MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
-                                                  "jade",
+                                                  OPENJADE_MESSAGE_DOMAIN,
 						  OPENJADE_LOCALE_DIR);
   return ret;
 }

@@ -1,6 +1,8 @@
 #ifndef constant_INCLUDED
 #define constant_INCLUDED 1
 
+#include "types.h"
+
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif

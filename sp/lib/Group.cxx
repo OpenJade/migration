@@ -15,13 +15,16 @@ namespace SP_NAMESPACE {
 #endif
 
 AllowedGroupTokens::AllowedGroupTokens(GroupToken::Type t1, GroupToken::Type t2,
-				       GroupToken::Type t3, GroupToken::Type t4)
+				       GroupToken::Type t3, GroupToken::Type t4,
+				       GroupToken::Type t5, GroupToken::Type t6)
 : flags_(0)
 {
   allow(t1);
   allow(t2);
   allow(t3);
   allow(t4);
+  allow(t5);
+  allow(t6);
 }
 
 AllowedGroupConnectors::AllowedGroupConnectors(GroupConnector::Type c1)
@@ -158,6 +161,20 @@ void AllowedGroupTokensMessageArg::append(MessageBuilder &builder) const
     StringC pcdata(syntax_->delimGeneral(Syntax::dRNI));
     pcdata += syntax_->reservedName(Syntax::rPCDATA);
     builder.appendChars(pcdata.data(), pcdata.size());
+  }
+  if (allow_.groupToken(GroupToken::all)) {
+    if (!first)
+      builder.appendFragment(ParserMessages::listSep);
+    StringC all(syntax_->delimGeneral(Syntax::dRNI));
+    all += syntax_->reservedName(Syntax::rALL);
+    builder.appendChars(all.data(), all.size());
+  }
+  if (allow_.groupToken(GroupToken::implicit)) {
+    if (!first)
+      builder.appendFragment(ParserMessages::listSep);
+    StringC implicit(syntax_->delimGeneral(Syntax::dRNI));
+    implicit += syntax_->reservedName(Syntax::rIMPLICIT);
+    builder.appendChars(implicit.data(), implicit.size());
   }
 }
 

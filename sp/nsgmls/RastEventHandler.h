@@ -102,7 +102,7 @@ private:
 
 class RastEventHandler : public ErrorCountEventHandler,
                          private RastSubdocState,
-                         private Messenger {
+                         protected Messenger {
 public:
   RastEventHandler(SgmlParser *, Messenger *);
   void data(DataEvent *);

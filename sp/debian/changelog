@@ -2,6 +2,7 @@ opensp (1.5pre4-1) unstable; urgency=low
 
   * new upstream version, prerelease
   * debian/copyright.Debian: update locations
+  * debian/libosp-dev.README: added
   * acconfig.h: patch for HAVE_BOOL problem
   * README: updates, some URLs
 

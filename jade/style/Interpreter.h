@@ -25,6 +25,7 @@
 #include "GroveManager.h"
 #include "Pattern.h"
 #include "CharMap.h"
+#include "TransformationMode.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -320,6 +321,8 @@ public:
   long getValue(Char) const;
   void setRange(Char, Char, long);
 private:
+  IntegerCharPropValues(const IntegerCharPropValues &); // Undefined.
+  IntegerCharPropValues &operator=(const IntegerCharPropValues &); // Undefined
   long def_;
   struct ValT_ {
     long l_;
@@ -350,6 +353,9 @@ public:
   void setRange(Char, Char, long);
   void setValue(Char, long);
 private:
+  MaybeIntegerCharPropValues(const MaybeIntegerCharPropValues &); // Undefined.
+  MaybeIntegerCharPropValues &operator=(const MaybeIntegerCharPropValues &);
+  // Above undefined.
   long def_;
   bool defFalse_;
   struct ValT_ {
@@ -380,6 +386,8 @@ public:
   bool getValue(Char) const;
   void setRange(Char, Char, bool);
 private:
+  BooleanCharPropValues(const BooleanCharPropValues &); // Undefined.
+  BooleanCharPropValues &operator=(const BooleanCharPropValues &); // Undefined.
   bool def_;
   struct ValT_ {
     bool b_:1;
@@ -406,8 +414,10 @@ public:
   PublicIdCharPropValues(FOTBuilder::PublicId def=0)
     : def_(def) {}
   FOTBuilder::PublicId getValue(Char) const;
-  void setRange(Char, Char, FOTBuilder::PublicId);
+  void setRange(Char, Char, const FOTBuilder::PublicId);
 private:
+  PublicIdCharPropValues(const PublicIdCharPropValues &); // Undefined.
+  PublicIdCharPropValues &operator=(const PublicIdCharPropValues &); // Undefined.
   FOTBuilder::PublicId def_;
   struct ValT_ {
     FOTBuilder::PublicId p_;
@@ -436,6 +446,8 @@ public:
   FOTBuilder::Symbol getValue(Char) const;
   void setRange(Char, Char, FOTBuilder::Symbol);
 private:
+  SymbolCharPropValues(const SymbolCharPropValues &); // Undefined.
+  SymbolCharPropValues &operator=(const SymbolCharPropValues &); // Undefined.
   FOTBuilder::Symbol def_;
   struct ValT_ {
     FOTBuilder::Symbol s_;
@@ -509,6 +521,9 @@ protected:
   void compileDef_(Interpreter &);
   void compileAdded_(addedProp_ &,Interpreter &);
   const addedProp_ *added_(Char) const;
+private:
+  CharProp(const CharProp &); // Undefined.
+  CharProp &operator=(const CharProp &); // Undefined.
 };
 
 class Interpreter : 
@@ -601,6 +616,7 @@ public:
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
   bool convertToPattern(ELObj *, const Location &, Pattern &);
+  const ConstPtr<InheritedC> &charMapC() const;
   const ConstPtr<InheritedC> &tableBorderC() const;
   const ConstPtr<InheritedC> &cellBeforeRowBorderC() const;
   const ConstPtr<InheritedC> &cellAfterRowBorderC() const;
@@ -622,6 +638,7 @@ public:
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
+  TransformationMode *transformationMode();
   void addClassAttributeName(const StringC &name);
   void addIdAttributeName(const StringC &name);
   void installInitialValue(Identifier *, Owner<Expression> &);
@@ -797,6 +814,7 @@ private:
   StyleObj *initialStyle_;
   StyleObj *borderTrueStyle_;
   StyleObj *borderFalseStyle_;
+  ConstPtr<InheritedC> charMapC_;
   ConstPtr<InheritedC> tableBorderC_;
   ConstPtr<InheritedC> cellBeforeRowBorderC_;
   ConstPtr<InheritedC> cellAfterRowBorderC_;
@@ -854,6 +872,7 @@ public: const t ## CharPropValues &n () const \
   bool explicitFeatures_;
   Status module_[nModules];
   bool explicitModules_;
+  TransformationMode transformationMode_;
 };
 
 inline
@@ -992,6 +1011,12 @@ inline
 GroveManager *Interpreter::groveManager() const
 {
   return groveManager_;
+}
+
+inline
+const ConstPtr<InheritedC> &Interpreter::charMapC() const
+{
+  return charMapC_;
 }
 
 inline

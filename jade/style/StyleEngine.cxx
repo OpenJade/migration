@@ -12,6 +12,7 @@
 #include "ProcessContext.h"
 #include "macros.h"
 #include "InternalInputSource.h"
+//#include "TransformContext.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -175,8 +176,15 @@ StyleEngine::~StyleEngine()
 
 void StyleEngine::process(const NodePtr &node, FOTBuilder &fotb)
 {
-  ProcessContext context(*interpreter_, fotb);
-  context.process(node);
+  if (interpreter_->style()) {
+    ProcessContext context(*interpreter_, fotb);
+    context.process(node);
+  }
+  else {
+    interpreter_->transformationMode()->compile(*interpreter_, node);
+    //TransformContext context(*interpreter_);
+    //context.process(node);
+  }
 }
 
 #ifdef DSSSL_NAMESPACE

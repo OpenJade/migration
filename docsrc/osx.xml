@@ -56,7 +56,7 @@
 	  <arg choice="opt"><option>-D<replaceable>directory</replaceable></option></arg>
 	  <arg choice="opt"><option>-i<replaceable>name</replaceable></option></arg>
 	  <arg choice="opt"><option>-f<replaceable>file</replaceable></option></arg>
-	  <arg choice="opt"><option>-l<replaceable>directory</replaceable></option></arg>
+	  <arg choice="opt"><option>-l<replaceable>dtd_file</replaceable></option></arg>
 	  <arg choice="opt"><option>-w<replaceable>warning_type</replaceable></option></arg>
 	  <arg choice="opt" rep="repeat"><option>-x<replaceable>xml_output_option</replaceable></option></arg>
 	  <arg choice="opt" rep="repeat"><option><replaceable>sysid</replaceable></option></arg>

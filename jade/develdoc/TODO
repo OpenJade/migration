@@ -78,9 +78,7 @@ Simple things
   FOTBuilder::FOMessage() non-virtual, so that backends may produce consistent
   error messages without knowing about ProcessContext internals.
 
-* An url-address (or href-address since, formally, a fragment id is not part
-  of an URL?) returning an ELObj of type address. Implement this in
-  the backends.
+* Support uri-ref addresses in more backends.
 
 Things which have to be added to the jade internals documentation
 =================================================================
@@ -101,12 +99,10 @@ Things which have to be added to the jade internals documentation
 *  char repertoire stuff.
 
 * messages: module stuff, message numbers 
-
+  I18n handling.
 
 Reorganization
 ==============
-
-* move the generated config.h files to toplevel.
 
 * clean up the mess of SP_ defines
  

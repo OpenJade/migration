@@ -4844,12 +4844,10 @@ DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
   for (;;) {
     PairObj *pair = list->asPair();
     if (pair) {
-      CharObj *ch = pair->car()->asChar();
-      if (!ch) 
-          return argError(interp, loc,
-                         InterpreterMessages::notACharList, 0, list);
       Char c;
-      ch->charValue(c);
+      if (!pair->car()->charValue(c))
+        return argError(interp, loc,
+                        InterpreterMessages::notACharList, 0, list);
       *obj += c;
       list = pair->cdr();
     } else if (list->isNil())

@@ -60,6 +60,9 @@ private:
   ParserOptions specOptions_;
 
   friend class PrologPiEventHandler;
+  const FOTBuilder::Description *fotbDescr_;
+  Boolean specTitleOption_;
+  StringC specTitle_;
 };
 
 #ifdef DSSSL_NAMESPACE

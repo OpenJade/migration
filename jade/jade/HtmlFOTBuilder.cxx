@@ -382,8 +382,7 @@ private:
 
 FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename,
 			       CmdLineApp *app,
-			       const FOTBuilder::Description *&descr)
-{
+			       const FOTBuilder::Description *&descr) {
   static const FOTBuilder::Extension extensions[] = {
     { "UNREGISTERED::James Clark//Characteristic::scroll-title", 0,
       (void (FOTBuilder::*)(const StringC &))&HtmlFOTBuilder::setScrollTitle },
@@ -394,10 +393,14 @@ FOTBuilder *makeHtmlFOTBuilder(const String<CmdLineApp::AppChar> &outputFilename
     { "online", 1},
     { 0, 0}
   };
+  
+  static const char *media[] = { "screen", 0 };
+
   static const FOTBuilder::Description description = {
     extensions,
     features,
-    false
+    false,
+    media
   };
   descr = &description;
 

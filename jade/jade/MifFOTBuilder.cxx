@@ -4337,10 +4337,13 @@ FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
     { 0, 0}
   };
 
+  static const char *media[] = { "print", 0 }; 
+
   static const FOTBuilder::Description description = {
     extensions,
     features,
-    false
+    false,
+    media
   };
 
   descr = &description;

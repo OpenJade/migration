@@ -733,6 +733,7 @@ public:
     // formance, so if you don't care (i.e. the formatter has its own
     // values), set to false.
     bool wantCharPropertyNICs;
+    const char **media;
   };
 
   static const char *symbolName(Symbol);

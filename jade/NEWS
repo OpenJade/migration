@@ -1,5 +1,7 @@
 Changes in OpenJade 1.4
 
+* The "media" and "title" attributes in stylesheet PIs are supported.
+
 * A new external procedure with public identifier
   "UNREGISTERED::OpenJade//Procedure::uri-ref-address" returns an address
   object to the supplied URI. This allows hyperlinks to resources of the WWW

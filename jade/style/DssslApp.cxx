@@ -33,7 +33,8 @@ const char specOffset = 80;
 DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
   dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
-  strictMode_(0)
+  strictMode_(0),
+  specTitleOption_(0), fotbDescr_(0)  
 {
   registerOption('2', 0, DssslAppMessages::help2);
   registerOption('G', SP_T("debug"), DssslAppMessages::GHelp);
@@ -42,6 +43,8 @@ DssslApp::DssslApp(int unitsPerInch)
   registerOption('V', SP_T("define"), DssslAppMessages::vardef,
                  DssslAppMessages::VHelp);
   registerOption('s', SP_T("strict"), DssslAppMessages::sHelp);
+  registerOption('T', SP_T("spec-title"), DssslAppMessages::name, 
+                 DssslAppMessages::THelp);
   registerOption('e' + docOffset, SP_T("doc-open-entities"), 
                  DssslAppMessages::eHelp);
   registerOption('g' + docOffset, SP_T("doc-open-elements"), 
@@ -160,6 +163,10 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     dssslSpecSysid_ = convertInput(arg);
     dssslSpecOption_ = 1;
     splitOffId(dssslSpecSysid_, dssslSpecId_);
+    break;
+  case 'T':
+    specTitleOption_ = 1;
+    specTitle_ = convertInput(arg);
     break;
   case 'V':
     defineVars_.push_back(convertInput(arg));
@@ -290,6 +297,8 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
   // FIXME maybe give warnings if syntax is wrong
   Boolean hadHref = 0;
   StringC href;
+  Boolean hadTitle = 0;
+  Boolean hadMedia = 0;
   Boolean isDsssl = 0;
   StringC name;
   StringC value;
@@ -313,8 +322,52 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
       hadHref = 1;
       value.swap(href);
     }
+    else if (matchCi(name, "title")) {
+      hadTitle = 1;
+      if (specTitleOption_ && specTitle_ != value) 
+        return 0;
+    }
+    else if (matchCi(name, "media")) { 
+      /* There is no point in doing detailed comparisons if either
+         the stylesheet is suitable for all media types or the
+         backend handles all media types. This doesn't work for
+         redundant values like "all, screen". */ 
+      Boolean match = matchCi(value, "all") || (fotbDescr_->media[0] == 0);
+      const Char *c = value.data();
+      const Char *end = c + value.size();
+      while (c < end && !match) {
+        while (c < end && isS(*c))
+          c++;
+        for (int i = 0; fotbDescr_->media[i] && !match; i++) {
+          match = 1;
+          const Char *d;
+          const char *d1;
+          for (d = c, d1 = fotbDescr_->media[i];; d++, d1++) { 
+            if (d == end) {
+              match = (*d1 == '\0');
+              break;
+            }
+            if (*d1 == '\0') { 
+              /* This is not entirely correct. We should check
+                 that *d is outside of [a-zA-Z0-9-]. */
+              match = (*d == Char(' ') || *d == Char(','));
+              break;
+            }
+            if (*d != Char(*d1)) {
+              match = 0;  
+              break;
+            }
+          }           
+        }
+        while (c < end && *c != Char(','))
+          c++;
+        c++;
+      }
+      if (!match)
+        return 0;
+    }
   }
-  if (!isDsssl || !hadHref)
+  if (!isDsssl || !hadHref || (specTitleOption_ && ! hadTitle))
     return 0;
   splitOffId(href, dssslSpecId_);
   // FIXME should use location of attribute value rather than location of PI
@@ -411,14 +464,13 @@ Boolean DssslApp::initSpecParser()
 
 void DssslApp::processGrove()
 {
-  if (!initSpecParser())
-    return;
-  const FOTBuilder::Description *fotbDescr;
-  Owner<FOTBuilder> fotb(makeFOTBuilder(fotbDescr));
+  Owner<FOTBuilder> fotb(makeFOTBuilder(fotbDescr_));
   if (!fotb)
     return;
+  if (!initSpecParser())
+    return;
   StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
-                 dsssl2_, strictMode_, *fotbDescr, outputCodingSystem()); 
+                 dsssl2_, strictMode_, *fotbDescr_, outputCodingSystem()); 
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, defineVars_);
   se.process(rootNode_, *fotb);
 }

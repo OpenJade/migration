@@ -1802,11 +1802,14 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
     { 0, 0}
   };
 
+  static const char * media[] = { "print", 0 };
+
   static FOTBuilder::Description description=
   {
     extensions,
     features,
-    false
+    false,
+    media
   };
   descr = &description;
 

@@ -9,6 +9,7 @@ I1+prefixInfo++Options with a "doc-"/"spec-" prefix apply only to the document/s
 I1+help2++Enable experimental DSSSL extensions.
 I1+GHelp++Debug mode.
 I1+dHelp++Use DSSSL specification %1.
+I1+THelp++Use DSSSL specification with title %1.
 I1+VHelp++Pretend that %1 appeared in the specification.
 I1+sHelp++Strict DSSSL compliance mode.
 I1+eHelp++Show open entities in error messages.

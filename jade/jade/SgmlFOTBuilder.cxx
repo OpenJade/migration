@@ -529,10 +529,14 @@ FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os,
     { "online", 0},
     { 0, 0}
   };
+
+  static const char *media[] = { 0 };
+
   static FOTBuilder::Description description = {
     0,  // Extension
     features,
-    false
+    false,
+    media
   };
   descr = &description;
 

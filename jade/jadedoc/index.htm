@@ -226,7 +226,7 @@ openjade demo.sgm
         document to be processed is specified as an argument to
         OpenJade. If this is omitted, standard input will be read.
         </font></p>
-        <p><font face="Arial">OpenJade determines the system
+        <p><font face="Arial"><a name="findspec"></a>OpenJade determines the system
         identifier for the DSSSL specification as follows: </font></p>
         <ol>
             <li><font face="Arial">If the <code>-d</code> option
@@ -237,7 +237,7 @@ openjade demo.sgm
                 document. Two kinds of processing instruction are
                 recognized: </font><dl>
                     <dt><font face="Arial"><code>&lt;?stylesheet
-                        href=&quot;</code><code><var>sysid</var></code><code>&quot;
+                        href=&quot;<var>sysid</var>&quot;
                         type=&quot;text/dsssl&quot;&gt;</code></font></dt>
                     <dd><font face="Arial">The system data of the
                         processing instruction is parsed like an
@@ -254,7 +254,22 @@ openjade demo.sgm
                         or <code>application/x-dsssl</code>. The
                         value of <code>href</code> attribute is
                         the system identifier of the DSSSL
-                        specification. </font></dd>
+                        specification.
+                        Additionally, you may specify the <code>title</code>
+                        and <code>media</code> attributes. If the 
+                        <code>title</code> attribute is specified, the 
+                        processing instruction will be ignored unless a
+                        <code>-T</code> command line option with the same
+                        argument was specified. If the <code>media</code> 
+                        attribute is specified (a comma-separated list of 
+                        media types), the processing instruction will be 
+                        ignored unless the selected backend is suitable for 
+                        one of the listed media types. See the <a 
+                        href="http://www.w3.org/TR/1998/REC-html40-19980424"
+                        >HTML4.0 specification</a> for a list of valid media
+                        types. OpenJade recognizes the media types 
+                        &quot;print&quot; (FOT, RTF, TeX and MIF backends) and 
+                        &quot;screen&quot; (FOT and HTML backends).</font></dd>
                     <dt><font face="Arial"><code>&lt;?dsssl </code><code><var>sysid</var></code><code>&gt;</code>
                         </font></dt>
                     <dd><font face="Arial">The system identifier
@@ -298,6 +313,12 @@ openjade demo.sgm
             <dd><font face="Arial">This specifies that <i>sysid</i>
                 is the system identifier of the DSSSL
                 specification to be used.</font> </dd>
+            <dt><font face="Arial"><code>-T</code> <i>name</i>, 
+                <code>--spec-title=</code><i>name</i></font>
+            </dt>
+            <dd><font face="Arial">This specifies that <i>name</i>
+                is the title of the processing instruction to be used 
+                in <a href="#findspec">determining the applicable DSSSL specification</a>.</font></dd>
             <dt><font face="Arial"><code>-G</code>, <code>--debug</code></font></dt>
             <dd><font face="Arial">Debug mode. When an error
                 occurs in the evaluation of an expression,

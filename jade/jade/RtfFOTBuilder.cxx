@@ -938,6 +938,7 @@ RtfFOTBuilder::~RtfFOTBuilder()
 	 << ';';
   }
   os() << "}{\\stylesheet";
+  os() << "{\\s0 "Normal;}";
   for (int i = 1; i <= 9; i++)
     os() << "{\\s" << i << " Heading " << i << ";}";
   os() << "}\n";

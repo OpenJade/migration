@@ -4,7 +4,7 @@ opensp (1.5pre5-4) unstable; urgency=low
     patch from Yann Dirson
     closes: #107239
 
- -- Adam Di Carlo <aph@debian.org>  Mon,  6 Aug 2001 10:44:15 -0400
+ -- Adam Di Carlo <aph@debian.org>  Fri, 31 Aug 2001 02:24:24 -0400
 
 opensp (1.5pre5-3) unstable; urgency=low
 

@@ -39,6 +39,22 @@ public:
     const char *s = rcs_ ? ComponentName::rcsName(id) : ComponentName::sdqlName(id);
     obj = interp_->makeSymbol(interp_->makeStringC(s));
   }
+  void set(const GroveStringListPtr &gsListPtr) {
+    PairObj *head = new (*interp_) PairObj(0, 0);
+    ELObjDynamicRoot protect(*interp_, head);
+    PairObj *tail = head;
+    ConstGroveStringListIter sgListIter(*gsListPtr);
+    while (!sgListIter.done()) {
+      StringObj *gs = new (*interp_) StringObj(sgListIter.cur().data(), sgListIter.cur().size());
+      tail->setCdr(gs);
+      PairObj *tem = new (*interp_) PairObj(gs, 0);
+      tail->setCdr(tem);
+      tail = tem;
+      sgListIter.next();
+    }
+    tail->setCdr(interp_->makeNil());
+    obj = head->cdr();
+  }
   void set(const ComponentName::Id *names) {
     PairObj *head = new (*interp_) PairObj(0, 0);
     ELObjDynamicRoot protect(*interp_, head);
@@ -55,6 +71,9 @@ public:
     }
     tail->setCdr(interp_->makeNil());
     obj = head->cdr();
+  }
+  void set(long l) {
+    obj = interp_->makeInteger(l);
   }
   ELObj *obj;
 private:

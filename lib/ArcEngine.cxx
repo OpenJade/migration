@@ -1632,7 +1632,7 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 	  Messenger::message(ArcEngineMessages::arcContInvalid,
 			     StringMessageArg(tokens[i + 1]));
 	}
-	else
+	else if (toIndex != invalidAtt)
 	  attRenamed[toIndex + 1] = 1;
       }
       else if (linkAtts

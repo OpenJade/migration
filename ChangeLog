@@ -1,3 +1,8 @@
+2002-12-10  Karl Eichwalder  <ke@suse.de>
+
+	* tests/catalog-1: New file.
+	* tests/Makefile.am (TESTS): Add catalog-1.
+
 2002-12-08  Karl Eichwalder  <ke@suse.de>
 
 	* tests/af-18: New file.

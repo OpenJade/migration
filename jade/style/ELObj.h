@@ -430,6 +430,7 @@ public:
   virtual NodeListObj *nodeListReverse(EvalContext &, Interpreter &);
   virtual long nodeListLength(EvalContext &, Interpreter &);
   virtual bool suppressError();
+  virtual bool contains(EvalContext &, Interpreter &, const NodePtr &);
 };
 
 class NamedNodeListObj : public NodeListObj {

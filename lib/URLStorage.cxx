@@ -594,6 +594,7 @@ HTTP_RESPONSE_TYPE HttpSocketStorageObject::open(const String<char> &host,
       fd_ = INVALID_SOCKET;
       return HTTP_ERROR ;
   }
+  return HTTP_ERROR ;
 }
 
 HTTP_RESPONSE_TYPE HttpSocketStorageObject::readHeader(Messenger &mgr,

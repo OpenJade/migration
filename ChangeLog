@@ -1,3 +1,9 @@
+2004-06-09  Karl Eichwalder  <ke@suse.de>
+
+	* include/MessageReporter.h: Add missing return; (thanks to Marcus
+	Meissner).
+	* lib/URLStorage.cxx (open): Likewise.
+
 2004-01-16  Karl Eichwalder  <ke@suse.de>
 
 	* include/RangeMap.cxx: Include "constant.h" to make it compile

@@ -78,6 +78,7 @@ public:
 	return locationHeader(loc.origin().pointer(), loc.index(), off) ;
     else if ( msgmode == SP_MESSAGES_TRADITIONAL )
 	return MessageReporter::locationHeader(loc, off) ;
+    return NULL ;
   }
 
 } ;

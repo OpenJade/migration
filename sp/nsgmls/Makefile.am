@@ -8,7 +8,7 @@ EXTRA_DIST = nsgmls_inst.m4 NsgmlsMessages.msg RastEventHandlerMessages.msg
 
 onsgmls_LDADD = $(top_builddir)/lib/libosp.la
 
-INCLUDES = $(top_srcdir)/include $(top_srcdir)/generic 
+INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic 
 
 BUILT_SOURCES = nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h
 

@@ -4,4 +4,4 @@ ospent_SOURCES = spent.cxx
 
 ospent_LDADD = $(top_builddir)/lib/libosp.la
 
-INCLUDES = $(top_srcdir)/include
+INCLUDES = -I$(top_srcdir)/include

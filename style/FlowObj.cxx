@@ -2507,14 +2507,19 @@ void ProcessContext::startTableRow(StyleObj *style)
     table->rowStyle = style;
     table->currentColumn = 0;
     table->inTableRow = 1;
+    saveCurrentConnection(table->rowConnection);
   }
   currentFOTBuilder().startTableRow();
 }
 
 void ProcessContext::endTableRow()
 {
+  SavedConnection curConn;
   Table *table = tableStack_.head();
   if (table) {
+    saveCurrentConnection(curConn);
+    if (curConn != table->rowConnection)
+      restoreConnection(table->rowConnection);
     // Fill in blank cells
     Vector<unsigned> &covered = table->covered;
     for (size_t i = 0; i < table->nColumns + 1; i++) {
@@ -2535,6 +2540,8 @@ void ProcessContext::endTableRow()
     table->inTableRow = 0;
   }
   currentFOTBuilder().endTableRow();
+  if (table && curConn != table->rowConnection)
+    endConnection();
 }
 
 bool ProcessContext::inTableRow()

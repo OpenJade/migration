@@ -18,7 +18,6 @@ OBJS=Collector.o \
   StyleEngine.o \
   primitive.o \
   GroveManager.o \
-  NotationStorage.o \
   style_inst.o
 INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove
 

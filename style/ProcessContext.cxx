@@ -14,7 +14,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 ProcessContext::ProcessContext(Interpreter &interp, FOTBuilder &fotb)
-: Collector::DynamicRoot(interp), vm_(interp), flowObjLevel_(0), havePageType_(0)
+: Collector::DynamicRoot(interp), vm_(interp), flowObjLevel_(0), havePageType_(0), connectableStackLevel_(0)
 {
   connectionStack_.insert(new Connection(&fotb));
 }
@@ -228,51 +228,20 @@ void ProcessContext::processChildrenTrim(const ProcessingMode *processingMode)
 
 void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
 {
-  for (IListIter<Connectable> iter(connectableStack_); !iter.done(); iter.next()) {
+  unsigned connLevel = connectableStackLevel_;
+  for (IListIter<Connectable> iter(connectableStack_); !iter.done(); iter.next(), --connLevel) {
     Connectable *conn = iter.cur();
     for (size_t i = 0; i < conn->ports.size(); i++) {
       Port &port = conn->ports[i];
       for (size_t j = 0; j < port.labels.size(); j++)
 	if (port.labels[j] == label) {
-	  Connection *c = new Connection(conn->styleStack, &port);
-	  if (port.connected) {
-	    port.connected++;
-	    SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
-						      vm().processingMode->name(),
-						      matchSpecificity_.ruleType());
-	    c->fotb = save;
-	    port.saveQueue.append(save);
-	  }
-	  else {
-	    c->fotb = port.fotb;
-	    port.connected = 1;
-	  }
-	  connectionStack_.insert(c);
-	  currentFOTBuilder().startNode(vm().currentNode,
-					vm().processingMode->name(),
-					matchSpecificity_.ruleType());
+	  restoreConnection(connLevel, j);
 	  return;
 	}
     }
     for (size_t i = 0; i < conn->principalPortLabels.size(); i++)
       if (conn->principalPortLabels[i] == label) {
-	Connection *c = new Connection(conn->styleStack, 0);
-	if (conn->flowObjLevel == flowObjLevel_) {
-	  c->fotb = &currentFOTBuilder();
-	}
-	else {
-	  SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
-						    vm().processingMode->name(),
-						    matchSpecificity_.ruleType());
-	  c->fotb = save;
-	  if (conn->flowObjLevel >= principalPortSaveQueues_.size())
-	    principalPortSaveQueues_.resize(conn->flowObjLevel + 1);
-	  principalPortSaveQueues_[conn->flowObjLevel].append(save);
-	}
-	connectionStack_.insert(c);
-	currentFOTBuilder().startNode(vm().currentNode,
-				      vm().processingMode->name(),
-				      matchSpecificity_.ruleType());
+	restoreConnection(connLevel, size_t(-1));
 	return;
       }
   }
@@ -301,6 +270,66 @@ void ProcessContext::endConnection()
   }
 }
 
+void ProcessContext::saveCurrentConnection(SavedConnection &save)
+{
+  const Connection &c = *connectionStack_.head();
+  save.connectableLevel = c.connectableLevel;
+  save.portIndex = c.portIndex;
+}
+
+void ProcessContext::restoreConnection(const SavedConnection &save)
+{
+  restoreConnection(save.connectableLevel, save.portIndex);
+}
+
+void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portIndex)
+{
+  unsigned connLevel = connectableStackLevel_;
+  IListIter<Connectable> iter(connectableStack_);
+  for (; connLevel != connectableLevel; iter.next(), --connLevel)
+    ;
+  Connectable *conn = iter.cur();
+  if (portIndex != size_t(-1)) {
+    Port &port = conn->ports[portIndex];
+    Connection *c = new Connection(conn->styleStack, &port, connLevel, portIndex);
+    if (port.connected) {
+      port.connected++;
+      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+						vm().processingMode->name(),
+						matchSpecificity_.ruleType());
+      c->fotb = save;
+      port.saveQueue.append(save);
+    }
+    else {
+      c->fotb = port.fotb;
+      port.connected = 1;
+    }
+    connectionStack_.insert(c);
+    currentFOTBuilder().startNode(vm().currentNode,
+				  vm().processingMode->name(),
+				  matchSpecificity_.ruleType());
+  }
+  else {
+    Connection *c = new Connection(conn->styleStack, 0, connLevel, size_t(-1));
+    if (conn->flowObjLevel == flowObjLevel_) {
+      c->fotb = &currentFOTBuilder();
+    }
+    else {
+      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+						vm().processingMode->name(),
+						matchSpecificity_.ruleType());
+      c->fotb = save;
+      if (conn->flowObjLevel >= principalPortSaveQueues_.size())
+	principalPortSaveQueues_.resize(conn->flowObjLevel + 1);
+      principalPortSaveQueues_[conn->flowObjLevel].append(save);
+    }
+    connectionStack_.insert(c);
+    currentFOTBuilder().startNode(vm().currentNode,
+				  vm().processingMode->name(),
+				  matchSpecificity_.ruleType());
+  }
+}
+
 void ProcessContext::endFlowObj()
 {
   flowObjLevel_--;
@@ -315,13 +344,13 @@ void ProcessContext::endFlowObj()
 }
 
 
-ProcessContext::Connection::Connection(const StyleStack &s, Port *p)
-: styleStack(s), port(p), nBadFollow(0)
+ProcessContext::Connection::Connection(const StyleStack &s, Port *p, unsigned connLevel, size_t pi)
+: styleStack(s), port(p), nBadFollow(0), connectableLevel(connLevel), portIndex(pi)
 {
 }
 
 ProcessContext::Connection::Connection(FOTBuilder *f)
-: fotb(f), port(0), nBadFollow(0)
+: fotb(f), port(0), nBadFollow(0), connectableLevel(0), portIndex(size_t(-1))
 {
 }
 
@@ -335,11 +364,13 @@ void ProcessContext::pushPorts(bool,
     c->ports[i].labels.push_back(labels[i]);
     c->ports[i].fotb = fotbs[i];
   }
+  connectableStackLevel_++;
   // FIXME deal with !hasPrincipalPort
 }
 
 void ProcessContext::popPorts()
 {
+  connectableStackLevel_--;
   delete connectableStack_.get();
 }
 

@@ -4164,7 +4164,9 @@ DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
   if (!argv[1]->exactIntegerValue(k))
     return argError(interp, loc,
 		    InterpreterMessages::notAnExactInteger, 1, argv[1]);
-  return new (interp) NodePtrNodeListObj(nl->nodeListRef(k, context, interp));
+  // Must use temporary variable, because operator new may bew called before nodeListRef.
+  NodePtr nd(nl->nodeListRef(k, context, interp));
+  return new (interp) NodePtrNodeListObj(nd);
 }
 
 DEFPRIMITIVE(NodeListReverse, argc, argv, context, interp, loc)
@@ -4465,8 +4467,12 @@ void DescendantsNodeListObj::advance(NodePtr &nd, unsigned &depth)
     depth++;
     return;
   }
+  if (depth == 0) {
+    nd.clear();
+    return;
+  }
   while (nd.assignNextSibling() != accessOK) {
-    if (depth <= 1 || nd.assignOrigin() != accessOK) {
+    if (depth == 1 || nd.assignOrigin() != accessOK) {
       nd.clear();
       return;
     }
@@ -4482,8 +4488,12 @@ void DescendantsNodeListObj::chunkAdvance(NodePtr &nd, unsigned &depth)
     depth++;
     return;
   }
+  if (depth == 0) {
+    nd.clear();
+    return;
+  }
   while (nd.assignNextChunkSibling() != accessOK) {
-    if (depth <= 1 || nd.assignOrigin() != accessOK) {
+    if (depth == 1 || nd.assignOrigin() != accessOK) {
       nd.clear();
       return;
     }

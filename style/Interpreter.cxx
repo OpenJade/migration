@@ -2667,7 +2667,12 @@ bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
     c = *cp;
     return 1;
   }
-  return convertUnicodeCharName(tem, c);
+  if (convertUnicodeCharName(tem, c))
+    return 1;
+  // I think this is the most thing to do.
+  // At least it makes preserve-sdata work with unknown SDATA entities.
+  c = defaultChar;
+  return 1;
 }
 
 bool Interpreter::parseQuote(Owner<Expression> &expr)

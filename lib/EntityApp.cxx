@@ -18,6 +18,7 @@
 #include "URLStorage.h"
 #endif
 #include "LiteralStorage.h"
+#include "NotationStorage.h"
 #include "ExtendEntityManager.h"
 #include "SOEntityCatalog.h"
 #include "CodingSystem.h"
@@ -144,6 +145,8 @@ Ptr<ExtendEntityManager> &EntityApp::entityManager()
   entityManager_->registerStorageManager(new URLStorageManager("URL"));
 #endif
   entityManager_->registerStorageManager(new LiteralStorageManager("LITERAL"));
+  entityManager_->registerStorageManager(new NotationStorageManager("CLSID"));
+  entityManager_->registerStorageManager(new NotationStorageManager("MIMETYPE"));
   Vector<StringC> v;
   for (i = 0; i < catalogSysids_.size(); i++)
     // filenames specified on command-line must exist

@@ -79,14 +79,21 @@ namespace SP_NAMESPACE {
 #ifdef __DECCXX
 #pragma define_template Ptr<Entity>
 #else
+#ifdef __xlC__
+#pragma define(Ptr<Entity>)
+#else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Entity>;
 #else
 typedef Ptr<Entity> Dummy_0;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Entity>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Entity>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Entity>;
@@ -94,8 +101,12 @@ template class ConstPtr<Entity>;
 typedef ConstPtr<Entity> Dummy_1;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Notation>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Notation>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Notation>;
@@ -103,8 +114,12 @@ template class Ptr<Notation>;
 typedef Ptr<Notation> Dummy_2;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Notation>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Notation>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Notation>;
@@ -112,8 +127,12 @@ template class ConstPtr<Notation>;
 typedef ConstPtr<Notation> Dummy_3;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Recognizer>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Recognizer>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Recognizer>;
@@ -121,8 +140,12 @@ template class Ptr<Recognizer>;
 typedef Ptr<Recognizer> Dummy_4;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Recognizer>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Recognizer>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Recognizer>;
@@ -130,8 +153,12 @@ template class ConstPtr<Recognizer>;
 typedef ConstPtr<Recognizer> Dummy_5;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<EntityOrigin>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<EntityOrigin>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<EntityOrigin>;
@@ -139,8 +166,12 @@ template class Ptr<EntityOrigin>;
 typedef Ptr<EntityOrigin> Dummy_6;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<EntityOrigin>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<EntityOrigin>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<EntityOrigin>;
@@ -148,8 +179,12 @@ template class ConstPtr<EntityOrigin>;
 typedef ConstPtr<EntityOrigin> Dummy_7;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<AttributeValue>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<AttributeValue>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<AttributeValue>;
@@ -157,8 +192,12 @@ template class Ptr<AttributeValue>;
 typedef Ptr<AttributeValue> Dummy_8;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<AttributeValue>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<AttributeValue>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<AttributeValue>;
@@ -166,8 +205,12 @@ template class ConstPtr<AttributeValue>;
 typedef ConstPtr<AttributeValue> Dummy_9;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<AttributeDefinitionList>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<AttributeDefinitionList>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<AttributeDefinitionList>;
@@ -175,8 +218,12 @@ template class Ptr<AttributeDefinitionList>;
 typedef Ptr<AttributeDefinitionList> Dummy_10;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<AttributeDefinitionList>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<AttributeDefinitionList>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<AttributeDefinitionList>;
@@ -184,8 +231,12 @@ template class ConstPtr<AttributeDefinitionList>;
 typedef ConstPtr<AttributeDefinitionList> Dummy_11;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<ElementDefinition>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<ElementDefinition>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<ElementDefinition>;
@@ -193,8 +244,12 @@ template class Ptr<ElementDefinition>;
 typedef Ptr<ElementDefinition> Dummy_12;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<ElementDefinition>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<ElementDefinition>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<ElementDefinition>;
@@ -202,8 +257,12 @@ template class ConstPtr<ElementDefinition>;
 typedef ConstPtr<ElementDefinition> Dummy_13;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Dtd>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Dtd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Dtd>;
@@ -211,8 +270,12 @@ template class Ptr<Dtd>;
 typedef Ptr<Dtd> Dummy_14;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Dtd>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Dtd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Dtd>;
@@ -220,8 +283,12 @@ template class ConstPtr<Dtd>;
 typedef ConstPtr<Dtd> Dummy_15;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Sd>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Sd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Sd>;
@@ -229,8 +296,12 @@ template class Ptr<Sd>;
 typedef Ptr<Sd> Dummy_16;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Sd>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Sd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Sd>;
@@ -238,8 +309,12 @@ template class ConstPtr<Sd>;
 typedef ConstPtr<Sd> Dummy_17;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Syntax>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Syntax>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Syntax>;
@@ -247,8 +322,12 @@ template class Ptr<Syntax>;
 typedef Ptr<Syntax> Dummy_18;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Syntax>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Syntax>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Syntax>;
@@ -256,8 +335,12 @@ template class ConstPtr<Syntax>;
 typedef ConstPtr<Syntax> Dummy_19;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<SourceLinkRuleResource>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<SourceLinkRuleResource>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<SourceLinkRuleResource>;
@@ -265,8 +348,12 @@ template class Ptr<SourceLinkRuleResource>;
 typedef Ptr<SourceLinkRuleResource> Dummy_20;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<SourceLinkRuleResource>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<SourceLinkRuleResource>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<SourceLinkRuleResource>;
@@ -274,8 +361,12 @@ template class ConstPtr<SourceLinkRuleResource>;
 typedef ConstPtr<SourceLinkRuleResource> Dummy_21;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<Lpd>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Lpd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Lpd>;
@@ -283,8 +374,12 @@ template class Ptr<Lpd>;
 typedef Ptr<Lpd> Dummy_22;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<Lpd>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<Lpd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Lpd>;
@@ -292,8 +387,12 @@ template class ConstPtr<Lpd>;
 typedef ConstPtr<Lpd> Dummy_23;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Ptr<ComplexLpd>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<ComplexLpd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<ComplexLpd>;
@@ -301,8 +400,12 @@ template class Ptr<ComplexLpd>;
 typedef Ptr<ComplexLpd> Dummy_24;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstPtr<ComplexLpd>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<ComplexLpd>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<ComplexLpd>;
@@ -310,8 +413,12 @@ template class ConstPtr<ComplexLpd>;
 typedef ConstPtr<ComplexLpd> Dummy_25;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template CopyOwner<BlankTrie>
+#else
+#ifdef __xlC__
+#pragma define(CopyOwner<BlankTrie>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class CopyOwner<BlankTrie>;
@@ -319,8 +426,12 @@ template class CopyOwner<BlankTrie>;
 typedef CopyOwner<BlankTrie> Dummy_26;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template CopyOwner<AttributeSemantics>
+#else
+#ifdef __xlC__
+#pragma define(CopyOwner<AttributeSemantics>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class CopyOwner<AttributeSemantics>;
@@ -328,8 +439,12 @@ template class CopyOwner<AttributeSemantics>;
 typedef CopyOwner<AttributeSemantics> Dummy_27;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template CopyOwner<AttributeDefinition>
+#else
+#ifdef __xlC__
+#pragma define(CopyOwner<AttributeDefinition>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class CopyOwner<AttributeDefinition>;
@@ -337,8 +452,12 @@ template class CopyOwner<AttributeDefinition>;
 typedef CopyOwner<AttributeDefinition> Dummy_28;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template CopyOwner<DeclaredValue>
+#else
+#ifdef __xlC__
+#pragma define(CopyOwner<DeclaredValue>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class CopyOwner<DeclaredValue>;
@@ -346,8 +465,12 @@ template class CopyOwner<DeclaredValue>;
 typedef CopyOwner<DeclaredValue> Dummy_29;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NCVector<Owner<ContentToken> >
+#else
+#ifdef __xlC__
+#pragma define(NCVector<Owner<ContentToken> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<Owner<ContentToken> >;
@@ -355,8 +478,12 @@ template class NCVector<Owner<ContentToken> >;
 typedef NCVector<Owner<ContentToken> > Dummy_30;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<CopyOwner<AttributeDefinition> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<CopyOwner<AttributeDefinition> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<CopyOwner<AttributeDefinition> >;
@@ -364,8 +491,12 @@ template class Vector<CopyOwner<AttributeDefinition> >;
 typedef Vector<CopyOwner<AttributeDefinition> > Dummy_31;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NCVector<Owner<AttributeList> >
+#else
+#ifdef __xlC__
+#pragma define(NCVector<Owner<AttributeList> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<Owner<AttributeList> >;
@@ -373,8 +504,12 @@ template class NCVector<Owner<AttributeList> >;
 typedef NCVector<Owner<AttributeList> > Dummy_32;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<AttributeList>
+#else
+#ifdef __xlC__
+#pragma define(Vector<AttributeList>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<AttributeList>;
@@ -382,8 +517,12 @@ template class Vector<AttributeList>;
 typedef Vector<AttributeList> Dummy_33;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template HashTableItem<StringC, int>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC, int>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class HashTableItem<StringC, int>;
@@ -391,8 +530,12 @@ template class HashTableItem<StringC, int>;
 typedef HashTableItem<StringC, int> Dummy_34;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template HashTable<StringC,int>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,int>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class HashTable<StringC,int>;
@@ -400,8 +543,12 @@ template class HashTable<StringC,int>;
 typedef HashTable<StringC,int> Dummy_35;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template HashTableItem<StringC,Char>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC,Char>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class HashTableItem<StringC,Char>;
@@ -409,8 +556,12 @@ template class HashTableItem<StringC,Char>;
 typedef HashTableItem<StringC,Char> Dummy_36;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template HashTable<StringC,Char>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,Char>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class HashTable<StringC,Char>;
@@ -418,8 +569,12 @@ template class HashTable<StringC,Char>;
 typedef HashTable<StringC,Char> Dummy_37;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<EquivClass>
+#else
+#ifdef __xlC__
+#pragma define(IList<EquivClass>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<EquivClass>;
@@ -427,8 +582,12 @@ template class IList<EquivClass>;
 typedef IList<EquivClass> Dummy_38;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<InputSource>
+#else
+#ifdef __xlC__
+#pragma define(IList<InputSource>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<InputSource>;
@@ -436,8 +595,12 @@ template class IList<InputSource>;
 typedef IList<InputSource> Dummy_39;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<OpenElement>
+#else
+#ifdef __xlC__
+#pragma define(IList<OpenElement>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<OpenElement>;
@@ -445,8 +608,12 @@ template class IList<OpenElement>;
 typedef IList<OpenElement> Dummy_40;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<Event>
+#else
+#ifdef __xlC__
+#pragma define(IList<Event>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<Event>;
@@ -454,8 +621,12 @@ template class IList<Event>;
 typedef IList<Event> Dummy_41;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<OutputStateLevel>
+#else
+#ifdef __xlC__
+#pragma define(IList<OutputStateLevel>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<OutputStateLevel>;
@@ -463,8 +634,12 @@ template class IList<OutputStateLevel>;
 typedef IList<OutputStateLevel> Dummy_42;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<SdFormalError>
+#else
+#ifdef __xlC__
+#pragma define(IList<SdFormalError>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<SdFormalError>;
@@ -472,8 +647,12 @@ template class IList<SdFormalError>;
 typedef IList<SdFormalError> Dummy_43;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<Undo>
+#else
+#ifdef __xlC__
+#pragma define(IList<Undo>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<Undo>;
@@ -481,8 +660,12 @@ template class IList<Undo>;
 typedef IList<Undo> Dummy_44;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IQueue<MessageEvent>
+#else
+#ifdef __xlC__
+#pragma define(IQueue<MessageEvent>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IQueue<MessageEvent>;
@@ -490,8 +673,12 @@ template class IQueue<MessageEvent>;
 typedef IQueue<MessageEvent> Dummy_45;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IQueue<Event>
+#else
+#ifdef __xlC__
+#pragma define(IQueue<Event>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IQueue<Event>;
@@ -499,8 +686,12 @@ template class IQueue<Event>;
 typedef IQueue<Event> Dummy_46;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>;
@@ -508,8 +699,12 @@ template class OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>;
 typedef OwnerTable<Named,StringC,Hash,NamedTableKeyFunction> Dummy_47;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction>;
@@ -517,8 +712,12 @@ template class OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction>;
 typedef OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction> Dummy_48;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<AndInfo>
+#else
+#ifdef __xlC__
+#pragma define(Owner<AndInfo>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<AndInfo>;
@@ -526,8 +725,12 @@ template class Owner<AndInfo>;
 typedef Owner<AndInfo> Dummy_49;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<BlankTrie>
+#else
+#ifdef __xlC__
+#pragma define(Owner<BlankTrie>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<BlankTrie>;
@@ -535,8 +738,12 @@ template class Owner<BlankTrie>;
 typedef Owner<BlankTrie> Dummy_50;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<EquivClass>
+#else
+#ifdef __xlC__
+#pragma define(Owner<EquivClass>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<EquivClass>;
@@ -544,8 +751,12 @@ template class Owner<EquivClass>;
 typedef Owner<EquivClass> Dummy_51;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<ModelGroup>
+#else
+#ifdef __xlC__
+#pragma define(Owner<ModelGroup>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<ModelGroup>;
@@ -553,8 +764,12 @@ template class Owner<ModelGroup>;
 typedef Owner<ModelGroup> Dummy_52;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<OpenElement>
+#else
+#ifdef __xlC__
+#pragma define(Owner<OpenElement>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<OpenElement>;
@@ -562,8 +777,12 @@ template class Owner<OpenElement>;
 typedef Owner<OpenElement> Dummy_53;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<ContentToken>
+#else
+#ifdef __xlC__
+#pragma define(Owner<ContentToken>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<ContentToken>;
@@ -571,8 +790,12 @@ template class Owner<ContentToken>;
 typedef Owner<ContentToken> Dummy_54;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<DeclaredValue>
+#else
+#ifdef __xlC__
+#pragma define(Owner<DeclaredValue>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<DeclaredValue>;
@@ -580,8 +803,12 @@ template class Owner<DeclaredValue>;
 typedef Owner<DeclaredValue> Dummy_55;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<LeafContentToken>
+#else
+#ifdef __xlC__
+#pragma define(Owner<LeafContentToken>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<LeafContentToken>;
@@ -589,8 +816,12 @@ template class Owner<LeafContentToken>;
 typedef Owner<LeafContentToken> Dummy_56;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<AttributeSemantics>
+#else
+#ifdef __xlC__
+#pragma define(Owner<AttributeSemantics>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<AttributeSemantics>;
@@ -598,8 +829,12 @@ template class Owner<AttributeSemantics>;
 typedef Owner<AttributeSemantics> Dummy_57;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<CompiledModelGroup>
+#else
+#ifdef __xlC__
+#pragma define(Owner<CompiledModelGroup>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<CompiledModelGroup>;
@@ -607,8 +842,12 @@ template class Owner<CompiledModelGroup>;
 typedef Owner<CompiledModelGroup> Dummy_58;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<AttributeDefinition>
+#else
+#ifdef __xlC__
+#pragma define(Owner<AttributeDefinition>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<AttributeDefinition>;
@@ -616,8 +855,12 @@ template class Owner<AttributeDefinition>;
 typedef Owner<AttributeDefinition> Dummy_59;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<AttributeList>
+#else
+#ifdef __xlC__
+#pragma define(Owner<AttributeList>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<AttributeList>;
@@ -625,8 +868,12 @@ template class Owner<AttributeList>;
 typedef Owner<AttributeList> Dummy_60;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<Trie>
+#else
+#ifdef __xlC__
+#pragma define(Owner<Trie>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<Trie>;
@@ -634,8 +881,12 @@ template class Owner<Trie>;
 typedef Owner<Trie> Dummy_61;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<Markup>
+#else
+#ifdef __xlC__
+#pragma define(Owner<Markup>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<Markup>;
@@ -643,8 +894,12 @@ template class Owner<Markup>;
 typedef Owner<Markup> Dummy_62;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction>;
@@ -652,8 +907,12 @@ template class PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction>;
 typedef PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_63;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTable<Named*,StringC,Hash,NamedTableKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(PointerTable<Named*,StringC,Hash,NamedTableKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<Named*,StringC,Hash,NamedTableKeyFunction>;
@@ -661,8 +920,12 @@ template class PointerTable<Named*,StringC,Hash,NamedTableKeyFunction>;
 typedef PointerTable<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_64;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTable<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(PointerTable<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>;
@@ -670,8 +933,12 @@ template class PointerTable<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunc
 typedef PointerTable<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction> Dummy_65;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTableIter<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>
+#else
+#ifdef __xlC__
+#pragma define(PointerTableIter<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction>;
@@ -679,8 +946,12 @@ template class PointerTableIter<Ptr<NamedResource>,StringC,Hash,NamedResourceKey
 typedef PointerTableIter<Ptr<NamedResource>,StringC,Hash,NamedResourceKeyFunction> Dummy_66;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<Entity> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<Entity> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<Entity> >;
@@ -688,8 +959,12 @@ template class Vector<ConstPtr<Entity> >;
 typedef Vector<ConstPtr<Entity> > Dummy_67;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<NameToken>
+#else
+#ifdef __xlC__
+#pragma define(Vector<NameToken>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<NameToken>;
@@ -697,8 +972,12 @@ template class Vector<NameToken>;
 typedef Vector<NameToken> Dummy_68;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<CharsetDeclRange>
+#else
+#ifdef __xlC__
+#pragma define(Vector<CharsetDeclRange>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<CharsetDeclRange>;
@@ -706,8 +985,12 @@ template class Vector<CharsetDeclRange>;
 typedef Vector<CharsetDeclRange> Dummy_69;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<CharsetDeclSection>
+#else
+#ifdef __xlC__
+#pragma define(Vector<CharsetDeclSection>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<CharsetDeclSection>;
@@ -715,8 +998,12 @@ template class Vector<CharsetDeclSection>;
 typedef Vector<CharsetDeclSection> Dummy_70;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Ptr<Dtd> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<Ptr<Dtd> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Ptr<Dtd> >;
@@ -724,8 +1011,12 @@ template class Vector<Ptr<Dtd> >;
 typedef Vector<Ptr<Dtd> > Dummy_71;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Attribute>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Attribute>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Attribute>;
@@ -733,8 +1024,12 @@ template class Vector<Attribute>;
 typedef Vector<Attribute> Dummy_72;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<TextItem>
+#else
+#ifdef __xlC__
+#pragma define(Vector<TextItem>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<TextItem>;
@@ -742,8 +1037,12 @@ template class Vector<TextItem>;
 typedef Vector<TextItem> Dummy_73;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<SdTextItem>
+#else
+#ifdef __xlC__
+#pragma define(Vector<SdTextItem>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<SdTextItem>;
@@ -751,8 +1050,12 @@ template class Vector<SdTextItem>;
 typedef Vector<SdTextItem> Dummy_74;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<MarkupItem>
+#else
+#ifdef __xlC__
+#pragma define(Vector<MarkupItem>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<MarkupItem>;
@@ -760,8 +1063,12 @@ template class Vector<MarkupItem>;
 typedef Vector<MarkupItem> Dummy_75;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<RankStem*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<RankStem*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<RankStem*>;
@@ -769,8 +1076,12 @@ template class Vector<RankStem*>;
 typedef Vector<RankStem*> Dummy_76;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<const RankStem*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<const RankStem*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<const RankStem*>;
@@ -778,8 +1089,12 @@ template class Vector<const RankStem*>;
 typedef Vector<const RankStem*> Dummy_77;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Attributed*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Attributed*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Attributed*>;
@@ -787,8 +1102,12 @@ template class Vector<Attributed*>;
 typedef Vector<Attributed*> Dummy_78;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ElementType*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ElementType*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ElementType*>;
@@ -796,8 +1115,12 @@ template class Vector<ElementType*>;
 typedef Vector<ElementType*> Dummy_79;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<const ElementType*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<const ElementType*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<const ElementType*>;
@@ -805,8 +1128,12 @@ template class Vector<const ElementType*>;
 typedef Vector<const ElementType*> Dummy_80;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<Notation> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<Notation> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<Notation> >;
@@ -814,8 +1141,12 @@ template class Vector<ConstPtr<Notation> >;
 typedef Vector<ConstPtr<Notation> > Dummy_81;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Ptr<NamedResource> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<Ptr<NamedResource> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Ptr<NamedResource> >;
@@ -823,8 +1154,12 @@ template class Vector<Ptr<NamedResource> >;
 typedef Vector<Ptr<NamedResource> > Dummy_82;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<LastSet>
+#else
+#ifdef __xlC__
+#pragma define(Vector<LastSet>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<LastSet>;
@@ -832,8 +1167,12 @@ template class Vector<LastSet>;
 typedef Vector<LastSet> Dummy_83;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<AttributeValue> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<AttributeValue> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<AttributeValue> >;
@@ -841,8 +1180,12 @@ template class Vector<ConstPtr<AttributeValue> >;
 typedef Vector<ConstPtr<AttributeValue> > Dummy_84;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<SrInfo>
+#else
+#ifdef __xlC__
+#pragma define(Vector<SrInfo>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<SrInfo>;
@@ -850,8 +1193,12 @@ template class Vector<SrInfo>;
 typedef Vector<SrInfo> Dummy_85;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Named*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Named*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Named*>;
@@ -859,8 +1206,12 @@ template class Vector<Named*>;
 typedef Vector<Named*> Dummy_86;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<FirstSet>
+#else
+#ifdef __xlC__
+#pragma define(Vector<FirstSet>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<FirstSet>;
@@ -868,8 +1219,12 @@ template class Vector<FirstSet>;
 typedef Vector<FirstSet> Dummy_87;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<const AttributeList *>
+#else
+#ifdef __xlC__
+#pragma define(Vector<const AttributeList *>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<const AttributeList *>;
@@ -877,8 +1232,12 @@ template class Vector<const AttributeList *>;
 typedef Vector<const AttributeList *> Dummy_88;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<ElementDefinition> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<ElementDefinition> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<ElementDefinition> >;
@@ -886,8 +1245,12 @@ template class Vector<ConstPtr<ElementDefinition> >;
 typedef Vector<ConstPtr<ElementDefinition> > Dummy_89;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Text>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Text>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Text>;
@@ -895,8 +1258,12 @@ template class Vector<Text>;
 typedef Vector<Text> Dummy_90;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Location>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Location>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Location>;
@@ -904,8 +1271,12 @@ template class Vector<Location>;
 typedef Vector<Location> Dummy_91;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<NamedResourceTable<Entity> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<NamedResourceTable<Entity> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<NamedResourceTable<Entity> >;
@@ -913,8 +1284,12 @@ template class Vector<NamedResourceTable<Entity> >;
 typedef Vector<NamedResourceTable<Entity> > Dummy_92;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ContentModelAmbiguity>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ContentModelAmbiguity>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ContentModelAmbiguity>;
@@ -922,8 +1297,12 @@ template class Vector<ContentModelAmbiguity>;
 typedef Vector<ContentModelAmbiguity> Dummy_93;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Transition>
+#else
+#ifdef __xlC__
+#pragma define(Vector<Transition>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Transition>;
@@ -931,8 +1310,12 @@ template class Vector<Transition>;
 typedef Vector<Transition> Dummy_94;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<LeafContentToken*>
+#else
+#ifdef __xlC__
+#pragma define(Vector<LeafContentToken*>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<LeafContentToken*>;
@@ -940,8 +1323,12 @@ template class Vector<LeafContentToken*>;
 typedef Vector<LeafContentToken*> Dummy_95;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<size_t>
+#else
+#ifdef __xlC__
+#pragma define(Vector<size_t>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<size_t>;
@@ -949,8 +1336,12 @@ template class Vector<size_t>;
 typedef Vector<size_t> Dummy_96;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<unsigned int>
+#else
+#ifdef __xlC__
+#pragma define(Vector<unsigned int>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<unsigned int>;
@@ -958,9 +1349,13 @@ template class Vector<unsigned int>;
 typedef Vector<unsigned int> Dummy_97;
 #endif
 #endif
+#endif
 
 #ifdef __DECCXX
 #pragma define_template NamedTable<Id>
+#else
+#ifdef __xlC__
+#pragma define(NamedTable<Id>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NamedTable<Id>;
@@ -968,8 +1363,12 @@ template class NamedTable<Id>;
 typedef NamedTable<Id> Dummy_98;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NamedTableIter<Id>
+#else
+#ifdef __xlC__
+#pragma define(NamedTableIter<Id>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NamedTableIter<Id>;
@@ -977,8 +1376,12 @@ template class NamedTableIter<Id>;
 typedef NamedTableIter<Id> Dummy_99;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IListIter<EquivClass>
+#else
+#ifdef __xlC__
+#pragma define(IListIter<EquivClass>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<EquivClass>;
@@ -986,8 +1389,12 @@ template class IListIter<EquivClass>;
 typedef IListIter<EquivClass> Dummy_100;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IListIter<InputSource>
+#else
+#ifdef __xlC__
+#pragma define(IListIter<InputSource>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<InputSource>;
@@ -995,9 +1402,13 @@ template class IListIter<InputSource>;
 typedef IListIter<InputSource> Dummy_101;
 #endif
 #endif
+#endif
 
 #ifdef __DECCXX
 #pragma define_template NamedResourceTable<Notation>
+#else
+#ifdef __xlC__
+#pragma define(NamedResourceTable<Notation>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NamedResourceTable<Notation>;
@@ -1005,8 +1416,12 @@ template class NamedResourceTable<Notation>;
 typedef NamedResourceTable<Notation> Dummy_102;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NamedResourceTable<Entity>
+#else
+#ifdef __xlC__
+#pragma define(NamedResourceTable<Entity>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NamedResourceTable<Entity>;
@@ -1014,8 +1429,12 @@ template class NamedResourceTable<Entity>;
 typedef NamedResourceTable<Entity> Dummy_103;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NamedResourceTableIter<Entity>
+#else
+#ifdef __xlC__
+#pragma define(NamedResourceTableIter<Entity>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NamedResourceTableIter<Entity>;
@@ -1023,8 +1442,12 @@ template class NamedResourceTableIter<Entity>;
 typedef NamedResourceTableIter<Entity> Dummy_104;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstNamedResourceTableIter<Entity>
+#else
+#ifdef __xlC__
+#pragma define(ConstNamedResourceTableIter<Entity>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstNamedResourceTableIter<Entity>;
@@ -1032,8 +1455,12 @@ template class ConstNamedResourceTableIter<Entity>;
 typedef ConstNamedResourceTableIter<Entity> Dummy_105;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template ConstNamedResourceTableIter<Notation>
+#else
+#ifdef __xlC__
+#pragma define(ConstNamedResourceTableIter<Notation>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class ConstNamedResourceTableIter<Notation>;
@@ -1041,9 +1468,13 @@ template class ConstNamedResourceTableIter<Notation>;
 typedef ConstNamedResourceTableIter<Notation> Dummy_106;
 #endif
 #endif
+#endif
 
 #ifdef __DECCXX
 #pragma define_template Vector<IdLinkRule>
+#else
+#ifdef __xlC__
+#pragma define(Vector<IdLinkRule>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<IdLinkRule>;
@@ -1051,8 +1482,12 @@ template class Vector<IdLinkRule>;
 typedef Vector<IdLinkRule> Dummy_107;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<SourceLinkRuleResource> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<SourceLinkRuleResource> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<SourceLinkRuleResource> >;
@@ -1060,8 +1495,12 @@ template class Vector<ConstPtr<SourceLinkRuleResource> >;
 typedef Vector<ConstPtr<SourceLinkRuleResource> > Dummy_108;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<Vector<ConstPtr<SourceLinkRuleResource> > >
+#else
+#ifdef __xlC__
+#pragma define(Vector<Vector<ConstPtr<SourceLinkRuleResource> > >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Vector<ConstPtr<SourceLinkRuleResource> > >;
@@ -1069,8 +1508,12 @@ template class Vector<Vector<ConstPtr<SourceLinkRuleResource> > >;
 typedef Vector<Vector<ConstPtr<SourceLinkRuleResource> > > Dummy_109;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ResultElementSpec>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ResultElementSpec>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ResultElementSpec>;
@@ -1078,8 +1521,12 @@ template class Vector<ResultElementSpec>;
 typedef Vector<ResultElementSpec> Dummy_110;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<AttributeDefinitionList> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<AttributeDefinitionList> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<AttributeDefinitionList> >;
@@ -1087,8 +1534,12 @@ template class Vector<ConstPtr<AttributeDefinitionList> >;
 typedef Vector<ConstPtr<AttributeDefinitionList> > Dummy_111;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<ConstPtr<Lpd> >
+#else
+#ifdef __xlC__
+#pragma define(Vector<ConstPtr<Lpd> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<Lpd> >;
@@ -1096,8 +1547,12 @@ template class Vector<ConstPtr<Lpd> >;
 typedef Vector<ConstPtr<Lpd> > Dummy_112;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<LpdEntityRef *>
+#else
+#ifdef __xlC__
+#pragma define(Vector<LpdEntityRef *>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<LpdEntityRef *>;
@@ -1105,8 +1560,12 @@ template class Vector<LpdEntityRef *>;
 typedef Vector<LpdEntityRef *> Dummy_113;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>
+#else
+#ifdef __xlC__
+#pragma define(PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
@@ -1114,8 +1573,12 @@ template class PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntit
 typedef PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_114;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>
+#else
+#ifdef __xlC__
+#pragma define(PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
@@ -1123,8 +1586,12 @@ template class PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdE
 typedef PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_115;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>
+#else
+#ifdef __xlC__
+#pragma define(OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
@@ -1132,8 +1599,12 @@ template class OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef
 typedef OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_116;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>
+#else
+#ifdef __xlC__
+#pragma define(OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>;
@@ -1141,13 +1612,18 @@ template class OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntit
 typedef OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef> Dummy_117;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template IList<LinkProcessOpenElement>
+#else
+#ifdef __xlC__
+#pragma define(IList<LinkProcessOpenElement>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class IList<LinkProcessOpenElement>;
 #else
 typedef IList<LinkProcessOpenElement> Dummy_118;
+#endif
 #endif
 #endif
 

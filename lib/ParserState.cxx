@@ -814,6 +814,8 @@ void ParserState::noteCurrentAttribute(size_t i, AttributeValue *value)
 
 ConstPtr<AttributeValue> ParserState::getCurrentAttribute(size_t i) const
 {
+  if (!inInstance())
+    return ConstPtr<AttributeValue>();
   return currentAttributes_[i];
 }
 

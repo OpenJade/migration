@@ -697,9 +697,11 @@ Boolean Parser::parseSgmlDecl()
     ISet<WideChar> invalidSgmlChar;
     proSyntax->checkSgmlChar(*sdBuilder.sd,
 			     sdBuilder.syntax.pointer(),
+			     1,  // get results in document character set
 			     invalidSgmlChar);
     sdBuilder.syntax->checkSgmlChar(*sdBuilder.sd,
 				    proSyntax,
+				    1, // get results in document character set
 				    invalidSgmlChar);
     if (!invalidSgmlChar.isEmpty())
       message(ParserMessages::invalidSgmlChar, CharsetMessageArg(invalidSgmlChar));
@@ -886,7 +888,7 @@ Boolean Parser::sdParseCharset(SdBuilder &sdBuilder,
 	break;
       case SdParam::minimumLiteral:
 	{
-	  UnivChar c = sdBuilder.sd->nameToUniv(parm.literalText.string());
+	  UnivChar c = charNameToUniv(*sdBuilder.sd, parm.literalText.string());
 	  if (adjCount > 256) {
 	    message(ParserMessages::tooManyCharsMinimumLiteral);
 	    adjCount = 256;
@@ -975,7 +977,7 @@ Boolean Parser::sdParseExternalCharset(Sd &sd, UnivCharsetDesc &desc)
 	desc.addRange(min, min + (count - 1), parm.n);
     }
     else if (parm.type == SdParam::minimumLiteral) {
-      UnivChar c = sd.nameToUniv(parm.literalText.string());
+      UnivChar c = charNameToUniv(sd, parm.literalText.string());
       if (count > 256) {
 	message(ParserMessages::tooManyCharsMinimumLiteral);
 	count = 256;
@@ -986,6 +988,15 @@ Boolean Parser::sdParseExternalCharset(Sd &sd, UnivCharsetDesc &desc)
   }
   popInputStack();
   return 0;
+}
+
+UnivChar Parser::charNameToUniv(Sd &sd, const StringC &name)
+{
+  UnivChar univ;
+  if (entityCatalog().lookupChar(name, sd.internalCharset(), messenger(), univ))
+    return univ;
+  else
+    return sd.nameToUniv(name);
 }
 
 Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
@@ -1195,6 +1206,7 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
     ISet<WideChar> invalidSgmlChar;
     sdBuilder.syntax->checkSgmlChar(*sdBuilder.sd,
 				    0,
+				    1,
 				    invalidSgmlChar);
     if (!invalidSgmlChar.isEmpty())
       message(ParserMessages::invalidSgmlChar, CharsetMessageArg(invalidSgmlChar));
@@ -2140,7 +2152,10 @@ Boolean Parser::translateSyntax(CharSwitcher &switcher,
   if (syntaxCharset.descToUniv(syntaxChar, univChar)
       && univToDescCheck(internalCharset, univChar, docChar))
     return 1;
-  message(ParserMessages::translateSyntaxChar, NumberMessageArg(syntaxChar));
+  message(sd().internalCharsetIsDocCharset()
+          ? ParserMessages::translateSyntaxCharDoc
+	  : ParserMessages::translateSyntaxCharInternal,
+	  NumberMessageArg(syntaxChar));
   return 0;
 }
 
@@ -2211,12 +2226,13 @@ Boolean Parser::translateSyntaxNoSwitch(SdBuilder &sdBuilder,
   StringC str;
   CharsetDeclRange::Type type;
   const PublicId *id;
-  if (sdBuilder.syntaxCharsetDecl.getCharInfo(syntaxChar,
-					      id,
-					      type,
-					      n,
-					      str,
-					      count)) {
+  if (sdBuilder.sd->internalCharsetIsDocCharset()
+      && sdBuilder.syntaxCharsetDecl.getCharInfo(syntaxChar,
+					         id,
+					         type,
+					         n,
+					         str,
+					         count)) {
     ISet<WideChar> docChars;
     switch (type) {
     case CharsetDeclRange::unused:
@@ -2258,7 +2274,10 @@ Boolean Parser::translateSyntaxNoSwitch(SdBuilder &sdBuilder,
     return 1;
   }
   sdBuilder.valid = 0;
-  message(ParserMessages::translateSyntaxChar, NumberMessageArg(syntaxChar));
+  message(sd().internalCharsetIsDocCharset()
+          ? ParserMessages::translateSyntaxCharDoc
+	  : ParserMessages::translateSyntaxCharInternal,
+	  NumberMessageArg(syntaxChar));
   return 0;
 }
 
@@ -2313,7 +2332,10 @@ UnivChar Parser::translateUniv(UnivChar univChar,
   }
   SyntaxChar tem = switcher.subst(syntaxChar);
   if (tem != syntaxChar && !syntaxCharset.descToUniv(tem, univChar))
-    message(ParserMessages::translateSyntaxChar, NumberMessageArg(tem));
+    message(sd().internalCharsetIsDocCharset()
+            ? ParserMessages::translateSyntaxCharDoc
+            : ParserMessages::translateSyntaxCharInternal,
+	    NumberMessageArg(tem));
   return univChar;
 }
 

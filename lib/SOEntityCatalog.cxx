@@ -71,6 +71,10 @@ public:
 		       const CharsetInfo &,
 		       Messenger &,
 		       StringC &) const;
+  Boolean lookupChar(const StringC &,
+                     const CharsetInfo &,
+		     Messenger &,
+		     UnivChar &) const;
   void addPublicId(StringC &publicId, StringC &systemId, const Location &,
 		   Boolean override);
   void addDelegate(StringC &prefix, StringC &systemId, const Location &,
@@ -497,6 +501,33 @@ Boolean SOEntityCatalog::lookupPublic(const StringC &publicId,
 				   0, charset, delegated ? &publicId : 0,
 				   mgr, result));
 				 
+}
+
+Boolean SOEntityCatalog::lookupChar(const StringC &name,
+				    const CharsetInfo &charset,
+				    Messenger &mgr,
+				    UnivChar &result) const
+{
+  Boolean delegated;
+  const CatalogEntry *entry = findBestPublicEntry(name, 0, charset,
+						  delegated);
+  if (!entry)
+    return 0;
+  if (delegated)
+    return 0;  // FIXME
+  const StringC &number = entry->to;
+  if (number.size() == 0)
+    return 0;
+  UnivChar n = 0;
+  for (size_t i = 0; i < number.size(); i++) {
+    int d = charset.digitWeight(number[i]);
+    if (d < 0)
+      return 0;
+    if (n <= UnivChar(-1)/10 && (n *= 10) <= UnivChar(-1) - d)
+      n += d;
+  }
+  result = n;
+  return 1;
 }
 
 const CatalogEntry *

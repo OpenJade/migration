@@ -793,6 +793,7 @@ private:
   StrOutputByteStream stringout_;
   Messenger *mgr_;
   bool preserveSdata_;
+  int inMath_;
 
 #ifdef OUTLINES
   int needToCollect() {return inHeading_;}
@@ -1821,6 +1822,7 @@ TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
 #ifdef OUTLINES
 ,inHeading_(0),headingSet_(0),lastHeaded_(0)
 #endif
+,inMath_(0)
 {
   #ifdef TEXDEBUG
     CurInstance = this;
@@ -1908,7 +1910,13 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
 	break;
       case '\n':
 	break;
-      }
+      case '-':
+      case '<':
+      case '>':
+        os() << char(*s);   
+	if (!inMath_)
+          os() << "\/"; // break ligatures
+        break;
     }
   }
 }
@@ -2526,12 +2534,14 @@ void TeXFOTBuilder::endTablePartFooter()
 
 void TeXFOTBuilder::startMathSequence()
 {
+  inMath_++;
   startGroup("MathSeq");
 }
 
 void TeXFOTBuilder::endMathSequence()
 {
   endGroup("MathSeq");
+  inMath_++;
 }
 
 void TeXFOTBuilder::startFractionSerial()

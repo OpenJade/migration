@@ -4889,8 +4889,8 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
    }
    // Split off the cars of the arguments and
    // check that they are proper lists of the same length
-   Vector<ELObj*> cars(argc, 0);
-   Vector<ELObj*> cdrs(argc, 0);
+   Vector<ELObj*> cars(argc);
+   Vector<ELObj*> cdrs(argc);
    bool hasSeenNil = 0;
    bool hasSeenNonNil = 0;
    for (unsigned i = 1; i < argc; i++) {

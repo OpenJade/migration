@@ -6,7 +6,7 @@ $prog = $0;
 $prog =~ s@.*/@@;
 
 $gen_c = 0;
-$gen_po = 1;
+$gen_po = 0;
 
 undef $opt_l;
 do 'getopts.pl';

@@ -1,3 +1,7 @@
+2004-06-09  Karl Eichwalder  <ke@gnu.franken.de>
+
+	* configure.in (ALL_LINGUAS): Remove it; only po/LINGUAS is required.
+
 2004-06-09  Karl Eichwalder  <ke@suse.de>
 
 	* include/MessageReporter.h: Add missing return; (thanks to Marcus

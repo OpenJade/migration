@@ -1306,7 +1306,6 @@ SaveFOTBuilder::operator=(const SaveFOTBuilder& other)
 
 void SaveFOTBuilder::clear()
 {
-  *tail_ = 0;
   while (calls_) {
     Call *tem = calls_;
     calls_ = calls_->next;
@@ -1337,7 +1336,6 @@ void SaveFOTBuilder::emit(FOTBuilder &fotb) const
   else 
 #endif
   {
-    *tail_ = 0;
     for (const Call* tem = calls_; tem; tem = tem->next) 
       tem->emit(fotb);
   }

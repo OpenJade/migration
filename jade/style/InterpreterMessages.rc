@@ -139,4 +139,9 @@ BEGIN
   136, "unsupported declaration will be ignored"
   137, "unsupported character repertoire %1 will be ignored"
   138, "error in declaration element"
+  139, "%2 argument for primitive %1 of wrong type: %3 not an integer"
+  140, "%2 argument for primitive %1 of wrong type: %3 not a keyword"
+  141, "%2 argument for primitive %1 of wrong type: %3 not an alist"
+  142, "%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+  143, "%2 argument for primitive %1 has wrong length"
 END

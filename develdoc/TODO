@@ -36,25 +36,8 @@ Simple things
 
 * install ports, ICs, etc only in SL Interpreters.
 
-* make MessageReporter::messageNumbers available from cmdline
-  like the other options in ParserApp.
-
-* change the MessageTable setup to allow separate message domains
-  per lib/app. 
-
-* modify msggen.pl to create separate module numbers for each
-  lib (eg appModule = 0, libsp = 1, libstyle = 2) 
-  ie must include stylelib.h if in style/ and then use
-
-  #ifdef BUILD_LIBSTYLE
-    libStyleModule
-  #else ...
-
-  similar hacks needed if libgrove or libspgrove ever acquire
-  messages.
-
-* split InterpreterMessages into InterpreterMessages and 
-  SchemeParserMessages.
+* Perhaps split InterpreterMessages into InterpreterMessages and 
+  SchemeParserMessages (and more...). 
 
 
 Things which have to be added to the jade internals documentation

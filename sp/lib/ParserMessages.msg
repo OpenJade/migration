@@ -442,6 +442,8 @@ E0+sorryImpliedDoctype++Sorry, #IMPLICIT doctypes not implemented
 W0+dtdDataEntityReference++reference to DTD data entity ignored
 E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefined
 E1+dsEntityNotationUndefined++notation %1 for external subset undefined
+E1+specifiedAttributeRedeclared+ISO 8879:1986 K4.4+attribute %1 can't be redeclared
+E1+notationMustNotBeDeclared++#IMPLICIT attributes have already been specified for notation %1
 # message fragments
 =1000
 +delimStart++delimiter 

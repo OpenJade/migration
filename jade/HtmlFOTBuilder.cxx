@@ -21,6 +21,7 @@
 #include "OwnerTable.h"
 #include "Hash.h"
 #include "OutputByteStream.h"
+#include "dsssl_ns.h"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -12,6 +12,7 @@
 #include "config.h"
 #include "SgmlFOTBuilder.h"
 #include "macros.h"
+#include "dsssl_ns.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

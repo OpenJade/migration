@@ -18,6 +18,7 @@
 #include "RtfOle.h"
 #endif
 #include "IList.h"
+#include "dsssl_ns.h"
 #include <string.h>
 #include <limits.h>
 

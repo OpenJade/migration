@@ -115,6 +115,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   ASSERT(processingMode != 0);
   GroveString str;
 
+  printf("ProcessContext::processNode\n");
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) {
     printf("chars\n");
     if (!processingMode->hasQuery()) {
@@ -140,9 +141,12 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   bool hadStyle = 0;
   currentFOTBuilder().startNode(nodePtr, processingMode->name());
   for (;;) {
+    printf("rule loop body\n");
     const ProcessingMode::Rule *rule
      = vm().processingMode->findMatch(nodePtr, *vm_.interp, *vm_.interp,
 					matchSpecificity_);
+    if (rule) printf("found rule\n");
+    else printf("no rule found\n");
     if (!rule) {
       if (hadStyle) {
         currentStyleStack().pushEnd(vm(), currentFOTBuilder());
@@ -158,31 +162,40 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
       break;
     }
     if (!matchSpecificity_.isStyle()) {
+      printf("no style rule\n");
       SosofoObj *sosofoObj;
       InsnPtr insn;
       rule->action().get(insn, sosofoObj);
+      printf("got action\n");
       if (hadStyle) {
 	currentStyleStack().pushEnd(vm(), currentFOTBuilder());
 	currentFOTBuilder().startSequence();
       }
-      if (sosofoObj)
+      if (sosofoObj) {
+        printf("process sosofo\n");
         sosofoObj->process(*this);
+      }
       else {
+        printf("process insn\n");
 	ELObj *obj = vm().eval(insn.pointer());
 	if (vm_.interp->isError(obj)) {
 	  if (processingMode->name().size() == 0)
 	    processChildren(processingMode, loc);
 	}
         else {
+          printf("treat obj as sosofo\n");
           ELObjDynamicRoot protect(*vm_.interp, obj);
             ((SosofoObj *)obj)->process(*this);
         }
       }
       break;
     }
+ 
+    printf("style rule\n");
     SosofoObj *sosofoObj;
     InsnPtr insn;
     rule->action().get(insn, sosofoObj);
+    printf("got action\n");
     ELObj *obj = vm().eval(insn.pointer());
     if (!vm_.interp->isError(obj)) {
       if (!hadStyle) {
@@ -196,8 +209,10 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
     currentFOTBuilder().endSequence();
     currentStyleStack().pop();
   }
+  printf("after rule loop\n");
   currentFOTBuilder().endNode();
   matchSpecificity_ = saveSpecificity;
+  printf("exit processNode\n");
 }
 
 void ProcessContext::nextMatch(StyleObj *overridingStyle, const Location &loc)

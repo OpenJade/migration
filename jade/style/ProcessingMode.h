@@ -91,6 +91,8 @@ public:
   void compile(Interpreter &);
   bool defined() const;
   void setDefined();
+  bool hasQuery() const;
+  void setQuery();
 
   struct ElementRules : public Named {
   public:
@@ -122,6 +124,7 @@ private:
   NCVector<GroveRules> groveRules_;
   const ProcessingMode *initial_; // 0 for initial mode
   bool defined_;
+  bool hasQuery_; // 1 if there are any query rules
 };
 
 
@@ -135,6 +138,18 @@ inline
 void ProcessingMode::setDefined()
 {
   defined_ = 1;
+}
+
+inline
+bool ProcessingMode::hasQuery() const
+{
+  return hasQuery_;
+}
+
+inline
+void ProcessingMode::setQuery()
+{
+  hasQuery_ = 1;
 }
 
 inline

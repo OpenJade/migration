@@ -6,6 +6,10 @@
 #include <OpenSP/macros.h>
 #include <OpenSP/Vector.h>
 #include "Interpreter.h"
+#include "ProcessingMode.h"
+#include "VM.h"
+#include "ELObj.h"
+#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -35,20 +39,17 @@ bool Pattern::computeTrivial(const IList<Element> &ancestors)
   return 1;
 }
 
-Pattern::Element::Element(const StringC &gi)
+Pattern::Element::Element(const StringC &gi, bool forceGi)
 : gi_(gi), minRepeat_(1), maxRepeat_(1)
 {
+  if (forceGi) 
+    addQualifier(new IsElementQualifier);
 }
 
 bool Pattern::Element::matches(const NodePtr &nd, MatchContext &context) const
 {
   if (gi_.size()) {
     if (!nd->hasGi(GroveString(gi_.data(), gi_.size())))
-      return 0;
-  }
-  else {
-    GroveString tem;
-    if (nd->getGi(tem) != accessOK)
       return 0;
   }
   for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next())
@@ -167,6 +168,59 @@ void Pattern::ChildrenQualifier::contributeSpecificity(int *s) const
 {
   for (IListIter<Element> iter(children_); !iter.done(); iter.next())
     iter.cur()->contributeSpecificity(s);
+}
+
+Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &expr, unsigned priority,
+                                      ProcessingMode *pm, Interpreter *interp)
+: priority_(priority), interp_(interp), pm_(pm), nl_(0)
+{
+  expr_.swap(expr);
+}
+
+bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
+{
+  printf("Pattern::NodeQualifier::satisfies\n");
+  NodePtr root;
+  m->getGroveRoot(root);
+  EvalContext ec;
+  EvalContext::CurrentNodeSetter cns(root, pm_, ec);
+
+  if (!nl_) {
+    InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
+    VM vm(ec, *interp_);
+    ELObj *val = vm.eval(insn.pointer());
+    if (!val || !val->asNodeList()) {
+      printf("no nodelist\n");
+      //FIXME: error
+      return 0;
+    }
+    nl_ = val->asNodeList();
+    printf("nodelist length %d\n", nl_->nodeListLength(ec, *interp_));
+    interp_->makePermanent(nl_);
+    printf("made perm\n");
+  }
+
+  NodeListObj *nl = nl_;
+  for (;;) {
+    printf("going loop\n");
+    ELObjDynamicRoot protect(*interp_, nl);
+    NodePtr nd = nl->nodeListFirst(ec, *interp_);
+    if (!nd)
+      break;
+    printf("checking node\n");
+    if (nd == m) {
+      printf("found\n");
+      return 1;
+    }
+    nl = nl->nodeListRest(ec, *interp_); 
+  }
+  printf("not found\n");
+  return 0;
+}
+
+void Pattern::NodeQualifier::contributeSpecificity(int *s) const
+{
+  s[nodeSpecificity] += 1 + priority_;
 }
 
 Pattern::IdQualifier::IdQualifier(const StringC &id)
@@ -418,6 +472,19 @@ void Pattern::ImportanceQualifier::contributeSpecificity(int *s) const
 bool Pattern::ImportanceQualifier::satisfies(const NodePtr &, MatchContext &) const
 {
   return 1;
+}
+
+void Pattern::IsElementQualifier::contributeSpecificity(int *s) const
+{
+}
+
+bool Pattern::IsElementQualifier::satisfies(const NodePtr &nd, MatchContext &) const
+{
+  GroveString tem;
+  if (nd->getGi(tem) == accessOK) 
+    return 1; 
+  else
+    return 0;
 }
 
 bool Pattern::matchAncestors1(const IListIter<Element> &ancestors,

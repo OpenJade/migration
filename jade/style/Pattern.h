@@ -5,7 +5,6 @@
 #define Pattern_INCLUDED 1
 
 #include <OpenSP/Boolean.h>
-#include "Node.h"
 #include <OpenSP/Link.h>
 #include <OpenSP/IList.h>
 #include <OpenSP/IListIter.h>
@@ -13,10 +12,18 @@
 #include <OpenSP/Vector.h>
 #include <OpenSP/Ptr.h>
 #include <OpenSP/Resource.h>
+#include <OpenSP/Owner.h>
+#include "Expression.h"
+#include "Node.h"
+#include "EvalContext.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
+
+class ProcessingMode;
+class Interpreter;
+class NodeListObj;
 
 class Pattern {
 public:
@@ -39,6 +46,18 @@ public:
 			       const StringC &value,
 			       const NodePtr &nd,
 			       MatchContext &context);
+  };
+  class NodeQualifier : public Qualifier {
+  public:
+    NodeQualifier(Owner<Expression> &, unsigned, ProcessingMode *, Interpreter *);
+    bool satisfies(const NodePtr &, MatchContext &) const;
+    void contributeSpecificity(int *) const;
+  private:
+    ProcessingMode *pm_;
+    Interpreter *interp_;
+    Owner<Expression> expr_;
+    mutable NodeListObj *nl_;
+    unsigned priority_;
   };
   class IdQualifier : public Qualifier {
   public:
@@ -133,10 +152,15 @@ public:
   private:
     long n_;
   };
+  class IsElementQualifier : public VacuousQualifier {
+  public:
+    void contributeSpecificity(int *) const;
+    bool satisfies(const NodePtr &, MatchContext &) const;
+  };
   typedef unsigned Repeat;
   class Element : public Link {
   public:
-    Element(const StringC &);
+    Element(const StringC &, bool forceGi = 1);
     bool matches(const NodePtr &, MatchContext &) const;
     void contributeSpecificity(int *) const;
     void addQualifier(Qualifier *);
@@ -172,6 +196,7 @@ public:
   bool trivial() const;
   static int compareSpecificity(const Pattern &, const Pattern &);
   enum {
+    nodeSpecificity,
     importanceSpecificity,
     idSpecificity,
     classSpecificity,

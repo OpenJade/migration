@@ -177,6 +177,9 @@ void SchemeParser::parse()
 	  case Identifier::keyDefault:
 	    recovering = !doDefault();
 	    break;
+	  case Identifier::keyQuery:
+	    recovering = !doQuery();
+	    break;
 	  case Identifier::keyElement:
 	    recovering = !doElement();
 	    break;
@@ -309,6 +312,10 @@ bool SchemeParser::doMode()
 	if (!doDefault())
 	  return 0;
 	break;
+      case Identifier::keyQuery:
+	if (!doQuery())
+	  return 0;
+	break;
       case Identifier::keyElement:
 	if (!doElement())
 	  return 0;
@@ -334,6 +341,44 @@ bool SchemeParser::doMode()
   }
   defMode_ = interp_->initialProcessingMode();
   return 1;
+}
+
+bool SchemeParser::doQuery()
+{
+  Location loc(in_->currentLocation());
+  Owner<Expression> query, construct;
+  Token tok;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, query, key, tok))
+    return 0;
+  
+  if (!parseExpression(0, construct, key, tok))
+    return 0;
+
+  Owner<Expression> expr;
+  long priority = 0;
+  if (!parseExpression(allowCloseParen, expr, key, tok))
+    return 0;
+  if (tok != tokenCloseParen) {
+    expr->optimize(*interp_, Environment(), expr);
+    ELObj *val = expr->constantValue();
+    if (!val || !val->exactIntegerValue(priority)) {
+      // error: priority not a number
+      return 0;
+    }
+  }
+
+  IList<Pattern::Element> list;
+  Pattern::Element *elem = new Pattern::Element(StringC(), 0);
+  list.insert(elem);
+  elem->addQualifier(new Pattern::NodeQualifier(query, priority, 
+                                                defMode_, interp_));
+  Pattern pattern(list);
+  NCVector<Pattern> patterns(1);
+  patterns[0].swap(pattern);
+  defMode_->addRule(0, patterns, construct, ProcessingMode::constructionRule, 
+                      loc, *interp_);
+  defMode_->setQuery();
 }
 
 bool SchemeParser::doElement()

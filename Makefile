@@ -122,7 +122,9 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/../Makefile.comm -f $$srcdir/Makefile.sub \
 	        -f $$srcdir/../Makefile.prog -f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): lib
+$(PROGDIRS): $(SP_LIBDIRS)
+
+$(JADE_PROGDIRS): $(JADE_LIBDIRS)
 
 # GNU tar
 TAR=tar

@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif Cristian Tornador Antolin 07-2003
 
 #include "stylelib.h"
 #include "Interpreter.h"
@@ -394,8 +395,9 @@ DEFPRIMITIVE(IsKeyword, argc, argv, context, interp, loc)
 DEFPRIMITIVE(IsInteger, argc, argv, context, interp, loc)
 {
   long n;
-  if (argv[0]->exactIntegerValue(n))
+  if (argv[0]->exactIntegerValue(n)){
     return interp.makeTrue();
+  }
   double x;
   if (argv[0]->realValue(x) && modf(x, &x) == 0.0)
     return interp.makeTrue();
@@ -1731,6 +1733,15 @@ DEFPRIMITIVE(SosofoDiscardLabeled, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notASymbol, 1, argv[1]);
   return new (interp) DiscardLabeledSosofoObj(sym, sosofo);
+}
+
+//para PageModelObj
+DEFPRIMITIVE(IsPageModel, argc, argv, context, interp, loc)
+{
+  if (argv[0]->asPageModel())
+    return interp.makeTrue(); 
+  else
+    return interp.makeFalse();
 }
 
 DEFPRIMITIVE(IsSosofo, argc, argv, context, interp, loc)

@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modificado Cristian Tornador Antolin 09-2003
 
 #include "stylelib.h"
 #include "Interpreter.h"
@@ -88,6 +89,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
   makePermanent(theUnspecifiedObj_ = new (*this) UnspecifiedObj);
   makePermanent(addressNoneObj_
                 = new (*this) AddressObj(FOTBuilder::Address::none));
+  makePermanent(pageModelNoneObj_
+                = new (*this) PageModelObj);
   makePermanent(emptyNodeListObj_
 		= new (*this) NodePtrNodeListObj);
   defaultLanguage_ = theFalseObj_;
@@ -1074,6 +1077,66 @@ bool Interpreter::convertEnumC(const FOTBuilder::Symbol *syms,  size_t nSyms,
   return 0;
 }
 
+//para PageModel -> Generic IC FALTA
+bool Interpreter::convertPageModelC(ELObj *obj, const Identifier *ident, const Location &loc,
+				    FOTBuilder::StModel &stpm)
+{
+  PageModelObj *pmobj;
+  //obj tiene los valores del .dsl, lo convertimos a tipo PageModelObj
+  //si es un simbolo quiere decir que es una lista!!
+  if (obj->asSymbol()) {
+	  pmobj = getSendPageModel(); 
+  }
+    else  pmobj = obj->asPageModel();
+  if (pmobj){
+   //cout << "el nombre del define-page-model es: ";
+   //pmobj->whatID(*this,cout); 
+   //cout << endl;
+   //obtenemos en stpm el valor del fichero .dsl, para despues pasarlo al FOTBuilder 
+   if (pmobj->pageModelData(stpm)){
+      return 1;
+   }
+  }
+  invalidCharacteristicValue(ident, loc);
+  return 0;
+}
+
+//no habra demasiados define-page-model (lista enlazada)
+//FALTA
+void Interpreter::sendPageModel(PageModelObj *send)
+{
+PairObj *last;
+
+ if (!pageModelsSends_){
+      pageModelsSends_ = new (*this) PairObj(send, 0);
+ }
+ else{
+     last  = pageModelsSends_;
+     while (last->cdr())
+      last = last->cdr()->asPair();
+    //el siguiente de last es nulo! fin!
+     PairObj *nuevo = new (*this) PairObj(send, 0);
+     //introducimos el siguiente
+     last->setCdr(nuevo); 
+ }
+}
+
+//FALTA : nos de el ultimo define-page-model
+PageModelObj* Interpreter::getSendPageModel()
+{
+ PageModelObj *pmobj = 0;
+ PairObj * last = pageModelsSends_;
+ //last->car()->asPageModel()->print(*this,cout);
+ //si hay alguno
+ if (last){
+  while(last->cdr()){
+   last = last->cdr()->asPair();
+ }
+  pmobj = last->car()->asPageModel(); 
+ }
+ return pmobj;
+}
+
 void Interpreter::invalidCharacteristicValue(const Identifier *ident, const Location &loc)
 {
   setNextLocation(loc);
@@ -1097,9 +1160,15 @@ ELObj *Interpreter::convertFromString(ELObj *obj, unsigned hints, const Location
   // FIXME fold to lower case
   const Char *s;
   size_t n;
-  if (!dsssl2() || !obj->stringData(s, n))
+  if (!dsssl2() || !obj->stringData(s, n)){
     return obj;
+  }
   if (hints & convertAllowNumber) {
+    ELObj *tem = convertNumber(StringC(s, n));
+    if (tem)
+      return tem->resolveQuantities(1, *this, loc);
+  }
+  if (hints & convertAllowPageModel) {
     ELObj *tem = convertNumber(StringC(s, n));
     if (tem)
       return tem->resolveQuantities(1, *this, loc);

@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+// modificado Cristian Tornador 07-2003
 
 #include "stylelib.h"
 #include "ELObj.h"
@@ -9,6 +10,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -88,6 +90,28 @@ FunctionObj *ELObj::asFunction()
 {
   return 0;
 }
+
+//para PageModelObj
+PageModelObj *ELObj::asPageModel()
+{
+  return 0;
+}
+
+IntegerObj *ELObj::asInteger()
+{
+  return 0;
+}
+
+StringObj *ELObj::asString()
+{
+  return 0;
+}
+
+bool ELObj::pageModelData(FOTBuilder::StModel &)
+{
+  return false;
+}
+
 
 SosofoObj *ELObj::asSosofo()
 {
@@ -547,6 +571,11 @@ StringObj::StringObj(const Char *s, size_t len)
 {
 }
 
+StringObj* StringObj::asString()
+{
+ return this;
+}
+
 bool StringObj::stringData(const Char *&s, size_t &n)
 {
   s = data();
@@ -594,6 +623,11 @@ IntegerObj::IntegerObj()
 IntegerObj::IntegerObj(long n)
 : n_(n)
 {
+}
+
+IntegerObj* IntegerObj::asInteger()
+{
+ return this;
 }
 
 bool IntegerObj::isEqual(ELObj &obj)

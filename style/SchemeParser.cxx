@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif: Cristian Tornador Antolin (Barcelona) cristxoc@opencoders.org
 
 #include "stylelib.h"
 #include "SchemeParser.h"
@@ -194,8 +195,10 @@ void SchemeParser::parse()
 	  case Identifier::keyDeclareCharCharacteristicAndProperty:
 	    recovering = !doDeclareCharCharacteristicAndProperty();
 	    break;
-	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDefinePageModel:
+	    recovering = !doDefinePageModel();
+	    break;
+	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDefineColumnSetModel:
 	    recovering = !skipForm();
 	    break;
@@ -750,6 +753,117 @@ bool SchemeParser::doDefineUnit()
   return 1;
 }
 
+//para PageModel
+bool SchemeParser::doDefinePageModel()
+{
+  StringC *nomdefine = 0;
+  //obtengo la localizacion de los datos de entrada actuales
+  Location loc(in_->currentLocation());
+
+  //enum token, todos los tokens posibles
+  Token tok;
+  //mira a ver si es un token valido con el enum
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  //obtenemos el token a identificar
+  Identifier *ident = lookup(currentToken_);
+  nomdefine = &currentToken_;
+  //miramos si es un syntacticKey
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key) && (key <= int(Identifier::lastSyntacticKey)))
+    message(InterpreterMessages::syntacticKeywordAsVariable,
+            StringMessageArg(currentToken_));
+
+  Location defLoc;
+  unsigned defPart;
+  if (ident->defined(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex()) {
+      message(InterpreterMessages::duplicateDefinition,
+              StringMessageArg(ident->name()),
+              defLoc);
+      return 0;
+    }
+  }
+
+  
+  //creamos el objeto donde guardara la info de la hoja de estilo
+  if (nomdefine) pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel(0,0), *nomdefine);
+   else pagemodelObj_ = interp_->makePageModel(FOTBuilder::StModel(0,0));
+  for (;;) {
+    //si es token abrir parentesis, sale, otra vez?
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    //token cierre de parentesis, fin!
+    if (tok == tokenCloseParen)
+      break;
+    //token identificador (width,height...)
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+
+    //obtiene identificador
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyWidth:
+        if (!doWidth())
+	 return 0;
+        break;
+      case Identifier::keyHeight:
+        if (!doHeight())
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+  }
+  //lo hace permanente en interpreter!!
+  interp_->sendPageModel(pagemodelObj_);
+
+  Owner<Expression> expr;
+  expr = new ConstantExpression(pagemodelObj_, in_->currentLocation());
+  pagemodelObj_ = 0;
+  ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doWidth()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setWidth(result);
+  return 1;
+}
+
+bool SchemeParser::doHeight()
+{
+  Token tok;
+  long result = 0;
+  //si es un token numero, ok
+  if (!getToken(allowOtherExpr, tok) || (tok != tokenNumber))
+    return 0;
+  //obtienes el valor de la hoja de estilo
+  ELObj* tmpobj = interp_->convertNumber(currentToken_);
+  tmpobj->exactIntegerValue(result);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  pagemodelObj_->setHeight(result);
+  return 1;
+}
+
+//las que faltan por definir
 bool SchemeParser::skipForm()
 {
   static const unsigned allow = (~0 & ~allowEndOfEntity);
@@ -1557,11 +1671,15 @@ bool SchemeParser::parseDatum(unsigned otherAllowed,
 			     Location &loc,
 			     Token &tok)
 {
+  //crea el tipo ELObj correspondiente y lo guarda en result (puede venir de recursivo)
   if (!parseSelfEvaluating(otherAllowed|allowVector|allowUnquote|allowUnquoteSplicing, result, tok))
     return 0;
   loc = in_->currentLocation();
-  if (result)
+  //en recursivo si no es un token, tendra ya tem con su informacion.
+  if (result){
     return 1;
+  }
+  //sino son datos y es un token!!
   switch (tok) {
   case tokenIdentifier:
     result = interp_->makeSymbol(currentToken_);
@@ -1588,8 +1706,9 @@ bool SchemeParser::parseDatum(unsigned otherAllowed,
       PairObj *last = new (*interp_) PairObj(tem, 0);
       list = last;
       for (;;) {
-	if (!parseDatum(allowCloseParen|allowPeriod, tem, ignore, tok))
-	  return 0;
+	if (!parseDatum(allowCloseParen|allowPeriod, tem, ignore, tok)){
+	 return 0;
+	}
 	if (!tem) {
 	  if (tok == tokenCloseParen) {
 	    last->setCdr(interp_->makeNil());
@@ -1640,6 +1759,10 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
   if (!getToken(allowExpr|otherAllowed, tok))
     return 0;
   switch (tok) {
+  //para lista PageModel
+//  case tokenDefine:
+//    result = interp_->makePageModel(FOTBuilder::StModel(3,3));
+//    break;
   case tokenTrue:
     result = interp_->makeTrue();
     break;
@@ -1890,6 +2013,16 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	break;
       }
       return handleNumber(allowed, tok);
+//    case '%':
+//    case '*':
+//      extendToken();
+//      if (!(allowed & allowOtherExpr))
+//	  return tokenRecover(allowed, tok);
+//      tok = tokenDefine;
+      //donde quieres que empiece; Para lista Page Model
+//      currentToken_.assign(in->currentTokenStart(),
+//                             in->currentTokenLength());
+//      return 1;
     default:
       switch (interp_->lexCategory(c)) {
       case Interpreter::lexAddWhiteSpace:

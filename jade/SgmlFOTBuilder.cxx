@@ -1,5 +1,6 @@
 // Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
+//modif Cristian Tornador Antolin 2002
 
 // Possible improvements:
 // Don't serialize ports
@@ -159,6 +160,10 @@ public:
   void setFirstPageType(Symbol);
   void setJustifySpread(bool);
   void setBindingEdge(Symbol);
+  void setInitialPageModel(const FOTBuilder::StModel &);
+  void setRepeatPageModels(const FOTBuilder::StModel &);
+  void setBlankBackPageModel(const FOTBuilder::StModel &);
+  void setBlankFrontPageModel(const FOTBuilder::StModel &);
   //For anchor
   void setAnchorKeepWithPrevious(bool);
   //For included-container-area
@@ -376,6 +381,10 @@ private:
   void optLengthSpecC(const char *, const OptLengthSpec &);
   void symbolC(const char *name, Symbol sym);
   void integerC(const char *, long);
+
+  //para PageModel
+  void pageModelC(const char *, const FOTBuilder::StModel &);
+  void extensionPageModelC(const char *, const FOTBuilder::StModel &);
   void publicIdC(const char *, PublicId);
   void inlineSpaceC(const char *name, const InlineSpace &);
   void displaySpaceNIC(const char *name, const DisplaySpace &);
@@ -1187,6 +1196,19 @@ void SgmlFOTBuilder::integerC(const char *s, long n)
   ics_ << ' ' << s << '=' << quot << n << quot;
 }
 
+//para PageModel
+void SgmlFOTBuilder::pageModelC(const char *s, const FOTBuilder::StModel& stpm)
+{
+  ics_ << ' ' << s << ".width="  << quot << stpm.stwidth_ << quot << ' '  << s << ".height=" << quot <<  stpm.stheight_ << quot; 
+}
+
+//ics_ pone a continuacion
+//os() al principio!! --> PageModelObj
+void SgmlFOTBuilder::extensionPageModelC(const char *s, const FOTBuilder::StModel& stpm)
+{
+  ics_ << ' ' << s << ".width="  << quot << stpm.stwidth_ << quot << ' '  << s << ".height=" << quot <<  stpm.stheight_ << quot; 
+}
+
 void SgmlFOTBuilder::setExpandTabs(long n)
 {
   integerC("expand-tabs", n);
@@ -1467,6 +1489,26 @@ void SgmlFOTBuilder::setJustifySpread(bool b)
 void SgmlFOTBuilder::setBindingEdge(Symbol sym)
 {
   symbolC("binding-edge", sym);
+}
+
+void SgmlFOTBuilder::setInitialPageModel(const FOTBuilder::StModel& stpm)
+{
+  extensionPageModelC("initial-page-model", stpm);
+}
+
+void SgmlFOTBuilder::setRepeatPageModels(const FOTBuilder::StModel& stpm)
+{
+  extensionPageModelC("repeat-page-models", stpm);
+}
+
+void SgmlFOTBuilder::setBlankBackPageModel(const FOTBuilder::StModel &stpm)
+{
+  pageModelC("blank-back-page-model", stpm);
+}
+
+void SgmlFOTBuilder::setBlankFrontPageModel(const FOTBuilder::StModel &stpm)
+{
+  pageModelC("blank-front-page-model", stpm);
 }
 
 //For anchor

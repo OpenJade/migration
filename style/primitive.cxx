@@ -13,6 +13,7 @@
 #include "LocNode.h"
 #include "VM.h"
 #include "Pattern.h"
+#include "ELObjPropVal.h"
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>
@@ -1592,15 +1593,12 @@ DEFPRIMITIVE(CharProperty, argc, argv, context, interp, loc)
   if (!sym)
     return argError(interp, loc,
 		    InterpreterMessages::notASymbol, 0, argv[0]);
+  StringObj *prop = argv[0]->asSymbol()->convertToString();
   Char c;
   if (!argv[1]->charValue(c))
     return argError(interp, loc,
 		    InterpreterMessages::notAChar, 1, argv[1]);
-  // FIXME
-  if (argc > 2)
-    return argv[2];
-  else
-    return interp.makeFalse();
+  return interp.charProperty(*prop, c, loc, (argc > 2) ? argv[2] : 0);
 }
 
 DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
@@ -4155,57 +4153,6 @@ bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
   return 1;
 }
 
-class ELObjPropertyValue : public PropertyValue {
-public:
-  ELObjPropertyValue(Interpreter &interp, bool rcs) : interp_(&interp), rcs_(rcs), obj(0) { }
-  void set(const NodePtr &nd) {
-    obj = new (*interp_) NodePtrNodeListObj(nd);
-  }
-  void set(const NodeListPtr &nl) {
-    obj = new (*interp_) NodeListPtrNodeListObj(nl);
-  }
-  void set(const NamedNodeListPtr &nnl) {
-    obj = new (*interp_) NamedNodeListPtrNodeListObj(nnl);
-  }
-  void set(bool b) {
-    if (b)
-      obj = interp_->makeTrue();
-    else
-      obj = interp_->makeFalse();
-  }
-  void set(GroveChar c) {
-    obj = interp_->makeChar(c);
-  }
-  void set(GroveString s) {
-    obj = new (*interp_) StringObj(s.data(), s.size());
-  }
-  void set(ComponentName::Id id) {
-    const char *s = rcs_ ? ComponentName::rcsName(id) : ComponentName::sdqlName(id);
-    obj = interp_->makeSymbol(interp_->makeStringC(s));
-  }
-  void set(const ComponentName::Id *names) {
-    PairObj *head = new (*interp_) PairObj(0, 0);
-    ELObjDynamicRoot protect(*interp_, head);
-    PairObj *tail = head;
-    for (int i = 0; names[i] != ComponentName::noId; i++) {
-      const char *s = (rcs_
-	               ? ComponentName::rcsName(names[i])
-		       : ComponentName::sdqlName(names[i]));
-      SymbolObj *sym = interp_->makeSymbol(interp_->makeStringC(s));
-      tail->setCdr(sym); // in case we ever gc symbols
-      PairObj *tem = new (*interp_) PairObj(sym, 0);
-      tail->setCdr(tem);
-      tail = tem;
-    }
-    tail->setCdr(interp_->makeNil());
-    obj = head->cdr();
-  }
-  ELObj *obj;
-private:
-  Interpreter *interp_;
-  bool rcs_;
-};
-
 DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
 {
   StringObj *str = argv[0]->convertToString();
@@ -5308,15 +5255,15 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
   NodePtr nd;
   ELObj *ret;
   InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
+  VM vm(context, interp);
   while (nd = nl->nodeListFirst(context, interp)) {
     nl = nl->nodeListRest(context, interp);
     protect1 = nl;
-    EvalContext::CurrentNodeSetter cns(nd, context.processingMode, context);
-    VM vm(context, interp);
+    EvalContext::CurrentNodeSetter cns(nd, context.processingMode, vm);
     ret = vm.eval(insn.pointer());
     if (!ret->asSosofo()) { 
       interp.setNextLocation(loc);
-      interp.message(InterpreterMessages::returnNotSosofo);
+      interp.message(InterpreterMessages::returnNotSosofo); 
       return interp.makeError();
     }
     obj->append(ret->asSosofo());

@@ -185,12 +185,16 @@ void SchemeParser::parse()
 	  case Identifier::keyDefineLanguage:
             recovering = !doDefineLanguage();
             break;
+	  case Identifier::keyDeclareCharProperty:
+            recovering = doDeclareCharProperty();
+            break;
+	  case Identifier::keyAddCharProperties:
+            recovering = doAddCharProperties();
+            break;
 	  case Identifier::keyDeclareCharCharacteristicAndProperty:
 	  case Identifier::keyDeclareReferenceValueType:
-	  case Identifier::keyDeclareCharProperty:
 	  case Identifier::keyDefinePageModel:
 	  case Identifier::keyDefineColumnSetModel:
-	  case Identifier::keyAddCharProperties:
 	    recovering = !skipForm();
 	    break;
 	  default:
@@ -2369,6 +2373,60 @@ bool SchemeParser::parseSpecialQuery(Owner<Expression> &rexp, const char *query)
   args[0] = new LambdaExpression(vars, inits, 0, 0, 0, expr, loc);
   rexp = new CallExpression(op, args, loc);
   return 1;
+}
+
+bool SchemeParser::doDeclareCharProperty()
+{
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Identifier *ident = lookup(currentToken_);
+  Owner<Expression> expr;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  interp_->addCharProperty(ident, expr);
+  return 1;
+}
+
+bool SchemeParser::doAddCharProperties()
+{
+  NCVector<Owner<Expression> > exprs;
+  Vector<const Identifier *> keys;
+  for (;;) {
+    Owner<Expression> tem;
+    Identifier::SyntacticKey key;
+    Token tok;
+    if (!parseExpression(allowCloseParen, tem, key, tok))
+      return 0;
+    if (!tem)
+      break;
+    if (keys.size() == exprs.size()) {
+      const Identifier *k = tem->keyword();
+      if (k) {
+        tem.clear();
+        if (!parseExpression(0, tem, key, tok))
+          return 0;
+        keys.push_back(k);
+      }
+    }
+    exprs.resize(exprs.size() + 1);
+    tem.swap(exprs.back());
+ }
+ for (size_t i = exprs.size() - 1; i >= keys.size(); i--) {
+   exprs[i]->optimize(*interp_, Environment(), exprs[i]);
+   ELObj *val = exprs[i]->constantValue();
+   Char c;
+   if (!val || !val->charValue(c)) {
+     interp_->setNextLocation(exprs[i]->location());
+     message(InterpreterMessages::badAddCharProperty);
+     continue;
+   }
+   for (size_t j = 0; j < keys.size(); j++) 
+     interp_->setCharProperty(keys[j], c, exprs[j]);
+ }
 }
 
 

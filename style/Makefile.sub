@@ -31,7 +31,8 @@ OBJS=InterpreterMessages.o \
 INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove
 
 GENSRCS=jade_version.h style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
-  InterpreterMessages.h DssslAppMessages.h DssslAppMessages.rc InterpreterMessages.rc
+  InterpreterMessages.h InterpreterMessages.rc InterpreterMessages.cxx \
+  DssslAppMessages.h DssslAppMessages.rc
 
 $(srcdir)/jade_version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@
@@ -46,5 +47,4 @@ primitive.lo: primitive_inst.cxx
 DssslApp.lo: jade_version.h DssslAppMessages.h
 InterpreterMessages.o: InterpreterMessages.h
 InterpreterMessages.lo: InterpreterMessages.h
-
-
+TransformationMode.cxx: InterpreterMessages.h

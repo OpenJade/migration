@@ -7,7 +7,8 @@ XLIBS=../style/libostyle.a ../spgrove/libospgrove.a ../grove/libogrove.a \
   ../lib/libosp.a
 GENSRCS=JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
  HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx  TeXFOTBuilder_inst.cxx \
- TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx
+ TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx \
+ JadeMessages.rc RtfMessages.rc HtmlMessages.rc TeXMessages.rc MifMessages.rc
 
 HtmlFOTBuilder.o: HtmlFOTBuilder_inst.cxx HtmlMessages.h
 RtfFOTBuilder.o: RtfFOTBuilder_inst.cxx RtfMessages.h

@@ -48,7 +48,7 @@ GENSRCS=version.h entmgr_inst.cxx \
   ArcEngineMessages.cxx MessageFormatterMessages.cxx PosixStorageMessages.cxx \
   CatalogMessages.cxx MessageReporterMessages.cxx StdioStorageMessages.cxx \
   CmdLineAppMessages.cxx ParserAppMessages.cxx URLStorageMessages.cxx \
-  EntityManagerMessages.cxx ParserMessages.cxx WinInetStorageMessages.msg \
+  EntityManagerMessages.cxx ParserMessages.cxx \
   URLStorageMessages.rc EntityManagerMessages.rc PosixStorageMessages.rc \
   StdioStorageMessages.rc CatalogMessages.rc ParserMessages.rc \
   MessageFormatterMessages.rc MessageReporterMessages.rc CmdLineAppMessages.rc \

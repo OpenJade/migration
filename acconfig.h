@@ -1,3 +1,9 @@
+/* these are needed for GNU gettext */
+#undef ENABLE_NLS
+#undef HAVE_CATGETS
+#undef HAVE_LC_MESSAGES
+#undef HAVE_STPCPY
+
 /* set this to the default catalog files list */
 #undef SGML_CATALOG_FILES_DEFAULT
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-03-09 17:35+0000\n"
+"POT-Creation-Date: 2000-03-16 20:43+0000\n"
 "PO-Revision-Date: 2000-03-15 17:19+01:00\n"
 "Last-Translator: Matthias Clasen <clasen@mathematik.uni-freiburg.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2224,7 +2224,8 @@ msgstr ""
 "#IMPLICIT kann als Dokumenttyp nur bei CONCUR NO und LINK EXPLICIT NO "
 "verwendet werden"
 
-msgid "Sorry, #IMPLICIT doctypes not implemented"
+#, fuzzy
+msgid "Sorry, #IMPLIED doctypes not implemented"
 msgstr "Sorry, #IMPLICIT als Dokumenttyp nicht implementiert"
 
 msgid "reference to DTD data entity ignored"
@@ -2241,6 +2242,31 @@ msgstr "Attribut %1 kann nicht redeklariert werden"
 
 msgid "#IMPLICIT attributes have already been specified for notation %1"
 msgstr "#IMPLICIT Attribut für Notationo %1 bereits spezifiziert"
+
+#, fuzzy
+msgid ""
+"a name group is not allowed in a parameter entity reference in a start tag"
+msgstr ""
+"Eine Namensgruppe ist in einer Referenz auf eine allgemeine Entität in einem "
+"Starttag nicht erlaubt"
+
+#, fuzzy
+msgid ""
+"name group in a parameter entity reference in an end tag (SGML forbids them "
+"in start tags)"
+msgstr ""
+"Eine Namensgruppe ist in einer Referenz auf eine allgemeine Entität in einem "
+"Starttag nicht erlaubt"
+
+#, fuzzy
+msgid "if the declared value is NOTATION a default value of CONREF is useless"
+msgstr ""
+"Wenn der deklarierte Wert ID ist, muß der Standardwert IMPLIED oder REQUIRED "
+"sein"
+
+#, fuzzy
+msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
+msgstr "Sorry, #IMPLICIT als Dokumenttyp nicht implementiert"
 
 msgid "delimiter "
 msgstr "Begrenzer "

@@ -51,6 +51,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	assert.cxx big5.h events.h gb2312.h iso646-jis.h iso8859-2.h \
 	iso8859-3.h iso8859-4.h iso8859-5.h iso8859-6.h iso8859-7.h \
 	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
+	koi8-r.h \
 	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
 	splibpch.h token.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \

@@ -1,6 +1,7 @@
 PROG=jade
 OBJS=jade.o SgmlFOTBuilder.o RtfFOTBuilder.o HtmlFOTBuilder.o \
-  TeXFOTBuilder.o TransformFOTBuilder.o MifFOTBuilder.o
+  TeXFOTBuilder.o TransformFOTBuilder.o MifFOTBuilder.o \
+  TextFOTBuilder.o
 INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove -I$(srcdir)/../style
 XLIBS=../style/libstyle.a ../spgrove/libspgrove.a ../grove/libgrove.a \
   ../lib/libsp.a

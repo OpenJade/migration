@@ -24,6 +24,7 @@
 #include "Node.h"
 #include "GroveManager.h"
 #include "Pattern.h"
+#include "CharMap.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -53,10 +54,15 @@ public:
     keyArrow,
     keySet,
     keyBegin,
+    keyThereExists,
+    keyForAll,
+    keySelectEach,
+    keyUnionForEach,
     keyMake,
     keyStyle,
     keyWithMode,
     keyDefineUnit,
+    keyQuery,
     keyElement,
     keyDefault,
     keyRoot,
@@ -157,24 +163,45 @@ public:
     keyDeclareFlowObjectMacro,
     keyOrElement,
     keyPositionPreference,
+    keyCollate,
+    keyToupper,
+    keyTolower,
+    keySymbol,
+    keyOrder,
+    keyForward,
+    keyBackward,
+    keyWhitePoint,
+    keyBlackPoint,
+    keyRange,
+    keyRangeAbc,
+    keyRangeLmn,
+    keyRangeA,
+    keyDecodeAbc,
+    keyDecodeLmn,
+    keyDecodeA, 
+    keyMatrixAbc,
+    keyMatrixLmn,
+    keyMatrixA,
     keyArchitecture
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
   // Return 0 is value can't yet be computed.
   ELObj *computeValue(bool force, Interpreter &) const;
+  ELObj *computeBuiltinValue(bool force, Interpreter &) const;
   bool syntacticKey(SyntacticKey &) const;
   void setSyntacticKey(SyntacticKey);
   bool defined(unsigned &, Location &) const;
-  void setDefinition(Owner<Expression> &, unsigned part,
-                     const Location &);
+  void setDefinition(Owner<Expression> &, unsigned part, const Location &);
+  void setBuiltinDefinition(Owner<Expression> &, unsigned part, const Location &);
   void setValue(ELObj *, unsigned defPart = unsigned(-1));
   bool evaluated() const;
   const ConstPtr<InheritedC> &inheritedC() const;
   bool inheritedCDefined(unsigned &, Location &) const;
+  bool charNICDefined(unsigned &, Location &) const;
+  void setCharNIC(unsigned, const Location &);
   void setInheritedC(const ConstPtr<InheritedC> &);
-  void setInheritedC(const ConstPtr<InheritedC> &, unsigned part,
-		     const Location &);
+  void setInheritedC(const ConstPtr<InheritedC> &, unsigned, const Location &);
   FlowObj *flowObj() const;
   bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
@@ -191,9 +218,13 @@ private:
   Location defLoc_;
   SyntacticKey syntacticKey_;
   bool beingComputed_;
+  bool charNIC_;
   ConstPtr<InheritedC> inheritedC_;
   unsigned inheritedCPart_;
   Location inheritedCLoc_;
+  void maybeSaveBuiltin();
+  Identifier *builtin_;
+  static bool preferBuiltin_;
 };
 
 class Unit : public Named {
@@ -239,6 +270,27 @@ private:
   ELObj *obj_;
 };
 
+struct CharPart {
+  Char c;
+  unsigned defPart;
+};
+
+struct ELObjPart {
+  ELObjPart();
+  ELObjPart(ELObj *x, unsigned y);
+  void operator=(const ELObjPart &);
+  bool operator==(const ELObjPart &) const;
+  bool operator!=(const ELObjPart &) const;
+  ELObj *obj;
+  unsigned defPart;
+};
+
+struct CharProp {
+  CharMap<ELObjPart> *map;
+  ELObjPart def;
+  Location loc;
+};
+
 class Interpreter : 
   public Collector,
   public Pattern::MatchContext,
@@ -267,9 +319,9 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, const FOTBuilder::Extension *);
-  void defineVariable(const StringC &);
+	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
   void endPart();
+  void dEndPart();
   FalseObj *makeFalse();
   TrueObj *makeTrue();
   NilObj *makeNil();
@@ -297,6 +349,10 @@ public:
   static StringC makeStringC(const char *);
   SymbolObj *portName(PortName);
   ELObj *cValueSymbol(FOTBuilder::Symbol);
+  ELObj *charProperty(const StringC &, Char, const Location &, ELObj *);
+  void addCharProperty(const Identifier *, Owner<Expression> &);
+  void setCharProperty(const Identifier *, Char, Owner<Expression> &);
+  void compileCharProperties();
   // Map of LexCategory
   XcharMap<char> lexCategory_;
   static void normalizeGeneralName(const NodePtr &, StringC &);
@@ -336,7 +392,12 @@ public:
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
   bool dsssl2() const;
+  bool strictMode() const;
   void setNodeLocation(const NodePtr &);
+  void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
+  ELObj *defaultLanguage() const;
+  bool defaultLanguageSet(unsigned &,Location &) const;
+  void compileDefaultLanguage();
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
@@ -344,20 +405,28 @@ public:
   void addIdAttributeName(const StringC &name);
   void installInitialValue(Identifier *, Owner<Expression> &);
   void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
+  void installExtensionCharNIC(Identifier *, const StringC &, const Location &);
   void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
   // Return 0 if an invalid number.
   ELObj *convertNumber(const StringC &, int radix = 10);
   bool convertCharName(const StringC &str, Char &c) const;
   enum LexCategory {
     lexLetter,			// a - z A - Z
-    lexOtherNameStart,		// 
+    lexOtherNameStart,		// !$%&*/<=>?~_^:
+    lexAddNameStart,
     lexDigit,			// 0-9
     lexOtherNumberStart,	// -+.
+    lexOther,
     lexDelimiter,		// ;()"
     lexWhiteSpace,
-    lexOther
+    lexAddWhiteSpace
   };
   LexCategory lexCategory(Xchar);
+  void addStandardChar(const StringC &, const StringC &);
+  void addSdataEntity(const StringC &, const StringC &, const StringC &);
+  void addNameChar(const StringC &);
+  void addSeparatorChar(const StringC &);
+  void setCharRepertoire(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -365,8 +434,9 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *s, PrimitiveObj *value);
-  void installXPrimitive(const char *s, PrimitiveObj *value);
+  void installPrimitive(const char *, PrimitiveObj *);
+  void installXPrimitive(const char *, const char *, PrimitiveObj *);
+  void installBuiltins();
   void installUnits();
   void installCharNames();
   void installInheritedCs();
@@ -375,6 +445,7 @@ private:
   void installFlowObjs();
   void installSdata();
   void installNodeProperties();
+  void installCharProperties();
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -407,6 +478,7 @@ private:
   Messenger *messenger_;
   const FOTBuilder::Extension *extensionTable_;
   unsigned partIndex_;
+  unsigned dPartIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
   GroveManager *groveManager_;
@@ -414,7 +486,9 @@ private:
   NamedTable<ProcessingMode> processingModeTable_;
   SymbolObj *portNames_[nPortNames];
   ELObj *cValueSymbols_[FOTBuilder::nSymbols];
-  HashTable<StringC,Char> namedCharTable_;
+  HashTable<StringC, CharPart> namedCharTable_;
+  HashTable<StringC, CharPart> sdataEntityNameTable_;
+  HashTable<StringC, CharPart> sdataEntityTextTable_;
   Vector<const Identifier *> initialValueNames_;
   NCVector<Owner<Expression> > initialValueValues_;
   size_t currentPartFirstInitialValue_;
@@ -437,14 +511,19 @@ private:
     OwnerTable<String<char>, String<char>, StringSet, StringSet> table_;
   };
   StringSet publicIds_;
-  HashTable<StringC,Char> sdataEntityNameTable_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
   bool dsssl2_;
+  bool strictMode_;
+  ELObj *defaultLanguage_;
+  Owner<Expression> defaultLanguageDef_;
+  unsigned defaultLanguageDefPart_;
+  Location defaultLanguageDefLoc_;
   friend class Identifier;
+  HashTable<StringC, CharProp> charProperties_;
 };
 
 inline
@@ -641,6 +720,12 @@ bool Interpreter::dsssl2() const
 }
 
 inline
+bool Interpreter::strictMode() const
+{
+  return strictMode_;
+}
+
+inline
 void Interpreter::makeReadOnly(ELObj *obj)
 {
   if (dsssl2())
@@ -703,10 +788,23 @@ bool Identifier::inheritedCDefined(unsigned &part, Location &loc) const
 }
 
 inline
-void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+bool Identifier::charNICDefined(unsigned &part, Location &loc) const
 {
-  inheritedC_ = ic;
-  inheritedCPart_ = unsigned(-1);
+  if (!charNIC_)
+    return 0;
+  part = inheritedCPart_;
+  loc = inheritedCLoc_;
+  return 1;
+}
+
+inline
+void Identifier::setCharNIC(unsigned part,
+			    const Location &loc)
+{
+  charNIC_ = 1;
+  inheritedC_ = ConstPtr<InheritedC>(0);
+  inheritedCPart_ = part;
+  inheritedCLoc_ = loc;
 }
 
 inline
@@ -716,6 +814,14 @@ void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic, unsigned part,
   inheritedC_ = ic;
   inheritedCPart_ = part;
   inheritedCLoc_ = loc;
+}
+
+inline
+void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
+{
+  inheritedC_ = ic;
+  inheritedCPart_ = unsigned(-1);
+  inheritedCLoc_ = Location();
 }
 
 inline
@@ -748,6 +854,38 @@ void Identifier::setFlowObj(FlowObj *fo, unsigned part, const Location &loc)
   flowObjPart_ = part;
   flowObjLoc_ = loc;
 }
+
+inline
+ELObjPart::ELObjPart()
+: obj(0), defPart(0)
+{
+}
+
+inline
+ELObjPart::ELObjPart(ELObj *o, unsigned p)
+: obj(o), defPart(p)
+{
+}
+
+inline
+void ELObjPart::operator=(const ELObjPart &x)
+{
+  obj = x.obj;
+  defPart = x.defPart;
+}
+
+inline
+bool ELObjPart::operator==(const ELObjPart &x) const
+{
+  return defPart == x.defPart && obj && x.obj && ELObj::eqv(*obj, *x.obj);
+}
+
+inline
+bool ELObjPart::operator!=(const ELObjPart &x) const
+{
+  return !(*this == x);
+}
+
 
 #ifdef DSSSL_NAMESPACE
 }

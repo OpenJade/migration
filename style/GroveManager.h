@@ -22,6 +22,7 @@ public:
   virtual bool load(const StringC &, const Vector<StringC> &active, const NodePtr &parent,
 		    NodePtr &, const Vector<StringC> &architecture) = 0;
   virtual bool readEntity(const StringC &, StringC &) = 0;
+  virtual void mapSysid(StringC &) = 0;
 };
 
 #ifdef DSSSL_NAMESPACE

@@ -16,6 +16,7 @@ namespace DSSSL_NAMESPACE {
 class StyleStack;
 class StyleObj;
 class ProcessingMode;
+class LanguageObj;
 
 class EvalContext {
 public:
@@ -36,12 +37,13 @@ public:
   Vector<size_t> *actualDependencies;
   NodePtr currentNode;
   const ProcessingMode *processingMode;
+  LanguageObj *currentLanguage;
 };
 
 inline
 EvalContext::EvalContext()
 : styleStack(0), overridingStyle(0),
-  actualDependencies(0), processingMode(0)
+  actualDependencies(0), processingMode(0), currentLanguage(0)
 {
 }
 

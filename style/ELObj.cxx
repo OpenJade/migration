@@ -94,6 +94,11 @@ SosofoObj *ELObj::asSosofo()
   return 0;
 }
 
+AppendSosofoObj *ELObj::asAppendSosofo()
+{
+  return 0;
+}
+
 ColorObj *ELObj::asColor()
 {
   return 0;

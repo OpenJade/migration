@@ -154,8 +154,9 @@ binary-arch:	build debian/copyright debian/substvars 		\
 #	 we can't use SUBDIRS here since that trickles down; 
 #	 install it all into openjade dir
 	$(MAKE) install							\
-	    prefix=$(SRCDIR)/$(prefix-openjade)/usr $(am_inst_flags)	\
-	    pkgdocdir=$(docdir-openjade)
+	    prefix=$(SRCDIR)/$(prefix-openjade)/usr			\
+	    pkgdocdir=$(SRCDIR)/$(docdir-openjade)			\
+	    $(am_inst_flags)
 
 #	 remove the extra docs installed from top-level Makefile
 	cd $(docdir-openjade) && rm -f $(DOCS_TOO_MUCH)

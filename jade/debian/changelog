@@ -2,10 +2,10 @@ openjade (1.4devel1-3) unstable; urgency=low
 
   * upstream changes from CVS, see NEWS
   * debian/rules: cope with DEB_BUILD_OPTIONS; stop building with -g by
-    default
+    default; fix setting of pkgdocdir when doing 'make install'
   * debian/control: Policy compliant with 3.2.1
 
- -- Adam Di Carlo <aph@debian.org>  Sat, 27 Jan 2001 13:51:26 -0500
+ -- Adam Di Carlo <aph@debian.org>  Sat, 27 Jan 2001 15:03:29 -0500
 
 openjade (1.4devel1-2) unstable; urgency=low
 

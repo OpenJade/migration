@@ -165,7 +165,9 @@ __instantiate(Vector<ContentModelAmbiguity>)
 __instantiate(Vector<Transition>)
 __instantiate(Vector<LeafContentToken*>)
 __instantiate(Vector<size_t>)
+#ifndef SIZE_T_IS_UINT
 __instantiate(Vector<unsigned int>)
+#endif
 
 __instantiate(NamedTable<Id>)
 __instantiate(NamedTableIter<Id>)

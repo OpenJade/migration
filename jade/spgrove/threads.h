@@ -141,7 +141,7 @@ private:
 
 #endif /* _MSC_VER && _MT */
 
-#ifdef __MACH__
+#if ((defined __MACH__) && !(defined __APPLE__)) || (defined __GNU__)
 
 // For Mach, using C Threads. May or may not work as-is on your Mach-based OS.
 // Written by Raf Schietekat <RfSchtkt@maze.ruca.ua.ac.be> on 1996-11-10.
@@ -155,6 +155,13 @@ extern "C" {
 // catch is a reserved word in C++, it's only used to declare a struct member
 #define catch catch22
 #include <mach/cthreads.h>
+#undef catch
+// don't want ASSERT to clash with ASSERT in SP's macros.h
+#undef ASSERT
+#elif defined __GNU__
+// catch is a reserved word in C++, it's only used to declare a struct member
+#define catch catch22
+#include <cthreads.h>
 #undef catch
 // don't want ASSERT to clash with ASSERT in SP's macros.h
 #undef ASSERT
@@ -295,7 +302,7 @@ private:
 
 #endif /* SP_NO_BLOCK */
 
-#endif /* __MACH__ */
+#endif /* __MACH__ || __GNU__ */
 
 #ifdef SP_USE_PTHREADS
 
@@ -305,7 +312,10 @@ private:
 extern "C" {
 // for some reason sigset_t is missing here (with glibc 2.0.7);
 // so we define it manually.
+  // Except for MacOS X, which has introduced it.
+#if !((defined __APPLE__) && (defined __MACH__))
 typedef __sigset_t sigset_t;
+#endif
 #include <pthread.h>
 }
 

@@ -1,6 +1,12 @@
-LIB=style
-OBJS=Collector.o \
+LTVERSION=0:1:0
+LIB=ostyle
+DEPLIBS=-lm -L$(TOP)/grove -L$(TOP)/grove/.libs -logrove \
+  -L$(TOP)/lib -L$(TOP)/lib/.libs -losp 		 \
+  -L$(TOP)/spgrove -L$(TOP)/spgrove/.libs -lospgrove
+OBJS=LangObj.o \
+  Collector.o \
   DssslApp.o \
+  InterpreterMessages.o \
   DssslSpecEventHandler.o \
   ELObj.o \
   ELObjMessageArg.o \
@@ -10,7 +16,6 @@ OBJS=Collector.o \
   InheritedC.o \
   Insn.o \
   Interpreter.o \
-  InterpreterMessages.o \
   NumberCache.o \
   ProcessContext.o \
   ProcessingMode.o \
@@ -21,7 +26,9 @@ OBJS=Collector.o \
   GroveManager.o \
   Pattern.o \
   MacroFlowObj.o \
-  style_inst.o
+  style_inst.o \
+  MessageModule.o \
+
 INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove
 
 GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
@@ -30,3 +37,8 @@ GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 FlowObj.o: FlowObj_inst.cxx
 primitive.o: primitive_inst.cxx
 DssslApp.o: DssslAppMessages.h
+FlowObj.lo: FlowObj_inst.cxx
+primitive.lo: primitive_inst.cxx
+DssslApp.lo: DssslAppMessages.h
+InterpreterMessages.o: InterpreterMessages.h
+InterpreterMessages.lo: InterpreterMessages.h

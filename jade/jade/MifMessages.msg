@@ -5,7 +5,7 @@
 #
 =7000
 #
-E2+cannotOpenOutputError++MIF: cannot open output file %1 (%2)
-E1+systemIdNotFilename++MIF: could not convert system identifier %1 to a single filename
-W0+missingTableColumnFlowObject++MIF: missing table column flow object (table-auto-width feature not fully supported)
+E2+cannotOpenOutputError++cannot open output file %1 (%2)
+E1+systemIdNotFilename++could not convert system identifier %1 to a single filename
+W0+missingTableColumnFlowObject++missing table column flow object (table-auto-width feature not fully supported)
 #

@@ -13,12 +13,196 @@ dnl
 dnl Initialization.
 AC_INIT
 AC_CONFIG_SRCDIR([pubtext])
-AM_INIT_AUTOMAKE(OpenSP, 1.5pre7, no-define)
+AM_INIT_AUTOMAKE(OpenSP, 1.5pre8, no-define)
 AC_PREREQ(2.53)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
+dnl Autoheader definitions
+
+AH_TEMPLATE([HAVE_CATGETS],[Define if you have the gettext() function])
+AH_TEMPLATE([SGML_CATALOG_FILES_DEFAULT],[set this to the default catalog files list])
+AH_TEMPLATE([SGML_SEARCH_PATH_DEFAULT],[set this to the default SGML search path])
+AH_TEMPLATE([ SP_DECLARE_H_ERRNO],[define this if h_errno should be declared extern int])
+AH_TEMPLATE([DECLARE_MEMMOVE],[define this if memmove  should be declared extern "C"])
+AH_TEMPLATE([DECLARE_STRERROR],[define this if strerror should be declared extern "C"])
+AH_TEMPLATE([SP_HAVE_SOCKET],[define this if sockets are available])
+AH_TEMPLATE([sig_atomic_t],[define this appropriately if the type sig_atomic_t is not available])
+AH_TEMPLATE([SP_NEW_H_MISSING],[define this if your system misses new.h])
+AH_TEMPLATE([SP_SET_NEW_HANDLER_EXTERN_C],[define this if  set_new_handler() has to be declared extern "C"])
+AH_TEMPLATE([SP_MULTI_BYTE],[define this to build a multi-byte version])
+AH_TEMPLATE([SP_DEFINE_TEMPLATES],[define this to include template definitions in the headers])
+AH_TEMPLATE([SP_MANUAL_INST],[define this to compile explicit template instantiations])
+AH_TEMPLATE([SP_FANCY_NEW_HANDLER],[define this if the new handler takes size_t and returns int.])
+AH_TEMPLATE([PATH_SEPARATOR],[set this to the path separator])
+AH_TEMPLATE([DEFAULT_ERROR_LIMIT],[if this is not set it defaults to 200 ])
+AH_TEMPLATE([SP_USE_OWN_ASSERT],[define this if you can't or don't want to use the builtin assert() macro])
+AH_TEMPLATE([SP_LINE_TERM1],[set this to the first line term character])
+AH_TEMPLATE([SP_LINE_TERM2],[set this to the second line term character])
+
+dnl These are really windows only
+
+AH_TEMPLATE([SP_MUTEX_WIN32],[define this to use win32 mutex mechanisms])
+AH_TEMPLATE([SP_HAVE_SETMODE],[define this if _setmode is supported])
+AH_TEMPLATE([SP_NO_MESSAGE_TEXT],[define this to not compile message texts in])
+AH_TEMPLATE([SP_USE_DLL],[define this to build a dll])
+AH_TEMPLATE([SP_DLLEXPORT],[define this to build a dll])
+AH_TEMPLATE([SP_DLLIMPORT],[define this tobuild a dll])
+AH_TEMPLATE([SP_WIDE_SYSTEM],[define this if the OS provides wide character interfaces])
+AH_TEMPLATE([SP_PCH],[define this to enable precompiled header support])
+AH_TEMPLATE([SP_LOCALE_DIR],[the location we install our messages])
+
 AH_TEMPLATE([SIZEOF_WCHAR_T],[size of wchar_t])
+
+AH_BOTTOM([
+#ifdef HAVE_UNISTD_H
+#define SP_INCLUDE_UNISTD_H
+#endif
+
+#ifdef HAVE_IO_H
+#undef SP_INCLUDE_IO_H     
+#endif
+
+#ifdef HAVE_OSFCN_H
+#undef SP_INCLUDE_OSFCN_H     
+#endif
+
+#ifndef SP_MSDOS_FILENAMES
+#define SP_POSIX_FILENAMES
+#endif
+
+#ifdef HAVE_ST_BLKSIZE
+#define SP_STAT_BLKSIZE 
+#endif
+
+#ifdef HAVE_BOOL 
+#define SP_HAVE_BOOL
+#endif /* HAVE_BOOL */
+
+#ifdef HAVE_TYPENAME
+#define SP_HAVE_TYPENAME
+#endif /* HAVE_TYPENAME */
+
+#if (SIZEOF_BOOL == 1)
+#define SP_SIZEOF_BOOL_1
+#endif
+
+#if (SIZEOF_WCHAR_T == SIZEOF_UNSIGNED_SHORT)
+#define SP_WCHAR_T_USHORT
+#endif
+
+#ifdef SP_HAVE_SETMODE
+#ifndef SP_LINE_TERM1
+#define SP_LINE_TERM1 '\r'
+#define SP_LINE_TERM2 '\n'
+#endif
+#endif /* not SP_HAVE_SETMODE */
+
+#ifndef SP_LINE_TERM1
+#define SP_LINE_TERM1 '\n'
+#endif
+
+#ifndef HAVE_NEW_FOR_SCOPING
+// This simulates the new ANSI "for" scope rules
+#define for if (0); else for
+#endif /* HAVE_NEW_FOR_SCOPING */
+
+#ifndef SP_HAVE_TYPENAME
+#define typename /* as nothing */
+#endif
+
+#ifndef SP_DLLEXPORT
+#define SP_DLLEXPORT /* as nothing */
+#endif
+
+#ifndef SP_DLLIMPORT
+#define SP_DLLIMPORT /* as nothing */
+#endif
+
+#ifdef SP_USE_DLL
+
+#ifdef BUILD_LIBSP
+#define SP_API SP_DLLEXPORT
+#else
+#define SP_API SP_DLLIMPORT
+#endif
+
+#else /* not SP_USE_DLL */
+
+#define SP_API /* as nothing */
+
+#endif /* not SP_USE_DLL */
+
+#ifdef SP_WIDE_SYSTEM
+#ifndef SP_MULTI_BYTE
+#define SP_MULTI_BYTE
+#endif
+#endif
+
+#ifdef HAVE_NAMESPACES
+#define SP_NAMESPACE OpenSP
+#endif /* HAVE_NAMESPACES */
+
+#ifdef SP_NAMESPACE
+#define SP_NAMESPACE_SCOPE SP_NAMESPACE::
+#else
+#define SP_NAMESPACE_SCOPE
+#endif /* SP_NAMESPACE */
+
+#ifdef HAVE_DYNAMIC_CAST
+#define SP_HAVE_RTTI
+#endif /* HAVE_DYNAMIC_CAST */
+
+#ifdef HAVE_PATHNAME_STYLE_DOS
+#define SP_MSDOS_FILENAMES 
+#else 
+#define SP_POSIX_FILENAMES  
+#endif /* HAVE_PATHNAME_STYLE_DOS */
+
+#ifdef HAVE_INSTANTIATIONS
+#define SP_ANSI_CLASS_INST
+#endif /* HAVE_INSTANTIATIONS */
+
+#ifdef HAVE_SETLOCALE
+#define SP_HAVE_LOCALE
+#endif /* HAVE_SETLOCALE */
+
+#if defined(HAVE_GETTEXT) && defined(ENABLE_NLS)
+#define SP_HAVE_GETTEXT 
+#endif /* HAVE_GETTEXT && ENABLE_NLS */
+
+#ifdef WORDS_BIGENDIAN
+#define SP_BIG_ENDIAN
+#endif /* WORDS_BIGENDIAN */
+
+#ifdef HAVE_LIBTHREADS
+#define SP_MUTEX_MACH
+#endif /* HAVE_LIBTHREADS */
+
+#ifdef HAVE_LIBPTHREAD
+#define SP_MUTEX_PTHREADS
+#endif /* HAVE_LIBPTHREAD */
+
+#ifdef HAVE_PLACEMENT_OPERATOR_DELETE
+#define SP_HAVE_PLACEMENT_OPERATOR_DELETE
+#endif /* HAVE_PLACEMENT_OPERATOR_DELETE */
+
+#ifndef HAVE_PLACEMENT_OPERATOR_NEW
+#define SP_DECLARE_PLACEMENT_OPERATOR_NEW
+#endif /* HAVE_PLACEMENT_OPERATOR_NEW */
+
+#ifndef HAVE_NAMESPACE_STD
+#define SP_NO_STD_NAMESPACE 
+#endif /* HAVE_NAMESPACE_STD */
+
+#if defined(HAVE_NEW) && defined(HAVE_CASSERT)
+#define SP_ANSI_LIB 1
+#endif /* HAVE_NEW && HAVE_CASSERT */
+
+#ifndef HAVE_MUTABLE
+#define mutable 
+#endif /* HAVE_MUTABLE */
+])
 
 dnl Since config.h gets included by user programs, we use special names
 dnl for PACKAGE and VERSION.
@@ -209,8 +393,8 @@ dnl Checks for system services.
 ACX_CHECK_PATHNAME_STYLE_DOS
 
 dnl Package options.
-AC_DEFINE(SP_MULTI_BYTE,1,
-          [define this to build a multi-byte version])
+dnl AC_DEFINE(SP_MULTI_BYTE,1,
+dnl           [define this to build a multi-byte version])
 AC_MSG_CHECKING(whether to include support for http)
 AC_ARG_ENABLE(http,
 [  --enable-http           include support for http],

@@ -10,7 +10,9 @@ libtool
 config.status
 Makefile
 stamp-h
+stamp-h1
 config.h.in
 msggen.pl
 *.tar.gz
 *.spec
+autom4te-2.53.cache

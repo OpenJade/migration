@@ -1,3 +1,7 @@
+Changes in OpenSP 1.5pre8
+
+* Support for newer autoconf, gettext tools
+
 Changes in OpenSP 1.5pre7
 
 * Option to produce error messages formatted as XML from Nick Kew

@@ -394,7 +394,7 @@ BEGIN
   391, "#PCDATA not first in model group"
   392, "#PCDATA in seq group"
   393, "#PCDATA in nested model group"
-  394, "#PCDATA in model group that is not repeatable"
+  394, "#PCDATA in model group that does not have rep occurrence indicator"
   395, "name group or name token group used connector other than OR"
   396, "processing instruction does not start with name"
   397, "s separator in status keyword specification"

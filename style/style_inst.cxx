@@ -37,6 +37,8 @@ namespace SP_NAMESPACE {
 #include "ProcessContext.h"
 #include "SosofoObj.h"
 #include "DssslSpecEventHandler.h"
+#include "Node.h"
+#include "DssslApp.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -332,41 +334,15 @@ typedef NamedTable<ProcessingMode::ElementRules> Dummy_21;
 #endif
 #endif
 #ifdef __DECCXX
-#pragma define_template NamedTableIter<ProcessingMode::ElementRules>
+#pragma define_template NamedTable<ProcessingMode::GroveIdRule>
 #else
 #ifdef __xlC__
-#pragma define(NamedTableIter<ProcessingMode::ElementRules>)
+#pragma define(NamedTable<ProcessingMode::GroveIdRule>)
 #else
 #ifdef SP_ANSI_CLASS_INST
-template class NamedTableIter<ProcessingMode::ElementRules>;
+template class NamedTable<ProcessingMode::GroveIdRule>;
 #else
-typedef NamedTableIter<ProcessingMode::ElementRules> Dummy_22;
-#endif
-#endif
-#endif
-#ifdef __DECCXX
-#pragma define_template NamedTable<ProcessingMode::IdRule>
-#else
-#ifdef __xlC__
-#pragma define(NamedTable<ProcessingMode::IdRule>)
-#else
-#ifdef SP_ANSI_CLASS_INST
-template class NamedTable<ProcessingMode::IdRule>;
-#else
-typedef NamedTable<ProcessingMode::IdRule> Dummy_23;
-#endif
-#endif
-#endif
-#ifdef __DECCXX
-#pragma define_template NamedTableIter<ProcessingMode::IdRule>
-#else
-#ifdef __xlC__
-#pragma define(NamedTableIter<ProcessingMode::IdRule>)
-#else
-#ifdef SP_ANSI_CLASS_INST
-template class NamedTableIter<ProcessingMode::IdRule>;
-#else
-typedef NamedTableIter<ProcessingMode::IdRule> Dummy_24;
+typedef NamedTable<ProcessingMode::GroveIdRule> Dummy_22;
 #endif
 #endif
 #endif
@@ -379,7 +355,46 @@ typedef NamedTableIter<ProcessingMode::IdRule> Dummy_24;
 #ifdef SP_ANSI_CLASS_INST
 template class NamedTableIter<ProcessingMode>;
 #else
-typedef NamedTableIter<ProcessingMode> Dummy_25;
+typedef NamedTableIter<ProcessingMode> Dummy_23;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template NCVector<ProcessingMode::GroveRules>
+#else
+#ifdef __xlC__
+#pragma define(NCVector<ProcessingMode::GroveRules>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class NCVector<ProcessingMode::GroveRules>;
+#else
+typedef NCVector<ProcessingMode::GroveRules> Dummy_24;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template IList<ProcessingMode::ComplexRule>
+#else
+#ifdef __xlC__
+#pragma define(IList<ProcessingMode::ComplexRule>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class IList<ProcessingMode::ComplexRule>;
+#else
+typedef IList<ProcessingMode::ComplexRule> Dummy_25;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template IListIter<ProcessingMode::ComplexRule>
+#else
+#ifdef __xlC__
+#pragma define(IListIter<ProcessingMode::ComplexRule>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class IListIter<ProcessingMode::ComplexRule>;
+#else
+typedef IListIter<ProcessingMode::ComplexRule> Dummy_26;
 #endif
 #endif
 #endif
@@ -392,7 +407,7 @@ typedef NamedTableIter<ProcessingMode> Dummy_25;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<SaveFOTBuilder>;
 #else
-typedef IList<SaveFOTBuilder> Dummy_26;
+typedef IList<SaveFOTBuilder> Dummy_27;
 #endif
 #endif
 #endif
@@ -405,7 +420,7 @@ typedef IList<SaveFOTBuilder> Dummy_26;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<const ProcessingMode *>;
 #else
-typedef Vector<const ProcessingMode *> Dummy_27;
+typedef Vector<const ProcessingMode *> Dummy_28;
 #endif
 #endif
 #endif
@@ -418,7 +433,7 @@ typedef Vector<const ProcessingMode *> Dummy_27;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<ProcessingMode::Part>;
 #else
-typedef NCVector<ProcessingMode::Part> Dummy_28;
+typedef NCVector<ProcessingMode::Part> Dummy_29;
 #endif
 #endif
 #endif
@@ -431,7 +446,7 @@ typedef NCVector<ProcessingMode::Part> Dummy_28;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<ProcessingMode::Rule>;
 #else
-typedef Owner<ProcessingMode::Rule> Dummy_29;
+typedef Owner<ProcessingMode::Rule> Dummy_30;
 #endif
 #endif
 #endif
@@ -444,7 +459,7 @@ typedef Owner<ProcessingMode::Rule> Dummy_29;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::DisplayGroupNIC>;
 #else
-typedef Owner<FOTBuilder::DisplayGroupNIC> Dummy_30;
+typedef Owner<FOTBuilder::DisplayGroupNIC> Dummy_31;
 #endif
 #endif
 #endif
@@ -457,7 +472,7 @@ typedef Owner<FOTBuilder::DisplayGroupNIC> Dummy_30;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<SosofoObj *>;
 #else
-typedef Vector<SosofoObj *> Dummy_31;
+typedef Vector<SosofoObj *> Dummy_32;
 #endif
 #endif
 #endif
@@ -470,7 +485,7 @@ typedef Vector<SosofoObj *> Dummy_31;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<FOTBuilder *>;
 #else
-typedef Vector<FOTBuilder *> Dummy_32;
+typedef Vector<FOTBuilder *> Dummy_33;
 #endif
 #endif
 #endif
@@ -483,7 +498,7 @@ typedef Vector<FOTBuilder *> Dummy_32;
 #ifdef SP_ANSI_CLASS_INST
 template class IQueue<SaveFOTBuilder>;
 #else
-typedef IQueue<SaveFOTBuilder> Dummy_33;
+typedef IQueue<SaveFOTBuilder> Dummy_34;
 #endif
 #endif
 #endif
@@ -496,7 +511,7 @@ typedef IQueue<SaveFOTBuilder> Dummy_33;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<IQueue<SaveFOTBuilder> >;
 #else
-typedef NCVector<IQueue<SaveFOTBuilder> > Dummy_34;
+typedef NCVector<IQueue<SaveFOTBuilder> > Dummy_35;
 #endif
 #endif
 #endif
@@ -509,7 +524,7 @@ typedef NCVector<IQueue<SaveFOTBuilder> > Dummy_34;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<ProcessContext::Connection>;
 #else
-typedef IList<ProcessContext::Connection> Dummy_35;
+typedef IList<ProcessContext::Connection> Dummy_36;
 #endif
 #endif
 #endif
@@ -522,7 +537,7 @@ typedef IList<ProcessContext::Connection> Dummy_35;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<ProcessContext::Connection>;
 #else
-typedef IListIter<ProcessContext::Connection> Dummy_36;
+typedef IListIter<ProcessContext::Connection> Dummy_37;
 #endif
 #endif
 #endif
@@ -535,7 +550,7 @@ typedef IListIter<ProcessContext::Connection> Dummy_36;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<ProcessContext::Connectable>;
 #else
-typedef IList<ProcessContext::Connectable> Dummy_37;
+typedef IList<ProcessContext::Connectable> Dummy_38;
 #endif
 #endif
 #endif
@@ -548,7 +563,7 @@ typedef IList<ProcessContext::Connectable> Dummy_37;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<ProcessContext::Connectable>;
 #else
-typedef IListIter<ProcessContext::Connectable> Dummy_38;
+typedef IListIter<ProcessContext::Connectable> Dummy_39;
 #endif
 #endif
 #endif
@@ -561,7 +576,7 @@ typedef IListIter<ProcessContext::Connectable> Dummy_38;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<PopList>;
 #else
-typedef Ptr<PopList> Dummy_39;
+typedef Ptr<PopList> Dummy_40;
 #endif
 #endif
 #endif
@@ -574,7 +589,7 @@ typedef Ptr<PopList> Dummy_39;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Ptr<InheritedCInfo> >;
 #else
-typedef Vector<Ptr<InheritedCInfo> > Dummy_40;
+typedef Vector<Ptr<InheritedCInfo> > Dummy_41;
 #endif
 #endif
 #endif
@@ -587,7 +602,7 @@ typedef Vector<Ptr<InheritedCInfo> > Dummy_40;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<ProcessContext::Port>;
 #else
-typedef NCVector<ProcessContext::Port> Dummy_41;
+typedef NCVector<ProcessContext::Port> Dummy_42;
 #endif
 #endif
 #endif
@@ -600,7 +615,7 @@ typedef NCVector<ProcessContext::Port> Dummy_41;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<CaseExpression::Case>;
 #else
-typedef NCVector<CaseExpression::Case> Dummy_42;
+typedef NCVector<CaseExpression::Case> Dummy_43;
 #endif
 #endif
 #endif
@@ -613,7 +628,7 @@ typedef NCVector<CaseExpression::Case> Dummy_42;
 #ifdef SP_ANSI_CLASS_INST
 template class NamedTable<NumberCache::Entry>;
 #else
-typedef NamedTable<NumberCache::Entry> Dummy_43;
+typedef NamedTable<NumberCache::Entry> Dummy_44;
 #endif
 #endif
 #endif
@@ -626,7 +641,7 @@ typedef NamedTable<NumberCache::Entry> Dummy_43;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<NamedTable<NumberCache::Entry> >;
 #else
-typedef NCVector<NamedTable<NumberCache::Entry> > Dummy_44;
+typedef NCVector<NamedTable<NumberCache::Entry> > Dummy_45;
 #endif
 #endif
 #endif
@@ -639,7 +654,7 @@ typedef NCVector<NamedTable<NumberCache::Entry> > Dummy_44;
 #ifdef SP_ANSI_CLASS_INST
 template class NamedTable<NumberCache::ElementEntry>;
 #else
-typedef NamedTable<NumberCache::ElementEntry> Dummy_45;
+typedef NamedTable<NumberCache::ElementEntry> Dummy_46;
 #endif
 #endif
 #endif
@@ -652,7 +667,7 @@ typedef NamedTable<NumberCache::ElementEntry> Dummy_45;
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<NamedTable<NumberCache::ElementEntry> >;
 #else
-typedef NCVector<NamedTable<NumberCache::ElementEntry> > Dummy_46;
+typedef NCVector<NamedTable<NumberCache::ElementEntry> > Dummy_47;
 #endif
 #endif
 #endif
@@ -665,7 +680,7 @@ typedef NCVector<NamedTable<NumberCache::ElementEntry> > Dummy_46;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ELObj *>;
 #else
-typedef Vector<ELObj *> Dummy_47;
+typedef Vector<ELObj *> Dummy_48;
 #endif
 #endif
 #endif
@@ -678,7 +693,7 @@ typedef Vector<ELObj *> Dummy_47;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<Insn> >;
 #else
-typedef Vector<ConstPtr<Insn> > Dummy_48;
+typedef Vector<ConstPtr<Insn> > Dummy_49;
 #endif
 #endif
 #endif
@@ -691,7 +706,7 @@ typedef Vector<ConstPtr<Insn> > Dummy_48;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<StyleObj *>;
 #else
-typedef Vector<StyleObj *> Dummy_49;
+typedef Vector<StyleObj *> Dummy_50;
 #endif
 #endif
 #endif
@@ -704,7 +719,7 @@ typedef Vector<StyleObj *> Dummy_49;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Vector<StyleObj *> >;
 #else
-typedef Vector<Vector<StyleObj *> > Dummy_50;
+typedef Vector<Vector<StyleObj *> > Dummy_51;
 #endif
 #endif
 #endif
@@ -717,7 +732,7 @@ typedef Vector<Vector<StyleObj *> > Dummy_50;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<ProcessContext::Table>;
 #else
-typedef IList<ProcessContext::Table> Dummy_51;
+typedef IList<ProcessContext::Table> Dummy_52;
 #endif
 #endif
 #endif
@@ -730,7 +745,7 @@ typedef IList<ProcessContext::Table> Dummy_51;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<ProcessContext::Table>;
 #else
-typedef IListIter<ProcessContext::Table> Dummy_52;
+typedef IListIter<ProcessContext::Table> Dummy_53;
 #endif
 #endif
 #endif
@@ -743,7 +758,7 @@ typedef IListIter<ProcessContext::Table> Dummy_52;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<String<char> >;
 #else
-typedef Vector<String<char> > Dummy_53;
+typedef Vector<String<char> > Dummy_54;
 #endif
 #endif
 #endif
@@ -756,7 +771,7 @@ typedef Vector<String<char> > Dummy_53;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<LengthSpec>;
 #else
-typedef Owner<LengthSpec> Dummy_54;
+typedef Owner<LengthSpec> Dummy_55;
 #endif
 #endif
 #endif
@@ -769,7 +784,7 @@ typedef Owner<LengthSpec> Dummy_54;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<FOTBuilder::MultiMode>;
 #else
-typedef Vector<FOTBuilder::MultiMode> Dummy_55;
+typedef Vector<FOTBuilder::MultiMode> Dummy_56;
 #endif
 #endif
 #endif
@@ -782,7 +797,7 @@ typedef Vector<FOTBuilder::MultiMode> Dummy_55;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<Vector<FOTBuilder::MultiMode> >;
 #else
-typedef Vector<Vector<FOTBuilder::MultiMode> > Dummy_56;
+typedef Vector<Vector<FOTBuilder::MultiMode> > Dummy_57;
 #endif
 #endif
 #endif
@@ -795,7 +810,7 @@ typedef Vector<Vector<FOTBuilder::MultiMode> > Dummy_56;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTable<StringC,FunctionObj *>;
 #else
-typedef HashTable<StringC,FunctionObj *> Dummy_57;
+typedef HashTable<StringC,FunctionObj *> Dummy_58;
 #endif
 #endif
 #endif
@@ -808,7 +823,7 @@ typedef HashTable<StringC,FunctionObj *> Dummy_57;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTableItem<StringC,FunctionObj *>;
 #else
-typedef HashTableItem<StringC,FunctionObj *> Dummy_58;
+typedef HashTableItem<StringC,FunctionObj *> Dummy_59;
 #endif
 #endif
 #endif
@@ -821,7 +836,7 @@ typedef HashTableItem<StringC,FunctionObj *> Dummy_58;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<DssslSpecEventHandler::Part *>;
 #else
-typedef Vector<DssslSpecEventHandler::Part *> Dummy_59;
+typedef Vector<DssslSpecEventHandler::Part *> Dummy_60;
 #endif
 #endif
 #endif
@@ -834,7 +849,7 @@ typedef Vector<DssslSpecEventHandler::Part *> Dummy_59;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<DssslSpecEventHandler::PartHeader *>;
 #else
-typedef Vector<DssslSpecEventHandler::PartHeader *> Dummy_60;
+typedef Vector<DssslSpecEventHandler::PartHeader *> Dummy_61;
 #endif
 #endif
 #endif
@@ -847,7 +862,7 @@ typedef Vector<DssslSpecEventHandler::PartHeader *> Dummy_60;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<DssslSpecEventHandler::BodyElement>;
 #else
-typedef IListIter<DssslSpecEventHandler::BodyElement> Dummy_61;
+typedef IListIter<DssslSpecEventHandler::BodyElement> Dummy_62;
 #endif
 #endif
 #endif
@@ -860,7 +875,7 @@ typedef IListIter<DssslSpecEventHandler::BodyElement> Dummy_61;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<DssslSpecEventHandler::BodyElement>;
 #else
-typedef IList<DssslSpecEventHandler::BodyElement> Dummy_62;
+typedef IList<DssslSpecEventHandler::BodyElement> Dummy_63;
 #endif
 #endif
 #endif
@@ -873,7 +888,7 @@ typedef IList<DssslSpecEventHandler::BodyElement> Dummy_62;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<DssslSpecEventHandler::PartHeader>;
 #else
-typedef IListIter<DssslSpecEventHandler::PartHeader> Dummy_63;
+typedef IListIter<DssslSpecEventHandler::PartHeader> Dummy_64;
 #endif
 #endif
 #endif
@@ -886,7 +901,7 @@ typedef IListIter<DssslSpecEventHandler::PartHeader> Dummy_63;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<DssslSpecEventHandler::PartHeader>;
 #else
-typedef IList<DssslSpecEventHandler::PartHeader> Dummy_64;
+typedef IList<DssslSpecEventHandler::PartHeader> Dummy_65;
 #endif
 #endif
 #endif
@@ -899,7 +914,7 @@ typedef IList<DssslSpecEventHandler::PartHeader> Dummy_64;
 #ifdef SP_ANSI_CLASS_INST
 template class IListIter<DssslSpecEventHandler::Doc>;
 #else
-typedef IListIter<DssslSpecEventHandler::Doc> Dummy_65;
+typedef IListIter<DssslSpecEventHandler::Doc> Dummy_66;
 #endif
 #endif
 #endif
@@ -912,7 +927,7 @@ typedef IListIter<DssslSpecEventHandler::Doc> Dummy_65;
 #ifdef SP_ANSI_CLASS_INST
 template class IList<DssslSpecEventHandler::Doc>;
 #else
-typedef IList<DssslSpecEventHandler::Doc> Dummy_66;
+typedef IList<DssslSpecEventHandler::Doc> Dummy_67;
 #endif
 #endif
 #endif
@@ -925,7 +940,7 @@ typedef IList<DssslSpecEventHandler::Doc> Dummy_66;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<DssslSpecEventHandler::SpecPart>;
 #else
-typedef Owner<DssslSpecEventHandler::SpecPart> Dummy_67;
+typedef Owner<DssslSpecEventHandler::SpecPart> Dummy_68;
 #endif
 #endif
 #endif
@@ -938,7 +953,7 @@ typedef Owner<DssslSpecEventHandler::SpecPart> Dummy_67;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<Location>;
 #else
-typedef Owner<Location> Dummy_68;
+typedef Owner<Location> Dummy_69;
 #endif
 #endif
 #endif
@@ -951,7 +966,7 @@ typedef Owner<Location> Dummy_68;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::DisplaySpace>;
 #else
-typedef Owner<FOTBuilder::DisplaySpace> Dummy_69;
+typedef Owner<FOTBuilder::DisplaySpace> Dummy_70;
 #endif
 #endif
 #endif
@@ -964,7 +979,7 @@ typedef Owner<FOTBuilder::DisplaySpace> Dummy_69;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::InlineSpace>;
 #else
-typedef Owner<FOTBuilder::InlineSpace> Dummy_70;
+typedef Owner<FOTBuilder::InlineSpace> Dummy_71;
 #endif
 #endif
 #endif
@@ -977,7 +992,7 @@ typedef Owner<FOTBuilder::InlineSpace> Dummy_70;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::Address>;
 #else
-typedef Owner<FOTBuilder::Address> Dummy_71;
+typedef Owner<FOTBuilder::Address> Dummy_72;
 #endif
 #endif
 #endif
@@ -990,7 +1005,7 @@ typedef Owner<FOTBuilder::Address> Dummy_71;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<String<char> *>;
 #else
-typedef Vector<String<char> *> Dummy_72;
+typedef Vector<String<char> *> Dummy_73;
 #endif
 #endif
 #endif
@@ -1003,7 +1018,7 @@ typedef Vector<String<char> *> Dummy_72;
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<String<char> *, String<char>, Interpreter::StringSet, Interpreter::StringSet>;
 #else
-typedef PointerTable<String<char> *, String<char>, Interpreter::StringSet, Interpreter::StringSet> Dummy_73;
+typedef PointerTable<String<char> *, String<char>, Interpreter::StringSet, Interpreter::StringSet> Dummy_74;
 #endif
 #endif
 #endif
@@ -1016,7 +1031,7 @@ typedef PointerTable<String<char> *, String<char>, Interpreter::StringSet, Inter
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<String<char>, String<char>, Interpreter::StringSet, Interpreter::StringSet>;
 #else
-typedef OwnerTable<String<char>, String<char>, Interpreter::StringSet, Interpreter::StringSet> Dummy_74;
+typedef OwnerTable<String<char>, String<char>, Interpreter::StringSet, Interpreter::StringSet> Dummy_75;
 #endif
 #endif
 #endif
@@ -1029,7 +1044,7 @@ typedef OwnerTable<String<char>, String<char>, Interpreter::StringSet, Interpret
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<FOTBuilder::GlyphId>;
 #else
-typedef Vector<FOTBuilder::GlyphId> Dummy_75;
+typedef Vector<FOTBuilder::GlyphId> Dummy_76;
 #endif
 #endif
 #endif
@@ -1042,7 +1057,7 @@ typedef Vector<FOTBuilder::GlyphId> Dummy_75;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<FOTBuilder::GlyphSubstTable>;
 #else
-typedef Ptr<FOTBuilder::GlyphSubstTable> Dummy_76;
+typedef Ptr<FOTBuilder::GlyphSubstTable> Dummy_77;
 #endif
 #endif
 #endif
@@ -1055,7 +1070,7 @@ typedef Ptr<FOTBuilder::GlyphSubstTable> Dummy_76;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<FOTBuilder::GlyphSubstTable>;
 #else
-typedef ConstPtr<FOTBuilder::GlyphSubstTable> Dummy_77;
+typedef ConstPtr<FOTBuilder::GlyphSubstTable> Dummy_78;
 #endif
 #endif
 #endif
@@ -1068,7 +1083,7 @@ typedef ConstPtr<FOTBuilder::GlyphSubstTable> Dummy_77;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<ConstPtr<FOTBuilder::GlyphSubstTable> >;
 #else
-typedef Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > Dummy_78;
+typedef Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > Dummy_79;
 #endif
 #endif
 #endif
@@ -1081,7 +1096,7 @@ typedef Vector<ConstPtr<FOTBuilder::GlyphSubstTable> > Dummy_78;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::ExtensionFlowObj>;
 #else
-typedef Owner<FOTBuilder::ExtensionFlowObj> Dummy_79;
+typedef Owner<FOTBuilder::ExtensionFlowObj> Dummy_80;
 #endif
 #endif
 #endif
@@ -1094,7 +1109,46 @@ typedef Owner<FOTBuilder::ExtensionFlowObj> Dummy_79;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<FOTBuilder::CompoundExtensionFlowObj>;
 #else
-typedef Owner<FOTBuilder::CompoundExtensionFlowObj> Dummy_80;
+typedef Owner<FOTBuilder::CompoundExtensionFlowObj> Dummy_81;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTable<StringC,NodePtr>
+#else
+#ifdef __xlC__
+#pragma define(HashTable<StringC,NodePtr>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTable<StringC,NodePtr>;
+#else
+typedef HashTable<StringC,NodePtr> Dummy_82;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template HashTableItem<StringC,NodePtr>
+#else
+#ifdef __xlC__
+#pragma define(HashTableItem<StringC,NodePtr>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class HashTableItem<StringC,NodePtr>;
+#else
+typedef HashTableItem<StringC,NodePtr> Dummy_83;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<ProcessContext::NodeStackEntry>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ProcessContext::NodeStackEntry>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<ProcessContext::NodeStackEntry>;
+#else
+typedef Vector<ProcessContext::NodeStackEntry> Dummy_84;
 #endif
 #endif
 #endif

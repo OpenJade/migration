@@ -155,7 +155,7 @@ InsnPtr CallExpression::compile(Interpreter &interp, const Environment &env,
     }
 
     int callerArgs;
-    if (!next.isNull() && next->isReturn(callerArgs))
+    if (!next.isNull() && next->isReturn(callerArgs) && !interp.debugMode())
       result = func->makeTailCallInsn(nArgs(), interp, location(), callerArgs);
     else
       result = func->makeCallInsn(nArgs(), interp, location(), next);
@@ -163,7 +163,7 @@ InsnPtr CallExpression::compile(Interpreter &interp, const Environment &env,
   else {
     int n = nArgs();
     int callerArgs;
-    if (!next.isNull() && next->isReturn(callerArgs))
+    if (!next.isNull() && next->isReturn(callerArgs) && !interp.debugMode())
       result = new TailApplyInsn(callerArgs, n, location());
     else
       result = new ApplyInsn(n, location(), next);
@@ -796,6 +796,78 @@ void LetrecExpression::markBoundVars(BoundVarList &vars)
     inits_[i]->markBoundVars(vars);
   body_->markBoundVars(vars);
   vars.unbind(vars_);
+}
+
+QuasiquoteExpression::QuasiquoteExpression(NCVector<Owner<Expression> > &members,
+					   Vector<PackedBoolean> &spliced,
+					   bool improper,
+					   const Location &loc)
+: Expression(loc), spliced_(spliced), improper_(improper)
+{
+  members.swap(members_);
+}
+
+InsnPtr QuasiquoteExpression::compile(Interpreter &interp, const Environment &env,
+				      int stackPos, const InsnPtr &next)
+{
+  InsnPtr tem(next);
+  size_t n = members_.size();
+  if (improper_)
+    n--;
+  for (size_t i = 0; i < n; i++) {
+    if (spliced_[i])
+      tem = new AppendInsn(location(), tem);
+    else
+      tem = new ConsInsn(tem);
+    tem = members_[i]->compile(interp, env, stackPos + 1, tem);
+  }
+  if (improper_)
+    tem = members_.back()->compile(interp, env, stackPos, tem);
+  else
+    tem = new ConstantInsn(interp.makeNil(), tem);
+  return tem;
+}
+
+void QuasiquoteExpression::markBoundVars(BoundVarList &vars)
+{
+  for (size_t i = 0; i < members_.size(); i++)
+    members_[i]->markBoundVars(vars);
+}
+
+bool QuasiquoteExpression::canEval(bool maybeCall) const
+{
+  for (size_t i = 0; i < members_.size(); i++)
+    if (!members_[i]->canEval(maybeCall))
+      return 0;
+  return 1;
+}
+
+void QuasiquoteExpression::optimize(Interpreter &interp, const Environment &env, Owner<Expression> &expr)
+{
+  if (members_.size() == 0)
+    expr = new ResolvedConstantExpression(interp.makeNil(), location());
+  for (size_t i = 0; i < members_.size(); i++)
+    members_[i]->optimize(interp, env, members_[i]);
+  ELObj *tail = members_.back()->constantValue();
+  if (!tail)
+    return;
+  if (!improper_) {
+    tail = interp.makePair(tail, interp.makeNil());
+    interp.makePermanent(tail);
+  }
+  for (size_t i = members_.size() - 1; i-- > 0;) {
+    ELObj *tem = members_[i]->constantValue();
+    // FIXME optimize splice as well
+    if (!tem || spliced_[i]) {
+      members_.resize(i + 2);
+      improper_ = 1;
+      members_[i + 1] = new ResolvedConstantExpression(tail, location());
+      return;
+    }
+    tail = interp.makePair(tem, tail);
+    interp.makePermanent(tail);
+  }
+  expr = new ResolvedConstantExpression(tail, location());
 }
 
 WithModeExpression::WithModeExpression(const ProcessingMode *mode, Owner<Expression> &expr,

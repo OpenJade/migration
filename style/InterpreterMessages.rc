@@ -111,4 +111,8 @@ BEGIN
   108, "table-row flow object not inside a table"
   109, "no value for node property %1"
   110, "value returned by procedure was not a node-list"
+  111, "called from here"
+  112, "called from here...(%1 calls omitted)"
+  113, "node processing loop detected"
+  114, "unquote-splicing expression does not evaluate to a list"
 END

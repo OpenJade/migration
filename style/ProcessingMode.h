@@ -15,6 +15,7 @@
 #include "Insn.h"
 #include "Node.h"
 #include "FOTBuilder.h"
+#include "IList.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -41,6 +42,8 @@ public:
     };
     RuleType ruleType_;
     unsigned nQual_; // number of qualifying elements applies if ruleType_ == elementRule
+    bool toInitial_; // 1 if the match fell through from a named processing mode to
+	             // the initial processing mode
     friend class ProcessingMode;
   };
   ProcessingMode(const StringC &, const ProcessingMode *initial = 0);
@@ -51,11 +54,13 @@ public:
   void addElement(Vector<StringC> &qgi, Owner<Expression> &expr,
 		  const Location &loc, Interpreter &);
   // Specificity gives specificity of last match; get specificity of current match.
-  bool findMatch(const NodePtr &, Specificity &, InsnPtr &, SosofoObj *&) const;
+  bool findMatch(const NodePtr &, Messenger &,
+		 Specificity &, InsnPtr &, SosofoObj *&) const;
   void compile(Interpreter &);
   class Rule {
   public:
     Rule(Owner<Expression> &, const Location &);
+    virtual ~Rule() { }
     void compile(Interpreter &);
     void get(InsnPtr &, SosofoObj *&) const;
     const Location &location() const;
@@ -67,39 +72,64 @@ public:
     // must be permanent
     SosofoObj *obj_;
   };
-private:
-  struct Part;
-  friend struct Part;
-  struct IdRule : public Rule, public Named {
-    IdRule(const StringC &, Owner<Expression> &, const Location &);
+  struct GroveRules;
+  class ComplexRule : public Rule, public Link {
+  public:
+    ComplexRule(Owner<Expression> &, const Location &);
+    virtual void add(GroveRules &, const NodePtr &, Messenger &) const = 0;
   };
-  struct ElementRules : public Named {
+  class IdRule : public ComplexRule {
+  public:
+    IdRule(const StringC &, Owner<Expression> &, const Location &);
+    void add(GroveRules &, const NodePtr &, Messenger &) const;
+  private:
+    StringC id_;
+  };
+  struct ElementRule : public ComplexRule {
+  public:
+    ElementRule(Vector<StringC> &, Owner<Expression> &, const Location &);
+    void add(GroveRules &, const NodePtr &, Messenger &) const;
+  private:
+    Vector<StringC> qGi_;
+  };
+  struct GroveIdRule : public Named {
+    GroveIdRule(const StringC &, const IdRule *);
+    const IdRule *rule;
+  };
+  class ElementRules : public Named {
   public:
     ElementRules(const StringC &);
-    void addRule(const StringC *parents, size_t nParents, Owner<Expression> &, const Location &,
-		 Interpreter &);
-    static void compile(NamedTable<ElementRules> &, Interpreter &);
+    void addRule(const StringC *parents, size_t nParents, const ElementRule *,
+		 Messenger &);
     const Rule *findMatch(const NodePtr &, unsigned &nQual) const;
     static void add(NamedTable<ElementRules> &, const StringC *gis, size_t nGis,
-		    Owner<Expression> &, const Location &, Interpreter &);
+		    const ElementRule *, Messenger &);
   private:
-    Owner<Rule> unqual_;
+    const ElementRule *unqual_;
     NamedTable<ElementRules> parent_;
+  };
+  struct GroveRules {
+    GroveRules();
+    bool built;
+    NamedTable<ElementRules> elementTable;
+    NamedTable<GroveIdRule> idTable;
   };
   struct Part {
     Owner<Rule> defaultRule;
     Owner<Rule> rootRule;
-    NamedTable<IdRule> idTable;
-    NamedTable<ElementRules> elementTable;
+    IList<ComplexRule> complexRules;
+    // Indexed by the groveIndex
+    NCVector<GroveRules> groveRules;
+    void prepare(const NodePtr &, Messenger &) const;
   };
+private:
   NCVector<Part> parts_;
   const ProcessingMode *initial_; // 0 for initial mode
 };
 
-
 inline
 ProcessingMode::Specificity::Specificity()
-: part_(0), ruleType_(noRule)
+: part_(0), ruleType_(noRule), toInitial_(0)
 {
 }
 

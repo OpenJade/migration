@@ -25,6 +25,7 @@ bin\sp114u.dll
 bin\style.dll
 bin\spgrove.dll
 bin\grove.dll
+bin\groveoa.dll
 bin\jade.exe
 bin\nsgmlsu.exe
 bin\spamu.exe

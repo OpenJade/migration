@@ -41,7 +41,7 @@ int GroveApp::generateEvents(ErrorCountEventHandler *eceh)
 
 ErrorCountEventHandler *GroveApp::makeEventHandler()
 {
-  return GroveBuilder::make(this, this, rootNode_);
+  return GroveBuilder::make(0, this, this, 0, rootNode_);
 }
 
 void GroveApp::dispatchMessage(const Message &message)

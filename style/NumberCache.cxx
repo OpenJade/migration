@@ -38,11 +38,12 @@ unsigned long NumberCache::elementNumberAfter(const NodePtr &node, const StringC
     unsigned long nodeIndex, entryIndex;
     bool useSubnode = 1;
     node->elementIndex(nodeIndex);
+    unsigned long nodeGroveIndex = node->groveIndex();
     if (entry->node) {
       if (*entry->node == *node)
 	return 0;
       entry->node->elementIndex(entryIndex);
-      if (entryIndex < nodeIndex) {
+      if (entryIndex < nodeIndex && entry->node->groveIndex() == nodeGroveIndex) {
 	start = lastMatch = entry->node;
 	advance(start);
 	resetCount = entry->num;
@@ -57,7 +58,7 @@ unsigned long NumberCache::elementNumberAfter(const NodePtr &node, const StringC
 	if (*entry->subNode == *node)
 	  return entry->subNum;
 	entry->subNode->elementIndex(entryIndex);
-	if (entryIndex < nodeIndex) {
+	if (entryIndex < nodeIndex && entry->subNode->groveIndex() == nodeGroveIndex) {
 	  start = entry->subNode;
 	  advance(start);
 	  count = entry->subNum;
@@ -107,7 +108,7 @@ unsigned long NumberCache::elementNumber(const NodePtr &node, const StringC &gi)
     unsigned long nodeIndex, entryIndex;
     entry->node->elementIndex(entryIndex);
     node->elementIndex(nodeIndex);
-    if (entryIndex < nodeIndex) {
+    if (entryIndex < nodeIndex && node->groveIndex() == entry->node->groveIndex()) {
       lastMatch = start = entry->node;
       count = entry->num;
       advance(start);
@@ -172,7 +173,7 @@ bool NumberCache::childNumber(const NodePtr &node, unsigned long &result)
       unsigned long nodeIndex, entryIndex;
       entry->node->elementIndex(entryIndex);
       node->elementIndex(nodeIndex);
-      if (entryIndex < nodeIndex) {
+      if (entryIndex < nodeIndex && node->groveIndex() == entry->node->groveIndex()) {
 	start = entry->node;
 	count = entry->num;
       }

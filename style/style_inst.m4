@@ -29,6 +29,8 @@
 #include "ProcessContext.h"
 #include "SosofoObj.h"
 #include "DssslSpecEventHandler.h"
+#include "Node.h"
+#include "DssslApp.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -59,10 +61,11 @@ __instantiate(Vector<const Vector<ConstPtr<InheritedC> > *>)
 __instantiate(Vector<const VarStyleObj *>)
 __instantiate(Ptr<InheritedCInfo>)
 __instantiate(NamedTable<ProcessingMode::ElementRules>)
-__instantiate(NamedTableIter<ProcessingMode::ElementRules>)
-__instantiate(NamedTable<ProcessingMode::IdRule>)
-__instantiate(NamedTableIter<ProcessingMode::IdRule>)
+__instantiate(NamedTable<ProcessingMode::GroveIdRule>)
 __instantiate(NamedTableIter<ProcessingMode>)
+__instantiate(NCVector<ProcessingMode::GroveRules>)
+__instantiate(IList<ProcessingMode::ComplexRule>)
+__instantiate(IListIter<ProcessingMode::ComplexRule>)
 __instantiate(IList<SaveFOTBuilder>)
 __instantiate(Vector<const ProcessingMode *>)
 __instantiate(NCVector<ProcessingMode::Part>)
@@ -118,6 +121,9 @@ __instantiate(ConstPtr<FOTBuilder::GlyphSubstTable>)
 __instantiate(Vector<ConstPtr<FOTBuilder::GlyphSubstTable> >)
 __instantiate(Owner<FOTBuilder::ExtensionFlowObj>)
 __instantiate(Owner<FOTBuilder::CompoundExtensionFlowObj>)
+__instantiate(`HashTable<StringC,NodePtr>')
+__instantiate(`HashTableItem<StringC,NodePtr>')
+__instantiate(Vector<ProcessContext::NodeStackEntry>)
 
 #ifdef DSSSL_NAMESPACE
 }

@@ -19,18 +19,48 @@ ProcessContext::ProcessContext(Interpreter &interp, FOTBuilder &fotb)
   connectionStack_.insert(new Connection(&fotb));
 }
 
-void ProcessContext::process(Interpreter &interp)
+void ProcessContext::process(const NodePtr &node)
 {
+  Interpreter &interp = *vm_.interp;
   StyleObj *style = interp.initialStyle();
   if (style) {
     currentStyleStack().push(style, vm(), currentFOTBuilder());
     currentFOTBuilder().startSequence();
   }
-  processNode(interp.rootNode(), interp.initialProcessingMode());
+  processNode(node, interp.initialProcessingMode());
   if (style) {
     currentFOTBuilder().endSequence();
     currentStyleStack().pop();
   }
+}
+
+void ProcessContext::processNodeSafe(const NodePtr &nodePtr,
+				     const ProcessingMode *processingMode,
+				     bool chunk)
+{
+  unsigned long elementIndex;
+  if (nodePtr->elementIndex(elementIndex) == accessOK) {
+    unsigned groveIndex = nodePtr->groveIndex();
+    for (size_t i = 0; i < nodeStack_.size(); i++) {
+      const NodeStackEntry &nse = nodeStack_[i];
+      if (nse.elementIndex == elementIndex
+	  && nse.groveIndex == groveIndex
+	  && nse.processingMode == processingMode) {
+	vm_.interp->setNodeLocation(nodePtr);
+	vm_.interp->message(InterpreterMessages::processNodeLoop);
+	return;
+      }
+    }
+    nodeStack_.resize(nodeStack_.size() + 1);
+    NodeStackEntry &e = nodeStack_.back();
+    e.elementIndex = elementIndex;
+    e.groveIndex = groveIndex;
+    e.processingMode = processingMode;
+    processNode(nodePtr, processingMode, chunk);
+    nodeStack_.resize(nodeStack_.size() - 1);
+  }
+  else
+    processNode(nodePtr, processingMode, chunk);
 }
 
 void ProcessContext::processNode(const NodePtr &nodePtr,
@@ -47,7 +77,7 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
     InsnPtr insn;
     ProcessingMode::Specificity saveSpecificity(matchSpecificity_);
     matchSpecificity_ = ProcessingMode::Specificity();
-    if (vm().processingMode->findMatch(nodePtr, matchSpecificity_, insn, sosofoObj)) {
+    if (vm().processingMode->findMatch(nodePtr, *vm_.interp, matchSpecificity_, insn, sosofoObj)) {
       currentFOTBuilder().startNode(nodePtr, processingMode->name(),
 				    matchSpecificity_.ruleType());
       if (sosofoObj)
@@ -82,7 +112,7 @@ void ProcessContext::nextMatch(StyleObj *overridingStyle)
   StyleObj *saveOverridingStyle = vm().overridingStyle;
   if (overridingStyle)
     vm().overridingStyle = overridingStyle;
-  if (vm().processingMode->findMatch(vm().currentNode, matchSpecificity_, insn, sosofoObj)) {
+  if (vm().processingMode->findMatch(vm().currentNode, *vm_.interp, matchSpecificity_, insn, sosofoObj)) {
     if (sosofoObj)
       sosofoObj->process(*this);
     else {
@@ -315,6 +345,7 @@ void ProcessContext::popPorts()
 
 void ProcessContext::startDiscardLabeled(SymbolObj *label)
 {
+  startFlowObj();
   Connectable *c = new Connectable(1, currentStyleStack(), flowObjLevel_);
   connectableStack_.insert(c);
   c->ports[0].labels.push_back(label);
@@ -324,6 +355,7 @@ void ProcessContext::startDiscardLabeled(SymbolObj *label)
 void ProcessContext::endDiscardLabeled()
 {
   delete connectableStack_.get();
+  endFlowObj();
 }
 
 void ProcessContext::startMapContent(ELObj *contentMap, const Location &loc)
@@ -528,7 +560,7 @@ void ProcessNodeListSosofoObj::process(ProcessContext &context)
     bool chunk;
     nl = nl->nodeListChunkRest(context.vm(), interp, chunk);
     protect = nl;
-    context.processNode(node, mode_, chunk);
+    context.processNodeSafe(node, mode_, chunk);
   }
 }
 

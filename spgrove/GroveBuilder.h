@@ -28,12 +28,19 @@ class MessageFormatter;
 class SPGROVE_API GroveBuilder {
 public:
   static bool setBlocking(bool);
-  static ErrorCountEventHandler *make(Messenger *,
+  static ErrorCountEventHandler *make(unsigned index,
+				      Messenger *,
 				      MessageFormatter *,
-#ifdef GROVE_NAMESPACE
-				      GROVE_NAMESPACE::
-#endif
-				      NodePtr &root);
+				      bool validateOnly,
+				      GROVE_NAMESPACE_SCOPE NodePtr &root);
+  static ErrorCountEventHandler *make(unsigned index,
+				      Messenger *,
+				      MessageFormatter *,
+				      bool validateOnly,
+				      const ConstPtr<Sd> &sd,
+				      const ConstPtr<Syntax> &prologSyntax,
+				      const ConstPtr<Syntax> &instanceSyntax,
+				      GROVE_NAMESPACE_SCOPE NodePtr &root);
 private:
   GroveBuilder();
 };

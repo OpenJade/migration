@@ -131,6 +131,10 @@ private:
   // gi followed by att name/value pairs.
   // empty gi matches any gi
   Vector<StringC> giAtts_;
+  // cached normalized version of giAtts_[0]
+  // correct for grove with index normGroveIndex_
+  StringC normGi_;
+  unsigned long normGroveIndex_;
 };
 
 class ParentElementPattern : public ElementPattern {
@@ -1783,7 +1787,6 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
     if (!n)
       return new NoElementPattern;
     giAtts[0].assign(s, n);
-    interp.normalizeGeneralName(giAtts[0]);
     return new SimpleElementPattern(giAtts);
   }
   else if (obj == interp.makeTrue() || obj->isNil())
@@ -1799,7 +1802,6 @@ ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
     if (!n)
       return new NoElementPattern;
     giAtts[0].assign(s, n);
-    interp.normalizeGeneralName(giAtts[0]);
   }
   else if (pair->car() != interp.makeTrue())
     return 0;
@@ -3973,7 +3975,7 @@ DEFPRIMITIVE(EmptyNodeList, argc, argv, context, interp, loc)
 
 static
 bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
-		   int nKeys, Interpreter &interp, const Location &loc, ELObj **values)
+		   int nKeys, Interpreter &interp, const Location &loc, int *pos)
 {
   if ((argc & 1) == 1) {
     interp.setNextLocation(loc);
@@ -3981,7 +3983,7 @@ bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
     return 0;
   }
   for (int i = 0; i < nKeys; i++)
-    values[i] = interp.makeUnspecified();
+    pos[i] = -1;
   // First has priority, so scan in reverse order
   for (int i = argc - 1; i > 0; i -= 2) {
     KeywordObj *keyObj = argv[i - 1]->asKeyword();
@@ -3995,7 +3997,7 @@ bool decodeKeyArgs(int argc, ELObj **argv, const Identifier::SyntacticKey *keys,
     if (keyObj->identifier()->syntacticKey(key)) {
       for (int j = 0; j < nKeys; j++) {
 	if (key == keys[j]) {
-	  values[j] = argv[i];
+	  pos[j] = i;
 	  found = 1;
 	}
       }
@@ -4074,27 +4076,27 @@ DEFPRIMITIVE(NodeProperty, argc, argv, context, interp, loc)
   static const Identifier::SyntacticKey keys[3] = {
     Identifier::keyDefault, Identifier::keyNull, Identifier::keyIsRcs
   };
-  ELObj *keyArgValues[3];
-  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 3, interp, loc, keyArgValues))
+  int pos[3];
+  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 3, interp, loc, pos))
     return interp.makeError();
   ComponentName::Id id;
   if (interp.lookupNodeProperty(*str, id)) {
     ELObjPropertyValue value(interp,
-			     keyArgValues[2] != interp.makeUnspecified()
-			     && keyArgValues[2] != interp.makeFalse());
+			     pos[2] >= 0
+			     && argv[pos[2] + 2] != interp.makeFalse());
     AccessResult ret = node->property(id, interp, value);
     if (ret == accessOK)
       return value.obj;
-    if (ret == accessNull && keyArgValues[1] != interp.makeUnspecified())
-      return keyArgValues[1];
+    if (ret == accessNull && pos[1] >= 0)
+      return argv[pos[1] + 2];
   }
-  if (keyArgValues[0] == interp.makeUnspecified()) {
+  if (pos[0] < 0) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::noNodePropertyValue,
 		   StringMessageArg(*str));
     return interp.makeError();
   }
-  return keyArgValues[0];
+  return argv[pos[0] + 2];
 }
 
 DEFPRIMITIVE(SelectByClass, argc, argv, context, interp, loc)
@@ -4169,6 +4171,62 @@ DEFPRIMITIVE(NodeListLength, argc, argv, context, interp, loc)
   return interp.makeInteger(nl->nodeListLength(context, interp));
 }
 
+DEFPRIMITIVE(SgmlParse, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  StringC sysid(s, n);
+  static const Identifier::SyntacticKey keys[2] = {
+    Identifier::keyActive, Identifier::keyParent
+  };
+  int pos[2];
+  if (!decodeKeyArgs(argc - 1, argv + 1, keys, 2, interp, loc, pos))
+    return interp.makeError();
+  Vector<StringC> active;
+  if (pos[0] >= 0) {
+    ELObj *obj = argv[pos[0] + 1];
+    while (!obj->isNil()) {
+      PairObj *pair = obj->asPair();
+      if (!pair)
+   	return argError(interp, loc,
+			InterpreterMessages::notAList, pos[0] + 1, argv[pos[0] + 1]);
+      if (!pair->car()->stringData(s, n))
+	return argError(interp, loc,
+  		        InterpreterMessages::notAString, pos[0] + 1, pair->car());
+      active.resize(active.size() + 1);
+      active.back().assign(s, n);
+      obj = pair->cdr();
+    }
+  }
+  NodePtr parent;
+  if (pos[1] >= 0) {
+    if (!argv[pos[1] + 1]->optSingletonNodeList(context, interp, parent) || !parent)
+      return argError(interp, loc,
+		      InterpreterMessages::notASingletonNode, pos[1] + 1, argv[pos[1] + 1]);
+  }
+  NodePtr nd;
+  if (!interp.groveManager()->load(sysid, active, parent, nd))
+    return interp.makeEmptyNodeList();
+  return new (interp) NodePtrNodeListObj(nd);
+}
+
+DEFPRIMITIVE(ReadEntity, argc, argv, context, interp, loc)
+{
+  const Char *s;
+  size_t n;
+  if (!argv[0]->stringData(s, n))
+    return argError(interp, loc,
+		    InterpreterMessages::notAString, 0, argv[0]);
+  StringC sysid(s, n);
+  StringObj *contents = new (interp) StringObj;
+  if (interp.groveManager()->readEntity(sysid, *contents))
+    return contents;
+  return interp.makeError();
+}
+
 DEFPRIMITIVE(Debug, argc, argv, context, interp, loc)
 {
   interp.setNextLocation(loc);
@@ -4198,6 +4256,26 @@ DEFPRIMITIVE(IfFrontPage, argc, argv, context, interp, loc)
   		      i, argv[i]);
   }
   return new (interp) PageTypeSosofoObj(FOTBuilder::frontHF, sosofo[0], sosofo[1]);
+}
+
+DEFPRIMITIVE(AllElementNumber, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (argc > 0) {
+    if (!argv[0]->optSingletonNodeList(context, interp, node))
+      return argError(interp, loc,
+		      InterpreterMessages::notAnOptSingletonNode, 0, argv[0]);
+  }
+  else {
+    if (!context.currentNode)
+      return noCurrentNodeError(interp, loc);
+    node = context.currentNode;
+  }
+  unsigned long n;
+  if (node && node->elementIndex(n) == accessOK)
+    return interp.makeInteger(long(n) + 1);
+  else
+    return interp.makeFalse();
 }
 
 void Interpreter::installPrimitives()
@@ -4235,20 +4313,30 @@ void Interpreter::installXPrimitive(const char *s, PrimitiveObj *value)
 }
 
 SimpleElementPattern::SimpleElementPattern(Vector<StringC> &giAtts)
+: normGroveIndex_((unsigned long)-1)
 {
   giAtts.swap(giAtts_);
 }
 
 bool SimpleElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
 {
-  GroveString tem;
-  if (node->getGi(tem) != accessOK)
+  GroveString nodeGi;
+  if (node->getGi(nodeGi) != accessOK)
     return 0;
   // An empty gi in the pattern matches any gi.
   size_t len = giAtts_[0].size();
   if (len) {
-    GroveString gi(giAtts_[0].data(), len);
-    if (gi != tem)
+    if (nodeGi.size() != len)
+      return 0;
+    unsigned long groveIndex = node->groveIndex();
+    if (groveIndex != normGroveIndex_) {
+      SimpleElementPattern *cache = (SimpleElementPattern *)this;
+      cache->normGroveIndex_ = groveIndex;
+      cache->normGi_ = giAtts_[0];
+      Interpreter::normalizeGeneralName(node, cache->normGi_);
+    }
+    GroveString normGi(normGi_.data(), normGi_.size());
+    if (normGi != nodeGi)
       return 0;
   }
   if (giAtts_.size() > 1) {

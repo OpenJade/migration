@@ -36,7 +36,8 @@ public:
   SOCatalogManagerImpl(const Vector<StringC> &sysids,
 		       size_t nSysidsMustExist,
 		       const CharsetInfo *sysidCharset,
-		       const CharsetInfo *catalogCharset);
+		       const CharsetInfo *catalogCharset,
+		       Boolean useDocCatalog);
   ConstPtr<EntityCatalog> makeCatalog(StringC &systemId,
 				      const CharsetInfo &charset,
 				      ExtendEntityManager *,
@@ -54,6 +55,7 @@ private:
   Vector<StringC> systemCatalogs_;
   const CharsetInfo *sysidCharset_;
   const CharsetInfo *catalogCharset_;
+  Boolean useDocCatalog_;
 };
 
 class SOEntityCatalog : public EntityCatalog {
@@ -128,7 +130,7 @@ private:
   Table publicIds_;
   Table delegates_;
   HashTable<StringC,CatalogEntry> systemIds_;
-  Table names_[4];
+  Table names_[5];
   size_t catalogNumber_;
   Boolean haveSgmlDecl_;
   StringC sgmlDecl_;
@@ -224,6 +226,7 @@ private:
   StringC baseKey_;
   StringC delegateKey_;
   StringC dtddeclKey_;
+  StringC sgmlKey_;
   XcharMap<unsigned char> categoryTable_;
   SubstTable<Char> substTable_;
   Boolean override_;
@@ -233,22 +236,26 @@ ExtendEntityManager::CatalogManager *
 SOCatalogManager::make(const Vector<StringC> &sysids,
 		       size_t nSysidsMustExist,
 		       const CharsetInfo *sysidCharset,
-		       const CharsetInfo *catalogCharset)
+		       const CharsetInfo *catalogCharset,
+		       Boolean useDocCatalog)
 {
   return new SOCatalogManagerImpl(sysids,
 				  nSysidsMustExist,
 				  sysidCharset,
-				  catalogCharset);
+				  catalogCharset,
+				  useDocCatalog);
 }
 		       
 SOCatalogManagerImpl::SOCatalogManagerImpl(const Vector<StringC> &systemCatalogs,
 					   size_t nSystemCatalogsMustExist,
 					   const CharsetInfo *sysidCharset,
-					   const CharsetInfo *catalogCharset)
+					   const CharsetInfo *catalogCharset,
+					   Boolean useDocCatalog)
 : systemCatalogs_(systemCatalogs),
   nSystemCatalogsMustExist_(nSystemCatalogsMustExist),
   sysidCharset_(sysidCharset),
-  catalogCharset_(catalogCharset)
+  catalogCharset_(catalogCharset),
+  useDocCatalog_(useDocCatalog)
 {
 }
 
@@ -311,7 +318,8 @@ SOCatalogManagerImpl::makeCatalog(StringC &systemId,
 			*sysidCharset_, *catalogCharset_,
 			InputSourceOrigin::make(), entityCatalog,
 			mgr);
-  addCatalogsForDocument(parser, systemId, entityCatalog, charset, mgr);
+  if (useDocCatalog_)
+    addCatalogsForDocument(parser, systemId, entityCatalog, charset, mgr);
   for (i = nSystemCatalogsMustExist_; i < systemCatalogs_.size(); i++)
     parser.parseCatalog(systemCatalogs_[i], 0,
 			*sysidCharset_, *catalogCharset_,
@@ -747,7 +755,8 @@ CatalogParser::CatalogParser(const CharsetInfo &charset)
   noKey_(charset.execToDesc("NO")),
   baseKey_(charset.execToDesc("BASE")),
   delegateKey_(charset.execToDesc("DELEGATE")),
-  dtddeclKey_(charset.execToDesc("DTDDECL"))
+  dtddeclKey_(charset.execToDesc("DTDDECL")),
+  sgmlKey_(charset.execToDesc("SGML"))
 {
   static const char lcletters[] = "abcdefghijklmnopqrstuvwxyz";
   static const char ucletters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -816,6 +825,8 @@ void CatalogParser::parseCatalog(const StringC &sysid,
 	parseNameMap(EntityDecl::linktype);
       else if (param_ == notationKey_)
 	parseNameMap(EntityDecl::notation);
+      else if (param_ == sgmlKey_)
+	parseNameMap(EntityDecl::sgml);
       else if (param_ == sgmlDeclKey_) {
 	if (parseArg())
 	  catalog_->setSgmlDecl(param_, paramLoc_);

@@ -446,7 +446,8 @@ public:
   AccessResult getTreeRoot(NodePtr &ptr) const;
   AccessResult getOrigin(NodePtr &) const;
   AccessResult getOriginToSubnodeRelPropertyName(ComponentName::Id &) const;
-  AccessResult nextChunkSibling(NodePtr &ptr) const;
+  AccessResult nextChunkSibling(NodePtr &) const;
+  AccessResult nextChunkAfter(NodePtr &) const;
   AccessResult firstSibling(NodePtr &) const;
   AccessResult siblingsIndex(unsigned long &) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
@@ -542,9 +543,11 @@ public:
     : ChunkNode(grove, chunk) { }
   AccessResult attributeRef(unsigned long i, NodePtr &ptr) const;
   AccessResult nextChunkSibling(NodePtr &ptr) const;
+  AccessResult nextChunkAfter(NodePtr &) const;
   AccessResult firstChild(NodePtr &ptr) const;
   AccessResult getAttributes(NamedNodeListPtr &ptr) const;
   AccessResult getGi(GroveString &str) const;
+  bool hasGi(GroveString) const;
   AccessResult getId(GroveString &str) const;
   AccessResult getContent(NodeListPtr &ptr) const;
   AccessResult getMustOmitEndTag(bool &) const;
@@ -594,6 +597,7 @@ public:
   bool same2(const DataNode *node) const;
   AccessResult nextSibling(NodePtr &ptr) const;
   AccessResult nextChunkSibling(NodePtr &ptr) const;
+  AccessResult nextChunkAfter(NodePtr &) const;
   AccessResult siblingsIndex(unsigned long &) const;
   AccessResult followSiblingRef(unsigned long, NodePtr &) const;
   AccessResult charChunk(const SdataMapper &, GroveString &) const;
@@ -2392,6 +2396,18 @@ AccessResult ElementNode::nextChunkSibling(NodePtr &ptr) const
   return chunk()->nextSibling->setNodePtrFirst(ptr, this);
 }
 
+// This is a duplicate of ChunkNode::nextChunkAfter
+// to take advantage of overloaded setNodePtrFirst.
+
+AccessResult ElementNode::nextChunkAfter(NodePtr &nd) const
+{
+  const Chunk *p = chunk_->after();
+  while (p == grove()->completeLimit())
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  return p->setNodePtrFirst(nd, this);
+}
+
 AccessResult ElementChunk::getFollowing(const GroveImpl *grove,
 					const Chunk *&f,
 					unsigned long &n) const
@@ -2442,6 +2458,21 @@ AccessResult ElementNode::getGi(GroveString &str) const
 {
   setString(str, chunk()->type->name());
   return accessOK;
+}
+
+bool ElementNode::hasGi(GroveString str) const
+{
+  const StringC &gi = chunk()->type->name();
+  size_t len = gi.size();
+  if (len != str.size())
+    return 0;
+  const SubstTable<Char> *subst = grove()->generalSubstTable();
+  if (!subst)
+    return 0;
+  for (size_t i = 0; i < len; i++)
+    if ((*subst)[str[i]] != gi[i])
+      return 0;
+  return 1;
 }
 
 AccessResult ElementNode::getId(GroveString &str) const
@@ -2738,6 +2769,15 @@ AccessResult DataNode::nextSibling(NodePtr &ptr) const
   return DataNode::nextChunkSibling(ptr);
 }
 
+AccessResult DataNode::nextChunkAfter(NodePtr &nd) const
+{
+  const Chunk *p = chunk_->after();
+  while (p == grove()->completeLimit())
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  return p->setNodePtrFirst(nd, this);
+}
+
 AccessResult DataNode::followSiblingRef(unsigned long i, NodePtr &ptr) const
 {
   if (i < chunk()->size - index_ - 1) {
@@ -3007,6 +3047,15 @@ AccessResult ChunkNode::nextChunkSibling(NodePtr &ptr) const
   if (p->origin != chunk_->origin)
     return accessNull;
   return p->setNodePtrFirst(ptr, this);
+}
+
+AccessResult ChunkNode::nextChunkAfter(NodePtr &nd) const
+{
+  const Chunk *p = chunk_->after();
+  while (p == grove()->completeLimit())
+    if (!grove()->waitForMoreNodes())
+      return accessTimeout;
+  return p->setNodePtrFirst(nd, this);
 }
 
 AccessResult ChunkNode::firstSibling(NodePtr &ptr) const

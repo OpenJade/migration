@@ -16,7 +16,12 @@ Sd::Sd(const Ptr<EntityManager> &entityManager)
 : entityManager_(entityManager),
   internalCharsetIsDocCharset_(entityManager->internalCharsetIsDocCharset()),
   docCharset_(entityManager->charset()),
-  scopeInstance_(0)
+  scopeInstance_(0),
+  www_(0),
+  netEnable_(netEnableNo),
+  entityRef_(entityRefAny),
+  typeValid_(1),
+  integrallyStored_(0)
 {
   int i;
   for (i = 0; i < nBooleanFeature; i++)
@@ -37,16 +42,27 @@ void Sd::setDocCharsetDesc(const UnivCharsetDesc &desc)
 }
 
 const char *const Sd::reservedName_[] = {
+  "ALL",
+  "ANY",
   "APPINFO",
+  "ATTLIST",
+  "ATTRIB",
   "BASESET",
   "CAPACITY",
   "CHARSET",
   "CONCUR",
   "CONTROLS",
   "DATATAG",
+  "DEFAULT",
   "DELIM",
   "DESCSET",
+  "DOCTYPE",
   "DOCUMENT",
+  "ELEMENT",
+  "EMPTY",
+  "EMPTYNRM",
+  "ENDTAG",
+  "ENTITIES",
   "ENTITY",
   "EXPLICIT",
   "FEATURES",
@@ -54,8 +70,13 @@ const char *const Sd::reservedName_[] = {
   "FUNCHAR",
   "FUNCTION",
   "GENERAL",
+  "IMMEDNET",
   "IMPLICIT",
+  "IMPLYDEF",
   "INSTANCE",
+  "INTEGRAL",
+  "INTERNAL",
+  "KEEPRSRE",
   "LCNMCHAR",
   "LCNMSTRT",
   "LINK",
@@ -68,16 +89,22 @@ const char *const Sd::reservedName_[] = {
   "NAMES",
   "NAMESTRT",
   "NAMING",
+  "NETENABL",
   "NO",
+  "NOASSERT",
   "NONE",
+  "NOTATION",
+  "OMITNAME",
   "OMITTAG",
   "OTHER",
   "PUBLIC",
   "QUANTITY",
   "RANK",
   "RE",
+  "REF",
   "RS",
   "SCOPE",
+  "SEEALSO",
   "SEPCHAR",
   "SGML",
   "SGMLREF",
@@ -86,12 +113,19 @@ const char *const Sd::reservedName_[] = {
   "SHUNCHAR",
   "SIMPLE",
   "SPACE",
+  "STARTTAG",
   "SUBDOC",
   "SWITCHES",
   "SYNTAX",
+  "SYSTEM",
+  "TYPE",
   "UCNMCHAR",
   "UCNMSTRT",
+  "UNCLOSED",
   "UNUSED",
+  "URN",
+  "VALIDITY",
+  "VALUE",
   "YES"
 };
 
@@ -146,6 +180,7 @@ const char *const Sd::generalDelimiterName_[] = {
   "ETAGO",
   "GRPC",
   "GRPO",
+  "HCRO",
   "LIT",
   "LITA",
   "MDC",
@@ -153,6 +188,7 @@ const char *const Sd::generalDelimiterName_[] = {
   "MINUS",
   "MSC",
   "NET",
+  "NESTC",
   "OPT",
   "OR",
   "PERO",
@@ -223,6 +259,13 @@ UnivChar Sd::nameToUniv(const StringC &name)
     namedCharTable_.insert(name, n);
   }
   return n + 0x60000000;	// 10646 private use group
+}
+
+void Sd::setShorttag(Boolean b)
+{
+  for (int i = fSHORTTAG_FIRST; i <= fSHORTTAG_LAST; i++)
+    booleanFeature_[i] = b;
+  netEnable_ = netEnableAll;
 }
 
 #ifdef SP_NAMESPACE

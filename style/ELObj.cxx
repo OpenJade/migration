@@ -39,6 +39,11 @@ bool ELObj::isEqual(ELObj &)
   return false;
 }
     
+bool ELObj::isEquiv(ELObj &obj)
+{
+  return isEqual(obj);
+}
+    
 bool ELObj::isNil() const
 {
   return false;
@@ -55,6 +60,11 @@ bool ELObj::isTrue() const
 }
 
 PairObj *ELObj::asPair()
+{
+  return 0;
+}
+
+VectorObj *ELObj::asVector()
 {
   return 0;
 }
@@ -301,7 +311,14 @@ bool PairObj::isEqual(ELObj &obj)
 {
   PairObj *p = obj.asPair();
   // FIXME need non-recursive implementation
-  return p && *p->car() == *car() && *p->cdr() == *cdr();
+  return p && equal(*p->car(), *car()) && equal(*p->cdr(), *cdr());
+}
+
+bool PairObj::isEquiv(ELObj &obj)
+{
+  PairObj *p = obj.asPair();
+  // FIXME need non-recursive implementation
+  return p && eqv(*p->car(), *car()) && eqv(*p->cdr(), *cdr());
 }
 
 void PairObj::traceSubObjects(Collector &c) const
@@ -319,8 +336,11 @@ ELObj *PairObj::resolveQuantities(bool force, Interpreter &interp,
     ELObj *tem = pair->car_->resolveQuantities(force, interp, loc);
     if (!tem)
       fail = 1;
-    else
+    else {
+      if (pair->permanent())
+	interp.makePermanent(tem);
       pair->car_ = tem;
+    }
     PairObj *nextPair = pair->cdr_->asPair();
     if (!nextPair)
       break;
@@ -329,8 +349,11 @@ ELObj *PairObj::resolveQuantities(bool force, Interpreter &interp,
   ELObj *tem = pair->cdr_->resolveQuantities(force, interp, loc);
   if (!tem)
     fail = 1;
-  else
+  else {
+    if (pair->permanent())
+      interp.makePermanent(tem);
     pair->cdr_ = tem;
+  }
   if (fail)
     return 0;
   else
@@ -376,6 +399,85 @@ void PairObj::print(Interpreter &interp, OutputCharStream &out)
     pair->car()->print(interp, out);
     p = pair->cdr();
   }
+}
+
+VectorObj::VectorObj()
+{
+  hasSubObjects_ = 1;
+}
+
+VectorObj::VectorObj(Vector<ELObj *> &v)
+{
+  hasSubObjects_ = 1;
+  v.swap(*this);
+}
+
+void VectorObj::traceSubObjects(Collector &c) const
+{
+  for (size_t i = 0; i < Vector<ELObj *>::size(); i++)
+    c.trace((*this)[i]);
+}
+
+VectorObj *VectorObj::asVector()
+{
+  return this;
+}
+
+bool VectorObj::isEquiv(ELObj &)
+{
+  return 0;
+}
+
+bool VectorObj::isEqual(ELObj &obj)
+{
+  VectorObj *v = obj.asVector();
+  if (!v)
+    return 0;
+  if (size() != v->size())
+    return 0;
+  for (size_t i = 0; i < size(); i++)
+    if (!equal(*(*this)[i], *(*v)[i]))
+      return 0;
+  return 1;
+}
+
+void VectorObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#(";
+  Vector<ELObj *> &v = *this;
+  for (size_t i = 0; i < v.size(); i++) {
+    if (i)
+      out << " ";
+    ELObj *tem = v[i];
+    if (!tem)
+      out << "#<cycle>";
+    else {
+      v[i] = 0;
+      tem->print(interp, out);
+      v[i] = tem;
+    }
+  }
+  out << ")";
+}
+
+ELObj *VectorObj::resolveQuantities(bool force, Interpreter &interp,
+				    const Location &loc)
+{
+  bool fail = 0;
+  Vector<ELObj *> &v = *this;
+  for (size_t i = 0; i < v.size(); i++) {
+    ELObj *tem = v[i]->resolveQuantities(force, interp, loc);
+    if (tem) {
+      if (permanent())
+	interp.makePermanent(tem);
+      v[i] = tem;
+    }
+    else
+      fail = 1;
+  }
+  if (fail)
+    return 0;
+  return this;
 }
 
 CharObj::CharObj(Char ch)

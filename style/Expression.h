@@ -23,15 +23,26 @@ class Identifier;
 
 struct BoundVar {
   const Identifier *ident;
-  bool used;
-  bool boxed;
+  enum {
+    usedFlag = 01,
+    assignedFlag = 02,
+    sharedFlag = 04,
+    uninitFlag = 010,
+    boxedFlags = assignedFlag|sharedFlag
+  };
+  static bool flagsBoxed(unsigned f) { return (f & boxedFlags) == boxedFlags; }
+  bool boxed() const { return flagsBoxed(flags); }
+  unsigned flags;
   unsigned reboundCount;
 };
 
 class BoundVarList : public Vector<BoundVar> {
 public:
-  void append(const Identifier *, bool boxed);
-  void mark(const Identifier *);
+  BoundVarList() { }
+  BoundVarList(const Vector<const Identifier *> &);
+  BoundVarList(const Vector<const Identifier *> &, size_t, unsigned flags = 0);
+  void append(const Identifier *, unsigned flags);
+  void mark(const Identifier *, unsigned flags);
   void removeUnused();
   void remove(const Vector<const Identifier *> &);
   void rebind(const Vector<const Identifier *> &);
@@ -42,18 +53,17 @@ public:
 class Environment {
 public:
   Environment();
-  Environment(const Vector<const Identifier *> &frameVars,
+  Environment(const BoundVarList &frameVars,
 	      const BoundVarList &closureVars);
   void boundVars(BoundVarList &) const;
   bool lookup(const Identifier *var,
-	      bool &isFrame, int &index, bool &boxed) const;
-  void augmentFrame(const Vector<const Identifier *> &,
-		    int stackPos, bool boxed);
+	      bool &isFrame, int &index, unsigned &flags) const;
+  void augmentFrame(const BoundVarList &,
+		    int stackPos);
 private:
   struct FrameVarList : public Resource {
     int stackPos;
-    bool boxed;
-    const Vector<const Identifier *> *vars;
+    const BoundVarList *vars;
     ConstPtr<FrameVarList> next;
   };
   ConstPtr<FrameVarList> frameVarList_;
@@ -69,7 +79,7 @@ public:
   static
     InsnPtr optimizeCompile(Owner<Expression> &, Interpreter &, const Environment &, int,
                             const InsnPtr &);
-  virtual void markBoundVars(BoundVarList &vars);
+  virtual void markBoundVars(BoundVarList &vars, bool);
   virtual void optimize(Interpreter &, const Environment &, Owner<Expression> &);
   virtual ELObj *constantValue() const;
   virtual bool canEval(bool maybeCall) const = 0;
@@ -111,7 +121,7 @@ public:
   CallExpression(Owner<Expression> &, NCVector<Owner<Expression> > &,
 		 const Location &loc);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   int nArgs();
   bool canEval(bool maybeCall) const;
 private:
@@ -124,7 +134,7 @@ public:
   VariableExpression(const Identifier *, const Location &loc);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
   void optimize(Interpreter &, const Environment &, Owner<Expression> &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 private:
   const Identifier *ident_;
@@ -138,7 +148,7 @@ public:
 	       Owner<Expression> &,
 	       const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
   void optimize(Interpreter &, const Environment &, Owner<Expression> &);
 private:
@@ -153,7 +163,7 @@ public:
 	       Owner<Expression> &,
 	       const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
   void optimize(Interpreter &, const Environment &, Owner<Expression> &);
 private:
@@ -179,7 +189,7 @@ public:
 		 Owner<Expression> &,
 		 const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
   void optimize(Interpreter &, const Environment &, Owner<Expression> &);
 private:
@@ -199,7 +209,7 @@ public:
 		   Owner<Expression> &body,
 		   const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 private:
   Vector<const Identifier *> formals_;
@@ -215,10 +225,11 @@ public:
 		Owner<Expression> &body,
 		const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 protected:
   InsnPtr compileInits(Interpreter &interp, const Environment &env,
+		       const BoundVarList &initVars,
 		       size_t initIndex, int stackPos, const InsnPtr &next);
   Vector<const Identifier *> vars_;
   NCVector<Owner<Expression> > inits_;
@@ -234,6 +245,7 @@ public:
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
 private:
   InsnPtr compileInits(Interpreter &interp, const Environment &env,
+		       const BoundVarList &initVars,
 		       size_t initIndex, int stackPos, const InsnPtr &next);
 };
 
@@ -244,7 +256,7 @@ public:
 		   Owner<Expression> &body,
 		   const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 private:
   InsnPtr compileInits(Interpreter &interp, const Environment &env,
@@ -256,18 +268,48 @@ private:
 
 class QuasiquoteExpression : public Expression {
 public:
+  enum Type {
+    listType,
+    improperType,
+    vectorType
+  };
   QuasiquoteExpression(NCVector<Owner<Expression> > &,
 		       Vector<PackedBoolean> &spliced,
-		       bool improper,
+		       Type type,
 		       const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
   void optimize(Interpreter &, const Environment &, Owner<Expression> &);
 private:
   NCVector<Owner<Expression> > members_;
   Vector<PackedBoolean> spliced_;
-  bool improper_;
+  Type type_;
+};
+
+class SequenceExpression : public Expression {
+public:
+  SequenceExpression(NCVector<Owner<Expression> > &,
+		     const Location &);
+  InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
+  void markBoundVars(BoundVarList &vars, bool);
+  bool canEval(bool maybeCall) const;
+  void optimize(Interpreter &, const Environment &, Owner<Expression> &);
+private:
+  NCVector<Owner<Expression> > sequence_;
+};
+
+class AssignmentExpression : public Expression {
+public:
+  AssignmentExpression(const Identifier *,
+                       Owner<Expression> &,
+		       const Location &);
+  InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
+  void markBoundVars(BoundVarList &vars, bool);
+  bool canEval(bool maybeCall) const;
+private:
+  const Identifier *var_;
+  Owner<Expression> value_;
 };
 
 class ProcessingMode;
@@ -278,7 +320,7 @@ public:
 		     const Location &);
   InsnPtr compile(Interpreter &, const Environment &, int,
 		  const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 private:
   const ProcessingMode *mode_;
@@ -291,11 +333,12 @@ public:
 		  NCVector<Owner<Expression> > &,
 		  const Location &loc);
   InsnPtr compile(Interpreter &, const Environment &, int, const InsnPtr &);
-  void markBoundVars(BoundVarList &vars);
+  void markBoundVars(BoundVarList &vars, bool);
   bool canEval(bool maybeCall) const;
 protected:
   virtual void unknownStyleKeyword(const Identifier *ident, Interpreter &interp,
                                    const Location &loc) const;
+  virtual bool maybeStyleKeyword(const Identifier *ident) const;
   Vector<const Identifier *> keys_;
   NCVector<Owner<Expression> > exprs_;
 };
@@ -315,6 +358,7 @@ private:
   FlowObj *applyConstNonInheritedCs(FlowObj *, Interpreter &, const Environment &);
   void unknownStyleKeyword(const Identifier *ident, Interpreter &interp,
 			   const Location &loc) const;
+  bool maybeStyleKeyword(const Identifier *ident) const;
 
   const Identifier *foc_;
 };

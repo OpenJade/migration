@@ -36,13 +36,15 @@ Parser::Parser(const SgmlParser::Params &params)
     sd->setBooleanFeature(Sd::fDATATAG, opt.datatag);
     sd->setBooleanFeature(Sd::fOMITTAG, opt.omittag);
     sd->setBooleanFeature(Sd::fRANK, opt.rank);
-    sd->setBooleanFeature(Sd::fSHORTTAG, opt.shorttag);
+    sd->setShorttag(opt.shorttag);
+    sd->setBooleanFeature(Sd::fEMPTYNRM, opt.emptynrm);
     sd->setNumberFeature(Sd::fSIMPLE, opt.linkSimple);
     sd->setBooleanFeature(Sd::fIMPLICIT, opt.linkImplicit);
     sd->setNumberFeature(Sd::fEXPLICIT, opt.linkExplicit);
     sd->setNumberFeature(Sd::fCONCUR, opt.concur);
     sd->setNumberFeature(Sd::fSUBDOC, opt.subdoc);
     sd->setBooleanFeature(Sd::fFORMAL, opt.formal);
+    setSdOverrides(*sd);
     PublicId publicId;
     CharsetDecl docCharsetDecl;
     docCharsetDecl.addSection(publicId);
@@ -112,6 +114,21 @@ Parser::Parser(const SgmlParser::Params &params)
     setPhase(declSubsetPhase);
     break;
   }
+}
+
+void Parser::setSdOverrides(Sd &sd)
+{
+  if (options().typeValid != ParserOptions::sgmlDeclTypeValid) {
+    sd.setTypeValid(options().typeValid);
+    sd.setBooleanFeature(Sd::fIMPLYDEFATTLIST, !options().typeValid);
+    sd.setBooleanFeature(Sd::fIMPLYDEFELEMENT, !options().typeValid);
+  }
+  if (options().noUnclosedTag) {
+    sd.setBooleanFeature(Sd::fSTARTTAGUNCLOSED, 0);
+    sd.setBooleanFeature(Sd::fENDTAGUNCLOSED, 0);
+  }
+  if (options().noNet)
+    sd.setStartTagNetEnable(Sd::netEnableNo);
 }
 
 void Parser::giveUp()

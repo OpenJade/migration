@@ -120,6 +120,7 @@ private:
   Boolean inSpecialMarkedSection_;
   Boolean hasInternalSubset_;
   Boolean mustOmitEnd_;
+  Boolean emptyElementNormal_;
   const AttributeList *currentAttributes_;
 };
 

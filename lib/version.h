@@ -1,1 +1,1 @@
-#define SP_VERSION SP_T("1.2.1")
+#define SP_VERSION SP_T("1.3")

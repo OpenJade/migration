@@ -55,6 +55,10 @@ Syntax::Syntax(const Sd &sd)
     set_[minimumData] += uc;
     set_[significant] += lc;
     set_[significant] += uc;
+    if (i < 6) {
+      set_[hexDigit] += lc;
+      set_[hexDigit] += uc;
+    }
     categoryTable_.setChar(lc, nameStartCategory);
     categoryTable_.setChar(uc, nameStartCategory);
     subst(lc, uc);
@@ -63,6 +67,7 @@ Syntax::Syntax(const Sd &sd)
   for (i = 0; i < 10; i++) {
     Char c = sd.execToInternal(digits[i]);
     set_[digit] += c;
+    set_[hexDigit] += c;
     set_[minimumData] += c;
     set_[significant] += c;
     categoryTable_.setChar(c, digitCategory);
@@ -73,6 +78,20 @@ Syntax::Syntax(const Sd &sd)
     set_[minimumData] += c;
     set_[significant] += c;
   }
+
+  if (sd.www()) {
+    static const char wwwSpecial[] = { 33, 35, 36, 37, 42, 59, 64, 95, 0 };
+    for (i = 0; wwwSpecial[i] != '\0'; i++) {
+      const CharsetInfo &charset = sd.internalCharset();
+      WideChar c;
+      ISet<WideChar> set;
+      if (charset.univToDesc(wwwSpecial[i], c, set) > 0 && c <= Char(-1)) {
+	set_[minimumData] += Char(c);
+	set_[significant] += c;
+      }
+    }
+  }
+
   for (i = 0; i < nQuantity; i++)
     quantity_[i] = referenceQuantity_[i];
   for (i = 0; i < 3; i++)
@@ -408,6 +427,24 @@ const StringC &Syntax::peroDelim() const
   return delimGeneral(dPERO);
 }
 
+Boolean Syntax::isHexDigit(Xchar c) const
+{
+  switch (categoryTable_[c]) {
+  case digitCategory:
+    return 1;
+  case nameStartCategory:
+    break;
+  default:
+    return 0;
+  }
+  return set_[hexDigit].contains(Char(c));
+}
+
+void Syntax::addEntity(const StringC &name, Char c)
+{
+  entityNames_.push_back(name);
+  entityChars_ += c;
+}
 
 #ifdef SP_NAMESPACE
 }

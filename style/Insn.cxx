@@ -83,8 +83,10 @@ void VM::trace(Collector &c) const
     for (ELObj **p = sbase; p != sp; p++)
       c.trace(*p);
   }
-  for (ControlStackEntry *p = csbase; p != csp; p++)
+  for (ControlStackEntry *p = csbase; p != csp; p++) {
     c.trace(p->protectClosure);
+    c.trace(p->continuation);
+  }
   c.trace(protectClosure);
 }
 
@@ -107,6 +109,7 @@ void VM::pushFrame(const Insn *next, int argsPushed)
   csp->next = next;
   csp->frameSize = sp - frame - argsPushed;
   csp->closureLoc = closureLoc;
+  csp->continuation = 0;
   csp++;
 }
 
@@ -114,11 +117,21 @@ const Insn *VM::popFrame()
 {
   ASSERT(csp > csbase);
   --csp;
+  if (csp->continuation)
+    csp->continuation->kill();
   closure = csp->closure;
   protectClosure = csp->protectClosure;
   frame = sp - csp->frameSize;
   closureLoc = csp->closureLoc;
   return csp->next;
+}
+
+void VM::setClosureArgToCC()
+{
+  ASSERT(nActualArgs == 1);
+  ContinuationObj *cc = (ContinuationObj *)sp[-1];
+  csp[-1].continuation = cc;
+  cc->set(sp - sbase, csp - csbase);
 }
 
 ELObj *VM::eval(const Insn *insn, ELObj **display, ELObj *arg)
@@ -292,7 +305,7 @@ CaseInsn::CaseInsn(ELObj *obj, InsnPtr match, InsnPtr fail)
 
 const Insn *CaseInsn::execute(VM &vm) const
 {
-  if (*vm.sp[-1] == *obj_) {
+  if (ELObj::eqv(*vm.sp[-1], *obj_)) {
     --vm.sp;
     return match_.pointer();
   }
@@ -529,7 +542,11 @@ FunctionObj *FunctionObj::asFunction()
 {
   return this;
 }
-  
+
+void FunctionObj::setArgToCC(VM &)
+{
+}
+
 const Insn *PrimitiveObj::call(VM &vm, const Location &loc,
 			       const Insn *next)
 {
@@ -646,6 +663,19 @@ const Insn *FunctionTailCallInsn::execute(VM &vm) const
   return function_->tailCall(vm, loc_, nCallerArgs_);
 }
 
+TestNullInsn::TestNullInsn(int offset, InsnPtr ifNull, InsnPtr ifNotNull)
+: offset_(offset), ifNull_(ifNull), ifNotNull_(ifNotNull)
+{
+}
+     
+const Insn *TestNullInsn::execute(VM &vm) const
+{
+  if (vm.sp[offset_] == 0)
+    return ifNull_.pointer();
+  else
+    return ifNotNull_.pointer();
+}
+
 VarargsInsn::VarargsInsn(const Signature &sig,
 			 Vector<InsnPtr> &entryPoints,
 			 const Location &loc)
@@ -670,7 +700,7 @@ const Insn *VarargsInsn::execute(VM &vm) const
       *vm.sp++ = protect;
     if (sig_->nKeyArgs) {
       for (int i = 0; i < sig_->nKeyArgs; i++)
-	vm.sp[i] = vm.interp->makeUnspecified();
+	vm.sp[i] = 0;
       ELObj *tem = protect;
       for (int i = n - (entryPoints_.size() - 2); i > 0; i -= 2) {
 	KeywordObj *k = ((PairObj *)tem)->car()->asKeyword();
@@ -678,7 +708,7 @@ const Insn *VarargsInsn::execute(VM &vm) const
 	if (k) {
 	  for (int j = 0; j < sig_->nKeyArgs; j++)
 	    if (sig_->keys[j] == k->identifier()) {
-	      if (vm.sp[j] == vm.interp->makeUnspecified())
+	      if (vm.sp[j] == 0)
 		vm.sp[j] = ((PairObj *)tem)->car();
 	      k = 0;
 	      break;
@@ -712,22 +742,6 @@ const Insn *SetKeyArgInsn::execute(VM &vm) const
   ELObj *val = *--vm.sp;
   vm.sp[offset_] = val;
   return next_.pointer();
-}
-
-TestUnspecifiedInsn::TestUnspecifiedInsn(int offset,
-					 InsnPtr ifUnspecified,
-					 InsnPtr ifNotUnspecified)
-: offset_(offset), ifUnspecified_(ifUnspecified),
-  ifNotUnspecified_(ifNotUnspecified)
-{
-}
-     
-const Insn *TestUnspecifiedInsn::execute(VM &vm) const
-{
-  if (vm.sp[offset_] == vm.interp->makeUnspecified())
-    return ifUnspecified_.pointer();
-  else
-    return ifNotUnspecified_.pointer();
 }
 
 ClosureObj::ClosureObj(const Signature *sig, InsnPtr code, ELObj **display)
@@ -767,12 +781,53 @@ const Insn *ClosureObj::tailCall(VM &vm, const Location &loc, int nCallerArgs)
   return code_.pointer();
 }
 
+void ClosureObj::setArgToCC(VM &vm)
+{
+  vm.setClosureArgToCC();
+}
+
 void ClosureObj::traceSubObjects(Collector &c) const
 {
   if (display_) {
     for (ELObj **p = display_; *p; p++)
       c.trace(*p);
   }
+}
+
+const Signature ContinuationObj::signature_ = { 1, 0, 0 };
+
+ContinuationObj::ContinuationObj()
+: FunctionObj(&signature_), controlStackSize_(0)
+{
+}
+
+const Insn *ContinuationObj::call(VM &vm, const Location &loc, const Insn *)
+{
+  if (!live() || readOnly()) {
+    vm.interp->setNextLocation(loc);
+    vm.interp->message(InterpreterMessages::continuationDead);
+    vm.sp = 0;
+    return 0;
+  }
+  ELObj *result = vm.sp[-1];
+  ASSERT(vm.sp - vm.sbase >= stackSize_);
+  ASSERT(vm.csp - vm.csbase >= controlStackSize_);
+  ASSERT(vm.csbase[controlStackSize_ - 1].continuation == this);
+  while (vm.csp - vm.csbase > controlStackSize_) {
+    vm.csp--;
+    if (vm.csp->continuation)
+      vm.csp->continuation->kill();
+  }
+  vm.sp = vm.sbase + stackSize_;
+  --vm.sp;
+  const Insn *next = vm.popFrame();
+  *vm.sp++ = result;
+  return next;
+}
+ 
+const Insn *ContinuationObj::tailCall(VM &vm, const Location &loc, int nCallerArgs)
+{
+  return call(vm, loc, 0);
 }
 
 ReturnInsn::ReturnInsn(int totalArgs)
@@ -852,6 +907,64 @@ const Insn *TopRefInsn::execute(VM &vm) const
   }
 }
 
+ClosureSetBoxInsn::ClosureSetBoxInsn(int index, const Location &loc, InsnPtr next)
+: index_(index), loc_(loc), next_(next)
+{
+}
+
+const Insn *ClosureSetBoxInsn::execute(VM &vm) const
+{
+  BoxObj *box = vm.closure[index_]->asBox();
+  ASSERT(box != 0);
+  if (box->readOnly()) {
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::readOnly);
+    vm.sp = 0;
+    return 0;
+  }
+  ELObj *tem = box->value;
+  box->value = vm.sp[-1];
+  vm.sp[-1] = tem;
+  return next_.pointer();
+}
+
+StackSetBoxInsn::StackSetBoxInsn(int index, int frameIndex, const Location &loc,
+				 InsnPtr next)
+: index_(index), frameIndex_(frameIndex), loc_(loc), next_(next)
+{
+}
+
+const Insn *StackSetBoxInsn::execute(VM &vm) const
+{
+  ASSERT(vm.sp - vm.frame == frameIndex_ - index_);
+  BoxObj *box = vm.sp[index_]->asBox();
+  ASSERT(box != 0);
+  if (box->readOnly()) {
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::readOnly);
+    vm.sp = 0;
+    return 0;
+  }
+  ELObj *tem = box->value;
+  box->value = vm.sp[-1];
+  vm.sp[-1] = tem;
+  return next_.pointer();
+}
+
+StackSetInsn::StackSetInsn(int index, int frameIndex, InsnPtr next)
+: index_(index), frameIndex_(frameIndex), next_(next)
+{
+}
+
+const Insn *StackSetInsn::execute(VM &vm) const
+{
+  ASSERT(vm.sp - vm.frame == frameIndex_ - index_);
+  ELObj *tem = vm.sp[index_];
+  vm.sp[index_] = vm.sp[-1];
+  vm.sp[-1] = tem;
+  return next_.pointer();
+}
+
 InsnPtr PopBindingsInsn::make(int n, InsnPtr next)
 {
   if (!next.isNull()) {
@@ -883,43 +996,51 @@ bool PopBindingsInsn::isPopBindings(int &n, InsnPtr &next) const
   return true;
 }
 
-MakeBoxesInsn::MakeBoxesInsn(int n, InsnPtr next)
+SetBoxInsn::SetBoxInsn(int n, InsnPtr next)
 : n_(n), next_(next)
 {
 }
 
-const Insn *MakeBoxesInsn::execute(VM &vm) const
+const Insn *SetBoxInsn::execute(VM &vm) const
 {
-  vm.needStack(n_);
-  for (int i = 0; i < n_; i++)
-    *vm.sp++ = new (*vm.interp) BoxObj;
+  --vm.sp;
+  BoxObj *box = vm.sp[-n_]->asBox();
+  ASSERT(box != 0);
+  box->value = *vm.sp;
   return next_.pointer();
 }
 
-SetBoxesInsn::SetBoxesInsn(int n, InsnPtr next)
+SetImmediateInsn::SetImmediateInsn(int n, InsnPtr next)
 : n_(n), next_(next)
 {
 }
 
-// On top of the stack there are n values, next n boxes.
-// Put the values in the boxes, and replace the boxes by the values.
-// Then pop the values.
-
-const Insn *SetBoxesInsn::execute(VM &vm) const
+const Insn *SetImmediateInsn::execute(VM &vm) const
 {
-  ELObj **boxes = vm.sp - n_ - n_;
-  ELObj **values = vm.sp - n_;
-  for (int i = 0; i < n_; i++) {
-    BoxObj *box = boxes[i]->asBox();
-    ASSERT(box != 0);
-    boxes[i] = box->value = values[i];
-  }
-  vm.sp -= n_;
+  --vm.sp;
+  vm.sp[-n_] = *vm.sp;
   return next_.pointer();
 }
 
-UnboxInsn::UnboxInsn(const Identifier *ident, const Location &loc, InsnPtr next)
+CheckInitInsn::CheckInitInsn(const Identifier *ident, const Location &loc, InsnPtr next)
 : ident_(ident), loc_(loc), next_(next)
+{
+}
+
+const Insn *CheckInitInsn::execute(VM &vm) const
+{
+  if (vm.sp[-1] == 0) {
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::uninitializedVariableReference,
+                       StringMessageArg(ident_->name()));
+    vm.sp = 0;
+    return 0;
+  }
+  return next_.pointer();
+}
+
+UnboxInsn::UnboxInsn(InsnPtr next)
+: next_(next)
 {
 }
 
@@ -927,14 +1048,82 @@ const Insn *UnboxInsn::execute(VM &vm) const
 {
   BoxObj *box = vm.sp[-1]->asBox();
   ASSERT(box != 0);
-  if (!box->value) {
-    vm.interp->setNextLocation(loc_);
-    vm.interp->message(InterpreterMessages::undefinedVariableReference,
-                       StringMessageArg(ident_->name()));
-    vm.sp = 0;
-    return 0;
-  }
   vm.sp[-1] = box->value;
+  return next_.pointer();
+}
+
+BoxInsn::BoxInsn(InsnPtr next)
+: next_(next)
+{
+}
+
+const Insn *BoxInsn::execute(VM &vm) const
+{
+  vm.sp[-1] = new (*vm.interp) BoxObj(vm.sp[-1]);
+  return next_.pointer();
+}
+
+BoxArgInsn::BoxArgInsn(int n, InsnPtr next)
+: n_(n), next_(next)
+{
+}
+
+const Insn *BoxArgInsn::execute(VM &vm) const
+{
+  ELObj *&arg = vm.sp[n_ - vm.nActualArgs];
+  arg = new (*vm.interp) BoxObj(arg);
+  return next_.pointer();
+}
+
+BoxStackInsn::BoxStackInsn(int n, InsnPtr next)
+: n_(n), next_(next)
+{
+}
+
+const Insn *BoxStackInsn::execute(VM &vm) const
+{
+  vm.sp[n_] = new (*vm.interp) BoxObj(vm.sp[n_]);
+  return next_.pointer();
+}
+
+VectorInsn::VectorInsn(size_t n, InsnPtr next)
+: n_(n), next_(next)
+{
+}
+
+const Insn *VectorInsn::execute(VM &vm) const
+{
+  if (n_ == 0) {
+    vm.needStack(1);
+    *vm.sp++ = new (*vm.interp) VectorObj;
+  }
+  else {
+    Vector<ELObj *> v(n_);
+    ELObj **p = vm.sp;
+    for (size_t n = n_; n > 0; n--)
+      v[n - 1] = *--p;
+    *p = new (*vm.interp) VectorObj(v);
+    vm.sp = p + 1;
+  }
+  return next_.pointer();
+}
+
+ListToVectorInsn::ListToVectorInsn(InsnPtr next)
+: next_(next)
+{
+}
+
+const Insn *ListToVectorInsn::execute(VM &vm) const
+{
+  Vector<ELObj *> v;
+  ELObj *obj = vm.sp[-1];
+  while (!obj->isNil()) {
+    PairObj *pair = obj->asPair();
+    ASSERT(pair != 0);
+    v.push_back(pair->car());
+    obj = pair->cdr();
+  }
+  vm.sp[-1] = new (*vm.interp) VectorObj(v);
   return next_.pointer();
 }
 
@@ -1015,6 +1204,7 @@ const Insn *VarStyleInsn::execute(VM &vm) const
     use = 0;
   *tem++ = new (*vm.interp) VarStyleObj(styleSpec_, use, display, vm.currentNode);
   vm.sp = tem;
+  vm.interp->makeReadOnly(tem[-1]);
   return next_.pointer();
 }
 
@@ -1113,13 +1303,19 @@ const Insn *SetContentInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
-SetDefaultContentInsn::SetDefaultContentInsn(const CompoundFlowObj *flowObj, InsnPtr next)
-: flowObj_(flowObj), next_(next)
+SetDefaultContentInsn::SetDefaultContentInsn(const CompoundFlowObj *flowObj, const Location &loc, InsnPtr next)
+: flowObj_(flowObj), next_(next), loc_(loc)
 {
 }
 
 const Insn *SetDefaultContentInsn::execute(VM &vm) const
 {
+  if (!vm.processingMode) {
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::noCurrentProcessingMode);
+    vm.sp = 0;
+    return 0;
+  }
   vm.needStack(1);
   *vm.sp++ = flowObj_->copy(*vm.interp);
   ((CompoundFlowObj *)vm.sp[-1])
@@ -1127,13 +1323,19 @@ const Insn *SetDefaultContentInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
-MakeDefaultContentInsn::MakeDefaultContentInsn(InsnPtr next)
-: next_(next)
+MakeDefaultContentInsn::MakeDefaultContentInsn(const Location &loc, InsnPtr next)
+: next_(next), loc_(loc)
 {
 }
 
 const Insn *MakeDefaultContentInsn::execute(VM &vm) const
 {
+  if (!vm.processingMode) {
+    vm.interp->setNextLocation(loc_);
+    vm.interp->message(InterpreterMessages::noCurrentProcessingMode);
+    vm.sp = 0;
+    return 0;
+  }
   vm.needStack(1);
   *vm.sp++ = new (*vm.interp) ProcessChildrenSosofoObj(vm.processingMode);
   return next_.pointer();
@@ -1178,6 +1380,12 @@ BoxObj::BoxObj()
   hasSubObjects_ = 1;
 }
 
+BoxObj::BoxObj(ELObj *obj)
+: value(obj)
+{
+  hasSubObjects_ = 1;
+}
+
 BoxObj *BoxObj::asBox()
 {
   return this;
@@ -1188,7 +1396,54 @@ void BoxObj::traceSubObjects(Collector &c) const
   c.trace(value);
 }
 
+CallWithCurrentContinuationPrimitiveObj::CallWithCurrentContinuationPrimitiveObj()
+: FunctionObj(&signature_)
+{
+}
+
+const Insn *CallWithCurrentContinuationPrimitiveObj::call(VM &vm, const Location &loc,
+							  const Insn *next)
+{
+  FunctionObj *f = vm.sp[-1]->asFunction();
+  if (!f) {
+    vm.interp->setNextLocation(loc);
+    vm.interp->message(InterpreterMessages::notAProcedure,
+		       StringMessageArg(Interpreter::makeStringC("call-with-current-continuation")),
+		       OrdinalMessageArg(1),
+		       ELObjMessageArg(vm.sp[-1], *vm.interp));
+    vm.sp = 0;
+    return 0;
+  }
+  ELObjDynamicRoot protect(*vm.interp, f);
+  vm.sp[-1] = new (*vm.interp) ContinuationObj;
+  const Insn *insn = f->call(vm, loc, next);
+  f->setArgToCC(vm);
+  return insn;
+}
+
+
+const Insn *CallWithCurrentContinuationPrimitiveObj::tailCall(VM &vm, const Location &loc,
+							      int nCallerArgs)
+{
+  FunctionObj *f = vm.sp[-1]->asFunction();
+  if (!f) {
+    vm.interp->setNextLocation(loc);
+    vm.interp->message(InterpreterMessages::notAProcedure,
+		       StringMessageArg(Interpreter::makeStringC("call-with-current-continuation")),
+		       OrdinalMessageArg(1),
+		       ELObjMessageArg(vm.sp[-1], *vm.interp));
+    vm.sp = 0;
+    return 0;
+  }
+  ELObjDynamicRoot protect(*vm.interp, f);
+  vm.sp[-1] = new (*vm.interp) ContinuationObj;
+  const Insn *insn = f->tailCall(vm, loc, nCallerArgs);
+  f->setArgToCC(vm);
+  return insn;
+}
+
+const Signature CallWithCurrentContinuationPrimitiveObj::signature_ = { 1, 0, 0 };
+
 #ifdef DSSSL_NAMESPACE
 }
 #endif
-

@@ -206,6 +206,7 @@ public:
     DisplayNIC();
     DisplaySpace spaceBefore;
     DisplaySpace spaceAfter;
+    Symbol positionPreference;
     Symbol keep;
     Symbol breakBefore;
     Symbol breakAfter;
@@ -599,7 +600,6 @@ public:
   virtual void setBorderAlignment(Symbol);
   virtual void setSidelineSide(Symbol);
   virtual void setHyphenationKeep(Symbol);
-  virtual void setPositionPreference(Symbol);
   virtual void setFontStructure(Symbol);
   virtual void setFontProportionateWidth(Symbol);
   virtual void setCellCrossed(Symbol);
@@ -645,19 +645,7 @@ public:
   virtual void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
   // Backlinks
   // processingMode is empty for initial processing mode.
-  enum RuleType {
-    ruleNone,
-    ruleRoot,
-    ruleDefault,
-    ruleQuery,
-    ruleId,
-    ruleElement1,		// an element rule with 1 GI
-    ruleElement2,		// an element rule with 2 GI
-    ruleElement3,		// an element rule with 3 GIs
-    ruleElement30000 = ruleElement1 + 29999
-    };
-  virtual void startNode(const NodePtr &, const StringC &processingMode,
-			 RuleType ruleType);
+  virtual void startNode(const NodePtr &, const StringC &processingMode);
   virtual void endNode();
   virtual void currentNodePageNumber(const NodePtr &);
 
@@ -712,8 +700,7 @@ public:
 class STYLE_API SaveFOTBuilder : public Link, public FOTBuilder {
 public:
   SaveFOTBuilder();
-  SaveFOTBuilder(const NodePtr &, const StringC &processingMode,
-		 RuleType ruleType);
+  SaveFOTBuilder(const NodePtr &, const StringC &processingMode);
  ~SaveFOTBuilder();
   SaveFOTBuilder *asSaveFOTBuilder();
   void emit(FOTBuilder &);
@@ -913,7 +900,6 @@ public:
   void setBorderAlignment(Symbol);
   void setSidelineSide(Symbol);
   void setHyphenationKeep(Symbol);
-  void setPositionPreference(Symbol);
   void setFontStructure(Symbol);
   void setFontProportionateWidth(Symbol);
   void setCellCrossed(Symbol);
@@ -944,7 +930,7 @@ public:
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
-  void startNode(const NodePtr &, const StringC &processingMode, RuleType);
+  void startNode(const NodePtr &, const StringC &processingMode);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
   void extensionSet(void (FOTBuilder::*)(bool), bool);
@@ -1093,11 +1079,10 @@ private:
     CharacterNIC arg;
   };
   struct StartNodeCall : Call {
-    StartNodeCall(const NodePtr &, const StringC &, RuleType);
+    StartNodeCall(const NodePtr &, const StringC &);
     void emit(FOTBuilder &);
     NodePtr node;
     StringC mode;
-    RuleType rule;
   };
   struct StartParagraphCall : Call {
     StartParagraphCall(const ParagraphNIC &nic);
@@ -1196,7 +1181,6 @@ private:
   Call **tail_;
   NodePtr currentNode_;
   StringC processingMode_;
-  RuleType ruleType_;
 };
 
 // Would like to make this a member of SaveFOTBuilder, but can't because

@@ -9,6 +9,7 @@
 #include "FOTBuilder.h"
 #include "Owner.h"
 #include "CopyOwner.h"
+#include "Insn.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -112,6 +113,7 @@ public:
   virtual FlowObj *copy(Collector &) const = 0;
   virtual CompoundFlowObj *asCompoundFlowObj();
   virtual bool hasNonInheritedC(const Identifier *) const;
+  virtual bool hasPseudoNonInheritedC(const Identifier *) const;
   virtual void setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &);
   void traceSubObjects(Collector &) const;
   void setStyle(StyleObj *);
@@ -135,6 +137,8 @@ public:
   void traceSubObjects(Collector &) const;
   void setContent(SosofoObj *content) { content_ = content; }
   CompoundFlowObj *asCompoundFlowObj();
+protected:
+  SosofoObj *content() const;
 private:
   SosofoObj *content_;
 };
@@ -246,6 +250,12 @@ inline
 void AppendSosofoObj::append(SosofoObj *obj)
 {
   v_.push_back(obj);
+}
+
+inline
+SosofoObj *CompoundFlowObj::content() const
+{
+  return content_;
 }
 
 #ifdef DSSSL_NAMESPACE

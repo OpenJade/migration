@@ -114,6 +114,17 @@ int CharsetInfo::digitWeight(Char c) const
   return -1;
 }
 
+int CharsetInfo::hexDigitWeight(Char c) const
+{
+  for (int i = 0; i < 10; i++)
+    if (c == execToDesc('0' + i))
+      return i;
+  for (int i = 0; i < 6; i++)
+    if (c == execToDesc('a' + i) || c == execToDesc('A' + i))
+      return i + 10;
+  return -1;
+}
+
 StringC CharsetInfo::execToDesc(const char *s) const
 {
   StringC result;

@@ -133,9 +133,12 @@ void ExternalEntity::generateSystemId(ParserState &parser)
 				    parser.messenger(),
 				    str))
     externalId_.setEffectiveSystem(str);
-  else if (externalId_.publicIdString())
-    parser.message(ParserMessages::cannotGenerateSystemIdPublic,
-		   StringMessageArg(*externalId_.publicIdString()));
+  // Don't generate warning when declType == sgml.
+  else if (externalId_.publicIdString()) {
+    if (declType() != sgml)
+      parser.message(ParserMessages::cannotGenerateSystemIdPublic,
+		     StringMessageArg(*externalId_.publicIdString()));
+  }
   else {
     switch (declType()) {
     case generalEntity:
@@ -153,6 +156,8 @@ void ExternalEntity::generateSystemId(ParserState &parser)
     case linktype:
       parser.message(ParserMessages::cannotGenerateSystemIdLinktype,
 		     StringMessageArg(name()));
+      break;
+    case sgml:
       break;
     default:
       CANNOT_HAPPEN();

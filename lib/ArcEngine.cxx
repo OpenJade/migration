@@ -23,10 +23,6 @@
 namespace SP_NAMESPACE {
 #endif
 
-static const char notationSetArchPublicId[]
- = "ISO/IEC 10744//NOTATION AFDR ARCBASE \
-Notation Set Architecture Definition Document//EN";
-
 static const size_t sizes[] = {
   sizeof(StartElementEvent),
   sizeof(EndElementEvent),
@@ -117,6 +113,7 @@ private:
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> syntax_;
   StringC arcBase_;
+  StringC is10744_;
   int stage_;
   QueueEventHandler eventQueue_;
   NullEventHandler nullHandler_;
@@ -213,15 +210,24 @@ void ArcEngineImpl::pi(PiEvent *event)
   currentLocation_ = event->location();
   if (stage_ == 1
       && arcBase_.size()
-      && event->dataLength() > arcBase_.size()) {
+      && event->dataLength() > is10744_.size() + 1) {
     Boolean match = 1;
-    for (size_t i = 0; i < arcBase_.size() && match; i++)
-      if ((*syntax_->generalSubstTable())[event->data()[i]] != arcBase_[i])
+    size_t i = 0;
+    for (size_t j = 0; j < is10744_.size() && match; i++, j++)
+      if ((*syntax_->generalSubstTable())[event->data()[i]] != is10744_[j])
 	match = 0;
-    if (!syntax_->isS(event->data()[arcBase_.size()]))
+    if (!syntax_->isS(event->data()[i]))
+      match = 0;
+    do {
+      i++;
+    } while (i < event->dataLength() && syntax_->isS(event->data()[i]));
+    for (size_t j = 0; j < arcBase_.size() && match; i++, j++)
+      if (i >= event->dataLength()
+          || (*syntax_->generalSubstTable())[event->data()[i]] != arcBase_[j])
+	match = 0;
+    if (i >= event->dataLength() || !syntax_->isS(event->data()[i]))
       match = 0;
     if (match) {
-      size_t i = arcBase_.size();
       size_t dataLength = event->dataLength();
       const Char *data = event->data();
       for (;;) {
@@ -293,6 +299,7 @@ void ArcEngineImpl::sgmlDecl(SgmlDeclEvent *event)
   syntax_ = event->instanceSyntaxPointer();
   arcBase_ = sd_->execToInternal("ArcBase");
   syntax_->generalSubstTable()->subst(arcBase_);
+  is10744_ = sd_->execToInternal("IS10744");
   Boolean atStart = 1;
   for (size_t i = 0; i < appinfo_.size(); i++)
     if (syntax_->isS(appinfo_[i]))
@@ -311,6 +318,15 @@ void ArcEngineImpl::sgmlDecl(SgmlDeclEvent *event)
 	    if (syntax_->isS(appinfo_[j]))
 	      break;
 	    arcBase_ += appinfo_[j];
+	  }
+	  // Allow quotes around replacement name.
+	  if (arcBase_.size() > 2
+	      && (arcBase_[0] == sd_->execToInternal('"')
+	          || arcBase_[0] == sd_->execToInternal('\''))
+	      && arcBase_[arcBase_.size() - 1] == arcBase_[0]) {
+	    for (size_t j = 0; j < arcBase_.size() - 2; j++)
+	      arcBase_[j] =  arcBase_[j + 1];
+	    arcBase_.resize(arcBase_.size() - 2);
 	  }
 	  syntax_->generalSubstTable()->subst(arcBase_);
 	  break;
@@ -520,7 +536,7 @@ void ArcEngineImpl::initMessage(Message &msg)
 }
 
 ArcProcessor::ArcProcessor()
-: errorIdref_(1), notationSetArch_(0), docHandler_(0), arcAuto_(1),
+: errorIdref_(1), docHandler_(0), arcAuto_(1),
   arcDtdIsParam_(0)
 {
 }
@@ -547,21 +563,19 @@ ConstPtr<Entity> ArcProcessor::getAttributeEntity(const StringC &name,
 						  const Location &)
 {
   // FIXME What about default entity
-  if (!notationSetArch_ && !metaDtd_.isNull())
+  if (!metaDtd_.isNull())
     return metaDtd_->lookupEntity(0, name);
   return 0;
 }
 
 void ArcProcessor::noteCurrentAttribute(size_t i, AttributeValue *value)
 {
-  if (valid_ && !notationSetArch_)
+  if (valid_)
     currentAttributes_[i] = value;
 }
 
 ConstPtr<AttributeValue> ArcProcessor::getCurrentAttribute(size_t i) const
 {
-  if (notationSetArch_)
-    return 0;
   return currentAttributes_[i];
 }
 
@@ -636,28 +650,15 @@ void ArcProcessor::init(const EndPrologEvent &event,
   Vector<StringC> docName(superName);
   docName.push_back(name_);
   ConstPtr<Notation> notation;
-  if (name_ == docSyntax_->rniReservedName(Syntax::rNOTATION)) {
-    notationSetArch_ = 1;
-    supportAtts_[rArcNamrA] = docSd_->execToInternal("NOTNAMES");
-    supportAtts_[rArcSuprA] = docSd_->execToInternal("NOTSUPR");
+  notation = docDtd_->lookupNotation(name_);
+  if (!notation.isNull()) {
+    ConstPtr<AttributeDefinitionList> notAttDef = notation->attributeDef();
+    attributeList_.init(notAttDef);
+    attributeList_.finish(*this);
+    supportAttributes(attributeList_);
   }
-  else {
-    notation = docDtd_->lookupNotation(name_);
-    if (!notation.isNull()) {
-      ConstPtr<AttributeDefinitionList> notAttDef = notation->attributeDef();
-      attributeList_.init(notAttDef);
-      attributeList_.finish(*this);
-      supportAttributes(attributeList_);
-      // FIXME make sure locations in error messages are right
-      if (notation->externalId().publicIdString()
-	  && (*notation->externalId().publicIdString()
-	      == docSd_->execToInternal(notationSetArchPublicId))) {
-	notationSetArch_ = 1;
-      }
-    }
-    else
-      message(ArcEngineMessages::noArcNotation, StringMessageArg(name_));
-  }
+  else
+    message(ArcEngineMessages::noArcNotation, StringMessageArg(name_));
   ArcEngineImpl *engine
     = new ArcEngineImpl(*mgr, parentParser, director, cancelPtr,
 			notation.pointer(),
@@ -665,10 +666,6 @@ void ArcProcessor::init(const EndPrologEvent &event,
 			docSyntax_->generalSubstTable());
   docHandler_ = engine;
   ownEventHandler_ = engine;
-  if (notationSetArch_) {
-    initNotationSet(event.location());
-    return;
-  }
   if (supportAtts_[rArcDocF].size() == 0)
     supportAtts_[rArcDocF] = name_;
   if (supportAtts_[rArcFormA].size() == 0)
@@ -709,6 +706,11 @@ void ArcProcessor::init(const EndPrologEvent &event,
   options.includes = arcOpts_;
   params.options = &options;
   params.sd = docSd_;
+  if (metaSyntax_->reservedName(Syntax::rALL).size() == 0) {
+    Ptr<Syntax> tem(new Syntax(*metaSyntax_));
+    tem->setName(Syntax::rALL, docSd_->execToInternal("ALL"));
+    metaSyntax_ = tem;
+  }
   params.prologSyntax = metaSyntax_;
   params.instanceSyntax = metaSyntax_;
   params.doctypeName = dtdent->name();
@@ -728,41 +730,6 @@ void ArcProcessor::init(const EndPrologEvent &event,
   docHandler_->endProlog(new EndPrologEvent(metaDtd_, event.location()));
   if (engine->nBases() == 0)
     docHandler_ = engine->delegateHandler();
-}
-
-void ArcProcessor::initNotationSet(const Location &loc)
-{
-  StringC name(docSyntax_->rniReservedName(Syntax::rNOTATION));
-  Ptr<Dtd> notDtd(new Dtd(name, 1));
-  metaDtd_ = notDtd;
-  ConstPtr<ElementDefinition> def
-    = new ElementDefinition(loc,
-			    notDtd->allocElementDefinitionIndex(),
-			    0,
-			    ElementDefinition::any);
-  notDtd->lookupElementType(name)->setElementDefinition(def, 0);
-  Dtd::ConstNotationIter iter(docDtd_->notationIter());
-  for (size_t i = 1;; i++) {
-    const Notation *notation = iter.next().pointer();
-    if (!notation)
-      break;
-    ElementType *e = new ElementType(notation->name(),
-				     notDtd->nElementTypeIndex());
-    notDtd->insertElementType(e);
-    e->setElementDefinition(def, i);
-    if (!notation->attributeDef().isNull()) {
-      Vector<CopyOwner<AttributeDefinition> >
-	attdefs(notation->attributeDef()->size());
-      for (size_t i = 0; i < attdefs.size(); i++)
-	attdefs[i] = notation->attributeDef()->def(i)->copy();
-      e->setAttributeDef(new AttributeDefinitionList(attdefs,
-						     notDtd->allocAttributeDefinitionListIndex()));
-    }
-  }
-  docHandler_->endProlog(new EndPrologEvent(metaDtd_, loc));
-  metaMapCache_.resize(docDtd_->nElementTypeIndex());
-  startContent(*notDtd);
-  valid_ = 1;
 }
 
 void ArcProcessor::mungeMetaDtd(Dtd &metaDtd, const Dtd &docDtd)
@@ -1084,9 +1051,8 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
       return 1;
     }
     metaType = metaDtd_->documentElementType();
-    if (!notationSetArch_)
-      mgr_->message(ArcEngineMessages::documentElementNotArc,
-		    StringMessageArg(metaType->name()));
+    mgr_->message(ArcEngineMessages::documentElementNotArc,
+		  StringMessageArg(metaType->name()));
     attributeList_.init(metaType->attributeDef());
     attributeList_.finish(*this);
   }
@@ -1103,12 +1069,7 @@ Boolean ArcProcessor::processStartElement(const StartElementEvent &event,
 					&attributeList_,
 					event.location(),
 					0);
-  if (notationSetArch_) {
-    if (tagLevel() == 0
-	&& !currentElement().isFinished())
-      currentElement().tryTransition(metaDtd_->documentElementType());
-  }
-  else if (metaType->definition()->undefined())
+  if (metaType->definition()->undefined())
     Messenger::message(ArcEngineMessages::undefinedElement,
 		       StringMessageArg(metaType->name()));
   else if (elementIsExcluded(metaType))
@@ -1185,10 +1146,8 @@ Boolean ArcProcessor::processData()
   if (openElementFlags_.size() > 0
       && (openElementFlags_.back() & ignoreData))
     return 0;
-  if (notationSetArch_)
-    return currentElement().type() != metaDtd_->documentElementType();
-  else if (!currentElement().declaredEmpty()
-	   && currentElement().tryTransitionPcdata())
+  if (!currentElement().declaredEmpty()
+      && currentElement().tryTransitionPcdata())
     return 1;
   else if (openElementFlags_.size() > 0
 	   && (openElementFlags_.back() & condIgnoreData))
@@ -1324,11 +1283,9 @@ ArcProcessor::buildMetaMap(const ElementType *docElementType,
   // Handle ArcForm.
   unsigned arcFormIndex;
   const Attributed *metaAttributed
-    = (notationSetArch_
-       ? considerNotation(atts, suppressFlags, inhibitCache, arcFormIndex)
-       : considerForm(atts, linkAtts, *nameP, isNotation,
-		      suppressFlags, newSuppressFlags,
-		      inhibitCache, arcFormIndex));
+    = considerForm(atts, linkAtts, *nameP, isNotation,
+		   suppressFlags, newSuppressFlags,
+		   inhibitCache, arcFormIndex);
   // See if there's a renamer that will inhibit cacheing.
   unsigned arcNamerIndex;
   const Text *namerText;
@@ -1474,30 +1431,6 @@ void ArcProcessor::considerIgnD(const AttributeList &atts,
     Messenger::message(ArcEngineMessages::invalidIgnD,
 		       StringMessageArg(token));
   }
-}
-
-const Attributed *
-ArcProcessor::considerNotation(const AttributeList &atts,
-			       unsigned thisSuppressFlags,
-			       Boolean &inhibitCache,
-			       unsigned &notAttIndex)
-{
-  if (thisSuppressFlags & suppressForm)
-    return 0;
-  for (unsigned i = 0; i < atts.size(); i++) {
-    const AttributeSemantics *sem = atts.semantics(i);
-    if (sem) {
-      ConstPtr<Notation> notation = sem->notation();
-      if (!notation.isNull()) {
-	notAttIndex = i;
-	if (atts.current(notAttIndex) || atts.specified(notAttIndex))
-	  inhibitCache = 1;
-	return metaDtd_->lookupElementType(notation->name());
-      }
-    }
-  }
-  notAttIndex = invalidAtt;
-  return 0;
 }
 
 const Attributed *

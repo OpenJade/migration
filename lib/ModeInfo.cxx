@@ -19,10 +19,12 @@
 namespace SP_NAMESPACE {
 #endif
 
-const unsigned REQUIRE_SHORTTAG = 1;
-const unsigned REQUIRE_CONCUR = 2;
-const unsigned REQUIRE_LINK_OR_CONCUR = 4;
-const unsigned REQUIRE_FLAGS = 7;
+const unsigned REQUIRE_EMPTY_STARTTAG = 01;
+const unsigned REQUIRE_EMPTY_ENDTAG = 02;
+const unsigned REQUIRE_CONCUR = 04;
+const unsigned REQUIRE_LINK_OR_CONCUR = 010;
+const unsigned REQUIRE_NOT_KEEPRSRE = 020;
+const unsigned REQUIRE_FLAGS = 037;
 
 #define ULONG_BIT (CHAR_BIT * sizeof(unsigned long))
 
@@ -76,7 +78,7 @@ static PackedTokenInfo tokenTable[] = {
   { tokenEtagoNameStart, 0, { Syntax::dETAGO, SET + Syntax::nameStart },
     { econMode, mconMode, cconMode, rcconMode,
       econnetMode, mconnetMode, cconnetMode, rcconnetMode, EOM }},
-  { tokenEtagoTagc, REQUIRE_SHORTTAG, { Syntax::dETAGO, Syntax::dTAGC },
+  { tokenEtagoTagc, REQUIRE_EMPTY_ENDTAG, { Syntax::dETAGO, Syntax::dTAGC },
     { econMode, mconMode, cconMode, rcconMode,
       econnetMode, mconnetMode, cconnetMode, rcconnetMode, EOM }},
   { tokenEtagoGrpo, REQUIRE_CONCUR, { Syntax::dETAGO, Syntax::dGRPO },
@@ -85,11 +87,16 @@ static PackedTokenInfo tokenTable[] = {
   { tokenGrpc, 0, { Syntax::dGRPC, NOTHING }, { grpMode, EOM }},
   { tokenGrpo, 0, { Syntax::dGRPO, NOTHING },
     { mdMode, mdMinusMode, grpMode, EOM }},
+  { tokenHcroHexDigit, 0, { Syntax::dHCRO, SET + Syntax::hexDigit },
+    { econMode, mconMode, rcconMode, econnetMode, mconnetMode, rcconnetMode,
+      rcconeMode, plitMode, plitaMode, pliteMode,
+      alitMode, alitaMode, aliteMode,
+      talitMode, talitaMode, taliteMode, rcmsMode, EOM }},
   { tokenLit, 0, { Syntax::dLIT, NOTHING },
-    { alitMode, talitMode, plitMode, sdplitMode, mlitMode, slitMode,
+    { alitMode, talitMode, plitMode, sdplitMode, mlitMode, slitMode, sdslitMode,
       asMode, tagMode, mdMode, sdMode, grpMode, EOM }},
   { tokenLita, 0, { Syntax::dLITA, NOTHING },
-    { alitaMode, talitaMode, plitaMode, sdplitaMode, mlitaMode, slitaMode,
+    { alitaMode, talitaMode, plitaMode, sdplitaMode, mlitaMode, slitaMode, sdslitaMode,
       asMode, tagMode, mdMode, sdMode, grpMode, EOM }},
   { tokenMdc, 0, { Syntax::dMDC, NOTHING }, { mdMode, sdMode, EOM }},
   { tokenMdoNameStart, 0, { Syntax::dMDO, SET + Syntax::nameStart },
@@ -109,8 +116,9 @@ static PackedTokenInfo tokenTable[] = {
   { tokenMscMdc, 0, { Syntax::dMSC, Syntax::dMDC},
     { imsMode, cmsMode, rcmsMode,
       econMode, mconMode, econnetMode, mconnetMode, dsMode, dsiMode, EOM }},
+  { tokenNestc, 0, { Syntax::dNESTC, NOTHING }, { tagMode, EOM }},
   { tokenNet, 0, { Syntax::dNET, NOTHING },
-    { econnetMode, mconnetMode, cconnetMode, rcconnetMode, tagMode, EOM }},
+    { econnetMode, mconnetMode, cconnetMode, rcconnetMode, EOM }},
   { tokenOpt, 0, { Syntax::dOPT, NOTHING }, { grpMode, grpsufMode, EOM }},
   { tokenOr, 0, { Syntax::dOR, NOTHING }, { grpMode, EOM }},
   { tokenPero, 0, { Syntax::dPERO, NOTHING }, { mdPeroMode, EOM }},
@@ -134,25 +142,28 @@ static PackedTokenInfo tokenTable[] = {
   { tokenStago, 0, { Syntax::dSTAGO, NOTHING }, { tagMode, EOM }},
   { tokenStagoNameStart, 0, { Syntax::dSTAGO, SET + Syntax::nameStart },
     { econMode, mconMode, econnetMode, mconnetMode, EOM }},
-  { tokenStagoTagc, REQUIRE_SHORTTAG, { Syntax::dSTAGO, Syntax::dTAGC },
+  { tokenStagoTagc, REQUIRE_EMPTY_STARTTAG, { Syntax::dSTAGO, Syntax::dTAGC },
     { econMode, mconMode, econnetMode, mconnetMode, EOM }},
   { tokenStagoGrpo, REQUIRE_CONCUR, { Syntax::dSTAGO, Syntax::dGRPO },
     { econMode, mconMode, econnetMode, mconnetMode, EOM }},
   { tokenTagc, 0, { Syntax::dTAGC, NOTHING }, { tagMode, EOM }},
   { tokenVi, 0, { Syntax::dVI, NOTHING }, { tagMode, asMode, EOM }},
   // Other tokens
-  { tokenRe, 0, { FUNCTION + Syntax::fRE, NOTHING },
+  { tokenRe, REQUIRE_NOT_KEEPRSRE, { FUNCTION + Syntax::fRE, NOTHING },
     { mconMode, cconMode, rcconMode,
       mconnetMode, cconnetMode, rcconnetMode,
-      rcconeMode, cmsMode, rcmsMode, refMode,
+      rcconeMode, cmsMode, rcmsMode, EOM }},
+  { tokenRe, 0, { FUNCTION + Syntax::fRE, NOTHING },
+    { refMode,
       mlitMode, mlitaMode, alitMode, alitaMode, aliteMode,
       talitMode, talitaMode, taliteMode,
       EOM }},
-  { tokenRs, 0, { FUNCTION + Syntax::fRS, NOTHING },
+  { tokenRs, REQUIRE_NOT_KEEPRSRE, { FUNCTION + Syntax::fRS, NOTHING },
     { mconMode, cconMode, rcconMode,
       mconnetMode, cconnetMode, rcconnetMode,
-      rcconeMode, cmsMode, rcmsMode,
-      mlitMode, mlitaMode, alitMode, alitaMode, aliteMode,
+      rcconeMode, cmsMode, rcmsMode, EOM }},
+  { tokenRs, 0, { FUNCTION + Syntax::fRS, NOTHING },
+    { mlitMode, mlitaMode, alitMode, alitaMode, aliteMode,
       talitMode, talitaMode, taliteMode,
       EOM }},
   { tokenSpace, 0, { FUNCTION + Syntax::fSPACE, NOTHING },
@@ -186,7 +197,7 @@ static PackedTokenInfo tokenTable[] = {
   { tokenChar, 0, { SET + Syntax::minimumData, NOTHING },
     { mlitMode, mlitaMode, EOM }},
   { tokenChar, 0, { SET + Syntax::significant, NOTHING },
-    { sdplitMode, sdplitaMode, sdcomMode, EOM }},
+    { sdplitMode, sdplitaMode, sdslitMode, sdslitaMode, sdcomMode, EOM }},
 };
 
 inline Boolean PackedTokenInfo::inMode(Mode mode) const
@@ -218,12 +229,16 @@ ModeInfo::ModeInfo(Mode mode, const Sd &sd)
 : mode_(mode), p_(tokenTable), count_(SIZEOF(tokenTable)),
   missingRequirements_(REQUIRE_FLAGS)
 {
-  if (sd.shorttag())
-    missingRequirements_ &= ~REQUIRE_SHORTTAG;
+  if (sd.startTagEmpty())
+    missingRequirements_ &= ~REQUIRE_EMPTY_STARTTAG;
+  if (sd.endTagEmpty())
+    missingRequirements_ &= ~REQUIRE_EMPTY_ENDTAG;
   if (sd.concur())
     missingRequirements_ &= ~(REQUIRE_CONCUR|REQUIRE_LINK_OR_CONCUR);
   if (sd.link())
     missingRequirements_ &= ~REQUIRE_LINK_OR_CONCUR;
+  if (!sd.keeprsre())
+    missingRequirements_ &= ~REQUIRE_NOT_KEEPRSRE;
 }
   
 Boolean ModeInfo::nextToken(TokenInfo *t)

@@ -32,7 +32,6 @@ public:
   BoolInheritedC(const Identifier *, unsigned index, bool);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, bool &) const;
   bool value_;
 };
 
@@ -49,27 +48,11 @@ ELObj *BoolInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) cons
     return vm.interp->makeFalse();
 }
 
-bool BoolInheritedC::convert(ELObj *obj, const Location &loc,
-			     Interpreter &interp, bool &b) const
-{
-  if (obj == interp.makeTrue()) {
-    b = 1;
-    return 1;
-  }
-  if (obj == interp.makeFalse()) {
-    b = 0;
-    return 1;
-  }
-  invalidValue(loc, interp);
-  return 0;
-}
-
 class IntegerInheritedC : public InheritedC {
 public:
   IntegerInheritedC(const Identifier *, unsigned index, long);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, long &) const;
   long n_;
 };
 
@@ -83,21 +66,11 @@ ELObj *IntegerInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) c
   return vm.interp->makeInteger(n_);
 }
 
-bool IntegerInheritedC::convert(ELObj *obj, const Location &loc,
-			       Interpreter &interp, long &n) const
-{
-  if (obj->exactIntegerValue(n))
-    return 1;
-  invalidValue(loc, interp);
-  return 0;
-}
-
 class LengthInheritedC : public InheritedC {
 public:
   LengthInheritedC(const Identifier *, unsigned index, FOTBuilder::Length);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, FOTBuilder::Length &) const;
   FOTBuilder::Length size_;
 };
 
@@ -111,36 +84,11 @@ ELObj *LengthInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) co
   return new (*vm.interp) LengthObj(size_);
 }
 
-bool LengthInheritedC::convert(ELObj *obj, const Location &loc,
-			       Interpreter &interp, FOTBuilder::Length &n) const
-{
-  int dim;
-  double d;
-  switch (obj->quantityValue(n, d, dim)) {
-  case ELObj::longQuantity:
-    if (dim == 1)
-      return 1;
-    break;
-  case ELObj::doubleQuantity:
-    if (dim == 1) {
-      // FIXME catch overflow
-      n = long(d);
-      return 1;
-    }
-    break;
-  default:
-    break;
-  }
-  invalidValue(loc, interp);
-  return 0;
-}
-
 class SymbolInheritedC : public InheritedC {
 public:
   SymbolInheritedC(const Identifier *, unsigned index, FOTBuilder::Symbol);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, FOTBuilder::Symbol &) const;
   FOTBuilder::Symbol sym_;
 };
 
@@ -154,34 +102,12 @@ ELObj *SymbolInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) co
   return vm.interp->cValueSymbol(sym_);
 }
 
-bool SymbolInheritedC::convert(ELObj *obj, const Location &loc,
-			       Interpreter &interp, FOTBuilder::Symbol &sym) const
-{
-  if (obj == interp.makeFalse()) {
-    sym = FOTBuilder::symbolFalse;
-    return 1;
-  }
-  SymbolObj *symObj = obj->asSymbol();
-  if (symObj) {
-    sym = symObj->cValue();
-    if (sym != FOTBuilder::symbolFalse)
-      return 1;
-  }
-  if (obj == interp.makeTrue()) {
-    sym = FOTBuilder::symbolTrue;
-    return 1;
-  }
-  invalidValue(loc, interp);
-  return 0;
-}
-
 class PublicIdInheritedC : public InheritedC {
 public:
   PublicIdInheritedC(const Identifier *, unsigned index,
 		     FOTBuilder::PublicId = 0);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, FOTBuilder::PublicId &) const;
   FOTBuilder::PublicId pubid_;
 };
 
@@ -199,20 +125,12 @@ ELObj *PublicIdInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) 
     return interp.makeFalse();
 }
 
-bool PublicIdInheritedC::convert(ELObj *obj, const Location &loc,
-				 Interpreter &interp,
-				 FOTBuilder::PublicId &pubid) const
-{
-  return interp.convertPublicIdC(obj, identifier(), loc, pubid);
-}
-
 class Letter2InheritedC : public InheritedC {
 public:
   Letter2InheritedC(const Identifier *, unsigned index,
 		     FOTBuilder::Letter2 = 0);
   ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
 protected:
-  bool convert(ELObj *, const Location &, Interpreter &, FOTBuilder::Letter2 &) const;
   FOTBuilder::Letter2 code_;
 };
 
@@ -234,28 +152,6 @@ ELObj *Letter2InheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) c
   }
   else
     return interp.makeFalse();
-}
-
-bool Letter2InheritedC::convert(ELObj *obj, const Location &loc,
-				Interpreter &interp,
-				FOTBuilder::Letter2 &code) const
-{
-  SymbolObj *sym = obj->asSymbol();
-  if (sym) {
-    const StringC &str = *sym->name();
-    if (str.size() == 2
-	&& str[0] >= 'A' && str[0] <= 'Z'
-	&& str[1] >= 'A' && str[1] <= 'Z') {
-      code = SP_LETTER2(str[0], str[1]);
-      return 1;
-    }
-  }
-  else if (obj == interp.makeFalse()) {
-    code = 0;
-    return 1;
-  }
-  invalidValue(loc, interp);
-  return 0;
 }
 
 class LengthSpecInheritedC : public InheritedC {
@@ -430,7 +326,7 @@ GenericBoolInheritedC::make(ELObj *obj, const Location &loc,
 			    Interpreter &interp) const
 {
   bool b;
-  if (convert(obj, loc, interp, b))
+  if (interp.convertBooleanC(obj, identifier(), loc, b))
     return new GenericBoolInheritedC(identifier(), index(), setter_, b);
   return ConstPtr<InheritedC>();
 }
@@ -467,7 +363,7 @@ ExtensionBoolInheritedC::make(ELObj *obj, const Location &loc,
 			    Interpreter &interp) const
 {
   bool b;
-  if (convert(obj, loc, interp, b))
+  if (interp.convertBooleanC(obj, identifier(), loc, b))
     return new ExtensionBoolInheritedC(identifier(), index(), setter_, b);
   return ConstPtr<InheritedC>();
 }
@@ -551,7 +447,7 @@ ExtensionIntegerInheritedC::make(ELObj *obj, const Location &loc,
 	  			 Interpreter &interp) const
 {
   long n;
-  if (convert(obj, loc, interp, n))
+  if (interp.convertIntegerC(obj, identifier(), loc, n))
     return new ExtensionIntegerInheritedC(identifier(), index(), setter_, n);
   return ConstPtr<InheritedC>();
 }
@@ -587,7 +483,7 @@ ExtensionLengthInheritedC::make(ELObj *obj, const Location &loc,
 				Interpreter &interp) const
 {
   FOTBuilder::Length n;
-  if (convert(obj, loc, interp, n))
+  if (interp.convertLengthC(obj, identifier(), loc, n))
     return new ExtensionLengthInheritedC(identifier(), index(), setter_, n);
   return ConstPtr<InheritedC>();
 }
@@ -624,7 +520,7 @@ GenericLengthInheritedC::make(ELObj *obj, const Location &loc,
 			      Interpreter &interp) const
 {
   FOTBuilder::Length n;
-  if (convert(obj, loc, interp, n))
+  if (interp.convertLengthC(obj, identifier(), loc, n))
     return new GenericLengthInheritedC(identifier(), index(), setter_, n);
   return ConstPtr<InheritedC>();
 }
@@ -660,7 +556,7 @@ GenericIntegerInheritedC::make(ELObj *obj, const Location &loc,
 			      Interpreter &interp) const
 {
   long n;
-  if (convert(obj, loc, interp, n))
+  if (interp.convertIntegerC(obj, identifier(), loc, n))
     return new GenericIntegerInheritedC(identifier(), index(), setter_, n);
   return ConstPtr<InheritedC>();
 }
@@ -691,18 +587,12 @@ ELObj *GenericMaybeIntegerInheritedC::value(VM &vm, const VarStyleObj *style,
 
 ConstPtr<InheritedC>
 GenericMaybeIntegerInheritedC::make(ELObj *obj, const Location &loc,
-				      Interpreter &interp) const
+				    Interpreter &interp) const
 {
-  if (obj == interp.makeFalse())
-    return new GenericMaybeIntegerInheritedC(identifier(), index(),
-					     setter_, 0);
   long n;
-  if (convert(obj, loc, interp, n)) {
-    if (n > 0)
-      return new GenericMaybeIntegerInheritedC(identifier(), index(),
-					       setter_, n);
-    invalidValue(loc, interp);
-  }
+  if (interp.convertOptPositiveIntegerC(obj, identifier(), loc, n))
+    return new GenericMaybeIntegerInheritedC(identifier(), index(),
+					     setter_, n);
   return ConstPtr<InheritedC>();
 }
 
@@ -738,7 +628,7 @@ GenericSymbolInheritedC::make(ELObj *obj, const Location &loc,
 			      Interpreter &interp) const
 {
   FOTBuilder::Symbol sym;
-  if (convert(obj, loc, interp, sym))
+  if (interp.convertEnumC(obj, identifier(), loc, sym))
     return new GenericSymbolInheritedC(identifier(), index(), setter_, sym);
   return ConstPtr<InheritedC>();
 }
@@ -775,7 +665,7 @@ GenericPublicIdInheritedC::make(ELObj *obj, const Location &loc,
 				Interpreter &interp) const
 {
   FOTBuilder::PublicId pubid;
-  if (convert(obj, loc, interp, pubid))
+  if (interp.convertPublicIdC(obj, identifier(), loc, pubid))
     return new GenericPublicIdInheritedC(identifier(), index(), setter_,
 					 pubid);
   return ConstPtr<InheritedC>();
@@ -813,7 +703,7 @@ GenericLetter2InheritedC::make(ELObj *obj, const Location &loc,
 				Interpreter &interp) const
 {
   FOTBuilder::Letter2 code;
-  if (convert(obj, loc, interp, code))
+  if (interp.convertLetter2C(obj, identifier(), loc, code))
     return new GenericLetter2InheritedC(identifier(), index(), setter_, code);
   return ConstPtr<InheritedC>();
 }
@@ -920,7 +810,7 @@ ConstPtr<InheritedC> FontSizeC::make(ELObj *obj, const Location &loc,
 				     Interpreter &interp) const
 {
   long n;
-  if (convert(obj, loc, interp, n))
+  if (interp.convertLengthC(obj, identifier(), loc, n))
     return new FontSizeC(identifier(), index(), n);
   return ConstPtr<InheritedC>();
 }
@@ -988,12 +878,10 @@ void ColorC::set(VM &, const VarStyleObj *, FOTBuilder &fotb,
 ConstPtr<InheritedC> ColorC::make(ELObj *obj, const Location &loc,
 				  Interpreter &interp) const
 {
-  ColorObj *color = obj->asColor();
-  if (!color) {
-    invalidValue(loc, interp);
-    return ConstPtr<InheritedC>();
-  }
-  return new ColorC(identifier(), index(), color, interp);
+  ColorObj *color;
+  if (interp.convertColorC(obj, identifier(), loc, color))
+    return new ColorC(identifier(), index(), color, interp);
+  return ConstPtr<InheritedC>();
 }
 
 ELObj *ColorC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) const
@@ -1040,12 +928,10 @@ void BackgroundColorC::set(VM &, const VarStyleObj *, FOTBuilder &fotb,
 ConstPtr<InheritedC> BackgroundColorC::make(ELObj *obj, const Location &loc,
 					    Interpreter &interp) const
 {
-  ColorObj *color = obj->asColor();
-  if (!color && obj != interp.makeFalse()) {
-    invalidValue(loc, interp);
-    return ConstPtr<InheritedC>();
-  }
-  return new BackgroundColorC(identifier(), index(), color, interp);
+  ColorObj *color;
+  if (interp.convertOptColorC(obj, identifier(), loc, color))
+    return new BackgroundColorC(identifier(), index(), color, interp);
+  return ConstPtr<InheritedC>();
 }
 
 ELObj *
@@ -1188,13 +1074,17 @@ BorderC::BorderC(const Identifier *ident, unsigned index, ELObj *value, Interpre
 ConstPtr<InheritedC> BorderC::make(ELObj *obj, const Location &loc, Interpreter &interp) const
 {
   StyleObj *tem;
-  SosofoObj *sosofo;
-  if (obj == interp.makeFalse()
-      || obj == interp.makeTrue()
-      || ((sosofo = obj->asSosofo()) != 0
-          && sosofo->tableBorderStyle(tem)))
+  SosofoObj *sosofo = obj->asSosofo();
+  if (sosofo && sosofo->tableBorderStyle(tem))
     return new BorderC(identifier(), index(), obj, interp);
-  invalidValue(loc, interp);
+  bool b;
+  if (interp.convertBooleanC(obj, identifier(), loc, b)) {
+    if (b)
+      obj = interp.makeTrue();
+    else
+      obj = interp.makeFalse();
+    return new BorderC(identifier(), index(), obj, interp);
+  }
   return ConstPtr<InheritedC>();
 }
 
@@ -1212,7 +1102,7 @@ RuleC::RuleC(const Identifier *ident, unsigned index, ELObj *value, Interpreter 
 ConstPtr<InheritedC> RuleC::make(ELObj *obj, const Location &loc, Interpreter &interp) const
 {
   SosofoObj *sosofo = obj->asSosofo();
-    if (sosofo && sosofo->isRule())
+  if (sosofo && sosofo->isRule())
     return new RuleC(identifier(), index(), obj, interp);
   invalidValue(loc, interp);
   return ConstPtr<InheritedC>();
@@ -1242,8 +1132,10 @@ ELObj *InheritedCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec,
     interp.message(InterpreterMessages::notInCharacteristicValue);
     return interp.makeError();
   }
-  return ec.styleStack->inherited(inheritedC_, ec.specLevel, interp,
-				  *ec.actualDependencies);
+  ELObj *obj = ec.styleStack->inherited(inheritedC_, ec.specLevel, interp,
+				        *ec.actualDependencies);
+  interp.makeReadOnly(obj);
+  return obj;
 }
 
 class ActualCPrimitiveObj : public PrimitiveObj {
@@ -1269,22 +1161,19 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
     interp.message(InterpreterMessages::notInCharacteristicValue);
     return interp.makeError();
   }
-  return ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  ELObj *obj = ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  interp.makeReadOnly(obj);
+  return obj;
 }
 
 #define INHERITED_C(name, C, init) \
-  { Identifier *ident = lookup(makeStringC(name)); \
-    ident->setInheritedC(new C(ident, nInheritedC_++, init)); \
-    installInheritedCProc(ident); }
+    installInheritedC(name, new C(0, nInheritedC_++, init))
 #define INHERITED_C2(name, C, init1, init2) \
-  { Identifier *ident = lookup(makeStringC(name)); \
-    ident->setInheritedC(new C(ident, nInheritedC_++, init1, init2)); \
-    installInheritedCProc(ident); }
+    installInheritedC(name, new C(0, nInheritedC_++, init1, init2))
 #define STORE_INHERITED_C2(var, name, C, init1, init2) \
-  { Identifier *ident = lookup(makeStringC(name)); \
-    var = new C(ident, nInheritedC_++, init1, init2); \
-    ident->setInheritedC(var); \
-    installInheritedCProc(ident); }
+   { InheritedC *ic = new C(0, nInheritedC_++, init1, init2); \
+     installInheritedC(name, ic); \
+     var = ic; }
 
 #define IGNORED_C(name, init) INHERITED_C2(name, IgnoredC, init, *this)
 
@@ -1477,8 +1366,6 @@ void Interpreter::installInheritedCs()
 	       FOTBuilder::symbolStart);
   INHERITED_C2("hyphenation-keep", GenericSymbolInheritedC, &FOTBuilder::setHyphenationKeep,
 	       FOTBuilder::symbolFalse);
-  INHERITED_C2("position-preference", GenericSymbolInheritedC, &FOTBuilder::setPositionPreference,
-	       FOTBuilder::symbolFalse);
   INHERITED_C2("font-structure", GenericSymbolInheritedC, &FOTBuilder::setFontStructure,
 	       FOTBuilder::symbolSolid);
   INHERITED_C2("font-proportionate-width", GenericSymbolInheritedC,
@@ -1559,10 +1446,28 @@ void Interpreter::installInheritedCs()
   IGNORED_C("char-map", makeFalse());
 }
 
-void Interpreter::installExtensionInheritedC(Identifier *ident, const StringC &pubid, const Location &loc)
+void Interpreter::installInheritedC(const char *s, InheritedC *ic)
+{
+  StringC name(makeStringC(s));
+  Identifier *ident = lookup(name);
+  ic->setIdentifier(ident);
+  ident->setInheritedC(ic);
+  installInheritedCProc(ident);
+  if (dsssl2() && name.size() && name[name.size() - 1] == '?') {
+    name.resize(name.size() - 1);
+    Identifier *ident2 = lookup(name);
+    ASSERT(ident2->inheritedC().isNull());
+    ident2->setInheritedC(ic);
+    installInheritedCProc(ident2);
+  }
+}
+
+void Interpreter::installExtensionInheritedC(Identifier *ident,
+					     const StringC &pubid,
+					     const Location &loc)
 {
   ConstPtr<InheritedC> ic;
-  if (extensionTable_) {
+  if (pubid.size() != 0 && extensionTable_) {
     for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
       if (pubid == ep->pubid) {
 	if (ep->boolSetter)

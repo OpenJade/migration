@@ -145,7 +145,7 @@ E0+dataMarkedSectionDeclSubset++data or replaceable character data in declaratio
 E1+duplicateId+4.153+ID %1 already defined+ID %1 first defined here
 E1+notFixedValue+4.136+value of fixed attribute %1 not equal to default
 E1+sdCommentSignificant++character %1 is not significant in the reference concrete syntax and so cannot occur in a comment in the SGML declaration
-E1+standardVersion+13p2+minimum data of first minimum literal in SGML declaration must be "ISO 8879:1986" or "ISO 8879:1986 (ENR)" not %1
+E1+standardVersion+13p2+minimum data of first minimum literal in SGML declaration must be "ISO 8879:1986" or "ISO 8879:1986 (ENR)" or "ISO 8879:1986 (WWW)" not %1
 E1+namingBeforeLcnmstrt+13.4.5p1+parameter before "LCNMSTRT" must be "NAMING" not %1
 E1+sdEntityEnd+13p1+unexpected entity end in SGML declaration: only %1, S separators and comments allowed
 E2+sdInvalidNameToken++%1 invalid: only %2 and parameter separators allowed
@@ -247,8 +247,9 @@ Q1+genericIdentifierLength+11.2.1.2+length of rank stem plus length of rank suff
 E0+instanceStartOmittag+7.2p1+document instance must start with document element
 Q1+grplvl+11.2.4.5p1+content model nesting level exceeds GRPLVL (%1)
 Q1+grpgtcnt+11.2.4.5p2+grand total of content tokens exceeds GRPGTCNT (%1)
-E0+minimizedStartTag+7.4.1p2+minimized start-tag requires SHORTTAG YES
-E0+minimizedEndTag+7.5.1p2+minimized end-tag requires SHORTTAG YES
+E0+unclosedStartTagShorttag+7.4.1p2+unclosed start-tag requires SHORTTAG YES
+E0+netEnablingStartTagShorttag+7.4.1p2+net-enabling start-tag requires SHORTTAG YES
+E0+unclosedEndTagShorttag+7.5.1p2+unclosed end-tag requires SHORTTAG YES
 E0+multipleDtds+7.1p6+DTDs other than base allowed only if CONCUR YES or EXPLICIT YES
 E0+afterDocumentElementEntityEnd+7.2p1+end of entity other than document entity after document element
 E1+declarationAfterDocumentElement+7.2p1+%1 declaration illegal after document element
@@ -331,12 +332,8 @@ E0+sdInvalidRange++number of first character in range must not exceed number of 
 E0+sdEmptyDelimiter++delimiter cannot be an empty string
 W0+tooManyCharsMinimumLiteral++too many characters assigned same meaning with minimum literal
 W1+defaultedEntityDefined++earlier reference to entity %1 used default entity
-W0+unclosedStartTag++unclosed start-tag
-W0+unclosedEndTag++unclosed end-tag
 W0+emptyStartTag++empty start-tag
 W0+emptyEndTag++empty end-tag
-W0+netStartTag++net-enabling start-tag
-W0+nullEndTag++null end-tag
 W1+unusedMap++unused short reference map %1
 W1+unusedParamEntity++unused parameter entity %1
 W1+cannotGenerateSystemIdPublic++cannot generate system identifier for public text %1
@@ -347,16 +344,19 @@ W1+cannotGenerateSystemIdLinktype++cannot generate system identifier for link ty
 W1+cannotGenerateSystemIdNotation++cannot generate system identifier for notation %1
 W1+excludeIncludeSame++element type %1 both included and excluded
 E1+implyingDtd++no document type declaration; implying %1
-E1+afdrVersion++minimum data of AFDR declaration must be "ISO/IEC 10744:1992" not %1
+E1+afdrVersion++minimum data of AFDR declaration must be "ISO/IEC 10744:1997" not %1
 E0+missingAfdrDecl++AFDR declaration required before use of AFDR extensions
-E0+enrRequired++ENR extensions were used but minimum literal was not "ISO 8879:1986 (ENR)"
+E0+enrRequired++ENR extensions were used but minimum literal was not "ISO 8879:1986 (ENR)" or "ISO 8879:1986 (WWW)"
 E1+numericCharRefLiteralNonSgml++illegal numeric character reference to non-SGML character %1 in literal
 E2+numericCharRefUnknownDesc++cannot convert character reference to number %1 because description %2 unrecognized
 E3+numericCharRefUnknownBase++cannot convert character reference to number %1 because character %2 from baseset %3 unknown
 E1+numericCharRefBadInternal++character reference to number %1 cannot be converted because of problem with internal character set
 E1+numericCharRefNoInternal++cannot convert character reference to number %1 because character not in internal character set
+E0+wwwRequired++Web SGML adaptations were used but minimum literal was not "ISO 8879:1986 (WWW)"
+E1+attributeTokenNotUnique++token %1 can be value for more multiple attributes so attribute name required
+Q1+hexNumberLength++length of hex number must not exceed NAMELEN (%1)
+W1+entityNameSyntax++%1 is not a valid name in the declared concrete syntax
 
-W0+netStartTagEndTag++end-tag for element with net-enabling start-tag
 W0+cdataContent++CDATA declared content
 W0+rcdataContent++RCDATA declared content
 W0+inclusion++inclusion
@@ -401,9 +401,23 @@ W0+pcdataInNestedModelGroup++#PCDATA in nested model group
 W0+pcdataGroupNotRep++#PCDATA in model group that does not have rep occurrence indicator
 W0+nameGroupNotOr++name group or name token group used connector other than OR
 W0+piMissingName++processing instruction does not start with name
-W0+statusKeywordSpecS++s separator in status keyword specification
+W0+instanceStatusKeywordSpecS++s separator in status keyword specification in document instance
 W0+externalDataEntityRef++reference to external data entity
 W0+attributeValueExternalEntityRef++reference to external entity in attribute value
+W1+dataCharDelim++character %1 is the first character of a delimiter but occurred as data
+W0+explicitSgmlDecl++SGML declaration was not implied
+W0+internalSubsetMarkedSection++marked section in internal DTD subset
+E0+nestcWithoutNet++net-enabling start-tag not immediately followed by null end-tag
+E0+contentAsyncEntityRef++entity end in different element from entity reference
+E0+immednetRequiresEmptynrm++NETENABL IMMEDNET requires EMPTYNRM YES
+W0+nonSgmlCharRef++reference to non-SGML character
+W0+defaultEntityDecl++declaration of default entity
+W0+internalSubsetPsParamEntityRef++reference to parameter entity in parameter separator in internal subset
+W0+internalSubsetTsParamEntityRef++reference to parameter entity in token separator in internal subset
+W0+internalSubsetLiteralParamEntityRef++reference to parameter entity in parameter literal in internal subset
+E0+cannotGenerateSystemIdSgml++cannot generate system identifier for SGML declaration reference
+E1+sdTextClass++public text class of formal public identifier of SGML declaration must be SD
+E0+sgmlDeclRefRequiresWww++SGML declaration reference was used but minimum literal was not "ISO 8879:1986 (WWW)"
 
 # message fragments
 =1000

@@ -11,17 +11,18 @@
 #include "NamedTable.h"
 #include "Collector.h"
 #include "InputSource.h"
+#include "XcharMap.h"
 #include "Owner.h"
 #include "Style.h"
 #include "SosofoObj.h"
 #include "ProcessingMode.h"
-#include "XcharMap.h"
 #include "NumberCache.h"
 #include "HashTable.h"
 #include "FOTBuilder.h"
 #include "Owner.h"
 #include "Node.h"
 #include "GroveManager.h"
+#include "Pattern.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -49,6 +50,8 @@ public:
     keyDefine,
     keyElse,
     keyArrow,
+    keySet,
+    keyBegin,
     keyMake,
     keyStyle,
     keyWithMode,
@@ -140,7 +143,19 @@ public:
     keyNull,
     keyIsRcs,
     keyParent,
-    keyActive
+    keyActive,
+    keyAttributes,
+    keyChildren,
+    keyRepeat,
+    keyPosition,
+    keyOnly,
+    keyClass,
+    keyImportance,
+    keyDeclareClassAttribute,
+    keyDeclareIdAttribute,
+    keyDeclareFlowObjectMacro,
+    keyOrElement,
+    keyPositionPreference
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
@@ -224,7 +239,7 @@ private:
 
 class Interpreter : 
   public Collector,
-  public SdataMapper,
+  public Pattern::MatchContext,
   public NumberCache,
   public Messenger {
 public:
@@ -250,9 +265,8 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      const FOTBuilder::Extension *);
+	      bool dsssl2, const FOTBuilder::Extension *);
   void defineVariable(const StringC &);
-  void parse(Owner<InputSource> &);
   void endPart();
   FalseObj *makeFalse();
   TrueObj *makeTrue();
@@ -272,19 +286,17 @@ public:
   NodeListObj *makeEmptyNodeList();
   void dispatchMessage(Message &);
   void dispatchMessage(const Message &);
-  void initMessage(Message &);
   Identifier *lookup(const StringC &);
   Unit *lookupUnit(const StringC &);
   FunctionObj *lookupExternalProc(const StringC &);
   int unitsPerInch() const;
   unsigned currentPartIndex() const;
-  const ProcessingMode *initialProcessingMode() const;
   void compile();
   static StringC makeStringC(const char *);
   SymbolObj *portName(PortName);
   ELObj *cValueSymbol(FOTBuilder::Symbol);
-  ELObj *convertNumber(const StringC &, bool giveError, int radix = 10);
-  ELObj *convertAfiiGlyphId(const StringC &);
+  // Map of LexCategory
+  XcharMap<char> lexCategory_;
   static void normalizeGeneralName(const NodePtr &, StringC &);
   GroveManager *groveManager() const;
   StyleObj *initialStyle() const;
@@ -294,16 +306,23 @@ public:
   bool convertPublicIdC(ELObj *, const Identifier *, const Location &,
 			FOTBuilder::PublicId &);
   bool convertStringC(ELObj *, const Identifier *, const Location &, StringC &);
+  bool convertLengthC(ELObj *, const Identifier *, const Location &, FOTBuilder::Length &);
   bool convertLengthSpecC(ELObj *, const Identifier *, const Location &, FOTBuilder::LengthSpec &);
+  bool convertLetter2C(ELObj *, const Identifier *, const Location &, FOTBuilder::Letter2 &);
   bool convertOptLengthSpecC(ELObj *, const Identifier *, const Location &, FOTBuilder::OptLengthSpec &);
   bool convertCharC(ELObj *, const Identifier *, const Location &, Char &);
+  bool convertColorC(ELObj *, const Identifier *, const Location &, ColorObj *&);
+  bool convertOptColorC(ELObj *, const Identifier *, const Location &, ColorObj *&);
   // FIXME allow inexact value
   bool convertIntegerC(ELObj *, const Identifier *, const Location &, long &);
+  bool convertOptPositiveIntegerC(ELObj *, const Identifier *, const Location &, long &);
   bool convertRealC(ELObj *, const Identifier *, const Location &, double &);
   bool convertEnumC(const FOTBuilder::Symbol *, size_t,
                     ELObj *, const Identifier *, const Location &, FOTBuilder::Symbol &);
+  bool convertEnumC(ELObj *, const Identifier *, const Location &, FOTBuilder::Symbol &);
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
+  bool convertToPattern(ELObj *, const Location &, Pattern &);
   const ConstPtr<InheritedC> &tableBorderC() const;
   const ConstPtr<InheritedC> &cellBeforeRowBorderC() const;
   const ConstPtr<InheritedC> &cellAfterRowBorderC() const;
@@ -314,56 +333,19 @@ public:
   unsigned allocGlyphSubstTableUniqueId();
   bool lookupNodeProperty(const StringC &, ComponentName::Id &);
   bool debugMode() const;
+  bool dsssl2() const;
   void setNodeLocation(const NodePtr &);
-private:
-  Interpreter(const Interpreter &); // undefined
-  void operator=(const Interpreter &); // undefined
-
-  enum {
-    allowEndOfEntity = 01,
-    allowFalse = 02,
-    allowKeyword = 04,
-    allowOpenParen = 010,
-    allowCloseParen = 020,
-    allowIdentifier = 040,
-    allowPeriod = 0100,
-    allowOtherDatum = 0200,  // number, character, glyph-id, quote, backquote
-    allowExpressionKey = 0400,
-    allowKeyDefine = 01000,
-    allowKeyElse = 02000,
-    allowKeyArrow = 04000, // =>
-    allowString = 010000,
-    allowHashOptional = 020000,
-    allowHashKey = 040000,
-    allowHashRest = 0100000,
-    allowUnquote = 0200000,
-    allowUnquoteSplicing = 0400000,
-    allowQuasiquoteKey = 01000000,
-    allowDatum = (allowFalse|allowKeyword|allowOpenParen|allowIdentifier
-		  |allowString|allowHashOptional|allowHashKey|allowHashRest
-		  |allowOtherDatum)
-  };
-  enum Token {
-    tokenEndOfEntity,
-    tokenTrue,
-    tokenFalse,
-    tokenString,
-    tokenIdentifier,
-    tokenKeyword,
-    tokenChar,
-    tokenNumber,
-    tokenGlyphId,
-    tokenOpenParen,
-    tokenCloseParen,
-    tokenPeriod,
-    tokenQuote,
-    tokenQuasiquote,
-    tokenUnquote,
-    tokenUnquoteSplicing,
-    tokenHashRest,
-    tokenHashOptional,
-    tokenHashKey
-  };
+  void makeReadOnly(ELObj *);
+  ProcessingMode *lookupProcessingMode(const StringC &);
+  ProcessingMode *initialProcessingMode();
+  void addClassAttributeName(const StringC &name);
+  void addIdAttributeName(const StringC &name);
+  void installInitialValue(Identifier *, Owner<Expression> &);
+  void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
+  void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
+  // Return 0 if an invalid number.
+  ELObj *convertNumber(const StringC &, int radix = 10);
+  bool convertCharName(const StringC &str, Char &c) const;
   enum LexCategory {
     lexLetter,			// a - z A - Z
     lexOtherNameStart,		// 
@@ -373,20 +355,10 @@ private:
     lexWhiteSpace,
     lexOther
   };
-  bool doDefine();
-  bool doDefineUnit();
-  bool doElement();
-  bool doDefault();
-  bool doId();
-  bool doRoot();
-  bool doMode();
-  bool doDeclareInitialValue();
-  bool doDeclareCharacteristic();
-  bool doDeclareFlowObjectClass();
-  bool skipForm();
-  void installInitialValue(Identifier *, Owner<Expression> &);
-  void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
-  void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
+  LexCategory lexCategory(Xchar);
+private:
+  Interpreter(const Interpreter &); // undefined
+  void operator=(const Interpreter &); // undefined
   void installSyntacticKeys();
   void installPortNames();
   void installCValueSymbols();
@@ -396,61 +368,28 @@ private:
   void installUnits();
   void installCharNames();
   void installInheritedCs();
+  void installInheritedC(const char *, InheritedC *);
   void installInheritedCProc(const Identifier *);
   void installFlowObjs();
   void installSdata();
   void installNodeProperties();
-  bool parseExpression(unsigned allowed, Owner<Expression> &,
-		       Identifier::SyntacticKey &, Token &);
-  bool parseLambda(Owner<Expression> &);
-  bool parseLet(Owner<Expression> &);
-  bool parseLetStar(Owner<Expression> &);
-  bool parseLetrec(Owner<Expression> &);
-  bool parseBindingsAndBody(Vector<const Identifier *> &vars,
-			    NCVector<Owner<Expression> > &inits,
-			    Owner<Expression> &body);
-  bool parseBindingsAndBody1(Vector<const Identifier *> &vars,
-			     NCVector<Owner<Expression> > &inits,
-			     Owner<Expression> &body);
-  bool parseQuote(Owner<Expression> &);
-  bool parseIf(Owner<Expression> &);
-  bool parseCond(Owner<Expression> &, bool opt = 0);
-  bool parseCase(Owner<Expression> &);
-  bool parseOr(Owner<Expression> &);
-  bool parseAnd(Owner<Expression> &, bool opt = 0);
-  bool parseMake(Owner<Expression> &);
-  bool parseStyle(Owner<Expression> &);
-  bool parseWithMode(Owner<Expression> &);
-  bool parseFormals(Vector<const Identifier *> &,
-		    NCVector<Owner<Expression> > &,
-		    int &, bool &, int &);
-  bool parseDatum(unsigned otherAllowed, ELObj *&, Location &, Token &);
-  bool parseSelfEvaluating(unsigned otherAllowed, ELObj *&, Token &);
-  bool parseAbbreviation(const char *, ELObj *&);
-  bool parseQuasiquote(Owner<Expression> &);
-  bool parseQuasiquoteTemplate(unsigned level,
-			       unsigned allowed,
-			       Owner<Expression> &,
-			       Identifier::SyntacticKey &,
-			       Token &,
-			       bool &spliced);
-  void createQuasiquoteAbbreviation(const char *, Owner<Expression> &);
-  bool getToken(unsigned, Token &);
-  bool isDelimiter(Xchar);
-  void extendToken();
-  bool scanString();
-  void skipComment();
-  bool tokenRecover(unsigned, Token &);
-  bool tokenIsNumber();
-  bool scanString(unsigned, Token &);
-  ELObj *convertNumberFloat(const StringC &, bool giveError);
-  bool scanSignDigits(const StringC &str, size_t &i, int &n);
-  Unit *scanUnit(const StringC &str, size_t i, bool giveError, int &unitExp);
-  ProcessingMode *lookupProcessingMode(const StringC &);
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
-  bool convertCharName(const StringC &str, Char &c) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
+  bool convertToPattern(ELObj *obj, const Location &loc,
+			bool isChild, IList<Pattern::Element> &list);
+  bool patternAddAttributeQualifiers(ELObj *obj,
+				     const Location &loc,
+				     Pattern::Element &elem);
+  enum {
+    convertAllowBoolean = 01,
+    convertAllowSymbol = 02,
+    convertAllowNumber = 04
+  };
+  ELObj *convertFromString(ELObj *, unsigned hints, const Location &);
+  ELObj *convertNumberFloat(const StringC &);
+  bool scanSignDigits(const StringC &str, size_t &i, int &n);
+  Unit *scanUnit(const StringC &str, size_t i, int &unitExp);
 
   NilObj *theNilObj_;
   TrueObj *theTrueObj_;
@@ -465,19 +404,14 @@ private:
   HashTable<StringC,FunctionObj *> externalProcTable_;
   Messenger *messenger_;
   const FOTBuilder::Extension *extensionTable_;
-  Owner<InputSource> in_;
-  StringC currentToken_;
   unsigned partIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
   GroveManager *groveManager_;
   ProcessingMode initialProcessingMode_;
   NamedTable<ProcessingMode> processingModeTable_;
-  ProcessingMode *defMode_;
   SymbolObj *portNames_[nPortNames];
   ELObj *cValueSymbols_[FOTBuilder::nSymbols];
-  // Map of LexCategory
-  XcharMap<char> lexCategory_;
   HashTable<StringC,Char> namedCharTable_;
   Vector<const Identifier *> initialValueNames_;
   NCVector<Owner<Expression> > initialValueValues_;
@@ -502,12 +436,12 @@ private:
   };
   StringSet publicIds_;
   HashTable<StringC,Char> sdataEntityNameTable_;
-  const char *afiiPublicId_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
+  bool dsssl2_;
   friend class Identifier;
 };
 
@@ -596,7 +530,7 @@ SymbolObj *Interpreter::portName(PortName i)
 }
 
 inline
-const ProcessingMode *Interpreter::initialProcessingMode() const
+ProcessingMode *Interpreter::initialProcessingMode()
 {
   return &initialProcessingMode_;
 }
@@ -696,6 +630,37 @@ inline
 bool Interpreter::debugMode() const
 {
   return debugMode_;
+}
+
+inline
+bool Interpreter::dsssl2() const
+{
+  return dsssl2_;
+}
+
+inline
+void Interpreter::makeReadOnly(ELObj *obj)
+{
+  if (dsssl2())
+    Collector::makeReadOnly(obj);
+}
+
+inline
+void Interpreter::addClassAttributeName(const StringC &name)
+{
+  classAttributeNames_.push_back(name);
+}
+
+inline
+void Interpreter::addIdAttributeName(const StringC &name)
+{
+  idAttributeNames_.push_back(name);
+}
+
+inline
+Interpreter::LexCategory Interpreter::lexCategory(Xchar c)
+{
+  return LexCategory(lexCategory_[c]);
 }
 
 inline

@@ -1647,7 +1647,7 @@ MessageFragment::appModule,
 #endif
 142
 #ifndef SP_NO_MESSAGE_TEXT
-,"minimum data of first minimum literal in SGML declaration must be \"ISO 8879:1986\" or \"ISO 8879:1986 (ENR)\" not %1"
+,"minimum data of first minimum literal in SGML declaration must be \"ISO 8879:1986\" or \"ISO 8879:1986 (ENR)\" or \"ISO 8879:1986 (WWW)\" not %1"
 #endif
 );
 const MessageType1 ParserMessages::namingBeforeLcnmstrt(
@@ -2850,7 +2850,7 @@ MessageFragment::appModule,
 ,"grand total of content tokens exceeds GRPGTCNT (%1)"
 #endif
 );
-const MessageType0 ParserMessages::minimizedStartTag(
+const MessageType0 ParserMessages::unclosedStartTagShorttag(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -2859,10 +2859,10 @@ MessageFragment::appModule,
 #endif
 243
 #ifndef SP_NO_MESSAGE_TEXT
-,"minimized start-tag requires SHORTTAG YES"
+,"unclosed start-tag requires SHORTTAG YES"
 #endif
 );
-const MessageType0 ParserMessages::minimizedEndTag(
+const MessageType0 ParserMessages::netEnablingStartTagShorttag(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -2871,7 +2871,19 @@ MessageFragment::appModule,
 #endif
 244
 #ifndef SP_NO_MESSAGE_TEXT
-,"minimized end-tag requires SHORTTAG YES"
+,"net-enabling start-tag requires SHORTTAG YES"
+#endif
+);
+const MessageType0 ParserMessages::unclosedEndTagShorttag(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+245
+#ifndef SP_NO_MESSAGE_TEXT
+,"unclosed end-tag requires SHORTTAG YES"
 #endif
 );
 const MessageType0 ParserMessages::multipleDtds(
@@ -2881,7 +2893,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-245
+246
 #ifndef SP_NO_MESSAGE_TEXT
 ,"DTDs other than base allowed only if CONCUR YES or EXPLICIT YES"
 #endif
@@ -2893,7 +2905,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-246
+247
 #ifndef SP_NO_MESSAGE_TEXT
 ,"end of entity other than document entity after document element"
 #endif
@@ -2905,7 +2917,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-247
+248
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 declaration illegal after document element"
 #endif
@@ -2917,7 +2929,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-248
+249
 #ifndef SP_NO_MESSAGE_TEXT
 ,"character reference illegal after document element"
 #endif
@@ -2929,7 +2941,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-249
+250
 #ifndef SP_NO_MESSAGE_TEXT
 ,"entity reference illegal after document element"
 #endif
@@ -2941,7 +2953,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-250
+251
 #ifndef SP_NO_MESSAGE_TEXT
 ,"marked section illegal after document element"
 #endif
@@ -2953,7 +2965,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-251
+252
 #ifndef SP_NO_MESSAGE_TEXT
 ,"the %1 occurrence of %2 in the content model for %3 cannot be excluded at this point because it is contextually required"
 #endif
@@ -2965,7 +2977,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-252
+253
 #ifndef SP_NO_MESSAGE_TEXT
 ,"the %1 occurrence of %2 in the content model for %3 cannot be excluded because it is neither inherently optional nor a member of an or group"
 #endif
@@ -2977,7 +2989,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-253
+254
 #ifndef SP_NO_MESSAGE_TEXT
 ,"an attribute value specification must be an attribute value literal unless SHORTTAG YES is specified"
 #endif
@@ -2989,7 +3001,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-254
+255
 #ifndef SP_NO_MESSAGE_TEXT
 ,"value cannot be specified both for notation attribute and content reference attribute"
 #endif
@@ -3001,7 +3013,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-255
+256
 #ifndef SP_NO_MESSAGE_TEXT
 ,"notation %1 already defined"
 #endif
@@ -3013,7 +3025,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-256
+257
 #ifndef SP_NO_MESSAGE_TEXT
 ,"short reference map %1 already defined"
 ,"first defined here"
@@ -3026,7 +3038,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-258
+259
 #ifndef SP_NO_MESSAGE_TEXT
 ,"general delimiter role %1 already defined"
 #endif
@@ -3038,7 +3050,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-259
+260
 #ifndef SP_NO_MESSAGE_TEXT
 ,"number of id references in start-tag must not exceed GRPCNT (%1)"
 #endif
@@ -3050,7 +3062,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-260
+261
 #ifndef SP_NO_MESSAGE_TEXT
 ,"number of entity names in attribute specification list must not exceed GRPCNT (%1)"
 #endif
@@ -3062,7 +3074,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-261
+262
 #ifndef SP_NO_MESSAGE_TEXT
 ,"normalized length of attribute specification list must not exceed ATTSPLEN (%1); length was %2"
 #endif
@@ -3074,7 +3086,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-262
+263
 #ifndef SP_NO_MESSAGE_TEXT
 ,"short reference delimiter %1 already specified"
 #endif
@@ -3086,7 +3098,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-263
+264
 #ifndef SP_NO_MESSAGE_TEXT
 ,"single character short references were already specified for character numbers: %1"
 #endif
@@ -3098,7 +3110,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-264
+265
 #ifndef SP_NO_MESSAGE_TEXT
 ,"default entity used in entity attribute %1"
 #endif
@@ -3110,7 +3122,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-265
+266
 #ifndef SP_NO_MESSAGE_TEXT
 ,"reference to entity %1 uses default entity "
 #endif
@@ -3122,7 +3134,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-266
+267
 #ifndef SP_NO_MESSAGE_TEXT
 ,"entity %1 in short reference map %2 uses default entity"
 #endif
@@ -3134,7 +3146,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-267
+268
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no DTD %1 declared"
 #endif
@@ -3146,7 +3158,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-268
+269
 #ifndef SP_NO_MESSAGE_TEXT
 ,"LPD %1 has neither internal nor external subset"
 #endif
@@ -3158,7 +3170,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-269
+270
 #ifndef SP_NO_MESSAGE_TEXT
 ,"element types have different link attribute definitions"
 #endif
@@ -3170,7 +3182,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-270
+271
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link set %1 already defined"
 #endif
@@ -3182,7 +3194,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-271
+272
 #ifndef SP_NO_MESSAGE_TEXT
 ,"empty result attribute specification"
 #endif
@@ -3194,7 +3206,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-272
+273
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no source element type %1"
 #endif
@@ -3206,7 +3218,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-273
+274
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no result element type %1"
 #endif
@@ -3218,7 +3230,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-274
+275
 #ifndef SP_NO_MESSAGE_TEXT
 ,"end of document in LPD subset"
 #endif
@@ -3230,7 +3242,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-275
+276
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%1 declaration not allowed in LPD subset"
 #endif
@@ -3242,7 +3254,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-276
+277
 #ifndef SP_NO_MESSAGE_TEXT
 ,"ID link set declaration not allowed in simple link declaration subset"
 #endif
@@ -3254,7 +3266,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-277
+278
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link set declaration not allowed in simple link declaration subset"
 #endif
@@ -3266,7 +3278,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-278
+279
 #ifndef SP_NO_MESSAGE_TEXT
 ,"attributes can only be defined for base document element (not %1) in simple link declaration subset"
 #endif
@@ -3278,7 +3290,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-279
+280
 #ifndef SP_NO_MESSAGE_TEXT
 ,"a short reference mapping declaration is allowed only in the base DTD"
 #endif
@@ -3290,7 +3302,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-280
+281
 #ifndef SP_NO_MESSAGE_TEXT
 ,"a short reference use declaration is allowed only in the base DTD"
 #endif
@@ -3302,7 +3314,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-281
+282
 #ifndef SP_NO_MESSAGE_TEXT
 ,"default value of link attribute cannot be CURRENT or CONREF"
 #endif
@@ -3314,7 +3326,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-282
+283
 #ifndef SP_NO_MESSAGE_TEXT
 ,"declared value of link attribute cannot be ID, IDREF, IDREFS or NOTATION"
 #endif
@@ -3326,7 +3338,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-283
+284
 #ifndef SP_NO_MESSAGE_TEXT
 ,"only fixed attributes can be defined in simple LPD"
 #endif
@@ -3338,7 +3350,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-284
+285
 #ifndef SP_NO_MESSAGE_TEXT
 ,"only one ID link set declaration allowed in an LPD subset"
 #endif
@@ -3350,7 +3362,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-285
+286
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no initial link set defined for LPD %1"
 #endif
@@ -3362,7 +3374,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-286
+287
 #ifndef SP_NO_MESSAGE_TEXT
 ,"notation %1 not defined in source DTD"
 #endif
@@ -3374,7 +3386,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-287
+288
 #ifndef SP_NO_MESSAGE_TEXT
 ,"result document type in simple link specification must be implied"
 #endif
@@ -3386,7 +3398,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-288
+289
 #ifndef SP_NO_MESSAGE_TEXT
 ,"simple link requires SIMPLE YES"
 #endif
@@ -3398,7 +3410,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-289
+290
 #ifndef SP_NO_MESSAGE_TEXT
 ,"implicit link requires IMPLICIT YES"
 #endif
@@ -3410,7 +3422,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-290
+291
 #ifndef SP_NO_MESSAGE_TEXT
 ,"explicit link requires EXPLICIT YES"
 #endif
@@ -3422,7 +3434,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-291
+292
 #ifndef SP_NO_MESSAGE_TEXT
 ,"LPD not allowed before first DTD"
 #endif
@@ -3434,7 +3446,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-292
+293
 #ifndef SP_NO_MESSAGE_TEXT
 ,"DTD not allowed after an LPD"
 #endif
@@ -3446,7 +3458,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-293
+294
 #ifndef SP_NO_MESSAGE_TEXT
 ,"definition of general entity %1 is unstable"
 #endif
@@ -3458,7 +3470,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-294
+295
 #ifndef SP_NO_MESSAGE_TEXT
 ,"definition of parameter entity %1 is unstable"
 #endif
@@ -3470,7 +3482,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-295
+296
 #ifndef SP_NO_MESSAGE_TEXT
 ,"multiple link rules for ID %1 but not all have link attribute specifications"
 #endif
@@ -3482,7 +3494,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-296
+297
 #ifndef SP_NO_MESSAGE_TEXT
 ,"multiple link rules for element type %1 but not all have link attribute specifications"
 #endif
@@ -3494,7 +3506,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-297
+298
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link type %1 does not have a link set %2"
 #endif
@@ -3506,7 +3518,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-298
+299
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link set use declaration for simple link process"
 #endif
@@ -3518,7 +3530,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-299
+300
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no link type %1"
 #endif
@@ -3530,7 +3542,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-300
+301
 #ifndef SP_NO_MESSAGE_TEXT
 ,"both document type and link type %1"
 #endif
@@ -3542,7 +3554,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-301
+302
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link type %1 already defined"
 #endif
@@ -3554,7 +3566,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-302
+303
 #ifndef SP_NO_MESSAGE_TEXT
 ,"document type %1 already defined"
 #endif
@@ -3566,7 +3578,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-303
+304
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link set %1 used in LPD but not defined"
 #endif
@@ -3578,7 +3590,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-304
+305
 #ifndef SP_NO_MESSAGE_TEXT
 ,"#IMPLIED already linked to result element type %1"
 #endif
@@ -3590,7 +3602,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-305
+306
 #ifndef SP_NO_MESSAGE_TEXT
 ,"number of active simple link processes exceeds quantity specified for SIMPLE parameter in SGML declaration (%1)"
 #endif
@@ -3602,7 +3614,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-306
+307
 #ifndef SP_NO_MESSAGE_TEXT
 ,"only one chain of explicit link processes can be active"
 #endif
@@ -3614,7 +3626,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-307
+308
 #ifndef SP_NO_MESSAGE_TEXT
 ,"source document type name for link type %1 must be base document type since EXPLICIT YES 1"
 #endif
@@ -3626,7 +3638,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-308
+309
 #ifndef SP_NO_MESSAGE_TEXT
 ,"one one implicit link process can be active"
 #endif
@@ -3638,7 +3650,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-309
+310
 #ifndef SP_NO_MESSAGE_TEXT
 ,"sorry, link type %1 not activated: only one implicit or explicit link process can be active (with base document type as source document type)"
 #endif
@@ -3650,7 +3662,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-310
+311
 #ifndef SP_NO_MESSAGE_TEXT
 ,"name missing after name group in entity reference"
 #endif
@@ -3662,7 +3674,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-311
+312
 #ifndef SP_NO_MESSAGE_TEXT
 ,"source document type name for link type %1 must be base document type since EXPLICIT NO"
 #endif
@@ -3674,7 +3686,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-312
+313
 #ifndef SP_NO_MESSAGE_TEXT
 ,"link process must be activated before base DTD"
 #endif
@@ -3686,7 +3698,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-313
+314
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unexpected entity end while starting second pass"
 #endif
@@ -3698,7 +3710,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-314
+315
 #ifndef SP_NO_MESSAGE_TEXT
 ,"type %1 of element with ID %2 not associated element type for applicable link rule in ID link set"
 #endif
@@ -3710,7 +3722,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-315
+316
 #ifndef SP_NO_MESSAGE_TEXT
 ,"DATATAG feature not implemented"
 #endif
@@ -3722,7 +3734,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-316
+317
 #ifndef SP_NO_MESSAGE_TEXT
 ,"generic identifier specification missing after document type specification in start-tag"
 #endif
@@ -3734,7 +3746,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-317
+318
 #ifndef SP_NO_MESSAGE_TEXT
 ,"generic identifier specification missing after document type specification in end-tag"
 #endif
@@ -3746,7 +3758,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-318
+319
 #ifndef SP_NO_MESSAGE_TEXT
 ,"a net-enabling start-tag cannot include a document type specification"
 #endif
@@ -3758,7 +3770,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-319
+320
 #ifndef SP_NO_MESSAGE_TEXT
 ,"DTD did not contain element declaration for document type name"
 #endif
@@ -3770,7 +3782,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-320
+321
 #ifndef SP_NO_MESSAGE_TEXT
 ,"invalid default SGML declaration"
 #endif
@@ -3782,7 +3794,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-321
+322
 #ifndef SP_NO_MESSAGE_TEXT
 ,"reference to entity %1 for which no system identifier could be generated"
 ,"entity was defined here"
@@ -3795,7 +3807,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-323
+324
 #ifndef SP_NO_MESSAGE_TEXT
 ,"content model is mixed but does not allow #PCDATA everywhere"
 #endif
@@ -3807,7 +3819,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-324
+325
 #ifndef SP_NO_MESSAGE_TEXT
 ,"start or end of range must specify a single character"
 #endif
@@ -3819,7 +3831,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-325
+326
 #ifndef SP_NO_MESSAGE_TEXT
 ,"number of first character in range must not exceed number of second character in range"
 #endif
@@ -3831,7 +3843,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-326
+327
 #ifndef SP_NO_MESSAGE_TEXT
 ,"delimiter cannot be an empty string"
 #endif
@@ -3843,7 +3855,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-327
+328
 #ifndef SP_NO_MESSAGE_TEXT
 ,"too many characters assigned same meaning with minimum literal"
 #endif
@@ -3855,33 +3867,9 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-328
-#ifndef SP_NO_MESSAGE_TEXT
-,"earlier reference to entity %1 used default entity"
-#endif
-);
-const MessageType0 ParserMessages::unclosedStartTag(
-MessageType::warning,
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
 329
 #ifndef SP_NO_MESSAGE_TEXT
-,"unclosed start-tag"
-#endif
-);
-const MessageType0 ParserMessages::unclosedEndTag(
-MessageType::warning,
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
-330
-#ifndef SP_NO_MESSAGE_TEXT
-,"unclosed end-tag"
+,"earlier reference to entity %1 used default entity"
 #endif
 );
 const MessageType0 ParserMessages::emptyStartTag(
@@ -3891,7 +3879,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-331
+330
 #ifndef SP_NO_MESSAGE_TEXT
 ,"empty start-tag"
 #endif
@@ -3903,33 +3891,9 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-332
+331
 #ifndef SP_NO_MESSAGE_TEXT
 ,"empty end-tag"
-#endif
-);
-const MessageType0 ParserMessages::netStartTag(
-MessageType::warning,
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
-333
-#ifndef SP_NO_MESSAGE_TEXT
-,"net-enabling start-tag"
-#endif
-);
-const MessageType0 ParserMessages::nullEndTag(
-MessageType::warning,
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
-334
-#ifndef SP_NO_MESSAGE_TEXT
-,"null end-tag"
 #endif
 );
 const MessageType1 ParserMessages::unusedMap(
@@ -3939,7 +3903,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-335
+332
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unused short reference map %1"
 #endif
@@ -3951,7 +3915,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-336
+333
 #ifndef SP_NO_MESSAGE_TEXT
 ,"unused parameter entity %1"
 #endif
@@ -3963,7 +3927,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-337
+334
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for public text %1"
 #endif
@@ -3975,7 +3939,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-338
+335
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for general entity %1"
 #endif
@@ -3987,7 +3951,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-339
+336
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for parameter entity %1"
 #endif
@@ -3999,7 +3963,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-340
+337
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for document type %1"
 #endif
@@ -4011,7 +3975,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-341
+338
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for link type %1"
 #endif
@@ -4023,7 +3987,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-342
+339
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot generate system identifier for notation %1"
 #endif
@@ -4035,7 +3999,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-343
+340
 #ifndef SP_NO_MESSAGE_TEXT
 ,"element type %1 both included and excluded"
 #endif
@@ -4047,7 +4011,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-344
+341
 #ifndef SP_NO_MESSAGE_TEXT
 ,"no document type declaration; implying %1"
 #endif
@@ -4059,9 +4023,9 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-345
+342
 #ifndef SP_NO_MESSAGE_TEXT
-,"minimum data of AFDR declaration must be \"ISO/IEC 10744:1992\" not %1"
+,"minimum data of AFDR declaration must be \"ISO/IEC 10744:1997\" not %1"
 #endif
 );
 const MessageType0 ParserMessages::missingAfdrDecl(
@@ -4071,7 +4035,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-346
+343
 #ifndef SP_NO_MESSAGE_TEXT
 ,"AFDR declaration required before use of AFDR extensions"
 #endif
@@ -4083,9 +4047,9 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-347
+344
 #ifndef SP_NO_MESSAGE_TEXT
-,"ENR extensions were used but minimum literal was not \"ISO 8879:1986 (ENR)\""
+,"ENR extensions were used but minimum literal was not \"ISO 8879:1986 (ENR)\" or \"ISO 8879:1986 (WWW)\""
 #endif
 );
 const MessageType1 ParserMessages::numericCharRefLiteralNonSgml(
@@ -4095,7 +4059,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-348
+345
 #ifndef SP_NO_MESSAGE_TEXT
 ,"illegal numeric character reference to non-SGML character %1 in literal"
 #endif
@@ -4107,7 +4071,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-349
+346
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot convert character reference to number %1 because description %2 unrecognized"
 #endif
@@ -4119,7 +4083,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-350
+347
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot convert character reference to number %1 because character %2 from baseset %3 unknown"
 #endif
@@ -4131,7 +4095,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-351
+348
 #ifndef SP_NO_MESSAGE_TEXT
 ,"character reference to number %1 cannot be converted because of problem with internal character set"
 #endif
@@ -4143,12 +4107,48 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-352
+349
 #ifndef SP_NO_MESSAGE_TEXT
 ,"cannot convert character reference to number %1 because character not in internal character set"
 #endif
 );
-const MessageType0 ParserMessages::netStartTagEndTag(
+const MessageType0 ParserMessages::wwwRequired(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+350
+#ifndef SP_NO_MESSAGE_TEXT
+,"Web SGML adaptations were used but minimum literal was not \"ISO 8879:1986 (WWW)\""
+#endif
+);
+const MessageType1 ParserMessages::attributeTokenNotUnique(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+351
+#ifndef SP_NO_MESSAGE_TEXT
+,"token %1 can be value for more multiple attributes so attribute name required"
+#endif
+);
+const MessageType1 ParserMessages::hexNumberLength(
+MessageType::quantityError,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+352
+#ifndef SP_NO_MESSAGE_TEXT
+,"length of hex number must not exceed NAMELEN (%1)"
+#endif
+);
+const MessageType1 ParserMessages::entityNameSyntax(
 MessageType::warning,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -4157,7 +4157,7 @@ MessageFragment::appModule,
 #endif
 353
 #ifndef SP_NO_MESSAGE_TEXT
-,"end-tag for element with net-enabling start-tag"
+,"%1 is not a valid name in the declared concrete syntax"
 #endif
 );
 const MessageType0 ParserMessages::cdataContent(
@@ -4688,7 +4688,7 @@ MessageFragment::appModule,
 ,"processing instruction does not start with name"
 #endif
 );
-const MessageType0 ParserMessages::statusKeywordSpecS(
+const MessageType0 ParserMessages::instanceStatusKeywordSpecS(
 MessageType::warning,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -4697,7 +4697,7 @@ MessageFragment::appModule,
 #endif
 398
 #ifndef SP_NO_MESSAGE_TEXT
-,"s separator in status keyword specification"
+,"s separator in status keyword specification in document instance"
 #endif
 );
 const MessageType0 ParserMessages::externalDataEntityRef(
@@ -4722,6 +4722,174 @@ MessageFragment::appModule,
 400
 #ifndef SP_NO_MESSAGE_TEXT
 ,"reference to external entity in attribute value"
+#endif
+);
+const MessageType1 ParserMessages::dataCharDelim(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+401
+#ifndef SP_NO_MESSAGE_TEXT
+,"character %1 is the first character of a delimiter but occurred as data"
+#endif
+);
+const MessageType0 ParserMessages::explicitSgmlDecl(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+402
+#ifndef SP_NO_MESSAGE_TEXT
+,"SGML declaration was not implied"
+#endif
+);
+const MessageType0 ParserMessages::internalSubsetMarkedSection(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+403
+#ifndef SP_NO_MESSAGE_TEXT
+,"marked section in internal DTD subset"
+#endif
+);
+const MessageType0 ParserMessages::nestcWithoutNet(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+404
+#ifndef SP_NO_MESSAGE_TEXT
+,"net-enabling start-tag not immediately followed by null end-tag"
+#endif
+);
+const MessageType0 ParserMessages::contentAsyncEntityRef(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+405
+#ifndef SP_NO_MESSAGE_TEXT
+,"entity end in different element from entity reference"
+#endif
+);
+const MessageType0 ParserMessages::immednetRequiresEmptynrm(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+406
+#ifndef SP_NO_MESSAGE_TEXT
+,"NETENABL IMMEDNET requires EMPTYNRM YES"
+#endif
+);
+const MessageType0 ParserMessages::nonSgmlCharRef(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+407
+#ifndef SP_NO_MESSAGE_TEXT
+,"reference to non-SGML character"
+#endif
+);
+const MessageType0 ParserMessages::defaultEntityDecl(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+408
+#ifndef SP_NO_MESSAGE_TEXT
+,"declaration of default entity"
+#endif
+);
+const MessageType0 ParserMessages::internalSubsetPsParamEntityRef(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+409
+#ifndef SP_NO_MESSAGE_TEXT
+,"reference to parameter entity in parameter separator in internal subset"
+#endif
+);
+const MessageType0 ParserMessages::internalSubsetTsParamEntityRef(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+410
+#ifndef SP_NO_MESSAGE_TEXT
+,"reference to parameter entity in token separator in internal subset"
+#endif
+);
+const MessageType0 ParserMessages::internalSubsetLiteralParamEntityRef(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+411
+#ifndef SP_NO_MESSAGE_TEXT
+,"reference to parameter entity in parameter literal in internal subset"
+#endif
+);
+const MessageType0 ParserMessages::cannotGenerateSystemIdSgml(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+412
+#ifndef SP_NO_MESSAGE_TEXT
+,"cannot generate system identifier for SGML declaration reference"
+#endif
+);
+const MessageType1 ParserMessages::sdTextClass(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+413
+#ifndef SP_NO_MESSAGE_TEXT
+,"public text class of formal public identifier of SGML declaration must be SD"
+#endif
+);
+const MessageType0 ParserMessages::sgmlDeclRefRequiresWww(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+414
+#ifndef SP_NO_MESSAGE_TEXT
+,"SGML declaration reference was used but minimum literal was not \"ISO 8879:1986 (WWW)\""
 #endif
 );
 const MessageFragment ParserMessages::delimStart(

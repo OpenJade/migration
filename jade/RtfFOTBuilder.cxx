@@ -243,7 +243,7 @@ public:
   void setUnderMarkDepth(Length);
   void setOverMarkHeight(Length);
 
-  void startNode(const NodePtr &, const StringC &, RuleType);
+  void startNode(const NodePtr &, const StringC &);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
   struct WinCharset {
@@ -2313,6 +2313,7 @@ void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)/2
        << "\\tqr\\tx"
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)
+       << ' '
        << hfPart_[flags | headerHF | leftHF]
        << "\\tab "
        << hfPart_[flags | headerHF | centerHF]
@@ -2328,6 +2329,7 @@ void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)/2
        << "\\tqr\\tx"
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)
+       << ' '
        << hfPart_[flags | footerHF | leftHF]
        << "\\tab "
        << hfPart_[flags | footerHF | centerHF]
@@ -2370,7 +2372,7 @@ void RtfFOTBuilder::idrefButton(unsigned long groveIndex, const Char *s, size_t 
   os() << (rtfVersion_ >= word97 ? "HYPERLINK  \\\\l " : "GOTOBUTTON ");
   outputBookmarkName(groveIndex, s, n);
   if (rtfVersion_ >= word97)
-    os() << "}{\\fldrslt ";
+    os() << "}{\\fldrslt";
   os() << ' ';
 }
 
@@ -2707,6 +2709,9 @@ void RtfFOTBuilder::endTable()
   endDisplay();
 }
 
+// FIXME How should borders between table-parts be handled?
+// This treats them like outside borders, which probably isn't right.
+
 void RtfFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
 {
   startDisplay(nic);
@@ -2747,7 +2752,7 @@ void RtfFOTBuilder::tableColumn(const TableColumnNIC &nic)
 {
   if (tableLevel_ == 1 && nic.nColumnsSpanned == 1) {
     if (nic.columnIndex >= columns_.size())
-      columns_.resize(columns_.size() + 1);
+      columns_.resize(nic.columnIndex + 1);
     columns_[nic.columnIndex].hasWidth = nic.hasWidth;
     if (nic.hasWidth)
       columns_[nic.columnIndex].width = nic.width;
@@ -2761,7 +2766,7 @@ void RtfFOTBuilder::outputTable()
     size_t j;
     bool lastIsDummy = 0;
     // last cell should be a dummy cell
-    for (j = 0; j < cells_[i].size() - 1; j += cells_[i][j].span)
+    for (j = 0; j < cells_[i].size(); j += cells_[i][j].span)
       lastIsDummy = !cells_[i][j].present;
     if (lastIsDummy)
       j--;
@@ -2906,9 +2911,15 @@ void RtfFOTBuilder::outputTable()
     }
     os() << ' ';
     for (unsigned j = 0; j < cells_[i].size(); j += cells_[i][j].span) {
-      os() << cells_[i][j].content;
-      if (keep_)
-	os() << "\\keepn";
+      if (cells_[i][j].content.size() == 0) {
+	if (j == 0)
+	  os() << "\\intbl";
+      }
+      else {
+	os() << cells_[i][j].content;
+	if (keep_)
+	  os() << "\\keepn";
+      }
       os() << "\\cell ";
     }
     os() << "\\row ";
@@ -3023,6 +3034,8 @@ void RtfFOTBuilder::endTableCell()
     else
       os() << "\\sa" << accumSpace_;
   }
+  else if (inlineState_ == inlineFirst)
+    os() << "\\intbl";
   accumSpace_ = 0;
   cellos_.extractString(cells_.back()[cellIndex_].content);
   end();
@@ -3116,7 +3129,9 @@ void RtfFOTBuilder::resolveBorder(Border &b1, Border &b2)
 void RtfFOTBuilder::resolveOutsideBorder(Border &cellBorder, const Border &tableBorder)
 {
   // The standard doesn't say this, but otherwise table-border: #t wouldn't work.
-  if (tableBorder.priority >= cellBorder.priority)
+  if (tableBorder.priority > cellBorder.priority
+      || (tableBorder.priority == cellBorder.priority
+          && (tableBorder.flags & Border::isPresent)))
     cellBorder = tableBorder;
 }
 
@@ -3783,8 +3798,7 @@ void RtfFOTBuilder::flushPendingElements()
   pendingElementLevels_.resize(0);
 }
 
-void RtfFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
-			      RuleType)
+void RtfFOTBuilder::startNode(const NodePtr &node, const StringC &mode)
 {
   nodeLevel_++;
   if (mode.size() == 0) {

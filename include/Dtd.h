@@ -154,7 +154,8 @@ inline
 Ptr<Entity>
 Dtd::insertEntity(const Ptr<Entity> &entity, Boolean replace)
 {
-  return (entity->declType() == Entity::parameterEntity
+  return ((entity->declType() == Entity::parameterEntity 
+	   || entity->declType() == Entity::doctype)
 	  ? &parameterEntityTable_
 	  : &generalEntityTable_)->insert(entity, replace);
 }

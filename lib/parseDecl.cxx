@@ -12,6 +12,7 @@
 #include "TokenMessageArg.h"
 #include "token.h"
 #include "macros.h"
+#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -1809,10 +1810,13 @@ Boolean Parser::parseExternalEntity(StringC &name,
     }
     else
       attributes.finish(*this);
-    entity = new ExternalDataEntity(name, dataType, markupLocation(), id, notation,
-				    attributes);
+    entity = new ExternalDataEntity(name, dataType, markupLocation(), id, 
+				    notation, attributes, 
+				    declType == Entity::parameterEntity 
+				    ? Entity::parameterEntity
+				    : Entity::generalEntity);
   }
-  if (declType == Entity::parameterEntity) {
+  if (declType == Entity::parameterEntity && !sd().www()) {
     message(ParserMessages::externalParameterDataSubdocEntity,
 	    StringMessageArg(name));
     return 1;
@@ -2073,9 +2077,17 @@ Boolean Parser::parseDoctypeDeclStart()
     message(ParserMessages::dtdAfterLpd);
   unsigned declInputLevel = inputLevel();
   Param parm;
-  
-  if (!parseParam(allowName, declInputLevel, parm))
+  static AllowedParams
+    allowImpliedName(Param::indicatedReservedName + Syntax::rIMPLIED,
+		     Param::name);
+  if (!parseParam(allowImpliedName, declInputLevel, parm))
     return 0;
+  if (parm.type == Param::indicatedReservedName + Syntax::rIMPLIED) {
+    if (sd().concur() > 0 || sd().explicitLink() > 0)
+      message(ParserMessages::impliedDoctypeConcurLink);
+    message(ParserMessages::sorryImpliedDoctype);
+    return 0;
+  }
   StringC name;
   parm.token.swap(name);
   if (!lookupDtd(name).isNull())
@@ -2088,23 +2100,70 @@ Boolean Parser::parseDoctypeDeclStart()
   if (!parseParam(allowPublicSystemDsoMdc, declInputLevel, parm))
     return 0;
   ConstPtr<Entity> entity;
+  StringC notation;
+  EntityDecl::DataType data;
+  ExternalId id;
   if (parm.type == Param::reservedName + Syntax::rPUBLIC
       || parm.type == Param::reservedName + Syntax::rSYSTEM) {
     static AllowedParams allowSystemIdentifierDsoMdc(Param::systemIdentifier,
 						     Param::dso, Param::mdc);
-    ExternalId id;
-    if (!parseExternalId(allowSystemIdentifierDsoMdc, allowDsoMdc,
+    static AllowedParams
+      allowSystemIdentifierDsoMdcData(Param::systemIdentifier,
+                                      Param::dso, Param::mdc,
+                                      Param::reservedName + Syntax::rCDATA,
+                                      Param::reservedName + Syntax::rSDATA,
+                                      Param::reservedName + Syntax::rNDATA);
+    static AllowedParams allowDsoMdcData(Param::dso, Param::mdc,
+                                         Param::reservedName + Syntax::rCDATA,
+                                         Param::reservedName + Syntax::rSDATA,
+                                         Param::reservedName + Syntax::rNDATA);
+    if (!parseExternalId(sd().www() ? allowSystemIdentifierDsoMdcData : 
+                                      allowSystemIdentifierDsoMdc, 
+                         sd().www() ? allowDsoMdcData : allowDsoMdc,
 			 1, declInputLevel, parm, id))
       return 0;
+    switch (parm.type) {
+    case Param::reservedName + Syntax::rCDATA:
+      data = Entity::cdata;
+      break; 
+    case Param::reservedName + Syntax::rSDATA:
+      data = Entity::sdata;
+      break; 
+    case Param::reservedName + Syntax::rNDATA:
+      data = Entity::ndata;
+      break; 
+    default:
+      data = Entity::sgmlText;
+      break;
+    }
+    if (data == Entity::sgmlText) {
+      Ptr<Entity> tem
+	= new ExternalTextEntity(name, Entity::doctype, markupLocation(), id);
+      tem->generateSystemId(*this);
+      entity = tem;
+    }
+#if 0
+      eventHandler()
+        .externalEntityDecl(new (eventAllocator())
+  			    ExternalEntityDeclEvent(entity, 0));
+#endif
+    else {
+      // external subset uses some DTD notation
+      if (!parseParam(allowName, declInputLevel, parm))
+        return 0;
+      parm.token.swap(notation);
+      if (!parseParam(allowDsoMdc, declInputLevel, parm))
+        return 0;
+    }
+  }
+  else 
+  // no external subset specified
+  if (sd().implydefDoctype()) {
+    // FIXME this fails for #IMPLIED, since name isn't yet known
     Ptr<Entity> tem
       = new ExternalTextEntity(name, Entity::doctype, markupLocation(), id);
     tem->generateSystemId(*this);
     entity = tem;
-#if 0
-    eventHandler()
-      .externalEntityDecl(new (eventAllocator())
-			  ExternalEntityDeclEvent(entity, 0));
-#endif
   }
   else if (parm.type == Param::mdc) {
     if (sd().implydefElement() == Sd::implydefElementNo) {
@@ -2120,6 +2179,25 @@ Boolean Parser::parseDoctypeDeclStart()
 					markupLocation(),
 					currentMarkup()));
   startDtd(name);
+  if (notation.size() > 0) {
+    // FIXME this case has the wrong entity in the event 
+    // this should be fixed by moving startDtd() call and this code up
+    ConstPtr<Notation> nt(lookupCreateNotation(notation)); 
+    
+    AttributeList attrs(nt->attributeDef());
+    attrs.finish(*this); 
+    Ptr<Entity> tem 
+      = new ExternalDataEntity(name, data, markupLocation(), id, nt, attrs, 
+			       Entity::doctype);
+    tem->generateSystemId(*this);
+    // FIXME This is a hack; we need the entity to have the doctype name to
+    // have generateSytemId() work properly, but have an empty name to add
+    // it as a parameter entity, which is needed to check the notation
+    StringC entname;
+    tem->setName(entname);
+    defDtd().insertEntity(tem);
+    entity = tem;
+  }
   if (parm.type == Param::mdc) {
     // unget the mdc
     currentInput()->ungetToken();
@@ -2154,6 +2232,11 @@ void Parser::implyDtd(const StringC &gi)
     currentMarkup()->addName(gi.data(), gi.size());
   }
 #endif
+  if (sd().concur() > 0 || sd().explicitLink() > 0
+      || (sd().implydefElement() == Sd::implydefElementNo
+          && !sd().implydefDoctype()))
+    message(ParserMessages::omittedProlog);
+
   if ((sd().implydefElement() != Sd::implydefElementNo) && !sd().implydefDoctype()) {
     eventHandler().startDtd(new (eventAllocator())
 				  StartDtdEvent(gi, ConstPtr<Entity>(), 0,
@@ -2337,25 +2420,41 @@ void Parser::checkDtd(Dtd &dtd)
       }
     }
   }
-  Dtd::ConstEntityIter entityIter(((const Dtd &)dtd).generalEntityIter());
-  for (;;) {
-    ConstPtr<Entity> entity(entityIter.next());
-    if (entity.isNull())
-      break;
-    const ExternalDataEntity *external = entity->asExternalDataEntity();
-    if (external) {
-      Notation *notation = (Notation *)external->notation();
-      if (!notation->defined()) {
-	if (sd().implydefNotation()) {
-	  ExternalId id;
-	  notation->setExternalId(id, Location());
-	  notation->generateSystemId(*this);
-	} 
-	else if (validate()) {
-	  setNextLocation(external->defLocation());
-	  message(ParserMessages::entityNotationUndefined,
-		  StringMessageArg(notation->name()),
-		  StringMessageArg(external->name()));
+  Dtd::ConstEntityIter gEntityIter(((const Dtd &)dtd).generalEntityIter());
+  Dtd::ConstEntityIter pEntityIter(((const Dtd &)dtd).parameterEntityIter());
+  for (i = 0; i < (sd().www() ? 2 : 1); i++) {
+    for (;;) {
+      ConstPtr<Entity> entity(i == 0 ? gEntityIter.next() : pEntityIter.next());
+      if (entity.isNull())
+	break;
+      const ExternalDataEntity *external = entity->asExternalDataEntity();
+      if (external) {
+	Notation *notation = (Notation *)external->notation();
+	if (!notation->defined()) {
+	  if (sd().implydefNotation()) {
+	    ExternalId id;
+	    notation->setExternalId(id, Location());
+	    notation->generateSystemId(*this);
+	  } 
+	  else if (validate()) {
+	    setNextLocation(external->defLocation());
+	    switch (external->declType()) {
+	    case Entity::parameterEntity:
+	    message(ParserMessages::parameterEntityNotationUndefined,
+		    StringMessageArg(notation->name()),
+		    StringMessageArg(external->name()));
+	      break;
+	    case Entity::doctype:
+	      message(ParserMessages::dsEntityNotationUndefined,
+		      StringMessageArg(notation->name()));
+	      break;
+	    default:
+	      message(ParserMessages::entityNotationUndefined,
+		StringMessageArg(notation->name()),
+		StringMessageArg(external->name()));
+	      break;
+	    }
+	  }
 	}
       }
     }

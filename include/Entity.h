@@ -211,7 +211,7 @@ private:
 
 class SP_API ExternalNonTextEntity : public ExternalEntity {
 public:
-  ExternalNonTextEntity(const StringC &, DataType,
+  ExternalNonTextEntity(const StringC &, DeclType, DataType,
 			const Location &, const ExternalId &);
   Boolean isDataOrSubdoc() const;
   void litReference(Text &, ParserState &,
@@ -222,6 +222,8 @@ public:
   void normalReference(ParserState &,
 		       const Ptr<EntityOrigin> &,
 		       Boolean) const;
+  void dsReference(ParserState &,
+		   const Ptr<EntityOrigin> &) const;
   Boolean isCharacterData() const;
 };
 
@@ -229,7 +231,7 @@ class SP_API ExternalDataEntity : public ExternalNonTextEntity {
 public:
   ExternalDataEntity(const StringC &, DataType, const Location &,
 		     const ExternalId &, const ConstPtr<Notation> &,
-		     AttributeList &);
+		     AttributeList &, DeclType = generalEntity);
   const AttributeList &attributes() const;
   const Notation *notation() const;
   const ExternalDataEntity *asExternalDataEntity() const;

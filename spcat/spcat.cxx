@@ -72,8 +72,8 @@ void SpcatApp::processOption(AppChar opt, const AppChar *arg)
   case 'P':
     for (int i = 0; arg[i] != '\0'; i++) 
       txt.addChar(arg[i], loc);
-    const MessageType1 *err;
-    exId.setPublic(txt, systemCharset(), syntax.space(), err);
+    const MessageType1 *err, *err1;
+    exId.setPublic(txt, systemCharset(), syntax.space(), err, err1);
     break;
   case 'S':
     for (int i = 0; arg[i] != '\0'; i++) 

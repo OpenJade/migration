@@ -34,6 +34,7 @@ public:
   typedef unsigned char Type;
   enum {
     invalid,
+    silent,
     dso,
     mdc,
     minus,
@@ -96,9 +97,11 @@ public:
   Param::Type digit() const;
   Param::Type nmchar() const;
   Param::Type literal() const;
+  Boolean silent() const;
 private:
   void init();
   void allow(Param::Type);
+  PackedBoolean silent_;
   PackedBoolean mdc_;
   PackedBoolean rni_;
   PackedBoolean dso_;
@@ -204,6 +207,12 @@ inline
 Param::Type AllowedParams::literal() const
 {
   return literal_;
+}
+
+inline
+Boolean AllowedParams::silent() const
+{
+  return silent_;
 }
 
 #ifdef SP_NAMESPACE

@@ -112,6 +112,42 @@ DeclaredValue *CdataDeclaredValue::copy() const
   return new CdataDeclaredValue(*this);
 }
 
+DataDeclaredValue::DataDeclaredValue(const ConstPtr<Notation> &nt,
+                                     AttributeList &attributes)
+: notation_(nt)
+{
+  attributes.swap(attributes_);
+}
+
+
+AttributeValue *DataDeclaredValue::makeValue(Text &text,
+                                             AttributeContext &context,
+                                             const StringC &str,
+                                             unsigned &specLength) const
+{
+  // FIXME should use private member function in CdataDeclaredValue
+  // to check this both here and in CdataDeclaredValue::makeValue()
+  const Syntax &syntax = context.attributeSyntax();
+  size_t normsep = syntax.normsep();
+  size_t normalizedLength = text.normalizedLength(normsep);
+  specLength += normalizedLength;
+  size_t litlen = syntax.litlen();
+  // A length error will already have been given if
+  // length > litlen - normsep.
+  if (litlen >= normsep && text.size() <= litlen - normsep
+      && normalizedLength > litlen)
+    context.message(ParserMessages::normalizedAttributeValueLength,
+		    NumberMessageArg(litlen),
+		    NumberMessageArg(normalizedLength));
+
+  return new DataAttributeValue(text, notation_, attributes_);
+}
+
+DeclaredValue *DataDeclaredValue::copy() const
+{
+  return new DataDeclaredValue(*this);
+}
+
 TokenizedDeclaredValue::TokenizedDeclaredValue(TokenType type,
 					       Boolean isList)
 : type_(type), isList_(isList)
@@ -1057,6 +1093,28 @@ Boolean CdataAttributeValue::recoverUnquoted(const StringC &str,
     return 1;
   }
   return 0;
+}
+
+const Notation *CdataAttributeValue::notation() const
+{
+  return 0;
+}
+
+DataAttributeValue::DataAttributeValue(Text &text,
+                                       const ConstPtr<Notation> &nt,
+                                       const AttributeList &attributes)
+: CdataAttributeValue(text), notation_(nt), attributes_(&attributes)
+{
+}
+
+const AttributeList &DataAttributeValue::attributes() const
+{
+  return *attributes_;
+}
+
+const Notation *DataAttributeValue::notation() const
+{
+  return notation_.pointer();
 }
 
 Attribute::Attribute()

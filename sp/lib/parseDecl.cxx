@@ -2103,7 +2103,7 @@ Boolean Parser::parseDoctypeDeclStart()
   static AllowedParams
     allowImpliedName(Param::indicatedReservedName + Syntax::rIMPLIED,
 		     Param::name);
-  if (!parseParam(allowImpliedName, declInputLevel, parm))
+  if (!parseParam(sd().www() ? allowImpliedName : allowName, declInputLevel, parm))
     return 0;
   if (parm.type == Param::indicatedReservedName + Syntax::rIMPLIED) {
     if (sd().concur() > 0 || sd().explicitLink() > 0)

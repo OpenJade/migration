@@ -1,4 +1,4 @@
-// This file was automatically generated from style/InterpreterMessages.msg by msggen.pl.
+// This file was automatically generated from InterpreterMessages.msg by msggen.pl.
 #ifndef InterpreterMessages_INCLUDED
 #define InterpreterMessages_INCLUDED 1
 
@@ -262,6 +262,16 @@ struct InterpreterMessages {
   static const MessageType1L duplicateFlowObjectClass;
   // 131
   static const MessageType1 undefinedMode;
+  // 132
+  static const MessageType3 notAnInteger;
+  // 133
+  static const MessageType3 notAKeyword;
+  // 134
+  static const MessageType3 notAnAlist;
+  // 135
+  static const MessageType3 notACharList;
+  // 136
+  static const MessageType3 lengthError;
 };
 
 #ifdef SP_NAMESPACE

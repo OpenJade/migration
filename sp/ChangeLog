@@ -1,3 +1,8 @@
+2004-01-16  Karl Eichwalder  <ke@suse.de>
+
+	* include/RangeMap.cxx: Include "constant.h" to make it compile
+	with GCC 3.4 (thanks to Marcus Meissner).
+
 2003-11-03  Karl Eichwalder  <ke@suse.de>
 
 	* po/LINGUAS (Tag): Add 'tr'
@@ -66,7 +71,7 @@
 
 	  I accomplished the versioning by adding a version number to
 	  SP_MESSAGE_DOMAIN, and it made sense to use the library SONAME
-	  for that.Â  So, I created a new variable in configure.in called
+	  for that.  So, I created a new variable in configure.in called
 	  SP_LIBOSP_CUR to be the "current" part of the SONAME, and used
 	  that in SP_MESSAGE_DOMAIN, and also referenced that in
 	  lib/Makefile to to actually set the SONAME.

@@ -190,6 +190,7 @@ dvi info tags TAGS ID:
 
 mostlyclean:
 	rm -f core core.* *.pox $(PACKAGE).po *.old.po cat-id-tbl.tmp
+	rm -f $(PACKAGE).pot stamp-cat-id cat-id-tbl.c
 	rm -fr *.o
 
 clean: mostlyclean

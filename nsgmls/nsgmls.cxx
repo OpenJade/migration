@@ -90,6 +90,14 @@ NsgmlsApp::NsgmlsApp()
   registerOption('m', 0, NsgmlsMessages::mHelp);
   registerOption('r', 0, NsgmlsMessages::rHelp);
   registerOption('u', 0, NsgmlsMessages::uHelp);
+  registerInfo(NsgmlsMessages::info1);
+  registerInfo(NsgmlsMessages::info2);
+  registerInfo(NsgmlsMessages::info3);
+  registerInfo(NsgmlsMessages::info4);
+  registerInfo(NsgmlsMessages::info5);
+  registerInfo(NsgmlsMessages::info6);
+  registerInfo(NsgmlsMessages::info7);
+  registerInfo(NsgmlsMessages::info8);
 }
 
 void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)

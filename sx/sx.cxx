@@ -54,6 +54,9 @@ SxApp::SxApp()
   changeOptionRegistration('x', AppChar(255));
   registerOption('x', SP_T("xml-output-option"), SxMessages::option,  
                  SxMessages::xHelp);
+  registerInfo(SxMessages::info1);
+  registerInfo(SxMessages::info2);
+  registerInfo(SxMessages::info3);
   outputOptions_.nlInTag = 1;
 }
 

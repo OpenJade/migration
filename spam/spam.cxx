@@ -81,6 +81,9 @@ SpamApp::SpamApp()
   registerOption('p', SP_T("output-prolog"), SpamMessages::pHelp);
   registerOption('r', SP_T("raw"), SpamMessages::rHelp);
   registerOption('x', SP_T("expand-references"), SpamMessages::xHelp);
+  registerInfo(SpamMessages::info1);
+  registerInfo(SpamMessages::info2);
+  registerInfo(SpamMessages::info3);
 }
 
 void SpamApp::processOption(AppChar opt, const AppChar *arg)

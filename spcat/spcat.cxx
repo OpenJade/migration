@@ -46,6 +46,10 @@ SpcatApp::SpcatApp()
                  SpcatMessages::name, SpcatMessages::nHelp);
   registerOption('s', SP_T("declaration"), 
                  SpcatMessages::name, SpcatMessages::sHelp);
+  registerInfo(SpcatMessages::info1);
+  registerInfo(SpcatMessages::info2);
+  registerInfo(SpcatMessages::info3);
+  registerInfo(SpcatMessages::info4);
 }
 
 void SpcatApp::processOption(AppChar opt, const AppChar *arg)

@@ -40,6 +40,9 @@ SgmlnormApp::SgmlnormApp()
   registerOption('m', SP_T("marked-sections"), SgmlnormMessages::mHelp);
   registerOption('n', SP_T("comments"), SgmlnormMessages::nHelp);
   registerOption('r', SP_T("raw"), SgmlnormMessages::rHelp);
+  registerInfo(SgmlnormMessages::info1);
+  registerInfo(SgmlnormMessages::info2);
+  registerInfo(SgmlnormMessages::info3);
 }
 
 void SgmlnormApp::processOption(AppChar opt, const AppChar *arg)

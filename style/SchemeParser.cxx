@@ -1131,6 +1131,7 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
     return getToken(allowCloseParen, tok);
   }
   NCVector<Owner<Expression> > valExprs;
+  Owner<Expression> tem;
   bool arrow = 0;
   if (!parseExpression(allowCloseParen|allowKeyArrow, tem, key, tok))
     return 0;

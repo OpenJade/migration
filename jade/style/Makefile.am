@@ -2,7 +2,7 @@
 
 lib_LTLIBRARIES = libostyle.la
 
-libostyle_la_LDFLAGS = -version-info 0:0:0
+libostyle_la_LDFLAGS = -version-info 1:0:0
 
 libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	DssslApp.h DssslAppMessages.h DssslSpecEventHandler.cxx \
@@ -19,7 +19,7 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	charProps.h dsssl_ns.h primitive.cxx primitive.h \
 	sdata.h style_inst.cxx style_pch.h stylelib.cxx \
 	stylelib.h TransformationMode.h TransformationMode.cxx \
-	DocumentGenerator.h DocumentGenerator.cxx
+	DocumentGenerator.h DocumentGenerator.cxx MessageModule.cxx
 
 # We install the headers needed to create a new application based on
 # the DssslApp class.
@@ -39,7 +39,7 @@ BUILT_SOURCES = style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 
 MAINTAINERCLEANFILES = Makefile.in
 
-MSGGENFLAGS = -l xModule 
+MSGGENFLAGS = -l jstyleModule 
 
 SUFFIXES = .m4 .msg .rc
 

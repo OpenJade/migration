@@ -89,7 +89,7 @@ int DssslApp::init(int argc, AppChar **argv)
   // Since we use strtod(), must have C numeric
   setlocale(LC_NUMERIC, "C");
 #endif
-  MessageTable::instance()->registerMessageDomain(MessageFragment::xModule,
+  MessageTable::instance()->registerMessageDomain(jstyleModule,
                                                   OPENJADE_MESSAGE_DOMAIN,
 						  OPENJADE_LOCALE_DIR);
   return ret;

@@ -1,0 +1,16 @@
+HtmlFOTBuilder_inst.cxx
+HtmlMessages.h
+HtmlMessages.rc
+JadeMessages.h
+JadeMessages.rc
+Makefile.in
+MifFOTBuilder_inst.cxx
+MifMessages.h
+MifMessages.rc
+RtfFOTBuilder_inst.cxx
+RtfMessages.h
+RtfMessages.rc
+TeXFOTBuilder_inst.cxx
+TeXMessages.h
+TeXMessages.rc
+TransformFOTBuilder_inst.cxx

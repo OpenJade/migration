@@ -8,7 +8,7 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	HtmlFOTBuilder.h TeXFOTBuilder.h TransformFOTBuilder.h \
 	MifFOTBuilder.h \
 	JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
-	MifMessages.h TmpOutputByteStream.h
+	MifMessages.h TmpOutputByteStream.h MessageModule.cxx
 
 openjade_LDADD = $(top_builddir)/style/libostyle.la \
 	$(top_builddir)/spgrove/libospgrove.la \
@@ -40,7 +40,7 @@ BUILT_SOURCES = JadeMessages.h JadeMessages.rc \
 
 MAINTAINERCLEANFILES = Makefile.in  jade-out.fot
 
-MSGGENFLAGS = -l xModule
+MSGGENFLAGS = -l jadeModule
 
 SUFFIXES = .msg .m4 .rc
 

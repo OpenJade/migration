@@ -10,10 +10,14 @@ dnl  Credits: this autoconf script was largely "inspired" <g> by the
 dnl  autoconf script around SP made by Henry Thompson.
 dnl
 AC_INIT(dsssl)
-AM_INIT_AUTOMAKE(OpenJade, 1.4)
+AM_INIT_AUTOMAKE(OpenJade, 1.4, no-define)
 AM_CONFIG_HEADER(style/config.h)
 AM_SANITY_CHECK
 missing_dir=`cd $ac_aux_dir && pwd`
+
+dnl Use different names than usually to avoid conflicts.
+AC_DEFINE_UNQUOTED(OPENJADE_PACKAGE, "$PACKAGE", Package name)
+AC_DEFINE_UNQUOTED(OPENJADE_VERSION, "$VERSION", Package version)
 
 dnl Checks for programs.
 AC_PROG_CC

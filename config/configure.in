@@ -148,25 +148,10 @@ AC_ARG_ENABLE(http,
     fi)
 
 dnl
-dnl  Framemaker support
+dnl  optional backends
 dnl
-AC_ARG_ENABLE(mif,
-[  --enable-mif            bind in support for FrameMaker MIF output],
-    if test $enableval
-    then
-	AC_DEFINE(JADE_MIF)
-    fi)
-
-
-dnl
-dnl  html+css support
-dnl
-AC_ARG_ENABLE(html,
-[  --enable-html            bind in support for HTML+CSS output],
-    if test $enableval
-    then
-	AC_DEFINE(JADE_HTML)
-    fi)
+smr_SWITCH(mif, support for FrameMaker MIF output, on, JADE_MIF)
+smr_SWITCH(html, support for HTML+CSS output, on, JADE_HTML)
 
 
 dnl 

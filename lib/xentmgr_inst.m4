@@ -92,6 +92,8 @@ __instantiate(Ptr<CharMapResource<unsigned char> >)
 __instantiate(ConstPtr<CharMapResource<unsigned char> >)
 __instantiate(String<unsigned short>)
 __instantiate(Vector<String<unsigned short> >)
+__instantiate(Ptr<CharMapResource<bool> >)
+__instantiate(Ptr<CharMapResource<unsigned short> >)
 #endif
 
 #ifdef SP_NAMESPACE

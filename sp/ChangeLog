@@ -5,6 +5,8 @@
 	$(pkgdocdir)/doc to make it compatible with description in README.
 	* doc/Makefile.am (pkgdochtml_DATA): Use it instead of
 	pkgdoc_DATA.
+	* spec.in: Change it accordingly.
+	Reported by Ville Skyttä.
 
 	* include/Makefile.am (EXTRA_DIST): Add NCVector.sed.
 	* include/NCVector.sed: Add it; required by sunfix.sh.

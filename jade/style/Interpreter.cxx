@@ -2110,8 +2110,8 @@ void Interpreter::installCharProperties()
     };
    
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-        cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("space?"), cp);
     
@@ -2128,8 +2128,8 @@ void Interpreter::installCharProperties()
     };
     
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("record-end?"), cp);
 
@@ -2146,8 +2146,8 @@ void Interpreter::installCharProperties()
     };
     
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("blank?"), cp);
 
@@ -2164,8 +2164,8 @@ void Interpreter::installCharProperties()
     };
     
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("input-tab?"), cp);
     
@@ -2182,8 +2182,8 @@ void Interpreter::installCharProperties()
     };
     
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("input-whitespace?"), cp);
 
@@ -2200,8 +2200,8 @@ void Interpreter::installCharProperties()
     };
     
     for (size_t i = 0; i < SIZEOF(chars); i++) 
-      for (Char c = chars[i].c; c < chars[i].c + chars[i].num; c++)   
-	cp.map->setChar(c, ELObjPart(makeTrue(), unsigned(-1)));
+      cp.map->setRange(chars[i].c, chars[i].c+chars[i].num-1,
+		       ELObjPart(makeTrue(), unsigned(-1)));
   }
   charProperties_.insert(makeStringC("punct?"), cp);
 
@@ -2223,8 +2223,8 @@ void Interpreter::installCharProperties()
       tem += makeStringC(chars[i].script);
       StringObj *obj = new (*this) StringObj(tem);
       makePermanent(obj);  
-      for (Char c = chars[i].c1; c <= chars[i].c2; c++)   
-	cp.map->setChar(c, ELObjPart(obj, unsigned(-1)));
+      cp.map->setRange(chars[i].c1, chars[i].c2,
+		       ELObjPart(obj, unsigned(-1)));
     }
   }
   charProperties_.insert(makeStringC("script"), cp);

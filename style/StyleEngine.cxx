@@ -12,7 +12,9 @@
 #include "ProcessContext.h"
 #include "macros.h"
 #include "InternalInputSource.h"
-//#include "TransformContext.h"
+#include "OutputCharStream.h"
+#include "OutputByteStream.h"
+#include "DocumentGenerator.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -24,12 +26,13 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 bool debugMode,
 			 bool dsssl2,
                          bool strictMode,
-			 const FOTBuilder::Description &fotbDescr)
+			 const FOTBuilder::Description &fotbDescr,
+                         const CodingSystem *out)
 : interpreter_(0),
   mgr_(&mgr), groveManager_(&groveManager), 
   unitsPerInch_(unitsPerInch), debugMode_(debugMode),
   dsssl2_(dsssl2), strictMode_(strictMode), 
-  fotbDescr_(&fotbDescr)  
+  fotbDescr_(&fotbDescr), outputCodingSystem_(out)  
 {
   // FIXME: this is super-ugly. We can't construct the Interpreter
   // right away, since we don't know if its a SL/TL context until
@@ -182,8 +185,13 @@ void StyleEngine::process(const NodePtr &node, FOTBuilder &fotb)
   }
   else {
     interpreter_->transformationMode()->compile(*interpreter_, node);
-    //TransformContext context(*interpreter_);
-    //context.process(node);
+    FileOutputByteStream outputFile_;
+    if (outputFile_.open("jade-grove.out")) {
+      DocumentGenerator docg(interpreter_, new RecordOutputCharStream(
+                                 new EncodeOutputCharStream(&outputFile_,
+                                   outputCodingSystem_)));
+      docg.emit(node);
+    }
   }
 }
 

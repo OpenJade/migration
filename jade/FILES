@@ -123,6 +123,7 @@ include/NamedResource.h
 include/NamedResourceTable.h
 include/NamedTable.h
 include/Notation.h
+include/NotationStorage.h
 include/OpenElement.h
 include/Options.cxx
 include/Options.h
@@ -169,6 +170,7 @@ include/UnivCharsetDesc.h
 include/Vector.cxx
 include/Vector.h
 include/Win32CodingSystem.h
+include/WinApp.h
 include/WinInetStorage.h
 include/XcharMap.cxx
 include/XcharMap.h
@@ -261,6 +263,7 @@ lib/ModeInfo.h
 lib/Mutex.h
 lib/NameToken.h
 lib/Notation.cxx
+lib/NotationStorage.cxx
 lib/NumericCharRefOrigin.cxx
 lib/NumericCharRefOrigin.h
 lib/OffsetOrderedList.cxx
@@ -333,6 +336,7 @@ lib/Undo.h
 lib/UnicodeCodingSystem.cxx
 lib/UnivCharsetDesc.cxx
 lib/Win32CodingSystem.cxx
+lib/WinApp.cxx
 lib/WinInetStorage.cxx
 lib/WinInetStorageMessages.msg
 lib/WinInetStorageMessages.rc

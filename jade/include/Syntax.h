@@ -237,6 +237,7 @@ public:
   // :: is for Watcom 10.0a
   void checkSgmlChar(const Sd &,
 		     const ::SP_NAMESPACE_SCOPE Syntax *otherSyntax,
+		     Boolean invalidUseDocumentCharset,
 		     ISet<WideChar> &invalid)
        const;
   static int referenceQuantity(Quantity);

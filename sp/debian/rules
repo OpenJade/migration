@@ -167,10 +167,6 @@ install-opensp:	$(install-common) debian/README.Debian
 	dh_undocumented -p$(pkg) onsgmls.1 osgmlnorm.1 ospam.1 ospcat.1	\
 	    ospent.1 osx.1
 
-#	 make sure maintainer scripts are good
-	sh -n debian/$(pkg).postinst
-	sh -n debian/$(pkg).prerm
-
 #	 install control files
 	dh_installdeb -p$(pkg)
 

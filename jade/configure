@@ -5358,8 +5358,8 @@ _ACEOF
 
 fi
 
-echo "$as_me:$LINENO: checking wether to include support for http" >&5
-echo $ECHO_N "checking wether to include support for http... $ECHO_C" >&6
+echo "$as_me:$LINENO: checking whether to include support for http" >&5
+echo $ECHO_N "checking whether to include support for http... $ECHO_C" >&6
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'

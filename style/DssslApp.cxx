@@ -26,9 +26,10 @@ namespace DSSSL_NAMESPACE {
 
 DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
-  dssslSpecOption_(0), debugMode_(0)
+  dssslSpecOption_(0), debugMode_(0), dsssl2_(0)
 {
   registerOption('G');
+  registerOption('2');
   registerOption('d', SP_T("dsssl_spec"));
   registerOption('V', SP_T("variable"));
 }
@@ -83,6 +84,9 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
   switch (opt) {
   case 'G':
     debugMode_ = 1;
+    break;
+  case '2':
+    dsssl2_ = 1;
     break;
   case 'd':
     dssslSpecId_.resize(0);
@@ -324,7 +328,7 @@ void DssslApp::processGrove()
   Owner<FOTBuilder> fotb(makeFOTBuilder(extensions));
   if (!fotb)
     return;
-  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, extensions);
+  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, dsssl2_, extensions);
   for (size_t i = 0; i < defineVars_.size(); i++)
     se.defineVariable(defineVars_[i]);
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this);

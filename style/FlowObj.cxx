@@ -59,6 +59,11 @@ bool FlowObj::hasNonInheritedC(const Identifier *) const
   return 0;
 }
 
+bool FlowObj::hasPseudoNonInheritedC(const Identifier *) const
+{
+  return 0;
+}
+
 void FlowObj::setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &)
 {
   CANNOT_HAPPEN();
@@ -69,6 +74,7 @@ bool FlowObj::isDisplayNIC(const Identifier *ident)
   Identifier::SyntacticKey key;
   if (ident->syntacticKey(key)) {
     switch (key) {
+    case Identifier::keyPositionPreference:
     case Identifier::keyIsKeepWithPrevious:
     case Identifier::keyIsKeepWithNext:
     case Identifier::keyKeep:
@@ -99,6 +105,16 @@ bool FlowObj::setDisplayNIC(FOTBuilder::DisplayNIC &nic,
   Identifier::SyntacticKey key;
   if (ident->syntacticKey(key)) {
     switch (key) {
+    case Identifier::keyPositionPreference:
+      {
+	static FOTBuilder::Symbol vals[] = {
+	  FOTBuilder::symbolFalse,
+	  FOTBuilder::symbolTop,
+	  FOTBuilder::symbolBottom,
+	};
+	interp.convertEnumC(vals, SIZEOF(vals), obj, ident, loc, nic.positionPreference);
+      }
+      return 1;
     case Identifier::keyIsKeepWithPrevious:
       interp.convertBooleanC(obj, ident, loc, nic.keepWithPrevious);
       return 1;
@@ -1115,19 +1131,6 @@ bool ScoreFlowObj::hasNonInheritedC(const Identifier *ident) const
 void ScoreFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
 				    const Location &loc, Interpreter &interp)
 {
-  SymbolObj *symObj = obj->asSymbol();
-  if (symObj) {
-    FOTBuilder::Symbol sym = symObj->cValue();
-    switch (sym) {
-    case FOTBuilder::symbolBefore:
-    case FOTBuilder::symbolThrough:
-    case FOTBuilder::symbolAfter:
-      type_ = new SymbolType(sym);
-      return;
-    default:
-      break;
-    }
-  }
   Char c;
   if (obj->charValue(c)) {
     type_ = new CharType(c);
@@ -1152,9 +1155,14 @@ void ScoreFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
   default:
     break;
   }
-  interp.setNextLocation(loc);
-  interp.message(InterpreterMessages::invalidCharacteristicValue,
-                 StringMessageArg(ident->name()));
+  static FOTBuilder::Symbol vals[] = {
+    FOTBuilder::symbolBefore,
+    FOTBuilder::symbolThrough,
+    FOTBuilder::symbolAfter
+  };
+  FOTBuilder::Symbol sym;
+  if (interp.convertEnumC(vals, SIZEOF(vals), obj, ident, loc, sym))
+    type_ = new SymbolType(sym);
 }
 
 ScoreFlowObj::Type::~Type()
@@ -2024,19 +2032,13 @@ public:
 	nic_->widthType = FOTBuilder::TableNIC::widthExplicit;
       return;
     }
-    StyleObj *style = 0;
-    if (obj == interp.makeTrue())
-      style = interp.borderTrueStyle();
-    else if (obj == interp.makeFalse())
-      style = interp.borderFalseStyle();
-    else {
-      SosofoObj *sosofo = obj->asSosofo();
-      if (!sosofo || !sosofo->tableBorderStyle(style)) {
-	interp.setNextLocation(loc);
-	interp.message(InterpreterMessages::invalidCharacteristicValue,
-  		       StringMessageArg(ident->name()));
+    StyleObj *style;
+    SosofoObj *sosofo = obj->asSosofo();
+    if (!sosofo || !sosofo->tableBorderStyle(style)) {
+      Boolean b;
+      if (!interp.convertBooleanC(obj, ident, loc, b))
 	return;
-      }
+      style = b ? interp.borderTrueStyle() : interp.borderFalseStyle();
     }
     switch (key) {
     case Identifier::keyBeforeRowBorder:
@@ -2102,7 +2104,13 @@ public:
     setDisplayNIC(*nic_, ident, obj, loc, interp);
   }
   bool hasNonInheritedC(const Identifier *ident) const {
-    return isDisplayNIC(ident);
+    if (!isDisplayNIC(ident))
+      return 0;
+    Identifier::SyntacticKey key;
+    ident->syntacticKey(key);
+    if (key == Identifier::keyPositionPreference)
+      return 0;
+    return 1;
   }
 private:
   Owner<FOTBuilder::TablePartNIC> nic_;
@@ -2311,6 +2319,17 @@ public:
       case Identifier::keyColumnNumber:
       case Identifier::keyNColumnsSpanned:
       case Identifier::keyNRowsSpanned:
+	return 1;
+      default:
+	break;
+      }
+    }
+    return 0;
+  }
+  bool hasPseudoNonInheritedC(const Identifier *ident) const {
+    Identifier::SyntacticKey key;
+    if (ident->syntacticKey(key)) {
+      switch (key) {
       case Identifier::keyIsStartsRow:
       case Identifier::keyIsEndsRow:
 	return 1;
@@ -2458,10 +2477,9 @@ void ProcessContext::addTableColumn(unsigned columnIndex, unsigned span, StyleOb
       table->columnStyles.resize(columnIndex + 1);
     Vector<StyleObj *> &tem = table->columnStyles[columnIndex];
     if (span > 0) {
-      if (span > tem.size()) {
-        tem.resize(span);
-        tem[span - 1] = style;
-      }
+      while (tem.size() < span)
+	tem.push_back((StyleObj *)0);
+      tem[span - 1] = style;
     }
   }
 }

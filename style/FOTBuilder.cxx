@@ -987,10 +987,6 @@ void FOTBuilder::setHyphenationKeep(Symbol)
 {
 }
 
-void FOTBuilder::setPositionPreference(Symbol)
-{
-}
-
 void FOTBuilder::setFontStructure(Symbol)
 {
 }
@@ -1111,7 +1107,7 @@ void FOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
 }
 
-void FOTBuilder::startNode(const NodePtr &, const StringC &, RuleType)
+void FOTBuilder::startNode(const NodePtr &, const StringC &)
 {
 }
   
@@ -1140,9 +1136,14 @@ void FOTBuilder::extensionSet(void (FOTBuilder::*func)(long), long arg)
 
 
 FOTBuilder::DisplayNIC::DisplayNIC()
-: keep(symbolFalse), breakBefore(symbolFalse), breakAfter(symbolFalse),
-  keepWithPrevious(0), keepWithNext(0),
-  mayViolateKeepBefore(0), mayViolateKeepAfter(0)
+: positionPreference(symbolFalse),
+  keep(symbolFalse),
+  breakBefore(symbolFalse),
+  breakAfter(symbolFalse),
+  keepWithPrevious(0),
+  keepWithNext(0),
+  mayViolateKeepBefore(0),
+  mayViolateKeepAfter(0)
 {
 }
 
@@ -1159,7 +1160,7 @@ FOTBuilder::InlineNIC::InlineNIC()
 
 FOTBuilder::ExternalGraphicNIC::ExternalGraphicNIC()
 : scaleType(symbolMaxUniform),
-  isDisplay(1),
+  isDisplay(0),
   hasMaxWidth(0),
   hasMaxHeight(0),
   escapementDirection(symbolFalse)
@@ -1232,11 +1233,9 @@ SaveFOTBuilder::SaveFOTBuilder()
 }
 
 SaveFOTBuilder::SaveFOTBuilder(const NodePtr &currentNode,
-			       const StringC &processingMode,
-			       RuleType ruleType)
+			       const StringC &processingMode)
 : currentNode_(currentNode),
   processingMode_(processingMode),
-  ruleType_(ruleType),
   calls_(0), tail_(&calls_)
 {
 }
@@ -1259,7 +1258,7 @@ SaveFOTBuilder *SaveFOTBuilder::asSaveFOTBuilder()
 void SaveFOTBuilder::emit(FOTBuilder &fotb)
 {
   if (currentNode_)
-    fotb.startNode(currentNode_, processingMode_, ruleType_);
+    fotb.startNode(currentNode_, processingMode_);
   SaveFOTBuilder *save = fotb.asSaveFOTBuilder();
   if (save) {
     if (calls_) {
@@ -1477,7 +1476,6 @@ SYMBOL_ARG_CALL(setCellRowAlignment)
 SYMBOL_ARG_CALL(setBorderAlignment)
 SYMBOL_ARG_CALL(setSidelineSide)
 SYMBOL_ARG_CALL(setHyphenationKeep)
-SYMBOL_ARG_CALL(setPositionPreference)
 SYMBOL_ARG_CALL(setFontStructure)
 SYMBOL_ARG_CALL(setFontProportionateWidth)
 SYMBOL_ARG_CALL(setCellCrossed)
@@ -1644,21 +1642,19 @@ void SaveFOTBuilder::character(const CharacterNIC &nic)
 }
 
 SaveFOTBuilder::StartNodeCall::StartNodeCall(const NodePtr &nd,
-					     const StringC &m,
-					     RuleType r)
-: node(nd), mode(m), rule(r)
+					     const StringC &m)
+: node(nd), mode(m)
 {
 }
 
 void SaveFOTBuilder::StartNodeCall::emit(FOTBuilder &fotb)
 {
-  fotb.startNode(node, mode, rule);
+  fotb.startNode(node, mode);
 }
 
-void SaveFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
-			       RuleType rule)
+void SaveFOTBuilder::startNode(const NodePtr &node, const StringC &mode)
 {
-  *tail_ = new StartNodeCall(node, mode, rule);
+  *tail_ = new StartNodeCall(node, mode);
   tail_ = &(*tail_)->next;
 }
 

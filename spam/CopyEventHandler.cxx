@@ -73,7 +73,7 @@ CopyEventHandler::CopyEventHandler(OutputCharStream *os,
 : os_(os), topOs_(os), inInstance_(0), entityLevel_(0),
   normalizeFlags_(normalizeFlags), outputEntity_(outputEntity),
   omittagHoist_(0), inSpecialMarkedSection_(0),
-  currentAttributes_(0)
+  currentAttributes_(0), emptyElementNormal_(0)
 {
   outputEntityLevel_ = outputEntity_.size() == 0 ? 0 : unsigned(-1);
 }
@@ -106,6 +106,7 @@ void CopyEventHandler::sgmlDecl(SgmlDeclEvent *event)
   else if (instanceSyntax_->namecaseEntity())
     instanceSyntax_->entitySubstTable()->inverseTable(lowerSubst_);
   sd_ = event->sdPointer();
+  emptyElementNormal_ = sd_->emptyElementNormal();
   delete event;
 }
 
@@ -258,7 +259,7 @@ void CopyEventHandler::startElement(StartElementEvent *event)
 	  }
 	  os() << syntax_->delimGeneral(iter.delimGeneral());
 	  break;
-	case Syntax::dNET:
+	case Syntax::dNESTC:
 	  closed = 1;
 	  if (normalizeFlags_ & normalizeNet) {
 	    handleChange();
@@ -491,7 +492,7 @@ void CopyEventHandler::literal(const Text &text)
 
 void CopyEventHandler::endElement(EndElementEvent *event)
 {
-  if (mustOmitEnd_) {
+  if (!emptyElementNormal_ && mustOmitEnd_) {
     delete event;
     mustOmitEnd_ = 0;
     return;

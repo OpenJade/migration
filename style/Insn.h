@@ -182,6 +182,37 @@ private:
   InsnPtr next_;
 };
 
+class StackSetBoxInsn : public Insn {
+public:
+  StackSetBoxInsn(int index, int frameIndex, const Location &loc, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  int index_;			// always negative
+  int frameIndex_;
+  Location loc_;
+  InsnPtr next_;
+};
+
+class StackSetInsn : public Insn {
+public:
+  StackSetInsn(int index, int frameIndex, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  int index_;			// always negative
+  int frameIndex_;
+  InsnPtr next_;
+};
+
+class ClosureSetBoxInsn : public Insn {
+public:
+  ClosureSetBoxInsn(int index, const Location &loc, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  int index_;
+  Location loc_;
+  InsnPtr next_;
+};
+
 class TopRefInsn : public Insn {
 public:
   TopRefInsn(const Identifier *var, InsnPtr next);
@@ -282,15 +313,14 @@ private:
   InsnPtr next_;
 };
 
-class TestUnspecifiedInsn : public Insn {
+class TestNullInsn : public Insn {
 public:
-  TestUnspecifiedInsn(int offset,
-		      InsnPtr ifUnspecified, InsnPtr ifNotUnspecified);
+  TestNullInsn(int offset, InsnPtr ifNull, InsnPtr ifNotNull);
   const Insn *execute(VM &) const;
 private:
   int offset_;
-  InsnPtr ifUnspecified_;
-  InsnPtr ifNotUnspecified_;
+  InsnPtr ifNull_;
+  InsnPtr ifNotNull_;
   InsnPtr next_;
 };
 
@@ -319,6 +349,7 @@ public:
 				   const Location &, int nCallerArgs);
   const Signature &signature() const { return *sig_; }
   FunctionObj *asFunction();
+  virtual void setArgToCC(VM &);
 private:
   const Signature *sig_;
 };
@@ -350,6 +381,15 @@ private:
   static const Signature signature_;
 };
 
+class CallWithCurrentContinuationPrimitiveObj : public FunctionObj {
+public:
+  CallWithCurrentContinuationPrimitiveObj();
+  const Insn *call(VM &vm, const Location &, const Insn *next);
+  const Insn *tailCall(VM &vm, const Location &, int nCallerArgs);
+private:
+  static const Signature signature_;
+};
+
 class ClosureObj : public FunctionObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -362,6 +402,7 @@ public:
   const Insn *tailCall(VM &, const Location &, int nCallerArgs);
   void traceSubObjects(Collector &) const;
   ELObj *display(int) const;
+  void setArgToCC(VM &);
 private:
   InsnPtr code_;
   // terminated by null pointer.
@@ -369,26 +410,44 @@ private:
   ELObj **display_;
 };
 
+class ContinuationObj : public FunctionObj {
+public:
+  ContinuationObj();
+  const Insn *call(VM &, const Location &, const Insn *);
+  const Insn *tailCall(VM &, const Location &, int nCallerArgs);
+  void set(size_t stackSize, size_t controlStackSize) {
+    stackSize_ = stackSize;
+    controlStackSize_ = controlStackSize;
+  }
+  void kill() { controlStackSize_ = 0; }
+  bool live() const { return controlStackSize_ > 0; }
+private:
+  size_t stackSize_;
+  size_t controlStackSize_;
+  static const Signature signature_;
+};
+
 class BoxObj : public ELObj {
 public:
   BoxObj();
+  BoxObj(ELObj *);
   BoxObj *asBox();
   void traceSubObjects(Collector &) const;
   ELObj *value;
 };
 
-class MakeBoxesInsn : public Insn {
+class SetBoxInsn : public Insn {
 public:
-  MakeBoxesInsn(int n, InsnPtr next);
-  const Insn *execute(VM &) const;
+  SetBoxInsn(int n, InsnPtr next);
+  const Insn *execute(VM &vm) const;
 private:
   int n_;
   InsnPtr next_;
 };
 
-class SetBoxesInsn : public Insn {
+class SetImmediateInsn : public Insn {
 public:
-  SetBoxesInsn(int n, InsnPtr next);
+  SetImmediateInsn(int n, InsnPtr next);
   const Insn *execute(VM &vm) const;
 private:
   int n_;
@@ -397,11 +456,62 @@ private:
 
 class UnboxInsn : public Insn {
 public:
-  UnboxInsn(const Identifier *ident, const Location &, InsnPtr next);
+  UnboxInsn(InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  InsnPtr next_;
+};
+
+class CheckInitInsn : public Insn {
+public:
+  CheckInitInsn(const Identifier *ident, const Location &, InsnPtr next);
   const Insn *execute(VM &vm) const;
 private:
   const Identifier *ident_;
   Location loc_;
+  InsnPtr next_;
+};
+
+class BoxInsn : public Insn {
+public:
+  BoxInsn(InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  InsnPtr next_;
+};
+
+class BoxArgInsn : public Insn {
+public:
+  BoxArgInsn(int n, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  int n_;
+  InsnPtr next_;
+};
+
+class BoxStackInsn : public Insn {
+public:
+  BoxStackInsn(int n, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  int n_;
+  InsnPtr next_;
+};
+
+class VectorInsn : public Insn {
+public:
+  VectorInsn(size_t n, InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
+  size_t n_;
+  InsnPtr next_;
+};
+
+class ListToVectorInsn : public Insn {
+public:
+  ListToVectorInsn(InsnPtr next);
+  const Insn *execute(VM &vm) const;
+private:
   InsnPtr next_;
 };
 

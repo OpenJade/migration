@@ -121,13 +121,13 @@ size_t UTF8Decoder::decode(Char *to, const char *s,
     else if ((c0 & cmask4) == cval4) {
       if (slen < 4)
 	goto done;
-      if (charMax < min5 - 1)
-	*to++ = invalid;
       unsigned c1 = us[1] ^ 0x80;
       unsigned c2 = us[2] ^ 0x80;
       unsigned c3 = us[3] ^ 0x80;
       if ((c1 | c2 | c3) & 0xc0)
 	goto error;
+      if (charMax < min5 - 1)
+	*to++ = invalid;
       else {
 	unsigned long c = ((((c0 & vmask4) << 6) | c1) << 6) | c2;
 	c = (c << 6) | c3;

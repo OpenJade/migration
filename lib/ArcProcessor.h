@@ -140,11 +140,6 @@ private:
 			AttributeList &to,
 			ConstPtr<AttributeValue> &arcContent,
 			const MetaMap &map);
-  void initNotationSet(const Location &loc);
-  const Attributed *considerNotation(const AttributeList &atts,
-				     unsigned thisSuppressFlags,
-				     Boolean &inhibitCache,
-				     unsigned &notAttIndex);
   void supportAttributes(const AttributeList &);
   void processArcOpts(const AttributeList &atts);
   void processArcQuant(const Text &);
@@ -202,7 +197,6 @@ private:
   Vector<ConstPtr<AttributeValue> > currentAttributes_;
   ConstPtr<Notation> defaultNotation_;
   Boolean errorIdref_;
-  Boolean notationSetArch_;
   ArcDirector *director_;
   EventHandler *docHandler_;
   Owner<EventHandler> ownEventHandler_;

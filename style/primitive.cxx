@@ -7,10 +7,12 @@
 #include "EvalContext.h"
 #include "SosofoObj.h"
 #include "Style.h"
+#include "Insn.h"
 #include "macros.h"
 #include "ELObjMessageArg.h"
 #include "LocNode.h"
 #include "VM.h"
+#include "Pattern.h"
 #include <math.h>
 #include <limits.h>
 #include <stdio.h>
@@ -93,64 +95,20 @@ private:
   ConstPtr<Context> context_;
 };
 
-class ElementPattern : public Resource {
-public:
-  virtual ~ElementPattern();
-  virtual bool matches(const NodePtr &, SdataMapper &) const = 0;
-};
-
 class SelectElementsNodeListObj : public NodeListObj {
 public:
+  struct PatternSet : public Resource, public NCVector<Pattern> { };
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  SelectElementsNodeListObj(NodeListObj *, const ConstPtr<ElementPattern> &);
+  SelectElementsNodeListObj(NodeListObj *, NCVector<Pattern> &);
+  SelectElementsNodeListObj(NodeListObj *, const ConstPtr<PatternSet> &);
   void traceSubObjects(Collector &) const;
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
 private:
   NodeListObj *nodeList_;
-  ConstPtr<ElementPattern> pattern_;
-};
-
-class UnionElementPattern : public ElementPattern {
-public:
-  UnionElementPattern(const ConstPtr<ElementPattern> &,
-		      const ConstPtr<ElementPattern> &);
-  bool matches(const NodePtr &, SdataMapper &) const;
-private:
-  ConstPtr<ElementPattern> pat1_;
-  ConstPtr<ElementPattern> pat2_;
-};
-
-class SimpleElementPattern : public ElementPattern {
-public:
-  SimpleElementPattern(Vector<StringC> &);
-  bool matches(const NodePtr &, SdataMapper &) const;
-private:
-  // gi followed by att name/value pairs.
-  // empty gi matches any gi
-  Vector<StringC> giAtts_;
-  // cached normalized version of giAtts_[0]
-  // correct for grove with index normGroveIndex_
-  StringC normGi_;
-  unsigned long normGroveIndex_;
-};
-
-class ParentElementPattern : public ElementPattern {
-public:
-  ParentElementPattern(const ConstPtr<ElementPattern> &pat,
-		       const ConstPtr<ElementPattern> &parentPat);
-  bool matches(const NodePtr &, SdataMapper &) const;
-private:
-  ConstPtr<ElementPattern> pat_;
-  ConstPtr<ElementPattern> parentPat_;
-};
-
-class NoElementPattern : public ElementPattern {
-public:
-  NoElementPattern() { }
-  bool matches(const NodePtr &, SdataMapper &) const;
+  ConstPtr<PatternSet> patterns_;
 };
 
 #define PRIMITIVE(name, string, nRequired, nOptional, rest) \
@@ -164,9 +122,11 @@ const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
 
 #define XPRIMITIVE PRIMITIVE
+#define PRIMITIVE2 PRIMITIVE
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
+#undef PRIMITIVE2
 
 #define DEFPRIMITIVE(name, argc, argv, context, interp, loc) \
  ELObj *name ## PrimitiveObj \
@@ -219,7 +179,15 @@ DEFPRIMITIVE(IsList, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(IsEqual, argc, argv, context, interp, loc)
 {
-  if (*argv[0] == *argv[1])
+  if (ELObj::equal(*argv[0], *argv[1]))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(IsEqv, argc, argv, context, interp, loc)
+{
+  if (ELObj::eqv(*argv[0], *argv[1]))
     return interp.makeTrue();
   else
     return interp.makeFalse();
@@ -351,7 +319,22 @@ DEFPRIMITIVE(Member, argc, argv, context, interp, loc)
     if (!tem)
       return argError(interp, loc,
 		      InterpreterMessages::notAList, 1, argv[1]);
-    if (*argv[0] == *tem->car())
+    if (ELObj::equal(*argv[0], *tem->car()))
+      return p;
+    p = tem->cdr();
+  }
+  return interp.makeFalse();
+}
+
+DEFPRIMITIVE(Memv, argc, argv, context, interp, loc)
+{
+  ELObj *p = argv[1];
+  while (!p->isNil()) {
+    PairObj *tem = p->asPair();
+    if (!tem)
+      return argError(interp, loc,
+		      InterpreterMessages::notAList, 1, argv[1]);
+    if (ELObj::eqv(*argv[0], *tem->car()))
       return p;
     p = tem->cdr();
   }
@@ -1775,89 +1758,6 @@ DEFPRIMITIVE(ProcessElementWithId, argc, argv, context, interp, loc)
   return new (interp) EmptySosofoObj;
 }
 
-inline
-ConstPtr<ElementPattern> makePattern(Vector<StringC> &giAtts,
-				     const ConstPtr<ElementPattern> &parentPat)
-{
-  if (parentPat.isNull())
-    return new SimpleElementPattern(giAtts);
-  else
-    return new ParentElementPattern(new SimpleElementPattern(giAtts), parentPat);
-}
-
-static
-ConstPtr<ElementPattern> convertToPattern(ELObj *obj,
-					  const ConstPtr<ElementPattern> &parentPat,
-					  Interpreter &interp)
-{
-  Vector<StringC> giAtts(1);
-  StringObj *str = obj->convertToString();
-  if (str) {
-    const Char *s;
-    size_t n;
-    str->stringData(s, n);
-    if (!n)
-      return new NoElementPattern;
-    giAtts[0].assign(s, n);
-    return makePattern(giAtts, parentPat);
-  }
-  else if (obj == interp.makeTrue() || obj->isNil())
-    return makePattern(giAtts, parentPat);
-  PairObj *pair = obj->asPair();
-  if (!pair)
-    return 0;
-  str = pair->car()->convertToString();
-  if (str) {
-    const Char *s;
-    size_t n;
-    str->stringData(s, n);
-    if (!n)
-      return new NoElementPattern;
-    giAtts[0].assign(s, n);
-  }
-  else if (pair->car() != interp.makeTrue())
-    return 0;
-  obj = pair->cdr();
-  if (!obj->isNil()) {
-    pair = obj->asPair();
-    if (!pair)
-      return 0;
-    if (pair->car()->isNil())
-      obj = pair->cdr();
-    else {
-      PairObj *atts = pair->car()->asPair();
-      if (atts) {
-	obj = pair->cdr();
-	for (;;) {
-	  str = atts->car()->convertToString();
-	  if (!str)
-	    return 0;
-	  const Char *s;
-	  size_t n;
-	  str->stringData(s, n);
-	  giAtts.push_back(StringC(s, n));
-	  if (atts->cdr()->isNil())
-	    break;
-	  atts = atts->cdr()->asPair();
-	  if (!atts)
-	    return 0;
-	}
-	if ((giAtts.size() & 1) == 0)
-	  return 0;
-      }
-    }
-    if (!obj->isNil())
-      return convertToPattern(obj, makePattern(giAtts, parentPat), interp);
-  }
-  return makePattern(giAtts, parentPat);
-}
-
-inline
-ConstPtr<ElementPattern> convertToPattern(ELObj *obj, Interpreter &interp)
-{
-  return convertToPattern(obj, ConstPtr<ElementPattern>(), interp);
-}
-
 DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
 {
   if (!context.processingMode) {
@@ -1867,22 +1767,15 @@ DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
   }
   if (!context.currentNode)
     return noCurrentNodeError(interp, loc);
-  ConstPtr<ElementPattern> pattern;
+  
+  NCVector<Pattern> patterns(argc);
   for (size_t i = 0; i < argc; i++) {
-    ConstPtr<ElementPattern> tem = convertToPattern(argv[i], interp);
-    if (tem.isNull())
-      return argError(interp, loc,
-    		      InterpreterMessages::notAPattern, i, argv[i]);
-    if (pattern.isNull())
-      pattern = tem;
-    else
-      pattern = new UnionElementPattern(tem, pattern);
+    if (!interp.convertToPattern(argv[i], loc, patterns[i]))
+      return interp.makeError();
   }
-  if (pattern.isNull())
-    return new (interp) EmptySosofoObj;
   NodeListObj *nl = new (interp) DescendantsNodeListObj(context.currentNode);
   ELObjDynamicRoot protect(interp, nl);
-  nl = new (interp) SelectElementsNodeListObj(nl, pattern);
+  nl = new (interp) SelectElementsNodeListObj(nl, patterns);
   protect = nl;
   NodePtr nd(nl->nodeListFirst(context, interp));
   if (!nd)
@@ -1899,24 +1792,18 @@ DEFPRIMITIVE(ProcessMatchingChildren, argc, argv, context, interp, loc)
   }
   if (!context.currentNode)
     return noCurrentNodeError(interp, loc);
-  ConstPtr<ElementPattern> pattern;
+  NCVector<Pattern> patterns(argc);
   for (size_t i = 0; i < argc; i++) {
-    ConstPtr<ElementPattern> tem = convertToPattern(argv[i], interp);
-    if (tem.isNull())
-      return argError(interp, loc,
-    		      InterpreterMessages::notAPattern, i, argv[i]);
-    if (pattern.isNull())
-      pattern = tem;
-    else
-      pattern = new UnionElementPattern(tem, pattern);
+    if (!interp.convertToPattern(argv[i], loc, patterns[i])) 
+      return interp.makeError();
   }
   NodeListPtr nlPtr;
   // FIXME handle root
-  if (pattern.isNull() || context.currentNode->children(nlPtr) != accessOK)
+  if (patterns.size() == 0 || context.currentNode->children(nlPtr) != accessOK)
     return new (interp) EmptySosofoObj;
   NodeListObj *nl = new (interp) NodeListPtrNodeListObj(nlPtr);
   ELObjDynamicRoot protect(interp, nl);
-  nl = new (interp) SelectElementsNodeListObj(nl, pattern);
+  nl = new (interp) SelectElementsNodeListObj(nl, patterns);
   protect = nl;
   return new (interp) ProcessNodeListSosofoObj(nl, context.processingMode);
 }
@@ -1927,11 +1814,24 @@ DEFPRIMITIVE(SelectElements, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
-  ConstPtr<ElementPattern> pattern(convertToPattern(argv[1], interp));
-  if (pattern.isNull())
+  NCVector<Pattern> patterns(1);
+  if (!interp.convertToPattern(argv[1], loc, patterns[0]))
+    return interp.makeError();
+  return new (interp) SelectElementsNodeListObj(nl, patterns);
+}
+
+DEFPRIMITIVE(IsMatchElement, argc, argv, context, interp, loc)
+{
+  Pattern pattern;
+  if (!interp.convertToPattern(argv[0], loc, pattern))
+    return interp.makeError();
+  NodePtr node;
+  if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
     return argError(interp, loc,
-  		    InterpreterMessages::notAPattern, 1, argv[1]);
-  return new (interp) SelectElementsNodeListObj(nl, pattern);
+		    InterpreterMessages::notASingletonNode, 1, argv[1]);
+  if (pattern.matches(node, interp))
+    return interp.makeTrue();
+  return interp.makeFalse();
 }
 
 DEFPRIMITIVE(ProcessNodeList, argc, argv, context, interp, loc)
@@ -2226,8 +2126,14 @@ DEFPRIMITIVE(StringToNumber, argc, argv, context, interp, loc)
   }
   else
     radix = 10;
-  StringC tem(s, n);
-  return interp.convertNumber(tem, 0, int(radix));
+  ELObj *result = interp.convertNumber(StringC(s, n), int(radix));
+  // Return #f for quantities.
+  // Note that resolveQuantities would have to be used to make this
+  // work for quantities.
+  double tem;
+  if (result && result->realValue(tem))
+    return result;
+  return interp.makeFalse();
 }
 
 DEFPRIMITIVE(NumberToString, argc, argv, context, interp, loc)
@@ -2237,6 +2143,22 @@ DEFPRIMITIVE(NumberToString, argc, argv, context, interp, loc)
   if (!argv[0]->realValue(x))
     return argError(interp, loc,
 		    InterpreterMessages::notANumber, 0, argv[0]);
+  StrOutputCharStream os;
+  argv[0]->print(interp, os);
+  StringC tem;
+  os.extractString(tem);
+  return new (interp) StringObj(tem);
+}
+
+DEFPRIMITIVE(QuantityToString, argc, argv, context, interp, loc)
+{
+  // FIXME use optional radix
+  long lResult;
+  double dResult;
+  int dim;
+  if (argv[0]->quantityValue(lResult, dResult, dim) == ELObj::noQuantity)
+    return argError(interp, loc,
+		    InterpreterMessages::notAQuantity, 0, argv[0]);
   StrOutputCharStream os;
   argv[0]->print(interp, os);
   StringC tem;
@@ -4147,6 +4069,7 @@ DEFPRIMITIVE(NodeListMap, argc, argv, context, interp, loc)
     interp.message(InterpreterMessages::tooManyArgs);
     return interp.makeError();
   }
+  interp.makeReadOnly(func);
   NodeListObj *nl = argv[1]->asNodeList();
   if (!nl)
     return argError(interp, loc,
@@ -4294,18 +4217,149 @@ DEFPRIMITIVE(AllElementNumber, argc, argv, context, interp, loc)
     return interp.makeFalse();
 }
 
+DEFPRIMITIVE(IsVector, argc, argv, context, interp, loc)
+{
+  if (argv[0]->asVector())
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(Vector, argc, argv, context, interp, loc)
+{
+  Vector<ELObj *> v(argc);
+  for (size_t i = 0; i < argc; i++)
+    v[i] = argv[i];
+  return new (interp) VectorObj(v);
+}
+
+DEFPRIMITIVE(MakeVector, argc, argv, context, interp, loc)
+{
+  long k;
+  if (!argv[0]->exactIntegerValue(k))
+    return argError(interp, loc,
+		    InterpreterMessages::notAnExactInteger, 0, argv[0]);
+  if (k < 0) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+  }
+  ELObj *fill = argc > 1 ? argv[1] : interp.makeUnspecified();
+  Vector<ELObj *> v((size_t)k);
+  for (size_t i = 0; i < v.size(); i++)
+    v[i] = fill;
+  return new (interp) VectorObj(v);
+}
+
+DEFPRIMITIVE(VectorSet, argc, argv, context, interp, loc)
+{
+  VectorObj *v = argv[0]->asVector();
+  if (!v)
+    return argError(interp, loc,
+		    InterpreterMessages::notAVector, 0, argv[0]);
+  long k;
+  if (!argv[1]->exactIntegerValue(k))
+    return argError(interp, loc,
+		    InterpreterMessages::notAnExactInteger, 1, argv[1]);
+  if (k < 0 || (unsigned long)k >= v->size()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+  }
+  if (v->readOnly()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::readOnly);
+    return interp.makeError();
+  }
+  (*v)[k] = argv[2];
+  return interp.makeUnspecified();
+}
+
+DEFPRIMITIVE(VectorRef, argc, argv, context, interp, loc)
+{
+  VectorObj *v = argv[0]->asVector();
+  if (!v)
+    return argError(interp, loc,
+		    InterpreterMessages::notAVector, 0, argv[0]);
+  long k;
+  if (!argv[1]->exactIntegerValue(k))
+    return argError(interp, loc,
+		    InterpreterMessages::notAnExactInteger, 1, argv[1]);
+  if (k < 0 || (unsigned long)k >= v->size()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::outOfRange);
+    return interp.makeError();
+  }
+  return (*v)[k];
+}
+
+DEFPRIMITIVE(VectorToList, argc, argv, context, interp, loc)
+{
+  VectorObj *v = argv[0]->asVector();
+  if (!v)
+    return argError(interp, loc,
+		    InterpreterMessages::notAVector, 0, argv[0]);
+  Vector<ELObj *> &vec = *v;
+  ELObjDynamicRoot result(interp, interp.makeNil());
+  for (size_t i = vec.size(); i > 0; i--)
+    result = new (interp) PairObj(vec[i - 1], result);
+  return result;
+}
+
+DEFPRIMITIVE(ListToVector, argc, argv, context, interp, loc)
+{
+  Vector<ELObj *> v;
+  ELObj *obj = argv[0];
+  while (!obj->isNil()) {
+    PairObj *pair = obj->asPair();
+    if (!pair)
+      return argError(interp, loc, InterpreterMessages::notAList, 0, obj);
+    v.push_back(pair->car());
+    obj = pair->cdr();
+  }
+  return new (interp) VectorObj(v);
+}
+
+DEFPRIMITIVE(VectorFill, argc, argv, context, interp, loc)
+{
+  VectorObj *v = argv[0]->asVector();
+  if (!v)
+    return argError(interp, loc,
+		    InterpreterMessages::notAVector, 0, argv[0]);
+  if (v->readOnly()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::readOnly);
+    return interp.makeError();
+  }
+  Vector<ELObj *> &vec = *v;
+  for (size_t i = 0; i < vec.size(); i++)
+    vec[i] = argv[1];
+  return interp.makeUnspecified();
+}
+
 void Interpreter::installPrimitives()
 {
 #define PRIMITIVE(name, string, nRequired, nOptional, rest) \
   installPrimitive(string, new (*this) name ## PrimitiveObj);
 #define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
   installXPrimitive(string, new (*this) name ## PrimitiveObj);
+#define PRIMITIVE2(name, string, nRequired, nOptional, rest) \
+  if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj);
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
+#undef PRIMITIVE2
   FunctionObj *apply = new (*this) ApplyPrimitiveObj;
   makePermanent(apply);
   lookup(makeStringC("apply"))->setValue(apply);
+  if (dsssl2()) {
+    FunctionObj *callCC = new (*this) CallWithCurrentContinuationPrimitiveObj;
+    makePermanent(callCC);
+    lookup(makeStringC("call-with-current-continuation"))->setValue(callCC);
+  }
+  if (dsssl2())
+    lookup(makeStringC("string->quantity"))
+      ->setValue(lookup(makeStringC("string->number"))->computeValue(0, *this));
 }
 
 void Interpreter::installPrimitive(const char *s, PrimitiveObj *value)
@@ -4326,111 +4380,6 @@ void Interpreter::installXPrimitive(const char *s, PrimitiveObj *value)
   StringC pubid(makeStringC("UNREGISTERED::James Clark//Procedure::"));
   pubid += makeStringC(s);
   externalProcTable_.insert(pubid, value);
-}
-
-SimpleElementPattern::SimpleElementPattern(Vector<StringC> &giAtts)
-: normGroveIndex_((unsigned long)-1)
-{
-  giAtts.swap(giAtts_);
-}
-
-bool SimpleElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
-{
-  GroveString nodeGi;
-  if (node->getGi(nodeGi) != accessOK)
-    return 0;
-  // An empty gi in the pattern matches any gi.
-  size_t len = giAtts_[0].size();
-  if (len) {
-    if (nodeGi.size() != len)
-      return 0;
-    unsigned long groveIndex = node->groveIndex();
-    if (groveIndex != normGroveIndex_) {
-      SimpleElementPattern *cache = (SimpleElementPattern *)this;
-      cache->normGroveIndex_ = groveIndex;
-      cache->normGi_ = giAtts_[0];
-      Interpreter::normalizeGeneralName(node, cache->normGi_);
-    }
-    GroveString normGi(normGi_.data(), normGi_.size());
-    if (normGi != nodeGi)
-      return 0;
-  }
-  if (giAtts_.size() > 1) {
-    NamedNodeListPtr atts;
-    if (node->getAttributes(atts) != accessOK)
-      return 0;
-    for (size_t i = 1; i < giAtts_.size(); i += 2) {
-      NodePtr att;
-      if (atts->namedNode(GroveString(giAtts_[i].data(), giAtts_[i].size()), att)
-	  != accessOK)
-	return 0;
-      bool implied;
-      if (att->getImplied(implied) == accessOK && implied)
-	return 0;
-      GroveString tokens;
-      if (att->tokens(tokens) == accessOK) {
-	if (tokens.size() != giAtts_[i + 1].size())
-	  return 0;
-	NodePtr node;
-	NamedNodeListPtr normalizer;
-	if (att->firstChild(node) != accessOK
-	    || node->getEntity(node) != accessOK
-	    || node->getGroveRoot(node) != accessOK
-	    || node->getEntities(normalizer) != accessOK)
-	  normalizer = atts;
-	StringC tem(giAtts_[i + 1]);
-	tem.resize(normalizer->normalize(&tem[0], tem.size()));
-	if (tokens != GroveString(tem.data(), tem.size()))
-	  return 0;
-      }
-      else {
-	NodePtr tem;
-	StringC value;
-	if (att->firstChild(tem) == accessOK) {
-	  do {
-	    GroveString chunk;
-	    if (tem->charChunk(mapper, chunk) == accessOK)
-	      value.append(chunk.data(), chunk.size());
-	  } while (tem.assignNextChunkSibling() == accessOK);
-	}
-	if (value != giAtts_[i + 1])
-	  return 0;
-      }
-    }
-  }
-  return 1;
-}
-
-UnionElementPattern::UnionElementPattern(const ConstPtr<ElementPattern> &pat1,
-					 const ConstPtr<ElementPattern> &pat2)
-: pat1_(pat1), pat2_(pat2)
-{
-}
-
-bool UnionElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
-{
-  return pat1_->matches(node, mapper) || pat2_->matches(node, mapper);
-}
-
-ParentElementPattern::ParentElementPattern(const ConstPtr<ElementPattern> &pat,
-					   const ConstPtr<ElementPattern> &parentPat)
-: pat_(pat), parentPat_(parentPat)
-{
-}
-
-bool ParentElementPattern::matches(const NodePtr &node, SdataMapper &mapper) const
-{
-  if (!pat_->matches(node, mapper))
-    return 0;
-  NodePtr parentNode;
-  if (node->getParent(parentNode) != accessOK)
-    return 0;
-  return parentPat_->matches(parentNode, mapper);
-}
-
-bool NoElementPattern::matches(const NodePtr &, SdataMapper &) const
-{
-  return 0;
 }
 
 DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start, unsigned depth)
@@ -4662,10 +4611,21 @@ void MapNodeListObj::Context::traceSubObjects(Collector &c) const
 }
 
 SelectElementsNodeListObj::SelectElementsNodeListObj(NodeListObj *nodeList,
-						     const ConstPtr<ElementPattern> &pattern)
-: nodeList_(nodeList), pattern_(pattern)
+						     const ConstPtr<PatternSet> &patterns)
+: nodeList_(nodeList), patterns_(patterns)
+{
+  ASSERT(!patterns_.isNull());
+  hasSubObjects_ = 1;
+}
+
+SelectElementsNodeListObj::SelectElementsNodeListObj(NodeListObj *nodeList,
+						     NCVector<Pattern> &patterns)
+: nodeList_(nodeList)
 {
   hasSubObjects_ = 1;
+  Ptr<PatternSet> tem(new PatternSet);
+  tem->swap(patterns);
+  patterns_ = tem;
 }
 
 void SelectElementsNodeListObj::traceSubObjects(Collector &c) const
@@ -4677,8 +4637,11 @@ NodePtr SelectElementsNodeListObj::nodeListFirst(EvalContext &context, Interpret
 {
   for (;;) {
     NodePtr nd = nodeList_->nodeListFirst(context, interp);
-    if (!nd || pattern_->matches(nd, interp))
+    if (!nd)
       return nd;
+    for (size_t i = 0; i < patterns_->size(); i++)
+      if ((*patterns_)[i].matches(nd, interp))
+        return nd;
     bool chunk;
     nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
   }
@@ -4688,10 +4651,18 @@ NodePtr SelectElementsNodeListObj::nodeListFirst(EvalContext &context, Interpret
 
 NodeListObj *SelectElementsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  ASSERT(!pattern_.isNull());
   for (;;) {
     NodePtr nd = nodeList_->nodeListFirst(context, interp);
-    if (!nd || pattern_->matches(nd, interp))
+    if (!nd)
+      break;
+    bool matched = 0;
+    for (size_t i = 0; i < patterns_->size(); i++) {
+      if ((*patterns_)[i].matches(nd, interp)) {
+        matched = 1;
+        break;
+      }
+    }
+    if (matched)
       break;
     bool chunk;
     nodeList_ = nodeList_->nodeListChunkRest(context, interp, chunk);
@@ -4699,7 +4670,7 @@ NodeListObj *SelectElementsNodeListObj::nodeListRest(EvalContext &context, Inter
   bool chunk;
   NodeListObj *tem = nodeList_->nodeListChunkRest(context, interp, chunk);
   ELObjDynamicRoot protect(interp, tem);
-  return new (interp) SelectElementsNodeListObj(tem, pattern_);
+  return new (interp) SelectElementsNodeListObj(tem, patterns_);
 }
 
 SiblingNodeListObj::SiblingNodeListObj(const NodePtr &first, const NodePtr &end)
@@ -4735,10 +4706,6 @@ NodeListObj *SiblingNodeListObj::nodeListChunkRest(EvalContext &context, Interpr
     CANNOT_HAPPEN();
   chunk = 1;
   return new (interp) SiblingNodeListObj(nd, end_);
-}
-
-ElementPattern::~ElementPattern()
-{
 }
 
 #ifdef DSSSL_NAMESPACE

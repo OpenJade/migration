@@ -13,14 +13,11 @@ NumberCache::NumberCache()
 {
 }
 
-static
+inline
 void advance(NodePtr &node)
 {
-  if (node.assignFirstChild() != accessOK) {
-    while (node.assignNextChunkSibling() != accessOK)
-      if (node.assignOrigin() != accessOK)
-        CANNOT_HAPPEN();
-  }
+  if (node.assignNextChunkAfter() != accessOK)
+    CANNOT_HAPPEN();
 }
 
 // This caching scheme will be defeated (but not disastrously so)

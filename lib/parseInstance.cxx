@@ -104,15 +104,20 @@ void Parser::doContent()
 				 EntityEndEvent(currentLocation()));
       if (afterDocumentElement())
 	message(ParserMessages::afterDocumentElementEntityEnd);
+      if (sd().integrallyStored()
+	  && tagLevel()
+	  && currentElement().index() != currentInputElementIndex())
+	message(ParserMessages::contentAsyncEntityRef);
       popInputStack();
       break;
     case tokenCroDigit:
+    case tokenHcroHexDigit:
       {
 	if (afterDocumentElement())
 	  message(ParserMessages::characterReferenceAfterDocumentElement);
 	Char ch;
 	Location loc;
-	if (parseNumericCharRef(ch, loc)) {
+	if (parseNumericCharRef(token == tokenHcroHexDigit, ch, loc)) {
 	  acceptPcdata(loc);
 	  noteData();
 	  Boolean isSgmlChar;
@@ -132,7 +137,7 @@ void Parser::doContent()
       break;
     case tokenCroNameStart:
       if (afterDocumentElement())
-	  message(ParserMessages::characterReferenceAfterDocumentElement);
+	message(ParserMessages::characterReferenceAfterDocumentElement);
       parseNamedCharRef();
       break;
     case tokenEroGrpo:
@@ -155,7 +160,7 @@ void Parser::doContent()
       }
       break;
     case tokenEtagoNameStart:
-      parseEndTag();
+      acceptEndTag(parseEndTag());
       break;
     case tokenEtagoTagc:
       parseEmptyEndTag();
@@ -276,6 +281,12 @@ void Parser::doContent()
       break;
     case tokenUnrecognized:
       reportNonSgmlCharacter();
+      parsePcdata();
+      break;
+    case tokenCharDelim:
+      message(ParserMessages::dataCharDelim,
+	      StringMessageArg(StringC(currentInput()->currentTokenStart(),
+			  	       currentInput()->currentTokenLength())));
       // fall through
     case tokenChar:
       parsePcdata();
@@ -357,7 +368,14 @@ void Parser::handleShortref(int index)
     s += i;
     length -= i;
     acceptPcdata(location);
-    // FIXME speed this up
+    if (sd().keeprsre()) {
+      noteData();
+      eventHandler().data(new (eventAllocator())
+  			  ImmediateDataEvent(Event::characterData, s, length,
+					     location, 0));
+      return;
+    }
+     // FIXME speed this up
     for (; length > 0; location += 1, length--, s++) {
       if (*s == syntax().standardFunction(Syntax::fRS)) {
 	noteRs();
@@ -410,13 +428,8 @@ void Parser::parseStartTag()
     else if (e->isRankedElement())
       handleRankedElement(e);
   }
-  ElementType *undefElementType;
   if (!e)
-    e = undefElementType = lookupCreateUndefinedElement(name,
-							currentLocation(),
-							currentDtdNonConst());
-  else
-    undefElementType = 0;
+    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst());
   Boolean netEnabling;
   AttributeList *attributes = allocAttributeList(e->attributeDef(), 0);
   Token closeToken = getToken(tagMode);
@@ -599,7 +612,8 @@ void Parser::acceptPcdata(const Location &startLocation)
     }
   discardKeptMessages();
   undo(undoList);
-  message(ParserMessages::pcdataNotAllowed);
+  if (validate() || afterDocumentElement())
+    message(ParserMessages::pcdataNotAllowed);
   pcdataRecover();
 }
 
@@ -607,15 +621,12 @@ void Parser::acceptStartTag(const ElementType *e,
 			    StartElementEvent *event,
 			    Boolean netEnabling)
 {
-  if (e->definition()->undefined()) {
-    if (validate())
-      message(ParserMessages::undefinedElement, StringMessageArg(e->name()));
-    pushElementCheck(e, event, netEnabling);
-    return;
-  }
+  if (e->definition()->undefined() && !implydefElement())
+    message(ParserMessages::undefinedElement, StringMessageArg(e->name()));
   if (elementIsExcluded(e)) {
     keepMessages();
-    checkExclusion(e);
+    if (validate())
+      checkExclusion(e);
   }
   else {
     if (currentElement().tryTransition(e)) {
@@ -639,7 +650,16 @@ void Parser::acceptStartTag(const ElementType *e,
       return;
   discardKeptMessages();
   undo(undoList);
-  handleBadStartTag(e, event, netEnabling);
+  if (validate() && !e->definition()->undefined())
+    handleBadStartTag(e, event, netEnabling);
+  else {
+    if (validate() ? implydefElement() : afterDocumentElement())
+      message(ParserMessages::elementNotAllowed, StringMessageArg(e->name()));
+    // If element couldn't occur because it was excluded, then
+    // do the transition here.
+    (void)currentElement().tryTransition(e);
+    pushElementCheck(e, event, netEnabling);
+  }
 }
 
 void Parser::undo(IList<Undo> &undoList)
@@ -792,21 +812,28 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
   if (tagLevel() == syntax().taglvl())
     message(ParserMessages::taglvlOpenElements, NumberMessageArg(syntax().taglvl()));
   noteStartElement(event->included());
-  if (event->mustOmitEnd()
-      || (stupidNetTrick() && netEnabling && e->definition()->undefined())) {
-    EndElementEvent *end
-      = new (eventAllocator()) EndElementEvent(e,
-					       currentDtdPointer(),
-					       event->location(),
-					       0);
-    if (event->included()) {
-      end->setIncluded();
-      noteEndElement(1);
+  if (event->mustOmitEnd()) {
+    if (sd().emptyElementNormal()) {
+      Boolean included = event->included();
+      Location loc(event->location());
+      eventHandler().startElement(event);
+      endTagEmptyElement(e, netEnabling, included, loc);
     }
-    else
-      noteEndElement(0);
-    eventHandler().startElement(event);
-    eventHandler().endElement(end);
+    else {
+      EndElementEvent *end
+	= new (eventAllocator()) EndElementEvent(e,
+					         currentDtdPointer(),
+					         event->location(),
+					         0);
+      if (event->included()) {
+	end->setIncluded();
+	noteEndElement(1);
+      }
+      else
+	noteEndElement(0);
+      eventHandler().startElement(event);
+      eventHandler().endElement(end);
+    }
   }
   else {
     const ShortReferenceMap *map = e->map();
@@ -820,6 +847,105 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
     // Can't access event after it's passed to the event handler.
     eventHandler().startElement(event);
   }
+}
+
+void Parser::endTagEmptyElement(const ElementType *e,
+				Boolean netEnabling,
+				Boolean included,
+				const Location &startLoc)
+{
+  Token token = getToken(netEnabling ? econnetMode : econMode);
+  switch (token) {
+  case tokenNet:
+    if (netEnabling) {
+      Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
+			           currentLocation());
+      if (markup)
+	markup->addDelim(Syntax::dNET);
+      EndElementEvent *end
+	= new (eventAllocator()) EndElementEvent(e,
+						 currentDtdPointer(),
+						 currentLocation(),
+						 markup);
+      if (included)
+	end->setIncluded();
+      eventHandler().endElement(end);
+      noteEndElement(included);
+      return;
+    }
+    break;
+  case tokenEtagoTagc:
+    {
+      if (options().warnEmptyTag)
+	message(ParserMessages::emptyEndTag);
+      Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
+				   currentLocation());
+      if (markup) {
+        markup->addDelim(Syntax::dETAGO);
+        markup->addDelim(Syntax::dTAGC);
+      }
+      EndElementEvent *end
+	= new (eventAllocator()) EndElementEvent(e,
+						 currentDtdPointer(),
+						 currentLocation(),
+						 markup);
+      if (included)
+	end->setIncluded();
+      eventHandler().endElement(end);
+      noteEndElement(included);
+      return;
+    }
+  case tokenEtagoNameStart:
+    {
+      EndElementEvent *end = parseEndTag();
+      if (end->elementType() == e) {
+	if (included)
+	  end->setIncluded();
+	eventHandler().endElement(end);
+	noteEndElement(included);
+	return;
+      }
+      if (!elementIsOpen(end->elementType())) {
+	message(ParserMessages::elementNotOpen,
+		StringMessageArg(end->elementType()->name()));
+	delete end;
+	break;
+      }
+      implyEmptyElementEnd(e, included, startLoc);
+      acceptEndTag(end);
+      return;
+    }
+  default:
+    break;
+  }
+  implyEmptyElementEnd(e, included, startLoc);
+  currentInput()->ungetToken();
+}
+
+void Parser::implyEmptyElementEnd(const ElementType *e,
+				  Boolean included,
+				  const Location &startLoc)
+{
+  if (!sd().omittag())
+    message(ParserMessages::omitEndTagOmittag,
+	    StringMessageArg(e->name()),
+	    startLoc);
+  else {
+    const ElementDefinition *def = e->definition();
+    if (def && !def->canOmitEndTag())
+      message(ParserMessages::omitEndTagDeclare,
+	      StringMessageArg(e->name()),
+	      startLoc);
+  }
+  EndElementEvent *end
+    = new (eventAllocator()) EndElementEvent(e,
+					     currentDtdPointer(),
+					     currentLocation(),
+					     0);
+  if (included)
+    end->setIncluded();
+  noteEndElement(included);
+  eventHandler().endElement(end);
 }
 
 void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
@@ -852,7 +978,7 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
   }
 }
 
-void Parser::parseEndTag()
+EndElementEvent *Parser::parseEndTag()
 {
   Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
 			       currentLocation());
@@ -872,12 +998,11 @@ void Parser::parseEndTag()
   if (!e) 
     e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst());
   parseEndTagClose();
-  acceptEndTag(e,
-	       new (eventAllocator())
+  return new (eventAllocator())
 	       EndElementEvent(e,
 			       currentDtdPointer(),
 			       markupLocation(),
-			       markup));
+			       markup);
 }
 
 void Parser::parseEndTagClose()
@@ -894,10 +1019,8 @@ void Parser::parseEndTagClose()
       return;
     case tokenEtago:
     case tokenStago:
-      if (!sd().shorttag())
-	message(ParserMessages::minimizedEndTag);
-      else if (options().warnUnclosedTag)
-	message(ParserMessages::unclosedEndTag);
+      if (!sd().endTagUnclosed())
+	message(ParserMessages::unclosedEndTagShorttag);
       currentInput()->ungetToken();
       return;
     case tokenTagc:
@@ -930,8 +1053,7 @@ void Parser::parseEmptyEndTag()
       markup->addDelim(Syntax::dETAGO);
       markup->addDelim(Syntax::dTAGC);
     }
-    acceptEndTag(currentElement().type(),
-		 new (eventAllocator()) EndElementEvent(currentElement().type(),
+    acceptEndTag(new (eventAllocator()) EndElementEvent(currentElement().type(),
 							currentDtdPointer(),
 							currentLocation(),
 							markup));
@@ -940,28 +1062,25 @@ void Parser::parseEmptyEndTag()
 
 void Parser::parseNullEndTag()
 {
-  if (options().warnNet || options().warnNetEmptyElement)
-    message(ParserMessages::nullEndTag);
   // If a null end tag was recognized, then there must be a net enabling
   // element on the stack.
   for (;;) {
     ASSERT(tagLevel() > 0);
     if (currentElement().netEnabling())
       break;
-    if (!currentElement().isFinished())
+    if (!currentElement().isFinished() && validate())
       message(ParserMessages::elementNotFinished,
 	      StringMessageArg(currentElement().type()->name()));
     implyCurrentElementEnd(currentLocation());
   }
-  if (!currentElement().isFinished())
+  if (!currentElement().isFinished() && validate())
     message(ParserMessages::elementEndTagNotFinished,
 	    StringMessageArg(currentElement().type()->name()));
   Markup *markup = startMarkup(eventsWanted().wantInstanceMarkup(),
 			       currentLocation());
   if (markup)
     markup->addDelim(Syntax::dNET);
-  acceptEndTag(currentElement().type(),
-	       new (eventAllocator()) EndElementEvent(currentElement().type(),
+  acceptEndTag(new (eventAllocator()) EndElementEvent(currentElement().type(),
 						      currentDtdPointer(),
 						      currentLocation(),
 						      markup));
@@ -979,9 +1098,9 @@ void Parser::endAllElements()
     message(ParserMessages::noDocumentElement);
 }
 
-void Parser::acceptEndTag(const ElementType *e,
-			  EndElementEvent *event)
+void Parser::acceptEndTag(EndElementEvent *event)
 {
+  const ElementType *e = event->elementType();
   if (!elementIsOpen(e)) {
     message(ParserMessages::elementNotOpen, StringMessageArg(e->name()));
     delete event;
@@ -990,18 +1109,16 @@ void Parser::acceptEndTag(const ElementType *e,
   for (;;){
     if (currentElement().type() == e)
       break;
-    if (!currentElement().isFinished())
+    if (!currentElement().isFinished() && validate())
       message(ParserMessages::elementNotFinished,
 	      StringMessageArg(currentElement().type()->name()));
     implyCurrentElementEnd(event->location());
   }
-  if (!currentElement().isFinished())
+  if (!currentElement().isFinished() && validate())
     message(ParserMessages::elementEndTagNotFinished,
 	    StringMessageArg(currentElement().type()->name()));
   if (currentElement().included())
     event->setIncluded();
-  if (options().warnNetEmptyElement && currentElement().netEnabling())
-    message(ParserMessages::netStartTagEndTag);
   noteEndElement(event->included());
   eventHandler().endElement(event);
   popElement();

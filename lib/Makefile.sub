@@ -11,8 +11,9 @@ XENTMGR_OBJS=LiteralStorage.o URLStorage.o RewindStorageObject.o \
   StorageManager.o CodingSystem.o IdentityCodingSystem.o \
   UTF8CodingSystem.o Fixed2CodingSystem.o UnicodeCodingSystem.o \
   EUCJPCodingSystem.o SJISCodingSystem.o TranslateCodingSystem.o \
-  Big5CodingSystem.o SearchResultMessageArg.o SOEntityCatalog.o \
-  CodingSystemKit.o OutputByteStream.o xentmgr_inst.o
+  Big5CodingSystem.o XMLCodingSystem.o CodingSystemKit.o \
+  SearchResultMessageArg.o SOEntityCatalog.o OutputByteStream.o \
+  xentmgr_inst.o
 PARSER_OBJS=ContentState.o ParserState.o parser_inst.o parseSd.o Parser.o \
   parseInstance.o parseMode.o parseAttribute.o \
   LinkProcess.o Lpd.o parseDecl.o ShortReferenceMap.o \

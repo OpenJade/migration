@@ -261,9 +261,11 @@ void Parser::doDeclSubset()
 	if (e
 	    && (e->declType() == Entity::doctype
 		|| e->declType() == Entity::linktype)) {
+	  // popInputStack may destroy e
+	  Boolean fake = e->defLocation().origin().isNull();
 	  popInputStack();
 	  if (!(inDtd
-		? parseDoctypeDeclEnd(e->defLocation().origin().isNull())
+		? parseDoctypeDeclEnd(fake)
 		: parseLinktypeDeclEnd()))
 	    ;			// FIXME recover
 	  setPhase(prologPhase);
@@ -322,7 +324,7 @@ void Parser::doDeclSubset()
 	  break;
 	case Syntax::rNOTATION:
 	  result = parseNotationDecl();
-	  if (!inDtd && options().errorLpdNotation)
+	  if (!inDtd && !sd().www())
 	    message(ParserMessages::lpdSubsetDeclaration,
 		    StringMessageArg(syntax().reservedName(name)));
 	  break;
@@ -438,8 +440,9 @@ void Parser::doDeclSubset()
       break;
     case tokenRe:
     case tokenRs:
-    case tokenCroDigit:
     case tokenCroNameStart:
+    case tokenCroDigit:
+    case tokenHcroHexDigit:
     case tokenEroNameStart:
     case tokenEroGrpo:
     case tokenChar:
@@ -600,7 +603,7 @@ Boolean Parser::parseElementDecl()
       elements[i] = lookupCreateElement(nameVector[i].name);
   }
   for (i = 0; i < elements.size(); i++)
-    if (defDtd().lookupRankStem(elements[i]->name()))
+    if (defDtd().lookupRankStem(elements[i]->name()) && validate())
       message(ParserMessages::rankStemGenericIdentifier,
 	      StringMessageArg(elements[i]->name()));
   unsigned char omitFlags = 0;
@@ -685,9 +688,11 @@ Boolean Parser::parseElementDecl()
 			  pcdataUnreachable);
       if (pcdataUnreachable && options().warnMixedContent)
 	message(ParserMessages::pcdataUnreachable);
-      for (i = 0; i < ambiguities.size(); i++) {
-	const ContentModelAmbiguity &a = ambiguities[i];
-	reportAmbiguity(a.from, a.to1, a.to2, a.andDepth);
+      if (validate()) {
+	for (i = 0; i < ambiguities.size(); i++) {
+	  const ContentModelAmbiguity &a = ambiguities[i];
+	  reportAmbiguity(a.from, a.to1, a.to2, a.andDepth);
+	}
       }
       def = new ElementDefinition(markupLocation(),
 				  defDtd().allocElementDefinitionIndex(),
@@ -703,9 +708,11 @@ Boolean Parser::parseElementDecl()
     def->setRank(rankSuffix, constRankStems);
   ConstPtr<ElementDefinition> constDef(def);
   for (i = 0; i < elements.size(); i++) {
-    if (elements[i]->definition() != 0)
-      message(ParserMessages::duplicateElementDefinition,
-	      StringMessageArg(elements[i]->name()));
+    if (elements[i]->definition() != 0) {
+      if (validate())
+	message(ParserMessages::duplicateElementDefinition,
+	        StringMessageArg(elements[i]->name()));
+    }
     else {
       elements[i]->setElementDefinition(constDef, i);
       if (!elements[i]->attributeDef().isNull())
@@ -788,6 +795,8 @@ void Parser::reportAmbiguity(const LeafContentToken *from,
 
 void Parser::checkElementAttribute(const ElementType *e, size_t checkFrom)
 {
+  if (!validate())
+    return;
   const AttributeDefinitionList *attDef = e->attributeDef().pointer();
   Boolean conref = 0;
   ASSERT(e != 0);
@@ -821,7 +830,7 @@ ElementType *Parser::lookupCreateElement(const StringC &name)
     if (haveDefLpd()) 
       message(ParserMessages::noSuchSourceElement, StringMessageArg(name));
     else {
-      e = new ElementType(name, defDtd().nElementTypeIndex());
+      e = new ElementType(name, defDtd().allocElementTypeIndex());
       defDtd().insertElementType(e);
     }
   }
@@ -892,9 +901,9 @@ Boolean Parser::parseAttlistDecl()
   if (!parseAttributed(declInputLevel, parm, attributed, isNotation))
     return 0;
   Vector<CopyOwner<AttributeDefinition> > defs;
-  if (!parseParam(allowName, declInputLevel, parm))
+  if (!parseParam(sd().www() ? allowNameMdc : allowName, declInputLevel, parm))
     return 0;
-  do {
+  while (parm.type != Param::mdc) {
     StringC attributeName;
     parm.token.swap(attributeName);
     attcnt++;
@@ -927,14 +936,16 @@ Boolean Parser::parseAttlistDecl()
     const Vector<StringC> *tokensPtr = declaredValue->getTokens();
     if (tokensPtr) {
       size_t nTokens = tokensPtr->size();
-      Vector<StringC>::const_iterator tokens = tokensPtr->begin();
-      for (i = 0; i < nTokens; i++) {
-	for (size_t j = 0; j < defs.size(); j++)
-	  if (defs[j]->containsToken(tokens[i])) {
-	    message(ParserMessages::duplicateAttributeToken,
-		    StringMessageArg(tokens[i]));
-	    break;
-	  }
+      if (!sd().www()) {
+	Vector<StringC>::const_iterator tokens = tokensPtr->begin();
+	for (i = 0; i < nTokens; i++) {
+	  for (size_t j = 0; j < defs.size(); j++)
+	    if (defs[j]->containsToken(tokens[i])) {
+	      message(ParserMessages::duplicateAttributeToken,
+		      StringMessageArg(tokens[i]));
+	      break;
+	    }
+	}
       }
       attcnt += nTokens;
     }
@@ -951,7 +962,7 @@ Boolean Parser::parseAttlistDecl()
     static AllowedParams allowNameMdc(Param::name, Param::mdc);
     if (!parseParam(allowNameMdc, declInputLevel, parm))
       return 0;
-  } while (parm.type != Param::mdc);
+  }
   if (attcnt > syntax().attcnt())
     message(ParserMessages::attcnt,
 	    NumberMessageArg(attcnt),
@@ -1009,11 +1020,7 @@ Boolean Parser::parseAttlistDecl()
 	    checkElementAttribute(e);
 	}
       }
-      else if (options().errorAfdr) {
-	if (!hadAfdrDecl()) {
-	  message(ParserMessages::missingAfdrDecl);
-	  setHadAfdrDecl();
-	}
+      else if (options().errorAfdr && !sd().www()) {
 	if (isNotation)
 	  message(ParserMessages::duplicateAttlistNotation,
 		  StringMessageArg(((Notation *)attributed[i])->name()));
@@ -1022,6 +1029,10 @@ Boolean Parser::parseAttlistDecl()
 		  StringMessageArg(((ElementType *)attributed[i])->name()));
       }
       else {
+	if (!hadAfdrDecl() && !sd().www()) {
+	  message(ParserMessages::missingAfdrDecl);
+	  setHadAfdrDecl();
+	}
 	AttributeDefinitionList *curAdl;
 	{
 	  // Use block to make sure temporary gets destroyed.
@@ -1113,7 +1124,6 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
 				Vector<Attributed *> &attributed,
 				Boolean &isNotation)
 {
-  // There's a hack in getIndicatedReservedName allows #ALL as #ANY.
   static AllowedParams
     allowNameGroupNotation(Param::name,
 			   Param::nameGroup,
@@ -1124,8 +1134,10 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
 			      Param::indicatedReservedName
 			      + Syntax::rNOTATION,
 			      Param::indicatedReservedName
-			      + Syntax::rANY);
-  if (!parseParam(options().errorAfdr || haveDefLpd()
+			      + Syntax::rALL,
+			      Param::indicatedReservedName
+			      + Syntax::rIMPLICIT);
+  if (!parseParam(haveDefLpd()
 		  ? allowNameGroupNotation
 		  : allowNameGroupNotationAll,
 		  declInputLevel, parm))
@@ -1137,8 +1149,9 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
     static AllowedParams
       allowNameGroupAll(Param::name,
 			Param::nameGroup,
-			Param::indicatedReservedName + Syntax::rANY);
-    if (!parseParam(options().errorAfdr || haveDefLpd()
+			Param::indicatedReservedName + Syntax::rALL,
+			Param::indicatedReservedName + Syntax::rIMPLICIT);
+    if (!parseParam(haveDefLpd()
 		    ? allowNameNameGroup
 		    : allowNameGroupAll,
 		    declInputLevel, parm))
@@ -1149,7 +1162,7 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
 	attributed[i] = lookupCreateNotation(parm.nameTokenVector[i].name);
     }
     else {
-      if (parm.type != Param::name && !hadAfdrDecl()) {
+      if (parm.type != Param::name && !hadAfdrDecl() && !sd().www()) {
 	message(ParserMessages::missingAfdrDecl);
 	setHadAfdrDecl();
       }
@@ -1157,7 +1170,7 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
       attributed[0]
 	= lookupCreateNotation(parm.type == Param::name
 			       ? parm.token
-			       : syntax().rniReservedName(Syntax::rANY));
+			       : syntax().rniReservedName(Syntax::ReservedName(parm.type - Param::indicatedReservedName)));
     }
   }
   else {
@@ -1170,7 +1183,7 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
 	attributed[i] = lookupCreateElement(parm.nameTokenVector[i].name);
     }
     else {
-      if (parm.type != Param::name && !hadAfdrDecl()) {
+      if (parm.type != Param::name && !hadAfdrDecl() && !sd().www()) {
 	message(ParserMessages::missingAfdrDecl);
 	setHadAfdrDecl();
       }
@@ -1178,7 +1191,7 @@ Boolean Parser::parseAttributed(unsigned declInputLevel,
       attributed[0]
 	= lookupCreateElement(parm.type == Param::name
 			      ? parm.token
-			      : syntax().rniReservedName(Syntax::rANY));
+			      : syntax().rniReservedName(Syntax::ReservedName(parm.type - Param::indicatedReservedName)));
     }
   }
   return 1;
@@ -1429,6 +1442,7 @@ Boolean Parser::parseDefaultValue(unsigned declInputLevel,
 
 Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
 				const AllowedParams &endAllow,
+				Boolean maybeWarnMissingSystemId,
 				unsigned declInputLevel,
 				Param &parm,
 				ExternalId &id)
@@ -1439,9 +1453,13 @@ Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
     if (!parseParam(allowMinimumLiteral, declInputLevel, parm))
       return 0;
     const MessageType1 *err;
-    if (!id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(),
-		      err)
-	&& sd().formal())
+    if (id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(),
+		      err)) {
+      PublicId::TextClass textClass;
+      if (sd().formal() && id.publicId()->getTextClass(textClass) && textClass == PublicId::SD)
+	message(ParserMessages::wwwRequired);
+    }
+    else if (sd().formal())
       message(*err,
 	      StringMessageArg(*id.publicIdString()));
   }
@@ -1452,7 +1470,7 @@ Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
     if (!parseParam(endAllow, declInputLevel, parm))
       return 0;
   }
-  else if (options().warnMissingSystemId)
+  else if (options().warnMissingSystemId && maybeWarnMissingSystemId)
     message(ParserMessages::missingSystemId);
   return 1;
 }
@@ -1464,7 +1482,7 @@ Boolean Parser::parseNotationDecl()
   if (!parseParam(allowName, declInputLevel, parm))
     return 0;
   Notation *nt = lookupCreateNotation(parm.token);
-  if (nt->defined())
+  if (validate() && nt->defined())
     message(ParserMessages::duplicateNotationDeclaration,
 	    StringMessageArg(parm.token));
   static AllowedParams
@@ -1479,9 +1497,10 @@ Boolean Parser::parseNotationDecl()
 
   ExternalId id;
   if (!parseExternalId(allowSystemIdentifierMdc, allowMdc,
+		       parm.type == Param::reservedName + Syntax::rSYSTEM,
 		       declInputLevel, parm, id))
     return 0;
-  if (sd().formal()) {
+  if (validate() && sd().formal()) {
     PublicId::TextClass textClass;
     const PublicId *publicId = id.publicId();
     if (publicId
@@ -1526,6 +1545,8 @@ Boolean Parser::parseEntityDecl()
     declType = Entity::generalEntity;
     if (parm.type == Param::entityName)
       parm.token.swap(name);
+    else if (options().warnDefaultEntityDecl)
+      message(ParserMessages::defaultEntityDecl);
   }
   static AllowedParams
     allowEntityTextType(Param::paramLiteral,
@@ -1677,7 +1698,7 @@ Boolean Parser::parseExternalEntity(StringC &name,
   
   ExternalId id;
   if (!parseExternalId(allowSystemIdentifierEntityTypeMdc, allowEntityTypeMdc,
-		       declInputLevel, parm, id))
+		       1, declInputLevel, parm, id))
     return 0;
   if (parm.type == Param::mdc) {
     maybeDefineEntity(new ExternalTextEntity(name, declType, markupLocation(),
@@ -2021,7 +2042,7 @@ Boolean Parser::parseDoctypeDeclStart()
 						     Param::dso, Param::mdc);
     ExternalId id;
     if (!parseExternalId(allowSystemIdentifierDsoMdc, allowDsoMdc,
-			 declInputLevel, parm, id))
+			 1, declInputLevel, parm, id))
       return 0;
     Ptr<Entity> tem
       = new ExternalTextEntity(name, Entity::doctype, markupLocation(), id);
@@ -2034,9 +2055,10 @@ Boolean Parser::parseDoctypeDeclStart()
 #endif
   }
   else if (parm.type == Param::mdc) {
-    if (options().errorValid)
-      message(ParserMessages::noDtd);
-    disableValidation();
+    if (!sd().implydefElement()) {
+      message(ParserMessages::noDtdSubset);
+      enableImplydef();
+    }
   }
   // Discard mdc or dso
   if (currentMarkup())
@@ -2080,21 +2102,7 @@ void Parser::implyDtd(const StringC &gi)
     currentMarkup()->addName(gi.data(), gi.size());
   }
 #endif
-  ExternalId id;
-  // The null location indicates that this is a fake entity.
-  ConstPtr<Entity> entity(new ExternalTextEntity(gi,
-						 Entity::doctype,
-						 Location(),
-						 id));
-  // Don't use Entity::generateSystemId because we don't want an error
-  // if it fails.
-  StringC str;
-  if (!entityCatalog().lookup(*entity, syntax(), sd().internalCharset(),
-			      messenger(), str)) {
-    if (options().errorValid) {
-      message(ParserMessages::noDtdSubset);
-      disableValidation();
-    }
+  if (sd().implydefElement() && !sd().implydefDoctype()) {
     eventHandler().startDtd(new (eventAllocator())
 				  StartDtdEvent(gi, ConstPtr<Entity>(), 0,
 					markupLocation(),
@@ -2103,28 +2111,50 @@ void Parser::implyDtd(const StringC &gi)
     parseDoctypeDeclEnd(1);
     return;
   }
-  id.setEffectiveSystem(str);
+  ExternalId id;
+  // The null location indicates that this is a fake entity.
+  Entity *tem = new ExternalTextEntity(gi, Entity::doctype, Location(), id);
+  ConstPtr<Entity> entity(tem);
+  if (sd().implydefDoctype())
+    tem->generateSystemId(*this);
+  else {
+    // Don't use Entity::generateSystemId because we don't want an error
+    // if it fails.
+    StringC str;
+    if (!entityCatalog().lookup(*entity, syntax(), sd().internalCharset(),
+			        messenger(), str)) {
+      message(ParserMessages::noDtd);
+      enableImplydef();
+      eventHandler().startDtd(new (eventAllocator())
+				   StartDtdEvent(gi, ConstPtr<Entity>(), 0,
+				                 markupLocation(),
+					         currentMarkup()));
+      startDtd(gi);
+      parseDoctypeDeclEnd(1);
+      return;
+    }
+    id.setEffectiveSystem(str);
 #if 0
-  if (currentMarkup()) {
-    currentMarkup()->addS(syntax().space());
-    currentMarkup()->addReservedName(Syntax::rSYSTEM,
-				     syntax().reservedName(Syntax::rSYSTEM));
-  }
+    if (currentMarkup()) {
+      currentMarkup()->addS(syntax().space());
+      currentMarkup()->addReservedName(Syntax::rSYSTEM,
+				       syntax().reservedName(Syntax::rSYSTEM));
+    }
 #endif
-  entity = new ExternalTextEntity(gi,
-				  Entity::doctype,
-				  Location(),
-				  id);
-  StringC declStr;
-  declStr += syntax().delimGeneral(Syntax::dMDO);
-  declStr += syntax().reservedName(Syntax::rDOCTYPE);
-  declStr += syntax().space();
-  declStr += gi;
-  declStr += syntax().space();
-  declStr += syntax().reservedName(Syntax::rSYSTEM);
-  declStr += syntax().delimGeneral(Syntax::dMDC);
-  if (options().errorValid)
+    entity = new ExternalTextEntity(gi,
+				    Entity::doctype,
+				    Location(),
+				    id);
+    StringC declStr;
+    declStr += syntax().delimGeneral(Syntax::dMDO);
+    declStr += syntax().reservedName(Syntax::rDOCTYPE);
+    declStr += syntax().space();
+    declStr += gi;
+    declStr += syntax().space();
+    declStr += syntax().reservedName(Syntax::rSYSTEM);
+    declStr += syntax().delimGeneral(Syntax::dMDC);
     message(ParserMessages::implyingDtd, StringMessageArg(declStr));
+  }
   Ptr<EntityOrigin> origin
     = EntityOrigin::make(internalAllocator(), entity, currentLocation());
   eventHandler().startDtd(new (eventAllocator())
@@ -2176,7 +2206,7 @@ void Parser::checkDtd(Dtd &dtd)
 {
   if (dtd.isBase())
     addNeededShortrefs(dtd, instanceSyntax());
-  if (!options().errorAfdr)
+  if (sd().www() || !options().errorAfdr)
     addCommonAttributes(dtd);
   Dtd::ElementTypeIter elementIter(dtd.elementTypeIter());
   ElementType *p;
@@ -2185,51 +2215,26 @@ void Parser::checkDtd(Dtd &dtd)
   while ((p = elementIter.next()) != 0) {
     if (p->definition() == 0) {
       if (p->name() == dtd.name()) {
-	if (validate())
+	if (validate() && !implydefElement())
 	  message(ParserMessages::documentElementUndefined);
       }
       else if (options().warnUndefinedElement)
 	message(ParserMessages::dtdUndefinedElement, StringMessageArg(p->name()));
       if (def.isNull())
 	def = new ElementDefinition(currentLocation(),
-				    ElementDefinition::undefinedIndex,
-				    (ElementDefinition::omitStart
-				     |ElementDefinition::omitEnd),
+				    size_t(ElementDefinition::undefinedIndex),
+				    0,
 				    ElementDefinition::any);
       p->setElementDefinition(def, i++);
     }
     const ShortReferenceMap *map = p->map();
     if (map != 0 && map != &theEmptyMap && !map->defined()) {
-      message(ParserMessages::undefinedShortrefMapDtd,
-	      StringMessageArg(map->name()),
-	      StringMessageArg(p->name()));
+      if (validate())
+	message(ParserMessages::undefinedShortrefMapDtd,
+	        StringMessageArg(map->name()),
+	        StringMessageArg(p->name()));
       p->setMap(0);
     }
-  }
-  Dtd::ConstEntityIter entityIter(((const Dtd &)dtd).generalEntityIter());
-  for (;;) {
-    ConstPtr<Entity> entity(entityIter.next());
-    if (entity.isNull())
-      break;
-    const ExternalDataEntity *external = entity->asExternalDataEntity();
-    if (external) {
-      const Notation *notation = external->notation();
-      if (!notation->defined()) {
-	setNextLocation(external->defLocation());
-	message(ParserMessages::entityNotationUndefined,
-		StringMessageArg(notation->name()),
-		StringMessageArg(external->name()));
-      }
-    }
-  }
-  Dtd::NotationIter notationIter(dtd.notationIter());
-  for (;;) {
-    ConstPtr<Notation> notation(notationIter.next());
-    if (notation.isNull())
-      break;
-    if (!notation->defined() && !notation->attributeDef().isNull())
-      message(ParserMessages::attlistNotationUndefined,
-	      StringMessageArg(notation->name()));
   }
   Dtd::ShortReferenceMapIter mapIter(dtd.shortReferenceMapIter());
   int nShortref = dtd.nShortref();
@@ -2279,6 +2284,33 @@ void Parser::checkDtd(Dtd &dtd)
       }
     }
   }
+  if (!validate())
+    return;
+  Dtd::ConstEntityIter entityIter(((const Dtd &)dtd).generalEntityIter());
+  for (;;) {
+    ConstPtr<Entity> entity(entityIter.next());
+    if (entity.isNull())
+      break;
+    const ExternalDataEntity *external = entity->asExternalDataEntity();
+    if (external) {
+      const Notation *notation = external->notation();
+      if (!notation->defined()) {
+	setNextLocation(external->defLocation());
+	message(ParserMessages::entityNotationUndefined,
+		StringMessageArg(notation->name()),
+		StringMessageArg(external->name()));
+      }
+    }
+  }
+  Dtd::NotationIter notationIter(dtd.notationIter());
+  for (;;) {
+    ConstPtr<Notation> notation(notationIter.next());
+    if (notation.isNull())
+      break;
+    if (!notation->defined() && !notation->attributeDef().isNull())
+      message(ParserMessages::attlistNotationUndefined,
+	      StringMessageArg(notation->name()));
+  }
 }
 
 void Parser::addCommonAttributes(Dtd &dtd)
@@ -2286,17 +2318,20 @@ void Parser::addCommonAttributes(Dtd &dtd)
   Ptr<AttributeDefinitionList> commonAdl[2];
   {
     ElementType *e = dtd.removeElementType(syntax()
-					   .rniReservedName(Syntax::rANY));
+					   .rniReservedName(Syntax::rALL));
     if (e) {
       commonAdl[0] = e->attributeDef();
       delete e;
+      lookupCreateElement(syntax().rniReservedName(Syntax::rIMPLICIT));
     }
   }
   {
     Ptr<Notation> allNotation
-      = dtd.removeNotation(syntax().rniReservedName(Syntax::rANY));
-    if (!allNotation.isNull())
+      = dtd.removeNotation(syntax().rniReservedName(Syntax::rALL));
+    if (!allNotation.isNull()) {
       commonAdl[1] = allNotation->attributeDef();
+      lookupCreateNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    }
   }
   Dtd::ElementTypeIter elementIter(dtd.elementTypeIter());
   Dtd::NotationIter notationIter(dtd.notationIter());
@@ -2327,6 +2362,19 @@ void Parser::addCommonAttributes(Dtd &dtd)
 	}
       }
     }
+  }
+  {
+    ElementType *e = dtd.removeElementType(syntax()
+					   .rniReservedName(Syntax::rIMPLICIT));
+    if (e)
+      dtd.setImplicitElementAttributeDef(e->attributeDef());
+    delete e;
+  }
+  {
+    Ptr<Notation> n
+      = dtd.removeNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    if (!n.isNull())
+      dtd.setImplicitNotationAttributeDef(n->attributeDef());
   }
 }
 
@@ -2439,7 +2487,7 @@ Boolean Parser::parseLinktypeDeclStart()
 						     Param::dso, Param::mdc);
     ExternalId id;
     if (!parseExternalId(allowSystemIdentifierDsoMdc, allowDsoMdc,
-			 declInputLevel, parm, id))
+			 1, declInputLevel, parm, id))
       return 0;
     Ptr<Entity> tem
       = new ExternalTextEntity(name, Entity::linktype, markupLocation(), id);
@@ -3030,6 +3078,10 @@ Boolean Parser::parseMarkedSectionDeclStart()
   if (markedSectionLevel() == syntax().taglvl())
     message(ParserMessages::markedSectionLevel,
 	    NumberMessageArg(syntax().taglvl()));
+  if (!inInstance()
+      && options().warnInternalSubsetMarkedSection
+      && inputLevel() == 1)
+    message(ParserMessages::internalSubsetMarkedSection);
   if (markedSectionSpecialLevel() > 0) {
     startMarkedSection(markupLocation());
     if (inInstance()
@@ -3052,7 +3104,7 @@ Boolean Parser::parseMarkedSectionDeclStart()
     currentMarkup()->addDelim(Syntax::dDSO);
     discardMarkup = 0;
   }
-  else if (options().warnStatusKeywordSpecS) {
+  else if (options().warnInstanceStatusKeywordSpecS && inInstance()) {
     startMarkup(1, currentLocation());
     discardMarkup = 1;
   }
@@ -3125,12 +3177,12 @@ Boolean Parser::parseMarkedSectionDeclStart()
     break;
   }
   if (currentMarkup()) {
-    if (options().warnStatusKeywordSpecS) {
+    if (options().warnInstanceStatusKeywordSpecS && inInstance()) {
       Location loc(markupLocation());
       for (MarkupIter iter(*currentMarkup()); iter.valid(); iter.advance(loc, syntaxPointer())) {
 	if (iter.type() == Markup::s) {
 	  setNextLocation(loc);
-	  message(ParserMessages::statusKeywordSpecS);
+	  message(ParserMessages::instanceStatusKeywordSpecS);
 	}
       }
       if (discardMarkup)
@@ -3267,7 +3319,7 @@ Boolean Parser::parseAfdrDecl()
   setHadAfdrDecl();
   if (!parseParam(allowMinimumLiteral, declInputLevel, parm))
     return 0;
-  if (parm.literalText.string() != sd().execToInternal("ISO/IEC 10744:1992"))
+  if (parm.literalText.string() != sd().execToInternal("ISO/IEC 10744:1997"))
     message(ParserMessages::afdrVersion,
 	    StringMessageArg(parm.literalText.string()));
   if (!parseParam(allowMdc, declInputLevel, parm))

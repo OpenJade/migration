@@ -52,7 +52,6 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
 			 Phase finalPhase)
 : entityManager_(em),
   options_(opt),
-  validate_(opt.errorValid),
   inInstance_(0),
   keepingMessages_(0),
   eventAllocator_(maxSize(eventSizes, SIZEOF(eventSizes)), 50),
@@ -74,8 +73,7 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
   currentMarkup_(0),
   cancelPtr_(&dummyCancel_),
   finalPhase_(finalPhase),
-  hadAfdrDecl_(0),
-  stupidNetTrick_(0)
+  hadAfdrDecl_(0)
 {
 }
 
@@ -213,6 +211,16 @@ void ParserState::startDtd(const StringC &name)
     entity->setUsed();
     defDtd_->insertEntity(entity);
   }
+  size_t nEntities = instanceSyntax_->nEntities();
+  for (size_t i = 0; i < nEntities; i++) {
+    Text text;
+    text.addChar(instanceSyntax_->entityChar(i), Location());
+    Entity *entity
+      = new InternalCdataEntity(instanceSyntax_->entityName(i),
+				Location(),
+				text);
+    defDtd_->insertEntity(entity);
+  }
   currentDtd_ = defDtd_;
   currentDtdConst_ = defDtd_;
   currentMode_ = dsMode;
@@ -260,12 +268,17 @@ void ParserState::popInputStack()
       && inputLevel_ == 1
       && markedSectionLevel_ == 0)
     currentMode_ = dsMode;
+  if (inputLevelElementIndex_.size())
+    inputLevelElementIndex_.resize(inputLevelElementIndex_.size() - 1);
 }
 
 void ParserState::setSd(ConstPtr<Sd> sd)
 {
   sd_ = sd;
-  mayDefaultAttribute_ = (sd_->omittag() || sd_->shorttag());
+  mayDefaultAttribute_ = (sd_->omittag() || sd_->attributeDefault());
+  validate_ = sd_->typeValid();
+  implydefElement_ = sd_->implydefElement();
+  implydefAttlist_ = sd_->implydefAttlist();
 }
 
 void ParserState::setSyntax(ConstPtr<Syntax> syntax)
@@ -295,6 +308,8 @@ void ParserState::pushInput(InputSource *in)
     currentMode_ = rcconeMode;	// mode for rcdata in an entity
   else if (currentMode_ == dsMode)
     currentMode_ = dsiMode;
+  if (inInstance_ && sd().integrallyStored())
+    inputLevelElementIndex_.push_back(tagLevel() ? currentElement().index() : 0);
 }
 
 void ParserState::startMarkedSection(const Location &loc)
@@ -414,13 +429,6 @@ void ParserState::startInstance()
   currentAttributes_.clear();
   currentAttributes_.resize(currentDtd().nCurrentAttribute());
   idTable_.clear();
-  const StringC &net = syntax().delimGeneral(Syntax::dNET);
-  const StringC &tagc = syntax().delimGeneral(Syntax::dTAGC);
-  if (net.size() > tagc.size()
-      && memcmp(net.data() + net.size() - tagc.size(),
-		tagc.data(),
-		tagc.size() * sizeof(Char)) == 0)
-    stupidNetTrick_ = 1;
 }
 
 Id *ParserState::lookupCreateId(const StringC &name)
@@ -521,19 +529,9 @@ ParserState::lookupEntity(Boolean isParameter,
   return (Entity *)0;
 }
 
-ConstPtr<Entity> ParserState::createUndefinedEntity(const StringC &name, const Location &loc,
-						    Boolean &known)
+ConstPtr<Entity> ParserState::createUndefinedEntity(const StringC &name, const Location &loc)
 {
-  known = 0;
   Text text;
-  const Vector<StringC> &v = options().recoveryEntities;
-  for (size_t i = 0; i < v.size(); i += 2) {
-    if (v[i] == name) {
-      known = 1;
-      text.addChars(v[i + 1], loc);
-      break;
-    }
-  }
   Ptr<Entity> entity(new InternalCdataEntity(name, loc, text));
   undefinedEntityTable_.insert(entity);
   return entity;
@@ -786,7 +784,7 @@ ConstPtr<Entity> ParserState::getAttributeEntity(const StringC &str,
 Boolean ParserState::defineId(const StringC &str, const Location &loc,
 			      Location &prevLoc)
 {
-  if (!inInstance())
+  if (!inInstance() || !validate())
     return 1;
   Id *id = lookupCreateId(str);
   if (id->defined()) {
@@ -799,7 +797,7 @@ Boolean ParserState::defineId(const StringC &str, const Location &loc,
 
 void ParserState::noteIdref(const StringC &str, const Location &loc)
 {
-  if (!inInstance() || !options().errorIdref)
+  if (!inInstance() || !options().errorIdref || !validate())
     return;
   Id *id = lookupCreateId(str);
   if (!id->defined())

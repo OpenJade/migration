@@ -24,12 +24,6 @@ private:
 };
 
 inline
-void *operator new(size_t n, GenericEventHandler *handler)
-{
-  return handler->allocate(n);
-}
-
-inline
 void GenericEventHandler::freeAll()
 {
   if (allocBlocks_)

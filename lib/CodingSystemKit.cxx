@@ -12,6 +12,7 @@
 #include "UTF8CodingSystem.h"
 #include "Fixed2CodingSystem.h"
 #include "UnicodeCodingSystem.h"
+#include "XMLCodingSystem.h"
 #include "EUCJPCodingSystem.h"
 #include "SJISCodingSystem.h"
 #include "Big5CodingSystem.h"
@@ -64,6 +65,7 @@ public:
     ansi,
     oem,
     maybeUnicode,
+    xml,
     iso8859_1,
     iso8859_2,
     iso8859_3,
@@ -91,6 +93,7 @@ private:
   UTF8CodingSystem utf8CodingSystem_;
   Fixed2CodingSystem fixed2CodingSystem_;
   UnicodeCodingSystem unicodeCodingSystem_;
+  XMLCodingSystem xmlCodingSystem_;
   EUCJPCodingSystem eucBctf_;
   SJISCodingSystem sjisBctf_;
   Big5CodingSystem big5Bctf_;
@@ -117,7 +120,7 @@ private:
   IdentityCodingSystem identityCodingSystem_;
   const TranslateCodingSystem::Desc *systemCharsetDesc_;
   static const Entry bctfTable_[];
-  enum { nEncodingsRequireUnicode = 7 };
+  enum { nEncodingsRequireUnicode = 8 };
   static const Entry encodingTable_[];
 };
 
@@ -263,10 +266,14 @@ const CodingSystemKitImpl::Entry CodingSystemKitImpl::encodingTable_[] = {
   { "UCS-2", fixed2 },
   { "ISO-10646-UCS-2", fixed2 },
   { "UNICODE", unicode },
+  // We don't really support UTF-16, but treating it
+  // as Unicode should work for the most part.
+  { "UTF-16", unicode },
   { "WINDOWS", ansi },
   { "MS-DOS", oem },
   { "WUNICODE", maybeUnicode },
-  // nEncodingsRequireUnicode = 7
+  { "XML", xml },
+  // nEncodingsRequireUnicode = 8
   { "IS8859-1", iso8859_1 },
   { "ISO-8859-1", iso8859_1 },
   { "IS8859-2", iso8859_2 },
@@ -307,6 +314,7 @@ CodingSystemKitImpl::CodingSystemKitImpl(const TranslateCodingSystem::Desc *syst
   oemCodingSystem_(Win32CodingSystem::codePageOEM),
   maybeUnicodeCodingSystem_(&ansiCodingSystem_),
 #endif
+  xmlCodingSystem_(this),
   iso8859_1CodingSystem_(&identityCodingSystem_, iso8859_1Desc, &systemCharset_, 0x100, unicodeReplaceChar),
   iso8859_2CodingSystem_(&identityCodingSystem_, iso8859_2Desc, &systemCharset_, 0x100, unicodeReplaceChar),
   iso8859_3CodingSystem_(&identityCodingSystem_, iso8859_3Desc, &systemCharset_, 0x100, unicodeReplaceChar),
@@ -464,6 +472,8 @@ CodingSystemKitImpl::makeCodingSystem(CodingSystemId id) const
     return &iso8859_8CodingSystem_;
   case iso8859_9:
     return &iso8859_9CodingSystem_;
+  case xml:
+    return &xmlCodingSystem_;
 #ifdef WIN32
   case ansi:
     return &ansiCodingSystem_;

@@ -172,10 +172,17 @@ Ptr<ExtendEntityManager> &EntityApp::entityManager()
       }
     }
   }
+  const SP_TCHAR *useDocCatalogStr = tgetenv(SP_T("SP_USE_DOCUMENT_CATALOG"));
+  Boolean useDocCatalog = true;
+  if (useDocCatalogStr
+      && (stringMatches(useDocCatalogStr, "NO")
+          || stringMatches(useDocCatalogStr, "0")))
+    useDocCatalog = false;
   entityManager_->setCatalogManager(SOCatalogManager::make(v,
 							   catalogSysids_.size(),
 							   &systemCharset(),
-							   &systemCharset()));
+							   &systemCharset(),
+							   useDocCatalog));
   return entityManager_;
 }
 

@@ -302,7 +302,7 @@ Boolean CmdLineApp::getMessageText(const MessageFragment &frag,
   return 1;
 }
 
-Boolean stringMatches(const SP_TCHAR *s, const char *key)
+Boolean CmdLineApp::stringMatches(const SP_TCHAR *s, const char *key)
 {
   for (; *key != '\0'; s++, key++) {
     if (*s != tolower(*key) && *s != toupper(*key))

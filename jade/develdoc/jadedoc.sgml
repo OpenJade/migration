@@ -1,7 +1,7 @@
 <!doctype article public "-//Davenport//DTD DocBook V3.0//EN">
 <article>
   <artheader>
-    <title>OpenJadei and OpenSP internals</title>
+    <title>OpenJade and OpenSP internals</title>
     <author>
       <firstname>Matthias</firstname>
       <surname>Clasen</surname>

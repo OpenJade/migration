@@ -33,7 +33,8 @@ foreach (@ARGV) {
     $Doc->Repaginate();
     $Stories = $Doc->StoryRanges;
     for $s (@storytypes) {
-        eval {
+        eval {            
+            local $SIG{__WARN__} = {};    
             $Story = $Stories->Item($s);
             if ($Story) {
                 $Story->Fields->Update();

@@ -68,13 +68,13 @@ namespace SP_NAMESPACE {
 
 #define SP_MUTEX
 
-#ifdef SP_NAMESPACE
-namespace SP_NAMESPACE {
-#endif
-
 extern "C" {
 #include <pthread.h>
 }
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
 
 class Mutex {
 public:

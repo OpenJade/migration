@@ -973,6 +973,15 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
   if (!inDtd_) {
     const CodingSystem *outputCodingSystem = app_->outputCodingSystem();
     const EntityDecl *entDecl = in->currentLocation().origin()->entityDecl();
+
+    if (entDecl == NULL ) {
+      if (options_.reportIS) {
+        os() << "<?inputOpened effectiveSystemID=\"NULL\" "
+             << "systemID=\"NULL\" publicID=\"NULL\" ?>";
+      }
+      return;
+    }
+
     const Entity *ent = in->currentLocation().origin()->entity();
     const StringC *effectiveSystemIdPointer =
       entDecl->effectiveSystemIdPointer();
@@ -1104,7 +1113,16 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 void XmlOutputEventHandler::inputClosed(InputSource *in)
   {
   if (! inDtd_) {
+    const EntityDecl *entDecl = in->currentLocation().origin()->entityDecl();
     const Entity *ent = in->currentLocation().origin()->entity();
+
+    if (entDecl == NULL || ent == NULL ) {
+      if ( options_.reportIS) {
+        os() << "<?inputOpened effectiveSystemID=\"NULL\" "
+             << "systemID=\"NULL\" publicID=\"NULL\" ?>";
+      }
+      return;
+    }
 
     // Close external entity
     if (ent->asExternalEntity() != NULL) {
@@ -1141,7 +1159,7 @@ void XmlOutputEventHandler::inputClosed(InputSource *in)
     else {
       // We should only get InternalText and ExternalText entities here.
       app_->message(XmlOutputMessages::unexpectedEntityType,
-		    StringMessageArg (ent->name()));
+		    StringMessageArg( ent->name() ));
       exit(1);
     }
 

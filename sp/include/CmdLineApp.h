@@ -98,6 +98,7 @@ private:
   wmain(int argc, wchar_t **argv) { CLASS app; return app.run(argc, argv); }
 #else
 #define SP_DEFINE_APP(CLASS) \
+ extern "C" \
  int main(int argc, char **argv) { CLASS app; return app.run(argc, argv); }
 #endif
 

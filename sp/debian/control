@@ -2,7 +2,7 @@ Source: opensp
 Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
-Standards-Version: 3.1.1
+Standards-Version: 3.5.0
 Build-Depends: debhelper, automake, libtool
 
 Package: opensp

@@ -24,11 +24,13 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 #ifdef SP_HAVE_LOCALE
+# ifndef __GLIBC__
 static char *strdup(const char *s)
 {
   size_t l = strlen(s) + 1;
   return (char *) memcpy ((char *) malloc (sizeof (char) * l), s, l);
 }
+# endif /* __GLIBC__ */
 
 static char *stringify(const StringC &s)
 {

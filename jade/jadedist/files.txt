@@ -22,6 +22,7 @@ spgrove/SdNode.h
 spgrove/threads.h
 style/charNames.h
 style/Collector.h
+style/DocumentGenerator.h
 style/DssslApp.h
 style/DssslSpecEventHandler.h
 style/dsssl_ns.h
@@ -53,6 +54,7 @@ style/stylelib.h
 style/style_pch.h
 style/VM.h
 style/Collector.cxx
+style/DocumentGenerator.cxx
 style/DssslApp.cxx
 style/DssslSpecEventHandler.cxx
 style/ELObj.cxx
@@ -116,7 +118,9 @@ jade.dsw
 dsssl/demo.dsl
 dsssl/demo.sgm
 dsssl/style-sheet.dtd
+dsssl/spec.dtd
 dsssl/dsssl.dtd
+dsssl/extensions.dsl
 dsssl/fot.dtd
 dsssl/catalog
 dsssl/jadetex.dtx
@@ -158,12 +162,19 @@ jade/MifMessages.h
 jade/MifMessages.msg
 jade/MifMessages.rc
 jadedoc/autoconf.htm
+jadedoc/contributors.htm
 jadedoc/copying.txt
 jadedoc/dsssl2.htm
-jadedoc/jade.htm
-jadedoc/TeX.htm
+jadedoc/index.htm
 jadedoc/mif.htm
+jadedoc/rtf.htm
+jadedoc/tex.htm
 jadedoc/transform.htm
+jadedoc/xmlfo.htm
+jadedoc/images/background.gif
+jadedoc/images/dsssltitle.gif
+jadedoc/images/space.gif
+jadedoc/images/top-of-page.gif
 jadedist/bin-files.txt
 jadedist/files.txt
 jadedist/makedist.bat

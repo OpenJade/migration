@@ -33,6 +33,7 @@ doc/sx.htm
 doc/sysdecl.htm
 doc/sysid.htm
 doc/xml.htm
+doc/xmlwarn.htm
 generic/EventGenerator.h
 generic/ParserEventGeneratorKit.h
 generic/SGMLApplication.h
@@ -436,6 +437,9 @@ spam/spam.dsp
 spam/spam.rc
 spam/spam_inst.cxx
 spam/spam_inst.m4
+spcat/Makefile.sub
+spcat/spcat.cxx
+spcat/spcat.dsp
 spent/Makefile.sub
 spent/spent.cxx
 spent/spent.dsp

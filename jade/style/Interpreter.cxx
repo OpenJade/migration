@@ -44,6 +44,11 @@ const Char defaultChar = 0xfffd;
 static
 size_t maxObjSize()
 {
+  // FlowObj classes are declared in FlowObj.cxx.
+  class Dummy : public CompoundFlowObj {
+  private:
+    Owner<Location> locp_;
+  };
   static size_t sz[] = {
     sizeof(UnresolvedQuantityObj),
     sizeof(VarStyleObj),
@@ -57,10 +62,11 @@ size_t maxObjSize()
     sizeof(NamedNodeListPtrNodeListObj),
     sizeof(ProcessNodeSosofoObj),
     sizeof(AppendSosofoObj),
+    sizeof(LiteralSosofoObj),
     sizeof(SetNonInheritedCsSosofoObj),
     sizeof(LabelSosofoObj),
     sizeof(MacroFlowObj),
-    sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
+    sizeof(Dummy),
     sizeof(LangObj),
 #ifdef SP_HAVE_LOCALE
     sizeof(RefLangObj),

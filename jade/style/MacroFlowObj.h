@@ -60,11 +60,19 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *, const Location &, Interpreter &);
   void traceSubObjects(Collector &) const;
   void processInner(ProcessContext &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afAlways; }
   void unpack(VM &);
 private:
   void operator=(const MacroFlowObj &); // undefined
-  Ptr<Definition> def_;
-  ELObj **charicVals_;
+  // Only one pointer/owner allowed.
+  struct S {
+    S(Definition *d, ELObj **c = 0)
+      : def_(d), charicVals_(c) {}
+    Ptr<Definition> def_;
+    ELObj **charicVals_;
+  };
+  Owner<S> sp_;
 };
 
 inline

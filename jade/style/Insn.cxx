@@ -1240,8 +1240,8 @@ const Insn *SosofoAppendInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
-CopyFlowObjInsn::CopyFlowObjInsn(FlowObj *flowObj, InsnPtr next)
-: flowObj_(flowObj), next_(next)
+CopyFlowObjInsn::CopyFlowObjInsn(FlowObj *flowObj, const Location &loc, InsnPtr next)
+: flowObj_(flowObj), next_(next), loc_(loc)
 {
 }
 
@@ -1249,6 +1249,7 @@ const Insn *CopyFlowObjInsn::execute(VM &vm) const
 {
   vm.needStack(1);
   *vm.sp++ = flowObj_->copy(*vm.interp);
+  ((FlowObj *)vm.sp[-1])->setLocation(loc_);
   return next_.pointer();
 }
 
@@ -1305,11 +1306,6 @@ const Insn *SetNonInheritedCInsn::execute(VM &vm) const
   return SetPseudoNonInheritedCInsn::execute(vm);
 }
 
-SetContentInsn::SetContentInsn(const CompoundFlowObj *flowObj, InsnPtr next)
-: flowObj_(flowObj), next_(next)
-{
-}
-
 SetImplicitCharInsn::SetImplicitCharInsn(const Location &loc, InsnPtr next)
 : loc_(loc), next_(next)
 {
@@ -1329,10 +1325,16 @@ const Insn *SetImplicitCharInsn::execute(VM &vm) const
   return next_.pointer();
 }
 
+SetContentInsn::SetContentInsn(const CompoundFlowObj *flowObj, const Location &loc, InsnPtr next)
+: flowObj_(flowObj), next_(next), loc_(loc)
+{
+}
+
 const Insn *SetContentInsn::execute(VM &vm) const
 {
   CompoundFlowObj *copy = (CompoundFlowObj *)flowObj_->copy(*vm.interp);
   copy->setContent((SosofoObj *)vm.sp[-1]);
+  copy->setLocation(loc_);
   vm.sp[-1] = copy;
   return next_.pointer();
 }
@@ -1353,7 +1355,9 @@ const Insn *SetDefaultContentInsn::execute(VM &vm) const
   vm.needStack(1);
   *vm.sp++ = flowObj_->copy(*vm.interp);
   ((CompoundFlowObj *)vm.sp[-1])
-    ->setContent(new (*vm.interp) ProcessChildrenSosofoObj(vm.processingMode));
+    ->setContent(new (*vm.interp) ProcessChildrenSosofoObj(vm.processingMode,
+							   loc_));
+  ((FlowObj *)vm.sp[-1])->setLocation(loc_);
   return next_.pointer();
 }
 
@@ -1371,7 +1375,8 @@ const Insn *MakeDefaultContentInsn::execute(VM &vm) const
     return 0;
   }
   vm.needStack(1);
-  *vm.sp++ = new (*vm.interp) ProcessChildrenSosofoObj(vm.processingMode);
+  *vm.sp++ = new (*vm.interp) ProcessChildrenSosofoObj(vm.processingMode,
+						       loc_);
   return next_.pointer();
 }
 

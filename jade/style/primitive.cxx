@@ -5648,6 +5648,9 @@ NodeListObj *TreeNodeListObj::nodeListRest(EvalContext &context, Interpreter &in
 NodeListObj *TreeNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
   TreeNodeListObj *obj = copy(interp);
+  // SubgroveNodeListObj::chunkAdvance uses ELObjPropertyValue, so we must
+  // protect obj.
+  ELObjDynamicRoot protect(interp, obj);
   obj->chunkAdvance(context, interp);
   chunk = 1;
   return obj;

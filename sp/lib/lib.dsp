@@ -1970,6 +1970,11 @@ SOURCE=.\CmdLineAppMessages.rc
 # End Source File
 # Begin Source File
 
+SOURCE=.\EntityAppMessages.rc
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
 SOURCE=.\EntityManagerMessages.rc
 # PROP Exclude_From_Build 1
 # End Source File

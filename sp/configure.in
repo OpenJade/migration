@@ -13,7 +13,7 @@ dnl
 dnl Initialization.
 AC_INIT(pubtext)
 AM_INIT_AUTOMAKE(OpenSP, 1.4, no-define)
-AM_CONFIG_HEADER(include/config.h)
+AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
 dnl Since config.h gets included by user programs, we use special names

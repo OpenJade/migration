@@ -395,6 +395,7 @@ class NamedNodeListObj : public NodeListObj {
 public:
   NamedNodeListObj *asNamedNodeList();
   virtual NodePtr namedNode(const Char *, size_t) = 0;
+  virtual bool nodeName(const NodePtr &, GroveString &) = 0;
 };
 
 class NodePtrNodeListObj : public NodeListObj {
@@ -436,6 +437,7 @@ public:
   NodePtr nodeListFirst(QueryContext &);
   NodeListObj *nodeListRest(QueryContext &);
   NodePtr namedNode(const Char *, size_t);
+  bool nodeName(const NodePtr &, GroveString &);
   NodeListObj *nodeListNoOrder(QueryContext &);
 private:
   NamedNodeListPtr namedNodeList_;

@@ -18,7 +18,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 DssslApp::DssslApp(int unitsPerInch)
-: unitsPerInch_(unitsPerInch)
+: GroveApp("unicode"), unitsPerInch_(unitsPerInch)
 {
   registerOption('d', SP_T("dsssl_spec"));
   registerOption('V', SP_T("variable"));
@@ -37,7 +37,7 @@ int DssslApp::init(int argc, AppChar **argv)
 int DssslApp::processSysid(const StringC &sysid)
 {
   ParsedSystemId v;
-  if (!entityManager()->parseSystemId(sysid, systemCharset_, 0, 0,
+  if (!entityManager()->parseSystemId(sysid, systemCharset(), 0, 0,
 				      *this, v))
     return 0;
   for (size_t i = v.size(); i > 0; i--)
@@ -61,7 +61,7 @@ int DssslApp::processSysid(const StringC &sysid)
       if (dssslSpecSysid_.size() == 0) {
 	static const Char ext[] = { '.', 'd', 's', 'l' };
         s.append(ext, SIZEOF(ext));
-	specId.unparse(systemCharset_, dssslSpecSysid_);
+	specId.unparse(systemCharset(), 0, dssslSpecSysid_);
       }
       break;
     }
@@ -110,7 +110,7 @@ void DssslApp::processGrove()
   StyleEngine se(*this, rootNode_, unitsPerInch_, extensions);
   for (size_t i = 0; i < defineVars_.size(); i++)
     se.defineVariable(defineVars_[i]);
-  se.parseSpec(specParser_, systemCharset_, dssslSpecId_, *this);
+  se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this);
   se.process(*fotb);
 }
 

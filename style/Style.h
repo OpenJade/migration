@@ -127,6 +127,9 @@ private:
 
 class MergeStyleObj : public StyleObj {
 public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
   MergeStyleObj();
   void append(StyleObj *);
   void appendIter(StyleObjIter &) const;

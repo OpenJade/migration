@@ -431,7 +431,32 @@ void FOTBuilder::endFraction()
 {
   end();
 }
-  
+ 
+void FOTBuilder::startElement(const ElementNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endElement()
+{
+  end();
+}
+
+void FOTBuilder::emptyElement(const ElementNIC &)
+{
+  atomic();
+}
+
+void FOTBuilder::documentType(const DocumentTypeNIC &)
+{
+  atomic();
+}
+
+void FOTBuilder::processingInstruction(const StringC &)
+{
+  atomic();
+}
+
 void FOTBuilder::setFontSize(Length)
 {
 }
@@ -1005,6 +1030,9 @@ FOTBuilder::GlyphId FOTBuilder::GlyphSubstTable::subst(const FOTBuilder::GlyphId
   return gid;
 }
 
+FOTBuilder::DocumentTypeNIC::DocumentTypeNIC()
+{
+}
 
 SaveFOTBuilder::SaveFOTBuilder()
 : calls_(0), tail_(&calls_)
@@ -1104,6 +1132,7 @@ NO_ARG_CALL(tableCellBeforeRowBorder)
 NO_ARG_CALL(tableCellAfterRowBorder)
 NO_ARG_CALL(tableCellBeforeColumnBorder)
 NO_ARG_CALL(tableCellAfterColumnBorder)
+NO_ARG_CALL(endElement)
 
 #define LENGTH_SPEC_ARG_CALL(F) \
   void SaveFOTBuilder::F(const LengthSpec &lengthSpec) { \
@@ -1268,6 +1297,7 @@ UNSIGNED_ARG_CALL(endSimplePageSequenceHeaderFooter)
 
 STRING_ARG_CALL(setFontFamilyName)
 STRING_ARG_CALL(formattingInstruction)
+STRING_ARG_CALL(processingInstruction)
 
 #define INLINE_SPACE_ARG_CALL(F) \
   void SaveFOTBuilder::F(const InlineSpace &is) { \
@@ -1555,6 +1585,24 @@ void SaveFOTBuilder::startMultiMode(const MultiMode *principalMode,
   tail_ = &(*tail_)->next;
 }
 
+void SaveFOTBuilder::startElement(const ElementNIC &nic)
+{
+  *tail_ = new StartElementCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::emptyElement(const ElementNIC &nic)
+{
+  *tail_ = new EmptyElementCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::documentType(const DocumentTypeNIC &nic)
+{
+  *tail_ = new DocumentTypeCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
 void SaveFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
 {
   *tail_ = new SetGlyphSubstTableCall(tables);
@@ -1726,6 +1774,21 @@ void SaveFOTBuilder::StartLinkCall::emit(FOTBuilder &fotb)
 void SaveFOTBuilder::SetGlyphSubstTableCall::emit(FOTBuilder &fotb)
 {
   fotb.setGlyphSubstTable(arg);
+}
+
+void SaveFOTBuilder::StartElementCall::emit(FOTBuilder &fotb)
+{
+  fotb.startElement(arg);
+}
+
+void SaveFOTBuilder::EmptyElementCall::emit(FOTBuilder &fotb)
+{
+  fotb.emptyElement(arg);
+}
+
+void SaveFOTBuilder::DocumentTypeCall::emit(FOTBuilder &fotb)
+{
+  fotb.documentType(arg);
 }
 
 SerialFOTBuilder::SerialFOTBuilder()

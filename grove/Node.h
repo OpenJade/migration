@@ -169,6 +169,10 @@ public:
   virtual AccessResult getDefaultedEntities(NamedNodeListPtr &) const;
   virtual AccessResult getGoverningDoctype(NodePtr &) const;
   virtual AccessResult getDoctypesAndLinktypes(NamedNodeListPtr &) const;
+  // Properties only on dataChar.
+  // For a non-SGML data character (resulting from a numeric character reference).
+  // Something like this is being added in the HyTime TC.
+  virtual AccessResult getNonSgml(unsigned long &) const;
 };
 
 class GROVE_API NodeList {

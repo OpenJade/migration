@@ -7,6 +7,7 @@
 #include "RtfFOTBuilder.h"
 #include "HtmlFOTBuilder.h"
 #include "TeXFOTBuilder.h"
+#include "TransformFOTBuilder.h"
 #include "OutputCharStream.h"
 #include "macros.h"
 #include "sptchar.h"
@@ -28,10 +29,11 @@ public:
   void processOption(AppChar opt, const AppChar *arg);
   FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&);
 private:
-  enum OutputType { fotType, rtfType, htmlType, texType };
+  enum OutputType { fotType, rtfType, htmlType, texType, sgmlType };
   static const AppChar *const outputTypeNames[];
   OutputType outputType_;
   String<AppChar> outputFilename_;
+  Vector<StringC> outputOptions_;
   filebuf outputFile_;
 };
 
@@ -41,13 +43,14 @@ const DfrontApp::AppChar *const DfrontApp::outputTypeNames[] = {
   SP_T("fot"),
   SP_T("rtf"),
   SP_T("html"),
-  SP_T("tex")
+  SP_T("tex"),
+  SP_T("sgml")
 };
 
 DfrontApp::DfrontApp()
 : DssslApp(u), outputType_(fotType)
 {
-  registerOption('t', SP_T("(fot|rtf|html|tex)"));
+  registerOption('t', SP_T("(fot|rtf|html|tex|sgml)"));
   registerOption('o', SP_T("output_file"));
 }
 
@@ -56,15 +59,32 @@ void DfrontApp::processOption(AppChar opt, const AppChar *arg)
   switch (opt) {
   case 't':
     {
+      const AppChar *sub = tcschr(arg, SP_T('-'));
+      size_t len = sub ? sub - arg : tcslen(arg);
       for (size_t i = 0;; i++) {
         if (i >= SIZEOF(outputTypeNames)) {
 	  message(JadeMessages::unknownType, StringMessageArg(convertInput(arg)));
 	  break;
 	}
-	if (tcscmp(arg, outputTypeNames[i]) == 0) {
+	if (tcsncmp(arg, outputTypeNames[i], len) == 0) {
 	  outputType_ = OutputType(i);
 	  break;
 	}
+      }
+      if (sub) {
+	StringC tem(convertInput(sub));
+	StringC arg;
+	for (size_t i = 0; i < tem.size(); i++) {
+	  if (tem[i] == '-') {
+	    if (arg.size())
+	      outputOptions_.push_back(arg);
+	    arg.resize(0);
+	  }
+	  else
+	    arg += tem[i];
+	}
+	if (arg.size())
+	  outputOptions_.push_back(arg);
       }
     }
     break;
@@ -102,7 +122,7 @@ FOTBuilder *DfrontApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
     const AppChar *ext = outputTypeNames[outputType_];
     outputFilename_.append(ext, tcslen(ext));
   }
-  if (outputType_ != htmlType) {
+  if (outputType_ != htmlType && outputType_ != sgmlType) {
     outputFilename_ += 0;
     if (!CmdLineApp::openFilebufWrite(outputFile_, outputFilename_.data())) {
       message(JadeMessages::cannotOpenOutputError,
@@ -114,14 +134,16 @@ FOTBuilder *DfrontApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
   switch (outputType_) {
   case rtfType:
     unitsPerInch_ = 20*72; // twips
-    return makeRtfFOTBuilder(&outputFile_, entityManager(), systemCharset_, this, exts);
+    return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts);
   case texType:
     return makeTeXFOTBuilder(&outputFile_);
   case htmlType:
-    return makeHtmlFOTBuilder(outputFilename_, outputCodingSystem_, this, exts);
+    return makeHtmlFOTBuilder(outputFilename_, this, exts);
   case fotType:
     return makeSgmlFOTBuilder(new RecordOutputCharStream(new IosOutputCharStream(&outputFile_,
                                                                                  outputCodingSystem_)));
+  case sgmlType:
+    return makeTransformFOTBuilder(this, exts);
   default:
     break;
   }

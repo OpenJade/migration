@@ -355,9 +355,6 @@ void DssslSpecEventHandler::Doc::load(DssslSpecEventHandler &eh)
     SgmlParser::Params params;
     params.parent = eh.parser_;
     params.sysid = sysid_;
-    params.initialCharset = &eh.charset_->desc();
-    // FIXME SP bug: shouldn't need to set options
-    params.options = &eh.parser_->options();
     SgmlParser specParser(params);
     eh.loadDoc(specParser, *this);
   }
@@ -412,19 +409,15 @@ void DssslSpecEventHandler
 {
   const InternalEntity *internal = entity_->asInternalEntity();
   if (internal) {
-    // FIXME SP bug: location shouldn't be required
     in = new InternalInputSource(internal->string(),
-                                 new EntityOrigin(entity_, Location()));
+                                 new EntityOrigin(entity_));
     return;
   }
   const StringC &sysid
     = entity_->asExternalEntity()->externalId().effectiveSystemId();
-  if (sysid.size()) {
-    // FIXME SP bug: SgmlParser::entityManager should not return const
-    EntityManager *em
-      = (EntityManager *)&eh.parser_->entityManager();
-    in = em->open(sysid, *eh.charset_, new InputSourceOrigin, 0, *eh.mgr_);
-  }
+  if (sysid.size())
+    in = eh.parser_->entityManager().open(sysid, *eh.charset_, new InputSourceOrigin,
+					  0, *eh.mgr_);
 }
 
 DssslSpecEventHandler::PartHeader::PartHeader(Doc *doc, const StringC &id)

@@ -57,15 +57,15 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-, root, root)
-/usr/bin/*
-/usr/share/@PACKAGE@/*
+%{_bindir}/*
+%{_datadir}/@PACKAGE@/*
 %doc /usr/doc/@PACKAGE@/*
 
 %files lib
 %defattr(-, root, root)
-/usr/lib/*.so.*
+%{_libdir}/*.so.*
 
 %files devel
 %defattr(-, root, root)
-/usr/lib/*
-/usr/include/@PACKAGE@/*
+%{_libdir}/lib*.{so,a,la}
+%{_includedir}/@PACKAGE@/*

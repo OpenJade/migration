@@ -55,6 +55,8 @@ void DssslSpecEventHandler::load(SgmlParser &specParser,
       syn->generalSubstTable()->subst(normId);
     tem = doc->refPart(normId)->resolve(*this);
   }
+  if (tem && tem->partial()) 
+    mgr_->message(InterpreterMessages::partialSpec);
   resolveParts(tem, parts);
 }
 
@@ -72,6 +74,10 @@ void DssslSpecEventHandler::resolveParts(Part *part, Vector<Part *> &parts)
 {
   if (!part)
     return;
+  if (parts.size() > 0 && parts[0]->style() != part->style()) {
+    mgr_->message(InterpreterMessages::mixedLanguages);
+    return;
+  }
   parts.push_back(part);
   if (part->setMark()) {
     mgr_->message(InterpreterMessages::useLoop);
@@ -130,10 +136,16 @@ static struct {
 } mappingTable[] = {
   { "STYLE-SPECIFICATION",
     &DssslSpecEventHandler::styleSpecificationStart,
-    &DssslSpecEventHandler::styleSpecificationEnd },
+    &DssslSpecEventHandler::specificationEnd },
   { "STYLE-SPECIFICATION-BODY",
-    &DssslSpecEventHandler::styleSpecificationBodyStart,
-    &DssslSpecEventHandler::styleSpecificationBodyEnd },
+    &DssslSpecEventHandler::specificationBodyStart,
+    &DssslSpecEventHandler::specificationBodyEnd },
+  { "TRANSFORMATION-SPECIFICATION",
+    &DssslSpecEventHandler::transformSpecificationStart,
+    &DssslSpecEventHandler::specificationEnd },
+  { "TRANSFORMATION-SPECIFICATION-BODY",
+    &DssslSpecEventHandler::specificationBodyStart,
+    &DssslSpecEventHandler::specificationBodyEnd },
   { "EXTERNAL-SPECIFICATION",
     &DssslSpecEventHandler::externalSpecificationStart,
     &DssslSpecEventHandler::externalSpecificationEnd },
@@ -281,6 +293,16 @@ void DssslSpecEventHandler::externalSpecificationEnd(const EndElementEvent &)
 
 void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &event)
 {
+  specificationStart(event, 1);
+}
+
+void DssslSpecEventHandler::transformSpecificationStart(const StartElementEvent &event)
+{
+  specificationStart(event, 0);
+}
+
+void DssslSpecEventHandler::specificationStart(const StartElementEvent &event, bool isStyle)
+{
   StringC empty;
   const StringC *idP = attributeString(event, "ID");
   if (!idP)
@@ -288,7 +310,9 @@ void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &eve
   PartHeader *header = currentDoc_->refPart(*idP);
   // FIXME give an error (or ignore) if header has part already
   const Text *useP = attributeText(event, "USE");
-  header->setPart(currentPart_ = new Part(currentDoc_));
+  const StringC *partialP = attributeString(event, "PARTIAL");
+  bool isPartial = (partialP && *partialP == "PARTIAL");
+  header->setPart(currentPart_ = new Part(currentDoc_, isPartial, isStyle));
   if (useP) {
     const StringC &use = useP->string();
     size_t i = 0;
@@ -305,15 +329,14 @@ void DssslSpecEventHandler::styleSpecificationStart(const StartElementEvent &eve
       i = j + 1;
     }
   }
-  // FIXME Give warning if selected part is incomplete
 }
 
-void DssslSpecEventHandler::styleSpecificationEnd(const EndElementEvent &event)
+void DssslSpecEventHandler::specificationEnd(const EndElementEvent &event)
 {
   currentPart_ = 0;
 }
 
-void DssslSpecEventHandler::styleSpecificationBodyStart(const StartElementEvent &event)
+void DssslSpecEventHandler::specificationBodyStart(const StartElementEvent &event)
 {
   if (currentPart_) {
     currentBody_.clear();
@@ -325,7 +348,7 @@ void DssslSpecEventHandler::styleSpecificationBodyStart(const StartElementEvent 
   }
 }
 
-void DssslSpecEventHandler::styleSpecificationBodyEnd(const EndElementEvent &event)
+void DssslSpecEventHandler::specificationBodyEnd(const EndElementEvent &event)
 {
   if (gatheringBody_) {
     if (currentPart_)
@@ -603,9 +626,19 @@ DssslSpecEventHandler::ExternalFirstPart::resolve(DssslSpecEventHandler &eh)
   return doc_->resolveFirstPart(eh);
 }
 
-DssslSpecEventHandler::Part::Part(Doc *doc)
-: mark_(0), doc_(doc)
+DssslSpecEventHandler::Part::Part(Doc *doc, bool partial, bool style)
+: mark_(0), doc_(doc), partial_(partial), style_(style)
 {
+}
+
+bool DssslSpecEventHandler::Part::partial()
+{
+  return partial_;
+}
+
+bool DssslSpecEventHandler::Part::style()
+{
+  return style_;
 }
 
 DssslSpecEventHandler::Part *

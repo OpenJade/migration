@@ -9,15 +9,28 @@
   | map-sdata-entity | char-repertoire | sgml-grove-plan"
 >
 
-<!element style-sheet o o ((%declarations;)*, style-specification,
-			   (external-specification|style-specification)*)>
+<!element style-sheet o o ((%declarations;)*, 
+                           (style-specification|transformation-specification),
+			   (external-specification|style-specification
+                                            |transformation-specification)*)>
 <!element style-specification o o ((%declarations;)*, style-specification-body)>
 <!attlist style-specification
   id id #implied
   use idrefs #implied
+  partial (partial | complete) complete
 >
 <!element style-specification-body o o (#pcdata)>
 <!attlist style-specification-body
+  content entity #conref
+>
+<!element transformation-specification o o ((%declarations;)*, transformation-specification-body)>
+<!attlist transformation-specification
+  id id #implied
+  use idrefs #implied
+  partial (partial | complete) complete
+>
+<!element transformation-specification-body o o (#pcdata)>
+<!attlist transformation-specification-body
   content entity #conref
 >
 <!element external-specification - o empty>

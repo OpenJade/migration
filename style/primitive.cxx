@@ -125,6 +125,7 @@ const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
 
 #define SPRIMITIVE PRIMITIVE
+#define TPRIMITIVE PRIMITIVE
 #define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
   PRIMITIVE(name, string, nRequired, nOptional, rest, noFeature) 
 #define XXPRIMITIVE XPRIMITIVE
@@ -132,6 +133,7 @@ const Signature name ## PrimitiveObj::signature_ \
 #include "primitive.h"
 #undef PRIMITIVE
 #undef SPRIMITIVE
+#undef TPRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
@@ -5228,6 +5230,211 @@ DEFPRIMITIVE(MapConstructor, argc, argv, context, interp, loc)
   return obj;
 }
 
+DEFPRIMITIVE(SubgroveSpec, argc, argv, context, interp, loc)
+{
+  static const Identifier::SyntacticKey keys[10] = {
+    Identifier::keyNode,
+    Identifier::keySubgrove,
+    Identifier::keyClass,
+    Identifier::keyAdd,
+    Identifier::keyNull,
+    Identifier::keyRemove,
+    Identifier::keyChildren,
+    Identifier::keySub,
+    Identifier::keyLabel,
+    Identifier::keySortChildren,
+  };
+  int pos[10];
+  if (!decodeKeyArgs(argc, argv, keys, 10, interp, loc, pos)) 
+    return interp.makeError();
+  if ((pos[0] >= 0) + (pos[1] >= 0) + (pos[2] >= 0) != 1) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::subgroveArgs);
+    return interp.makeError();
+  } 
+
+  // FIXME: check the type of these args
+  ELObj *add =          (pos[3] >= 0) ? argv[pos[3]] : 0;   
+  ELObj *null =         (pos[4] >= 0) ? argv[pos[4]] : 0;   
+  ELObj *remove =       (pos[5] >= 0) ? argv[pos[5]] : 0;   
+  ELObj *children =     (pos[6] >= 0) ? argv[pos[6]] : 0;   
+  ELObj *sub =          (pos[7] >= 0) ? argv[pos[7]] : 0;   
+  ELObj *label =        (pos[8] >= 0) ? argv[pos[8]] : 0;   
+  FunctionObj *sort = 0;
+  if (pos[9] >= 0) {
+    sort = argv[pos[9]]->asFunction();
+    if (!sort) 
+      return argError(interp, loc,
+               InterpreterMessages::notAProcedure, pos[0], argv[pos[9]]); 
+  }
+  NodePtr node;
+  NodePtr subgrove;
+  SymbolObj *cls = 0;
+  if (pos[0] >= 0) { 
+    if (!argv[pos[0]]->optSingletonNodeList(context, interp, node) || !node)
+      return argError(interp, loc,
+                InterpreterMessages::notASingletonNode, pos[0], argv[pos[0]]);
+  }
+  else if (pos[1] >= 0) {
+    if (!argv[pos[1]]->optSingletonNodeList(context, interp, subgrove) || !subgrove)
+      return argError(interp, loc,
+                InterpreterMessages::notASingletonNode, pos[1], argv[pos[1]]);
+    if (add || null || remove || children || sub) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::subgroveSubgroveArgs);
+      return interp.makeError();
+    } 
+  }
+  else {
+    cls = argv[pos[2]]->asSymbol();
+    if (!cls)
+      return argError(interp, loc,
+                InterpreterMessages::notASymbol, pos[2], argv[pos[2]]);
+    if (remove) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::subgroveClassArgs);
+      return interp.makeError();
+    } 
+  }
+
+  return new (interp) SubgroveSpecObj(node, subgrove, cls, add, null, 
+                                      remove, sub, children, label, sort); 
+}
+
+DEFPRIMITIVE(IsCreateSpec, argc, argv, context, interp, loc)
+{
+  if (argv[0]->asCreateSpec())
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(CreateRoot, argc, argv, context, interp, loc)
+{
+  SubgroveSpecObj *sg = argv[1]->asSubgroveSpec();
+  if (!sg)
+    return argError(interp, loc,
+      InterpreterMessages::notASubgroveSpec, 1, argv[1]);
+  return new (interp) CreateSpecObj(CreateSpecObj::root, argv[0], 0, sg, 0, 
+                                    0, 0, 0, 0); 
+}
+
+DEFPRIMITIVE(CreateSub, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+              InterpreterMessages::notASingletonNode, 0, argv[0]);
+  SubgroveSpecObj *sg = argv[1]->asSubgroveSpec();
+  if (!sg)
+    return argError(interp, loc,
+      InterpreterMessages::notASubgroveSpec, 1, argv[1]);
+
+  static const Identifier::SyntacticKey keys[5] = {
+    Identifier::keyProperty,
+    Identifier::keyLabel,
+    Identifier::keyResultPath,
+    Identifier::keyOptional,
+    Identifier::keyUnique,
+  };
+  int pos[5];
+  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 5, interp, loc, pos)) 
+    return interp.makeError();
+  
+  StringObj *prop = 0;
+  if (pos[0] >= 0) {
+    prop = argv[pos[0] + 2]->convertToString();
+    if (!prop)
+      return argError(interp, loc,
+        InterpreterMessages::notAStringOrSymbol, pos[0] + 2, argv[pos[0] + 2]);
+  }
+  ELObj *label = (pos[1] >= 0 ? argv[pos[1] + 2] : 0);
+  FunctionObj *rp = 0;
+  if (pos[2] >= 0) {
+    rp = argv[pos[2] + 2]->asFunction();
+    if (!rp)
+      return argError(interp, loc,
+        InterpreterMessages::notAProcedure, pos[2] + 2, argv[pos[2] + 2]);
+  }
+  bool opt = (pos[3] >= 0 ? argv[pos[3] + 2]->isTrue() : 0);
+  bool uniq = (pos[4] >= 0 ? argv[pos[4] + 2]->isTrue() : 0);
+ 
+  return new (interp) CreateSpecObj(CreateSpecObj::sub, 0, node, sg, prop, 
+                                    label, rp, opt, uniq);
+}
+
+DEFPRIMITIVE(CreatePreced, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+              InterpreterMessages::notASingletonNode, 0, argv[0]);
+  SubgroveSpecObj *sg = argv[1]->asSubgroveSpec();
+  if (!sg)
+    return argError(interp, loc,
+      InterpreterMessages::notASubgroveSpec, 1, argv[1]);
+
+  static const Identifier::SyntacticKey keys[4] = {
+    Identifier::keyLabel,
+    Identifier::keyResultPath,
+    Identifier::keyOptional,
+    Identifier::keyUnique,
+  };
+  int pos[4];
+  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 4, interp, loc, pos))
+    return interp.makeError();
+
+  ELObj *label = (pos[0] >= 0 ? argv[pos[0] + 2] : 0);
+  FunctionObj *rp = 0;
+  if (pos[1] >= 0) {
+    rp = argv[pos[1] + 2]->asFunction();
+    if (!rp)
+      return argError(interp, loc,
+        InterpreterMessages::notAProcedure, pos[1] + 2, argv[pos[1] + 2]);
+  }
+  bool opt = (pos[2] >= 0 ? argv[pos[2] + 2]->isTrue() : 0);
+  bool uniq = (pos[3] >= 0 ? argv[pos[3] + 2]->isTrue() : 0);
+
+  return new (interp) CreateSpecObj(CreateSpecObj::preced, 0, node, sg, 0, 
+                                    label, rp, opt, uniq);
+}
+
+DEFPRIMITIVE(CreateFollow, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+              InterpreterMessages::notASingletonNode, 0, argv[0]);
+  SubgroveSpecObj *sg = argv[1]->asSubgroveSpec();
+  if (!sg)
+    return argError(interp, loc,
+      InterpreterMessages::notASubgroveSpec, 1, argv[1]);
+
+  static const Identifier::SyntacticKey keys[4] = {
+    Identifier::keyLabel,
+    Identifier::keyResultPath,
+    Identifier::keyOptional,
+    Identifier::keyUnique,
+  };
+  int pos[4];
+  if (!decodeKeyArgs(argc - 2, argv + 2, keys, 4, interp, loc, pos))
+    return interp.makeError();
+
+  ELObj *label = (pos[0] >= 0 ? argv[pos[0] + 2] : 0);
+  FunctionObj *rp = 0;
+  if (pos[1] >= 0) {
+    rp = argv[pos[1] + 2]->asFunction();
+    if (!rp)
+      return argError(interp, loc,
+        InterpreterMessages::notAProcedure, pos[1] + 2, argv[pos[1] + 2]);
+  }
+  bool opt = (pos[2] >= 0 ? argv[pos[2] + 2]->isTrue() : 0);
+  bool uniq = (pos[3] >= 0 ? argv[pos[3] + 2]->isTrue() : 0);
+
+  return new (interp) CreateSpecObj(CreateSpecObj::follow, 0, node, sg, 0,
+                                    label, rp, opt, uniq);
+}
+
 void Interpreter::installPrimitives()
 {
 #define PRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
@@ -5245,12 +5452,16 @@ void Interpreter::installPrimitives()
 #define SPRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
   if (style()) installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
 
+#define TPRIMITIVE(name, string, nRequired, nOptional, rest, feature) \
+  if (!style()) installPrimitive(string, new (*this) name ## PrimitiveObj, feature);
+
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
 #undef XXPRIMITIVE
 #undef PRIMITIVE2
 #undef SPRIMITIVE
+#undef TPRIMITIVE
   FunctionObj *apply = new (*this) ApplyPrimitiveObj;
   makePermanent(apply);
   lookup(makeStringC("apply"))->setValue(apply);

@@ -2604,6 +2604,10 @@ public:
     case sColumn:
       if (af & FlowObj::afTableColumn)
 	return true;
+      if (af & (FlowObj::afTableRow | FlowObj::afTableCell)) {
+        s_ = sContent;
+        return true;
+      }
       s_ = sBadColumn;
       break;
     case sBadContent:

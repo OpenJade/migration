@@ -1710,50 +1710,99 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
     case ';':
       skipComment();
       break;
-    default:
-      if (c < ' ') {
-	// ignore it
-	message(InterpreterMessages::invalidChar);
-	break;
-      }
+    case '.':
       extendToken();
-      if (tokenIsNumber()) {
-	if (!(allowed & allowOtherExpr))
-	  return tokenRecover(allowed, tok);
-	tok = tokenNumber;
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength());
-	return 1;
-      }
-      else if (in_->currentTokenEnd()[-1] == ':') {
-	if (!(allowed & allowKeyword))
-	  return tokenRecover(allowed, tok);
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength() - 1);
-	tok = tokenKeyword;
-	return 1;
-      }
-      else if (*in->currentTokenStart() == '.'
-	       && in->currentTokenLength() == 1) {
+      switch (in->currentTokenLength()) {
+      case 1:
 	if (!(allowed & allowPeriod))
 	  return tokenRecover(allowed, tok);
 	tok = tokenPeriod;
 	return 1;
+      case 3:
+        if (in_->currentTokenStart()[1] == '.'
+	    && in_->currentTokenStart()[2] == '.')
+	  return handleIdentifier(allowed, tok);
+	break;
       }
-      else {
-	if (!(allowed & allowIdentifier))
-	  return tokenRecover(allowed, tok);
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength());
-#if 0
-	if (!isValidIdentifier(currentToken_))
-	  message();
-#endif
-	tok = tokenIdentifier;
-	return 1;
+      return handleNumber(allowed, tok);
+    default:
+      switch (interp_->lexCategory(c)) {
+      case Interpreter::lexAddWhiteSpace:
+	break;
+      case Interpreter::lexOtherNumberStart:
+	extendToken();
+	// handle + and - as identifiers
+	if (in->currentTokenLength() == 1)
+	  return handleIdentifier(allowed, tok);
+	return handleNumber(allowed, tok);
+      case Interpreter::lexDigit:
+	extendToken();
+	return handleNumber(allowed, tok);
+      case Interpreter::lexOther:
+	if (c < ' ') {
+	  // ignore control characters
+	  message(InterpreterMessages::invalidChar);
+	  break;
+	}
+	in->ungetToken();
+	// fall through
+      default:
+	{
+	  bool invalid = 0;
+	  size_t length = in->currentTokenLength();
+	  for (;;) {
+	    Interpreter::LexCategory lc = interp_->lexCategory(in->tokenChar(*this));
+	    if (lc > Interpreter::lexOther)
+	      break;
+	    if (lc == Interpreter::lexOther)
+	      invalid = 1;
+	    length++;
+	  }
+	  in->endToken(length);
+
+	  if (in->currentTokenEnd()[-1] == ':' 
+              && in->currentTokenLength() > 1) {
+	    if (!(allowed & allowKeyword))
+	      return tokenRecover(allowed, tok);
+	    currentToken_.assign(in->currentTokenStart(),
+	                         in->currentTokenLength() - 1);
+	    tok = tokenKeyword;
+	    if (currentToken_.size() == 1 
+                || currentToken_[currentToken_.size() - 2] == ':'
+	        || invalid)
+	      message(InterpreterMessages::invalidIdentifier, 
+		      StringMessageArg(currentToken_));
+	    return 1;
+	  }
+	  if (invalid)
+	    message(InterpreterMessages::invalidIdentifier, 
+		    StringMessageArg(StringC(in->currentTokenStart(),
+		                             in->currentTokenLength())));
+	  return handleIdentifier(allowed, tok);
+	}
       }
     }
   }
+}
+
+bool SchemeParser::handleNumber(unsigned allowed, Token &tok)
+{
+  if (!(allowed & allowOtherExpr))
+    return tokenRecover(allowed, tok);
+  tok = tokenNumber;
+  currentToken_.assign(in_->currentTokenStart(),
+  	               in_->currentTokenLength());
+  return 1;
+}
+
+bool SchemeParser::handleIdentifier(unsigned allowed, Token &tok)
+{
+  if (!(allowed & allowIdentifier))
+    return tokenRecover(allowed, tok);
+  currentToken_.assign(in_->currentTokenStart(),
+	               in_->currentTokenLength());
+  tok = tokenIdentifier;
+  return 1;
 }
 
 bool SchemeParser::tokenRecover(unsigned allowed, Token &tok)
@@ -1773,66 +1822,15 @@ bool SchemeParser::tokenRecover(unsigned allowed, Token &tok)
   return 0;
 }
 
-bool SchemeParser::tokenIsNumber()
-{
-  switch (*in_->currentTokenStart()) {
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
-    return 1;
-  case '+':
-  case '-':
-    return in_->currentTokenLength() > 1;
-  case '.':
-    if (in_->currentTokenLength() == 1
-        || (in_->currentTokenLength() == 3
-            && in_->currentTokenStart()[1] == '.'
-	    && in_->currentTokenStart()[2] == '.'))
-      return 0;
-    return 1;
-  }
-  return 0;
-}
-
 void SchemeParser::extendToken()
 {
   // extend to a delimiter
   InputSource *in = in_.pointer();
   size_t length = in->currentTokenLength();
-  while (!isDelimiter(in->tokenChar(*this)))
+  while (interp_->lexCategory(in->tokenChar(*this))
+         <= Interpreter::lexOther)
     length++;
   in->endToken(length);
-}
-
-bool SchemeParser::isDelimiter(Xchar c)
-{
-  switch (c) {
-  case InputSource::eE:
-  case '(':
-  case ')':
-  case '"':
-  case ';':
-  case ' ':
-  case '\t':
-  case '\f':
-  case '\r':
-  case '\n':
-    return 1;
-  default:
-    if (c < ' ') {
-       // FIXME check not added name character
-       return 1;
-    }
-  }
-  // FIXME return 1 if added white space char
-  return 0;
 }
 
 bool SchemeParser::scanString(unsigned allowed, Token &tok)

@@ -1797,6 +1797,7 @@ FOTBuilder *makeTeXFOTBuilder(OutputByteStream *os, Messenger *mgr,
     { "table", 0},
     { "math", 0},
     { "simple-page", 0},
+    { "online", 1},
     { 0, 0}
   };
 

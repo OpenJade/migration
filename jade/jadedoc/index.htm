@@ -30,7 +30,7 @@ content="text/html; charset=iso-8859-1">
                 href="#copyright"><font
                 face="Arial">Copyright</font></a></li>
             <li><a
-                href="http://jade-cvs.avionitek.com/download.html"><font
+                href="http://peano.mathematik.uni-freiburg.de/OpenJade/download.html"><font
                 face="Arial">Getting OpenJade</font></a></li>
             <li><a
                 href="#build"><font
@@ -65,7 +65,7 @@ content="text/html; charset=iso-8859-1">
             <li><a
                 href="#source"><font
                 face="Arial">About OpenJade sources</font></a></li>
-            <li><a href="http://jade-cvs.avionitek.com/bugs.html"><font
+            <li><a href="http://peano.mathematik.uni-freiburg.de/OpenJade/bugs.html"><font
                 face="Arial">Reporting bugs in OpenJade</font></a></li>
             <li><a href="contributors.htm"><font face="Arial">OpenJade
                 contributors</font></a></li>
@@ -78,7 +78,7 @@ content="text/html; charset=iso-8859-1">
         implementation of DSSSL named </font><a
         href="http://www.jclark.com/jade/"><font face="Arial">Jade</font></a><font
         face="Arial">. OpenJade is now developed and maintained
-        by the OpenJade team. The current version is 1.3. </font></p>
+        by the OpenJade team. The current version is 1.4. </font></p>
         <p><font face="Arial">For general information about DSSSL,
         see the </font><a href="http://www.netfolder.com/DSSSL/"><font
         face="Arial">OpenJade home page</font></a><font
@@ -163,25 +163,7 @@ the perl-generated files.
 </p>
 <h3><A NAME=building-unix>Unix</A></h3>
 <p>
-The following compilers should work:
-<ul>
-<li>gcc 2.95.1
-<li>egcs 1.1.2
-<li>egcs 1.0.2
-<li>gcc 2.8.1
-<li>gcc 2.7.2
-</ul>
-<p>Only the first two have been recently tested.
-<p>
-If you use gcc 2.7.2 with -O on an x86 processor you must use
--fno-strength-reduce. gcc 2.7.2.1 fixes this problem.
-<p>
-Edit <code>Makefile</code>, then build with <code>make</code>.  Note
-that you must use -DSP_MULTI_BYTE. If you plan to do any development,
-also do <code>make depend</code>.
-Alternatively you can build using the <a
-HREF="autoconf.htm">experimental autoconf support</a>. This
-will soon be the recommended method.
+Use the <a HREF="autoconf.htm">autoconf support</a>. 
 
 		<p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
         alt="Up" border="0" width="11" height="15"></font></a><a
@@ -414,7 +396,7 @@ openjade demo.sgm
                 have to use some escaping mechanism for the spaces to get 
                 the entire scheme expression parsed as one cmdline argument.</font></dd>
             <dt><font face="Arial"><code>-2</code></font></dt>
-            <dd><font face="Arial">Enable experimental DSSSL extensions.</font></dd>
+            <dd><font face="Arial">Enable experimental <a href="dsssl2.htm">DSSSL extensions</a>.</font></dd>
             <dt><a name="optw"><font face="Arial"><code>-w</code> <i>type</i>,
                 <code>--warning=</code><i>type</i></font></a><font
                 face="Arial"> (examples: wxml, wmixed, wsgmldecl,
@@ -538,6 +520,17 @@ openjade demo.sgm
                 </dl>
             </dd>
         </dl>
+        <p><font face="Arial">The following options are the same as their
+        unprefixed SP counterparts, but apply only to the SGML parser used
+        for the document or stylesheet, respectively:
+        <dl>
+          <dt><code>--doc-open-entities</code>, <code>--spec-open-entities</code>
+          <dt><code>--doc-open-elements</code>, <code>--spec-open-elements</code>
+          <dt><code>--doc-error-numbers</code>, <code>--spec-error-numbers</code>
+          <dt><code>--doc-references</code>, <code>--spec-references</code>
+          <dt><code>--doc-include</code>, <code>--spec-include</code>
+          <dt><code>--doc-warning</code>, <code>--spec-warning</code>
+        </dl> 
         <p><font face="Arial">OpenJade ignores the <samp>SP_CHARSET_FIXED</samp>
         and <samp>SP_SYSTEM_CHARSET</samp> environment variables
         and always uses Unicode as its internal character set, as
@@ -641,6 +634,12 @@ openjade demo.sgm
         giving the two letter country code.</font></p>
         <p><font face="Arial">This procedure uses POSIX
         locales. It is an OpenJade addition.</font></p>
+        <h3><font face="Arial">URI addresses</font></h3>
+        <pre><font face="Arial">
+(uri-ref-addres <var>uri</var>)
+</font></pre>
+        <p><font face="Arial">This procedure returns an object of
+        type address for the resource pointed to by the given URI.</font></p>
         <h3><font face="Arial">Extended standard procedures</font></h3>
         <pre><font face="Arial">
 (sgml-parse <var>sysid</var> #!key <var>active:</var> <var>parent:</var> <var>architecture:</var>)
@@ -665,8 +664,6 @@ openjade demo.sgm
         <p><font face="Arial">This section describes the
         limitations of the front-end (the general-purpose DSSSL
         engine); each backend also has its own limitations. </font></p>
-        <p><font face="Arial">OpenJade doesn't allow the <code>(test
-        =&gt; recipient)</code> variant of cond clauses.</font></p>
         <p><font face="Arial">OpenJade supports only a single,
         fixed grove plan which comprises the following modules:</font></p>
         <ul>
@@ -751,7 +748,7 @@ openjade demo.sgm
         <h2><a name="source"><font face="Arial">About OpenJade
         sources</font></a></h2>
         <p><font face="Arial">The source of OpenJade is available
-        via CVS from </font><a href="http://jade-cvs.avionitek.com"><font face="Arial">jade-cvs.avionitek.com</font></a><font face="Arial">. See the
+        via CVS from </font><a href="http://peano.mathematik.uni-freiburg.de/OpenJade"><font face="Arial">peano.mathematik.uni-freiburg.de</font></a><font face="Arial">. See the
         </font><a href="http://www.netfolder.com/DSSSL/"><font
         face="Arial">OpenJade home page</font></a><font
         face="Arial"> for more details.</font></p>

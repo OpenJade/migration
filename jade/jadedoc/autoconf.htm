@@ -3,15 +3,12 @@
 <title>OpenJade autoconf support</title>
 <body bgcolor="#ffffff">
 <h1>OpenJade autoconf support</h1>
-<h4>(originally by Cees de Groot <A href="mailto:cg@sgmltools.org">cg@sgmltools.org</A>)</h4>
 
-<p>With <code>./configure</code>, you'll have an alternate method to
-prepare the source distribution for building. This support is
-experimental, and I'd like to receive feedback and patches for your
-operating system. If a build with autoconf doesn't work, you can
-always revert to the original Makefile which is saved by configure to
-<code>Makefile.dist</code>. <code>make mrproper</code> will undo
-everything that has been modified by <code>./configure</code>.</p>
+<p>We have dropped the old jade Makefiles in favour of the GNU
+configuration tools automake, autoconf and libtool. If building 
+OpenJade doesn't work out of the box on your system, we'd like to 
+receive feedback and patches for your operating system. 
+</p>
 
 <h2>Usage</h2>
 
@@ -28,15 +25,8 @@ everything that has been modified by <code>./configure</code>.</p>
 <dd>Print a full list of options. This document only deals with the 
 non-standard options.</dd>
 
-<dt><code>--enable-http</code></dt>
-<dd>This enables the built-in HTTP client so that you can use HTTP as
-a method for getting to system identifiers.</dd>
-
-<dt><code>--enable-default-catalog=<var>pathlist</var></code></dt>
-<dd>Provide the built-in definition for <code>SGML_CATALOG_FILES</code>.</dd>
-
-<dt><code>--enable-default-search-path=<var>pathlist</var></code>
-<dd>Provide a built-in definition for <code>SGML_SEARCH_PATH</code>.</dd>
+<dt><code>--enable-threads</code>
+<dd>Run the grove builder in a separate thread.</dd>
 
 <dt><code>--disable-mif</code>
 <dd>Don't build the MIF backend.</dd>

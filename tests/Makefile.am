@@ -4,7 +4,7 @@
 
 # AUTOMAKE_OPTIONS = 1.5 no-dependencies
 
-SHOWSTOPPERS = af-7 af-8 af-9
+SHOWSTOPPERS = af-7 af-8 af-9 af-10 af-11
 
 TESTS = onsgmls-1 \
 osnorm-1 \

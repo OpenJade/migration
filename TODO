@@ -7,5 +7,10 @@ Resolve AF bugs:
 
 
 2. Deriving attribute values from content causes segfaults; cf.
-   tests/af-9.
+   tests/af-9 and tests/af-10.
+   Sourceforge bug report #646313 (version 1.5).
+
+
+3. Deriving  content from attribute values causes segfaults;
+   cf. tests/af-11.
    Sourceforge bug report #646313 (version 1.5).

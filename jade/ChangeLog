@@ -1,11 +1,17 @@
 2002-12-08  Karl Eichwalder  <ke@suse.de>
 
+	* config/configure.in: Remove do-nothing configure options:
+	--enable-http, --enable-default-catalog, and
+	--enable-default-search-path; these options belong to opensp only.
+	Reported by Ville Skyttä.
+
 	* unicode/unicode.syn: Remove it; now part of opensp.
 	* unicode/unicode.sd: Likewise.
 	* unicode/gensyntax.pl: Likewise.
 	* unicode/demo.sgm: Likewise.
 	* unicode/catalog: Likewise.
 	* unicode: Likewise.
+	* FILES: Delete all mentioned files.
 
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 

@@ -66,8 +66,8 @@ all: $(GENSRCS)
 	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
-include\config.h: include\config.h.old
-	copy include\config.h.old include\config.h 
+include\config.h: include\config.h.old.in
+	copy include\config.h.old.in include\config.h 
 
 msggen.pl: msggen.pl.in
 	copy msggen.pl.in msggen.pl

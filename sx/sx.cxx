@@ -37,6 +37,8 @@ struct {
   { SP_T("internal-decl"), &XmlOutputEventHandler::Options::intDecl },
   { SP_T("external-decl"), &XmlOutputEventHandler::Options::extDecl },
   { SP_T("sdata-as-pis"), &XmlOutputEventHandler::Options::sdataAsPi },
+  { SP_T("preserve-case"), &XmlOutputEventHandler::Options::preserveCase },
+  { SP_T("overwrite"), &XmlOutputEventHandler::Options::overwrite },
   { SP_T("write-outside-outdir"), &XmlOutputEventHandler::Options::writeOutsideOutDir },
 };
 
@@ -80,6 +82,7 @@ SxApp::SxApp()
   outputOptions_.extDecl = 1;
   outputOptions_.expInt = 1;
   outputOptions_.expExt = 1;
+  outputOptions_.overwrite = 1;
   outputOptions_.writeOutsideOutDir = 1;
   outputDir_ = NULL;
   dtdLoc_ = NULL;

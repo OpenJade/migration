@@ -85,6 +85,7 @@ public:
   DefaultValueType defaultValueType;
   ConstPtr<AttributeValue> defaultValue;
   Vector<StringC> allowedValues;
+  Vector<StringC> origAllowedValues;
   // Attribute definitions whose default value type is current and
   // which have the same currentIndex share current values.
   size_t currentIndex;
@@ -120,6 +121,7 @@ public:
   virtual Boolean isId() const;
   virtual Boolean isIdref() const;
   virtual const Vector<StringC> *getTokens() const;
+  virtual const Vector<StringC> *getOrigTokens() const;
   virtual void buildDesc(AttributeDefinitionDesc &) const = 0;
   virtual DeclaredValue *copy() const = 0;
 };
@@ -173,10 +175,14 @@ public:
 				     const StringC &name,
 				     unsigned &) const;
   const Vector<StringC> *getTokens() const;
+  const Vector<StringC> *getOrigTokens() const;
   void buildDesc(AttributeDefinitionDesc &) const;
   DeclaredValue *copy() const;
+  void setOrigAllowedValues(Vector<StringC> &origAllowedValues);
+
 private:
   Vector<StringC> allowedValues_;
+  Vector<StringC> origAllowedValues_;
 };
 
 class NameTokenGroupDeclaredValue : public GroupDeclaredValue {
@@ -248,10 +254,10 @@ public:
   virtual const AttributeValue *
     defaultValue(const AttributeValue *impliedValue) const;
   AttributeValue *makeValue(Text &, AttributeContext &, unsigned &) const;
-  AttributeValue *makeValueFromToken(Text &, 
+  AttributeValue *makeValueFromToken(Text &,
 				     AttributeContext &,
 				     unsigned &) const;
-  
+
   virtual Boolean isConref() const;
   virtual Boolean isCurrent() const;
   virtual Boolean isFixed() const;
@@ -261,6 +267,7 @@ public:
 				    unsigned &nEntityNames) const;
   Boolean tokenized() const;
   const StringC &name() const;
+  const StringC &origName() const;
   Boolean containsToken(const StringC &) const;
   Boolean isNotation() const;
   Boolean isEntity() const;
@@ -268,16 +275,19 @@ public:
   Boolean isIdref() const;
   void getDesc(AttributeDefinitionDesc &) const;
   const Vector<StringC> *getTokens() const;
+  const Vector<StringC> *getOrigTokens() const;
   virtual AttributeDefinition *copy() const = 0;
   void setDeclaredValue(DeclaredValue *);
   void setSpecified(Boolean implicit);
   Boolean isSpecified(Boolean &implicit);
+  void setOrigName(StringC &origName);
 private:
   virtual void buildDesc(AttributeDefinitionDesc &) const = 0;
   virtual AttributeValue *checkValue(AttributeValue *, AttributeContext &) const;
   PackedBoolean implicit_;
   PackedBoolean all_;
   StringC name_;
+  StringC origName_;
   CopyOwner<DeclaredValue> declaredValue_;
 };
 
@@ -598,6 +608,12 @@ const Vector<StringC> *AttributeDefinition::getTokens() const
 }
 
 inline
+const Vector<StringC> *AttributeDefinition::getOrigTokens() const
+{
+  return declaredValue_->getOrigTokens();
+}
+
+inline
 AttributeSemantics *
 AttributeDefinition::makeSemantics(const AttributeValue *value,
 				   AttributeContext &context,
@@ -639,6 +655,12 @@ inline
 const StringC &AttributeDefinition::name() const
 {
   return name_;
+}
+
+inline
+const StringC &AttributeDefinition::origName() const
+{
+  return origName_;
 }
 
 inline

@@ -1,1 +1,1 @@
-#define JADE_VERSION SP_T("1.2.2-pre2")
+#define JADE_VERSION SP_T("1.2.2pre3")

@@ -1,5 +1,7 @@
 2003-10-10  Karl Eichwalder  <ke@suse.de>
 
+	* BUGS: New file.
+
 	* tests/Makefile.am (TESTS_ENVIRONMENT): Add
 	../sgmlnorm:../sx:../spent:../spcat:../spam to PATH.
 

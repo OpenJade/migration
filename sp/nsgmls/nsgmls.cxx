@@ -55,13 +55,13 @@ public:
 		    const StringC &filenameStr,
 		    const OutputCodingSystem *,
 		    CmdLineApp *,
-		    Messenger *messenger);
+		    ::Messenger *messenger);
   ~XRastEventHandler();
   void message(MessageEvent *);
   void truncateOutput();
   void allLinkTypesActivated();
 private:
-  Messenger *messenger_;
+  ::Messenger *messenger_;
   // file_ must come before os_ so it gets inited first
   FileOutputByteStream file_;
   EncodeOutputCharStream os_;
@@ -239,7 +239,7 @@ XRastEventHandler::XRastEventHandler(SgmlParser *parser,
 				     const StringC &filenameStr,
 				     const OutputCodingSystem *codingSystem,
 				     CmdLineApp *app,
-				     Messenger *messenger)
+				     ::Messenger *messenger)
 : RastEventHandler(parser, messenger),
   messenger_(messenger),
   filename_(filename),

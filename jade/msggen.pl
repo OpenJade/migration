@@ -1,31 +1,26 @@
 #! /usr/bin/perl
-# Copyright (c) 1994 James Clark
+# Copyright (c) 1994 James Clark, 1999 Matthias Clasen
 # See the file COPYING for copying permission.
 
 $prog = $0;
 $prog =~ s@.*/@@;
 
 $gen_c = 0;
-$gen_po = 1;
 
 undef $opt_l;
+undef $opt_p;
 do 'getopts.pl';
-&Getopts('l:');
+&Getopts('l:p:');
 $module = $opt_l;
+$pot_file = $opt_p;
 
-die "Usage: $prog file\n" unless $#ARGV == 0;
+$num = 0; 
 
-$def_file = $ARGV[0];
+foreach $def_file (@ARGV) {
 
-$file_base = $def_file;
-$file_base =~ s/\.[^.]*$//;
-
-$class = $file_base;
-$class =~ s|.*[\\/]||;
+@tag_used = ();
 
 open(DEF, $def_file) || die "can't open \`$def_file': $!\n";
-
-$num = 0;
 
 while (<DEF>) {
     chop;
@@ -34,9 +29,11 @@ while (<DEF>) {
 	next;
     }
     if (/^=/) {
-	$n = substr($_, 1);
-	&error("= directive must increase message num") if ($n < $num);
-	$num = $n;
+        if (!defined($opt_p)) {
+	    $n = substr($_, 1);
+	    &error("= directive must increase message num") if ($n < $num);
+	    $num = $n;
+        }
 	next;
     }
     if (/^-/) {
@@ -66,7 +63,8 @@ while (<DEF>) {
     $nargs[$num] = $argc;
     $field[1] =~ /^[a-zA-Z_][a-zA-Z0-9_]+$/ || &error("invalid tag");
     $tag[$num] = $field[1];
-    &error("duplicate tag $field[1]") if defined($tag_used{$field[1]});
+    &error("duplicate tag $field[1]") 
+      if (!defined($opt_p) && defined($tag_used{$field[1]}));
     $tag_used{$field[1]} = 1;
     $field[2] =~ /^([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?( [A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)*)?$/
 	|| &error("invalid clauses field");
@@ -90,6 +88,14 @@ while (<DEF>) {
 }
 
 close(DEF);
+
+if (!defined($opt_p)) {
+
+$file_base = $ARGV[0];
+$file_base =~ s/\.[^.]*$//;
+
+$class = $file_base;
+$class =~ s|.*[\\/]||;
 
 # this is needed on Windows NT
 chmod 0666, "$file_base.h";
@@ -255,25 +261,30 @@ foreach $i (0 .. $#message) {
 print "END\n";
 close(OUT);
 
-if ($gen_po) {
+} # !opt_p
+
+} # foreach def_file
+
+if (defined($opt_p)) {
+
   # this is needed for GNU gettext 
-  chmod 0666, "$file_base.po";
-  unlink("$file_base.po");
-  open(OUT, ">$file_base.po");
-  chmod 0444, "$file_base.po";
+  chmod 0666, "$pot_file";
+  unlink("$pot_file");
+  open(OUT, ">$pot_file");
+  chmod 0444, "$pot_file";
   select(OUT);
 
-  printf "# %s\n\n", $file_base;
-
   foreach $i (0 .. $#message) {
-    if (defined($message[$i])) {
+    if (defined($message[$i]) && !defined($written{$message[$i]})) {
+	$written{$message[$i]} = 1;
 	$str = $message[$i];
-	$str =~ s/"/""/g;
+	$str =~ s/"/\\"/g;
 	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
     }
-    elsif (defined($message2[$i])) {
+    elsif (defined($message2[$i]) && ! defined($written{$message2[$i]})) {
+	$written{$message2[$i]} = 1;
 	$str = $message2[$i];
-	$str =~ s/"/""/g;
+	$str =~ s/"/\\"/g;
 	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
     }
  }

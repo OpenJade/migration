@@ -1,7 +1,7 @@
-jade/HtmlMessages.po
-jade/JadeMessages.po
-jade/MifMessages.po
-jade/RtfMessages.po
-jade/TeXMessages.po
-style/DssslAppMessages.po
-style/InterpreterMessages.po
+jade/HtmlMessages.msg
+jade/JadeMessages.msg
+jade/MifMessages.msg
+jade/RtfMessages.msg
+jade/TeXMessages.msg
+style/DssslAppMessages.msg
+style/InterpreterMessages.msg

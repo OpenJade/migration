@@ -14,12 +14,12 @@ namespace SP_NAMESPACE {
 
 class UTF16Decoder : public Decoder {
 public:
-  UTF16Decoder(Boolean swapBytes);
+  UTF16Decoder(Boolean lsbFirst);
   size_t decode(Char *, const char *, size_t, const char **);
 private:
   // value for encoding error
   enum { invalid = 0xfffd };
-  Boolean swapBytes_;
+  Boolean lsbFirst_;
 };
 
 class UTF16Encoder : public Encoder {
@@ -28,9 +28,9 @@ public:
   void output(const Char *, size_t, OutputByteStream *);
 };
 
-Decoder *UTF16CodingSystem::makeDecoder(Boolean swapBytes) const
+Decoder *UTF16CodingSystem::makeDecoder(Boolean lsbFirst) const
 {
-  return new UTF16Decoder(swapBytes);
+  return new UTF16Decoder(lsbFirst);
 }
 
 Encoder *UTF16CodingSystem::makeEncoder() const
@@ -39,8 +39,8 @@ Encoder *UTF16CodingSystem::makeEncoder() const
 }
 
 
-UTF16Decoder::UTF16Decoder(Boolean swapBytes)
-: swapBytes_(swapBytes)
+UTF16Decoder::UTF16Decoder(Boolean lsbFirst)
+: lsbFirst_(lsbFirst)
 {
 }
 
@@ -52,8 +52,8 @@ size_t UTF16Decoder::decode(Char *to, const char *from,
   for (;;) {
     if (fromLen < 2) 
       break;
-    Unsigned32 x = swapBytes_ ? (us[1] << 8) + us[0]
-                              : (us[0] << 8) + us[1];
+    Unsigned32 x = lsbFirst_ ? (us[1] << 8) + us[0]
+                             : (us[0] << 8) + us[1];
     if (x < 0xd800 || x > 0xdfff) {
       *to++ = x;
       us += 2;
@@ -69,8 +69,8 @@ size_t UTF16Decoder::decode(Char *to, const char *from,
     }
     if (fromLen < 4)
       break;
-    Unsigned32 y = swapBytes_ ? (us[3] << 8) + us[2]
-                              : (us[2] << 8) + us[3];
+    Unsigned32 y = lsbFirst_ ? (us[3] << 8) + us[2]
+                             : (us[2] << 8) + us[3];
     if (y < 0xd800 || y > 0xdfff) {
       // FIXME: unpaired RC element
       *to++ = invalid;

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 2000 Peter Nilsson
 // See the file copying.txt for copying permission.
 
 #include "stylelib.h"
@@ -1858,7 +1858,7 @@ DEFPRIMITIVE(IsMatchElement, argc, argv, context, interp, loc)
   return interp.makeFalse();
 }
 
-DEFPRIMITIVE(NodeListContains, argc, argv, context, interp, loc)
+DEFPRIMITIVE(IsNodeListContains, argc, argv, context, interp, loc)
 {
   NodeListObj *nl = argv[0]->asNodeList();
   if (!nl)

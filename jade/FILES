@@ -440,7 +440,6 @@ spent/Makefile.sub
 spent/spent.cxx
 spent/spent.dsp
 sp-generate.mak
-sunfix.sh
 sx/Makefile.sub
 sx/SxMessages.h
 sx/SxMessages.msg

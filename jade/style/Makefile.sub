@@ -4,6 +4,7 @@ DEPLIBS=-lm -L$(TOP)/grove/.libs -lgrove -L$(TOP)/lib/.libs -lsp 	\
 OBJS=LangObj.o \
   Collector.o \
   DssslApp.o \
+  InterpreterMessages.o \
   DssslSpecEventHandler.o \
   ELObj.o \
   ELObjMessageArg.o \
@@ -13,7 +14,6 @@ OBJS=LangObj.o \
   InheritedC.o \
   Insn.o \
   Interpreter.o \
-  InterpreterMessages.o \
   NumberCache.o \
   ProcessContext.o \
   ProcessingMode.o \
@@ -36,3 +36,5 @@ DssslApp.o: DssslAppMessages.h
 FlowObj.lo: FlowObj_inst.cxx
 primitive.lo: primitive_inst.cxx
 DssslApp.lo: DssslAppMessages.h
+InterpreterMessages.o: InterpreterMessages.h
+InterpreterMessages.lo: InterpreterMessages.h

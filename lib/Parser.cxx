@@ -123,11 +123,54 @@ Parser::Parser(const SgmlParser::Params &params)
 
 void Parser::setSdOverrides(Sd &sd)
 {
+  // FIXME overriding behaviour when using multiple -w options
   if (options().typeValid != ParserOptions::sgmlDeclTypeValid) {
     sd.setTypeValid(options().typeValid);
     sd.setBooleanFeature(Sd::fIMPLYDEFATTLIST, !options().typeValid);
-    if (!options().typeValid) 
-      sd.setImplydefElement(Sd::implydefElementYes);
+    sd.setImplydefElement(options().typeValid
+                          ? Sd::implydefElementNo
+                          : Sd::implydefElementYes);
+    sd.setBooleanFeature(Sd::fIMPLYDEFENTITY, !options().typeValid);
+    sd.setBooleanFeature(Sd::fIMPLYDEFNOTATION, !options().typeValid);
+  }
+  if (options().fullyDeclared) {
+    sd.setBooleanFeature(Sd::fIMPLYDEFATTLIST, 0);
+    sd.setImplydefElement(Sd::implydefElementNo);
+    sd.setBooleanFeature(Sd::fIMPLYDEFENTITY, 0);
+    sd.setBooleanFeature(Sd::fIMPLYDEFNOTATION, 0);
+  }
+  if (options().fullyTagged) {
+    sd.setBooleanFeature(Sd::fDATATAG, 0);
+    sd.setBooleanFeature(Sd::fRANK, 0);
+    sd.setBooleanFeature(Sd::fOMITTAG, 0);
+    sd.setBooleanFeature(Sd::fSTARTTAGEMPTY, 0);
+    sd.setBooleanFeature(Sd::fATTRIBOMITNAME, 0);
+  }
+  if (options().amplyTagged) {
+    sd.setBooleanFeature(Sd::fDATATAG, 0);
+    sd.setBooleanFeature(Sd::fRANK, 0);
+    sd.setBooleanFeature(Sd::fOMITTAG, 0);
+    sd.setBooleanFeature(Sd::fATTRIBOMITNAME, 0);
+    sd.setImplydefElement(Sd::implydefElementYes);
+  }
+  if (options().amplyTaggedAnyother) {
+    sd.setBooleanFeature(Sd::fDATATAG, 0);
+    sd.setBooleanFeature(Sd::fRANK, 0);
+    sd.setBooleanFeature(Sd::fOMITTAG, 0);
+    sd.setBooleanFeature(Sd::fATTRIBOMITNAME, 0);
+    sd.setImplydefElement(Sd::implydefElementAnyother);
+  }
+  if (options().valid) {
+    sd.setTypeValid(1);
+  }
+  if (options().entityRef) {
+    sd.setEntityRef(Sd::entityRefNone);
+  }
+  if (options().externalEntityRef) {
+    sd.setEntityRef(Sd::entityRefInternal);
+  }
+  if (options().integral) {
+    sd.setIntegrallyStored(1);
   }
   if (options().noUnclosedTag) {
     sd.setBooleanFeature(Sd::fSTARTTAGUNCLOSED, 0);

@@ -12,7 +12,8 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx
 
 openjade_LDADD = $(top_builddir)/style/libostyle.la \
-	$(top_builddir)/spgrove/libospgrove.la
+	$(top_builddir)/spgrove/libospgrove.la \
+	$(top_builddir)/grove/libogrove.la -losp
 
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove -I$(top_srcdir)/style
 

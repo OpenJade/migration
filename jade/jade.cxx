@@ -176,7 +176,7 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
 						         outputCodingSystem_)));
   case sgmlType:
   case xmlType:
-    return makeTransformFOTBuilder(this, outputType_ == xmlType, exts);
+    return makeTransformFOTBuilder(this, outputType_ == xmlType, outputOptions_, exts);
   default:
     break;
   }

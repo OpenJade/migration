@@ -4586,9 +4586,11 @@ DEFPRIMITIVE(Language, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notAStringOrSymbol, 1, argv[1]);
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
   if (RefLangObj::supportedLanguage(*lang, *country))
     return new (interp) RefLangObj (*lang, *country);
   else
+#endif
 #endif
     return interp.makeFalse();
 }

@@ -29,7 +29,9 @@
 #include <ctype.h>
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
 #include <locale.h>
+#endif
 #endif
 #ifdef SP_HAVE_SETMODE
 #include <fcntl.h>
@@ -178,7 +180,9 @@ int CmdLineApp::init(int, AppChar **argv)
   set_new_handler(outOfMemory);
 #endif
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
   setlocale(LC_ALL, "");
+#endif
 #endif
 #ifdef SP_HAVE_SETMODE
   _setmode(1, _O_BINARY);

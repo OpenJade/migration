@@ -19,7 +19,9 @@
 #include <string.h>
 
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
 #include <locale.h>
+#endif
 #endif
 
 #ifdef DSSSL_NAMESPACE
@@ -42,8 +44,10 @@ int DssslApp::init(int argc, AppChar **argv)
 {
   int ret = GroveApp::init(argc, argv);
 #ifdef SP_HAVE_LOCALE
+#ifdef SP_HAVE_WCHAR
   // Since we use strtod(), must have C numeric
   setlocale(LC_NUMERIC, "C");
+#endif
 #endif
   return ret;
 }

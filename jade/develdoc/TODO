@@ -1,0 +1,69 @@
+Things which are missing and need a lot of work
+===============================================
+
+* query: leads to current-node not being an element node.
+
+* char-script-case: this should be handled by the backends.
+
+* baseset-encoding, literal-described-char, other-chars: 
+  must abandon SP_CHARSET_FIXED to do this, since otherwise
+  SP does unwanted conversions on numeric char refs. On the
+  other hand, we do want SP_CHARSET_FIXED, if we are using
+  jades builtin repertoire (ie Unicode). Since Char is only
+  16bit, have to map other-chars in the private area somewhere
+  and tell the user/backend about it.
+  
+* combine-char: If we do this, we can't do character translation
+  as a map char --> char any longer, but instead have to deal
+  with string --> string.
+
+* Annex K #ALL/#IMLICIT content tokens. Implementation idea: At the 
+  begin of the instance and after seeing a new implicit element type 
+  in the instance, go over all definitions and recompile the model 
+  groups. Also adjust the inclusions/exclusions. Optimization: recompile 
+  only those which actually use #ALL/#IMPLICIT.
+
+* check table-auto-width and multi-process features.
+
+
+Simple things
+=============
+
+* Concur: Forbit name groups in parameter entity references in 
+  document type specifications in tags.
+
+* install ports, ICs, etc only in SL Interpreters.
+
+
+Things which have to be added to the jade internals documentation
+=================================================================
+
+*  .msg file format: clauses field format, deleted messages,
+    comments, number assignments, fragments.
+
+*  tracing subobjects.
+
+*  writing backends.
+
+*  scheme primitives: special meaning of partIndex == unsigned(-1),
+   (define internal: ...), (define feature: foo ...).
+
+*  language stuff.
+
+*  feature checking.
+
+*  grove plan checking.
+
+*  color spaces.
+
+*  char repertoire stuff.
+
+
+Reorganization
+==============
+
+* Move jadetex from dsssl/ to contrib/
+
+* Move japan.sgmldecl to pubtext/japan.sd
+
+* Remove config/

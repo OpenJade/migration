@@ -126,6 +126,17 @@ int DssslApp::processSysid(const StringC &sysid)
       }
       break;
     }
+
+  fotb_ = makeFOTBuilder(fotbDescr_);
+  if (!fotb_)
+    return 1; 
+  if (!initSpecParser())
+    return 1;
+  se_ = new StyleEngine(*this, *this, unitsPerInch_, debugMode_, 
+			dsssl2_, strictMode_, *fotbDescr_, 
+			outputCodingSystem());  
+  se_->parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, defineVars_);
+
   return GroveApp::processSysid(sysid);
 }
 
@@ -483,15 +494,7 @@ Boolean DssslApp::initSpecParser()
 
 void DssslApp::processGrove()
 {
-  Owner<FOTBuilder> fotb(makeFOTBuilder(fotbDescr_));
-  if (!fotb)
-    return;
-  if (!initSpecParser())
-    return;
-  StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
-                 dsssl2_, strictMode_, *fotbDescr_, outputCodingSystem()); 
-  se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, defineVars_);
-  se.process(rootNode_, *fotb);
+  se_->process(rootNode_, *fotb_);
 }
 
 bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,

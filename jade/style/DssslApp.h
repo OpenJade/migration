@@ -8,6 +8,7 @@
 #include "FOTBuilder.h"
 #include "GroveManager.h"
 #include "dsssl_ns.h"
+#include "StyleEngine.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -64,6 +65,9 @@ private:
   Boolean specTitleOption_;
   StringC specTitle_;
   Vector<StringC> availableSpecTitles_;
+
+  Owner<FOTBuilder> fotb_;
+  Owner<StyleEngine> se_;
 };
 
 #ifdef DSSSL_NAMESPACE

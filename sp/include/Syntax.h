@@ -179,6 +179,7 @@ public:
 
   Syntax(const Sd &);
   Boolean lookupFunctionChar(const StringC &, Char *) const;
+  HashTableIter<StringC,Char> functionIter() const;
   Boolean charFunctionName(Char c, const StringC *&name) const;
   Boolean lookupReservedName(const StringC &, ReservedName *) const;
   const StringC &reservedName(ReservedName) const;

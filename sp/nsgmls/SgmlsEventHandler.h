@@ -46,6 +46,7 @@ class SgmlsEventHandler : public ErrorCountEventHandler,
   private SgmlsSubdocState, private Messenger {
 public:
   enum {
+    outputAll = 07777,
     outputLine = 01,
     outputEntity = 02,
     outputId = 04,
@@ -53,7 +54,12 @@ public:
     outputNotationSysid = 020,
     outputNonSgml = 040,
     outputEmpty = 0100,
-    outputDataAtt = 0200
+    outputDataAtt = 0200,
+    outputComment = 0400,
+    outputTagOmission = 01000,
+    outputAttributeOmission = 02000,
+    outputParserInformation = 04000,
+    outputPostfix = 010000, // note this not in outputAll
     };
       
   SgmlsEventHandler(const SgmlParser *,
@@ -65,6 +71,7 @@ public:
   void startElement(StartElementEvent *);
   void endElement(EndElementEvent *);
   void pi(PiEvent *);
+  void commentDecl(CommentDeclEvent *);
   void sdataEntity(SdataEntityEvent *);
   void externalDataEntity(ExternalDataEntityEvent *);
   void subdocEntity(SubdocEntityEvent *);
@@ -82,6 +89,7 @@ private:
   SgmlsEventHandler(const SgmlsEventHandler &); // undefined
   void operator=(const SgmlsEventHandler &);	// undefined
 
+  void features(unsigned outputFlags);
   void attributes(const AttributeList &attributes, char code,
 		  const StringC *ownerName);
   void startAttribute(const StringC &name, char code,
@@ -102,13 +110,14 @@ private:
   void outputLocation1(const Location &loc);
   void outputString(const StringC &str);
   void outputString(const Char *, size_t);
-  static void escape(OutputCharStream &, Char);
+  static void escaper(OutputCharStream &, Char);
 
   OutputCharStream &os();
 
   Messenger *messenger_;
   Location currentLocation_;
   OutputCharStream *os_;
+  Boolean inDocument_;
   Boolean haveData_;
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> syntax_;
@@ -123,6 +132,10 @@ private:
   PackedBoolean outputNonSgml_;
   PackedBoolean outputEmpty_;
   PackedBoolean outputDataAtt_;
+  PackedBoolean outputComment_;
+  PackedBoolean outputTagOmission_;
+  PackedBoolean outputAttributeOmission_;
+  PackedBoolean outputParserInformation_;
 };
 
 inline

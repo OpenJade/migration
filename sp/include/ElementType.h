@@ -105,13 +105,16 @@ public:
   void setMap(const ShortReferenceMap *);
   void setRankStem(RankStem *);
   Boolean undefined() const;
+  void setOrigName(StringC &origName);
   const ElementDefinition *definition() const;
   Boolean isRankedElement() const;
   const RankStem *rankedElementRankStem() const;
   size_t index() const;
   const ShortReferenceMap *map() const;
   void swap(ElementType &);
+  const StringC &origName() const;
 private:
+  StringC origName_;
   ElementType(const ElementType &); // undefined
   void operator=(const ElementType &); // undefined
   size_t index_;
@@ -231,6 +234,12 @@ void ElementDefinition::setRank(StringC &rankSuffix,
 }
 
 inline
+void ElementType::setOrigName(StringC &origName)
+{
+  origName.swap(origName_);
+}
+
+inline
 Boolean ElementType::undefined() const
 {
   return def_->undefined();
@@ -272,6 +281,12 @@ inline
 void ElementType::setMap(const ShortReferenceMap *map)
 {
   map_ = map;
+}
+
+inline
+const StringC &ElementType::origName() const
+{
+  return origName_;
 }
 
 inline

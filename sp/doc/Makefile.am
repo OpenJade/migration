@@ -1,14 +1,19 @@
 ## Process this file with automake to produce Makefile.in
 
-docdir = $(prefix)/doc
+docdir = $(datadir)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
+pkgdochtmldir = $(pkgdocdir)/doc
 
-pkgdoc_DATA = archform.htm build.htm catalog.htm charset.htm \
+MAINTAINERCLEANFILES = Makefile.in
+
+pkgdochtml_DATA = archform.htm build.htm catalog.htm charset.htm \
 	features.htm generic.htm ideas.htm index.htm new.htm nsgmls.htm \
 	sgmldecl.htm sgmlnorm.htm sgmlsout.htm spam.htm spcat.htm \
-	spent.htm sx.htm sysdecl.htm sysid.htm xml.htm xmlwarn.htm
+	spent.htm sx.htm sysdecl.htm sysid.htm xml.htm xmlwarn.htm \
+	autoconf.htm
 
 EXTRA_DIST = archform.htm build.htm catalog.htm charset.htm \
 	features.htm generic.htm ideas.htm index.htm new.htm nsgmls.htm \
 	sgmldecl.htm sgmlnorm.htm sgmlsout.htm spam.htm spcat.htm \
-	spent.htm sx.htm sysdecl.htm sysid.htm xml.htm xmlwarn.htm
+	spent.htm sx.htm sysdecl.htm sysid.htm xml.htm xmlwarn.htm \
+	autoconf.htm catalog .cvsignore

@@ -18,6 +18,7 @@
 #define SP_HAVE_SOCKET
 #else
 #ifdef SP_HAVE_SOCKET
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -65,6 +66,7 @@ typedef int SOCKET;
 #include <ctype.h>
 #include <stdio.h>
 
+
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -74,11 +76,21 @@ static CharsetInfo iso646Charset(UnivCharsetDesc(&range, 1));
 
 #ifdef SP_HAVE_SOCKET
 
+typedef enum {
+	HTTP_OK ,
+	HTTP_REDIRECT ,
+	HTTP_ERROR
+} HTTP_RESPONSE_TYPE ;
+
 class HttpSocketStorageObject : public RewindStorageObject {
 public:
   HttpSocketStorageObject(SOCKET fd, Boolean mayRewind, const StringC &hostStr);
   ~HttpSocketStorageObject();
-  Boolean open(const String<char> &path, Messenger &);
+  HTTP_RESPONSE_TYPE open(const String<char> &host,
+               unsigned short port,
+               const String<char> &path,
+               Messenger &,
+		char[]);
   Boolean read(char *buf, size_t bufSize, Messenger &mgr, size_t &nread);
   Boolean seekToStart(Messenger &);
   static SOCKET openHttp(const String<char> &host,
@@ -88,7 +100,7 @@ public:
 private:
   HttpSocketStorageObject(const HttpSocketStorageObject &); // undefined
   void operator=(const HttpSocketStorageObject &); // undefined
-  Boolean readHeader(Messenger &);
+  HTTP_RESPONSE_TYPE readHeader(Messenger &, char[]);
   Boolean readLine(Messenger &mgr, String<char> &line, String<char> &leftOver);
   static Boolean parseStatus(const char *&ptr, int &val);
   StringC hostStr_;
@@ -189,6 +201,18 @@ Boolean URLStorageManager::guessIsId(const StringC &id,
   return 1;
 }
 
+inline int strdiff(const char* str, char* buf) {
+  if ( ! *buf )
+    return 1 ;
+  if ( strlen(buf) <= strlen (str) )
+    return 2 ;
+//  if ( strncasecmp(buf, str, strlen(str)) )
+  for ( int i = 0; i < strlen(str); ++i)
+    if ( tolower(buf[i]) != tolower(str[i]) )
+      return 3 ;
+  return 0 ;
+}
+
 StorageObject *URLStorageManager::makeStorageObject(const StringC &specId,
 						    const StringC &baseId,
 						    Boolean,
@@ -262,23 +286,83 @@ StorageObject *URLStorageManager::makeStorageObject(const StringC &specId,
       i++;
     }
   }
-  if (path.size() == 0)
-    path += '/';
 
-  StringC hostStr;
-  for (i = 0; i < host.size(); i++)
-    hostStr += host[i];
-  host += '\0';
-  SOCKET fd = HttpSocketStorageObject::openHttp(host, port, hostStr, mgr);
-  if (fd == INVALID_SOCKET)
-    return 0;
-  HttpSocketStorageObject *p
-    = new HttpSocketStorageObject(fd, mayRewind, hostStr);
-  if (!p->open(path, mgr)) {
-    delete p;
-    return 0;
+  for ( int tries=0; tries<20; ++tries ) {
+    if (path.size() == 0)
+      path += '/';
+    StringC hostStr;
+    for (i = 0; i < host.size(); i++)
+      hostStr += host[i];
+
+// Support HTTP redirect but limit number against an infinite loop
+
+    SOCKET fd = HttpSocketStorageObject::openHttp(host, port, hostStr, mgr);
+    if (fd == INVALID_SOCKET)
+      return 0;
+    HttpSocketStorageObject *p
+      = new HttpSocketStorageObject(fd, mayRewind, hostStr);
+    char locbuf[256] ;
+    static String<char> nullStringC("", 0) ;
+    char* line ;
+    switch (p->open(host, port, path, mgr, locbuf)) {
+      case HTTP_OK:
+        return p ;
+      case HTTP_REDIRECT:
+//        (void)closesocket(fd);
+	delete p ;
+
+	// reassign host, port and path
+	// and go round the loop again
+	line = locbuf ;
+
+	if ( strdiff ("location:", line) )
+	  return 0 ;
+     	line += strlen("location:") ;
+
+
+      while ( isspace(*line) )
+	++line ;
+
+	// call ourself recursively with our new URL
+
+	// construct message - there must be a better way even without
+	// hacking on other source files
+	{ 
+          StringC sline ;
+	  for ( char* x = line; *x; ++x)
+	    sline +=  (Char)(*x) ;
+	  mgr.message(URLStorageMessages::Redirect, StringMessageArg(sline)) ;
+	}
+
+	host = nullStringC ;
+	path = nullStringC ;
+	port = 0 ;
+
+	if ( strdiff ("http://", line) )
+	  return 0 ;
+	line += strlen("http://") ;
+
+	while ( *line != ':' && *line != '/' )
+	  host += *line++ ;
+
+	if ( *line == ':' )
+          while ( isdigit(*++line) )
+	    port = 10 * port + ( *line - '0' ) ;
+	else
+	  port = 80 ;
+
+	while ( *line && ! isspace(*line) )
+          path += *line++ ;
+
+	break ;
+
+      case HTTP_ERROR:
+        delete p;
+        return 0;
+    }
   }
-  return p;
+  return 0 ;	// we were in an infinite redirection loop
+
 #else /* not SP_HAVE_SOCKET */
   ParentLocationMessenger(mgr).message(URLStorageMessages::notSupported);
   return 0;
@@ -360,11 +444,14 @@ Boolean URLStorageManager::transformNeutral(StringC &str, Boolean fold,
 
 #ifdef SP_HAVE_SOCKET
 
-SOCKET HttpSocketStorageObject::openHttp(const String<char> &host,
+SOCKET HttpSocketStorageObject::openHttp(const String<char> &theHost,
 					unsigned short port,
 					const StringC &hostStr,
 					Messenger &mgr)
 {
+  String<char> host = theHost;
+  host += '\0';
+
 #ifdef WINSOCK
   if (!winsockIniter.init(mgr))
     return INVALID_SOCKET;
@@ -450,7 +537,11 @@ HttpSocketStorageObject::~HttpSocketStorageObject()
     (void)closesocket(fd_);
 }
 
-Boolean HttpSocketStorageObject::open(const String<char> &path, Messenger &mgr)
+HTTP_RESPONSE_TYPE HttpSocketStorageObject::open(const String<char> &host,
+				     unsigned short port,
+	 	 		     const String<char> &path,
+				     Messenger &mgr,
+					char locbuf[])
 {
   path_ = path;
   String<char> request;
@@ -458,8 +549,31 @@ Boolean HttpSocketStorageObject::open(const String<char> &path, Messenger &mgr)
   request += path_;
   request += ' ';
   request.append("HTTP/1.0\r\n", 10);
-  request.append("Accept: */*\r\n", 13);
+  request.append("Host: ", 6);
+  if (!isdigit((unsigned char)host[0])) {
+    request += host;
+    if (port != 80) {
+      char portstr[sizeof(unsigned short)*3 + 1];
+      sprintf(portstr, "%u", port);
+      request.append(":", 1);
+      request.append(portstr, strlen(portstr));
+    } 
+  }
   request.append("\r\n", 2);
+  char* http_ua = getenv("SP_HTTP_USER_AGENT") ;
+  if ( ! http_ua )
+    http_ua = "libosp 1.5" ;
+  request.append("User-Agent: ", 12) ;
+  request.append(http_ua, strlen(http_ua)) ;
+  request.append("\r\n", 2);
+  const char* http_accept = getenv("SP_HTTP_ACCEPT") ;
+  if ( http_accept ) {
+    request.append("Accept: ", 8) ;
+    request.append(http_accept, strlen(http_accept)) ;
+    request.append("\r\n", 2);
+  }
+  request.append("\r\n", 2);
+
   // FIXME check length of write
   if (writesocket(fd_, request.data(), request.size()) == SOCKET_ERROR) {
     ParentLocationMessenger(mgr).message(URLStorageMessages::writeError,
@@ -467,31 +581,37 @@ Boolean HttpSocketStorageObject::open(const String<char> &path, Messenger &mgr)
 					 SocketMessageArg(errnosocket));
     (void)closesocket(fd_);
     fd_ = INVALID_SOCKET;
-    return 0;
+    return HTTP_ERROR ;
   }
-  if (!readHeader(mgr)) {
-    (void)closesocket(fd_);
-    fd_ = INVALID_SOCKET;
-    return 0;
+  switch ( readHeader(mgr, locbuf) ) {
+    case HTTP_OK:
+	return HTTP_OK ;
+    case HTTP_REDIRECT:
+      (void)closesocket(fd_);
+	return HTTP_REDIRECT ;
+    case HTTP_ERROR:
+      (void)closesocket(fd_);
+      fd_ = INVALID_SOCKET;
+      return HTTP_ERROR ;
   }
-  return 1;
 }
 
-Boolean HttpSocketStorageObject::readHeader(Messenger &mgr)
+HTTP_RESPONSE_TYPE HttpSocketStorageObject::readHeader(Messenger &mgr,
+							char locbuf[])
 {
-  String<char> buf;
+  String<char> buf ;
   String<char> leftOver;
   if (!readLine(mgr, buf, leftOver))
-    return 0;
+    return HTTP_ERROR;
   buf += '\0';
   const char *ptr = &buf[0];
   int val;
   if (!parseStatus(ptr, val)) {
     if (buf.size() > 0)
       unread(buf.data(), buf.size() - 1);
-    return 1;
+    return HTTP_OK;
   }
-  if (val < 200 || val >= 300) {
+  if (val < 200 || val >= 400) {
     StringC reason;
     while (*ptr && *ptr != '\n' && *ptr != '\r') {
       reason += Char(*ptr);
@@ -504,18 +624,27 @@ Boolean HttpSocketStorageObject::readHeader(Messenger &mgr)
 					 StringMessageArg(hostStr_),
 					 StringMessageArg(pathStr),
 					 StringMessageArg(reason));
-    return 0;
+    return HTTP_ERROR;
   }
-					 
   for (;;) {
     if (!readLine(mgr, buf, leftOver))
-      return 0;
+      return HTTP_ERROR;
+    if ( ! strdiff("location:", (char*) buf.data() ) ) {
+      unsigned int sz = buf.size() > 255 ? 255 : buf.size() ;
+      strncpy(locbuf, buf.data(), sz) ;
+      locbuf[sz] = 0 ;
+      for (int i=0; i<sz; ++i)
+	if ( locbuf[i] == '\r' || locbuf[i] == '\n' ) {
+	  locbuf[i] = 0 ;
+	  break ;
+	}
+    }
     if (buf.size() == 0 || buf[0] == '\r' || buf[0] == '\n')
       break;
   }
   if (leftOver.size())
     unread(leftOver.data(), leftOver.size());
-  return 1;
+  return ( val < 300 ) ? HTTP_OK : HTTP_REDIRECT ;
 }
 
 // Status line must start with: "HTTP/" 1*DIGIT "." 1*DIGIT SP 3DIGIT SP

@@ -1281,8 +1281,8 @@ class MifFOTBuilder : public SerialFOTBuilder {
     void start();
     void end();
 
-    void startSimplePageSequence();
-    void endSimplePageSequence();
+    void startSimplePageSequenceSerial();
+    void endSimplePageSequenceSerial();
     void startSimplePageSequenceHeaderFooter( unsigned );
     void endSimplePageSequenceHeaderFooter( unsigned );
     void endAllSimplePageSequenceHeaderFooter();
@@ -2540,7 +2540,7 @@ void MifFOTBuilder::endDisplay() {
     delete di;
 }
 
-void MifFOTBuilder::startSimplePageSequence() {
+void MifFOTBuilder::startSimplePageSequenceSerial() {
 
     inSimplePageSequence = true;
     firstHeaderFooter = true;
@@ -2577,7 +2577,7 @@ void MifFOTBuilder::startSimplePageSequence() {
     FotSimplePageSequence.paragraphFormat = format();
 }
 
-void MifFOTBuilder::endSimplePageSequence() {
+void MifFOTBuilder::endSimplePageSequenceSerial() {
 
     end();
     mifDoc.exitTextFlow();

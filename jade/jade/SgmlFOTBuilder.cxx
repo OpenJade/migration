@@ -160,8 +160,8 @@ public:
   void rule(const RuleNIC &);
   void alignmentPoint();
 
-  void startSimplePageSequence();
-  void endSimplePageSequence();
+  void startSimplePageSequenceSerial();
+  void endSimplePageSequenceSerial();
   void pageNumber();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
@@ -1613,14 +1613,14 @@ void SgmlFOTBuilder::endScore()
   endFlow("score");
 }
 
-void SgmlFOTBuilder::startSimplePageSequence()
+void SgmlFOTBuilder::startSimplePageSequenceSerial()
 {
   startSimpleFlowObj("simple-page-sequence");
   suppressAnchors_ = 1;
   curOs_ = &hfs_;
 }
  
-void SgmlFOTBuilder::endSimplePageSequence()
+void SgmlFOTBuilder::endSimplePageSequenceSerial()
 {
   endFlow("simple-page-sequence");
 }

@@ -387,13 +387,11 @@ bool Interpreter::doDeclareInitialValue()
 
 bool Interpreter::doDeclareCharacteristic()
 {
+  Location loc(in_->currentLocation());
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
   Identifier *ident = lookup(currentToken_);
-  if (!ident->inheritedC().isNull())
-    // FIXME report an error if same part
-    ;
   if (!getToken(allowString, tok))
     return 0;
   StringC pubid(currentToken_);
@@ -403,8 +401,19 @@ bool Interpreter::doDeclareCharacteristic()
     return 0;
   if (!getToken(allowCloseParen, tok))
     return 0;
-  if (ident->inheritedC().isNull()) {
-    installExtensionInheritedC(ident, pubid);
+  Location defLoc;
+  unsigned defPart;
+  if (ident->inheritedCDefined(defPart, defLoc)
+      && defPart <= currentPartIndex()) {
+    if (defPart == currentPartIndex()) {
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateCharacteristic,
+	      StringMessageArg(ident->name()),
+	      defLoc);
+    }
+  }
+  else {
+    installExtensionInheritedC(ident, pubid, loc);
     installInitialValue(ident, expr);
   }
   return 1;
@@ -412,17 +421,26 @@ bool Interpreter::doDeclareCharacteristic()
 
 bool Interpreter::doDeclareFlowObjectClass()
 {
+  Location loc(in_->currentLocation());
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
   Identifier *ident = lookup(currentToken_);
-  if (ident->flowObj())
-    // FIXME report an error if same part
-    ;
   if (!getToken(allowString, tok))
     return 0;
-  if (!ident->flowObj())
-    installExtensionFlowObjectClass(ident, currentToken_);
+  Location defLoc;
+  unsigned defPart;
+  if (ident->inheritedCDefined(defPart, defLoc)
+      && defPart <= currentPartIndex()) {
+    if (defPart == currentPartIndex()) {
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateFlowObjectClass,
+	      StringMessageArg(ident->name()),
+	      defLoc);
+    }
+  }
+  else
+    installExtensionFlowObjectClass(ident, currentToken_, loc);
   if (!getToken(allowCloseParen, tok))
     return 0;
   return 1;
@@ -485,7 +503,7 @@ bool Interpreter::doDefine()
 				expr, loc);
   Location defLoc;
   unsigned defPart;
-  if (ident->defined(defPart, defLoc)) {
+  if (ident->defined(defPart, defLoc) && defPart <= partIndex_) {
     if (defPart == partIndex_)
       message(InterpreterMessages::duplicateDefinition,
 	      StringMessageArg(ident->name()),
@@ -511,7 +529,7 @@ bool Interpreter::doDefineUnit()
     return 0;
   Location defLoc;
   unsigned defPart;
-  if (unit->defined(defPart, defLoc)) {
+  if (unit->defined(defPart, defLoc) && defPart <= partIndex_) {
     if (defPart == partIndex_)
       message(InterpreterMessages::duplicateUnitDefinition,
 	      StringMessageArg(unit->name()),
@@ -4401,6 +4419,7 @@ void Identifier::setDefinition(Owner<Expression> &expr,
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
+  value_ = 0;
 }
 
 void Identifier::setValue(ELObj *value, unsigned partIndex)
@@ -4470,6 +4489,7 @@ void Unit::setDefinition(Owner<Expression> &expr,
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
+  computed_ = notComputed;
 }
 
 void Unit::setValue(long n)

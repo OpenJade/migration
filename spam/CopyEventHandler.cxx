@@ -548,22 +548,23 @@ void CopyEventHandler::endElement(EndElementEvent *event)
 	    os() << elementTypeOrigName(event->elementType(), nameBuf);
 	  }
 	}
-	else if (iter.delimGeneral() == Syntax::dNET
-		 && (normalizeFlags_ & normalizeNet)) {
-	  handleChange();
-	  StringC nameBuf;
-	  os() << syntax_->delimGeneral(Syntax::dETAGO)
-	    << elementTypeOrigName(event->elementType(), nameBuf)
-	      << syntax_->delimGeneral(Syntax::dTAGC);
+	else if (iter.delimGeneral() == Syntax::dNET) {
 	  closed = 1;
-	  break;
+	  if (normalizeFlags_ & normalizeNet) {
+	    handleChange();
+	    StringC nameBuf;
+	    os() << syntax_->delimGeneral(Syntax::dETAGO)
+	         << elementTypeOrigName(event->elementType(), nameBuf)
+	         << syntax_->delimGeneral(Syntax::dTAGC);
+	    break;
+	  }
 	}
 	os() << syntax_->delimGeneral(iter.delimGeneral());
 	break;
       default:
 	CANNOT_HAPPEN();
       }
-    if (!closed && (normalizeFlags_ && normalizeUnclosed)) {
+    if (!closed && (normalizeFlags_ & normalizeUnclosed)) {
       handleChange();
       os() << syntax_->delimGeneral(Syntax::dTAGC);
     }

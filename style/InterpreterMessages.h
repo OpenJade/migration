@@ -228,6 +228,12 @@ struct InterpreterMessages {
   static const MessageType0 processNodeLoop;
   // 114
   static const MessageType0 spliceNotList;
+  // 115
+  static const MessageType1 actualLoop;
+  // 116
+  static const MessageType1L duplicateCharacteristic;
+  // 118
+  static const MessageType1L duplicateFlowObjectClass;
 };
 
 #ifdef SP_NAMESPACE

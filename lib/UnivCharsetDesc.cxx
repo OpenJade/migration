@@ -49,8 +49,10 @@ void UnivCharsetDesc::addRange(WideChar descMin,
     charMap_.setRange(descMin, max, wrapChar(univMin, descMin));
   }
   if (descMax > charMax) {
-    WideChar min = descMin > charMax ? descMin : charMax;
-    rangeMap_.addRange(min, descMax, univMin);
+    if (descMin > charMax)
+      rangeMap_.addRange(descMin, descMax, univMin);
+    else
+      rangeMap_.addRange(charMax, descMax, univMin + (charMax - descMin));
   }
 }
 

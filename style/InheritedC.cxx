@@ -1269,7 +1269,7 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
     interp.message(InterpreterMessages::notInCharacteristicValue);
     return interp.makeError();
   }
-  return ec.styleStack->actual(inheritedC_, interp, *ec.actualDependencies);
+  return ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
 }
 
 #define INHERITED_C(name, C, init) \
@@ -1559,7 +1559,7 @@ void Interpreter::installInheritedCs()
   IGNORED_C("char-map", makeFalse());
 }
 
-void Interpreter::installExtensionInheritedC(Identifier *ident, const StringC &pubid)
+void Interpreter::installExtensionInheritedC(Identifier *ident, const StringC &pubid, const Location &loc)
 {
   ConstPtr<InheritedC> ic;
   if (extensionTable_) {
@@ -1580,7 +1580,7 @@ void Interpreter::installExtensionInheritedC(Identifier *ident, const StringC &p
   if (ic.isNull())
     // FIXME should call FOTBuilder with PublicId argument
     ic = new IgnoredC(ident, nInheritedC_++, makeFalse(), *this);
-  ident->setInheritedC(ic);
+  ident->setInheritedC(ic, currentPartIndex(), loc);
   installInheritedCProc(ident);
 }
 

@@ -107,3 +107,6 @@ I0+stackTrace++called from here
 I1+stackTraceEllipsis++called from here...(%1 calls omitted)
 E0+processNodeLoop++node processing loop detected
 E0+spliceNotList++unquote-splicing expression does not evaluate to a list
+E1+actualLoop++circular use of actual value of characteristic %1
+E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
+E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here

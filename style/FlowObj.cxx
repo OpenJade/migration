@@ -21,16 +21,27 @@ FlowObj::FlowObj()
 void FlowObj::process(ProcessContext &context)
 {
   context.startFlowObj();
+  unsigned flags = 0;
+  pushStyle(context, flags);
+  processInner(context);
+  popStyle(context, flags);
+  context.endFlowObj();
+}
+
+void FlowObj::pushStyle(ProcessContext &context, unsigned &)
+{
   if (style_)
     context.currentStyleStack().push(style_, context.vm(), context.currentFOTBuilder());
   else
     context.currentStyleStack().pushEmpty();
-  processInner(context);
+}
+
+void FlowObj::popStyle(ProcessContext &context, unsigned)
+{
   if (style_)
     context.currentStyleStack().pop();
   else
     context.currentStyleStack().popEmpty();
-  context.endFlowObj();
 }
 
 void FlowObj::traceSubObjects(Collector &c) const
@@ -2189,17 +2200,15 @@ private:
 class TableRowFlowObj : public CompoundFlowObj {
 public:
   TableRowFlowObj() { }
-  void process(ProcessContext &context) {
+  void pushStyle(ProcessContext &, unsigned &) {  }
+  void popStyle(ProcessContext &, unsigned) {  }
+  void processInner(ProcessContext &context) {
     if (!context.inTable()) {
       // FIXME location
       context.vm().interp->message(InterpreterMessages::tableRowOutsideTable);
       CompoundFlowObj::processInner(context);
       return;
     }
-    // Don't handle style here
-    processInner(context);
-  }
-  void processInner(ProcessContext &context) {
     if (context.inTableRow())
       context.endTableRow();
     context.startTableRow(style_);
@@ -2230,13 +2239,7 @@ public:
       nic_->missing = 1;
   }
   TableCellFlowObj(const TableCellFlowObj &fo) : CompoundFlowObj(fo), nic_(new NIC(*fo.nic_)) { }
-  void process(ProcessContext &context) {
-    if (!context.inTable()) {
-      // FIXME location
-      context.vm().interp->message(InterpreterMessages::tableCellOutsideTable);
-      CompoundFlowObj::processInner(context);
-      return;
-    }
+  void pushStyle(ProcessContext &context, unsigned &nPush) {
     if (context.inTableRow()) {
       if (nic_->startsRow) {
 	context.endTableRow();
@@ -2251,18 +2254,19 @@ public:
     if (columnStyle) {
       context.currentStyleStack().push(columnStyle, context.vm(), context.currentFOTBuilder());
       context.currentFOTBuilder().startSequence();
+      nPush++;
     }
     StyleObj *rowStyle = context.tableRowStyle();
     if (rowStyle) {
       context.currentStyleStack().push(rowStyle, context.vm(), context.currentFOTBuilder());
       context.currentFOTBuilder().startSequence();
+      nPush++;
     }
-    CompoundFlowObj::process(context);
-    if (rowStyle) {
-      context.currentFOTBuilder().endSequence();
-      context.currentStyleStack().pop();
-    }
-    if (columnStyle) {
+    CompoundFlowObj::pushStyle(context, nPush);
+  }
+  void popStyle(ProcessContext &context, unsigned nPush) {
+    CompoundFlowObj::popStyle(context, nPush);
+    for (unsigned i = 0; i < nPush; i++) {
       context.currentFOTBuilder().endSequence();
       context.currentStyleStack().pop();
     }
@@ -2270,6 +2274,12 @@ public:
       context.endTableRow();
   }
   void processInner(ProcessContext &context) {
+    if (!context.inTable()) {
+      // FIXME location
+      context.vm().interp->message(InterpreterMessages::tableCellOutsideTable);
+      CompoundFlowObj::processInner(context);
+      return;
+    }
     FOTBuilder &fotb = context.currentFOTBuilder();
     if (!nic_->hasColumnNumber) {
       FOTBuilder::TableCellNIC nic(*nic_);
@@ -2817,7 +2827,8 @@ void Interpreter::installFlowObjs()
 }
 
 void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
-						  const StringC &pubid)
+						  const StringC &pubid,
+						  const Location &loc)
 {
   FlowObj *tem = 0;
   if (extensionTable_) {
@@ -2844,7 +2855,7 @@ void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
       tem = new (*this) UnknownFlowObj;
   }
   makePermanent(tem);
-  ident->setFlowObj(tem);
+  ident->setFlowObj(tem, currentPartIndex(), loc);
 }
 
 #ifdef DSSSL_NAMESPACE

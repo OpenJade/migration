@@ -12,4 +12,5 @@ BEGIN
   2109, "second argument for SYSTEM entry should be quoted to avoid ambiguity"
   2110, "no DOCUMENT entry in catalog %1"
   2111, "no entry for public identifier %1 in catalog %2"
+  2112, "DTDDECL catalog entries are not supported"
 END

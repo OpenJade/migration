@@ -861,7 +861,6 @@ Boolean Parser::sdParseCharset(SdBuilder &sdBuilder,
 	  && (min > charMax || count - 1 > charMax - min)) {
 	message(ParserMessages::documentCharMax, NumberMessageArg(charMax));
 	adjCount = min > charMax ? 0 : 1 + (charMax - min);
-	sdBuilder.valid = 0;
 	maybeISO646 = 0;
       }
       else

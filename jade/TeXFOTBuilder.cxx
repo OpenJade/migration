@@ -627,6 +627,7 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       case '\\':
       case '^':
       case '_':
+      case '~':
 	os() << "\\char" << int(*s) << "{}";
 	break;
       case '{':
@@ -634,9 +635,8 @@ void TeXFOTBuilder::characters(const Char *s, size_t n)
       case '$':
       case '&':
       case '#':
-      case '~':
       case '%':
-	os() << "\\" << char(*s) << " ";
+	os() << "\\" << char(*s);
 	break;
       case '\r':
 	os() << '\n';

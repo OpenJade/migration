@@ -116,6 +116,8 @@ public:
   void traceSubObjects(Collector &) const;
   void setStyle(StyleObj *);
   void process(ProcessContext &);
+  virtual void pushStyle(ProcessContext &, unsigned &);
+  virtual void popStyle(ProcessContext &, unsigned);
   virtual void processInner(ProcessContext &) = 0;
 protected:
   static

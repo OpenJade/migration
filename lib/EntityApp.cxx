@@ -45,6 +45,9 @@ EntityApp::EntityApp(const char *requiredInternalCode)
   registerOption('c', SP_T("catalog_sysid"));
   registerOption('C');
   registerOption('D', SP_T("dir"));
+  registerLongOption(SP_T("catalog-sysid"), 'c', SP_T("file"));
+  registerLongOption(SP_T("catalog-document"), 'C');
+  registerLongOption(SP_T("directory"), 'D', SP_T("path"));
 }
 
 void EntityApp::processOption(AppChar opt, const AppChar *arg)

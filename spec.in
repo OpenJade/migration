@@ -39,6 +39,9 @@ This C++ library contains entity management functions, parsing functions,
 and other functions useful for SGML/XML/DSSSL development.
 
 %prep
+# check that rpm is new enough to know internal macros like %{_prefix}
+rpmversion=`rpm -q --queryformat '%{RPMVERSION}' rpm`
+[ ${rpmversion//.*} -lt 3 ] && { echo "please update rpm" exit 1 ; }
 # unpack source .tar.gz package
 %setup
 

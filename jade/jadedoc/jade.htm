@@ -153,25 +153,36 @@ The distributions include the sources for a compatible version of SP
 
 <h3><A NAME=building-win32>Win32</A></h3>
 <p>
-Only Microsoft Visual C++ 6.0 is supported.  To build using the Visual
-Studio GUI, open the workspace <code>jade.dsw</code> and build the
-<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
-project.  To build on the command line, ensure that the directory
-containing <code>msdev</code> is in your path, typically by executing
+Only Microsoft Visual C++ 6.0 is supported. Also, Perl 5 is required; the 
+executable must be on your PATH.
+</p>
+<p>
+To build on the command line, ensure that the directories
+containing <code>msdev</code> and <code>nmake</code> are in your path, 
+typically by executing
 the command:
 <pre>
-path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;%path%
+path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;
+    C:/Program Files/Microsoft Visual Studio/VC98/Bin;%path%
 </pre>
 <p>
-then run the command:
+(all in one long line) then run the command:
 <pre>
-msdev jade.dsw /make "all - Win32 Release"
+build-win32.bat
 </pre>
-
+<p>
+To build using the Visual
+Studio GUI, open the workspace <code>jade.dsw</code> and build the
+<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
+project.  You must first do a command-line build, however, to get
+the perl-generated files.
+</p>
 <h3><A NAME=building-unix>Unix</A></h3>
 <p>
 The following compilers should work:
 <ul>
+<li>gcc 2.95
+<li>egcs 1.1.2
 <li>egcs 1.0.2
 <li>gcc 2.8.1
 <li>gcc 2.7.2
@@ -186,7 +197,8 @@ that you must use -DSP_MULTI_BYTE. If you plan to do any development,
 also do <code>make depend</code>.
 <p>
 Alternatively you can build using the <a
-HREF="autoconf.htm">experimental autoconf support</a>.
+HREF="autoconf.htm">experimental autoconf support</a>. This
+will soon be the recommended method.
 
 <h2><A NAME=using>Using Jade</A></h2>
 <P>

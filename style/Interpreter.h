@@ -25,6 +25,7 @@
 #include "GroveManager.h"
 #include "Pattern.h"
 #include "CharMap.h"
+#include "TransformationMode.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -182,7 +183,18 @@ public:
     keyMatrixAbc,
     keyMatrixLmn,
     keyMatrixA,
-    keyArchitecture
+    keyArchitecture,
+    keyDefineTransliterationMap,
+    keyNode,
+    keySubgrove,
+    keyAdd,
+    keyRemove,
+    keySub,
+    keySortChildren,
+    keyOptional,
+    keyUnique,
+    keyProperty,
+    keyResultPath,
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);
@@ -626,6 +638,7 @@ public:
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
+  TransformationMode *transformationMode();
   void addClassAttributeName(const StringC &name);
   void addIdAttributeName(const StringC &name);
   void installInitialValue(Identifier *, Owner<Expression> &);
@@ -859,6 +872,7 @@ public: const t ## CharPropValues &n () const \
   bool explicitFeatures_;
   Status module_[nModules];
   bool explicitModules_;
+  TransformationMode transformationMode_;
 };
 
 inline

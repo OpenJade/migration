@@ -1304,6 +1304,93 @@ void ReverseNodeListObj::traceSubObjects(Collector &c) const
   c.trace(reversed_);
 }
 
+SubgroveSpecObj *ELObj::asSubgroveSpec()
+{
+  return 0;
+}
+
+SubgroveSpecObj::SubgroveSpecObj(NodePtr node, NodePtr subgrove, SymbolObj *cls,
+                                 ELObj *add, ELObj *null, ELObj *remove, 
+                                 ELObj *sub, ELObj *children, 
+                                 ELObj *label, FunctionObj *sort)
+{
+  spec_ = new SubgroveSpec;
+  spec_->node = node;
+  spec_->subgrove = subgrove;
+  spec_->cls = cls;
+  spec_->add = add;
+  spec_->null = null;
+  spec_->remove = remove;
+  spec_->sub = sub;
+  spec_->children = children;
+  spec_->label = label;
+  spec_->sort = sort; 
+}
+
+SubgroveSpecObj::~SubgroveSpecObj()
+{
+  delete spec_;
+}
+
+SubgroveSpecObj *SubgroveSpecObj::asSubgroveSpec()
+{
+  return this;
+}
+
+void SubgroveSpecObj::traceSubObjects(Collector &c) const
+{
+  c.trace(spec_->cls);
+  c.trace(spec_->add);
+  c.trace(spec_->null);
+  c.trace(spec_->remove);
+  c.trace(spec_->sub);
+  c.trace(spec_->children);
+  c.trace(spec_->label);
+  c.trace(spec_->sort);
+}
+
+CreateSpecObj *ELObj::asCreateSpec()
+{
+  return 0;
+}
+
+CreateSpecObj::CreateSpecObj(CreateSpecObj::Type t, ELObj *id, 
+                NodePtr node, SubgroveSpecObj *sg,
+                StringObj *property, ELObj *label,
+                FunctionObj *resultPath, bool optional, bool unique)
+{
+  spec_ = new CreateSpec;
+  spec_->type = t;
+  spec_->groveId = id;
+  spec_->node = node;
+  spec_->sg = sg;
+  spec_->property = property;
+  spec_->label = label;
+  spec_->resultPath = resultPath;
+  spec_->optional = optional;
+  spec_->unique = unique;
+}
+
+CreateSpecObj::~CreateSpecObj()
+{
+  delete spec_;
+}
+
+CreateSpecObj *CreateSpecObj::asCreateSpec()
+{
+  return this;
+}
+
+void CreateSpecObj::traceSubObjects(Collector &c) const
+{
+  c.trace(spec_->groveId);
+  c.trace(spec_->sg);
+  c.trace(spec_->label);
+  c.trace(spec_->property);
+  c.trace(spec_->resultPath);
+}
+
+
 #ifdef DSSSL_NAMESPACE
 }
 #endif

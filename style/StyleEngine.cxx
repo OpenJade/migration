@@ -12,6 +12,7 @@
 #include "ProcessContext.h"
 #include "macros.h"
 #include "InternalInputSource.h"
+//#include "TransformContext.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -24,20 +25,61 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 bool dsssl2,
                          bool strictMode,
 			 const FOTBuilder::Description &fotbDescr)
-: interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
-                               debugMode, dsssl2, 1, strictMode, 
-			       fotbDescr))
+: interpreter_(0),
+  mgr_(&mgr), groveManager_(&groveManager), 
+  unitsPerInch_(unitsPerInch), debugMode_(debugMode),
+  dsssl2_(dsssl2), strictMode_(strictMode), 
+  fotbDescr_(&fotbDescr)  
 {
+  // FIXME: this is super-ugly. We can't construct the Interpreter
+  // right away, since we don't know if its a SL/TL context until
+  // we have parsed the spec. Thus we have to store all constructor
+  // args until then.
+}
+
+void StyleEngine::defineVariable(const StringC &str, StringC &cmdline)
+{
+  // Dk: Interpret "name=value" as a string variable Setting.
+  if (str[0] == '(') {
+    cmdline += str;
+  } 
+  else {
+    int i;
+    for (i = 0; (i < str.size()) && (str[i] != '='); i++)
+      ;
+
+    // Dk: Not name=value?
+    if (!i || (i >= (str.size()))) {  
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += str;
+      cmdline += interpreter_->makeStringC(" #t)");
+    }
+    else {  
+      // Dk: name=value.
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += StringC(str.begin(), i);
+      cmdline += interpreter_->makeStringC(" \"");
+      if (str.size() - (i + 1) > 0);
+        cmdline += StringC(str.begin() + i + 1, str.size() - (i + 1));
+      cmdline += interpreter_->makeStringC("\")");
+    }
+  }
 }
 
 void StyleEngine::parseSpec(SgmlParser &specParser,
 			    const CharsetInfo &charset,
 			    const StringC &id,
-			    Messenger &mgr)
+			    Messenger &mgr,
+			    const Vector<StringC> &defVars)
 {
   DssslSpecEventHandler specHandler(mgr);
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
+
+  interpreter_ = new Interpreter(groveManager_, mgr_, unitsPerInch_, 
+                                 debugMode_, dsssl2_, 
+                                 parts.size() > 0 ? parts[0]->style() : 1, 
+                                 strictMode_, *fotbDescr_);
   
   for (int phase = 0; phase < 3; phase++) {
     for (size_t i = 0; i < parts.size(); i++) {
@@ -99,7 +141,10 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
     }
   }
 
-  if (cmdline.size() > 0) {  
+  if (defVars.size() > 0) {  
+    StringC cmdline;
+    for (size_t i = 0; i < defVars.size(); i++) 
+      defineVariable(defVars[i], cmdline);
     Owner<InputSource> in(new InternalInputSource(cmdline,
                           InputSourceOrigin::make()));
     SchemeParser scm(*interpreter_, in);
@@ -123,34 +168,6 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   interpreter_->compile();
 }
 
-void StyleEngine::defineVariable(const StringC &str)
-{
-  // Dk: Interpret "name=value" as a string variable Setting.
-  if (str[0] == '(') {
-    cmdline += str;
-  } 
-  else {
-    int i;
-    for (i = 0; (i < str.size()) && (str[i] != '='); i++)
-      ;
-
-    // Dk: Not name=value?
-    if (!i || (i >= (str.size()))) {  
-      cmdline += interpreter_->makeStringC("(define ");
-      cmdline += str;
-      cmdline += interpreter_->makeStringC(" #t)");
-    }
-    else {  
-      // Dk: name=value.
-      cmdline += interpreter_->makeStringC("(define ");
-      cmdline += StringC(str.begin(), i);
-      cmdline += interpreter_->makeStringC(" \"");
-      if (str.size() - (i + 1) > 0);
-        cmdline += StringC(str.begin() + i + 1, str.size() - (i + 1));
-      cmdline += interpreter_->makeStringC("\")");
-    }
-  }
-}
 
 StyleEngine::~StyleEngine()
 {
@@ -159,8 +176,15 @@ StyleEngine::~StyleEngine()
 
 void StyleEngine::process(const NodePtr &node, FOTBuilder &fotb)
 {
-  ProcessContext context(*interpreter_, fotb);
-  context.process(node);
+  if (interpreter_->style()) {
+    ProcessContext context(*interpreter_, fotb);
+    context.process(node);
+  }
+  else {
+    interpreter_->transformationMode()->compile(*interpreter_, node);
+    //TransformContext context(*interpreter_);
+    //context.process(node);
+  }
 }
 
 #ifdef DSSSL_NAMESPACE

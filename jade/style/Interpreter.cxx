@@ -155,8 +155,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   // in names (as most of them have special meaning in
   // scheme/dsssl).
   if (!strictMode_)
-    for (Char i = 127; i < charMax; i++)
-      lexCategory_.setChar(i, lexAddNameStart);
+    lexCategory_.setRange(127, charMax - 1, lexAddNameStart);
 
   initialProcessingMode_.setDefined();
   // can't be done before initializing lexCategory_

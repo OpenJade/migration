@@ -1,3 +1,251 @@
+2002-01-17 18:37  icastle
+
+	* docsrc/: Makefile, openjade.xml: More man page updates
+
+2002-01-17 16:51  icastle
+
+	* config/aclocal.m4, config/configure.in, lib/parser_inst.m4:
+	Include re-worked version of RedHat's size_t patch
+	
+	Ref: redhat openjade-1.3-21
+	
+	Redhat's RPM contains a patch to provide a single #define to
+	determine if size_t is the same as unsigned int.
+	
+	This patch was only applied if the build architecture was s390 or
+	s390x.	However, I can't really see how this patch has a bearing on
+	the S/390.  And the patch didn't actually work with any GNU C++
+	compiler from 2.8 up to an including 3.0. The idea is quite good
+	though, so I've reworked the patch to make it work as it is
+	supposed to.
+	
+	Anyway, this may or may not have a bearing on S/390 support.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/osx.xml: file osx.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/onsgmls.xml: file onsgmls.xml was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/osgmlnorm.xml: file osgmlnorm.xml was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/openjade.xml: file openjade.xml was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/Makefile: file Makefile was initially added on branch
+	RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/.cvsignore: file .cvsignore was initially added on branch
+	RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* docsrc/ospam.xml: file ospam.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-17 16:41  icastle
+
+	* doc/onsgmls.xml, doc/osgmlnorm.xml, doc/ospam.xml,
+	docsrc/.cvsignore, docsrc/Makefile, docsrc/onsgmls.xml,
+	docsrc/openjade.xml, docsrc/osgmlnorm.xml, docsrc/ospam.xml,
+	docsrc/osx.xml, jadedoc/openjade.xml: Move source of documentation
+	to docsrc.
+	
+	Will place the published versions in doc, jadedoc, man or whatever
+	at release/build time
+
+2002-01-17 14:35  icastle
+
+	* include/config.h, spgrove/threads.h: MacOS X patches (fink)
+
+2002-01-17 13:45  icastle
+
+	* Makefile.comm.in, Makefile.in, Makefile.lib.in, Makefile.prog.in,
+	configure, config/aclocal.m4, config/config.guess,
+	config/config.sub, config/configure.in, config/ltconfig,
+	config/ltmain.sh: Upgrade autoconf/libtool
+	
+	Ref:
+	
+	Update the autocof/libtool infrastructure.
+	
+	Use the latest config.sub/config/guess
+	
+	Use autoconf 2.52 and libtool 1.4.x
+	
+	Move the hack from configure to be a proper test for towupper in
+	configure.in.  Correct some complaints about smr_SWITCH being
+	passed the wrong number of arguments (which is what DUMMY is all
+	about).
+	
+	Create new aclocal.m4 and adjust various *.in files to use new
+	style libtool (the one without ltconfig).
+
+2002-01-17 13:36  icastle
+
+	* doc/osgmlnorm.xml: Another man page
+
+2002-01-17 13:36  icastle
+
+	* doc/osgmlnorm.xml: file osgmlnorm.xml was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 12:12  icastle
+
+	* testsuite/expr-lang.dsl: Make the stylesheet a valid one
+
+2002-01-17 12:11  icastle
+
+	* jadedoc/openjade.xml: Manual page for openjade(1)
+
+2002-01-17 12:11  icastle
+
+	* jadedoc/openjade.xml: file openjade.xml was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 12:09  icastle
+
+	* dsssl/README.jadetex: file README.jadetex was initially added on
+	branch RELEASE-1_3.
+
+2002-01-17 12:09  icastle
+
+	* dsssl/: ChangeLog, Makefile.jadetex, README.jadetex, demo.dsl,
+	demo.sgm, jadetex.dtx, jadetex.ini, jadetex.ins, pdfjadetex.ini,
+	unicode.sty: Make the demo actually work without errors
+	
+	Remove jadetex as it is now distributed seperately from openjade at
+	http://jadetex.sourceforge.net
+
+2002-01-16 17:39  icastle
+
+	* doc/: onsgmls.xml, ospam.xml: More man pages
+
+2002-01-16 17:39  icastle
+
+	* doc/ospam.xml: file ospam.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-16 13:26  icastle
+
+	* doc/onsgmls.xml: file onsgmls.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-16 13:26  icastle
+
+	* doc/: nsgmls.xml, onsgmls.xml: Really, the command should be
+	onsgmls because this is openjade. Renamed accordingly
+
+2002-01-16 08:28  icastle
+
+	* doc/nsgmls.xml: file nsgmls.xml was initially added on branch
+	RELEASE-1_3.
+
+2002-01-16 08:28  icastle
+
+	* doc/: nsgmls.xml, openjade.1: Far better to mark up the man pages
+	as XML/SGML.
+	
+	However, the best stylesheet for processing docbook refentries is
+	an XLST one... It would be nice to have DSSSL version, of course.
+
+2002-01-15 18:48  icastle
+
+	* style/jade_version.h: Prepare for openjade-1.3.1-pre3
+
+2002-01-15 18:36  icastle
+
+	* configure, lib/CmdLineApp.cxx, lib/lib.dsp, style/DssslApp.cxx,
+	style/Interpreter.cxx, style/LangObj.cxx, style/LangObj.h,
+	style/primitive.cxx, style/style.dsp: Support for BSD (freeBSD 4.4)
+	and MacOS X
+	
+	Ref: FreeBSD 4.4 patches + Fink patches
+	
+	This provides equivalent functionality to the freebsd 4.4 patch-aa
+	and patch-ab patches.
+	
+	However, the standard BSD patches simply clobber the build
+	environment - so if you use these, builds on other platforms break.
+	
+	The problem is that support for the POSIX locale in openjade
+	requires two things: setlocale, and reasonable wchar support.
+	FreeBSD 4.4 has setlocale support but is missing some wchar
+	functions that are required. (towupper for example).
+	
+	The best solution would be to rework the POSIX locale support so
+	that it will work with FreeBSD.
+	
+	However, I've made a simple hack:
+	
+	- Left the configure setlocale check in place - Added a new "wchar"
+	check (which tests for towupper).
+	
+	This defines an additional build parameters SP_HAVE_WCHAR. This is
+	simply applied with the same scope as SP_HAVE_SETLOCALE.
+	
+	This means that to get the locale support you must have an
+	environment where both these are set.
+	
+	The result is that all environments that worked before will still
+	work...
+	
+	I've directly edited configure rather than configure.in, but as it
+	is already impossible to generate configure from configure.in I
+	don't think this is too much of a problem.
+
+2002-01-15 18:29  icastle
+
+	* spgrove/GroveBuilder.cxx: Support for GCC version supplied with
+	MacOS X
+	
+	Ref: fink project
+	
+	Tidy up C++ a bit for MacOS X builds
+
+2002-01-15 18:28  icastle
+
+	* spgrove/Makefile.sub, style/Makefile.sub: Support for old
+	versions of libtool (1.3.x)
+	
+	Ref:
+	
+	FreeBSD 4.4 only has libtool 1.3 installed. Make sure this works as
+	well as libtool 1.4
+
+2002-01-15 15:31  icastle
+
+	* doc/openjade.1: First go at a manual page for openjade
+	
+	Info taken from the HTML
+
+2002-01-15 15:31  icastle
+
+	* doc/openjade.1: file openjade.1 was initially added on branch
+	RELEASE-1_3.
+
+2002-01-15 13:26  icastle
+
+	* ChangeLog: file ChangeLog was initially added on branch
+	RELEASE-1_3.
+
+2002-01-15 13:26  icastle
+
+	* ChangeLog: Add a ChangeLog. People like ChangeLogs
+
 2002-01-15 13:14  icastle
 
 	* style/jade_version.h: Prepare for 1.3.1-pre2
@@ -364,12 +612,12 @@
 
 1999-08-22 15:37  Avi
 
-	* Makefile.comm, Makefile.comm.in: .msg implicit rule fix; old rule
-	remains for non-gnu make.
+	* Makefile.comm.in: .msg implicit rule fix; old rule remains for
+	non-gnu make.
 
 1999-08-22 15:13  Avi
 
-	* Makefile, Makefile.in: Inter-directory dependency fixes.
+	* Makefile.in: Inter-directory dependency fixes.
 
 1999-08-21 19:25  Avi
 
@@ -381,11 +629,7 @@
 
 1999-08-21 13:22  Avi
 
-	* Makefile, Makefile.in: Directory dependency fix.
-
-1999-08-21 13:19  Avi
-
-	* Makefile.comm: Removed dependency on m4.
+	* Makefile.in: Directory dependency fix.
 
 1999-08-21 12:39  Avi
 
@@ -659,18 +903,9 @@
 	style/ProcessContext.cxx, style/ProcessContext.h:
 	simple-page-sequence headers and footers unserialized
 
-1999-07-23 19:00  Avi
-
-	* Makefile: Mif and HTML enabled by default
-
 1999-07-23 18:55  Avi
 
 	* dsssl/catalog: System id resolved for builtins.dsl
-
-1999-07-23 18:36  clasen
-
-	* Makefile, Makefile.comm, Makefile.lib, Makefile.prog: Restore
-	original Makefiles.
 
 1999-07-23 18:19  Avi
 
@@ -678,8 +913,7 @@
 
 1999-07-23 18:15  clasen
 
-	* Makefile, Makefile.comm, Makefile.lib, Makefile.prog,
-	jade/TeXFOTBuilder.cxx: Cleanup to make it compile. Added enough
+	* jade/TeXFOTBuilder.cxx: Cleanup to make it compile. Added enough
 	dependencies for ./configure; make to work without intermediate
 	make gen.
 
@@ -1037,11 +1271,10 @@
 
 1999-05-02 13:50  Avi
 
-	* Makefile, Makefile.comm, Makefile.lib, Makefile.prog, VERSION,
-	msggen.pl, sp-generate.mak, include/Entity.h, include/config.h,
-	lib/CmdLineAppMessages.msg, lib/CmdLineAppMessages.rc,
-	lib/entmgr_inst.m4, lib/parser_inst.m4, jade/TeXMessages.h,
-	style/primitive_inst.cxx: Initial revision
+	* VERSION, msggen.pl, sp-generate.mak, include/Entity.h,
+	include/config.h, lib/CmdLineAppMessages.msg,
+	lib/CmdLineAppMessages.rc, lib/entmgr_inst.m4, lib/parser_inst.m4,
+	jade/TeXMessages.h, style/primitive_inst.cxx: Initial revision
 
 1999-05-02 13:50  Avi
 

@@ -8,6 +8,7 @@ $prog =~ s@.*/@@;
 $gen_c = 0;
 $gen_po = 0;
 
+undef $opt_l;
 do 'getopts.pl';
 &Getopts('l');
 

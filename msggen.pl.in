@@ -24,7 +24,8 @@ $module = $opt_l;
 $pot_file = $opt_p;
 
 if (defined($opt_t)) {
-    &read_po_translations($opt_t);
+  # don't try to read translations for English
+  $opt_t =~ /.*en.*/ || &read_po_translations($opt_t);
 }
 
 $num = 0; 

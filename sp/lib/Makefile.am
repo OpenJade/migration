@@ -42,8 +42,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	SGMLApplication.cxx SJISCodingSystem.cxx SOEntityCatalog.cxx Sd.cxx \
 	SdFormalError.h SdText.cxx SearchResultMessageArg.cxx SgmlParser.cxx \
 	ShortReferenceMap.cxx SrInfo.h StdioStorage.cxx StdioStorageMessages.h \
-	StorageManager.cxx StorageObjectPosition.h \
-	StringVectorMessageArg.cxx StringVectorMessageArg.h Syntax.cxx \
+	StorageManager.cxx StorageObjectPosition.h Syntax.cxx \
 	Text.cxx TokenMessageArg.cxx TokenMessageArg.h \
 	TranslateCodingSystem.cxx Trie.h TrieBuilder.cxx TrieBuilder.h \
 	TypeId.cxx URLStorage.cxx URLStorageMessages.h \

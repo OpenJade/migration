@@ -44,6 +44,7 @@ bin\spam.exe
 bin\sgmlnorm.exe
 bin\spent.exe
 bin\sx.exe
+bin\spcat.exe
 bin\MSVCRT.DLL
 jadedoc/autoconf.htm
 jadedoc/contributors.htm

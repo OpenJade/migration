@@ -46,8 +46,8 @@ size_t maxSize(const size_t *v, size_t n)
   return max;
 }
 
-const unsigned contentPseudoAtt = unsigned(-1);
-const unsigned invalidAtt = unsigned(-2);
+const unsigned invalidAtt = unsigned(-1);
+const unsigned contentPseudoAtt = unsigned(-2);
 
 class DelegateEventHandler : public EventHandler {
 public:
@@ -1336,16 +1336,14 @@ ArcProcessor::buildMetaMap(const ElementType *docElementType,
   mapP->suppressFlags = newSuppressFlags;
   // Build the attribute map.
   if (metaAttributed) {
-    Vector<PackedBoolean> renamed;
-    Vector<PackedBoolean> substituted;
     ConstPtr<AttributeDefinitionList> metaAttDef
       = metaAttributed->attributeDef();
-    if (!metaAttDef.isNull()) {
-      renamed.assign(metaAttDef->size() + 1, PackedBoolean(0));
-      substituted.assign(atts.def()->size() 
-			 + (linkAtts ? linkAtts->def()->size() : 0)
-			 + 1, PackedBoolean(0));
-    }
+    Vector<PackedBoolean> renamed(metaAttDef.isNull() 
+                                  ? 1 : metaAttDef->size() + 1, 
+                                   PackedBoolean(0));
+    Vector<PackedBoolean> substituted((atts.def().isNull() ? 1 : atts.def()->size() + 1) 
+  	                             + (linkAtts && !linkAtts->def().isNull() ? linkAtts->def()->size() : 0),
+		                     PackedBoolean(0));
     if (linkAtts) {
       Boolean specified;
       unsigned index;

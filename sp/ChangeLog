@@ -1,6 +1,116 @@
+2003-09-14 08:26  Neil Roeth
+
+	  Make sure DESTDIR is handled correctly in po/Makefile
+
+2003-09-13 08:48  Ian Castle <ian.castle@openjade.org>
+
+	* Add ospcat man page
+
 2003-09-03  Karl Eichwalder  <ke@suse.de>
 
 	* Add testsuite from opensp_1_5_tests_branch.
+
+2003-08-31 12:09  Jessica Perry Hekman
+
+	  Add new options (-x preserve-case, -x no-overwrite ) to osx
+
+	  preserve-case:
+
+	  Preserve casing as specified in the DTD for element names;
+	  attribute names; attribute values which are token lists.
+
+	  no-overwrite:
+
+	  When preserving internal or external entities, multiple output
+	  files will be written.  If this option is specified, do not
+	  overwrite existing files; instead, attempt to append a number to
+	  the end of the original filename to create a unique filename.
+	  Exit with an error if too many (100) such files already exist.
+
+2003-08-30 11:54  Neil Roeth
+
+	  Build Infrastructure/Localisation Changes
+
+	  The change is to add versions to the translations so that
+	  multiple versions of libosp, i.e., with different SONAMEs, can
+	  exist simultaneously without stomping on each other's files.
+
+	  Without this, the Debian package would not upgrade properly. 
+	  Since the next release will require a new SONAME (recent changes
+	  made the ABI different), it makes sense to include this change in
+	  the next release.
+
+	  I accomplished the versioning by adding a version number to
+	  SP_MESSAGE_DOMAIN, and it made sense to use the library SONAME
+	  for that.  So, I created a new variable in configure.in called
+	  SP_LIBOSP_CUR to be the "current" part of the SONAME, and used
+	  that in SP_MESSAGE_DOMAIN, and also referenced that in
+	  lib/Makefile to to actually set the SONAME.
+
+2003-08-30 09:56  Peter O'Gorman
+
+	  Fix for Mac OS X/Darwin compiliation.
+
+2003-08-30 09:26  Nick Kew
+
+	  MessageReporter: to enable selection of [XML|TRADITIONAL|NONE] at
+	  run time.
+
+	  The message format can now be set at run time using the
+	  environment variable	  SP_MESSAGE_FORMAT e.g.	  export
+	  SP_MESSAGE_FORMAT=XML
+
+	  ParserEventGeneratorKit: enable Liam's restrictFileReading from
+	  the "generic API".
+
+	  Improvements to http:// support. Allow http redirection.  The
+	  User-Agent: header can be specified by the environment variable
+	  SP_HTTP_USER_AGENT It defaults to "libosp 1.5" if not set.  The
+	  environment variable SP_HTTP_ACCEPT can contain the argument to
+	  the Accept: header (was hard coded as "Accept: */*"). There is no
+	  default, so to obtain the same behaviour do	export
+	  SP_HTTP_ACCEPT="*/*"
+
+2003-07-17 19:41  Patrick Smith
+
+	* Make opensp compile with gcc 3.3
+
+2003-07-17 19:16  Jessica Perry Hekman
+
+	* Fixed bug reported by Neil Roeth: nested entities were being
+	  mishandled; also sdata entities were being misquoted; note,
+	  modified outputData to have additional argument, and added
+	  getQuoteMark method
+
+	* added contents() for use by osx
+
+	* added asInternalInputSource for use by osx
+
+2003-05-08 16:57  Jessica Perry Hekman
+
+	* New command line argument
+
+	* Warn before removing leading slashes in output file pathnames,
+          and remove them; added no-write-outside-outdir to request
+          exiting instead of writing output file outside (above) output
+          directory
+
+2003-04-29 22:08  Jessica Perry Hekman
+
+	* handle schemes such as http://
+	  correctly in external entity filenames
+
+2003-02-10 21:05  Jessica Perry Hekman
+
+	* - include appropriate quotation marks in entity declarations
+	  - print correct output filenames for external entity files in
+	    driver file
+	  - print correct output directory name in for driver files in
+	    internal subset
+	  - create directories where needed when writing files
+	  - output all under output directory, even absolute
+	    filenames
+	  - don't define predefined entities (like lt)
 
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 

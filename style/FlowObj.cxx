@@ -1506,8 +1506,8 @@ void FlowObj::fixCharNICs(const Char *ch, size_t n,
   Vector<size_t> dep;
   FunctionObj *func = context.currentStyleStack().
     actual(interp.charMapC(), interp, dep)->asFunction();
-  if (func->nRequiredArgs()>1
-      || (func->nRequiredArgs() + func->nOptionalArgs()
+  if (func && (func->nRequiredArgs()>1
+      || (func->nRequiredArgs() + func->nOptionalArgs())
 	  + func->restArg() ? 1 : 0) == 0)
     func = 0;
   InsnPtr insn(func != 0 ? func->makeCallInsn(1, interp, loc, InsnPtr()) : InsnPtr());

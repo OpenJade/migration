@@ -25,7 +25,8 @@ public:
   enum Option {
     openElements = 01,
     openEntities = 02,
-    messageNumbers = 04
+    messageNumbers = 04,
+    clauses = 010 
     };
   // The OutputCharStream will be deleted by the MessageReporter
   MessageReporter(OutputCharStream *);

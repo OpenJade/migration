@@ -15,6 +15,8 @@ INCLUDES = -I$(top_srcdir)/include
 BUILT_SOURCES = XmlOutputMessages.h XmlOutputMessages.rc \
 	SxMessages.h SxMessages.rc sx_inst.cxx
 
+MSGGENFLAGS = -l appModule
+
 sx.o: SxMessages.h
 XmlOutputEventHandler.o: XmlOutputMessages.h
 

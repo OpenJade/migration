@@ -24,8 +24,10 @@ class SP_API MessageFragment {
 public:
   enum {
     libModule = 0,
-    appModule = 1
+    appModule = 1,
+    xModule = 2 
     };
+  enum { nModules = xModule + 1 };
   MessageFragment(unsigned module, unsigned number, const char *text = 0);
   unsigned module() const;
   unsigned number() const;
@@ -51,12 +53,15 @@ public:
     error
     };
   MessageType(Severity, unsigned module, unsigned number,
-	      const char *text = 0, const char *auxText = 0);
+	      const char *text = 0, const char *clauses = 0, 
+              const char *auxText = 0);
   Severity severity() const;
   MessageFragment auxFragment() const;
   Boolean isError() const;
+  const char *clauses() const;
 private:
 #ifndef SP_NO_MESSAGE_TEXT
+  const char *clauses_;
   const char *auxText_;
 #endif
 };
@@ -64,49 +69,56 @@ private:
 
 class SP_API MessageType0 : public MessageType {
 public:
-  MessageType0(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType0(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType1 : public MessageType {
 public:
-  MessageType1(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType1(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType2 : public MessageType {
 public:
-  MessageType2(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType2(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType3 : public MessageType {
 public:
-  MessageType3(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType3(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType4 : public MessageType {
 public:
-  MessageType4(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType4(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType5 : public MessageType {
 public:
-  MessageType5(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType5(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType6 : public MessageType {
 public:
-  MessageType6(Severity, unsigned module, unsigned number, const char *text = 0);
+  MessageType6(Severity, unsigned module, unsigned number, const char *text = 0,
+               const char *clauses = 0);
 };
 
 class SP_API MessageType0L : public MessageType {
 public:
   MessageType0L(Severity, unsigned module, unsigned number, const char *text = 0,
-		const char *auxText = 0);
+		const char *clauses = 0, const char *auxText = 0);
 };
 
 class SP_API MessageType1L : public MessageType {
 public:
   MessageType1L(Severity, unsigned module, unsigned number, const char *text = 0,
-		const char *auxText = 0);
+		const char *clauses = 0, const char *auxText = 0);
 };
 
 class SP_API OpenElementInfo {
@@ -241,6 +253,16 @@ inline
 Boolean MessageType::isError() const
 {
   return severity() != info && severity() != warning;
+}
+
+inline
+const char *MessageType::clauses() const
+{
+#ifdef SP_NO_MESSAGE_TEXT
+  return 0;
+#else
+  return clauses_;
+#endif
 }
 
 inline

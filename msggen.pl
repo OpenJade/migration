@@ -10,7 +10,8 @@ $gen_po = 0;
 
 undef $opt_l;
 do 'getopts.pl';
-&Getopts('l');
+&Getopts('l:');
+$module = $opt_l;
 
 die "Usage: $prog file\n" unless $#ARGV == 0;
 
@@ -18,7 +19,6 @@ $def_file = $ARGV[0];
 
 $file_base = $def_file;
 $file_base =~ s/\.[^.]*$//;
-$config_h = $opt_l ? "splib.h" : "config.h";
 
 $class = $file_base;
 $class =~ s|.*[\\/]||;
@@ -68,9 +68,10 @@ while (<DEF>) {
     $tag[$num] = $field[1];
     &error("duplicate tag $field[1]") if defined($tag_used{$field[1]});
     $tag_used{$field[1]} = 1;
-    $field[2] =~ /^([0-9]+(\.[0-9]+)*(p[0-9]+)?( [0-9]+(\.[0-9]+)*(p[0-9]+)?)*)?$/
+    $field[2] =~ /^([A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?( [A-Z]?[0-9]+(\.[0-9]+)*(p[0-9]+)?)*)?$/
 	|| &error("invalid clauses field");
     # push @clauses, $field[2];
+    $clauses[$num] = $field[2];
     if ($argc == 0) {
 	if ($field[0] ne "") {
 	    $field[3] =~ /^([^%]|%%)*$/ || &error("invalid character after %");
@@ -160,7 +161,7 @@ if ($gen_c) {
 #pragma implementation
 #endif
 
-#include "$config_h"
+#include "config.h"
 #include "$class.h"
 
 #ifdef SP_NAMESPACE
@@ -195,20 +196,23 @@ foreach $i (0 .. $#message) {
 	    }
 	    print ",\n";
 	}
-	print <<END;
-#ifdef BUILD_LIBSP
-MessageFragment::libModule,
-#else
-MessageFragment::appModule,
-#endif
-END
+	print "MessageFragment::$module,\n";
 	print "$i\n";
 	print "#ifndef SP_NO_MESSAGE_TEXT\n";
 	$str = $message[$i];
 	$str =~ s|\\|\\\\|g;
 	$str =~ s|"|\\"|g;
 	printf ",\"%s\"", $str; 
+	if ($clauses[$i]) {
+	  $str = $clauses[$i];
+	  $str =~ s|\\|\\\\|g;
+	  $str =~ s|"|\\"|g;
+	  printf "\n,\"%s\"", $str; 
+        }
 	if ($auxloc[$i]) {
+            if ($clauses[$i] eq "") {
+              print "\n,0";
+            }
 	    $str = $message2[$i + 1];
 	    $str =~ s|\\|\\\\|g;
 	    $str =~ s|"|\\"|g;

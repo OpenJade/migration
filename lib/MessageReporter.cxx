@@ -78,6 +78,16 @@ void MessageReporter::dispatchMessage(const Message &message)
   os() << ": ";
   formatMessage(*message.type, message.args, os());
   os() << nl;
+  if ((options_ & clauses) && message.type->clauses() != 0) {
+    if (programName_.size())
+      os() << programName_ << ':';
+    if (externalInfo) {
+      printLocation(externalInfo, off);
+      os() << ": ";
+    }
+    formatFragment(MessageReporterMessages::relevantClauses, os());
+    os() << " " << message.type->clauses() << nl;
+  }
   if (!message.auxLoc.origin().isNull()) {
     Offset off;
     const ExternalInfo *externalInfo = locationHeader(message.auxLoc, off);

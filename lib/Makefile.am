@@ -77,7 +77,7 @@ EXTRA_DIST = ArcEngineMessages.msg ArgEngineMessages.rc \
 	WinInetStorageMessages.msg WinInetStorageMessages.rc \
 	WinApp.cxx Win32CodingSystem.cxx lib.rc lib.dsp
 
-MSGGENFLAGS = -l
+MSGGENFLAGS = -l libModule
 
 BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
 	CatalogMessages.h CatalogMessages.rc \

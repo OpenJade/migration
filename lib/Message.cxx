@@ -29,11 +29,16 @@ MessageFragment::MessageFragment(unsigned module, unsigned number, const char *
 MessageType::MessageType(Severity severity, unsigned module, unsigned number,
 			 const char *text, const char *
 #ifndef SP_NO_MESSAGE_TEXT
+	     		 clauses
+#endif
+                         , const char *
+#ifndef SP_NO_MESSAGE_TEXT
 	     		 auxText
 #endif
 			 )
 : 
 #ifndef SP_NO_MESSAGE_TEXT
+  clauses_(clauses),
   auxText_(auxText),
 #endif
   MessageFragment(module, number, text)
@@ -42,56 +47,58 @@ MessageType::MessageType(Severity severity, unsigned module, unsigned number,
 }
      
 MessageType0::MessageType0(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType1::MessageType1(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType2::MessageType2(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType3::MessageType3(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType4::MessageType4(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType5::MessageType5(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType6::MessageType6(Severity severity, unsigned module, unsigned number,
-			   const char *text)
-: MessageType(severity, module, number, text)
+			   const char *text, const char *clauses)
+: MessageType(severity, module, number, text, clauses)
 {
 }
 
 MessageType0L::MessageType0L(Severity severity, unsigned module, unsigned number,
-			     const char *text, const char *auxText)
-: MessageType(severity, module, number, text, auxText)
+			     const char *text, const char *clauses,
+                             const char *auxText)
+: MessageType(severity, module, number, text, clauses, auxText)
 {
 }
 
 MessageType1L::MessageType1L(Severity severity, unsigned module, unsigned number,
-			     const char *text, const char *auxText)
-: MessageType(severity, module, number, text, auxText)
+			     const char *text, const char *clauses,
+                             const char *auxText)
+: MessageType(severity, module, number, text, clauses, auxText)
 {
 }
 

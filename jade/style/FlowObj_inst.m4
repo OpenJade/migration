@@ -33,6 +33,13 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 __instantiate(Owner<SimplePageSequenceFlowObj::HeaderFooter>)
+__instantiate(Owner<FOTBuilder::EmbeddedTextNIC>)
+__instantiate(Owner<FOTBuilder::AnchorNIC>)
+__instantiate(Owner<FOTBuilder::IncludedContainerAreaNIC>)
+__instantiate(Owner<MultiLineInlineNoteFlowObj::NIC>)
+__instantiate(Owner<FOTBuilder::MultiLineInlineNoteNIC>)
+__instantiate(Owner<FOTBuilder::EmphasizingMarkNIC>)
+__instantiate(Owner<FOTBuilder::GlyphAnnotationNIC>)
 __instantiate(CopyOwner<ScoreFlowObj::Type>)
 __instantiate(Owner<TableFlowObj::NIC>)
 __instantiate(Owner<ScoreFlowObj::Type>)

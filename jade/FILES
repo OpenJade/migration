@@ -440,7 +440,6 @@ spent/Makefile.sub
 spent/spent.cxx
 spent/spent.dsp
 sp-generate.mak
-sunfix.sh
 sx/Makefile.sub
 sx/SxMessages.h
 sx/SxMessages.msg
@@ -455,8 +454,4 @@ sx/sx.dsp
 sx/sx.rc
 sx/sx_inst.cxx
 sx/sx_inst.m4
-unicode/catalog
-unicode/demo.sgm
-unicode/gensyntax.pl
-unicode/unicode.sd
-unicode/unicode.syn
+

@@ -44,7 +44,7 @@ SP_DEFINE_APP(NsgmlsApp)
 
 class PrologMessageEventHandler : public MessageEventHandler {
 public:
-  PrologMessageEventHandler(Messenger *messenger);
+  PrologMessageEventHandler(class Messenger *messenger);
   void endProlog(EndPrologEvent *);
 };
 
@@ -55,13 +55,13 @@ public:
 		    const StringC &filenameStr,
 		    const OutputCodingSystem *,
 		    CmdLineApp *,
-		    Messenger *messenger);
+		    class Messenger *messenger);
   ~XRastEventHandler();
   void message(MessageEvent *);
   void truncateOutput();
   void allLinkTypesActivated();
 private:
-  Messenger *messenger_;
+  class Messenger *messenger_;
   // file_ must come before os_ so it gets inited first
   FileOutputByteStream file_;
   EncodeOutputCharStream os_;
@@ -200,7 +200,7 @@ ErrorCountEventHandler *NsgmlsApp::makeEventHandler()
 				 outputFlags_);
 }
 
-PrologMessageEventHandler::PrologMessageEventHandler(Messenger *messenger)
+PrologMessageEventHandler::PrologMessageEventHandler(class Messenger *messenger)
 : MessageEventHandler(messenger)
 {
 }
@@ -216,7 +216,7 @@ XRastEventHandler::XRastEventHandler(SgmlParser *parser,
 				     const StringC &filenameStr,
 				     const OutputCodingSystem *codingSystem,
 				     CmdLineApp *app,
-				     Messenger *messenger)
+				     class Messenger *messenger)
 : RastEventHandler(parser, messenger),
   messenger_(messenger),
   filename_(filename),

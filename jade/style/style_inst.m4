@@ -17,6 +17,7 @@
 #include "IListIter.h"
 #include "IQueue.h"
 #include "HashTable.h"
+#include "CharMap.h"
 #ifdef SP_SIZEOF_BOOL_1
 #include "XcharMap.h"
 #endif
@@ -161,12 +162,26 @@ __instantiate(IListIter<Pattern::Element>)
 __instantiate(IList<Pattern::Qualifier>)
 __instantiate(IListIter<Pattern::Qualifier>)
 __instantiate(Ptr<MacroFlowObj::Definition>)
+__instantiate(`HashTable<StringC,CharPart>')
+__instantiate(`HashTableItem<StringC,CharPart>')
+__instantiate(`HashTable<StringC,StringC>')
+__instantiate(`HashTableItem<StringC,StringC>')
 #ifdef SP_SIZEOF_BOOL_1
 __instantiate(XcharMap<char>)
 __instantiate(SharedXcharMap<char>)
 __instantiate(Ptr<SharedXcharMap<char> >)
 __instantiate(ConstPtr<SharedXcharMap<char> >)
 #endif
+__instantiate(CharMap<ELObjPart>)
+__instantiate(CharMapPage<ELObjPart>)
+__instantiate(CharMapColumn<ELObjPart>)
+__instantiate(CharMapResource<ELObjPart>)
+__instantiate(Ptr<CharMapResource<ELObjPart> >)
+__instantiate(ConstPtr<CharMapResource<ELObjPart> >)
+__instantiate(`HashTable<StringC,CharProp>')
+__instantiate(`HashTableItem<StringC,CharProp>')
+__instantiate(`HashTableIter<StringC,CharProp>')
+ 
 
 #ifdef SP_NAMESPACE
 }

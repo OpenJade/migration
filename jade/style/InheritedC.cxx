@@ -120,7 +120,7 @@ ELObj *PublicIdInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) 
 {
   Interpreter &interp = *vm.interp;
   if (pubid_)
-    return interp.makeSymbol(interp.makeStringC(pubid_));
+    return new (interp) StringObj(interp.makeStringC(pubid_));
   else
     return interp.makeFalse();
 }
@@ -748,6 +748,74 @@ GenericLengthSpecInheritedC::make(ELObj *obj, const Location &loc,
   return copy;
 }
 
+class GenericOptInlineSpaceInheritedC : public InheritedC {
+public:
+  typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptInlineSpace &);
+  GenericOptInlineSpaceInheritedC(const Identifier *, unsigned index, Setter);
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&value, Vector<size_t> &dependencies) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+private:
+  FOTBuilder::OptInlineSpace value_;
+  Setter setter_;
+};
+
+GenericOptInlineSpaceInheritedC
+::GenericOptInlineSpaceInheritedC(const Identifier *ident, unsigned index,
+                                  Setter setter)
+: InheritedC(ident, index), setter_(setter)
+{
+}
+
+ELObj *GenericOptInlineSpaceInheritedC::value(VM &vm, const VarStyleObj *,
+                                              Vector<size_t> &) const
+{
+  if (!value_.hasSpace)
+    return vm.interp->makeFalse();
+  else
+    return new (*vm.interp) InlineSpaceObj(value_.space);
+}
+
+
+void GenericOptInlineSpaceInheritedC::set(VM &, const VarStyleObj *,
+                                          FOTBuilder &fotb,
+                                          ELObj *&,
+                                          Vector<size_t> &) const
+{
+  (fotb.*setter_)(value_);
+}
+
+ConstPtr<InheritedC>
+GenericOptInlineSpaceInheritedC::make(ELObj *obj, const Location &loc,
+                                      Interpreter &interp) const
+{
+  GenericOptInlineSpaceInheritedC *copy
+    = new GenericOptInlineSpaceInheritedC(identifier(), index(), setter_);
+  InlineSpaceObj *iso = obj->asInlineSpace();
+  if (iso) {
+    copy->value_.space = iso->inlineSpace();
+    copy->value_.hasSpace = 1;
+  }
+  else {
+    FOTBuilder::OptLengthSpec res;
+    if (interp.convertOptLengthSpecC(obj, identifier(), loc, res))  {
+      if (res.hasLength) {
+        copy->value_.space.nominal = res.length;
+        copy->value_.space.min     = res.length; 
+        copy->value_.space.max     = res.length; 
+        copy->value_.hasSpace = 1;
+      } else 
+        copy->value_.hasSpace = 0;
+    } else {
+      delete copy;
+      copy = 0;
+    }
+  } 
+  return copy;
+}
+
+
 class GenericOptLengthSpecInheritedC : public OptLengthSpecInheritedC {
 public:
   typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptLengthSpec &);
@@ -1162,6 +1230,8 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
     return interp.makeError();
   }
   ELObj *obj = ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  const Char *s;
+  size_t n;
   interp.makeReadOnly(obj);
   return obj;
 }
@@ -1416,7 +1486,42 @@ void Interpreter::installInheritedCs()
   INHERITED_C("glyph-subst-table", GlyphSubstTableC, 0);
 
   // #f or inline-space
-  IGNORED_C("inline-space-space", makeFalse());
+  INHERITED_C("inline-space-space", GenericOptInlineSpaceInheritedC, &FOTBuilder::setInlineSpaceSpace);
+
+  //page-sequence IC 
+  INHERITED_C("page-category", GenericSymbolInheritedC, &FOTBuilder::setPageCategory);
+  INHERITED_C("force-last-page", GenericSymbolInheritedC, &FOTBuilder::setForceLastPage);
+  INHERITED_C("force-first-page", GenericSymbolInheritedC, &FOTBuilder::setForceFirstPage);
+  INHERITED_C("first-page-type", GenericSymbolInheritedC, &FOTBuilder::setFirstPageType);
+  INHERITED_C2("justify-spread?", GenericBoolInheritedC, &FOTBuilder::setJustifySpread, 0);
+  INHERITED_C("binding-edge", GenericSymbolInheritedC, &FOTBuilder::setBindingEdge);
+
+  //anchor IC 
+  INHERITED_C2("anchor-keep-with-previous?", GenericBoolInheritedC, &FOTBuilder::setAnchorKeepWithPrevious, 0);
+  
+  //included-container-area IC
+  INHERITED_C("contents-alignment", GenericSymbolInheritedC, &FOTBuilder::setContentsAlignment);
+  INHERITED_C("overflow-action", GenericSymbolInheritedC, &FOTBuilder::setOverflowAction);
+
+  //glyph-annotation IC
+  INHERITED_C("annotation-glyph-placement", GenericSymbolInheritedC, &FOTBuilder::setAnnotationGlyphPlacement);
+  INHERITED_C("annotation-glyph-style", GenericPublicIdInheritedC, &FOTBuilder::setAnnotationGlyphStyle);
+
+  //multi-line-inline-note IC
+  INHERITED_C2("inline-note-line-count", GenericIntegerInheritedC, &FOTBuilder::setInlineNoteLineCount, 2);
+  INHERITED_C("inline-note-style", GenericPublicIdInheritedC, &FOTBuilder::setInlineNoteStyle);
+
+  //emphasizing-mark IC
+  INHERITED_C("mark-distribution", GenericSymbolInheritedC, &FOTBuilder::setMarkDistribution);
+  INHERITED_C("mark-style", GenericPublicIdInheritedC, &FOTBuilder::setMarkStyle);
+
+  //side-by-side IC
+  INHERITED_C("side-by-side-overlap-control", GenericSymbolInheritedC, &FOTBuilder::setSideBySideOverlapControl);
+  
+  //side-by-side-item IC
+  INHERITED_C("side-by-side-pre-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePreAlign);
+  INHERITED_C("side-by-side-post-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePostAlign);
+ 
   // integers
   // float
   IGNORED_C("line-miter-limit", makeInteger(10));

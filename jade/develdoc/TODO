@@ -13,6 +13,9 @@ Things which are missing and need a lot of work
 
 * Support i18n on win32.
 
+* SGML backend: Change the document-type FO to be non-atomic, to allow an
+  internal DTD subset. ADD FOs for DTD declarations.
+
 * query: leads to current-node not being an element node.
 
 * char-script-case: this should be handled by the backends.

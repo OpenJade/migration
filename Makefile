@@ -124,7 +124,11 @@ $(PROGDIRS): FORCE
 
 $(PROGDIRS): $(SP_LIBDIRS)
 
-$(JADE_PROGDIRS): $(JADE_LIBDIRS)
+jade: grove spgrove style lib
+
+spgrove: grove lib
+
+style: grove spgrove lib
 
 # GNU tar
 TAR=tar

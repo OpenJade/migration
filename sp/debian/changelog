@@ -5,8 +5,10 @@ opensp (1.5pre4-1) unstable; urgency=low
   * debian/libosp-dev.README: added
   * acconfig.h: patch for HAVE_BOOL problem
   * README: updates, some URLs
+  * Makefile.am, */Makefile.am: 'maintainer-clean' is cleaner; this helps
+    the debian/rules clean target quite a bit
 
- -- Adam Di Carlo <aph@debian.org>  Fri,  5 May 2000 18:49:07 -0400
+ -- Adam Di Carlo <aph@debian.org>  Fri,  5 May 2000 19:21:08 -0400
 
 opensp (1.4-1) unstable; urgency=low
 

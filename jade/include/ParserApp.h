@@ -38,7 +38,6 @@ protected:
   unsigned errorLimit_;
   Vector<StringC> arcNames_;
   Vector<const AppChar *> activeLinkTypes_;
-  Vector<const AppChar *> activeDocTypes_;
 };
 
 inline

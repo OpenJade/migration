@@ -420,13 +420,20 @@ void ParserState::startInstance()
   currentMode_ = econMode;
 
   currentDtd_.clear();
-  if (activeDocTypes_.size() > 0) {
-    // FIXME use mutable
-    ParserState *state = (ParserState *)this;
-    for (size_t i = 0; i < activeDocTypes_[0].size(); i++)
-      syntax().generalSubstTable()->subst(state->activeDocTypes_[0][i]);
-    currentDtd_ = lookupDtd(activeDocTypes_[0]);
-  }    
+  for (size_t i = 0; i < dtd_.size(); i++) {
+    if (shouldActivateLink(dtd_[i]->name())) {
+      if (nActiveLink() > 0) {
+	message(ParserMessages::activeDocLink);
+	break;
+      }
+      else if (!currentDtd_.isNull()) {
+	message(ParserMessages::sorryActiveDoctypes);
+	break;
+      }
+      else 
+	currentDtd_ = dtd_[i];
+    }  
+  }  
   if (currentDtd_.isNull())
     currentDtd_ = dtd_[0];
   currentDtdConst_ = currentDtd_;
@@ -725,22 +732,10 @@ ParserState::allocAttributeList(const ConstPtr<AttributeDefinitionList> &def,
 
 void ParserState::activateLinkType(const StringC &name)
 {
-  if (activeDocTypes_.size() > 0) 
-    message(ParserMessages::activeDocLink);
-  else if (!hadPass2Start_ && !pass2_)
+  if (!hadPass2Start_ && !pass2_)
     activeLinkTypes_.push_back(name);
   else
     message(ParserMessages::linkActivateTooLate);
-}
-
-void ParserState::activateDocType(const StringC &name)
-{
-  if (activeLinkTypes_.size() > 0) 
-    message(ParserMessages::activeDocLink);
-  else if (activeDocTypes_.size() > 0)
-    message(ParserMessages::sorryActiveDoctypes);
-  else
-    activeDocTypes_.push_back(name);
 }
 
 Boolean ParserState::shouldActivateLink(const StringC &name) const

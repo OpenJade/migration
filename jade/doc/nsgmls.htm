@@ -22,7 +22,7 @@ Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language</h4>
 SYNOPSIS</h2>
 <tt>nsgmls</tt> [
 <tt>-BCdeglprsuv</tt> ] [
-<tt>-a<i>linktype</i></tt>
+<tt>-a<i>type</i></tt>
 ] [ -x<i>doctype</i> ] [
 <tt>-b<i>bctf</i></tt> ] [
 <tt>-c<i>sysid</i></tt>
@@ -60,26 +60,15 @@ OPTIONS</h2>
 The following options are available:
 <dl>
 <dt>
-<tt>-a<i>linktype</i></tt></dt>
+<tt>-a<i>type</i></tt></dt>
 
 <dd>
-Make link type
-<i><tt>linktype</tt></i> active. Not all ESIS information
-is output in this case: the active LPDs are not explicitly reported, although
-each link attribute is qualified with its link type name; there is no information
+Make link type or doctype <i><tt>type</tt></i> active. Not all ESIS
+information is output in this case: the active LPDs are not explicitly
+reported, although each link attribute is qualified with its link type name; there is no information
 about result elements; when there are multiple link rules applicable to
-the current element, nsgmls always chooses the first.</dd>
-
-<dt>
-<tt>-x<i>doctype</i></tt></dt>
-
-<dd>
-Make doctype
-<i><tt>doctype</tt></i> active.&nbsp; Currently you cannot
-make more than</dd>
-
-<dd>
-one doctype active.</dd>
+the current element, nsgmls always chooses the first. You cannot mix
+active link types and doctypes. Only one active doctype can be specified.</dd>
 
 <dt>
 <tt>-b<i>bctf</i></tt></dt>

@@ -23,7 +23,7 @@
 #endif
 #undef SP_DEFINE_TEMPLATES
 
-#include <OpenSP/Insn.h>
+#include "Insn.h"
 #include "Expression.h"
 #include "Interpreter.h"
 #include "ELObj.h"

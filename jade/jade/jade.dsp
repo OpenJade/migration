@@ -108,7 +108,7 @@ InputName=HtmlFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -122,7 +122,7 @@ InputName=HtmlFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -213,7 +213,7 @@ InputName=MifFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -227,7 +227,7 @@ InputName=MifFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -283,7 +283,7 @@ InputName=RtfFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -297,7 +297,7 @@ InputName=RtfFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -361,7 +361,7 @@ InputName=TeXFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -375,7 +375,7 @@ InputName=TeXFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -431,7 +431,7 @@ InputName=TransformFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -445,7 +445,7 @@ InputName=TransformFOTBuilder_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	m4 ..\lib\instmac.m4 $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

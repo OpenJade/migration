@@ -82,9 +82,6 @@ __instantiate(String<EquivCode>)
 #endif
 __instantiate(String<SyntaxChar>)
 __instantiate(XcharMap<PackedBoolean>)
-#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 
-__instantiate(XcharMap<unsigned char>)
-#endif
 __instantiate(XcharMap<EquivCode>)
 __instantiate(Vector<char>)
 #if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95 

@@ -1,10 +1,12 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modificado por Cristian Tornador 09-2003
 
 #ifndef Interpreter_INCLUDED
 #define Interpreter_INCLUDED 1
 
 #include "ELObj.h"
+#include "PageModelObj.h"
 #include "Expression.h"
 #include "Message.h"
 #include "PointerTable.h"
@@ -334,6 +336,9 @@ public:
   SymbolObj *makeSymbol(const StringC &);
   KeywordObj *makeKeyword(const StringC &);
   IntegerObj *makeInteger(long n);
+  //para PageModelObj  
+  PageModelObj *makePageModel(const FOTBuilder::StModel &);
+  PageModelObj *makePageModel(const FOTBuilder::StModel &, const StringC &);
   ErrorObj *makeError();
   UnspecifiedObj *makeUnspecified();
   PairObj *makePair(ELObj *, ELObj *);
@@ -343,6 +348,12 @@ public:
   CharObj *makeChar(Char);
   ELObj *makeLengthSpec(const FOTBuilder::LengthSpec &);
   AddressObj *makeAddressNone();
+
+  //para PageModel
+  PageModelObj *makePageModelNone();
+  void sendPageModel(PageModelObj *);
+  PageModelObj* getSendPageModel();
+  
   NodeListObj *makeEmptyNodeList();
   void dispatchMessage(Message &);
   void dispatchMessage(const Message &);
@@ -384,6 +395,10 @@ public:
   bool convertEnumC(const FOTBuilder::Symbol *, size_t,
                     ELObj *, const Identifier *, const Location &, FOTBuilder::Symbol &);
   bool convertEnumC(ELObj *, const Identifier *, const Location &, FOTBuilder::Symbol &);
+
+  //para PageModel -> Generic IC
+  bool convertPageModelC(ELObj *, const Identifier *, const Location &, FOTBuilder::StModel &);
+
   void invalidCharacteristicValue(const Identifier *ident, const Location &loc);
   bool convertLengthSpec(ELObj *, FOTBuilder::LengthSpec &);
   bool convertToPattern(ELObj *, const Location &, Pattern &);
@@ -463,7 +478,8 @@ private:
   enum {
     convertAllowBoolean = 01,
     convertAllowSymbol = 02,
-    convertAllowNumber = 04
+    convertAllowNumber = 04,
+    convertAllowPageModel = 06
   };
   ELObj *convertFromString(ELObj *, unsigned hints, const Location &);
   ELObj *convertNumberFloat(const StringC &);
@@ -519,6 +535,10 @@ private:
   StringSet publicIds_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
+  //Para PageModel
+  PageModelObj *pageModelNoneObj_;
+  PairObj *pageModelsSends_; 
+
   NodeListObj *emptyNodeListObj_;
   HashTable<StringC,int> nodePropertyTable_;
   bool debugMode_;
@@ -580,6 +600,19 @@ IntegerObj *Interpreter::makeInteger(long n)
   return new (*this) IntegerObj(n);
 }
 
+//creando un PageModelObj
+inline
+PageModelObj *Interpreter::makePageModel(const FOTBuilder::StModel &stpm)
+{
+  return new (*this) PageModelObj(stpm);
+}
+
+inline
+PageModelObj *Interpreter::makePageModel(const FOTBuilder::StModel &stpm, const StringC& str)
+{
+  return new (*this) PageModelObj(stpm,str);
+}
+
 inline
 PairObj *Interpreter::makePair(ELObj *car, ELObj *cdr)
 {
@@ -597,6 +630,14 @@ AddressObj *Interpreter::makeAddressNone()
 {
   return addressNoneObj_;
 }
+
+//para PageModel
+inline
+PageModelObj *Interpreter::makePageModelNone()
+{
+  return pageModelNoneObj_;
+}
+
 
 inline
 NodeListObj *Interpreter::makeEmptyNodeList()

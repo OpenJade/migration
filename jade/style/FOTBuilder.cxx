@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif: Cristian Tornador (Barcelona) PFC-UPC 22-10-2002
 
 #include "stylelib.h"
 #include "FOTBuilder.h"
@@ -863,6 +864,23 @@ void FOTBuilder::setBindingEdge(Symbol)
 {
 }
 
+//stpm viene dado por el GenericPageModelInheritedC
+void FOTBuilder::setInitialPageModel(const StModel& stpm)
+{
+}
+
+void FOTBuilder::setRepeatPageModels(const StModel& stpm)
+{
+}
+
+void FOTBuilder::setBlankBackPageModel(const StModel& stpm)
+{
+}
+
+void FOTBuilder::setBlankFrontPageModel(const StModel& stpm)
+{
+}
+
 //For anchor
 void FOTBuilder::setAnchorKeepWithPrevious(bool)
 {
@@ -1357,6 +1375,44 @@ void FOTBuilder::extensionSet(void (FOTBuilder::*func)(long), long arg)
   (this->*func)(arg);
 }
 
+//para PageModel
+void FOTBuilder::StModel::operator=(const FOTBuilder::StModel& stpm)
+{
+ stwidth_ = stpm.stwidth_;
+ stheight_ = stpm.stheight_;
+}
+
+/*FOTBuilder::ListaStModel::ListaStModel(const FOTBuilder::ListaStModel &vstpm){
+ FOTBuilder::ListaStModel *last = &vstpm;
+ FOTBuilder::ListaStModel *mylast = this;
+ mylast->segstpm_ = 0;
+ while (last->segstpm_){
+    last = last->segstpm_;
+     mylast->segstpm_ = new FOTBuilder::ListaStModel(last->datastpm_);
+ }
+}
+*/
+
+//para PageModel
+void FOTBuilder::ListaStModel::pushStpm(const FOTBuilder::StModel& stpm)
+{
+   FOTBuilder::ListaStModel *last = this;
+   if (!last) {
+	   segstpm_ = new FOTBuilder::ListaStModel(stpm); 
+   }
+  else{
+   while (last->segstpm_)
+	  last = last->segstpm_;
+   //creo el nuevo nodo, el constructor se encarga de asignar y puntero a nulo
+   last->segstpm_ = new FOTBuilder::ListaStModel(stpm);
+  }
+}
+
+//de momento extrae el primero!
+const FOTBuilder::StModel& FOTBuilder::ListaStModel::popStpm()
+{
+  return this->segstpm_->datastpm_;
+}
 
 FOTBuilder::DisplayNIC::DisplayNIC()
 : positionPreference(symbolFalse),
@@ -1820,6 +1876,31 @@ STRING_ARG_CALL(formattingInstruction)
 INLINE_SPACE_ARG_CALL(setEscapementSpaceBefore)
 INLINE_SPACE_ARG_CALL(setEscapementSpaceAfter)
 
+//Para PageModel
+/*void SaveFOTBuilder::setInitialPageModel(const Vector<ConstPtr<FOTBuilder::StModel> > &stpm)
+{
+  *tail_ = new SetInitialPageModelArgCall(stpm);
+  tail_ = &(*tail_)->next;
+}
+
+void SaveFOTBuilder::setRepeatPageModels(const Vector<ConstPtr<FOTBuilder::StModel> > &stpm)
+{
+  *tail_ = new SetRepeatPageModelsArgCall(stpm);
+  tail_ = &(*tail_)->next;
+}
+*/
+//Para PageModel
+#define PAGE_MODEL_ARG_CALL(F) \
+  void SaveFOTBuilder::F(const FOTBuilder::StModel& stpm) { \
+    *tail_ = new PageModelArgCall(&FOTBuilder::F, stpm); \
+     tail_ = &(*tail_)->next; }
+
+PAGE_MODEL_ARG_CALL(setInitialPageModel)
+PAGE_MODEL_ARG_CALL(setRepeatPageModels)
+PAGE_MODEL_ARG_CALL(setBlankBackPageModel)
+PAGE_MODEL_ARG_CALL(setBlankFrontPageModel)
+
+
 SaveFOTBuilder::Call::~Call()
 {
 }
@@ -1830,6 +1911,23 @@ void SaveFOTBuilder::NoArgCall::emit(FOTBuilder &fotb)
 }
 
 void SaveFOTBuilder::LongArgCall::emit(FOTBuilder &fotb)
+{
+  (fotb.*func)(arg);
+}
+
+//Para PageModel
+/*void SaveFOTBuilder::SetInitialPageModelArgCall::emit(FOTBuilder &fotb)
+{
+  fotb.setInitialPageModel(arg);
+}
+
+void SaveFOTBuilder::SetRepeatPageModelsArgCall::emit(FOTBuilder &fotb)
+{
+  fotb.setRepeatPageModels(arg);
+}
+*/
+//Para PageModel
+void SaveFOTBuilder::PageModelArgCall::emit(FOTBuilder &fotb)
 {
   (fotb.*func)(arg);
 }

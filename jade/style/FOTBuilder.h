@@ -45,6 +45,29 @@ class SaveFOTBuilder;
 
 class STYLE_API FOTBuilder {
 public:
+  //para PageModel, GenericPageModelIc 
+  struct StModel{
+    StModel(const FOTBuilder::StModel& stpm) : stwidth_(stpm.stwidth_), stheight_(stpm.stheight_) { }
+    StModel(long w, long h) : stwidth_(w), stheight_(h) { }
+    StModel() : stwidth_(0), stheight_(0) { }
+    void operator=(const FOTBuilder::StModel &);
+    long stwidth_;
+    long stheight_;
+  };
+
+  //para PageModel, ExtensionPageModelIc 
+  struct ListaStModel{
+    ListaStModel() : datastpm_() {}
+    ListaStModel(const FOTBuilder::StModel& stpm) : datastpm_(stpm) {}
+    //necesario para pasar por parametro por copia 
+//    ListaStModel(const FOTBuilder::ListaStModel &);
+    //añadimos uno mas al final
+    void pushStpm(const FOTBuilder::StModel& stpm);
+    const FOTBuilder::StModel& popStpm();
+    FOTBuilder::ListaStModel *segstpm_;
+    const FOTBuilder::StModel datastpm_;
+  };
+
   enum Symbol {
     symbolFalse,
     symbolTrue,
@@ -180,6 +203,8 @@ public:
     // public identifier of the glyph id.
     unsigned long suffix;
   };
+
+	
   struct GlyphSubstTable : public Resource {
     unsigned uniqueId;
     Vector<GlyphId> pairs;
@@ -195,6 +220,7 @@ public:
   typedef unsigned Letter2;
   typedef long Length;
 
+  
 
   struct LengthSpec {
     LengthSpec(long len = 0) : length(len), displaySizeFactor(0.0) { }
@@ -776,6 +802,10 @@ public:
   virtual void setFirstPageType(Symbol);
   virtual void setJustifySpread(bool);
   virtual void setBindingEdge(Symbol);
+  virtual void setInitialPageModel(const StModel &);
+  virtual void setRepeatPageModels(const StModel &);
+  virtual void setBlankBackPageModel(const StModel &);
+  virtual void setBlankFrontPageModel(const StModel &);
   //For anchor
   virtual void setAnchorKeepWithPrevious(bool);
   //For included-container-area 
@@ -1126,6 +1156,10 @@ public:
   void setFirstPageType(Symbol);
   void setJustifySpread(bool);
   void setBindingEdge(Symbol);
+  void setInitialPageModel(const FOTBuilder::StModel &);
+  void setRepeatPageModels(const FOTBuilder::StModel &);
+  void setBlankBackPageModel(const FOTBuilder::StModel &);
+  void setBlankFrontPageModel(const FOTBuilder::StModel &);
   //For anchor
   void setAnchorKeepWithPrevious(bool);
   //For included-container-area 
@@ -1213,7 +1247,25 @@ private:
     FuncPtr func;
     StringC arg;
   };
-  struct ExtensionStringArgCall : Call {
+  //para PageModel
+  struct PageModelArgCall : Call {
+    typedef void (FOTBuilder::*FuncPtr)(const FOTBuilder::StModel& stpm);
+    PageModelArgCall(FuncPtr f, const FOTBuilder::StModel &stpm) : func(f), arg(stpm){ }
+    void emit(FOTBuilder &);
+    FuncPtr func;
+    StModel arg;
+  };
+/*  struct SetInitialPageModelArgCall : Call {
+    SetInitialPageModelArgCall(const Vector<ConstPtr<StModel> > &stpm) : arg(stpm){ }
+    void emit(FOTBuilder &);
+    Vector<ConstPtr<StModel> > arg;
+  };
+  struct SetRepeatPageModelsArgCall : Call {
+    SetRepeatPageModelsArgCall(const Vector<ConstPtr<StModel> > &stpm) : arg(stpm){ }
+    void emit(FOTBuilder &);
+    Vector<ConstPtr<StModel> > arg;
+  };
+*/  struct ExtensionStringArgCall : Call {
     typedef void (FOTBuilder::*FuncPtr)(const StringC &);
     ExtensionStringArgCall(FuncPtr f, const StringC &s) : func(f), arg(s) { }
     void emit(FOTBuilder &);

@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modificado Cristian Tornador Antolin 07-2003
 
 #ifndef ELObj_INCLUDED
 #define ELObj_INCLUDED 1
@@ -19,14 +20,15 @@ namespace DSSSL_NAMESPACE {
 
 class Interpreter;
 class EvalContext;
-
+class StringObj;
+class IntegerObj;
+class PageModelObj;
 class Unit;
 class PairObj;
 class FunctionObj;
 class SymbolObj;
 class KeywordObj;
 class BoxObj;
-class StringObj;
 class SosofoObj;
 class AppendSosofoObj;
 class ColorObj;
@@ -65,6 +67,13 @@ public:
   virtual KeywordObj *asKeyword();
   virtual FunctionObj *asFunction();
   virtual SosofoObj *asSosofo();
+
+  //para PageModelObj
+  virtual PageModelObj *asPageModel();
+  virtual bool pageModelData(FOTBuilder::StModel &);
+
+  virtual IntegerObj *asInteger();
+  virtual StringObj *asString();
   virtual AppendSosofoObj *asAppendSosofo();
   virtual ColorObj *asColor();
   virtual ColorSpaceObj *asColorSpace();
@@ -245,6 +254,8 @@ public:
   StringObj *convertToString();
   bool stringData(const Char *&, size_t &);
   bool isEqual(ELObj &);
+  //nuevos metodo
+  StringObj* asString();
 };
 
 class IntegerObj : public ELObj {
@@ -255,6 +266,11 @@ public:
   bool realValue(double &);
   QuantityType quantityValue(long &, double &, int &);
   bool isEqual(ELObj &);
+  //nuevos metodo
+  IntegerObj* asInteger();
+
+  long devuelve() { return n_; }
+
 private:
   friend class Interpreter;
   IntegerObj();

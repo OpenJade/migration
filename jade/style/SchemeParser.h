@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif: Cristian Tornador Antolin (Barcelona)
 
 #ifndef SchemeParser_INCLUDED
 #define SchemeParser_INCLUDED 1
@@ -63,6 +64,8 @@ private:
     tokenChar,
     tokenNumber,
     tokenGlyphId,
+    //para lista PageModel 
+    tokenDefine,
     tokenOpenParen,
     tokenCloseParen,
     tokenPeriod,
@@ -79,6 +82,12 @@ private:
   };
   bool doDefine();
   bool doDefineUnit();
+
+  //para PageModel
+  bool doDefinePageModel();
+  bool doWidth();
+  bool doHeight();
+
   bool doElement();
   bool doOrElement();
   bool doDefault();
@@ -166,6 +175,7 @@ private:
   const char *afiiPublicId_;
   bool dsssl2_;
   LangObj *lang_;
+  PageModelObj *pagemodelObj_;
 };
 
 inline

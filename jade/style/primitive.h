@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif Cristian Tornador Antolin 07-2003
 
 PRIMITIVE(Cons, "cons", 2, 0, 0)
 PRIMITIVE(List, "list", 0, 0, 1)
@@ -67,6 +68,8 @@ PRIMITIVE(EmptySosofo, "empty-sosofo", 0, 0, 0)
 PRIMITIVE(SosofoLabel, "sosofo-label", 2, 0, 0)
 PRIMITIVE(SosofoDiscardLabeled, "sosofo-discard-labeled", 2, 0, 0)
 PRIMITIVE(IsSosofo, "sosofo?", 1, 0, 0)
+//para PageModelObj
+PRIMITIVE(IsPageModel, "page-model?", 1, 0, 0)
 PRIMITIVE(IsStyle, "style?", 1, 0, 0)
 PRIMITIVE(MergeStyle, "merge-style", 0, 0, 1)
 PRIMITIVE(ProcessElementWithId, "process-element-with-id", 1, 0, 0)

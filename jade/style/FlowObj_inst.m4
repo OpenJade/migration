@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modif: Cristian Tornador (Barcelona) PFC-UPC 22-10-2002
 
 #include "stylelib.h"
 

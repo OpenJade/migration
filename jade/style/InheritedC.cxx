@@ -1,5 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
+//modificado Cristian Tornador Antolin 9-2003
 
 #include "stylelib.h"
 #include "Style.h"
@@ -64,6 +65,25 @@ IntegerInheritedC::IntegerInheritedC(const Identifier *ident, unsigned index, lo
 ELObj *IntegerInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) const
 {
   return vm.interp->makeInteger(n_);
+}
+
+//para InheritedC de PageModelObj
+class PageModelInheritedC : public InheritedC {
+public:
+  PageModelInheritedC(const Identifier *, unsigned index, const FOTBuilder::StModel &);
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+protected:
+  FOTBuilder::StModel value_;
+};
+
+PageModelInheritedC::PageModelInheritedC(const Identifier *ident, unsigned index, const FOTBuilder::StModel& stpm)
+: InheritedC(ident, index), value_(stpm)
+{
+}
+
+ELObj *PageModelInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) const
+{
+  return vm.interp->makePageModel(value_);
 }
 
 class LengthInheritedC : public InheritedC {
@@ -555,9 +575,10 @@ ConstPtr<InheritedC>
 GenericIntegerInheritedC::make(ELObj *obj, const Location &loc,
 			      Interpreter &interp) const
 {
-  long n;
-  if (interp.convertIntegerC(obj, identifier(), loc, n))
+  long n = 0;
+  if (interp.convertIntegerC(obj, identifier(), loc, n)){
     return new GenericIntegerInheritedC(identifier(), index(), setter_, n);
+  }
   return ConstPtr<InheritedC>();
 }
 
@@ -595,6 +616,133 @@ GenericMaybeIntegerInheritedC::make(ELObj *obj, const Location &loc,
 					     setter_, n);
   return ConstPtr<InheritedC>();
 }
+
+// para PageModel
+class GenericPageModelInheritedC : public PageModelInheritedC {
+public:
+  typedef void (FOTBuilder::*Setter)(const FOTBuilder::StModel &);
+  GenericPageModelInheritedC(const Identifier *, unsigned index, Setter, const FOTBuilder::StModel &);
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&value, Vector<size_t> &dependencies) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+protected:
+  Setter setter_;
+};
+
+GenericPageModelInheritedC
+::GenericPageModelInheritedC(const Identifier *ident, unsigned index,
+                          Setter setter, const FOTBuilder::StModel& stpm)
+: PageModelInheritedC(ident, index, stpm), setter_(setter)
+{
+}
+
+
+//envia el valor de StModel al FOTBuilder
+void GenericPageModelInheritedC::set(VM &, const VarStyleObj *,
+                                  FOTBuilder &fotb,
+                                  ELObj *&,
+                                  Vector<size_t> &) const
+{
+  (fotb.*setter_)(value_);
+}
+
+//obtiene el valor de la hoja de estilo y lo guarda en la estructura stpm
+//despues creara un nuevo GenericPageModel con esa estructra para enviarsela al FOTBuilder
+ConstPtr<InheritedC>
+GenericPageModelInheritedC::make(ELObj *obj, const Location &loc,
+                              Interpreter &interp) const
+{
+//da igual el valor stpm,cogera el que tenga obj (ELObj)
+//estructura para crear el nuevo GenericPageModel, aqui se guardaran los valores de la hoja de estilo
+  FOTBuilder::StModel stpm(0,0);
+  //guardas los valores en stpm
+  if (interp.convertPageModelC(obj, identifier(), loc, stpm)){
+    //creas el nuevo GenericPageModel con la stpm obtenida, que es la que se pedira para FOTBuilder
+    return new GenericPageModelInheritedC(identifier(), index(), setter_, stpm);
+  }
+  return ConstPtr<InheritedC>();
+}
+
+// para PageModel, lista!
+class ExtensionPageModelInheritedC : public InheritedC{
+public:
+  typedef void (FOTBuilder::*Setter)(const FOTBuilder::StModel &);
+//  ExtensionPageModelInheritedC(const Identifier *, unsigned index, Setter);
+  ExtensionPageModelInheritedC(const Identifier *, unsigned index, Setter, const FOTBuilder::StModel &);
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&value, Vector<size_t> &dependencies) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+protected:
+  Setter setter_;
+  FOTBuilder::StModel lista_;
+};
+
+/*ExtensionPageModelInheritedC
+::ExtensionPageModelInheritedC(const Identifier *ident, unsigned index,
+                          Setter setter)
+: InheritedC(ident, index), setter_(setter)
+{
+}
+*/
+
+ExtensionPageModelInheritedC
+::ExtensionPageModelInheritedC(const Identifier *ident, unsigned index,
+                          Setter setter, const FOTBuilder::StModel& vstpm)
+: InheritedC(ident, index), setter_(setter), lista_(vstpm) 
+{
+}
+
+//envia el valor de StModel al FOTBuilder
+void ExtensionPageModelInheritedC::set(VM &, const VarStyleObj *,
+                                  FOTBuilder &fotb,
+                                  ELObj *&,
+                                  Vector<size_t> &) const
+{
+   (fotb.*setter_)(lista_);
+}
+
+//recoge la informacion de la hoja de estilo y lo va añadiendo a la lista
+//esta lista despues mediante la funcion value se le pasara al FOTBuilder
+ConstPtr<InheritedC>
+ExtensionPageModelInheritedC::make(ELObj *obj, const Location &loc,
+                              Interpreter &interp) const
+{
+  FOTBuilder::StModel stpm(0,0);
+  bool invalid = false;
+  ConstPtr<InheritedC> tem;
+  FOTBuilder::StModel *tmpvector;
+  
+  //crea el ExtensionPageModel encargado de pasar la info al FOTBuilder!
+  for (;;) {
+      if (obj->isNil()){
+        return  new ExtensionPageModelInheritedC(identifier(), index(), setter_, *tmpvector);
+      }
+      PairObj *pair = obj->asPair();
+      if (!pair)
+        break;
+      //obj tendra puntero al siguiente objeto ELObj
+      obj = pair->cdr();
+      //(actual) obtienes un ELObj de tipo PageModelObj
+      ELObj *pmobj = pair->car();
+      //obtienes la structura StModel del PageModelObj que guarda la info
+      if (!interp.convertPageModelC(pmobj, identifier(), loc, stpm)){
+        invalid = "true";
+	break;
+      }
+      //va añadiendo las estructuras a la lista FALTA!
+      tmpvector = &stpm;
+  }
+  if (!invalid) invalidValue(loc, interp);
+  return ConstPtr<InheritedC>();
+}
+
+//prepara la lista de nodos de StModels y se lo pasa al FOTBuilder???
+ELObj *ExtensionPageModelInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) const
+{
+  return vm.interp->makePageModel(lista_);
+}
+
 
 class GenericSymbolInheritedC : public SymbolInheritedC {
 public:
@@ -1238,6 +1386,15 @@ ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interp
 
 #define INHERITED_C(name, C, init) \
     installInheritedC(name, new C(0, nInheritedC_++, init))
+
+//para PageModel
+//init1 es set.... de FOTBuilder, creas un nuevo GenericPageModel donde init1 es el Setter
+//init2 es puntero a la instancia PageModelObj
+#define INHERITED_CPM2(name, C, init1, init2) \
+    installInheritedC(name, new C(0, nInheritedC_++, init1, init2))
+#define INHERITED_CPM3(name, C, init1, init2) \
+    installInheritedC(name, new C(0, nInheritedC_++, init2))
+
 #define INHERITED_C2(name, C, init1, init2) \
     installInheritedC(name, new C(0, nInheritedC_++, init1, init2))
 #define STORE_INHERITED_C2(var, name, C, init1, init2) \
@@ -1365,7 +1522,7 @@ void Interpreter::installInheritedCs()
   INHERITED_C2("ligature?", GenericBoolInheritedC, &FOTBuilder::setLigature, 0);
   INHERITED_C2("score-spaces?", GenericBoolInheritedC, &FOTBuilder::setScoreSpaces, 0);
   INHERITED_C2("float-out-sidelines?", GenericBoolInheritedC, &FOTBuilder::setFloatOutSidelines, 0);
-  INHERITED_C2("float-out-marginalia?", GenericBoolInheritedC, &FOTBuilder::setFloatOutMarginalia, 0);
+  INHERITED_C2("float-out-marginaLia?", GenericBoolInheritedC, &FOTBuilder::setFloatOutMarginalia, 0);
   INHERITED_C2("float-out-line-numbers?", GenericBoolInheritedC, &FOTBuilder::setFloatOutLineNumbers, 0);
   INHERITED_C2("cell-background?", GenericBoolInheritedC, &FOTBuilder::setCellBackground, 0);
   INHERITED_C2("span-weak?", GenericBoolInheritedC, &FOTBuilder::setSpanWeak, 0);
@@ -1495,6 +1652,13 @@ void Interpreter::installInheritedCs()
   INHERITED_C("first-page-type", GenericSymbolInheritedC, &FOTBuilder::setFirstPageType);
   INHERITED_C2("justify-spread?", GenericBoolInheritedC, &FOTBuilder::setJustifySpread, 0);
   INHERITED_C("binding-edge", GenericSymbolInheritedC, &FOTBuilder::setBindingEdge);
+  //estructura por defecto para GenericPageModelInhertiedC
+//  Vector<ConstPtr<FOTBuilder::StModel> > vstmodel_(0);
+  FOTBuilder::StModel stmodel_(0,0);  
+  INHERITED_CPM2("initial-page-model", ExtensionPageModelInheritedC, &FOTBuilder::setInitialPageModel, stmodel_);
+  INHERITED_CPM2("repeat-page-models", ExtensionPageModelInheritedC, &FOTBuilder::setRepeatPageModels, stmodel_);
+  INHERITED_CPM2("blank-back-page-model", GenericPageModelInheritedC, &FOTBuilder::setBlankBackPageModel, stmodel_);
+  INHERITED_CPM2("blank-front-page-model", GenericPageModelInheritedC, &FOTBuilder::setBlankFrontPageModel, stmodel_);
 
   //anchor IC 
   INHERITED_C2("anchor-keep-with-previous?", GenericBoolInheritedC, &FOTBuilder::setAnchorKeepWithPrevious, 0);

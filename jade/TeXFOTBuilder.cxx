@@ -560,6 +560,185 @@ public:
         stream << "\\end" << name() << "{}" << NodeInfoEpilog << "%\n" ;
       #endif
     }
+  void setPageNumberRestart(bool);
+  void setPageNumberFormat(const StringC &);
+  void setPageNColumns(long);
+  void setPageColumnSep(Length);
+  void setPageBalanceColumns(bool);
+  void setGridRowSep(Length);
+  void setGridColumnSep(Length);
+  void setSubscriptDepth(Length);
+  void setSuperscriptHeight(Length);
+  void setUnderMarkDepth(Length);
+  void setOverMarkHeight(Length);
+  void setHeadingLevel(long);
+
+  void setMinPreLineSpacing(const OptLengthSpec &);
+  void setMinPostLineSpacing(const OptLengthSpec &);
+  void setMinLeading(const OptLengthSpec &);
+  void setScriptPreAlign(Symbol);
+  void setScriptPostAlign(Symbol);
+  void setScriptMidSupAlign(Symbol);
+  void setScriptMidSubAlign(Symbol);
+  void setNumeratorAlign(Symbol);
+  void setDenominatorAlign(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowAlignment(Symbol);
+  void setGridEquidistantRows(bool);
+  void setGridEquidistantColumns(bool);
+  void setEscapementSpaceBefore(const InlineSpace &);
+  void setEscapementSpaceAfter(const InlineSpace &);
+  void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
+
+  void startDisplay( const DisplayNIC & );
+  void endDisplay();
+
+  enum FotObjectClassType { oc_Unknown, oc_Cell };
+ 
+  
+  struct Format {
+
+    Format() : FotCurDisplaySize( 0 ),
+               FotLineThickness( 1000 ),
+               FotLineCap( symbolButt ),
+               FotBorderPriority( 0 ),
+               FotBorderPresent( true ),
+               FotLineRepeat( 1 ),
+               FotLineSep( 1000 ),
+               FotDisplayAlignment( symbolStart ),
+               FotStartIndentSpec( 0 ),
+               FotEndIndentSpec( 0 ),
+               FotLeftMargin( 1 ),
+               FotRightMargin( 1 ),
+               FotPageWidth( 72000*8 ),
+               FotPageNColumns( 1 ),
+               FotPageColumnSep( 72000/2 ),
+               FotSpan( 1 ),
+               FotCellBeforeColumnMargin( 0 ),
+               FotCellAfterColumnMargin( 0 ),
+               FotObjectClass( oc_Unknown ) {}
+
+    long                 FotCurDisplaySize;
+    Length               FotLineThickness;
+    Symbol               FotLineCap;
+    long                 FotBorderPriority;
+    bool                 FotBorderPresent;
+    long                 FotLineRepeat;
+    Length               FotLineSep;
+    Symbol               FotDisplayAlignment;
+    LengthSpec           FotStartIndentSpec;
+    LengthSpec           FotEndIndentSpec;
+    Length               FotLeftMargin;
+    Length               FotRightMargin;
+    Length               FotPageWidth;
+    long                 FotPageNColumns;
+    Length               FotPageColumnSep;
+    long                 FotSpan;
+    Length               FotCellBeforeColumnMargin;
+    Length               FotCellAfterColumnMargin;
+    FotObjectClassType   FotObjectClass;
+
+    static const Length INITIAL_PAGE_SIZE() { return 72000*8; }
+  };
+
+  struct CompoundFotElement;
+  struct FotElement {
+
+    FotElement(  CompoundFotElement *parent = NULL )
+     : Parent( parent ), SiblingSeqIdx( -1 ) {}
+    String<char> Characteristics;
+
+    virtual void out( OutputByteStream &stream ) const
+     { outProlog( stream ); outContent( stream ); outEpilog( stream ); }
+    virtual void open( TeXFOTBuilder &builder );
+    virtual void close( TeXFOTBuilder &builder );
+    virtual bool isAtomic() const = 0;
+    virtual const char *name() const = 0;
+    CompoundFotElement *parent() const { return Parent; }
+    String<char> &nodeInfoEpilog() { return NodeInfoEpilog; }
+    void setParent( CompoundFotElement *parent ) { Parent = parent; }
+    virtual FotElement *lastClosed_() = 0;
+    virtual FotElement *currentlyOpen_() = 0;
+    void setSiblingSeqIdx( int idx ) { SiblingSeqIdx = idx; }
+    int siblingSeqIdx() const { assert( SiblingSeqIdx > -1 ); return SiblingSeqIdx; }
+
+   protected:
+    int SiblingSeqIdx;
+    CompoundFotElement* Parent;
+    String<char> NodeInfoProlog;
+    String<char> NodeInfoEpilog;
+
+    virtual void outContent( OutputByteStream & ) const {};
+    virtual void outProlog( OutputByteStream &stream ) const = 0;
+    virtual void outEpilog( OutputByteStream &stream ) const = 0;
+  };
+
+  struct FotElementState {
+    FotElementState() : EnforcingStructure( true ), IsOpen( false ) {}
+    bool enforcingStructure() { return IsOpen && EnforcingStructure; }
+
+    bool EnforcingStructure;
+    bool IsOpen;
+    String<char> CurNodeInfoProlog;
+  };
+  
+  struct AtomicFotElement : public FotElement {
+
+    AtomicFotElement( CompoundFotElement *parent = NULL ) : FotElement( parent ) {}
+    virtual bool isAtomic() const { return true; }
+    virtual FotElement *lastClosed_() { return NULL; };
+    virtual FotElement *currentlyOpen_() { return this; }
+   
+   protected:
+    virtual void outProlog( OutputByteStream &stream ) const
+     { stream << NodeInfoProlog << "\\insert" << name() << "%\n{" << Characteristics << '}'; }
+    virtual void outEpilog( OutputByteStream &stream ) const
+     { stream << '}' << NodeInfoEpilog; }
+  };
+
+  struct CompoundFotElement : public FotElement {
+
+    CompoundFotElement( CompoundFotElement *parent = NULL )
+     : FotElement( parent ), CurrentlyOpenChildIdx( -1 ), LastClosedChildIdx( -1 ) {}
+    virtual bool isAtomic() const { return false; }
+    virtual void open( TeXFOTBuilder &builder )
+      { FotElement::open( builder ); builder.setCurOs( &PreContent ); };
+    virtual void childJustClosed( FotElement &child )
+     { CurrentlyOpenChildIdx = -1; LastClosedChildIdx = child.siblingSeqIdx(); };
+    virtual void childJustOpened( FotElement &child )
+     { CurrentlyOpenChildIdx = child.siblingSeqIdx(); };
+    virtual FotElement &child( size_t idx ) = 0;
+    static FotElement *lastClosed( CompoundFotElement &treeRoot )
+     { return treeRoot.currentlyOpen( treeRoot )
+        ? treeRoot.currentlyOpen( treeRoot )->lastClosed_() : (FotElement*)NULL; }
+    static FotElement *currentlyOpen( CompoundFotElement &treeRoot ) {
+      return treeRoot.currentlyOpen_();
+    }
+    virtual FotElement *currentlyOpen_()
+     { return CurrentlyOpenChildIdx > -1
+        ? child( (size_t)CurrentlyOpenChildIdx ).currentlyOpen_() : this; }
+    virtual FotElement *lastClosed_() 
+     { return LastClosedChildIdx > -1
+        ? &child( (size_t)LastClosedChildIdx )
+        : ( parent() ? parent()->lastClosed_() : (FotElement*)NULL ); }
+    
+   protected:
+    virtual void outProlog( OutputByteStream &stream ) const {
+      #ifdef TEXDEBUG
+       stream <<  "\nELEMENT\n" << "\nPRO\n" << NodeInfoProlog << "\nEND_PRO\n" << "\\" << name() << "%\n{" << Characteristics << '}';
+      #else
+       stream <<  NodeInfoProlog << "\\" << name() << "%\n{" << Characteristics << '}';
+      #endif
+       PreContent.commit( stream );
+     }
+    virtual void outEpilog( OutputByteStream &stream ) const {
+      #ifdef TEXDEBUG
+        stream << "\\end" << name() << "{}" << "\nEPI\n" << NodeInfoEpilog << "\nEND_EPI\nEND_ELEMENT\n" ;
+      #else
+        stream << "\\end" << name() << "{}" << NodeInfoEpilog << "%\n" ;
+      #endif
+    }
 
     int CurrentlyOpenChildIdx;
     int LastClosedChildIdx;
@@ -884,27 +1063,35 @@ private:
   void dumpInherited();
 
   void message(const MessageType0 &);
+  static ParHead& top(Vector<ParHead>& s);
+  static ParHead* ptrTop(Vector<ParHead>& s);
+  static void pop(Vector<ParHead>& s);
+  static void push(Vector<ParHead>& s, ParHead p);
 };
 
 #ifdef OUTLINES
 // Stack Utilities
 
-TeXFOTBuilder::ParHead & top (Vector<TeXFOTBuilder::ParHead> &s) {
+TeXFOTBuilder::ParHead& 
+TeXFOTBuilder::top (Vector<TeXFOTBuilder::ParHead> &s) {
   //cerr << "top" <<s.back().level_<<'\n';
   return s.back();
 }
 
-TeXFOTBuilder::ParHead * ptrTop (Vector<TeXFOTBuilder::ParHead> &s) {
+TeXFOTBuilder::ParHead* 
+TeXFOTBuilder::ptrTop (Vector<TeXFOTBuilder::ParHead> &s) {
   //cerr << "top" <<s.back().level_<<'\n';
   return &(s.back());
 }
 
-void pop(Vector<TeXFOTBuilder::ParHead> &s){
+void 
+TeXFOTBuilder::pop(Vector<TeXFOTBuilder::ParHead> &s){
   //cerr << "popping" <<'\n';
   s.resize(s.size() - 1);
 }
     
-void push(Vector<TeXFOTBuilder::ParHead> &s,TeXFOTBuilder::ParHead p ){
+void 
+TeXFOTBuilder::push(Vector<TeXFOTBuilder::ParHead> &s,TeXFOTBuilder::ParHead p ){
   //cerr << "pushing" <<p.level_<<'\n';
   s.push_back(p);
 }

@@ -37,7 +37,7 @@
 #define SP_STAT_BLKSIZE
 #endif
 
-#ifdef __MACH__
+#if (defined __MACH__) && (! defined __GNU__)
 #define SP_MUTEX_MACH
 #endif
 

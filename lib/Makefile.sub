@@ -1,5 +1,6 @@
 LIB=sp
 INCLUDE=-I$(srcdir)/../generic
+DEPLIBS=-lm
 MSGGENFLAGS=-l
 COMMON_OBJS=Allocator.o Link.o IListBase.o TypeId.o assert.o
 ENTMGR_OBJS=CharsetInfo.o EntityCatalog.o EntityDecl.o EntityManager.o \

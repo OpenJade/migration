@@ -28,6 +28,7 @@ EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	@PACKAGE@-@VERSION@.spec
 
 dist-hook:
+	mv $(distdir)/include/config.h.old $(distdir)/config.h
 	if test -f $(top_srcdir)/update-changelog; then \
 	  cd $(top_srcdir); \
 	  ./update-changelog; \

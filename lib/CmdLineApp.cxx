@@ -461,7 +461,9 @@ Boolean CmdLineApp::getMessageText(const MessageFragment &frag,
   if (!MessageTable::instance()->getText(frag, str))
     return 0;
 #ifdef SP_WIDE_SYSTEM
-  text.assign((const Char *)str.data(), str.size());
+  text.resize(str.size());
+  for (size_t i = 0; i < str.size(); i++)
+    text[i] = Char(str[i]);
 #else
   str += 0;
   text = codingSystem()->convertIn(str.data());

@@ -1,8 +1,8 @@
-Source: openjade
+Source: opensp
 Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
-Standards-Version: 3.0.1
+Standards-Version: 3.1.1
 
 Package: opensp
 Architecture: any
@@ -34,3 +34,4 @@ Description: OpenJade group's SP suite, developer support
  This contains include files and the static library for libosp1.
  This C++ library contains entity management functions, parsing functions,
  and other functions useful for SGML/XML/DSSSL development. 
+

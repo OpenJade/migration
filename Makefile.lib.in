@@ -8,6 +8,7 @@
 
 CLEANFILES=-r lib$(LIB).la $(OBJS) $(COBJS) $(LT_OBJS) core .libs Makefile.lt
 
+top_builddir=@TOP@
 LIB_THREADS=@LIB_THREADS@
 
 all: lib$(LIB).la

@@ -6,6 +6,7 @@
 #  Copyright (C) 1998 Cees de Groot <cg@sgmltools.org>
 #
 
+top_builddir=@TOP@
 TOP=@TOP@
 prefix=@prefix@
 exec_prefix=@exec_prefix@

@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenSP 1.4\n"
-"POT-Creation-Date: 1999-12-21 22:25+0000\n"
+"POT-Creation-Date: 2000-03-16 20:43+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -85,9 +85,6 @@ msgstr "meta-DTD tillåter inte data här"
 msgid "invalid value %1 for ArcIgnD attribute"
 msgstr "ogiltigt värde %1 för attributet ArcIgnD"
 
-msgid "invalid value %1 for ArcIndr architectural support attribute"
-msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"
-
 msgid "unrecognized quantity name %1"
 msgstr "okänt kvantitetsnamn %1"
 
@@ -102,6 +99,22 @@ msgstr "ogiltig siffra %1"
 
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "för attributet ArcIndr stöds endast värdet nArcIndr"
+
+#, fuzzy
+msgid "#ARCCONT attribute already specified"
+msgstr "kapaciteten %1 är redan angiven"
+
+#, fuzzy
+msgid "invalid value %1 for #ARCCONT"
+msgstr "ogiltigt värde %1 för ArcSurp-attribut"
+
+#, fuzzy
+msgid "%1 already used as a substitute name"
+msgstr "%1 är redan ett funktionsnamn"
+
+#, fuzzy
+msgid "substitute name #CONTENT already specified"
+msgstr "ersättningsnamn för %1 är redan definierat"
 
 # CatalogMessages
 msgid "name expected"
@@ -2056,7 +2069,8 @@ msgstr ""
 "kan ej använda implicit (#IMPLICIT) dokumenttyp om inte CONCUR NO LINK "
 "EXPLICIT NO är angivna"
 
-msgid "Sorry, #IMPLICIT doctypes not implemented"
+#, fuzzy
+msgid "Sorry, #IMPLIED doctypes not implemented"
 msgstr "Tyvärr är #IMPLICIT dokumenttyper ej implementerat."
 
 msgid "reference to DTD data entity ignored"
@@ -2067,6 +2081,36 @@ msgstr "notationen %1 för parameterentiteten %2 odefinierad"
 
 msgid "notation %1 for external subset undefined"
 msgstr "notationen %1 för extern delmängd odefinierad"
+
+msgid "attribute %1 can't be redeclared"
+msgstr ""
+
+#, fuzzy
+msgid "#IMPLICIT attributes have already been specified for notation %1"
+msgstr "inga attribut definierade för notationen %1"
+
+#, fuzzy
+msgid ""
+"a name group is not allowed in a parameter entity reference in a start tag"
+msgstr ""
+"en namngrupp är ej tillåten i en generell entitetsreferens in en starttagg"
+
+#, fuzzy
+msgid ""
+"name group in a parameter entity reference in an end tag (SGML forbids them "
+"in start tags)"
+msgstr ""
+"en namngrupp är ej tillåten i en generell entitetsreferens in en starttagg"
+
+#, fuzzy
+msgid "if the declared value is NOTATION a default value of CONREF is useless"
+msgstr ""
+"om det deklarerade värdet är ID, måste ingångsvärdet vara IMPLIED eller "
+"REQUIRED"
+
+#, fuzzy
+msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
+msgstr "Tyvärr är #IMPLICIT dokumenttyper ej implementerat."
 
 msgid "delimiter "
 msgstr "avgränsaren "
@@ -2518,3 +2562,6 @@ msgstr "%1 slår samman och skriver ut entiteterna med systemidentifierarna "
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... på standard ut."
+
+#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
+#~ msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"

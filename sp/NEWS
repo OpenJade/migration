@@ -1,9 +1,14 @@
-Changes in OpenSP 1.4
+Changes in OpenSP 1.5pre4
 
+* More of Annex K supported: Common data attributes can now be
+  specified in external entity declarations.
+  
 * The architecture engine supports #MAPTOKEN.
 
 * The multibyte version of OpenSP now uses 32bit chars and supports
   the full UTF-16 range 0x0000-0x10ffff.
+
+Changes in OpenSP 1.4
 
 * Support for the koi8-r (RFC 1489) encoding.
  

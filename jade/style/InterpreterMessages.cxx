@@ -1,4 +1,4 @@
-// This file was automatically generated from style/InterpreterMessages.msg by msggen.pl.
+// This file was automatically generated from InterpreterMessages.msg by msggen.pl.
 
 #ifdef __GNUG__
 #pragma implementation
@@ -191,7 +191,7 @@ MessageFragment::appModule,
 ,"reference to undefined variable %1"
 #endif
 );
-const MessageType0 InterpreterMessages::badCharName(
+const MessageType1 InterpreterMessages::badCharName(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -200,7 +200,7 @@ MessageFragment::appModule,
 #endif
 15
 #ifndef SP_NO_MESSAGE_TEXT
-,"no character with that name"
+,"no character with name %1"
 #endif
 );
 const MessageType1 InterpreterMessages::keywordNotAllowedCall(
@@ -1516,6 +1516,150 @@ MessageFragment::appModule,
 131
 #ifndef SP_NO_MESSAGE_TEXT
 ,"mode %1 not defined"
+#endif
+);
+const MessageType1 InterpreterMessages::badCharNumber(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+132
+#ifndef SP_NO_MESSAGE_TEXT
+,"bad character number %1"
+#endif
+);
+const MessageType1 InterpreterMessages::duplicateCharName(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+133
+#ifndef SP_NO_MESSAGE_TEXT
+,"duplicate character name %1"
+#endif
+);
+const MessageType1 InterpreterMessages::duplicateSdataEntityName(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+134
+#ifndef SP_NO_MESSAGE_TEXT
+,"duplicate SDATA entity name %1"
+#endif
+);
+const MessageType1 InterpreterMessages::duplicateSdataEntityText(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+135
+#ifndef SP_NO_MESSAGE_TEXT
+,"duplicate SDATA entity text %1"
+#endif
+);
+const MessageType0 InterpreterMessages::unsupportedDeclaration(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+136
+#ifndef SP_NO_MESSAGE_TEXT
+,"unsupported declaration will be ignored"
+#endif
+);
+const MessageType1 InterpreterMessages::unsupportedCharRepertoire(
+MessageType::warning,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+137
+#ifndef SP_NO_MESSAGE_TEXT
+,"unsupported character repertoire %1 will be ignored"
+#endif
+);
+const MessageType0 InterpreterMessages::badDeclaration(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+138
+#ifndef SP_NO_MESSAGE_TEXT
+,"error in declaration element"
+#endif
+);
+const MessageType3 InterpreterMessages::notAnInteger(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+139
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not an integer"
+#endif
+);
+const MessageType3 InterpreterMessages::notAKeyword(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+140
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a keyword"
+#endif
+);
+const MessageType3 InterpreterMessages::notAnAlist(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+141
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not an alist"
+#endif
+);
+const MessageType3 InterpreterMessages::notACharList(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+142
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+#endif
+);
+const MessageType3 InterpreterMessages::lengthError(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+143
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 has wrong length"
 #endif
 );
 #ifdef SP_NAMESPACE

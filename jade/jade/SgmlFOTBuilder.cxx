@@ -1506,7 +1506,7 @@ void SgmlFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned flags)
     os() << " center";
     break;
   }
-  if ((flags & (firstHF|otherHF)) == otherHF)
+  if ((flags & (firstHF|otherHF)) == firstHF)
     os() << " first";
   else
     os() << " other";

@@ -1314,6 +1314,44 @@ MessageFragment::appModule,
 ,"unquote-splicing expression does not evaluate to a list"
 #endif
 );
+const MessageType1 InterpreterMessages::actualLoop(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+115
+#ifndef SP_NO_MESSAGE_TEXT
+,"circular use of actual value of characteristic %1"
+#endif
+);
+const MessageType1L InterpreterMessages::duplicateCharacteristic(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+116
+#ifndef SP_NO_MESSAGE_TEXT
+,"characteristic %1 already defined in same part"
+,"first definition was here"
+#endif
+);
+const MessageType1L InterpreterMessages::duplicateFlowObjectClass(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+118
+#ifndef SP_NO_MESSAGE_TEXT
+,"flow object class %1 already defined in same part"
+,"first definition was here"
+#endif
+);
 #ifdef SP_NAMESPACE
 }
 #endif

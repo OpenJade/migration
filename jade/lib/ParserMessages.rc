@@ -157,7 +157,7 @@ BEGIN
   154, "character numbers declared more than once: %1"
   155, "character numbers should have been declared UNUSED: %1"
   156, "character numbers missing in base set: %1"
-  157, "this system requires that characters in the document character set not have numbers exceeding %1"
+  157, "characters in the document character set with numbers exceeding %1 not supported"
   158, "invalid formal public identifier %1: missing //"
   159, "invalid formal public identifier %1: no SPACE after public text class"
   160, "invalid formal public identifier %1: invalid public text class"

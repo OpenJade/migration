@@ -506,8 +506,10 @@ OutputCharStream &operator<<(OutputCharStream &os, GroveString &str)
 void TransformFOTBuilder::charactersFromNode(const NodePtr &nd, const Char *s, size_t n)
 {
   GroveString name;
-  if (preserveSdata_ && n == 1 && nd->getEntityName(name) == accessOK)
+  if (preserveSdata_ && n == 1 && nd->getEntityName(name) == accessOK) {
+    flushPendingRe();
     os() << "&" << name << ';';
+  }
   else
     TransformFOTBuilder::characters(s, n);
 }

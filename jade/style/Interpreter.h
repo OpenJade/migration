@@ -154,9 +154,14 @@ public:
   void setValue(ELObj *, unsigned defPart = unsigned(-1));
   bool evaluated() const;
   const ConstPtr<InheritedC> &inheritedC() const;
+  bool inheritedCDefined(unsigned &, Location &) const;
   void setInheritedC(const ConstPtr<InheritedC> &);
+  void setInheritedC(const ConstPtr<InheritedC> &, unsigned part,
+		     const Location &);
   FlowObj *flowObj() const;
+  bool flowObjDefined(unsigned &, Location &) const;
   void setFlowObj(FlowObj *);
+  void setFlowObj(FlowObj *, unsigned part, const Location &);
 private:
   unsigned defPart_;
   Owner<Expression> def_;
@@ -164,10 +169,14 @@ private:
   // Value in top-level environment.
   ELObj *value_;		// must be permanent
   FlowObj *flowObj_;    // prototype FlowObj with this name
+  unsigned flowObjPart_;
+  Location flowObjLoc_;
   Location defLoc_;
   SyntacticKey syntacticKey_;
   bool beingComputed_;
   ConstPtr<InheritedC> inheritedC_;
+  unsigned inheritedCPart_;
+  Location inheritedCLoc_;
 };
 
 class Unit : public Named {
@@ -376,8 +385,8 @@ private:
   bool doDeclareFlowObjectClass();
   bool skipForm();
   void installInitialValue(Identifier *, Owner<Expression> &);
-  void installExtensionInheritedC(Identifier *, const StringC &);
-  void installExtensionFlowObjectClass(Identifier *, const StringC &);
+  void installExtensionInheritedC(Identifier *, const StringC &, const Location &);
+  void installExtensionFlowObjectClass(Identifier *, const StringC &, const Location &);
   void installSyntacticKeys();
   void installPortNames();
   void installCValueSymbols();
@@ -717,9 +726,29 @@ const ConstPtr<InheritedC> &Identifier::inheritedC() const
 }
 
 inline
+bool Identifier::inheritedCDefined(unsigned &part, Location &loc) const
+{
+  if (inheritedC_.isNull())
+    return 0;
+  part = inheritedCPart_;
+  loc = inheritedCLoc_;
+  return 1;
+}
+
+inline
 void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic)
 {
   inheritedC_ = ic;
+  inheritedCPart_ = unsigned(-1);
+}
+
+inline
+void Identifier::setInheritedC(const ConstPtr<InheritedC> &ic, unsigned part,
+			       const Location &loc)
+{
+  inheritedC_ = ic;
+  inheritedCPart_ = part;
+  inheritedCLoc_ = loc;
 }
 
 inline
@@ -729,9 +758,28 @@ FlowObj *Identifier::flowObj() const
 }
 
 inline
+bool Identifier::flowObjDefined(unsigned &part, Location &loc) const
+{
+  if (!flowObj_)
+    return 0;
+  part = flowObjPart_;
+  loc = flowObjLoc_;
+  return 1;
+}
+
+inline
 void Identifier::setFlowObj(FlowObj *fo)
 {
   flowObj_ = fo;
+  flowObjPart_ = unsigned(-1);
+}
+
+inline
+void Identifier::setFlowObj(FlowObj *fo, unsigned part, const Location &loc)
+{
+  flowObj_ = fo;
+  flowObjPart_ = part;
+  flowObjLoc_ = loc;
 }
 
 #ifdef DSSSL_NAMESPACE

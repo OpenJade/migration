@@ -8,11 +8,12 @@
 <P>
 The Hytime standard (ISO/IEC 10744) introduced the concept of
 architectural forms.  This document assumes you are already familiar
-with this concept. The first Technical Corrigendum to HyTime, which is
-soon to be published, generalizes this, and makes it possible to have
-an <I>architecture engine</I> which can perform architectural form
-processing for arbitrary architectures.  SP now includes such an
-architecture engine.
+with this concept. HyTime 2nd Edition generalizes this, and makes it
+possible to have an <I>architecture engine</I> which can perform
+architectural form processing for arbitrary architectures.  SP now
+includes such an architecture engine.  The implementation is based on
+a draft of HyTime 2nd Edition, and has some <A
+HREF="#hi2diff">differences</A> from the final version.
 <P>
 Non-markup sensitive applications built using SP now support
 architectural form processing using the <SAMP>-A
@@ -387,13 +388,24 @@ document to produce an architectural document conforming to the
 A document that is validated against a meta-DTD will automatically
 be validated against any base architectures of that meta-DTD.
 
-<H2>Not implemented</H2>
+<H2><A NAME=hi2diff>Differences from HyTime 2nd Edition</A></H2>
 <P>
-The following features in the current AFDR draft are not implemented:
+This implementation differs from the AFDR specification in HyTime 2nd
+edition in the following ways:
 <UL>
 <LI>
-<SAMP>ArcIndr</SAMP> architectural support attribute with value
-other than <SAMP>nArcIndr</SAMP>.
+The date in the public identifier in the AFDR declaration is 1992
+rather than 1997.
+<LI>
+The <CODE>#MAPTOKEN</CODE> feature is not implemented.
+<LI>
+The notation set architecture is provided.
+<LI>
+The architecture base declaration processing instruction starts with
+<CODE>ArcBase</CODE> rather than <CODE>IS10744 ArcBase</CODE>.
+<LI>
+Changing <CODE>ArcBase</CODE> using APPINFO in the SGML declaration is
+not supported.
 </UL>
 <P>
 <ADDRESS>

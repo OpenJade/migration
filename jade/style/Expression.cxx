@@ -844,14 +844,16 @@ bool QuasiquoteExpression::canEval(bool maybeCall) const
 
 void QuasiquoteExpression::optimize(Interpreter &interp, const Environment &env, Owner<Expression> &expr)
 {
-  if (members_.size() == 0)
+  if (members_.size() == 0) {
     expr = new ResolvedConstantExpression(interp.makeNil(), location());
+    return;
+  }
   for (size_t i = 0; i < members_.size(); i++)
     members_[i]->optimize(interp, env, members_[i]);
   ELObj *tail = members_.back()->constantValue();
   if (!tail)
     return;
-  if (!improper_) {
+  if (!improper_ && !spliced_.back()) {
     tail = interp.makePair(tail, interp.makeNil());
     interp.makePermanent(tail);
   }

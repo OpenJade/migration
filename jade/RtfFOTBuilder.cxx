@@ -731,6 +731,7 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
     { "table", 0},
     { "math", 1},
     { "simple-page", 0},
+    { "online", 1},
     { 0, 0}
   };
   static const FOTBuilder::Description description = {

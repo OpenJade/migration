@@ -668,7 +668,8 @@ bool SchemeParser::doDefineUnit()
   for (i = 0; i < currentToken_.size(); i++)
     if (interp_->lexCategory(currentToken_[i]) != Interpreter::lexLetter)
       break;
-  if (i < currentToken_.size()) {
+  if ((i < currentToken_.size())
+       || ((currentToken_.size() == 1) && (currentToken_[0] =='e'))) {
     message(InterpreterMessages::invalidUnitName,
             StringMessageArg(currentToken_));
     return 0;

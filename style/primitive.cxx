@@ -34,7 +34,6 @@ public:
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
-  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 protected:
   virtual void advance(EvalContext &, Interpreter &) = 0;
   virtual void chunkAdvance(EvalContext &, Interpreter &) = 0;
@@ -58,6 +57,7 @@ protected:
 class SubgroveNodeListObj : public TreeNodeListObj {
 public:
   SubgroveNodeListObj(const NodePtr &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 protected:
   void advance(EvalContext &, Interpreter &);
   void chunkAdvance(EvalContext &, Interpreter &);
@@ -5654,17 +5654,6 @@ NodeListObj *TreeNodeListObj::nodeListChunkRest(EvalContext &context, Interprete
   return obj;
 }
 
-bool TreeNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
-{
-  NodePtr nd(ptr);
-  for (;;) {
-    if (*nd == *root_)
-      return 1;
-    if (nd->getOrigin(nd) != accessOK)
-      return 0;
-  }
-}
-
 SubgroveNodeListObj::SubgroveNodeListObj(const NodePtr &start)
 : TreeNodeListObj(start), depth_(0)
 {
@@ -5789,6 +5778,60 @@ void SubgroveNodeListObj::chunkAdvance(EvalContext &context, Interpreter &interp
   }
 }
 
+bool SubgroveNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &ptr)
+{
+  if (!start_)
+    return 0;
+  NodePtr nd(ptr);
+  unsigned int depth = 0;
+
+  // determine the depth of ptr
+  for(;;) {
+    if (*start_ == *nd)
+      return 1; // start_ ancestor of ptr
+    if (*root_ == *nd)
+      break;
+    if (nd->getOrigin(nd) != accessOK)
+      return 0;
+    depth++;
+  }
+  
+  nd = ptr;
+  for (; depth > depth_; depth--) 
+    nd->getOrigin(nd);
+  NodePtr s(start_);
+  for (; depth_ > depth; depth++)
+    s->getOrigin(s);
+  if (*s == *nd)
+    return 0; // ptr ancestor of start_
+  // now s and nd are ancestors of start_ and ptr at the same depth
+  NodePtr s1(s);
+  NodePtr nd1(nd);
+  while (*s1 != *nd1) {
+    nd = nd1; 
+    nd1->getOrigin(nd);
+    s = s1;
+    s1->getOrigin(s); 
+  }
+  // now s and nd are ancestors of start_ and ptr with common parent s1
+  unsigned long i1, i2;
+  if (s->siblingsIndex(i1) == accessOK
+      && nd->siblingsIndex(i2) == accessOK)
+    return (i1 < i2);
+  NodePtr sibling;
+  if (s->firstSibling(sibling) != accessOK)
+    return 0;
+  for (;;) {
+    if (*sibling == *s)
+      return 1;
+    if (*sibling == *nd)
+      return 0;
+    if (sibling.assignNextSibling() != accessOK)
+      return 0;
+  }
+  return 0;
+}
+
 SubtreeNodeListObj::SubtreeNodeListObj(const NodePtr &start)
 : TreeNodeListObj(start), depth_(0)
 {
@@ -5846,43 +5889,51 @@ bool SubtreeNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &p
   if (!start_)
     return 0;
   NodePtr nd(ptr);
+  unsigned int depth = 0;
 
-  if (depth_ == 0) {
-    for(;;) {
-      if (*start_ == *nd)
-	return 1;
-      if (nd->getParent(nd) != accessOK)
-	return 0;
-    }
-  }
-
-  NodePtr startParent;
-  if (start_->getParent(startParent) == accessOK)
-    CANNOT_HAPPEN();
+  // determine the depth of ptr
   for(;;) {
     if (*start_ == *nd)
-      return 1;
-    NodePtr parent;
-    if (nd->getParent(parent) != accessOK)
+      return 1; // start_ ancestor of ptr
+    if (*root_ == *nd)
+      break;
+    if (nd->getParent(nd) != accessOK)
       return 0;
-    if (*parent == *startParent) {
-      unsigned long i1, i2;
-      if (start_->siblingsIndex(i1) == accessOK
-	  && nd->siblingsIndex(i2) == accessOK)
-	return (i1 < i2);
-      NodePtr sibling;
-      if (start_->firstSibling(sibling) != accessOK)
-	return 0;
-      for (;;) {
-	if (*sibling == *start_)
-	  return 1;
-	if (*sibling == *nd)
-	  return 0;
-	if (sibling.assignNextSibling() != accessOK)
-	  return 0;
-      }
-    }
-    nd = parent;
+    depth++;
+  }
+  
+  nd = ptr;
+  for (; depth > depth_; depth--) 
+    nd->getParent(nd);
+  NodePtr s(start_);
+  for (; depth_ > depth; depth++)
+    s->getParent(s);
+  if (*s == *nd)
+    return 0; // ptr ancestor of start_
+  // now s and nd are ancestors of start_ and ptr at the same depth
+  NodePtr s1(s);
+  NodePtr nd1(nd);
+  while (*s1 != *nd1) {
+    nd = nd1; 
+    nd1->getParent(nd);
+    s = s1;
+    s1->getParent(s); 
+  }
+  // now s and nd are ancestors of start_ and ptr with common parent s1
+  unsigned long i1, i2;
+  if (s->siblingsIndex(i1) == accessOK
+      && nd->siblingsIndex(i2) == accessOK)
+    return (i1 < i2);
+  NodePtr sibling;
+  if (s->firstSibling(sibling) != accessOK)
+    return 0;
+  for (;;) {
+    if (*sibling == *s)
+      return 1;
+    if (*sibling == *nd)
+      return 0;
+    if (sibling.assignNextSibling() != accessOK)
+      return 0;
   }
   return 0;
 }
@@ -6240,6 +6291,12 @@ bool SiblingNodeListObj::contains(EvalContext &context, Interpreter &interp, con
       || ptr->getOrigin(origin2) != accessOK
       || *origin1 != *origin2) 
     return 0;
+  unsigned long i1, i2, i3;
+  if (first_->siblingsIndex(i1) == accessOK
+      && ptr->siblingsIndex(i2) == accessOK
+      && end_->siblingsIndex(i3) == accessOK)
+    return i1 <= i2 && i2 < i3;
+  
   return NodeListObj::contains(context, interp, ptr);
 }
 

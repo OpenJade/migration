@@ -58,7 +58,7 @@ You must use a compiler that generates 32-bit code.
 The following compilers have been tested:
 <DL>
 <DT>
-Visual C++ 4.1
+Visual C++ 4.2
 <DD>
 Open SP.mak as a Makefile in the Developer Studio and build whatever
 you want.
@@ -84,7 +84,19 @@ In the <SAMP>Code Generation</SAMP> category make sure you've selected
 the same run-time library as that used by the corresponding configuration
 of <SAMP>lib</SAMP>.
 <DT>
-Watcom C++ 10.5a
+Visual C++ 5.0
+<DD>
+Use SP.mak as with Visual C++ 4.2.  Visual C++ 5.0 has a bug which
+will cause it to crash when converting the makefile. To work around
+this, rename the lib directory to x, say, before converting the
+makefile and then, after conversion but before building, rename it
+back to lib. Then proceed as with Visual C++ 4.2.
+<P>
+You should be aware that Visual C++ 5.0 also has some optimization
+bugs.  There are workarounds for those I've discovered, but it would
+be safer to use Visual C++ 4.2.
+<DT>
+Watcom C++ 11.0
 <DD>
 Use Makefile.wat.
 <P>

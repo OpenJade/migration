@@ -18,7 +18,7 @@
 #include <errno.h>
 
 #ifdef DSSSL_NAMESPACE
-using namespace DSSSL_NAMESPACE;
+namespace DSSSL_NAMESPACE {
 #endif
 
 class JadeApp : public DssslApp {
@@ -35,8 +35,6 @@ private:
   Vector<StringC> outputOptions_;
   FileOutputByteStream outputFile_;
 };
-
-SP_DEFINE_APP(JadeApp)
 
 const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
   SP_T("fot"),
@@ -138,7 +136,7 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
     unitsPerInch_ = 20*72; // twips
     return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts);
   case texType:
-    return makeTeXFOTBuilder(&outputFile_, this);
+    return makeTeXFOTBuilder(&outputFile_, this, exts);
   case htmlType:
     return makeHtmlFOTBuilder(outputFilename_, this, exts);
   case fotType:
@@ -153,3 +151,13 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
   CANNOT_HAPPEN();
   return 0;
 }
+
+#ifdef DSSSL_NAMESPACE
+}
+#endif
+
+#ifdef DSSSL_NAMESPACE
+SP_DEFINE_APP(DSSSL_NAMESPACE::JadeApp)
+#else
+SP_DEFINE_APP(JadeApp)
+#endif

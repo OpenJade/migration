@@ -13,6 +13,7 @@
 #define SP_THREAD
 
 #define STRICT 1
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <process.h>
 // <windows.h> appears to turn these warnings back on

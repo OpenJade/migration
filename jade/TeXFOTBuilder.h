@@ -13,7 +13,8 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-FOTBuilder *makeTeXFOTBuilder(OutputByteStream *, Messenger *);
+FOTBuilder *makeTeXFOTBuilder(OutputByteStream *, Messenger *,
+			      const FOTBuilder::Extension *&);
 
 #ifdef DSSSL_NAMESPACE
 }

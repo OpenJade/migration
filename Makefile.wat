@@ -27,6 +27,7 @@ LIB_OBJS=Allocator.obj &
   CharsetRegistry.obj &
   CmdLineApp.obj &
   CodingSystem.obj &
+  CodingSystemKit.obj &
   ConsoleOutput.obj &
   ContentState.obj &
   ContentToken.obj &

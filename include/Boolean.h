@@ -11,7 +11,11 @@ namespace SP_NAMESPACE {
 #ifdef SP_HAVE_BOOL
 
 typedef bool Boolean;
+#ifdef SP_SIZEOF_BOOL_1
+typedef bool PackedBoolean;
+#else
 typedef char PackedBoolean;
+#endif
 
 #else /* not SP_HAVE_BOOL */
 

@@ -1756,16 +1756,18 @@ void Interpreter::installSdata()
 {
   // This comes from uni2sgml.txt on ftp://unicode.org.
   // It is marked there as obsolete, so it probably ought to be checked.
+  // The definitions of apos and quot have been fixed for consistency with XML.
   static struct {
     Char c;
     const char *name;
   } entities[] = {
   { 0x0021, "excl" },
+  { 0x0022, "quot" },
   { 0x0023, "num" },
   { 0x0024, "dollar" },
   { 0x0025, "percnt" },
   { 0x0026, "amp" },
-  { 0x0027, "quot" },
+  { 0x0027, "apos" },
   { 0x0028, "lpar" },
   { 0x0029, "rpar" },
   { 0x002A, "ast" },
@@ -2011,7 +2013,6 @@ void Interpreter::installSdata()
   { 0x017D, "Zcaron" },
   { 0x017E, "zcaron" },
   { 0x0192, "fnof" },
-  { 0x02BC, "apos" },
   { 0x02C7, "caron" },
   { 0x02D8, "breve" },
   { 0x02D9, "dot" },

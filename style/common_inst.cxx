@@ -35,11 +35,77 @@ namespace SP_NAMESPACE {
 #include "Syntax.h"
 #include "ExtendEntityManager.h"
 #include "Event.h"
+#include "CmdLineApp.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
+#ifdef __DECCXX
+#pragma define_template Vector<const CmdLineApp::AppChar *>
+#else
+#ifdef __xlC__
+#pragma define(Vector<const CmdLineApp::AppChar *>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<const CmdLineApp::AppChar *>;
+#else
+typedef Vector<const CmdLineApp::AppChar *> Dummy_0;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<CodingSystemKit>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<CodingSystemKit>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<CodingSystemKit>;
+#else
+typedef Ptr<CodingSystemKit> Dummy_1;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<Sd>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<Sd>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<Sd>;
+#else
+typedef Ptr<Sd> Dummy_2;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<InputSourceOrigin>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<InputSourceOrigin>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<InputSourceOrigin>;
+#else
+typedef Ptr<InputSourceOrigin> Dummy_3;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<ParsedSystemId::Map>
+#else
+#ifdef __xlC__
+#pragma define(Vector<ParsedSystemId::Map>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<ParsedSystemId::Map>;
+#else
+typedef Vector<ParsedSystemId::Map> Dummy_4;
+#endif
+#endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Vector<size_t>
 #else
@@ -49,7 +115,7 @@ namespace SP_NAMESPACE {
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<size_t>;
 #else
-typedef Vector<size_t> Dummy_0;
+typedef Vector<size_t> Dummy_5;
 #endif
 #endif
 #endif
@@ -62,7 +128,7 @@ typedef Vector<size_t> Dummy_0;
 #ifdef SP_ANSI_CLASS_INST
 template class String<Char>;
 #else
-typedef String<Char> Dummy_1;
+typedef String<Char> Dummy_6;
 #endif
 #endif
 #endif
@@ -75,7 +141,7 @@ typedef String<Char> Dummy_1;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<String<Char> >;
 #else
-typedef Vector<String<Char> > Dummy_2;
+typedef Vector<String<Char> > Dummy_7;
 #endif
 #endif
 #endif
@@ -88,7 +154,7 @@ typedef Vector<String<Char> > Dummy_2;
 #ifdef SP_ANSI_CLASS_INST
 template class String<char>;
 #else
-typedef String<char> Dummy_3;
+typedef String<char> Dummy_8;
 #endif
 #endif
 #endif
@@ -101,7 +167,7 @@ typedef String<char> Dummy_3;
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>;
 #else
-typedef OwnerTable<Named,StringC,Hash,NamedTableKeyFunction> Dummy_4;
+typedef OwnerTable<Named,StringC,Hash,NamedTableKeyFunction> Dummy_9;
 #endif
 #endif
 #endif
@@ -114,7 +180,7 @@ typedef OwnerTable<Named,StringC,Hash,NamedTableKeyFunction> Dummy_4;
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction>;
 #else
-typedef OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction> Dummy_5;
+typedef OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction> Dummy_10;
 #endif
 #endif
 #endif
@@ -127,7 +193,7 @@ typedef OwnerTableIter<Named,StringC,Hash,NamedTableKeyFunction> Dummy_5;
 #ifdef SP_ANSI_CLASS_INST
 template class XcharMap<PackedBoolean>;
 #else
-typedef XcharMap<PackedBoolean> Dummy_6;
+typedef XcharMap<PackedBoolean> Dummy_11;
 #endif
 #endif
 #endif
@@ -140,7 +206,7 @@ typedef XcharMap<PackedBoolean> Dummy_6;
 #ifdef SP_ANSI_CLASS_INST
 template class SharedXcharMap<PackedBoolean>;
 #else
-typedef SharedXcharMap<PackedBoolean> Dummy_7;
+typedef SharedXcharMap<PackedBoolean> Dummy_12;
 #endif
 #endif
 #endif
@@ -153,7 +219,7 @@ typedef SharedXcharMap<PackedBoolean> Dummy_7;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<SharedXcharMap<PackedBoolean> >;
 #else
-typedef Ptr<SharedXcharMap<PackedBoolean> > Dummy_8;
+typedef Ptr<SharedXcharMap<PackedBoolean> > Dummy_13;
 #endif
 #endif
 #endif
@@ -166,7 +232,7 @@ typedef Ptr<SharedXcharMap<PackedBoolean> > Dummy_8;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<SharedXcharMap<PackedBoolean> >;
 #else
-typedef ConstPtr<SharedXcharMap<PackedBoolean> > Dummy_9;
+typedef ConstPtr<SharedXcharMap<PackedBoolean> > Dummy_14;
 #endif
 #endif
 #endif
@@ -179,7 +245,7 @@ typedef ConstPtr<SharedXcharMap<PackedBoolean> > Dummy_9;
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction>;
 #else
-typedef PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_10;
+typedef PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_15;
 #endif
 #endif
 #endif
@@ -192,7 +258,7 @@ typedef PointerTableIter<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_10;
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<Named*,StringC,Hash,NamedTableKeyFunction>;
 #else
-typedef PointerTable<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_11;
+typedef PointerTable<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_16;
 #endif
 #endif
 #endif
@@ -205,7 +271,7 @@ typedef PointerTable<Named*,StringC,Hash,NamedTableKeyFunction> Dummy_11;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTableItemBase<String<Char> >;
 #else
-typedef HashTableItemBase<String<Char> > Dummy_12;
+typedef HashTableItemBase<String<Char> > Dummy_17;
 #endif
 #endif
 #endif
@@ -218,7 +284,7 @@ typedef HashTableItemBase<String<Char> > Dummy_12;
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > >;
 #else
-typedef OwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_13;
+typedef OwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_18;
 #endif
 #endif
 #endif
@@ -231,7 +297,7 @@ typedef OwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableK
 #ifdef SP_ANSI_CLASS_INST
 template class CopyOwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > >;
 #else
-typedef CopyOwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_14;
+typedef CopyOwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_19;
 #endif
 #endif
 #endif
@@ -244,7 +310,7 @@ typedef CopyOwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash,HashTa
 #ifdef SP_ANSI_CLASS_INST
 template class OwnerTableIter<HashTableItemBase<String<Char> >, String<Char>, Hash, HashTableKeyFunction<String<Char> > >;
 #else
-typedef OwnerTableIter<HashTableItemBase<String<Char> >, String<Char>, Hash, HashTableKeyFunction<String<Char> > > Dummy_15;
+typedef OwnerTableIter<HashTableItemBase<String<Char> >, String<Char>, Hash, HashTableKeyFunction<String<Char> > > Dummy_20;
 #endif
 #endif
 #endif
@@ -257,7 +323,7 @@ typedef OwnerTableIter<HashTableItemBase<String<Char> >, String<Char>, Hash, Has
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTable<HashTableItemBase<String<Char> >*,String<Char>,Hash,HashTableKeyFunction<String<Char> > >;
 #else
-typedef PointerTable<HashTableItemBase<String<Char> >*,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_16;
+typedef PointerTable<HashTableItemBase<String<Char> >*,String<Char>,Hash,HashTableKeyFunction<String<Char> > > Dummy_21;
 #endif
 #endif
 #endif
@@ -270,7 +336,7 @@ typedef PointerTable<HashTableItemBase<String<Char> >*,String<Char>,Hash,HashTab
 #ifdef SP_ANSI_CLASS_INST
 template class PointerTableIter<HashTableItemBase<String<Char> > *, String<Char>, Hash, HashTableKeyFunction<String<Char> > >;
 #else
-typedef PointerTableIter<HashTableItemBase<String<Char> > *, String<Char>, Hash, HashTableKeyFunction<String<Char> > > Dummy_17;
+typedef PointerTableIter<HashTableItemBase<String<Char> > *, String<Char>, Hash, HashTableKeyFunction<String<Char> > > Dummy_22;
 #endif
 #endif
 #endif
@@ -283,7 +349,7 @@ typedef PointerTableIter<HashTableItemBase<String<Char> > *, String<Char>, Hash,
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<HashTableItemBase<String<Char> >*>;
 #else
-typedef Vector<HashTableItemBase<String<Char> >*> Dummy_18;
+typedef Vector<HashTableItemBase<String<Char> >*> Dummy_23;
 #endif
 #endif
 #endif
@@ -296,7 +362,7 @@ typedef Vector<HashTableItemBase<String<Char> >*> Dummy_18;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Origin>;
 #else
-typedef Ptr<Origin> Dummy_19;
+typedef Ptr<Origin> Dummy_24;
 #endif
 #endif
 #endif
@@ -309,7 +375,7 @@ typedef Ptr<Origin> Dummy_19;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTable<StringC,Char>;
 #else
-typedef HashTable<StringC,Char> Dummy_20;
+typedef HashTable<StringC,Char> Dummy_25;
 #endif
 #endif
 #endif
@@ -322,7 +388,7 @@ typedef HashTable<StringC,Char> Dummy_20;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Entity>;
 #else
-typedef ConstPtr<Entity> Dummy_21;
+typedef ConstPtr<Entity> Dummy_26;
 #endif
 #endif
 #endif
@@ -335,7 +401,7 @@ typedef ConstPtr<Entity> Dummy_21;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Entity>;
 #else
-typedef Ptr<Entity> Dummy_22;
+typedef Ptr<Entity> Dummy_27;
 #endif
 #endif
 #endif
@@ -348,7 +414,7 @@ typedef Ptr<Entity> Dummy_22;
 #ifdef SP_ANSI_CLASS_INST
 template class SubstTable<Char>;
 #else
-typedef SubstTable<Char> Dummy_23;
+typedef SubstTable<Char> Dummy_28;
 #endif
 #endif
 #endif
@@ -361,7 +427,7 @@ typedef SubstTable<Char> Dummy_23;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<Syntax>;
 #else
-typedef Ptr<Syntax> Dummy_24;
+typedef Ptr<Syntax> Dummy_29;
 #endif
 #endif
 #endif
@@ -374,7 +440,7 @@ typedef Ptr<Syntax> Dummy_24;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<Syntax>;
 #else
-typedef ConstPtr<Syntax> Dummy_25;
+typedef ConstPtr<Syntax> Dummy_30;
 #endif
 #endif
 #endif
@@ -387,7 +453,7 @@ typedef ConstPtr<Syntax> Dummy_25;
 #ifdef SP_ANSI_CLASS_INST
 template class ISet<Char>;
 #else
-typedef ISet<Char> Dummy_26;
+typedef ISet<Char> Dummy_31;
 #endif
 #endif
 #endif
@@ -400,7 +466,7 @@ typedef ISet<Char> Dummy_26;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<TextItem>;
 #else
-typedef Vector<TextItem> Dummy_27;
+typedef Vector<TextItem> Dummy_32;
 #endif
 #endif
 #endif
@@ -413,7 +479,7 @@ typedef Vector<TextItem> Dummy_27;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTableItem<StringC, int>;
 #else
-typedef HashTableItem<StringC, int> Dummy_28;
+typedef HashTableItem<StringC, int> Dummy_33;
 #endif
 #endif
 #endif
@@ -426,7 +492,7 @@ typedef HashTableItem<StringC, int> Dummy_28;
 #ifdef SP_ANSI_CLASS_INST
 template class HashTable<StringC,int>;
 #else
-typedef HashTable<StringC,int> Dummy_29;
+typedef HashTable<StringC,int> Dummy_34;
 #endif
 #endif
 #endif
@@ -439,7 +505,7 @@ typedef HashTable<StringC,int> Dummy_29;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<PackedBoolean>;
 #else
-typedef Vector<PackedBoolean> Dummy_30;
+typedef Vector<PackedBoolean> Dummy_35;
 #endif
 #endif
 #endif
@@ -452,7 +518,7 @@ typedef Vector<PackedBoolean> Dummy_30;
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<EventHandler>;
 #else
-typedef Owner<EventHandler> Dummy_31;
+typedef Owner<EventHandler> Dummy_36;
 #endif
 #endif
 #endif
@@ -465,7 +531,7 @@ typedef Owner<EventHandler> Dummy_31;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<EntityManager>;
 #else
-typedef Ptr<EntityManager> Dummy_32;
+typedef Ptr<EntityManager> Dummy_37;
 #endif
 #endif
 #endif
@@ -478,7 +544,7 @@ typedef Ptr<EntityManager> Dummy_32;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<ExtendEntityManager>;
 #else
-typedef Ptr<ExtendEntityManager> Dummy_33;
+typedef Ptr<ExtendEntityManager> Dummy_38;
 #endif
 #endif
 #endif
@@ -491,7 +557,7 @@ typedef Ptr<ExtendEntityManager> Dummy_33;
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<StorageObjectSpec>;
 #else
-typedef Vector<StorageObjectSpec> Dummy_34;
+typedef Vector<StorageObjectSpec> Dummy_39;
 #endif
 #endif
 #endif

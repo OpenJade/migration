@@ -1,5 +1,10 @@
 2002-12-07  Karl Eichwalder  <ke@suse.de>
 
+	* tests/af-9: New file.
+	* tests/Makefile.am (SHOWSTOPPERS): New variable; add af-7, af-8,
+	and af-9
+	* tests/Makefile.am (TESTS): Add $(SHOWSTOPPERS).
+
 	* tests/af-6: New file.
 	* tests/af-7: Likewise.
 	* tests/af-8: Likewise.

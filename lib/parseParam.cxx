@@ -204,8 +204,7 @@ Boolean Parser::parseParam(const AllowedParams &allow,
 	extendNameToken(syntax().namelen(), ParserMessages::nameLength);
 	parm.type = Param::name;
         getCurrentToken(parm.origToken);
-        StringC *substToken = new StringC(parm.origToken);
-        parm.token = *substToken;
+        parm.token = StringC(parm.origToken);
         const SubstTable *subst = syntax().generalSubstTable();
         StringC::iterator s = parm.token.begin();
         size_t count = parm.token.size();

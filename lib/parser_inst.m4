@@ -166,7 +166,7 @@ __instantiate(Vector<Transition>)
 __instantiate(Vector<LeafContentToken*>)
 __instantiate(Vector<size_t>)
  // we really just want to test if size_t == unsigned int
-#if __GNUC__ != 2 &&  __GNUC_MINOR__ != 95
+#if !defined(SIZEOF_SIZE_T) || !defined(SIZEOF_UNSIGNED_INT) || (SIZEOF_SIZE_T != SIZEOF_UNSIGNED_INT)
 __instantiate(Vector<unsigned int>)
 #endif
 

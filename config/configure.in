@@ -75,6 +75,9 @@ then
     AC_CHECK_TYPE(sig_atomic_t,int)
 fi
 
+AC_CHECK_SIZEOF(size_t)
+AC_CHECK_SIZEOF(unsigned int)
+
 dnl
 dnl the following tests require c++, not c; note that if you switch this
 dnl earlier, AC_C_CONST will fail, at least

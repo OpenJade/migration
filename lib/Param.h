@@ -66,6 +66,7 @@ public:
   Owner<ModelGroup> modelGroupPtr;
   Vector<NameToken> nameTokenVector;
   StringC token;		// name nameToken; with substitution
+  StringC origToken;
   Vector<const ElementType *> elementVector;
 private:
   Param(const Param &);		// undefined

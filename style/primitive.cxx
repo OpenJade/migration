@@ -5118,7 +5118,7 @@ DEFPRIMITIVE(StringToList, argc, argv, context, interp, loc)
   if (!argv[0]->stringData(s, n))
     return argError(interp, loc,
                     InterpreterMessages::notAString, 0, argv[0]);
-  ELObj *pair = interp.makeNil(); 
+  ELObjDynamicRoot pair(interp, interp.makeNil());
   for (int i = n; i > 0; i--) 
     pair = interp.makePair(interp.makeChar(s[i - 1]), pair);
   return pair;

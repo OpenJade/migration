@@ -44,8 +44,8 @@ endif
 make_directory	:= install -d -o root -g root -m 755
 compress	:= gzip -9f
 
-CFLAGS		:= -O2 --pipe
-CXXFLAGS	:= -O2 --pipe
+CFLAGS		:= -O3 --pipe
+CXXFLAGS	:= -O3 --pipe
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
   CFLAGS += -g
   CXXFLAGS += -g
@@ -63,7 +63,7 @@ am_inst_flags	:= INSTALL='install -o root -g root -p' \
 SHLIBS_PKGVER	:= 1.4devel1-1
 
 # extra docs we don't want
-DOCS_TOO_MUCH	:= ABOUT-NLS COPYING ChangeLog
+DOCS_TOO_MUCH	:= ABOUT-NLS COPYING copying.txt ChangeLog
 
 # determine our version numbers
 SRC_VERSION	:= $(shell LC_ALL=C dpkg-parsechangelog | grep ^Version: | sed 's/^Version: *//')
@@ -74,7 +74,7 @@ SRCDIR		:= $(shell pwd)
 
 # stuff for snapshot/cvs building
 root_cmd		:= sudo
-deb_build		:= dpkg-buildpackage -ppgp -r$(root_cmd)
+deb_build		:= dpkg-buildpackage -ppgp -r$(root_cmd) -b
 cvs_build_dir		:= $(HOME)/debian/$(pkg)
 cvs_ver_build_dir	:= $(cvs_build_dir)/$(pkg)-$(UPSTREAM_VERSION)
 cvs_pure_src_dir	:= ..
@@ -90,6 +90,8 @@ ChangeLog:
 	rm -r OpenJade-1.4devel
 
 config.status:	ChangeLog
+	aclocal
+	autoheader
 	automake --add-missing
 	autoreconf
 	./configure --prefix=/usr --sysconfdir=/etc			\
@@ -100,13 +102,14 @@ config.status:	ChangeLog
 
 build:	config.status
 	$(checkdir)
-	$(MAKE) SUBDIRS="grove spgrove style" CXXFLAGS="-O2 -g --pipe -D_REENTRANT"
+	$(MAKE) SUBDIRS="grove spgrove style" CXXFLAGS="$(CXXFLAGS) -D_REENTRANT"
 	$(MAKE)
 	touch build
 
 clean:
 	$(checkdir)
 	[ ! -f Makefile ] || $(MAKE) maintainer-clean
+	find . -type l | xargs rm -f
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libostyle).shlibs
 
@@ -226,7 +229,7 @@ binary-arch:	build debian/copyright debian/substvars 		\
 	touch binary-arch
 
 # cvs snapshot building
-cvs-build:
+cvs-build:	clean
 	[ -d $(cvs_pure_src_dir)/$(cvs_pure_src)/CVS ] || exit 1
 	$(root_cmd) rm -rf $(cvs_ver_build_dir)
 #	rm -f $(cvs_build_dir)/$(pkg)_$(UPSTREAM_VERSION).orig.tar.gz

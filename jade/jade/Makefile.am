@@ -8,9 +8,7 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	HtmlFOTBuilder.h TeXFOTBuilder.h TransformFOTBuilder.h \
 	MifFOTBuilder.h TextFOTBuilder.h TextFOTBuilder.cxx \
 	JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
-	HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx TeXFOTBuilder_inst.cxx \
-	TransformFOTBuilder_inst.cxx MifMessages.h MifFOTBuilder_inst.cxx \
-	TmpOutputByteStream.h
+	MifMessages.h TmpOutputByteStream.h
 
 openjade_LDADD = $(top_builddir)/style/libostyle.la \
 	$(top_builddir)/spgrove/libospgrove.la \
@@ -23,6 +21,9 @@ EXTRA_DIST = JadeMessages.msg JadeMessages.rc \
 	RtfMessages.msg RtfMessages.rc \
 	TeXMessages.msg TeXMessages.rc \
 	MifMessages.msg MifMessages.rc \
+	HtmlFOTBuilder_inst.cxx RtfFOTBuilder_inst.cxx \
+	TeXFOTBuilder_inst.cxx TransformFOTBuilder_inst.cxx \
+	MifFOTBuilder_inst.cxx \
 	HtmlFOTBuilder_inst.m4 RtfFOTBuilder_inst.m4 \
 	TeXFOTBuilder_inst.m4 TransformFOTBuilder_inst.m4 \
 	MifFOTBuilder_inst.m4 jade.dsp jade.rc \

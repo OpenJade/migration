@@ -5,13 +5,13 @@ lib_LTLIBRARIES = libospgrove.la
 libospgrove_la_LDFLAGS = -version-info 0:0:0
 
 libospgrove_la_SOURCES = GroveApp.cxx GroveApp.h GroveBuilder.cxx \
-	GroveBuilder.h SdNode.cxx SdNode.h grove_inst.cxx threads.h
+	GroveBuilder.h SdNode.cxx SdNode.h threads.h
 
 pkginclude_HEADERS = GroveApp.h GroveBuilder.h
 
 INCLUDES = -I$(top_srcdir)/grove
 
-EXTRA_DIST = grove_inst.m4 spgrove.dsp
+EXTRA_DIST = grove_inst.m4 grove_inst.cxx spgrove.dsp
 
 BUILT_SOURCES = grove_inst.cxx
 

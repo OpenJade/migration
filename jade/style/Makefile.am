@@ -8,7 +8,7 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	DssslApp.h DssslAppMessages.h DssslSpecEventHandler.cxx \
 	DssslSpecEventHandler.h ELObj.cxx ELObj.h ELObjMessageArg.cxx \
 	ELObjMessageArg.h ELObjPropVal.h EvalContext.h Expression.cxx \
-	Expression.h FOTBuilder.cxx FOTBuilder.h FlowObj.cxx FlowObj_inst.cxx \
+	Expression.h FOTBuilder.cxx FOTBuilder.h FlowObj.cxx \
 	GroveManager.cxx GroveManager.h InheritedC.cxx Insn.cxx Insn.h \
 	Insn2.h Interpreter.cxx Interpreter.h InterpreterMessages.cxx \
 	InterpreterMessages.h LangObj.cxx LangObj.h MacroFlowObj.cxx \
@@ -17,7 +17,7 @@ libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	ProcessingMode.h SchemeParser.cxx SchemeParser.h SosofoObj.h \
 	Style.cxx Style.h StyleEngine.cxx StyleEngine.h VM.h charNames.h \
 	charProps.h dsssl_ns.h primitive.cxx primitive.h \
-	primitive_inst.cxx sdata.h style_inst.cxx style_pch.h stylelib.cxx \
+	sdata.h style_inst.cxx style_pch.h stylelib.cxx \
 	stylelib.h TransformationMode.h TransformationMode.cxx \
 	DocumentGenerator.h DocumentGenerator.cxx
 
@@ -27,7 +27,8 @@ pkginclude_HEADERS = FOTBuilder.h dsssl_ns.h DssslApp.h GroveManager.h
 
 INCLUDES = -I$(top_srcdir)/grove -I$(top_srcdir)/spgrove
 
-EXTRA_DIST = style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
+EXTRA_DIST = FlowObj_inst.cxx primitive_inst.cxx \
+	style_inst.m4 FlowObj_inst.m4 primitive_inst.m4 \
 	InterpreterMessages.msg InterpreterMessages.rc \
 	DssslAppMessages.msg DssslAppMessages.rc \
 	style.dsp 

@@ -41,13 +41,16 @@ const Char FILE_SEP = PATH_SEPARATOR;
 
 EntityApp::EntityApp(const char *requiredInternalCode)
 : CmdLineApp(requiredInternalCode),
-  mapCatalogDocument_(0)
+  mapCatalogDocument_(0),
+  restrictFileReading_(0)
 {
   registerOption('c', SP_T("catalog"), 
                  EntityAppMessages::sysid, EntityAppMessages::cHelp);
   registerOption('C', SP_T("catalogs"), EntityAppMessages::CHelp);
   registerOption('D', SP_T("directory"), 
                  EntityAppMessages::directory, EntityAppMessages::DHelp); 
+  registerOption('R', SP_T("restricted"),
+                 EntityAppMessages::RHelp);
 }
 
 void EntityApp::processOption(AppChar opt, const AppChar *arg)
@@ -61,6 +64,9 @@ void EntityApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'D':
     searchDirs_.push_back(arg);
+    break;
+  case 'R':
+    restrictFileReading_ = 1;
     break;
   default:
     CmdLineApp::processOption(opt, arg);
@@ -105,7 +111,8 @@ Ptr<ExtendEntityManager> &EntityApp::entityManager()
 #ifndef SP_WIDE_SYSTEM
 			      codingSystem(),
 #endif
-			      5);
+			      5,
+			      restrictFileReading_);
   size_t i;
   for (i = 0; i < searchDirs_.size(); i++)
     sm->addSearchDir(convertInput(searchDirs_[i]));

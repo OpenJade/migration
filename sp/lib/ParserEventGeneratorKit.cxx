@@ -109,6 +109,9 @@ void ParserEventGeneratorKit::setOption(Option opt)
   case mapCatalogDocument:
     impl_->processOption('C', 0);
     break;
+  case restrictFileReading:
+    impl_->processOption('R', 0);
+    break;
   }
 }
 

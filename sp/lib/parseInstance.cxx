@@ -451,7 +451,7 @@ StartElementEvent *Parser::doParseStartTag(Boolean &netEnabling)
   else {
     in->ungetToken();
     Ptr<AttributeDefinitionList> newAttDef;
-    if (parseAttributeSpec(0, *attributes, netEnabling, newAttDef)) {
+    if (parseAttributeSpec(tagMode, *attributes, netEnabling, newAttDef)) {
       // The difference between the indices will be the difference
       // in offsets plus 1 for each named character reference.
       if (in->currentLocation().index() - markupLocation().index()
@@ -547,7 +547,7 @@ void Parser::parseGroupStartTag()
     currentMarkup()->addDelim(Syntax::dGRPO);
   }
   Boolean active;
-  if (!parseTagNameGroup(active))
+  if (!parseTagNameGroup(active, 1))
     return;
   in->startToken();
   // Location startLocation = in->currentLocation();
@@ -565,6 +565,7 @@ void Parser::parseGroupStartTag()
   }
   else {
     in->discardInitial();
+
     extendNameToken(syntax().namelen(), ParserMessages::nameLength);
     if (currentMarkup())
       currentMarkup()->addName(currentInput());
@@ -585,7 +586,7 @@ void Parser::parseGroupEndTag()
     currentMarkup()->addDelim(Syntax::dGRPO);
   }
   Boolean active;
-  if (!parseTagNameGroup(active))
+  if (!parseTagNameGroup(active, 0))
     return;
   in->startToken();
   // Location startLocation = in->currentLocation();

@@ -15,8 +15,8 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 	InternalInputSource.h Link.h LinkProcess.h List.cxx List.h ListIter.h \
 	LiteralStorage.h Location.h Lpd.h Markup.h Message.h MessageArg.h \
 	MessageBuilder.h MessageEventHandler.h MessageFormatter.h \
-	MessageReporter.h MessageTable.h Mode.h NCVector.h Named.h \
-	NamedResource.h NamedResourceTable.h NamedTable.h Notation.h \
+	MessageModule.h MessageReporter.h MessageTable.h Mode.h NCVector.h \
+	Named.h NamedResource.h NamedResourceTable.h NamedTable.h Notation.h \
 	NotationStorage.h OpenElement.h Options.cxx Options.h \
 	OutputByteStream.h OutputCharStream.h Owner.cxx Owner.h \
 	OwnerTable.cxx OwnerTable.h ParserApp.h ParserOptions.h \
@@ -34,4 +34,7 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 
 ## We don't install the windows-only headers on unix systems, but
 ## we still include it in the distribution
-EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old
+EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old \
+	.cvsignore
+
+MAINTAINERCLEANFILES = Makefile.in

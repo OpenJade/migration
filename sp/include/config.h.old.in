@@ -21,7 +21,9 @@
 #define SP_NO_STD_NAMESPACE
 #undef SP_NEW_H_MISSING
 #endif
-
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 9)
+#undef SP_NO_STD_NAMESPACE
+#endif
 #endif /* __GNUG__ */
 
 #if defined(sun) || defined(__sun)
@@ -300,7 +302,7 @@
 #endif
 
 // NOTE: This is processed as a Makefile, not as a header by autoconf.
-#define SP_PACKAGE "@SP_PACKAGE@"
-#define SP_VERSION "@SP_VERSION@"
+#define SP_PACKAGE "@PACKAGE@"
+#define SP_VERSION "@VERSION@"
 
 #endif /* not config_INCLUDED */

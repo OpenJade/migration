@@ -21,6 +21,7 @@ namespace SP_NAMESPACE {
 class Messenger;
 class NamedCharRef;
 class CharsetInfo;
+class InternalInputSource;
 
 class SP_API InputSource : public Link {
 public:
@@ -51,6 +52,7 @@ public:
   virtual void setDocCharset(const CharsetInfo &docCharset,
 			     const CharsetInfo &emCharset);
   virtual void willNotSetDocCharset();
+  virtual InternalInputSource *asInternalInputSource();
 protected:
   InputSource(InputSourceOrigin *origin, const Char *start, const Char *end);
   void reset(const Char *start, const Char *end);

@@ -30,26 +30,54 @@ public:
     };
   // The OutputCharStream will be deleted by the MessageReporter
   MessageReporter(OutputCharStream *);
-  ~MessageReporter();
+  virtual ~MessageReporter();
   void setMessageStream(OutputCharStream *);
   OutputCharStream *releaseMessageStream();
-  void dispatchMessage(const Message &);
+  virtual void dispatchMessage(const Message &);
   virtual Boolean getMessageText(const MessageFragment &, StringC &);
   void addOption(Option);
   void setProgramName(const StringC &);
-private:
+protected:
   MessageReporter(const MessageReporter &); // undefined
   void operator=(const MessageReporter &);  // undefined
   
-  const ExternalInfo *locationHeader(const Location &, Offset &off);
-  const ExternalInfo *locationHeader(const Origin *, Index, Offset &off);
-  void printLocation(const ExternalInfo *info, Offset off);
+  virtual const ExternalInfo *locationHeader(const Location &, Offset &off);
+  virtual const ExternalInfo *locationHeader(const Origin *, Index, Offset &off);
+  virtual void printLocation(const ExternalInfo *info, Offset off);
   OutputCharStream &os();
 
   OutputCharStream *os_;
   unsigned options_;
   StringC programName_;
 };
+class SP_API XMLMessageReporter : public MessageReporter {
+  long unsigned int id ;
+  enum { SP_MESSAGES_NONE, SP_MESSAGES_TRADITIONAL, SP_MESSAGES_XML } msgmode ;
+protected:
+  virtual void printLocation(const ExternalInfo *info, Offset off);
+public:
+  XMLMessageReporter(OutputCharStream * o) ; //: MessageReporter(o), id(0) {}
+  virtual void dispatchMessage(const Message &);
+  virtual Boolean XMLformatFragment(const MessageFragment &, OutputCharStream &);
+  virtual void formatMessage(const MessageFragment &,
+		     const Vector<CopyOwner<MessageArg> > &args,
+		     OutputCharStream &, bool noquote = 0);
+
+  virtual void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
+			  OutputCharStream &os);
+  virtual const ExternalInfo *locationHeader(const Origin *, Index, Offset &off);
+  virtual void showOpenEntities(const Origin *, Index, Offset &off) ;
+  virtual void showOpenEntities(const Location &loc, Offset &off) {
+	showOpenEntities(loc.origin().pointer(), loc.index(), off) ;
+  }
+  virtual const ExternalInfo *locationHeader(const Location &loc, Offset &off) {
+    if ( msgmode == SP_MESSAGES_XML )
+	return locationHeader(loc.origin().pointer(), loc.index(), off) ;
+    else if ( msgmode == SP_MESSAGES_TRADITIONAL )
+	return MessageReporter::locationHeader(loc, off) ;
+  }
+
+} ;
 
 inline
 OutputCharStream &MessageReporter::os()

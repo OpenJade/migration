@@ -1,3 +1,31 @@
+dnl @synopsis AC_CXX_PLACEMENT_OPERATOR_DELETE
+dnl
+dnl If the compiler supports void delete(size_t,void*), define
+dnl HAVE_PLACEMENT_OPERATOR_DELETE.
+dnl
+dnl @author Matthias Clasen
+dnl
+AC_DEFUN(AC_CXX_PLACEMENT_OPERATOR_DELETE,
+[AC_CACHE_CHECK(whether the compiler supports placement operator delete,
+ac_cv_cxx_placement_operator_delete,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <stddef.h>],
+  [class Thing {
+   public:
+    Thing() { };
+    void *operator new(size_t,bool) { };
+    void operator delete(size_t,void*) { };
+   };],
+   ac_cv_cxx_placement_operator_delete=yes,
+   ac_cv_cxx_placement_operator_delete=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_placement_operator_delete" = yes; then
+  AC_DEFINE(HAVE_PLACEMENT_OPERATOR_DELETE,,
+            [define if the compiler supports placement operator delete])
+fi
+])
 
 
 dnl @synopsis AC_CXX_TYPENAME
@@ -21,40 +49,7 @@ if test "$ac_cv_cxx_typename" = yes; then
   AC_DEFINE(HAVE_TYPENAME,,[define if the compiler recognizes typename])
 fi
 ])
-dnl @synopsis AC_CXX_RTTI
-dnl
-dnl If the compiler supports Run-Time Type Identification (typeinfo
-dnl header and typeid keyword), define HAVE_RTTI.
-dnl
-dnl @version $Id$
-dnl @author Luc Maisonobe
-dnl
-AC_DEFUN(AC_CXX_RTTI,
-[AC_CACHE_CHECK(whether the compiler supports Run-Time Type Identification,
-ac_cv_cxx_rtti,
-[AC_LANG_SAVE
- AC_LANG_CPLUSPLUS
- AC_TRY_COMPILE([#include <typeinfo>
-class Base { public :
-             Base () {}
-             virtual int f () { return 0; }
-           };
-class Derived : public Base { public :
-                              Derived () {}
-                              virtual int f () { return 1; }
-                            };
-],[Derived d;
-Base *ptr = &d;
-return typeid (*ptr) == typeid (Derived);
-],
- ac_cv_cxx_rtti=yes, ac_cv_cxx_rtti=no)
- AC_LANG_RESTORE
-])
-if test "$ac_cv_cxx_rtti" = yes; then
-  AC_DEFINE(HAVE_RTTI,,
-            [define if the compiler supports Run-Time Type Identification])
-fi
-])
+
 dnl @synopsis AC_CXX_NEW_FOR_SCOPING
 dnl
 dnl If the compiler accepts the new for scoping rules (the scope of a

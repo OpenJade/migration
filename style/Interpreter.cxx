@@ -26,6 +26,8 @@ public:
   ELObjCharPropValues()
     : def_(0), map_(0) {}
 private:
+  ELObjCharPropValues(const ELObjCharPropValues &); // Undefined.
+  ELObjCharPropValues &operator=(const ELObjCharPropValues &); // Undefined.
   // 0 means no value.
   ELObj *def_;
   CharMap<ELObj *> map_;

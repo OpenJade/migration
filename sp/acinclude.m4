@@ -1,0 +1,163 @@
+dnl @synopsis AC_CXX_BOOL
+dnl
+dnl If the compiler recognizes bool as a separate built-in type,
+dnl define HAVE_BOOL. Note that a typedef is not a separate
+dnl type since you cannot overload a function such that it accepts either
+dnl the basic type or the typedef.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_BOOL,
+[AC_CACHE_CHECK(whether the compiler recognizes bool as a built-in type,
+ac_cv_cxx_bool,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([
+int f(int  x){return 1;}
+int f(char x){return 1;}
+int f(bool x){return 1;}
+],[bool b = true; return f(b);],
+ ac_cv_cxx_bool=yes, ac_cv_cxx_bool=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_bool" = yes; then
+  AC_DEFINE(HAVE_BOOL,,[define if bool is a built-in type])
+fi
+])
+
+
+dnl @synopsis AC_CXX_NEW_FOR_SCOPING
+dnl
+dnl If the compiler accepts the new for scoping rules (the scope of a
+dnl variable declared inside the parentheses is restricted to the
+dnl for-body), define HAVE_NEW_FOR_SCOPING.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_NEW_FOR_SCOPING,
+[AC_CACHE_CHECK(whether the compiler accepts the new for scoping rules,
+ac_cv_cxx_new_for_scoping,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE(,[
+  int z = 0;
+  for (int i = 0; i < 10; ++i)
+    z = z + i;
+  for (int i = 0; i < 10; ++i)
+    z = z - i;
+  return z;],
+ ac_cv_cxx_new_for_scoping=yes, ac_cv_cxx_new_for_scoping=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_new_for_scoping" = yes; then
+  AC_DEFINE(HAVE_NEW_FOR_SCOPING,,[define if the compiler accepts the new for scoping rules])
+fi
+])
+
+
+dnl @synopsis AC_CXX_DYNAMIC_CAST
+dnl
+dnl If the compiler supports dynamic_cast<>, define HAVE_DYNAMIC_CAST.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_DYNAMIC_CAST,
+[AC_CACHE_CHECK(whether the compiler supports dynamic_cast<>,
+ac_cv_cxx_dynamic_cast,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <typeinfo>
+class Base { public : Base () {} virtual void f () = 0;};
+class Derived : public Base { public : Derived () {} virtual void f () {} };],[
+Derived d; Base& b=d; return dynamic_cast<Derived*>(&b) ? 0 : 1;],
+ ac_cv_cxx_dynamic_cast=yes, ac_cv_cxx_dynamic_cast=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_dynamic_cast" = yes; then
+  AC_DEFINE(HAVE_DYNAMIC_CAST,,[define if the compiler supports dynamic_cast<>])
+fi
+])
+
+
+dnl @synopsis AC_CXX_NAMESPACES
+dnl
+dnl If the compiler can prevent names clashes using namespaces, define
+dnl HAVE_NAMESPACES.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_NAMESPACES,
+[AC_CACHE_CHECK(whether the compiler implements namespaces,
+ac_cv_cxx_namespaces,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([namespace Outer { namespace Inner { int i = 0; }}],
+                [using namespace Outer::Inner; return i;],
+ ac_cv_cxx_namespaces=yes, ac_cv_cxx_namespaces=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_namespaces" = yes; then
+  AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
+fi
+])
+
+
+dnl @synopsis ACX_CHECK_PATHNAME_STYLE_DOS
+dnl
+dnl Check if host OS uses DOS-style pathnames. This includes the use
+dnl of drive letters and backslashes. Under DOS, Windows, and OS/2,
+dnl defines HAVE_PATHNAME_STYLE_DOS and PATH_SEPARATOR to ';'.
+dnl Otherwise, defines PATH_SEPARATOR to ':'.
+dnl
+dnl Use for enabling code to handle drive letters, backslashes in
+dnl filenames and semicolons in the PATH.
+dnl
+dnl @version $Id$
+dnl @author Mark Elbrecht <snowball3@bigfoot.com>
+dnl
+AC_DEFUN(ACX_CHECK_PATHNAME_STYLE_DOS,
+[AC_MSG_CHECKING(for Windows and DOS and OS/2 style pathnames)
+AC_CACHE_VAL(acx_cv_pathname_style_dos,
+[AC_REQUIRE([AC_CANONICAL_HOST])
+
+acx_cv_pathname_style_dos="no"
+case ${host_os} in
+  *djgpp | *mingw32 | *emx*) acx_cv_pathname_style_dos="yes" ;;
+esac
+])
+AC_MSG_RESULT($acx_cv_pathname_style_dos)
+if test $acx_cv_pathname_style_dos = "yes"; then
+  AC_DEFINE(HAVE_PATHNAME_STYLE_DOS)
+  AC_DEFINE(PATH_SEPARATOR, ";")
+else
+  AC_DEFINE(PATH_SEPARATOR, ":")
+fi
+])
+
+
+dnl @synopsis AC_CXX_EXPLICIT_INSTANTIATIONS
+dnl
+dnl If the C++ compiler supports explicit instanciations syntax,
+dnl define HAVE_INSTANTIATIONS.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_EXPLICIT_INSTANTIATIONS,
+[AC_CACHE_CHECK(whether the compiler supports explicit instantiations,
+ac_cv_cxx_explinst,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([template <class T> class A { T t; }; template class A<int>;],
+ [], ac_cv_cxx_explinst=yes, ac_cv_cxx_explinst=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_explinst" = yes; then
+  AC_DEFINE(HAVE_INSTANTIATIONS,,
+            [define if the compiler supports explicit instantiations])
+fi
+])

@@ -384,7 +384,11 @@ void XmlOutputEventHandler::endElement(EndElementEvent *event)
       && event->elementType()->definition()->declaredContent() == ElementDefinition::empty)
     ;
   else {
-    os() << "</" << generalName(event->name(), nameBuf_);
+    if (options_.preserveCase) {
+      os() << "</" << event->elementType()->origName();
+    } else {
+      os() << "</" << generalName(event->name(), nameBuf_);
+    }
 #if 0
     if (options_.nlInTag)
       os() << RE;

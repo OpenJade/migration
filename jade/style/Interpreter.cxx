@@ -111,18 +111,18 @@ Interpreter::Interpreter(GroveManager *groveManager,
     " \t\r\n\f",
     "",
   };
-  lexCategory_.setChar(InputSource::eE, lexDelimiter);
+  lexCategory_.setEe(lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
 
- // #',@[\\]`{|} are ASCII chars not mentioned above,
- // but I guess we don't want to allow any of these
- // in names (as most of them have special meaning in
- // scheme/dsssl).
- if (!strictMode_)
-   for (Char i = 127; i < charMax; i++)
-     lexCategory_.setChar(i, lexAddNameStart);
+  // #',@[\\]`{|} are ASCII chars not mentioned above,
+  // but I guess we don't want to allow any of these
+  // in names (as most of them have special meaning in
+  // scheme/dsssl).
+  if (!strictMode_)
+    for (Char i = 127; i < charMax; i++)
+      lexCategory_.setChar(i, lexAddNameStart);
 
   initialProcessingMode_.setDefined();
   // can't be done before initializing lexCategory_
@@ -454,49 +454,9 @@ void Interpreter::installNodeProperties()
   }
 }
 
-static
-bool isWhitespace(Xchar c)
-{
-   switch (c) {
-     case InputSource::eE:
-     case '\t':
-     case '\f':
-     case '\r':
-     case '\n':
-     case ' ':
-	return 1;
-     default:
-        return 0;
-   }
-}
-
-static
-bool getToken(InputSource *in, Interpreter &inp)
-{
-  // Get the next sequence of nonblank chars from 
-  // in. Ignore inital blanks. Return 1 if at least
-  // one nonblank was found, else 0.
-   for (;;) {
-     in->startToken();
-     int length = 0;
-     Xchar c = in->tokenChar(inp); 
-     if (c == InputSource::eE)
-       return 0;
-     if (!isWhitespace(c)) { 
-       length = in->currentTokenLength();
-       while (!isWhitespace(c)) { 
-	 c = in->tokenChar(inp); 
-	 length++;
-       }
-       in->endToken(length - 1);
-       return 1;        
-     } 
-   }
-}
-
 void Interpreter::setCharRepertoire(const StringC &pubid)
 {
-  if (pubid == "UNREGISTERED::James Clark//Character Repertoire::Jade") {
+  if (pubid == "UNREGISTERED::OpenJade//Character Repertoire::OpenJade") {
     if (strictMode_) {
       installCharNames();
       installSdata();
@@ -507,142 +467,98 @@ void Interpreter::setCharRepertoire(const StringC &pubid)
         lexCategory_.setChar(i, lexAddNameStart);
       strictMode_ = 0;
     }
-   } else {
+   } else 
      message(InterpreterMessages::unsupportedCharRepertoire,
                 StringMessageArg(pubid));
-   }
 }
  
-void Interpreter::addStandardChars(Owner<InputSource> &ins) 
+void Interpreter::addStandardChar(const StringC &name, const StringC &num)
 {
-  InputSource *in = ins.pointer();
-  if (!in)
+  int n;
+  size_t i = 0;
+  if (!scanSignDigits(num, i, n)) {
+    message(InterpreterMessages::badCharNumber, StringMessageArg(num));
     return;
-  for (;;) {
-    // FIXME we do not check that we have valid character names
-    // and numbers (in decimal)
-    if (!getToken(in, *this)) 
-      break;
-    StringC name(in->currentTokenStart(), in->currentTokenLength());
- 
-   if (!getToken(in, *this)) {
-      setNextLocation(in->currentLocation());
-      message(InterpreterMessages::badDeclaration);
-      break;
-    }
-    StringC digits(in->currentTokenStart(), in->currentTokenLength());
+  }
 
-    int n;
-    unsigned int i=0;  
-    if (!scanSignDigits(digits, i, n)) {
-      setNextLocation(in->currentLocation());
-      message(InterpreterMessages::badCharNumber, StringMessageArg(digits));
-      continue;
-    }
-
-    const CharPart *def = namedCharTable_.lookup(name);
-    CharPart ch;
-    ch.c = n;
-    ch.defPart = dPartIndex_;
-    if (def) {
-      if (dPartIndex_ < def->defPart)
-        namedCharTable_.insert(name, ch, 1);
-      else if (def->defPart == dPartIndex_ && def->c != ch.c) {
-	setNextLocation(in->currentLocation());
-       	message(InterpreterMessages::duplicateCharName, 
-		StringMessageArg(name));
-      }
-    }
-    else 
+  const CharPart *def = namedCharTable_.lookup(name);
+  CharPart ch;
+  ch.c = n;
+  ch.defPart = dPartIndex_;
+  if (def) {
+    if (dPartIndex_ < def->defPart)
       namedCharTable_.insert(name, ch, 1);
+    else if (def->defPart == dPartIndex_ && def->c != ch.c) 
+      message(InterpreterMessages::duplicateCharName, 
+    	      StringMessageArg(name));
   }
+  else 
+    namedCharTable_.insert(name, ch, 1);
 }
 
-void Interpreter::addNameChars(Owner<InputSource> &ins)
+void Interpreter::addNameChar(const StringC &name)
 {
-  InputSource *in = ins.pointer();
-  if (!in)
-    return;
-  for (;;) {
-    if (!getToken(in, *this))
-      break;
-    StringC ch(in->currentTokenStart(), in->currentTokenLength());
-
-    const CharPart *cp = namedCharTable_.lookup(ch);
-    if (cp && lexCategory_[cp->c] == lexOther)
-      lexCategory_.setChar(cp->c, lexAddNameStart);
-    // FIXME else give an error
-  }
-}
-
-void Interpreter::addSeparatorChars(Owner<InputSource> &ins)
-{
-  InputSource *in = ins.pointer();
-  if (!in)
-    return;
-  for (;;) {
-    if (!getToken(in, *this))
-      break;
-    StringC ch(in->currentTokenStart(), in->currentTokenLength());
-
-    const CharPart *cp = namedCharTable_.lookup(ch);
-    if (cp && lexCategory_[cp->c] == lexOther)
-      lexCategory_.setChar(cp->c, lexAddWhiteSpace);
-    // FIXME else give an error
-  }
-}
-
-void Interpreter::addSdataEntity(const StringC &name, const StringC &text, Owner<InputSource> &ins)
-{
-  InputSource *in = ins.pointer();
-  if (!in)
-    return;
-
-  if (!getToken(in, *this)) {
-    setNextLocation(in->currentLocation());
-    message(InterpreterMessages::badDeclaration);
-    return;
-  }
-
-  StringC chnum(in->currentTokenStart(), in->currentTokenLength());
-  // FIXME we do not check that there is only one token
-
-  const CharPart *cp = namedCharTable_.lookup(chnum);
+  const CharPart *cp = namedCharTable_.lookup(name);
   if (!cp) 
-    return;  // FIXME
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddNameStart);
+}
+
+void Interpreter::addSeparatorChar(const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp)
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+  else if (lexCategory_[cp->c] != lexOther)
+    // FIXME give a more specific error
+    message(InterpreterMessages::badDeclaration);
+  else
+    lexCategory_.setChar(cp->c, lexAddWhiteSpace);
+}
+
+void Interpreter::addSdataEntity(const StringC &ename, const StringC &etext, const StringC &name)
+{
+  const CharPart *cp = namedCharTable_.lookup(name);
+  if (!cp) { 
+    message(InterpreterMessages::badCharName, 
+            StringMessageArg(name));
+    return; 
+  }
 
   CharPart ch;
   ch.c = cp->c;
   ch.defPart = dPartIndex_;
 
-  if (name.size() > 0) {
-    const CharPart *def = sdataEntityNameTable_.lookup(name);
+  if (ename.size() > 0) {
+    const CharPart *def = sdataEntityNameTable_.lookup(ename);
     if (def) {
       if (dPartIndex_ < def->defPart)
-	sdataEntityNameTable_.insert(name, ch);
-      else if (def->defPart == dPartIndex_ && def->c != cp->c) {
-	setNextLocation(in->currentLocation());
+	sdataEntityNameTable_.insert(ename, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
        	message(InterpreterMessages::duplicateSdataEntityName, 
-		StringMessageArg(name));
-      }
+		StringMessageArg(ename));
     }
     else
-      sdataEntityNameTable_.insert(name, ch);
+      sdataEntityNameTable_.insert(ename, ch);
   }
 
-  if (text.size() > 0) {
-    const CharPart *def = sdataEntityTextTable_.lookup(text);
+  if (etext.size() > 0) {
+    const CharPart *def = sdataEntityTextTable_.lookup(etext);
     if (def) {
       if (dPartIndex_ < def->defPart)
-	sdataEntityTextTable_.insert(text, ch);
-      else if (def->defPart == dPartIndex_ && def->c != cp->c) {
-	setNextLocation(in->currentLocation());
+	sdataEntityTextTable_.insert(etext, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) 
        	message(InterpreterMessages::duplicateSdataEntityText, 
-		StringMessageArg(text));
-      }
+		StringMessageArg(etext));
     }
     else
-      sdataEntityTextTable_.insert(text, ch);
+      sdataEntityTextTable_.insert(etext, ch);
   }
 }
 

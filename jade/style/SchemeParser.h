@@ -18,6 +18,10 @@ class SchemeParser : public Messenger {
 public:
   SchemeParser(Interpreter &, Owner<InputSource> &);
   void parse();
+  void parseStandardChars();
+  void parseMapSdataEntity(const StringC &name, const StringC &text);
+  void parseNameChars();
+  void parseSeparatorChars();
   bool parseExpression(Owner<Expression> &);
 private:
   SchemeParser(const SchemeParser &); // undefined

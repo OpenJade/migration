@@ -36,7 +36,6 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   DssslSpecEventHandler specHandler(mgr);
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
-
   for (int phase = 0; phase < 2; phase++) {
     for (size_t i = 0; i < parts.size(); i++) {
       DssslSpecEventHandler::Part::DIter diter(parts[i]->doc()->diter());
@@ -52,29 +51,30 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
 	      : phase == 1) {
 	    Owner<InputSource> in;
 	    diter.cur()->makeInputSource(specHandler, in);
+	    SchemeParser scm(*interpreter_, in);
 	    switch (diter.cur()->type()) {
             case DssslSpecEventHandler::DeclarationElement::charRepertoire:
               interpreter_->setCharRepertoire(diter.cur()->name());
               break;
+            case DssslSpecEventHandler::DeclarationElement::standardChars:
+              scm.parseStandardChars(); 
+              break;
+            case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
+              scm.parseMapSdataEntity(diter.cur()->name(), diter.cur()->text());
+              break;
             case DssslSpecEventHandler::DeclarationElement::addNameChars:
-              interpreter_->addNameChars(in);
+              scm.parseNameChars();
               break;
             case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
-              interpreter_->addSeparatorChars(in);
+              scm.parseSeparatorChars();
               break;
-	    case DssslSpecEventHandler::DeclarationElement::standardChars:
-	      interpreter_->addStandardChars(in);
-	      break;
-	    case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
-	      interpreter_->addSdataEntity(diter.cur()->name(), 
-				           diter.cur()->text(),
-				           in);
-	      break;
-	    default:
-	      interpreter_->message(InterpreterMessages::unsupportedDeclaration);
-	      break;
-	    }
-	  }
+            default:
+              interpreter_->message(
+                     InterpreterMessages::unsupportedDeclaration);
+             break;
+ 
+            }
+          }
 	}
       } while (local);
     }

@@ -379,10 +379,10 @@ public:
     lexAddWhiteSpace
   };
   LexCategory lexCategory(Xchar);
-  void addStandardChars(Owner<InputSource> &);
-  void addSdataEntity(const StringC &name, const StringC &text, Owner<InputSource> &);
-  void addNameChars(Owner<InputSource> &);
-  void addSeparatorChars(Owner<InputSource> &);
+  void addStandardChar(const StringC &, const StringC &);
+  void addSdataEntity(const StringC &, const StringC &, const StringC &);
+  void addNameChar(const StringC &);
+  void addSeparatorChar(const StringC &);
   void setCharRepertoire(const StringC &);
 private:
   Interpreter(const Interpreter &); // undefined

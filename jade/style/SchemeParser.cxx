@@ -11,6 +11,7 @@
 #include "LangObj.h"
 #include "VM.h"
 #include "ELObjMessageArg.h"
+#include "DssslSpecEventHandler.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -30,6 +31,63 @@ SchemeParser::SchemeParser(Interpreter &interp,
     StringC tem(Interpreter::makeStringC("ISO/IEC 10036/RA//Glyphs"));
     afiiPublicId_ = interp_->storePublicId(tem.data(), tem.size(), Location());
   }
+}
+
+void SchemeParser::parseStandardChars() 
+{
+  for (;;) {
+    // FIXME we do not check that we have valid character names
+    // and numbers (in decimal)
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+
+    StringC name(currentToken_);
+
+    if (!getToken(allowOtherExpr, tok) || tok != tokenNumber) {
+      message(InterpreterMessages::badDeclaration);
+      break;
+    }
+
+    interp_->addStandardChar(name, currentToken_);
+  }
+}
+
+void SchemeParser::parseNameChars()
+{
+  for (;;) {
+    // FIXME we do not check that we have valid character names
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->addNameChar(currentToken_);
+  }
+}
+
+void SchemeParser::parseSeparatorChars()
+{
+  for (;;) {
+    // FIXME we do not check that we have valid character names
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok)
+        || tok == tokenEndOfEntity)
+      break;
+    interp_->addSeparatorChar(currentToken_);
+  }
+}
+
+void SchemeParser::parseMapSdataEntity(const StringC &ename, const StringC &etext)
+{
+  Token tok;
+  if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+       || tok == tokenEndOfEntity) {
+    message(InterpreterMessages::badDeclaration);
+    return;
+  }
+
+  interp_->addSdataEntity(ename, etext, currentToken_);
 }
 
 void SchemeParser::parse()

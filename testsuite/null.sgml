@@ -1,0 +1,7 @@
+<!doctype nothing [
+
+<!element nothing o o (#pcdata)>
+
+]>
+
+<nothing></nothing>

@@ -27,7 +27,10 @@ nsgmls\nsgmls_inst.cxx \
 nsgmls\RastEventHandlerMessages.h \
 nsgmls\NsgmlsMessages.h \
 spam\SpamMessages.h \
-spam\spam_inst.cxx
+spam\spam_inst.cxx \
+sx\SxMessages.h \
+sx\XmlOutputMessages.h \
+sx\sx_inst.cxx
 
 .SUFFIXES: .m4 .msg
 
@@ -51,7 +54,12 @@ all: $(GENSRCS)
 
 {spam}.msg{spam}.h:
 	rm -f $@
-	$(PERL) -w msggen.pl -l $<
+	$(PERL) -w msggen.pl $<
+	chmod -w $@
+
+{sx}.msg{sx}.h:
+	rm -f $@
+	$(PERL) -w msggen.pl $<
 	chmod -w $@
 
 lib\version.h: lib\mkversion.pl VERSION

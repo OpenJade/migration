@@ -46,6 +46,10 @@ enum Mode {
   asMode,			// data/link/result attribute specification
   slitMode,			// system id literal starting with LIT
   slitaMode,			// system id literal starting with LITA
+  sdslitMode,			// system id literal starting with LIT
+                                // in an SGML declaration
+  sdslitaMode,			// system id literal starting with LITA
+                                // in an SGML declaration
   // These modes are needed only for the instance.
   cconMode,			// CDATA content
   rcconMode,			// RCDATA content

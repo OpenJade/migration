@@ -6,8 +6,8 @@
 # TARGTYPE "Win32 (x86) Dynamic-Link Library" 0x0102
 
 !IF "$(CFG)" == ""
-CFG=lib - Win32 Release
-!MESSAGE No configuration specified.  Defaulting to lib - Win32 Release.
+CFG=sx - Win32 Debug
+!MESSAGE No configuration specified.  Defaulting to sx - Win32 Debug.
 !ENDIF 
 
 !IF "$(CFG)" != "lib - Win32 Release" && "$(CFG)" != "lib - Win32 Debug" &&\
@@ -15,20 +15,13 @@ CFG=lib - Win32 Release
  "$(CFG)" != "spam - Win32 Release" && "$(CFG)" != "spam - Win32 Debug" &&\
  "$(CFG)" != "spent - Win32 Release" && "$(CFG)" != "spent - Win32 Debug" &&\
  "$(CFG)" != "sgmlnorm - Win32 Release" && "$(CFG)" != "sgmlnorm - Win32 Debug"\
- && "$(CFG)" != "spam - Win32 UnicodeRelease" && "$(CFG)" !=\
- "sgmlnorm - Win32 UnicodeRelease" && "$(CFG)" != "spent - Win32 UnicodeRelease"\
- && "$(CFG)" != "nsgmls - Win32 UnicodeRelease" && "$(CFG)" !=\
- "lib - Win32 UnicodeRelease" && "$(CFG)" != "spam - Win32 UnicodeDebug" &&\
- "$(CFG)" != "sgmlnorm - Win32 UnicodeDebug" && "$(CFG)" !=\
- "spent - Win32 UnicodeDebug" && "$(CFG)" != "nsgmls - Win32 UnicodeDebug" &&\
- "$(CFG)" != "lib - Win32 UnicodeDebug" && "$(CFG)" != "all - Win32 Release" &&\
- "$(CFG)" != "all - Win32 Debug" && "$(CFG)" != "all - Win32 UnicodeDebug" &&\
- "$(CFG)" != "all - Win32 UnicodeRelease"
+ && "$(CFG)" != "all - Win32 Release" && "$(CFG)" != "all - Win32 Debug" &&\
+ "$(CFG)" != "sx - Win32 Release" && "$(CFG)" != "sx - Win32 Debug"
 !MESSAGE Invalid configuration "$(CFG)" specified.
 !MESSAGE You can specify a configuration when running NMAKE on this makefile
 !MESSAGE by defining the macro CFG on the command line.  For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "SP.mak" CFG="lib - Win32 Release"
+!MESSAGE NMAKE /f "SP.mak" CFG="sx - Win32 Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
@@ -43,30 +36,10 @@ CFG=lib - Win32 Release
 !MESSAGE "sgmlnorm - Win32 Release" (based on\
  "Win32 (x86) Console Application")
 !MESSAGE "sgmlnorm - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "spam - Win32 UnicodeRelease" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "sgmlnorm - Win32 UnicodeRelease" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "spent - Win32 UnicodeRelease" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "nsgmls - Win32 UnicodeRelease" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "lib - Win32 UnicodeRelease" (based on\
- "Win32 (x86) Dynamic-Link Library")
-!MESSAGE "spam - Win32 UnicodeDebug" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "sgmlnorm - Win32 UnicodeDebug" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "spent - Win32 UnicodeDebug" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "nsgmls - Win32 UnicodeDebug" (based on\
- "Win32 (x86) Console Application")
-!MESSAGE "lib - Win32 UnicodeDebug" (based on\
- "Win32 (x86) Dynamic-Link Library")
 !MESSAGE "all - Win32 Release" (based on "Win32 (x86) External Target")
 !MESSAGE "all - Win32 Debug" (based on "Win32 (x86) External Target")
-!MESSAGE "all - Win32 UnicodeDebug" (based on "Win32 (x86) External Target")
-!MESSAGE "all - Win32 UnicodeRelease" (based on "Win32 (x86) External Target")
+!MESSAGE "sx - Win32 Release" (based on "Win32 (x86) Console Application")
+!MESSAGE "sx - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 !ERROR An invalid configuration is specified.
 !ENDIF 
@@ -78,7 +51,7 @@ NULL=nul
 !ENDIF 
 ################################################################################
 # Begin Project
-# PROP Target_Last_Scanned "lib - Win32 UnicodeDebug"
+# PROP Target_Last_Scanned "sx - Win32 Debug"
 
 !IF  "$(CFG)" == "lib - Win32 Release"
 
@@ -95,7 +68,7 @@ NULL=nul
 OUTDIR=.\lib\Release
 INTDIR=.\lib\Release
 
-ALL : ".\bin\sp120.dll"
+ALL : ".\bin\sp130.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -205,21 +178,23 @@ CLEAN :
 	-@erase "$(INTDIR)\URLStorage.obj"
 	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
+	-@erase "$(INTDIR)\WinApp.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp120.exp"
-	-@erase "$(OUTDIR)\sp120.lib"
-	-@erase ".\bin\sp120.dll"
+	-@erase "$(INTDIR)\XMLCodingSystem.obj"
+	-@erase "$(OUTDIR)\sp130.exp"
+	-@erase "$(OUTDIR)\sp130.lib"
+	-@erase ".\bin\sp130.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Yu"splib.h" /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /Yu"splib.h" /c
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c 
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\lib\Release/
 CPP_SBRS=.\.
 
@@ -257,13 +232,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp120.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp130.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp120.pdb" /machine:I386 /out:"bin/sp120.dll"\
- /implib:"$(OUTDIR)/sp120.lib" 
+ /pdb:"$(OUTDIR)/sp130.pdb" /machine:I386 /out:"bin/sp130.dll"\
+ /implib:"$(OUTDIR)/sp130.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -371,10 +346,12 @@ LINK32_OBJS= \
 	"$(INTDIR)\URLStorage.obj" \
 	"$(INTDIR)\UTF8CodingSystem.obj" \
 	"$(INTDIR)\Win32CodingSystem.obj" \
+	"$(INTDIR)\WinApp.obj" \
 	"$(INTDIR)\WinInetStorage.obj" \
-	"$(INTDIR)\xentmgr_inst.obj"
+	"$(INTDIR)\xentmgr_inst.obj" \
+	"$(INTDIR)\XMLCodingSystem.obj"
 
-".\bin\sp120.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp130.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -394,7 +371,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\Debug
 INTDIR=.\lib\Debug
 
-ALL : "$(OUTDIR)\sp120d.dll"
+ALL : "$(OUTDIR)\sp130d.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -505,23 +482,26 @@ CLEAN :
 	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
+	-@erase "$(INTDIR)\WinApp.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp120d.dll"
-	-@erase "$(OUTDIR)\sp120d.exp"
-	-@erase "$(OUTDIR)\sp120d.ilk"
-	-@erase "$(OUTDIR)\sp120d.lib"
-	-@erase "$(OUTDIR)\sp120d.pdb"
+	-@erase "$(INTDIR)\XMLCodingSystem.obj"
+	-@erase "$(OUTDIR)\sp130d.dll"
+	-@erase "$(OUTDIR)\sp130d.exp"
+	-@erase "$(OUTDIR)\sp130d.ilk"
+	-@erase "$(OUTDIR)\sp130d.lib"
+	-@erase "$(OUTDIR)\sp130d.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Yu"splib.h" /c
+# ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /Yu"splib.h" /c
 CPP_PROJ=/nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\lib\Debug/
 CPP_SBRS=.\.
 
@@ -559,12 +539,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp120d.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp130d.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/sp120d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp120d.dll"\
- /implib:"$(OUTDIR)/sp120d.lib" 
+ /pdb:"$(OUTDIR)/sp130d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp130d.dll"\
+ /implib:"$(OUTDIR)/sp130d.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -672,10 +652,12 @@ LINK32_OBJS= \
 	"$(INTDIR)\URLStorage.obj" \
 	"$(INTDIR)\UTF8CodingSystem.obj" \
 	"$(INTDIR)\Win32CodingSystem.obj" \
+	"$(INTDIR)\WinApp.obj" \
 	"$(INTDIR)\WinInetStorage.obj" \
-	"$(INTDIR)\xentmgr_inst.obj"
+	"$(INTDIR)\xentmgr_inst.obj" \
+	"$(INTDIR)\XMLCodingSystem.obj"
 
-"$(OUTDIR)\sp120d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\sp130d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -711,10 +693,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/nsgmls.pch" /YX\
- /Fo"$(INTDIR)/" /c 
+ "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/nsgmls.pch" /YX /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\nsgmls\Release/
 CPP_SBRS=.\.
 
@@ -761,7 +743,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Release\sp120.lib"
+	".\lib\Release\sp130.lib"
 
 ".\bin\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -803,10 +785,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/nsgmls.pch"\
- /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+ "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/nsgmls.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\nsgmls\Debug/
 CPP_SBRS=.\.
 
@@ -852,7 +834,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Debug\sp120d.lib"
+	".\lib\Debug\sp130d.lib"
 
 ".\lib\Debug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -889,10 +871,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/spam.pch" /YX\
- /Fo"$(INTDIR)/" /c 
+ "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/spam.pch" /YX /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\spam\Release/
 CPP_SBRS=.\.
 
@@ -938,7 +920,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Release\sp120.lib"
+	".\lib\Release\sp130.lib"
 
 ".\bin\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -979,10 +961,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/spam.pch"\
- /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+ "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/spam.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\spam\Debug/
 CPP_SBRS=.\.
 
@@ -1027,7 +1009,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Debug\sp120d.lib"
+	".\lib\Debug\sp130d.lib"
 
 ".\lib\Debug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1060,10 +1042,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/spent.pch" /YX\
- /Fo"$(INTDIR)/" /c 
+ "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/spent.pch" /YX /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\spent\Release/
 CPP_SBRS=.\.
 
@@ -1104,7 +1086,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Release\sp120.lib"
+	".\lib\Release\sp130.lib"
 
 ".\bin\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1141,10 +1123,10 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/spent.pch"\
- /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+ "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/spent.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\spent\Debug/
 CPP_SBRS=.\.
 
@@ -1184,7 +1166,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /machine:I386 /out:"lib\Debug/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Debug\sp120d.lib"
+	".\lib\Debug\sp130d.lib"
 
 ".\lib\Debug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1218,9 +1200,9 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
+ "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
  /Fp"$(INTDIR)/sgmlnorm.pch" /YX /Fo"$(INTDIR)/" /c 
 CPP_OBJS=.\sgmlnorm\Release/
 CPP_SBRS=.\.
@@ -1263,7 +1245,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Release\sp120.lib"
+	".\lib\Release\sp130.lib"
 
 ".\bin\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1301,9 +1283,9 @@ CLEAN :
 
 CPP=cl.exe
 # ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
 CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG"\
- /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
+ /D "_CONSOLE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
  /Fp"$(INTDIR)/sgmlnorm.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
 CPP_OBJS=.\sgmlnorm\Debug/
 CPP_SBRS=.\.
@@ -1345,1286 +1327,9 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Debug\sp120d.lib"
+	".\lib\Debug\sp130d.lib"
 
 ".\lib\Debug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "spam\UnicodeRelease"
-# PROP BASE Intermediate_Dir "spam\UnicodeRelease"
-# PROP BASE Target_Dir "spam"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "spam\UnicodeRelease"
-# PROP Intermediate_Dir "spam\UnicodeRelease"
-# PROP Target_Dir "spam"
-OUTDIR=.\spam\UnicodeRelease
-INTDIR=.\spam\UnicodeRelease
-
-ALL : "lib - Win32 UnicodeRelease" ".\bin\spamu.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\CopyEventHandler.obj"
-	-@erase "$(INTDIR)\MarkupEventHandler.obj"
-	-@erase "$(INTDIR)\spam.obj"
-	-@erase "$(INTDIR)\spam.res"
-	-@erase "$(INTDIR)\spam_inst.obj"
-	-@erase ".\bin\spamu.exe"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/spam.pch" /YX /Fo"$(INTDIR)/" /c 
-CPP_OBJS=.\spam\UnicodeRelease/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/spam.res" /d "NDEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/spam.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"bin/spamu.exe"
-# SUBTRACT LINK32 /profile
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:no /pdb:"$(OUTDIR)/spamu.pdb" /machine:I386\
- /out:"bin/spamu.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\CopyEventHandler.obj" \
-	"$(INTDIR)\MarkupEventHandler.obj" \
-	"$(INTDIR)\spam.obj" \
-	"$(INTDIR)\spam.res" \
-	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeRelease\sp120u.lib"
-
-".\bin\spamu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "sgmlnorm\UnicodeRelease"
-# PROP BASE Intermediate_Dir "sgmlnorm\UnicodeRelease"
-# PROP BASE Target_Dir "sgmlnorm"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "sgmlnorm\UnicodeRelease"
-# PROP Intermediate_Dir "sgmlnorm\UnicodeRelease"
-# PROP Target_Dir "sgmlnorm"
-OUTDIR=.\sgmlnorm\UnicodeRelease
-INTDIR=.\sgmlnorm\UnicodeRelease
-
-ALL : "lib - Win32 UnicodeRelease" ".\bin\sgmlnrmu.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\SGMLGenerator.obj"
-	-@erase "$(INTDIR)\sgmlnorm.obj"
-	-@erase ".\bin\sgmlnrmu.exe"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/sgmlnorm.pch" /YX /Fo"$(INTDIR)/" /c 
-CPP_OBJS=.\sgmlnorm\UnicodeRelease/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/sgmlnorm.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"bin/sgmlnrmu.exe"
-# SUBTRACT LINK32 /profile
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:no /pdb:"$(OUTDIR)/sgmlnrmu.pdb" /machine:I386\
- /out:"bin/sgmlnrmu.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\SGMLGenerator.obj" \
-	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeRelease\sp120u.lib"
-
-".\bin\sgmlnrmu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "spent\UnicodeRelease"
-# PROP BASE Intermediate_Dir "spent\UnicodeRelease"
-# PROP BASE Target_Dir "spent"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "spent\UnicodeRelease"
-# PROP Intermediate_Dir "spent\UnicodeRelease"
-# PROP Target_Dir "spent"
-OUTDIR=.\spent\UnicodeRelease
-INTDIR=.\spent\UnicodeRelease
-
-ALL : "lib - Win32 UnicodeRelease" ".\bin\spentu.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\spent.obj"
-	-@erase ".\bin\spentu.exe"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/spent.pch" /YX /Fo"$(INTDIR)/" /c 
-CPP_OBJS=.\spent\UnicodeRelease/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/spent.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"bin/spentu.exe"
-# SUBTRACT LINK32 /profile
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:no /pdb:"$(OUTDIR)/spentu.pdb" /machine:I386\
- /out:"bin/spentu.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeRelease\sp120u.lib"
-
-".\bin\spentu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "nsgmls\UnicodeRelease"
-# PROP BASE Intermediate_Dir "nsgmls\UnicodeRelease"
-# PROP BASE Target_Dir "nsgmls"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "nsgmls\UnicodeRelease"
-# PROP Intermediate_Dir "nsgmls\UnicodeRelease"
-# PROP Target_Dir "nsgmls"
-OUTDIR=.\nsgmls\UnicodeRelease
-INTDIR=.\nsgmls\UnicodeRelease
-
-ALL : "lib - Win32 UnicodeRelease" ".\bin\nsgmlsu.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\nsgmls.obj"
-	-@erase "$(INTDIR)\nsgmls.res"
-	-@erase "$(INTDIR)\nsgmls_inst.obj"
-	-@erase "$(INTDIR)\RastEventHandler.obj"
-	-@erase "$(INTDIR)\SgmlsEventHandler.obj"
-	-@erase "$(INTDIR)\StringSet.obj"
-	-@erase ".\bin\nsgmlsu.exe"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_CONSOLE" /D\
- "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/nsgmls.pch" /YX /Fo"$(INTDIR)/" /c 
-CPP_OBJS=.\nsgmls\UnicodeRelease/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/nsgmls.res" /d "NDEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/nsgmls.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /machine:I386 /out:"bin/nsgmlsu.exe"
-# SUBTRACT LINK32 /profile
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:no /pdb:"$(OUTDIR)/nsgmlsu.pdb" /machine:I386\
- /out:"bin/nsgmlsu.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\nsgmls.obj" \
-	"$(INTDIR)\nsgmls.res" \
-	"$(INTDIR)\nsgmls_inst.obj" \
-	"$(INTDIR)\RastEventHandler.obj" \
-	"$(INTDIR)\SgmlsEventHandler.obj" \
-	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeRelease\sp120u.lib"
-
-".\bin\nsgmlsu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "lib\UnicodeRelease"
-# PROP BASE Intermediate_Dir "lib\UnicodeRelease"
-# PROP BASE Target_Dir "lib"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 0
-# PROP Output_Dir "lib\UnicodeRelease"
-# PROP Intermediate_Dir "lib\UnicodeRelease"
-# PROP Target_Dir "lib"
-OUTDIR=.\lib\UnicodeRelease
-INTDIR=.\lib\UnicodeRelease
-
-ALL : ".\bin\sp120u.dll"
-
-CLEAN : 
-	-@erase "$(INTDIR)\Allocator.obj"
-	-@erase "$(INTDIR)\app_inst.obj"
-	-@erase "$(INTDIR)\arc_inst.obj"
-	-@erase "$(INTDIR)\ArcEngine.obj"
-	-@erase "$(INTDIR)\assert.obj"
-	-@erase "$(INTDIR)\Attribute.obj"
-	-@erase "$(INTDIR)\Big5CodingSystem.obj"
-	-@erase "$(INTDIR)\CharsetDecl.obj"
-	-@erase "$(INTDIR)\CharsetInfo.obj"
-	-@erase "$(INTDIR)\CharsetRegistry.obj"
-	-@erase "$(INTDIR)\CmdLineApp.obj"
-	-@erase "$(INTDIR)\CodingSystem.obj"
-	-@erase "$(INTDIR)\CodingSystemKit.obj"
-	-@erase "$(INTDIR)\ConsoleOutput.obj"
-	-@erase "$(INTDIR)\ContentState.obj"
-	-@erase "$(INTDIR)\ContentToken.obj"
-	-@erase "$(INTDIR)\DescriptorManager.obj"
-	-@erase "$(INTDIR)\Dtd.obj"
-	-@erase "$(INTDIR)\ElementType.obj"
-	-@erase "$(INTDIR)\Entity.obj"
-	-@erase "$(INTDIR)\EntityApp.obj"
-	-@erase "$(INTDIR)\EntityCatalog.obj"
-	-@erase "$(INTDIR)\EntityDecl.obj"
-	-@erase "$(INTDIR)\EntityManager.obj"
-	-@erase "$(INTDIR)\entmgr_inst.obj"
-	-@erase "$(INTDIR)\ErrnoMessageArg.obj"
-	-@erase "$(INTDIR)\ErrorCountEventHandler.obj"
-	-@erase "$(INTDIR)\EUCJPCodingSystem.obj"
-	-@erase "$(INTDIR)\Event.obj"
-	-@erase "$(INTDIR)\EventGenerator.obj"
-	-@erase "$(INTDIR)\ExtendEntityManager.obj"
-	-@erase "$(INTDIR)\ExternalId.obj"
-	-@erase "$(INTDIR)\Fixed2CodingSystem.obj"
-	-@erase "$(INTDIR)\GenericEventHandler.obj"
-	-@erase "$(INTDIR)\Group.obj"
-	-@erase "$(INTDIR)\Hash.obj"
-	-@erase "$(INTDIR)\Id.obj"
-	-@erase "$(INTDIR)\IdentityCodingSystem.obj"
-	-@erase "$(INTDIR)\IListBase.obj"
-	-@erase "$(INTDIR)\InputSource.obj"
-	-@erase "$(INTDIR)\InternalInputSource.obj"
-	-@erase "$(INTDIR)\lib.pch"
-	-@erase "$(INTDIR)\lib.res"
-	-@erase "$(INTDIR)\Link.obj"
-	-@erase "$(INTDIR)\LinkProcess.obj"
-	-@erase "$(INTDIR)\LiteralStorage.obj"
-	-@erase "$(INTDIR)\Location.obj"
-	-@erase "$(INTDIR)\Lpd.obj"
-	-@erase "$(INTDIR)\Markup.obj"
-	-@erase "$(INTDIR)\Message.obj"
-	-@erase "$(INTDIR)\MessageArg.obj"
-	-@erase "$(INTDIR)\MessageEventHandler.obj"
-	-@erase "$(INTDIR)\MessageFormatter.obj"
-	-@erase "$(INTDIR)\MessageReporter.obj"
-	-@erase "$(INTDIR)\MessageTable.obj"
-	-@erase "$(INTDIR)\ModeInfo.obj"
-	-@erase "$(INTDIR)\Notation.obj"
-	-@erase "$(INTDIR)\NotationStorage.obj"
-	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
-	-@erase "$(INTDIR)\OffsetOrderedList.obj"
-	-@erase "$(INTDIR)\OpenElement.obj"
-	-@erase "$(INTDIR)\OutputByteStream.obj"
-	-@erase "$(INTDIR)\OutputCharStream.obj"
-	-@erase "$(INTDIR)\OutputState.obj"
-	-@erase "$(INTDIR)\Param.obj"
-	-@erase "$(INTDIR)\parseAttribute.obj"
-	-@erase "$(INTDIR)\parseCommon.obj"
-	-@erase "$(INTDIR)\parseDecl.obj"
-	-@erase "$(INTDIR)\parseInstance.obj"
-	-@erase "$(INTDIR)\parseMode.obj"
-	-@erase "$(INTDIR)\parseParam.obj"
-	-@erase "$(INTDIR)\Parser.obj"
-	-@erase "$(INTDIR)\parser_inst.obj"
-	-@erase "$(INTDIR)\ParserApp.obj"
-	-@erase "$(INTDIR)\ParserEventGeneratorKit.obj"
-	-@erase "$(INTDIR)\ParserMessages.obj"
-	-@erase "$(INTDIR)\ParserOptions.obj"
-	-@erase "$(INTDIR)\ParserState.obj"
-	-@erase "$(INTDIR)\parseSd.obj"
-	-@erase "$(INTDIR)\Partition.obj"
-	-@erase "$(INTDIR)\PosixStorage.obj"
-	-@erase "$(INTDIR)\Recognizer.obj"
-	-@erase "$(INTDIR)\RewindStorageObject.obj"
-	-@erase "$(INTDIR)\Sd.obj"
-	-@erase "$(INTDIR)\SdText.obj"
-	-@erase "$(INTDIR)\SearchResultMessageArg.obj"
-	-@erase "$(INTDIR)\SGMLApplication.obj"
-	-@erase "$(INTDIR)\SgmlParser.obj"
-	-@erase "$(INTDIR)\ShortReferenceMap.obj"
-	-@erase "$(INTDIR)\SJISCodingSystem.obj"
-	-@erase "$(INTDIR)\SOEntityCatalog.obj"
-	-@erase "$(INTDIR)\splib.obj"
-	-@erase "$(INTDIR)\StdioStorage.obj"
-	-@erase "$(INTDIR)\StorageManager.obj"
-	-@erase "$(INTDIR)\StringVectorMessageArg.obj"
-	-@erase "$(INTDIR)\Syntax.obj"
-	-@erase "$(INTDIR)\Text.obj"
-	-@erase "$(INTDIR)\TokenMessageArg.obj"
-	-@erase "$(INTDIR)\TranslateCodingSystem.obj"
-	-@erase "$(INTDIR)\TrieBuilder.obj"
-	-@erase "$(INTDIR)\TypeId.obj"
-	-@erase "$(INTDIR)\Undo.obj"
-	-@erase "$(INTDIR)\UnicodeCodingSystem.obj"
-	-@erase "$(INTDIR)\UnivCharsetDesc.obj"
-	-@erase "$(INTDIR)\URLStorage.obj"
-	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
-	-@erase "$(INTDIR)\Win32CodingSystem.obj"
-	-@erase "$(INTDIR)\WinApp.obj"
-	-@erase "$(INTDIR)\WinInetStorage.obj"
-	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp120u.exp"
-	-@erase "$(OUTDIR)\sp120u.lib"
-	-@erase ".\bin\sp120u.dll"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "_WINDOWS" /D "BUILD_LIBSP" /D "WINSOCK" /D "WIN32" /YX /c
-# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Yu"splib.h" /c
-CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c 
-CPP_OBJS=.\lib\UnicodeRelease/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-MTL=mktyplib.exe
-# ADD BASE MTL /nologo /D "NDEBUG" /win32
-# ADD MTL /nologo /D "NDEBUG" /win32
-MTL_PROJ=/nologo /D "NDEBUG" /win32 
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "NDEBUG"
-# ADD RSC /l 0x809 /d "NDEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/lib.res" /d "NDEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/lib.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"lib\Release/sp108.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp120u.dll"
-# SUBTRACT LINK32 /profile
-LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
- winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp120u.pdb" /machine:I386 /out:"bin/sp120u.dll"\
- /implib:"$(OUTDIR)/sp120u.lib" 
-LINK32_OBJS= \
-	"$(INTDIR)\Allocator.obj" \
-	"$(INTDIR)\app_inst.obj" \
-	"$(INTDIR)\arc_inst.obj" \
-	"$(INTDIR)\ArcEngine.obj" \
-	"$(INTDIR)\assert.obj" \
-	"$(INTDIR)\Attribute.obj" \
-	"$(INTDIR)\Big5CodingSystem.obj" \
-	"$(INTDIR)\CharsetDecl.obj" \
-	"$(INTDIR)\CharsetInfo.obj" \
-	"$(INTDIR)\CharsetRegistry.obj" \
-	"$(INTDIR)\CmdLineApp.obj" \
-	"$(INTDIR)\CodingSystem.obj" \
-	"$(INTDIR)\CodingSystemKit.obj" \
-	"$(INTDIR)\ConsoleOutput.obj" \
-	"$(INTDIR)\ContentState.obj" \
-	"$(INTDIR)\ContentToken.obj" \
-	"$(INTDIR)\DescriptorManager.obj" \
-	"$(INTDIR)\Dtd.obj" \
-	"$(INTDIR)\ElementType.obj" \
-	"$(INTDIR)\Entity.obj" \
-	"$(INTDIR)\EntityApp.obj" \
-	"$(INTDIR)\EntityCatalog.obj" \
-	"$(INTDIR)\EntityDecl.obj" \
-	"$(INTDIR)\EntityManager.obj" \
-	"$(INTDIR)\entmgr_inst.obj" \
-	"$(INTDIR)\ErrnoMessageArg.obj" \
-	"$(INTDIR)\ErrorCountEventHandler.obj" \
-	"$(INTDIR)\EUCJPCodingSystem.obj" \
-	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\EventGenerator.obj" \
-	"$(INTDIR)\ExtendEntityManager.obj" \
-	"$(INTDIR)\ExternalId.obj" \
-	"$(INTDIR)\Fixed2CodingSystem.obj" \
-	"$(INTDIR)\GenericEventHandler.obj" \
-	"$(INTDIR)\Group.obj" \
-	"$(INTDIR)\Hash.obj" \
-	"$(INTDIR)\Id.obj" \
-	"$(INTDIR)\IdentityCodingSystem.obj" \
-	"$(INTDIR)\IListBase.obj" \
-	"$(INTDIR)\InputSource.obj" \
-	"$(INTDIR)\InternalInputSource.obj" \
-	"$(INTDIR)\lib.res" \
-	"$(INTDIR)\Link.obj" \
-	"$(INTDIR)\LinkProcess.obj" \
-	"$(INTDIR)\LiteralStorage.obj" \
-	"$(INTDIR)\Location.obj" \
-	"$(INTDIR)\Lpd.obj" \
-	"$(INTDIR)\Markup.obj" \
-	"$(INTDIR)\Message.obj" \
-	"$(INTDIR)\MessageArg.obj" \
-	"$(INTDIR)\MessageEventHandler.obj" \
-	"$(INTDIR)\MessageFormatter.obj" \
-	"$(INTDIR)\MessageReporter.obj" \
-	"$(INTDIR)\MessageTable.obj" \
-	"$(INTDIR)\ModeInfo.obj" \
-	"$(INTDIR)\Notation.obj" \
-	"$(INTDIR)\NotationStorage.obj" \
-	"$(INTDIR)\NumericCharRefOrigin.obj" \
-	"$(INTDIR)\OffsetOrderedList.obj" \
-	"$(INTDIR)\OpenElement.obj" \
-	"$(INTDIR)\OutputByteStream.obj" \
-	"$(INTDIR)\OutputCharStream.obj" \
-	"$(INTDIR)\OutputState.obj" \
-	"$(INTDIR)\Param.obj" \
-	"$(INTDIR)\parseAttribute.obj" \
-	"$(INTDIR)\parseCommon.obj" \
-	"$(INTDIR)\parseDecl.obj" \
-	"$(INTDIR)\parseInstance.obj" \
-	"$(INTDIR)\parseMode.obj" \
-	"$(INTDIR)\parseParam.obj" \
-	"$(INTDIR)\Parser.obj" \
-	"$(INTDIR)\parser_inst.obj" \
-	"$(INTDIR)\ParserApp.obj" \
-	"$(INTDIR)\ParserEventGeneratorKit.obj" \
-	"$(INTDIR)\ParserMessages.obj" \
-	"$(INTDIR)\ParserOptions.obj" \
-	"$(INTDIR)\ParserState.obj" \
-	"$(INTDIR)\parseSd.obj" \
-	"$(INTDIR)\Partition.obj" \
-	"$(INTDIR)\PosixStorage.obj" \
-	"$(INTDIR)\Recognizer.obj" \
-	"$(INTDIR)\RewindStorageObject.obj" \
-	"$(INTDIR)\Sd.obj" \
-	"$(INTDIR)\SdText.obj" \
-	"$(INTDIR)\SearchResultMessageArg.obj" \
-	"$(INTDIR)\SGMLApplication.obj" \
-	"$(INTDIR)\SgmlParser.obj" \
-	"$(INTDIR)\ShortReferenceMap.obj" \
-	"$(INTDIR)\SJISCodingSystem.obj" \
-	"$(INTDIR)\SOEntityCatalog.obj" \
-	"$(INTDIR)\splib.obj" \
-	"$(INTDIR)\StdioStorage.obj" \
-	"$(INTDIR)\StorageManager.obj" \
-	"$(INTDIR)\StringVectorMessageArg.obj" \
-	"$(INTDIR)\Syntax.obj" \
-	"$(INTDIR)\Text.obj" \
-	"$(INTDIR)\TokenMessageArg.obj" \
-	"$(INTDIR)\TranslateCodingSystem.obj" \
-	"$(INTDIR)\TrieBuilder.obj" \
-	"$(INTDIR)\TypeId.obj" \
-	"$(INTDIR)\Undo.obj" \
-	"$(INTDIR)\UnicodeCodingSystem.obj" \
-	"$(INTDIR)\UnivCharsetDesc.obj" \
-	"$(INTDIR)\URLStorage.obj" \
-	"$(INTDIR)\UTF8CodingSystem.obj" \
-	"$(INTDIR)\Win32CodingSystem.obj" \
-	"$(INTDIR)\WinApp.obj" \
-	"$(INTDIR)\WinInetStorage.obj" \
-	"$(INTDIR)\xentmgr_inst.obj"
-
-".\bin\sp120u.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "spam\UnicodeDebug"
-# PROP BASE Intermediate_Dir "spam\UnicodeDebug"
-# PROP BASE Target_Dir "spam"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "spam\UnicodeDebug"
-# PROP Intermediate_Dir "spam\UnicodeDebug"
-# PROP Target_Dir "spam"
-OUTDIR=.\spam\UnicodeDebug
-INTDIR=.\spam\UnicodeDebug
-
-ALL : "lib - Win32 UnicodeDebug" ".\lib\UnicodeDebug\spam.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\CopyEventHandler.obj"
-	-@erase "$(INTDIR)\MarkupEventHandler.obj"
-	-@erase "$(INTDIR)\spam.obj"
-	-@erase "$(INTDIR)\spam.res"
-	-@erase "$(INTDIR)\spam_inst.obj"
-	-@erase "$(INTDIR)\vc40.idb"
-	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\spam.pdb"
-	-@erase ".\lib\UnicodeDebug\spam.exe"
-	-@erase ".\lib\UnicodeDebug\spam.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/spam.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\spam\UnicodeDebug/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/spam.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/spam.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/spam.exe"
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\UnicodeDebug/spam.exe"
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/spam.pdb" /debug\
- /machine:I386 /out:"lib\UnicodeDebug/spam.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\CopyEventHandler.obj" \
-	"$(INTDIR)\MarkupEventHandler.obj" \
-	"$(INTDIR)\spam.obj" \
-	"$(INTDIR)\spam.res" \
-	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeDebug\sp120ud.lib"
-
-".\lib\UnicodeDebug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "sgmlnorm\UnicodeDebug"
-# PROP BASE Intermediate_Dir "sgmlnorm\UnicodeDebug"
-# PROP BASE Target_Dir "sgmlnorm"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "sgmlnorm\UnicodeDebug"
-# PROP Intermediate_Dir "sgmlnorm\UnicodeDebug"
-# PROP Target_Dir "sgmlnorm"
-OUTDIR=.\sgmlnorm\UnicodeDebug
-INTDIR=.\sgmlnorm\UnicodeDebug
-
-ALL : "lib - Win32 UnicodeDebug" ".\lib\UnicodeDebug\sgmlnorm.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\SGMLGenerator.obj"
-	-@erase "$(INTDIR)\sgmlnorm.obj"
-	-@erase "$(INTDIR)\vc40.idb"
-	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\sgmlnorm.pdb"
-	-@erase ".\lib\UnicodeDebug\sgmlnorm.exe"
-	-@erase ".\lib\UnicodeDebug\sgmlnorm.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG"\
- /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/sgmlnorm.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\sgmlnorm\UnicodeDebug/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/sgmlnorm.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/sgmlnorm.exe"
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\UnicodeDebug/sgmlnorm.exe"
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/sgmlnorm.pdb" /debug\
- /machine:I386 /out:"lib\UnicodeDebug/sgmlnorm.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\SGMLGenerator.obj" \
-	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeDebug\sp120ud.lib"
-
-".\lib\UnicodeDebug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "spent\UnicodeDebug"
-# PROP BASE Intermediate_Dir "spent\UnicodeDebug"
-# PROP BASE Target_Dir "spent"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "spent\UnicodeDebug"
-# PROP Intermediate_Dir "spent\UnicodeDebug"
-# PROP Target_Dir "spent"
-OUTDIR=.\spent\UnicodeDebug
-INTDIR=.\spent\UnicodeDebug
-
-ALL : "lib - Win32 UnicodeDebug" ".\lib\UnicodeDebug\spent.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\spent.obj"
-	-@erase "$(INTDIR)\vc40.idb"
-	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\spent.pdb"
-	-@erase ".\lib\UnicodeDebug\spent.exe"
-	-@erase ".\lib\UnicodeDebug\spent.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/spent.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\spent\UnicodeDebug/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/spent.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/spent.exe"
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\UnicodeDebug/spent.exe"
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/spent.pdb" /debug\
- /machine:I386 /out:"lib\UnicodeDebug/spent.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeDebug\sp120ud.lib"
-
-".\lib\UnicodeDebug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "nsgmls\UnicodeDebug"
-# PROP BASE Intermediate_Dir "nsgmls\UnicodeDebug"
-# PROP BASE Target_Dir "nsgmls"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "nsgmls\UnicodeDebug"
-# PROP Intermediate_Dir "nsgmls\UnicodeDebug"
-# PROP Target_Dir "nsgmls"
-OUTDIR=.\nsgmls\UnicodeDebug
-INTDIR=.\nsgmls\UnicodeDebug
-
-ALL : "lib - Win32 UnicodeDebug" ".\lib\UnicodeDebug\nsgmls.exe"
-
-CLEAN : 
-	-@erase "$(INTDIR)\nsgmls.obj"
-	-@erase "$(INTDIR)\nsgmls.res"
-	-@erase "$(INTDIR)\nsgmls_inst.obj"
-	-@erase "$(INTDIR)\RastEventHandler.obj"
-	-@erase "$(INTDIR)\SgmlsEventHandler.obj"
-	-@erase "$(INTDIR)\StringSet.obj"
-	-@erase "$(INTDIR)\vc40.idb"
-	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(OUTDIR)\nsgmls.pdb"
-	-@erase ".\lib\UnicodeDebug\nsgmls.exe"
-	-@erase ".\lib\UnicodeDebug\nsgmls.ilk"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "WIN32" /YX /c
-# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /YX /c
-CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D\
- "_CONSOLE" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/nsgmls.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\nsgmls\UnicodeDebug/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/nsgmls.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/nsgmls.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/nsgmls.exe"
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\UnicodeDebug/nsgmls.exe"
-LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
- advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo\
- /subsystem:console /incremental:yes /pdb:"$(OUTDIR)/nsgmls.pdb" /debug\
- /machine:I386 /out:"lib\UnicodeDebug/nsgmls.exe" 
-LINK32_OBJS= \
-	"$(INTDIR)\nsgmls.obj" \
-	"$(INTDIR)\nsgmls.res" \
-	"$(INTDIR)\nsgmls_inst.obj" \
-	"$(INTDIR)\RastEventHandler.obj" \
-	"$(INTDIR)\SgmlsEventHandler.obj" \
-	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeDebug\sp120ud.lib"
-
-".\lib\UnicodeDebug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
-    $(LINK32) @<<
-  $(LINK32_FLAGS) $(LINK32_OBJS)
-<<
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "lib\UnicodeDebug"
-# PROP BASE Intermediate_Dir "lib\UnicodeDebug"
-# PROP BASE Target_Dir "lib"
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "lib\UnicodeDebug"
-# PROP Intermediate_Dir "lib\UnicodeDebug"
-# PROP Target_Dir "lib"
-OUTDIR=.\lib\UnicodeDebug
-INTDIR=.\lib\UnicodeDebug
-
-ALL : "$(OUTDIR)\sp120ud.dll"
-
-CLEAN : 
-	-@erase "$(INTDIR)\Allocator.obj"
-	-@erase "$(INTDIR)\app_inst.obj"
-	-@erase "$(INTDIR)\arc_inst.obj"
-	-@erase "$(INTDIR)\ArcEngine.obj"
-	-@erase "$(INTDIR)\assert.obj"
-	-@erase "$(INTDIR)\Attribute.obj"
-	-@erase "$(INTDIR)\Big5CodingSystem.obj"
-	-@erase "$(INTDIR)\CharsetDecl.obj"
-	-@erase "$(INTDIR)\CharsetInfo.obj"
-	-@erase "$(INTDIR)\CharsetRegistry.obj"
-	-@erase "$(INTDIR)\CmdLineApp.obj"
-	-@erase "$(INTDIR)\CodingSystem.obj"
-	-@erase "$(INTDIR)\CodingSystemKit.obj"
-	-@erase "$(INTDIR)\ConsoleOutput.obj"
-	-@erase "$(INTDIR)\ContentState.obj"
-	-@erase "$(INTDIR)\ContentToken.obj"
-	-@erase "$(INTDIR)\DescriptorManager.obj"
-	-@erase "$(INTDIR)\Dtd.obj"
-	-@erase "$(INTDIR)\ElementType.obj"
-	-@erase "$(INTDIR)\Entity.obj"
-	-@erase "$(INTDIR)\EntityApp.obj"
-	-@erase "$(INTDIR)\EntityCatalog.obj"
-	-@erase "$(INTDIR)\EntityDecl.obj"
-	-@erase "$(INTDIR)\EntityManager.obj"
-	-@erase "$(INTDIR)\entmgr_inst.obj"
-	-@erase "$(INTDIR)\ErrnoMessageArg.obj"
-	-@erase "$(INTDIR)\ErrorCountEventHandler.obj"
-	-@erase "$(INTDIR)\EUCJPCodingSystem.obj"
-	-@erase "$(INTDIR)\Event.obj"
-	-@erase "$(INTDIR)\EventGenerator.obj"
-	-@erase "$(INTDIR)\ExtendEntityManager.obj"
-	-@erase "$(INTDIR)\ExternalId.obj"
-	-@erase "$(INTDIR)\Fixed2CodingSystem.obj"
-	-@erase "$(INTDIR)\GenericEventHandler.obj"
-	-@erase "$(INTDIR)\Group.obj"
-	-@erase "$(INTDIR)\Hash.obj"
-	-@erase "$(INTDIR)\Id.obj"
-	-@erase "$(INTDIR)\IdentityCodingSystem.obj"
-	-@erase "$(INTDIR)\IListBase.obj"
-	-@erase "$(INTDIR)\InputSource.obj"
-	-@erase "$(INTDIR)\InternalInputSource.obj"
-	-@erase "$(INTDIR)\lib.pch"
-	-@erase "$(INTDIR)\lib.res"
-	-@erase "$(INTDIR)\Link.obj"
-	-@erase "$(INTDIR)\LinkProcess.obj"
-	-@erase "$(INTDIR)\LiteralStorage.obj"
-	-@erase "$(INTDIR)\Location.obj"
-	-@erase "$(INTDIR)\Lpd.obj"
-	-@erase "$(INTDIR)\Markup.obj"
-	-@erase "$(INTDIR)\Message.obj"
-	-@erase "$(INTDIR)\MessageArg.obj"
-	-@erase "$(INTDIR)\MessageEventHandler.obj"
-	-@erase "$(INTDIR)\MessageFormatter.obj"
-	-@erase "$(INTDIR)\MessageReporter.obj"
-	-@erase "$(INTDIR)\MessageTable.obj"
-	-@erase "$(INTDIR)\ModeInfo.obj"
-	-@erase "$(INTDIR)\Notation.obj"
-	-@erase "$(INTDIR)\NotationStorage.obj"
-	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
-	-@erase "$(INTDIR)\OffsetOrderedList.obj"
-	-@erase "$(INTDIR)\OpenElement.obj"
-	-@erase "$(INTDIR)\OutputByteStream.obj"
-	-@erase "$(INTDIR)\OutputCharStream.obj"
-	-@erase "$(INTDIR)\OutputState.obj"
-	-@erase "$(INTDIR)\Param.obj"
-	-@erase "$(INTDIR)\parseAttribute.obj"
-	-@erase "$(INTDIR)\parseCommon.obj"
-	-@erase "$(INTDIR)\parseDecl.obj"
-	-@erase "$(INTDIR)\parseInstance.obj"
-	-@erase "$(INTDIR)\parseMode.obj"
-	-@erase "$(INTDIR)\parseParam.obj"
-	-@erase "$(INTDIR)\Parser.obj"
-	-@erase "$(INTDIR)\parser_inst.obj"
-	-@erase "$(INTDIR)\ParserApp.obj"
-	-@erase "$(INTDIR)\ParserEventGeneratorKit.obj"
-	-@erase "$(INTDIR)\ParserMessages.obj"
-	-@erase "$(INTDIR)\ParserOptions.obj"
-	-@erase "$(INTDIR)\ParserState.obj"
-	-@erase "$(INTDIR)\parseSd.obj"
-	-@erase "$(INTDIR)\Partition.obj"
-	-@erase "$(INTDIR)\PosixStorage.obj"
-	-@erase "$(INTDIR)\Recognizer.obj"
-	-@erase "$(INTDIR)\RewindStorageObject.obj"
-	-@erase "$(INTDIR)\Sd.obj"
-	-@erase "$(INTDIR)\SdText.obj"
-	-@erase "$(INTDIR)\SearchResultMessageArg.obj"
-	-@erase "$(INTDIR)\SGMLApplication.obj"
-	-@erase "$(INTDIR)\SgmlParser.obj"
-	-@erase "$(INTDIR)\ShortReferenceMap.obj"
-	-@erase "$(INTDIR)\SJISCodingSystem.obj"
-	-@erase "$(INTDIR)\SOEntityCatalog.obj"
-	-@erase "$(INTDIR)\splib.obj"
-	-@erase "$(INTDIR)\StdioStorage.obj"
-	-@erase "$(INTDIR)\StorageManager.obj"
-	-@erase "$(INTDIR)\StringVectorMessageArg.obj"
-	-@erase "$(INTDIR)\Syntax.obj"
-	-@erase "$(INTDIR)\Text.obj"
-	-@erase "$(INTDIR)\TokenMessageArg.obj"
-	-@erase "$(INTDIR)\TranslateCodingSystem.obj"
-	-@erase "$(INTDIR)\TrieBuilder.obj"
-	-@erase "$(INTDIR)\TypeId.obj"
-	-@erase "$(INTDIR)\Undo.obj"
-	-@erase "$(INTDIR)\UnicodeCodingSystem.obj"
-	-@erase "$(INTDIR)\UnivCharsetDesc.obj"
-	-@erase "$(INTDIR)\URLStorage.obj"
-	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
-	-@erase "$(INTDIR)\vc40.pdb"
-	-@erase "$(INTDIR)\Win32CodingSystem.obj"
-	-@erase "$(INTDIR)\WinApp.obj"
-	-@erase "$(INTDIR)\WinInetStorage.obj"
-	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp120ud.dll"
-	-@erase "$(OUTDIR)\sp120ud.exp"
-	-@erase "$(OUTDIR)\sp120ud.lib"
-	-@erase "$(OUTDIR)\sp120ud.pdb"
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-CPP=cl.exe
-# ADD BASE CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "_WINDOWS" /D "BUILD_LIBSP" /D "WINSOCK" /D "WIN32" /YX /c
-# ADD CPP /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /Yu"splib.h" /c
-CPP_PROJ=/nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /Fd"$(INTDIR)/" /c 
-CPP_OBJS=.\lib\UnicodeDebug/
-CPP_SBRS=.\.
-
-.c{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_OBJS)}.obj:
-   $(CPP) $(CPP_PROJ) $<  
-
-.c{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cpp{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-.cxx{$(CPP_SBRS)}.sbr:
-   $(CPP) $(CPP_PROJ) $<  
-
-MTL=mktyplib.exe
-# ADD BASE MTL /nologo /D "_DEBUG" /win32
-# ADD MTL /nologo /D "_DEBUG" /win32
-MTL_PROJ=/nologo /D "_DEBUG" /win32 
-RSC=rc.exe
-# ADD BASE RSC /l 0x809 /d "_DEBUG"
-# ADD RSC /l 0x809 /d "_DEBUG"
-RSC_PROJ=/l 0x809 /fo"$(INTDIR)/lib.res" /d "_DEBUG" 
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-BSC32_FLAGS=/nologo /o"$(OUTDIR)/lib.bsc" 
-BSC32_SBRS= \
-	
-LINK32=link.exe
-# ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp108d.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug/sp120ud.dll"
-LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
- winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp120ud.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp120ud.dll"\
- /implib:"$(OUTDIR)/sp120ud.lib" 
-LINK32_OBJS= \
-	"$(INTDIR)\Allocator.obj" \
-	"$(INTDIR)\app_inst.obj" \
-	"$(INTDIR)\arc_inst.obj" \
-	"$(INTDIR)\ArcEngine.obj" \
-	"$(INTDIR)\assert.obj" \
-	"$(INTDIR)\Attribute.obj" \
-	"$(INTDIR)\Big5CodingSystem.obj" \
-	"$(INTDIR)\CharsetDecl.obj" \
-	"$(INTDIR)\CharsetInfo.obj" \
-	"$(INTDIR)\CharsetRegistry.obj" \
-	"$(INTDIR)\CmdLineApp.obj" \
-	"$(INTDIR)\CodingSystem.obj" \
-	"$(INTDIR)\CodingSystemKit.obj" \
-	"$(INTDIR)\ConsoleOutput.obj" \
-	"$(INTDIR)\ContentState.obj" \
-	"$(INTDIR)\ContentToken.obj" \
-	"$(INTDIR)\DescriptorManager.obj" \
-	"$(INTDIR)\Dtd.obj" \
-	"$(INTDIR)\ElementType.obj" \
-	"$(INTDIR)\Entity.obj" \
-	"$(INTDIR)\EntityApp.obj" \
-	"$(INTDIR)\EntityCatalog.obj" \
-	"$(INTDIR)\EntityDecl.obj" \
-	"$(INTDIR)\EntityManager.obj" \
-	"$(INTDIR)\entmgr_inst.obj" \
-	"$(INTDIR)\ErrnoMessageArg.obj" \
-	"$(INTDIR)\ErrorCountEventHandler.obj" \
-	"$(INTDIR)\EUCJPCodingSystem.obj" \
-	"$(INTDIR)\Event.obj" \
-	"$(INTDIR)\EventGenerator.obj" \
-	"$(INTDIR)\ExtendEntityManager.obj" \
-	"$(INTDIR)\ExternalId.obj" \
-	"$(INTDIR)\Fixed2CodingSystem.obj" \
-	"$(INTDIR)\GenericEventHandler.obj" \
-	"$(INTDIR)\Group.obj" \
-	"$(INTDIR)\Hash.obj" \
-	"$(INTDIR)\Id.obj" \
-	"$(INTDIR)\IdentityCodingSystem.obj" \
-	"$(INTDIR)\IListBase.obj" \
-	"$(INTDIR)\InputSource.obj" \
-	"$(INTDIR)\InternalInputSource.obj" \
-	"$(INTDIR)\lib.res" \
-	"$(INTDIR)\Link.obj" \
-	"$(INTDIR)\LinkProcess.obj" \
-	"$(INTDIR)\LiteralStorage.obj" \
-	"$(INTDIR)\Location.obj" \
-	"$(INTDIR)\Lpd.obj" \
-	"$(INTDIR)\Markup.obj" \
-	"$(INTDIR)\Message.obj" \
-	"$(INTDIR)\MessageArg.obj" \
-	"$(INTDIR)\MessageEventHandler.obj" \
-	"$(INTDIR)\MessageFormatter.obj" \
-	"$(INTDIR)\MessageReporter.obj" \
-	"$(INTDIR)\MessageTable.obj" \
-	"$(INTDIR)\ModeInfo.obj" \
-	"$(INTDIR)\Notation.obj" \
-	"$(INTDIR)\NotationStorage.obj" \
-	"$(INTDIR)\NumericCharRefOrigin.obj" \
-	"$(INTDIR)\OffsetOrderedList.obj" \
-	"$(INTDIR)\OpenElement.obj" \
-	"$(INTDIR)\OutputByteStream.obj" \
-	"$(INTDIR)\OutputCharStream.obj" \
-	"$(INTDIR)\OutputState.obj" \
-	"$(INTDIR)\Param.obj" \
-	"$(INTDIR)\parseAttribute.obj" \
-	"$(INTDIR)\parseCommon.obj" \
-	"$(INTDIR)\parseDecl.obj" \
-	"$(INTDIR)\parseInstance.obj" \
-	"$(INTDIR)\parseMode.obj" \
-	"$(INTDIR)\parseParam.obj" \
-	"$(INTDIR)\Parser.obj" \
-	"$(INTDIR)\parser_inst.obj" \
-	"$(INTDIR)\ParserApp.obj" \
-	"$(INTDIR)\ParserEventGeneratorKit.obj" \
-	"$(INTDIR)\ParserMessages.obj" \
-	"$(INTDIR)\ParserOptions.obj" \
-	"$(INTDIR)\ParserState.obj" \
-	"$(INTDIR)\parseSd.obj" \
-	"$(INTDIR)\Partition.obj" \
-	"$(INTDIR)\PosixStorage.obj" \
-	"$(INTDIR)\Recognizer.obj" \
-	"$(INTDIR)\RewindStorageObject.obj" \
-	"$(INTDIR)\Sd.obj" \
-	"$(INTDIR)\SdText.obj" \
-	"$(INTDIR)\SearchResultMessageArg.obj" \
-	"$(INTDIR)\SGMLApplication.obj" \
-	"$(INTDIR)\SgmlParser.obj" \
-	"$(INTDIR)\ShortReferenceMap.obj" \
-	"$(INTDIR)\SJISCodingSystem.obj" \
-	"$(INTDIR)\SOEntityCatalog.obj" \
-	"$(INTDIR)\splib.obj" \
-	"$(INTDIR)\StdioStorage.obj" \
-	"$(INTDIR)\StorageManager.obj" \
-	"$(INTDIR)\StringVectorMessageArg.obj" \
-	"$(INTDIR)\Syntax.obj" \
-	"$(INTDIR)\Text.obj" \
-	"$(INTDIR)\TokenMessageArg.obj" \
-	"$(INTDIR)\TranslateCodingSystem.obj" \
-	"$(INTDIR)\TrieBuilder.obj" \
-	"$(INTDIR)\TypeId.obj" \
-	"$(INTDIR)\Undo.obj" \
-	"$(INTDIR)\UnicodeCodingSystem.obj" \
-	"$(INTDIR)\UnivCharsetDesc.obj" \
-	"$(INTDIR)\URLStorage.obj" \
-	"$(INTDIR)\UTF8CodingSystem.obj" \
-	"$(INTDIR)\Win32CodingSystem.obj" \
-	"$(INTDIR)\WinApp.obj" \
-	"$(INTDIR)\WinInetStorage.obj" \
-	"$(INTDIR)\xentmgr_inst.obj"
-
-"$(OUTDIR)\sp120ud.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -2650,8 +1355,8 @@ LINK32_OBJS= \
 OUTDIR=.\all\Release
 INTDIR=.\all\Release
 
-ALL : "spent - Win32 Release" "spam - Win32 Release" "sgmlnorm - Win32 Release"\
- "nsgmls - Win32 Release" "lib - Win32 Release" 
+ALL : "sx - Win32 Release" "spent - Win32 Release" "spam - Win32 Release"\
+ "sgmlnorm - Win32 Release" "nsgmls - Win32 Release" "lib - Win32 Release" 
 
 CLEAN : 
 	-@erase 
@@ -2680,8 +1385,8 @@ CLEAN :
 OUTDIR=.\all\Debug
 INTDIR=.\all\Debug
 
-ALL : "spent - Win32 Debug" "spam - Win32 Debug" "sgmlnorm - Win32 Debug"\
- "nsgmls - Win32 Debug" "lib - Win32 Debug" 
+ALL : "sx - Win32 Debug" "spent - Win32 Debug" "spam - Win32 Debug"\
+ "sgmlnorm - Win32 Debug" "nsgmls - Win32 Debug" "lib - Win32 Debug" 
 
 CLEAN : 
 	-@erase 
@@ -2689,67 +1394,175 @@ CLEAN :
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
 
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
+!ELSEIF  "$(CFG)" == "sx - Win32 Release"
 
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "all\UnicodeDebug"
-# PROP BASE Intermediate_Dir "all\UnicodeDebug"
-# PROP BASE Target_Dir "all"
-# PROP BASE Cmd_Line "NMAKE"
-# PROP BASE Rebuild_Opt ""
-# PROP BASE Target_File "all"
-# PROP BASE Bsc_Name ""
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "all\UnicodeDebug"
-# PROP Intermediate_Dir "all\UnicodeDebug"
-# PROP Target_Dir "all"
-# PROP Cmd_Line ""
-# PROP Rebuild_Opt ""
-# PROP Target_File "all"
-# PROP Bsc_Name ""
-OUTDIR=.\all\UnicodeDebug
-INTDIR=.\all\UnicodeDebug
-
-ALL : "spent - Win32 UnicodeDebug" "spam - Win32 UnicodeDebug"\
- "sgmlnorm - Win32 UnicodeDebug" "nsgmls - Win32 UnicodeDebug"\
- "lib - Win32 UnicodeDebug" 
-
-CLEAN : 
-	-@erase 
-
-"$(OUTDIR)" :
-    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
-
+# PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "all\UnicodeRelease"
-# PROP BASE Intermediate_Dir "all\UnicodeRelease"
-# PROP BASE Target_Dir "all"
-# PROP BASE Cmd_Line "NMAKE"
-# PROP BASE Rebuild_Opt ""
-# PROP BASE Target_File "all"
-# PROP BASE Bsc_Name ""
+# PROP BASE Output_Dir "sx\Release"
+# PROP BASE Intermediate_Dir "sx\Release"
+# PROP BASE Target_Dir "sx"
+# PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "all\UnicodeRelease"
-# PROP Intermediate_Dir "all\UnicodeRelease"
-# PROP Target_Dir "all"
-# PROP Cmd_Line ""
-# PROP Rebuild_Opt ""
-# PROP Target_File "all"
-# PROP Bsc_Name ""
-OUTDIR=.\all\UnicodeRelease
-INTDIR=.\all\UnicodeRelease
+# PROP Output_Dir "sx\Release"
+# PROP Intermediate_Dir "sx\Release"
+# PROP Target_Dir "sx"
+OUTDIR=.\sx\Release
+INTDIR=.\sx\Release
 
-ALL : "spent - Win32 UnicodeRelease" "spam - Win32 UnicodeRelease"\
- "sgmlnorm - Win32 UnicodeRelease" "nsgmls - Win32 UnicodeRelease"\
- "lib - Win32 UnicodeRelease" 
+ALL : "lib - Win32 Release" ".\bin\sx.exe"
 
 CLEAN : 
-	-@erase 
+	-@erase "$(INTDIR)\sx.obj"
+	-@erase "$(INTDIR)\sx.res"
+	-@erase "$(INTDIR)\sx_inst.obj"
+	-@erase "$(INTDIR)\XmlOutputEventHandler.obj"
+	-@erase ".\bin\sx.exe"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+# ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /YX /c
+# ADD CPP /nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
+CPP_PROJ=/nologo /MD /W3 /GX /O2 /I "include" /D "NDEBUG" /D "WIN32" /D\
+ "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/sx.pch" /YX /Fo"$(INTDIR)/" /c 
+CPP_OBJS=.\sx\Release/
+CPP_SBRS=.\.
+
+.c{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cpp{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cxx{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.c{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cpp{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cxx{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+RSC=rc.exe
+# ADD BASE RSC /l 0x809 /d "NDEBUG"
+# ADD RSC /l 0x809 /d "NDEBUG"
+RSC_PROJ=/l 0x809 /fo"$(INTDIR)/sx.res" /d "NDEBUG" 
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/sx.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /machine:I386 /out:"bin/sx.exe"
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
+ odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"$(OUTDIR)/sx.pdb"\
+ /machine:I386 /out:"bin/sx.exe" 
+LINK32_OBJS= \
+	"$(INTDIR)\sx.obj" \
+	"$(INTDIR)\sx.res" \
+	"$(INTDIR)\sx_inst.obj" \
+	"$(INTDIR)\XmlOutputEventHandler.obj" \
+	".\lib\Release\sp130.lib"
+
+".\bin\sx.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
+
+!ELSEIF  "$(CFG)" == "sx - Win32 Debug"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "sx\Debug"
+# PROP BASE Intermediate_Dir "sx\Debug"
+# PROP BASE Target_Dir "sx"
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "sx\Debug"
+# PROP Intermediate_Dir "sx\Debug"
+# PROP Target_Dir "sx"
+OUTDIR=.\sx\Debug
+INTDIR=.\sx\Debug
+
+ALL : "lib - Win32 Debug" ".\lib\Debug\sx.exe"
+
+CLEAN : 
+	-@erase "$(INTDIR)\sx.obj"
+	-@erase "$(INTDIR)\sx.res"
+	-@erase "$(INTDIR)\sx_inst.obj"
+	-@erase "$(INTDIR)\vc40.idb"
+	-@erase "$(INTDIR)\vc40.pdb"
+	-@erase "$(INTDIR)\XmlOutputEventHandler.obj"
+	-@erase "$(OUTDIR)\sx.pdb"
+	-@erase ".\lib\Debug\sx.exe"
+	-@erase ".\lib\Debug\sx.ilk"
+
+"$(OUTDIR)" :
+    if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
+
+CPP=cl.exe
+# ADD BASE CPP /nologo /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /YX /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "WIN32" /D "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE" /YX /c
+CPP_PROJ=/nologo /MDd /W3 /Gm /GX /Zi /Od /I "include" /D "_DEBUG" /D "WIN32"\
+ /D "_CONSOLE" /D SP_NAMESPACE=James_Clark_SP /D "SP_MULTI_BYTE"\
+ /Fp"$(INTDIR)/sx.pch" /YX /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c 
+CPP_OBJS=.\sx\Debug/
+CPP_SBRS=.\.
+
+.c{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cpp{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cxx{$(CPP_OBJS)}.obj:
+   $(CPP) $(CPP_PROJ) $<  
+
+.c{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cpp{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+.cxx{$(CPP_SBRS)}.sbr:
+   $(CPP) $(CPP_PROJ) $<  
+
+RSC=rc.exe
+# ADD BASE RSC /l 0x809 /d "_DEBUG"
+# ADD RSC /l 0x809 /d "_DEBUG"
+RSC_PROJ=/l 0x809 /fo"$(INTDIR)/sx.res" /d "_DEBUG" 
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+BSC32_FLAGS=/nologo /o"$(OUTDIR)/sx.bsc" 
+BSC32_SBRS= \
+	
+LINK32=link.exe
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /out:"lib\Debug/sx.exe"
+LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
+ advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib\
+ odbccp32.lib /nologo /subsystem:console /incremental:yes\
+ /pdb:"$(OUTDIR)/sx.pdb" /debug /machine:I386 /out:"lib\Debug/sx.exe" 
+LINK32_OBJS= \
+	"$(INTDIR)\sx.obj" \
+	"$(INTDIR)\sx.res" \
+	"$(INTDIR)\sx_inst.obj" \
+	"$(INTDIR)\XmlOutputEventHandler.obj" \
+	".\lib\Debug\sp130d.lib"
+
+".\lib\Debug\sx.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+    $(LINK32) @<<
+  $(LINK32_FLAGS) $(LINK32_OBJS)
+<<
 
 !ENDIF 
 
@@ -2758,16 +1571,10 @@ CLEAN :
 
 # Name "lib - Win32 Release"
 # Name "lib - Win32 Debug"
-# Name "lib - Win32 UnicodeRelease"
-# Name "lib - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -2949,8 +1756,9 @@ DEP_CPP_XENTM=\
 "$(INTDIR)\xentmgr_inst.obj" : $(SOURCE) $(DEP_CPP_XENTM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -2960,32 +1768,8 @@ DEP_CPP_XENTM=\
 "$(INTDIR)\xentmgr_inst.obj" : $(SOURCE) $(DEP_CPP_XENTM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\xentmgr_inst.obj" : $(SOURCE) $(DEP_CPP_XENTM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\xentmgr_inst.obj" : $(SOURCE) $(DEP_CPP_XENTM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -3168,7 +1952,10 @@ DEP_CPP_URLST=\
 
 "$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -3176,23 +1963,10 @@ DEP_CPP_URLST=\
 
 "$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\URLStorage.obj" : $(SOURCE) $(DEP_CPP_URLST) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -3372,7 +2146,10 @@ DEP_CPP_UNIVC=\
 
 "$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -3380,23 +2157,10 @@ DEP_CPP_UNIVC=\
 
 "$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\UnivCharsetDesc.obj" : $(SOURCE) $(DEP_CPP_UNIVC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -3576,7 +2340,10 @@ DEP_CPP_UNICO=\
 
 "$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -3584,23 +2351,10 @@ DEP_CPP_UNICO=\
 
 "$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\UnicodeCodingSystem.obj" : $(SOURCE) $(DEP_CPP_UNICO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -3780,7 +2534,10 @@ DEP_CPP_UNDO_=\
 
 "$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -3788,23 +2545,10 @@ DEP_CPP_UNDO_=\
 
 "$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Undo.obj" : $(SOURCE) $(DEP_CPP_UNDO_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -3984,7 +2728,10 @@ DEP_CPP_TYPEI=\
 
 "$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -3992,23 +2739,10 @@ DEP_CPP_TYPEI=\
 
 "$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\TypeId.obj" : $(SOURCE) $(DEP_CPP_TYPEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -4188,7 +2922,10 @@ DEP_CPP_TRIEB=\
 
 "$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -4196,23 +2933,10 @@ DEP_CPP_TRIEB=\
 
 "$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\TrieBuilder.obj" : $(SOURCE) $(DEP_CPP_TRIEB) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -4226,10 +2950,6 @@ SOURCE=.\lib\TokenMessageArg.h
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -4408,7 +3128,10 @@ DEP_CPP_TOKEN=\
 
 "$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -4416,23 +3139,10 @@ DEP_CPP_TOKEN=\
 
 "$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\TokenMessageArg.obj" : $(SOURCE) $(DEP_CPP_TOKEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -4446,10 +3156,6 @@ SOURCE=.\lib\token.h
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -4628,7 +3334,10 @@ DEP_CPP_TEXT_=\
 
 "$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -4636,23 +3345,10 @@ DEP_CPP_TEXT_=\
 
 "$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Text.obj" : $(SOURCE) $(DEP_CPP_TEXT_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -4832,7 +3528,10 @@ DEP_CPP_SYNTA=\
 
 "$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -4840,23 +3539,10 @@ DEP_CPP_SYNTA=\
 
 "$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Syntax.obj" : $(SOURCE) $(DEP_CPP_SYNTA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -5036,7 +3722,10 @@ DEP_CPP_STORA=\
 
 "$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -5044,23 +3733,10 @@ DEP_CPP_STORA=\
 
 "$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\StorageManager.obj" : $(SOURCE) $(DEP_CPP_STORA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -5241,7 +3917,10 @@ DEP_CPP_STDIO=\
 
 "$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -5249,23 +3928,10 @@ DEP_CPP_STDIO=\
 
 "$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\StdioStorage.obj" : $(SOURCE) $(DEP_CPP_STDIO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -5446,7 +4112,10 @@ DEP_CPP_SOENT=\
 
 "$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -5454,23 +4123,10 @@ DEP_CPP_SOENT=\
 
 "$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SOEntityCatalog.obj" : $(SOURCE) $(DEP_CPP_SOENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -5650,7 +4306,10 @@ DEP_CPP_SJISC=\
 
 "$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -5658,23 +4317,10 @@ DEP_CPP_SJISC=\
 
 "$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SJISCodingSystem.obj" : $(SOURCE) $(DEP_CPP_SJISC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -5854,7 +4500,10 @@ DEP_CPP_SHORT=\
 
 "$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -5862,23 +4511,10 @@ DEP_CPP_SHORT=\
 
 "$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ShortReferenceMap.obj" : $(SOURCE) $(DEP_CPP_SHORT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -6058,7 +4694,10 @@ DEP_CPP_SGMLP=\
 
 "$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -6066,23 +4705,10 @@ DEP_CPP_SGMLP=\
 
 "$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SgmlParser.obj" : $(SOURCE) $(DEP_CPP_SGMLP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -6262,7 +4888,10 @@ DEP_CPP_SEARC=\
 
 "$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -6270,23 +4899,10 @@ DEP_CPP_SEARC=\
 
 "$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SearchResultMessageArg.obj" : $(SOURCE) $(DEP_CPP_SEARC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -6466,7 +5082,10 @@ DEP_CPP_SDTEX=\
 
 "$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -6474,23 +5093,10 @@ DEP_CPP_SDTEX=\
 
 "$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SdText.obj" : $(SOURCE) $(DEP_CPP_SDTEX) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -6669,28 +5275,20 @@ DEP_CPP_SD_CX=\
 
 
 "$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
 
 "$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Sd.obj" : $(SOURCE) $(DEP_CPP_SD_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -6870,7 +5468,10 @@ DEP_CPP_REWIN=\
 
 "$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -6878,23 +5479,10 @@ DEP_CPP_REWIN=\
 
 "$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\RewindStorageObject.obj" : $(SOURCE) $(DEP_CPP_REWIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -7074,7 +5662,10 @@ DEP_CPP_RECOG=\
 
 "$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -7082,23 +5673,10 @@ DEP_CPP_RECOG=\
 
 "$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Recognizer.obj" : $(SOURCE) $(DEP_CPP_RECOG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -7281,7 +5859,10 @@ DEP_CPP_POSIX=\
 
 "$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -7289,23 +5870,10 @@ DEP_CPP_POSIX=\
 
 "$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\PosixStorage.obj" : $(SOURCE) $(DEP_CPP_POSIX) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -7485,7 +6053,10 @@ DEP_CPP_PARTI=\
 
 "$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -7493,23 +6064,10 @@ DEP_CPP_PARTI=\
 
 "$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Partition.obj" : $(SOURCE) $(DEP_CPP_PARTI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -7689,7 +6247,10 @@ DEP_CPP_PARSE=\
 
 "$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -7697,23 +6258,10 @@ DEP_CPP_PARSE=\
 
 "$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseSd.obj" : $(SOURCE) $(DEP_CPP_PARSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -7893,7 +6441,10 @@ DEP_CPP_PARSER=\
 
 "$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -7901,23 +6452,10 @@ DEP_CPP_PARSER=\
 
 "$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ParserState.obj" : $(SOURCE) $(DEP_CPP_PARSER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -8097,7 +6635,10 @@ DEP_CPP_PARSERO=\
 
 "$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -8105,23 +6646,10 @@ DEP_CPP_PARSERO=\
 
 "$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ParserOptions.obj" : $(SOURCE) $(DEP_CPP_PARSERO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -8301,7 +6829,10 @@ DEP_CPP_PARSERM=\
 
 "$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -8309,23 +6840,10 @@ DEP_CPP_PARSERM=\
 
 "$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ParserMessages.obj" : $(SOURCE) $(DEP_CPP_PARSERM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -8507,8 +7025,9 @@ DEP_CPP_PARSER_=\
 "$(INTDIR)\parser_inst.obj" : $(SOURCE) $(DEP_CPP_PARSER_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -8518,32 +7037,8 @@ DEP_CPP_PARSER_=\
 "$(INTDIR)\parser_inst.obj" : $(SOURCE) $(DEP_CPP_PARSER_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\parser_inst.obj" : $(SOURCE) $(DEP_CPP_PARSER_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\parser_inst.obj" : $(SOURCE) $(DEP_CPP_PARSER_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -8724,7 +7219,10 @@ DEP_CPP_PARSER_C=\
 
 "$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -8732,23 +7230,10 @@ DEP_CPP_PARSER_C=\
 
 "$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Parser.obj" : $(SOURCE) $(DEP_CPP_PARSER_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -8928,7 +7413,10 @@ DEP_CPP_PARSEP=\
 
 "$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -8936,23 +7424,10 @@ DEP_CPP_PARSEP=\
 
 "$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseParam.obj" : $(SOURCE) $(DEP_CPP_PARSEP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -9132,7 +7607,10 @@ DEP_CPP_PARSEM=\
 
 "$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -9140,23 +7618,10 @@ DEP_CPP_PARSEM=\
 
 "$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseMode.obj" : $(SOURCE) $(DEP_CPP_PARSEM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -9336,7 +7801,10 @@ DEP_CPP_PARSEI=\
 
 "$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -9344,23 +7812,10 @@ DEP_CPP_PARSEI=\
 
 "$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseInstance.obj" : $(SOURCE) $(DEP_CPP_PARSEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -9540,7 +7995,10 @@ DEP_CPP_PARSED=\
 
 "$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -9548,23 +8006,10 @@ DEP_CPP_PARSED=\
 
 "$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseDecl.obj" : $(SOURCE) $(DEP_CPP_PARSED) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -9744,7 +8189,10 @@ DEP_CPP_PARSEC=\
 
 "$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -9752,23 +8200,10 @@ DEP_CPP_PARSEC=\
 
 "$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseCommon.obj" : $(SOURCE) $(DEP_CPP_PARSEC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -9948,7 +8383,10 @@ DEP_CPP_PARSEA=\
 
 "$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -9956,23 +8394,10 @@ DEP_CPP_PARSEA=\
 
 "$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\parseAttribute.obj" : $(SOURCE) $(DEP_CPP_PARSEA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -10152,7 +8577,10 @@ DEP_CPP_PARAM=\
 
 "$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -10160,23 +8588,10 @@ DEP_CPP_PARAM=\
 
 "$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Param.obj" : $(SOURCE) $(DEP_CPP_PARAM) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -10356,7 +8771,10 @@ DEP_CPP_OUTPU=\
 
 "$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -10364,23 +8782,10 @@ DEP_CPP_OUTPU=\
 
 "$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\OutputState.obj" : $(SOURCE) $(DEP_CPP_OUTPU) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -10560,7 +8965,10 @@ DEP_CPP_OUTPUT=\
 
 "$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -10568,23 +8976,10 @@ DEP_CPP_OUTPUT=\
 
 "$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\OutputCharStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -10764,7 +9159,10 @@ DEP_CPP_OPENE=\
 
 "$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -10772,23 +9170,10 @@ DEP_CPP_OPENE=\
 
 "$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\OpenElement.obj" : $(SOURCE) $(DEP_CPP_OPENE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -10802,10 +9187,6 @@ SOURCE=.\lib\OffsetOrderedList.h
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -10986,7 +9367,10 @@ DEP_CPP_OFFSE=\
 
 "$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -10994,23 +9378,10 @@ DEP_CPP_OFFSE=\
 
 "$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\OffsetOrderedList.obj" : $(SOURCE) $(DEP_CPP_OFFSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -11190,7 +9561,10 @@ DEP_CPP_NUMER=\
 
 "$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -11198,23 +9572,10 @@ DEP_CPP_NUMER=\
 
 "$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\NumericCharRefOrigin.obj" : $(SOURCE) $(DEP_CPP_NUMER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -11394,7 +9755,10 @@ DEP_CPP_NOTAT=\
 
 "$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -11402,23 +9766,10 @@ DEP_CPP_NOTAT=\
 
 "$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Notation.obj" : $(SOURCE) $(DEP_CPP_NOTAT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -11598,7 +9949,10 @@ DEP_CPP_MODEI=\
 
 "$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -11606,23 +9960,10 @@ DEP_CPP_MODEI=\
 
 "$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ModeInfo.obj" : $(SOURCE) $(DEP_CPP_MODEI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -11803,7 +10144,10 @@ DEP_CPP_MESSA=\
 
 "$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -11811,23 +10155,10 @@ DEP_CPP_MESSA=\
 
 "$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MessageReporter.obj" : $(SOURCE) $(DEP_CPP_MESSA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -12007,7 +10338,10 @@ DEP_CPP_MESSAG=\
 
 "$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -12015,23 +10349,10 @@ DEP_CPP_MESSAG=\
 
 "$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MessageEventHandler.obj" : $(SOURCE) $(DEP_CPP_MESSAG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -12211,7 +10532,10 @@ DEP_CPP_MESSAGE=\
 
 "$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -12219,23 +10543,10 @@ DEP_CPP_MESSAGE=\
 
 "$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MessageArg.obj" : $(SOURCE) $(DEP_CPP_MESSAGE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -12415,7 +10726,10 @@ DEP_CPP_MESSAGE_=\
 
 "$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -12423,23 +10737,10 @@ DEP_CPP_MESSAGE_=\
 
 "$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Message.obj" : $(SOURCE) $(DEP_CPP_MESSAGE_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -12619,7 +10920,10 @@ DEP_CPP_MARKU=\
 
 "$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -12627,23 +10931,10 @@ DEP_CPP_MARKU=\
 
 "$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Markup.obj" : $(SOURCE) $(DEP_CPP_MARKU) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -12823,7 +11114,10 @@ DEP_CPP_LPD_C=\
 
 "$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -12831,23 +11125,10 @@ DEP_CPP_LPD_C=\
 
 "$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Lpd.obj" : $(SOURCE) $(DEP_CPP_LPD_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -13028,7 +11309,10 @@ DEP_CPP_LOCAT=\
 
 "$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -13036,23 +11320,10 @@ DEP_CPP_LOCAT=\
 
 "$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Location.obj" : $(SOURCE) $(DEP_CPP_LOCAT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -13232,7 +11503,10 @@ DEP_CPP_LITER=\
 
 "$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -13240,23 +11514,10 @@ DEP_CPP_LITER=\
 
 "$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\LiteralStorage.obj" : $(SOURCE) $(DEP_CPP_LITER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -13436,7 +11697,10 @@ DEP_CPP_LINKP=\
 
 "$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -13444,23 +11708,10 @@ DEP_CPP_LINKP=\
 
 "$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\LinkProcess.obj" : $(SOURCE) $(DEP_CPP_LINKP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -13640,7 +11891,10 @@ DEP_CPP_LINK_=\
 
 "$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -13648,23 +11902,10 @@ DEP_CPP_LINK_=\
 
 "$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Link.obj" : $(SOURCE) $(DEP_CPP_LINK_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -13844,7 +12085,10 @@ DEP_CPP_INTER=\
 
 "$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -13852,23 +12096,10 @@ DEP_CPP_INTER=\
 
 "$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\InternalInputSource.obj" : $(SOURCE) $(DEP_CPP_INTER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -14048,7 +12279,10 @@ DEP_CPP_INPUT=\
 
 "$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -14056,23 +12290,10 @@ DEP_CPP_INPUT=\
 
 "$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\InputSource.obj" : $(SOURCE) $(DEP_CPP_INPUT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -14252,7 +12473,10 @@ DEP_CPP_ILIST=\
 
 "$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -14260,23 +12484,10 @@ DEP_CPP_ILIST=\
 
 "$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\IListBase.obj" : $(SOURCE) $(DEP_CPP_ILIST) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -14456,7 +12667,10 @@ DEP_CPP_IDENT=\
 
 "$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -14464,23 +12678,10 @@ DEP_CPP_IDENT=\
 
 "$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\IdentityCodingSystem.obj" : $(SOURCE) $(DEP_CPP_IDENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -14659,28 +12860,20 @@ DEP_CPP_ID_CX=\
 
 
 "$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
 
 "$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Id.obj" : $(SOURCE) $(DEP_CPP_ID_CX) "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -14860,7 +13053,10 @@ DEP_CPP_HASH_=\
 
 "$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -14868,23 +13064,10 @@ DEP_CPP_HASH_=\
 
 "$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Hash.obj" : $(SOURCE) $(DEP_CPP_HASH_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -15064,7 +13247,10 @@ DEP_CPP_GROUP=\
 
 "$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -15072,23 +13258,10 @@ DEP_CPP_GROUP=\
 
 "$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Group.obj" : $(SOURCE) $(DEP_CPP_GROUP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -15268,7 +13441,10 @@ DEP_CPP_FIXED=\
 
 "$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -15276,23 +13452,10 @@ DEP_CPP_FIXED=\
 
 "$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Fixed2CodingSystem.obj" : $(SOURCE) $(DEP_CPP_FIXED) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -15472,7 +13635,10 @@ DEP_CPP_EXTER=\
 
 "$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -15480,23 +13646,10 @@ DEP_CPP_EXTER=\
 
 "$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ExternalId.obj" : $(SOURCE) $(DEP_CPP_EXTER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -15679,7 +13832,10 @@ DEP_CPP_EXTEN=\
 
 "$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -15687,23 +13843,10 @@ DEP_CPP_EXTEN=\
 
 "$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ExtendEntityManager.obj" : $(SOURCE) $(DEP_CPP_EXTEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -15883,7 +14026,10 @@ DEP_CPP_EVENT=\
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -15891,23 +14037,10 @@ DEP_CPP_EVENT=\
 
 "$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Event.obj" : $(SOURCE) $(DEP_CPP_EVENT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -16087,7 +14220,10 @@ DEP_CPP_EUCJP=\
 
 "$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -16095,23 +14231,10 @@ DEP_CPP_EUCJP=\
 
 "$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EUCJPCodingSystem.obj" : $(SOURCE) $(DEP_CPP_EUCJP) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -16291,7 +14414,10 @@ DEP_CPP_ERRNO=\
 
 "$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -16299,23 +14425,10 @@ DEP_CPP_ERRNO=\
 
 "$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ErrnoMessageArg.obj" : $(SOURCE) $(DEP_CPP_ERRNO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -16497,8 +14610,9 @@ DEP_CPP_ENTMG=\
 "$(INTDIR)\entmgr_inst.obj" : $(SOURCE) $(DEP_CPP_ENTMG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -16508,32 +14622,8 @@ DEP_CPP_ENTMG=\
 "$(INTDIR)\entmgr_inst.obj" : $(SOURCE) $(DEP_CPP_ENTMG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\entmgr_inst.obj" : $(SOURCE) $(DEP_CPP_ENTMG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\entmgr_inst.obj" : $(SOURCE) $(DEP_CPP_ENTMG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -16714,7 +14804,10 @@ DEP_CPP_ENTIT=\
 
 "$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -16722,23 +14815,10 @@ DEP_CPP_ENTIT=\
 
 "$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EntityManager.obj" : $(SOURCE) $(DEP_CPP_ENTIT) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -16918,7 +14998,10 @@ DEP_CPP_ENTITY=\
 
 "$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -16926,23 +15009,10 @@ DEP_CPP_ENTITY=\
 
 "$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EntityDecl.obj" : $(SOURCE) $(DEP_CPP_ENTITY) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -17122,7 +15192,10 @@ DEP_CPP_ENTITYC=\
 
 "$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -17130,23 +15203,10 @@ DEP_CPP_ENTITYC=\
 
 "$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EntityCatalog.obj" : $(SOURCE) $(DEP_CPP_ENTITYC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -17326,7 +15386,10 @@ DEP_CPP_ENTITY_=\
 
 "$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -17334,23 +15397,10 @@ DEP_CPP_ENTITY_=\
 
 "$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Entity.obj" : $(SOURCE) $(DEP_CPP_ENTITY_) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -17530,7 +15580,10 @@ DEP_CPP_ELEME=\
 
 "$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -17538,23 +15591,10 @@ DEP_CPP_ELEME=\
 
 "$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ElementType.obj" : $(SOURCE) $(DEP_CPP_ELEME) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -17734,7 +15774,10 @@ DEP_CPP_DTD_C=\
 
 "$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -17742,23 +15785,10 @@ DEP_CPP_DTD_C=\
 
 "$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Dtd.obj" : $(SOURCE) $(DEP_CPP_DTD_C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -17938,7 +15968,10 @@ DEP_CPP_DESCR=\
 
 "$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -17946,23 +15979,10 @@ DEP_CPP_DESCR=\
 
 "$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\DescriptorManager.obj" : $(SOURCE) $(DEP_CPP_DESCR) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -18142,7 +16162,10 @@ DEP_CPP_CONTE=\
 
 "$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -18150,23 +16173,10 @@ DEP_CPP_CONTE=\
 
 "$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ContentToken.obj" : $(SOURCE) $(DEP_CPP_CONTE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -18361,7 +16371,10 @@ DEP_CPP_CHARS=\
 
 "$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -18369,23 +16382,10 @@ DEP_CPP_CHARS=\
 
 "$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CharsetRegistry.obj" : $(SOURCE) $(DEP_CPP_CHARS) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -18565,7 +16565,10 @@ DEP_CPP_CHARSE=\
 
 "$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -18573,23 +16576,10 @@ DEP_CPP_CHARSE=\
 
 "$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CharsetInfo.obj" : $(SOURCE) $(DEP_CPP_CHARSE) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -18769,7 +16759,10 @@ DEP_CPP_CHARSET=\
 
 "$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -18777,23 +16770,10 @@ DEP_CPP_CHARSET=\
 
 "$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CharsetDecl.obj" : $(SOURCE) $(DEP_CPP_CHARSET) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -18973,7 +16953,10 @@ DEP_CPP_ATTRI=\
 
 "$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -18981,23 +16964,10 @@ DEP_CPP_ATTRI=\
 
 "$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Attribute.obj" : $(SOURCE) $(DEP_CPP_ATTRI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -19177,7 +17147,10 @@ DEP_CPP_ASSER=\
 
 "$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -19185,23 +17158,10 @@ DEP_CPP_ASSER=\
 
 "$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\assert.obj" : $(SOURCE) $(DEP_CPP_ASSER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -19383,8 +17343,9 @@ DEP_CPP_APP_I=\
 "$(INTDIR)\app_inst.obj" : $(SOURCE) $(DEP_CPP_APP_I) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -19394,32 +17355,8 @@ DEP_CPP_APP_I=\
 "$(INTDIR)\app_inst.obj" : $(SOURCE) $(DEP_CPP_APP_I) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\app_inst.obj" : $(SOURCE) $(DEP_CPP_APP_I) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\app_inst.obj" : $(SOURCE) $(DEP_CPP_APP_I) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -19600,7 +17537,10 @@ DEP_CPP_ALLOC=\
 
 "$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -19608,23 +17548,10 @@ DEP_CPP_ALLOC=\
 
 "$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Allocator.obj" : $(SOURCE) $(DEP_CPP_ALLOC) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -19804,7 +17731,10 @@ DEP_CPP_ERROR=\
 
 "$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -19812,23 +17742,10 @@ DEP_CPP_ERROR=\
 
 "$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ErrorCountEventHandler.obj" : $(SOURCE) $(DEP_CPP_ERROR) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -20008,7 +17925,10 @@ DEP_CPP_WIN32=\
 
 "$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -20016,23 +17936,10 @@ DEP_CPP_WIN32=\
 
 "$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Win32CodingSystem.obj" : $(SOURCE) $(DEP_CPP_WIN32) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -20212,7 +18119,10 @@ DEP_CPP_UTF8C=\
 
 "$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -20220,23 +18130,10 @@ DEP_CPP_UTF8C=\
 
 "$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\UTF8CodingSystem.obj" : $(SOURCE) $(DEP_CPP_UTF8C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -20416,7 +18313,10 @@ DEP_CPP_STRIN=\
 
 "$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -20424,23 +18324,10 @@ DEP_CPP_STRIN=\
 
 "$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\StringVectorMessageArg.obj" : $(SOURCE) $(DEP_CPP_STRIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -20621,7 +18508,10 @@ DEP_CPP_PARSERA=\
 
 "$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -20629,23 +18519,10 @@ DEP_CPP_PARSERA=\
 
 "$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ParserApp.obj" : $(SOURCE) $(DEP_CPP_PARSERA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -20826,7 +18703,10 @@ DEP_CPP_ENTITYA=\
 
 "$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -20834,23 +18714,10 @@ DEP_CPP_ENTITYA=\
 
 "$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EntityApp.obj" : $(SOURCE) $(DEP_CPP_ENTITYA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -21034,7 +18901,10 @@ DEP_CPP_CMDLI=\
 
 "$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -21042,23 +18912,10 @@ DEP_CPP_CMDLI=\
 
 "$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CmdLineApp.obj" : $(SOURCE) $(DEP_CPP_CMDLI) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -21238,7 +19095,10 @@ DEP_CPP_CONSO=\
 
 "$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -21246,23 +19106,10 @@ DEP_CPP_CONSO=\
 
 "$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ConsoleOutput.obj" : $(SOURCE) $(DEP_CPP_CONSO) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -21442,7 +19289,10 @@ DEP_CPP_CONTEN=\
 
 "$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -21450,23 +19300,10 @@ DEP_CPP_CONTEN=\
 
 "$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ContentState.obj" : $(SOURCE) $(DEP_CPP_CONTEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -21647,7 +19484,10 @@ DEP_CPP_ARCEN=\
 
 "$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -21655,23 +19495,10 @@ DEP_CPP_ARCEN=\
 
 "$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ArcEngine.obj" : $(SOURCE) $(DEP_CPP_ARCEN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -21853,8 +19680,9 @@ DEP_CPP_ARC_I=\
 "$(INTDIR)\arc_inst.obj" : $(SOURCE) $(DEP_CPP_ARC_I) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -21864,32 +19692,8 @@ DEP_CPP_ARC_I=\
 "$(INTDIR)\arc_inst.obj" : $(SOURCE) $(DEP_CPP_ARC_I) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\arc_inst.obj" : $(SOURCE) $(DEP_CPP_ARC_I) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yu"splib.h"
-
-"$(INTDIR)\arc_inst.obj" : $(SOURCE) $(DEP_CPP_ARC_I) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -22071,8 +19875,9 @@ DEP_CPP_SPLIB=\
 
 BuildCmds= \
 	$(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/" /c $(SOURCE) \
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE) \
 	
 
 "$(INTDIR)\splib.obj" : $(SOURCE) $(DEP_CPP_SPLIB) "$(INTDIR)"
@@ -22087,42 +19892,8 @@ BuildCmds= \
 
 BuildCmds= \
 	$(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP\
- /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/" /Fd"$(INTDIR)/" /c\
- $(SOURCE) \
-	
-
-"$(INTDIR)\splib.obj" : $(SOURCE) $(DEP_CPP_SPLIB) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\lib.pch" : $(SOURCE) $(DEP_CPP_SPLIB) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-# ADD CPP /Yc"splib.h"
-
-BuildCmds= \
-	$(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE) \
-	
-
-"$(INTDIR)\splib.obj" : $(SOURCE) $(DEP_CPP_SPLIB) "$(INTDIR)"
-   $(BuildCmds)
-
-"$(INTDIR)\lib.pch" : $(SOURCE) $(DEP_CPP_SPLIB) "$(INTDIR)"
-   $(BuildCmds)
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-# ADD CPP /Yc"splib.h"
-
-BuildCmds= \
-	$(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yc"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE) \
 	
 
@@ -22309,7 +20080,10 @@ DEP_CPP_SGMLA=\
 
 "$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -22317,23 +20091,10 @@ DEP_CPP_SGMLA=\
 
 "$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SGMLApplication.obj" : $(SOURCE) $(DEP_CPP_SGMLA) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -22513,7 +20274,10 @@ DEP_CPP_PARSERE=\
 
 "$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
  "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -22521,23 +20285,10 @@ DEP_CPP_PARSERE=\
 
 "$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
  "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
- "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\ParserEventGeneratorKit.obj" : $(SOURCE) $(DEP_CPP_PARSERE)\
- "$(INTDIR)" "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -22717,7 +20468,10 @@ DEP_CPP_GENER=\
 
 "$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -22725,23 +20479,10 @@ DEP_CPP_GENER=\
 
 "$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\GenericEventHandler.obj" : $(SOURCE) $(DEP_CPP_GENER) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -22921,7 +20662,10 @@ DEP_CPP_EVENTG=\
 
 "$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -22929,23 +20673,10 @@ DEP_CPP_EVENTG=\
 
 "$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\EventGenerator.obj" : $(SOURCE) $(DEP_CPP_EVENTG) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -22977,20 +20708,6 @@ DEP_RSC_LIB_R=\
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-
-"$(INTDIR)\lib.res" : $(SOURCE) $(DEP_RSC_LIB_R) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/lib.res" /i "lib" /d "_DEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\lib.res" : $(SOURCE) $(DEP_RSC_LIB_R) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/lib.res" /i "lib" /d "NDEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 
 "$(INTDIR)\lib.res" : $(SOURCE) $(DEP_RSC_LIB_R) "$(INTDIR)"
@@ -23175,7 +20892,10 @@ DEP_CPP_MESSAGET=\
 
 "$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -23183,23 +20903,10 @@ DEP_CPP_MESSAGET=\
 
 "$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MessageTable.obj" : $(SOURCE) $(DEP_CPP_MESSAGET) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -23381,7 +21088,10 @@ DEP_CPP_WININ=\
 
 "$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -23389,23 +21099,10 @@ DEP_CPP_WININ=\
 
 "$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\WinInetStorage.obj" : $(SOURCE) $(DEP_CPP_WININ) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -23420,10 +21117,6 @@ SOURCE=.\lib\ParserMessages.msg
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -23435,10 +21128,6 @@ SOURCE=.\lib\arc_inst.m4
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -23452,10 +21141,6 @@ SOURCE=.\lib\app_inst.m4
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -23467,10 +21152,6 @@ SOURCE=.\lib\entmgr_inst.m4
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -23484,10 +21165,6 @@ SOURCE=.\lib\instmac.m4
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -23500,10 +21177,6 @@ SOURCE=.\lib\parser_inst.m4
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -23515,10 +21188,6 @@ SOURCE=.\lib\xentmgr_inst.m4
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -23698,7 +21367,10 @@ DEP_CPP_TRANS=\
 
 "$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -23706,23 +21378,10 @@ DEP_CPP_TRANS=\
 
 "$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\TranslateCodingSystem.obj" : $(SOURCE) $(DEP_CPP_TRANS) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -23865,6 +21524,7 @@ DEP_CPP_CODIN=\
 	".\include\Win32CodingSystem.h"\
 	".\include\XcharMap.cxx"\
 	".\include\XcharMap.h"\
+	".\include\XMLCodingSystem.h"\
 	".\include\xnew.h"\
 	".\lib\ArcProcessor.h"\
 	".\lib\CatalogEntry.h"\
@@ -23904,7 +21564,10 @@ DEP_CPP_CODIN=\
 
 "$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -23912,23 +21575,10 @@ DEP_CPP_CODIN=\
 
 "$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CodingSystemKit.obj" : $(SOURCE) $(DEP_CPP_CODIN) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -23943,10 +21593,6 @@ SOURCE=.\lib\CmdLineAppMessages.msg
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -23958,10 +21604,6 @@ SOURCE=.\lib\EntityManagerMessages.msg
 !IF  "$(CFG)" == "lib - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -24140,7 +21782,10 @@ DEP_CPP_CODING=\
 
 "$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -24148,23 +21793,10 @@ DEP_CPP_CODING=\
 
 "$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CodingSystem.obj" : $(SOURCE) $(DEP_CPP_CODING) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -24345,7 +21977,10 @@ DEP_CPP_BIG5C=\
 
 "$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -24353,23 +21988,10 @@ DEP_CPP_BIG5C=\
 
 "$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\Big5CodingSystem.obj" : $(SOURCE) $(DEP_CPP_BIG5C) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -24551,7 +22173,10 @@ DEP_CPP_OUTPUTB=\
 
 "$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -24559,23 +22184,10 @@ DEP_CPP_OUTPUTB=\
 
 "$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\OutputByteStream.obj" : $(SOURCE) $(DEP_CPP_OUTPUTB) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -24756,7 +22368,10 @@ DEP_CPP_MESSAGEF=\
 
 "$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -24764,23 +22379,10 @@ DEP_CPP_MESSAGEF=\
 
 "$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
- "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -24959,31 +22561,25 @@ DEP_CPP_WINAP=\
 
 !IF  "$(CFG)" == "lib - Win32 Release"
 
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
-
+# PROP Exclude_From_Build 0
 
 "$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
- /c $(SOURCE)
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
+# PROP Exclude_From_Build 0
 
 "$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
- "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
- SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
  /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
@@ -25164,7 +22760,10 @@ DEP_CPP_NOTATI=\
 
 "$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -25172,23 +22771,205 @@ DEP_CPP_NOTATI=\
 
 "$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\lib\XMLCodingSystem.cxx
+DEP_CPP_XMLCO=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\XMLCodingSystem.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
+
+!IF  "$(CFG)" == "lib - Win32 Release"
 
 
-"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
+"$(INTDIR)\XMLCodingSystem.obj" : $(SOURCE) $(DEP_CPP_XMLCO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/" /c\
+ $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
 
 
-"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
+"$(INTDIR)\XMLCodingSystem.obj" : $(SOURCE) $(DEP_CPP_XMLCO) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D\
+ "SP_MULTI_BYTE" /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
 
 
 !ENDIF 
@@ -25200,16 +22981,10 @@ DEP_CPP_NOTATI=\
 
 # Name "nsgmls - Win32 Release"
 # Name "nsgmls - Win32 Debug"
-# Name "nsgmls - Win32 UnicodeRelease"
-# Name "nsgmls - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "nsgmls - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -25227,16 +23002,6 @@ DEP_CPP_NOTATI=\
 
 "lib - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-"lib - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeRelease" 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-"lib - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeDebug" 
 
 !ENDIF 
 
@@ -25262,35 +23027,9 @@ DEP_CPP_STRING=\
 	".\nsgmls\StringSet.h"\
 	
 
-!IF  "$(CFG)" == "nsgmls - Win32 Release"
-
-
 "$(INTDIR)\StringSet.obj" : $(SOURCE) $(DEP_CPP_STRING) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-
-"$(INTDIR)\StringSet.obj" : $(SOURCE) $(DEP_CPP_STRING) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\StringSet.obj" : $(SOURCE) $(DEP_CPP_STRING) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\StringSet.obj" : $(SOURCE) $(DEP_CPP_STRING) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -25387,35 +23126,9 @@ DEP_CPP_SGMLS=\
 	".\nsgmls\StringSet.h"\
 	
 
-!IF  "$(CFG)" == "nsgmls - Win32 Release"
-
-
 "$(INTDIR)\SgmlsEventHandler.obj" : $(SOURCE) $(DEP_CPP_SGMLS) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-
-"$(INTDIR)\SgmlsEventHandler.obj" : $(SOURCE) $(DEP_CPP_SGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SgmlsEventHandler.obj" : $(SOURCE) $(DEP_CPP_SGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SgmlsEventHandler.obj" : $(SOURCE) $(DEP_CPP_SGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -25510,35 +23223,9 @@ DEP_CPP_RASTE=\
 	".\nsgmls\RastEventHandlerMessages.h"\
 	
 
-!IF  "$(CFG)" == "nsgmls - Win32 Release"
-
-
 "$(INTDIR)\RastEventHandler.obj" : $(SOURCE) $(DEP_CPP_RASTE) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-
-"$(INTDIR)\RastEventHandler.obj" : $(SOURCE) $(DEP_CPP_RASTE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\RastEventHandler.obj" : $(SOURCE) $(DEP_CPP_RASTE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\RastEventHandler.obj" : $(SOURCE) $(DEP_CPP_RASTE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -25630,35 +23317,9 @@ DEP_CPP_NSGML=\
 	".\nsgmls\StringSet.h"\
 	
 
-!IF  "$(CFG)" == "nsgmls - Win32 Release"
-
-
 "$(INTDIR)\nsgmls_inst.obj" : $(SOURCE) $(DEP_CPP_NSGML) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-
-"$(INTDIR)\nsgmls_inst.obj" : $(SOURCE) $(DEP_CPP_NSGML) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\nsgmls_inst.obj" : $(SOURCE) $(DEP_CPP_NSGML) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\nsgmls_inst.obj" : $(SOURCE) $(DEP_CPP_NSGML) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -25767,35 +23428,9 @@ DEP_CPP_NSGMLS=\
 	".\nsgmls\StringSet.h"\
 	
 
-!IF  "$(CFG)" == "nsgmls - Win32 Release"
-
-
 "$(INTDIR)\nsgmls.obj" : $(SOURCE) $(DEP_CPP_NSGMLS) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 Debug"
-
-
-"$(INTDIR)\nsgmls.obj" : $(SOURCE) $(DEP_CPP_NSGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\nsgmls.obj" : $(SOURCE) $(DEP_CPP_NSGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\nsgmls.obj" : $(SOURCE) $(DEP_CPP_NSGMLS) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -25821,20 +23456,6 @@ DEP_RSC_NSGMLS_=\
    $(RSC) /l 0x809 /fo"$(INTDIR)/nsgmls.res" /i "nsgmls" /d "_DEBUG" $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\nsgmls.res" : $(SOURCE) $(DEP_RSC_NSGMLS_) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/nsgmls.res" /i "nsgmls" /d "NDEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "nsgmls - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\nsgmls.res" : $(SOURCE) $(DEP_RSC_NSGMLS_) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/nsgmls.res" /i "nsgmls" /d "_DEBUG" $(SOURCE)
-
-
 !ENDIF 
 
 # End Source File
@@ -25844,16 +23465,10 @@ DEP_RSC_NSGMLS_=\
 
 # Name "spam - Win32 Release"
 # Name "spam - Win32 Debug"
-# Name "spam - Win32 UnicodeRelease"
-# Name "spam - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "spam - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -25871,16 +23486,6 @@ DEP_RSC_NSGMLS_=\
 
 "lib - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-"lib - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeRelease" 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-"lib - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeDebug" 
 
 !ENDIF 
 
@@ -25969,35 +23574,9 @@ DEP_CPP_SPAM_=\
 	".\spam\MarkupEventHandler.h"\
 	
 
-!IF  "$(CFG)" == "spam - Win32 Release"
-
-
 "$(INTDIR)\spam_inst.obj" : $(SOURCE) $(DEP_CPP_SPAM_) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-
-"$(INTDIR)\spam_inst.obj" : $(SOURCE) $(DEP_CPP_SPAM_) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\spam_inst.obj" : $(SOURCE) $(DEP_CPP_SPAM_) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\spam_inst.obj" : $(SOURCE) $(DEP_CPP_SPAM_) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26099,35 +23678,9 @@ DEP_CPP_SPAM_C=\
 	".\spam\SpamMessages.h"\
 	
 
-!IF  "$(CFG)" == "spam - Win32 Release"
-
-
 "$(INTDIR)\spam.obj" : $(SOURCE) $(DEP_CPP_SPAM_C) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-
-"$(INTDIR)\spam.obj" : $(SOURCE) $(DEP_CPP_SPAM_C) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\spam.obj" : $(SOURCE) $(DEP_CPP_SPAM_C) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\spam.obj" : $(SOURCE) $(DEP_CPP_SPAM_C) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26210,35 +23763,9 @@ DEP_CPP_MARKUP=\
 	".\spam\MarkupEventHandler.h"\
 	
 
-!IF  "$(CFG)" == "spam - Win32 Release"
-
-
 "$(INTDIR)\MarkupEventHandler.obj" : $(SOURCE) $(DEP_CPP_MARKUP) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-
-"$(INTDIR)\MarkupEventHandler.obj" : $(SOURCE) $(DEP_CPP_MARKUP) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\MarkupEventHandler.obj" : $(SOURCE) $(DEP_CPP_MARKUP) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\MarkupEventHandler.obj" : $(SOURCE) $(DEP_CPP_MARKUP) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26326,35 +23853,9 @@ DEP_CPP_COPYE=\
 	".\spam\MarkupEventHandler.h"\
 	
 
-!IF  "$(CFG)" == "spam - Win32 Release"
-
-
 "$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-
-"$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\CopyEventHandler.obj" : $(SOURCE) $(DEP_CPP_COPYE) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26365,10 +23866,6 @@ SOURCE=.\spam\SpamMessages.msg
 !IF  "$(CFG)" == "spam - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "spam - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -26395,20 +23892,6 @@ DEP_RSC_SPAM_R=\
    $(RSC) /l 0x809 /fo"$(INTDIR)/spam.res" /i "spam" /d "_DEBUG" $(SOURCE)
 
 
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\spam.res" : $(SOURCE) $(DEP_RSC_SPAM_R) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/spam.res" /i "spam" /d "NDEBUG" $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spam - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\spam.res" : $(SOURCE) $(DEP_RSC_SPAM_R) "$(INTDIR)"
-   $(RSC) /l 0x809 /fo"$(INTDIR)/spam.res" /i "spam" /d "_DEBUG" $(SOURCE)
-
-
 !ENDIF 
 
 # End Source File
@@ -26418,16 +23901,10 @@ DEP_RSC_SPAM_R=\
 
 # Name "spent - Win32 Release"
 # Name "spent - Win32 Debug"
-# Name "spent - Win32 UnicodeRelease"
-# Name "spent - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "spent - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "spent - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -26445,16 +23922,6 @@ DEP_RSC_SPAM_R=\
 
 "lib - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
-
-"lib - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeRelease" 
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
-
-"lib - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeDebug" 
 
 !ENDIF 
 
@@ -26513,35 +23980,9 @@ DEP_CPP_SPENT=\
 	".\include\xnew.h"\
 	
 
-!IF  "$(CFG)" == "spent - Win32 Release"
-
-
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "spent - Win32 Debug"
-
-
-"$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26553,10 +23994,6 @@ SOURCE=.\spent\SpentMessages.msg
 
 !ELSEIF  "$(CFG)" == "spent - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
-
 !ENDIF 
 
 # End Source File
@@ -26566,16 +24003,10 @@ SOURCE=.\spent\SpentMessages.msg
 
 # Name "sgmlnorm - Win32 Release"
 # Name "sgmlnorm - Win32 Debug"
-# Name "sgmlnorm - Win32 UnicodeRelease"
-# Name "sgmlnorm - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "sgmlnorm - Win32 Release"
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
 
 !ENDIF 
 
@@ -26593,16 +24024,6 @@ SOURCE=.\spent\SpentMessages.msg
 
 "lib - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
-
-"lib - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeRelease" 
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
-
-"lib - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeDebug" 
 
 !ENDIF 
 
@@ -26703,35 +24124,9 @@ DEP_CPP_SGMLN=\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
 
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
-
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
-
-
-"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 ################################################################################
@@ -26753,35 +24148,9 @@ DEP_CPP_SGMLG=\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
 
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
-
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
-
-
-"$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
-
-
-"$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
-
-
-"$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
 
 # End Source File
 # End Target
@@ -26790,8 +24159,6 @@ DEP_CPP_SGMLG=\
 
 # Name "all - Win32 Release"
 # Name "all - Win32 Debug"
-# Name "all - Win32 UnicodeDebug"
-# Name "all - Win32 UnicodeRelease"
 
 !IF  "$(CFG)" == "all - Win32 Release"
 
@@ -26800,18 +24167,6 @@ DEP_CPP_SGMLG=\
    
 
 !ELSEIF  "$(CFG)" == "all - Win32 Debug"
-
-".\all" : 
-   CD all
-   
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
-
-".\all" : 
-   CD all
-   
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
 
 ".\all" : 
    CD all
@@ -26834,16 +24189,6 @@ DEP_CPP_SGMLG=\
 "lib - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
 
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
-
-"lib - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeDebug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
-
-"lib - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 UnicodeRelease" 
-
 !ENDIF 
 
 # End Project Dependency
@@ -26861,16 +24206,6 @@ DEP_CPP_SGMLG=\
 
 "nsgmls - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="nsgmls - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
-
-"nsgmls - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="nsgmls - Win32 UnicodeDebug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
-
-"nsgmls - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="nsgmls - Win32 UnicodeRelease" 
 
 !ENDIF 
 
@@ -26890,16 +24225,6 @@ DEP_CPP_SGMLG=\
 "sgmlnorm - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="sgmlnorm - Win32 Debug" 
 
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
-
-"sgmlnorm - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="sgmlnorm - Win32 UnicodeDebug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
-
-"sgmlnorm - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="sgmlnorm - Win32 UnicodeRelease" 
-
 !ENDIF 
 
 # End Project Dependency
@@ -26917,16 +24242,6 @@ DEP_CPP_SGMLG=\
 
 "spam - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spam - Win32 Debug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
-
-"spam - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spam - Win32 UnicodeDebug" 
-
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
-
-"spam - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spam - Win32 UnicodeRelease" 
 
 !ENDIF 
 
@@ -26946,19 +24261,314 @@ DEP_CPP_SGMLG=\
 "spent - Win32 Debug" : 
    $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spent - Win32 Debug" 
 
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeDebug"
+!ENDIF 
 
-"spent - Win32 UnicodeDebug" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spent - Win32 UnicodeDebug" 
+# End Project Dependency
+################################################################################
+# Begin Project Dependency
 
-!ELSEIF  "$(CFG)" == "all - Win32 UnicodeRelease"
+# Project_Dep_Name "sx"
 
-"spent - Win32 UnicodeRelease" : 
-   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="spent - Win32 UnicodeRelease" 
+!IF  "$(CFG)" == "all - Win32 Release"
+
+"sx - Win32 Release" : 
+   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="sx - Win32 Release" 
+
+!ELSEIF  "$(CFG)" == "all - Win32 Debug"
+
+"sx - Win32 Debug" : 
+   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="sx - Win32 Debug" 
 
 !ENDIF 
 
 # End Project Dependency
+# End Target
+################################################################################
+# Begin Target
+
+# Name "sx - Win32 Release"
+# Name "sx - Win32 Debug"
+
+!IF  "$(CFG)" == "sx - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "sx - Win32 Debug"
+
+!ENDIF 
+
+################################################################################
+# Begin Project Dependency
+
+# Project_Dep_Name "lib"
+
+!IF  "$(CFG)" == "sx - Win32 Release"
+
+"lib - Win32 Release" : 
+   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Release" 
+
+!ELSEIF  "$(CFG)" == "sx - Win32 Debug"
+
+"lib - Win32 Debug" : 
+   $(MAKE) /$(MAKEFLAGS) /F ".\SP.mak" CFG="lib - Win32 Debug" 
+
+!ENDIF 
+
+# End Project Dependency
+################################################################################
+# Begin Source File
+
+SOURCE=.\sx\sx.cxx
+DEP_CPP_SX_CX=\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\sptchar.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\sx\SxMessages.h"\
+	".\sx\XmlOutputEventHandler.h"\
+	
+
+"$(INTDIR)\sx.obj" : $(SOURCE) $(DEP_CPP_SX_CX) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\sx\sx_inst.cxx
+DEP_CPP_SX_IN=\
+	".\include\Boolean.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\InputSource.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\TypeId.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	
+
+"$(INTDIR)\sx_inst.obj" : $(SOURCE) $(DEP_CPP_SX_IN) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\sx\XmlOutputEventHandler.cxx
+DEP_CPP_XMLOU=\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\InputSource.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\sx\XmlOutputEventHandler.h"\
+	".\sx\XmlOutputMessages.h"\
+	
+
+"$(INTDIR)\XmlOutputEventHandler.obj" : $(SOURCE) $(DEP_CPP_XMLOU) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\sx\sx.rc
+DEP_RSC_SX_RC=\
+	".\sx\SxMessages.rc"\
+	".\sx\XmlOutputMessages.rc"\
+	
+
+!IF  "$(CFG)" == "sx - Win32 Release"
+
+
+"$(INTDIR)\sx.res" : $(SOURCE) $(DEP_RSC_SX_RC) "$(INTDIR)"
+   $(RSC) /l 0x809 /fo"$(INTDIR)/sx.res" /i "sx" /d "NDEBUG" $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "sx - Win32 Debug"
+
+
+"$(INTDIR)\sx.res" : $(SOURCE) $(DEP_RSC_SX_RC) "$(INTDIR)"
+   $(RSC) /l 0x809 /fo"$(INTDIR)/sx.res" /i "sx" /d "_DEBUG" $(SOURCE)
+
+
+!ENDIF 
+
+# End Source File
 # End Target
 # End Project
 ################################################################################

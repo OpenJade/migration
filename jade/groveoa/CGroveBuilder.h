@@ -17,7 +17,7 @@ class ATL_NO_VTABLE CGroveBuilder :
 	public IDispatchImpl<_GroveBuilder, &IID__GroveBuilder, &LIBID_GROVE>
 {
 public:
-	CGroveBuilder() : validateOnly_(0) { }
+	CGroveBuilder() : validateOnly_(0), errorLpdNotation_(0) { }
 
 DECLARE_REGISTRY_RESOURCEID(IDR_GROVEBUILDER)
 
@@ -53,6 +53,8 @@ private:
 	SP_NAMESPACE::PackedBoolean *lookupErrorType(ErrorType type);
 	SP_NAMESPACE::WinApp app_;
 	VARIANT_BOOL validateOnly_;
+	// This is just for binary compatibility.
+	SP_NAMESPACE::PackedBoolean errorLpdNotation_;
 };
 
 #endif //__GROVEBUILDER_H_

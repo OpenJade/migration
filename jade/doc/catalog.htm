@@ -128,16 +128,25 @@ The delimiters can be omitted from the <SAMP><VAR>sysid</VAR></SAMP>
 provided it does not contain any white space.  Comments are allowed
 between parameters delimited by <SAMP>--</SAMP> as in SGML.
 <P>
-The environment variable <SAMP>SGML_CATALOG_FILES</SAMP> contains a
-list of catalog entry files.  The list is separated by colons under
-Unix and by semi-colons under MS-DOS and Windows..  These will be
-searched after any catalog entry files specified using the
-<SAMP>-m</SAMP> option, and after the catalog entry file called
-<SAMP>catalog</SAMP> in the same place as the document entity.  If
-this environment variable is not set, then a system dependent list of
-catalog entry files will be used.  In fact catalog entry files are not
-restricted to being files: the name of a catalog entry file is
-interpreted as a system identifier.
+The entity manager will look for catalog entry files as follows:
+<OL>
+<LI>
+a file called <SAMP>catalog</SAMP> in the same directory as the
+document entity, unless the environment variable
+<SAMP>SP_USE_DOCUMENT_CATALOG</SAMP> has the value <SAMP>NO</SAMP> or
+<SAMP>0</SAMP>;
+<LI>
+any catalog entry files specified using the <SAMP>-c</SAMP> option;
+<LI>
+a list of files specified by the environment variable
+<SAMP>SGML_CATALOG_FILES</SAMP>; the list is separated by colons under
+Unix and by semi-colons under MS-DOS and Windows; if this environment
+variable is not set, then a system dependent list of catalog entry
+files will be used.
+</OL>
+<P>
+In fact catalog entry files are not restricted to being files: the
+name of a catalog entry file is interpreted as a system identifier.
 <P>
 A match in one catalog entry file will take precedence over any match
 in a later catalog entry file.  A more specific matching entry in one

@@ -151,7 +151,7 @@ CharMapPage<T>::~CharMapPage()
 }
 
 template<class T>
-void CharMapPage<T>::swap(CharMapPage &pg)
+void CharMapPage<T>::swap(CharMapPage<T> &pg)
 {
   {
     CharMapColumn<T> *tem = values;

@@ -28,11 +28,13 @@ class CharsetInfo;
 class SP_API Syntax : public Resource, public EntityCatalog::Syntax {
 public:
   enum ReservedName {
+    rALL,
     rANY,
     rATTLIST,
     rCDATA,
     rCONREF,
     rCURRENT,
+    rDATA,
     rDEFAULT,
     rDOCTYPE,
     rELEMENT,
@@ -46,6 +48,7 @@ public:
     rIDREF,
     rIDREFS,
     rIGNORE,
+    rIMPLICIT,
     rIMPLIED,
     rINCLUDE,
     rINITIAL,
@@ -103,6 +106,7 @@ public:
     qTAGLVL
   };
   enum { nQuantity = qTAGLVL + 1 };
+  enum { unlimited = 100000000 };
   enum DelimGeneral {
     dAND,
     dCOM,
@@ -115,6 +119,7 @@ public:
     dETAGO,
     dGRPC,
     dGRPO,
+    dHCRO, // WWW TC addition
     dLIT,
     dLITA,
     dMDC,
@@ -122,6 +127,7 @@ public:
     dMINUS,
     dMSC,
     dNET,
+    dNESTC, // WWW TC addition
     dOPT,
     dOR,
     dPERO,
@@ -152,6 +158,7 @@ public:
   enum Set {
     nameStart,
     digit,
+    hexDigit,
     nmchar,			// LCNMCHAR or UCNMCHAR
     s,
     blank,
@@ -196,6 +203,7 @@ public:
   Boolean isNameCharacter(Xchar) const;
   Boolean isNameStartCharacter(Xchar) const;
   Boolean isDigit(Xchar) const;
+  Boolean isHexDigit(Xchar) const;
   Boolean isS(Xchar) const;
   Boolean isB(Xchar c) const;
   Category charCategory(Xchar) const;
@@ -243,6 +251,10 @@ public:
   static int referenceQuantity(Quantity);
   const XcharMap<unsigned char> &markupScanTable() const;
   Boolean multicode() const;
+  void addEntity(const StringC &, Char);
+  size_t nEntities() const;
+  const StringC &entityName(size_t) const;
+  Char entityChar(size_t) const;
 private:
   void subst(Char, Char);
   void checkUnivControlChar(UnivChar univChar,
@@ -271,6 +283,8 @@ private:
   XcharMap<unsigned char> categoryTable_;
   Boolean multicode_;
   XcharMap<unsigned char> markupScanTable_;
+  Vector<StringC> entityNames_;
+  StringC entityChars_;
   static const int referenceQuantity_[];
 };
 
@@ -489,6 +503,21 @@ inline Boolean Syntax::namecaseGeneral() const
 inline Boolean Syntax::namecaseEntity() const
 {
   return namecaseEntity_;
+}
+
+inline size_t Syntax::nEntities() const
+{
+  return entityNames_.size();
+}
+
+inline const StringC &Syntax::entityName(size_t i) const
+{
+  return entityNames_[i];
+}
+
+inline Char Syntax::entityChar(size_t i) const
+{
+  return entityChars_[i];
 }
 
 #ifdef SP_NAMESPACE

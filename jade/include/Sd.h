@@ -32,11 +32,29 @@ public:
     fDATATAG,
     fOMITTAG,
     fRANK,
-    fSHORTTAG,
+    fSTARTTAGEMPTY,
+    fSTARTTAGUNCLOSED,
+    fENDTAGEMPTY,
+    fENDTAGUNCLOSED,
+    fATTRIBDEFAULT,
+    fATTRIBOMITNAME,
+    fATTRIBVALUE,
+    fEMPTYNRM,
+    fIMPLYDEFATTLIST,
+    fIMPLYDEFDOCTYPE,
+    fIMPLYDEFELEMENT,
+    fIMPLYDEFENTITY,
+    fIMPLYDEFNOTATION,
     fIMPLICIT,
-    fFORMAL
+    fFORMAL,
+    fURN,
+    fKEEPRSRE
     };
-  enum { nBooleanFeature = fFORMAL + 1 };
+  enum {
+    nBooleanFeature = fKEEPRSRE + 1,
+    fSHORTTAG_FIRST = fSTARTTAGEMPTY,
+    fSHORTTAG_LAST = fATTRIBVALUE
+  };
   // These must be in the same order as in the SGML declaration.
   enum NumberFeature {
     fSIMPLE,
@@ -45,18 +63,39 @@ public:
     fSUBDOC
   };
   enum { nNumberFeature = fSUBDOC + 1 };
-  // These are names used only in the SGML declaration.
+  enum NetEnable {
+    netEnableNo,
+    netEnableImmednet,
+    netEnableAll
+  };
+  enum EntityRef {
+    entityRefAny,
+    entityRefInternal,
+    entityRefNone
+  };
+  // These are names used in the SGML declaration.
   enum ReservedName {
+    rALL,
+    rANY,
     rAPPINFO,
+    rATTLIST,
+    rATTRIB,
     rBASESET,
     rCAPACITY,
     rCHARSET,
     rCONCUR,
     rCONTROLS,
     rDATATAG,
+    rDEFAULT,
     rDELIM,
     rDESCSET,
+    rDOCTYPE,
     rDOCUMENT,
+    rELEMENT,
+    rEMPTY,
+    rEMPTYNRM,
+    rENDTAG,
+    rENTITIES,
     rENTITY,
     rEXPLICIT,
     rFEATURES,
@@ -64,8 +103,13 @@ public:
     rFUNCHAR,
     rFUNCTION,
     rGENERAL,
+    rIMMEDNET,
     rIMPLICIT,
+    rIMPLYDEF,
     rINSTANCE,
+    rINTEGRAL,
+    rINTERNAL,
+    rKEEPRSRE,
     rLCNMCHAR,
     rLCNMSTRT,
     rLINK,
@@ -78,16 +122,22 @@ public:
     rNAMES,
     rNAMESTRT,
     rNAMING,
+    rNETENABL,
     rNO,
+    rNOASSERT,
     rNONE,
+    rNOTATION,
+    rOMITNAME,
     rOMITTAG,
     rOTHER,
     rPUBLIC,
     rQUANTITY,
     rRANK,
     rRE,
+    rREF,
     rRS,
     rSCOPE,
+    rSEEALSO,
     rSEPCHAR,
     rSGML,
     rSGMLREF,
@@ -96,12 +146,19 @@ public:
     rSHUNCHAR,
     rSIMPLE,
     rSPACE,
+    rSTARTTAG,
     rSUBDOC,
     rSWITCHES,
     rSYNTAX,
+    rSYSTEM,
+    rTYPE,
     rUCNMCHAR,
     rUCNMSTRT,
+    rUNCLOSED,
     rUNUSED,
+    rURN,
+    rVALIDITY,
+    rVALUE,
     rYES
   };
   enum Capacity {
@@ -128,16 +185,32 @@ public:
   void setDocCharsetDesc(const UnivCharsetDesc &);
   Boolean matchesReservedName(const StringC &, ReservedName) const;
   int digitWeight(Char) const;
+  int hexDigitWeight(Char) const;
   Boolean link() const;
   Number simpleLink() const;
   Boolean implicitLink() const;
   Number explicitLink() const;
-  Boolean shorttag() const;
+  Boolean startTagEmpty() const;
+  Boolean startTagUnclosed() const;
+  NetEnable startTagNetEnable() const;
+  void setStartTagNetEnable(NetEnable);
+  Boolean endTagEmpty() const;
+  Boolean endTagUnclosed() const;
+  Boolean attributeDefault() const;
+  Boolean attributeValueNotLiteral() const;
+  Boolean attributeOmitName() const;
+  Boolean emptyElementNormal() const;
+  Boolean implydefAttlist() const;
+  Boolean implydefDoctype() const;
+  Boolean implydefElement() const;
+  Boolean implydefEntity() const;
+  Boolean implydefNotation() const;
   Number concur() const;
   Boolean omittag() const;
   Boolean rank() const;
   Boolean datatag() const;
   Boolean formal() const;
+  Boolean keeprsre() const;
   Number subdoc() const;
   StringC reservedName(int) const;
   Boolean lookupQuantityName(const StringC &, Syntax::Quantity &) const;
@@ -158,11 +231,19 @@ public:
   void setDocCharsetDecl(CharsetDecl &);
   const CharsetDecl &docCharsetDecl() const;
   void setBooleanFeature(BooleanFeature, Boolean);
+  void setShorttag(Boolean);
   void setNumberFeature(NumberFeature, Number);
   StringC generalDelimiterName(Syntax::DelimGeneral) const;
   UnivChar nameToUniv(const StringC &);
+  Boolean www() const;
+  void setWww(Boolean);
+  EntityRef entityRef() const;
+  void setEntityRef(EntityRef);
+  Boolean typeValid() const;
+  void setTypeValid(Boolean);
+  Boolean integrallyStored() const;
+  void setIntegrallyStored(Boolean);
 private:
-  enum { nFeature = fFORMAL + 1 };
   PackedBoolean booleanFeature_[nBooleanFeature];
   Number numberFeature_[nNumberFeature];
   Number capacity_[nCapacity];
@@ -172,6 +253,11 @@ private:
   CharsetInfo docCharset_;
   CharsetDecl docCharsetDecl_;
   Boolean scopeInstance_;
+  Boolean www_;
+  NetEnable netEnable_;
+  EntityRef entityRef_;
+  Boolean typeValid_;
+  Boolean integrallyStored_;
   HashTable<StringC,int> namedCharTable_;
   Ptr<EntityManager> entityManager_;
   static const char *const reservedName_[];
@@ -207,9 +293,93 @@ Number Sd::simpleLink() const
 }
 
 inline
-Boolean Sd::shorttag() const
+Boolean Sd::startTagEmpty() const
 {
-  return booleanFeature_[fSHORTTAG];
+  return booleanFeature_[fSTARTTAGEMPTY];
+}
+
+inline
+Boolean Sd::startTagUnclosed() const
+{
+  return booleanFeature_[fSTARTTAGUNCLOSED];
+}
+
+inline
+Sd::NetEnable Sd::startTagNetEnable() const
+{
+  return netEnable_;
+}
+
+inline
+void Sd::setStartTagNetEnable(NetEnable e)
+{
+  netEnable_ = e;
+}
+
+inline
+Boolean Sd::endTagEmpty() const
+{
+  return booleanFeature_[fENDTAGEMPTY];
+}
+
+inline
+Boolean Sd::endTagUnclosed() const
+{
+  return booleanFeature_[fENDTAGUNCLOSED];
+}
+
+inline
+Boolean Sd::attributeDefault() const
+{
+  return booleanFeature_[fATTRIBDEFAULT];
+}
+
+inline
+Boolean Sd::attributeValueNotLiteral() const
+{
+  return booleanFeature_[fATTRIBVALUE];
+}
+
+inline
+Boolean Sd::attributeOmitName() const
+{
+  return booleanFeature_[fATTRIBOMITNAME];
+}
+
+inline
+Boolean Sd::emptyElementNormal() const
+{
+  return booleanFeature_[fEMPTYNRM];
+}
+
+inline
+Boolean Sd::implydefAttlist() const
+{
+  return booleanFeature_[fIMPLYDEFATTLIST];
+}
+
+inline
+Boolean Sd::implydefDoctype() const
+{
+  return booleanFeature_[fIMPLYDEFDOCTYPE];
+}
+
+inline
+Boolean Sd::implydefElement() const
+{
+  return booleanFeature_[fIMPLYDEFELEMENT];
+}
+
+inline
+Boolean Sd::implydefEntity() const
+{
+  return booleanFeature_[fIMPLYDEFENTITY];
+}
+
+inline
+Boolean Sd::implydefNotation() const
+{
+  return booleanFeature_[fIMPLYDEFNOTATION];
 }
 
 inline
@@ -247,6 +417,12 @@ inline
 Boolean Sd::formal() const
 {
   return booleanFeature_[fFORMAL];
+}
+
+inline
+Boolean Sd::keeprsre() const
+{
+  return booleanFeature_[fKEEPRSRE];
 }
 
 inline
@@ -289,6 +465,12 @@ inline
 int Sd::digitWeight(Char c) const
 {
   return internalCharset().digitWeight(c);
+}
+
+inline
+int Sd::hexDigitWeight(Char c) const
+{
+  return internalCharset().hexDigitWeight(c);
 }
 
 inline
@@ -343,6 +525,54 @@ inline
 void Sd::setNumberFeature(NumberFeature i, Number n)
 {
   numberFeature_[i] = n;
+}
+
+inline
+Boolean Sd::www() const
+{
+  return www_;
+}
+
+inline
+void Sd::setWww(Boolean b)
+{
+  www_ = b;
+}
+
+inline
+Sd::EntityRef Sd::entityRef() const
+{
+  return entityRef_;
+}
+
+inline
+void Sd::setEntityRef(EntityRef r)
+{
+  entityRef_ = r;
+}
+
+inline
+Boolean Sd::typeValid() const
+{
+  return typeValid_;
+}
+ 
+inline
+void Sd::setTypeValid(Boolean b)
+{
+  typeValid_ = b;
+}
+
+inline
+Boolean Sd::integrallyStored() const
+{
+  return integrallyStored_;
+}
+
+inline
+void Sd::setIntegrallyStored(Boolean b)
+{
+  integrallyStored_ = b;
 }
 
 #ifdef SP_NAMESPACE

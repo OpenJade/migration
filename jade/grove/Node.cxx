@@ -149,6 +149,11 @@ AccessResult Node::getGi(GroveString &) const
   return accessNotInClass;
 }
 
+bool Node::hasGi(GroveString) const
+{
+  return 0;
+}
+
 AccessResult Node::getId(GroveString &) const
 {
   return accessNotInClass;
@@ -252,6 +257,32 @@ AccessResult Node::getNonSgml(unsigned long &) const
 AccessResult Node::nextSibling(NodePtr &) const
 {
   return accessNotInClass;
+}
+
+AccessResult Node::nextChunkAfter(NodePtr &nd) const
+{
+  AccessResult ret = firstChild(nd);
+  switch (ret) {
+  case accessOK:
+  case accessTimeout:
+    return ret;
+  default:
+    break;
+  }
+  for (;;) {
+    ret = nextChunkSibling(nd);
+    switch (ret) {
+    case accessOK:
+    case accessTimeout:
+      return ret;
+    default:
+      break;
+    }
+    ret = getParent(nd);
+    if (ret != accessOK)
+      break;
+  }
+  return ret;
 }
 
 AccessResult Node::nextChunkSibling(NodePtr &) const

@@ -24,8 +24,6 @@ struct Warnings {
   PackedBoolean warnUndefinedElement;
   PackedBoolean warnDefaultEntityReference;
   PackedBoolean warnMixedContent;
-  PackedBoolean warnUnclosedTag;
-  PackedBoolean warnNet;
   PackedBoolean warnEmptyTag;
   PackedBoolean warnUnusedMap;
   PackedBoolean warnUnusedParam;
@@ -59,7 +57,6 @@ struct Warnings {
   PackedBoolean warnAndGroup;
   PackedBoolean warnRank;
   PackedBoolean warnEmptyCommentDecl;
-  PackedBoolean warnNetEmptyElement;
   PackedBoolean warnAttributeValueNotLiteral;
   PackedBoolean warnMissingAttributeName;
   PackedBoolean warnCommentDeclS;
@@ -71,9 +68,17 @@ struct Warnings {
   PackedBoolean warnMixedContentRepOrGroup;
   PackedBoolean warnNameGroupNotOr;
   PackedBoolean warnPiMissingName;
-  PackedBoolean warnStatusKeywordSpecS;
+  PackedBoolean warnInstanceStatusKeywordSpecS;
   PackedBoolean warnExternalDataEntityRef;
   PackedBoolean warnAttributeValueExternalEntityRef;
+  PackedBoolean warnDataDelim;
+  PackedBoolean warnExplicitSgmlDecl;
+  PackedBoolean warnInternalSubsetMarkedSection;
+  PackedBoolean warnDefaultEntityDecl;
+  PackedBoolean warnNonSgmlCharRef;
+  PackedBoolean warnInternalSubsetPsParamEntityRef;
+  PackedBoolean warnInternalSubsetTsParamEntityRef;
+  PackedBoolean warnInternalSubsetLiteralParamEntityRef;
 };
 
 struct SP_API ParserOptions : public Warnings {
@@ -83,6 +88,7 @@ struct SP_API ParserOptions : public Warnings {
   PackedBoolean omittag;
   PackedBoolean rank;
   PackedBoolean shorttag;
+  PackedBoolean emptynrm;
   Number linkSimple;
   PackedBoolean linkImplicit;
   Number linkExplicit;
@@ -90,6 +96,8 @@ struct SP_API ParserOptions : public Warnings {
   Number subdoc;
   PackedBoolean formal;
   PackedBoolean shortref;
+  enum { sgmlDeclTypeValid = -1 };
+  short typeValid;
   enum Quantity {
     ATTCNT,
     ATTSPLEN,
@@ -112,10 +120,10 @@ struct SP_API ParserOptions : public Warnings {
   PackedBoolean errorIdref;
   PackedBoolean errorSignificant;
   PackedBoolean errorAfdr;	// error if AFDR extensions are used
-  PackedBoolean errorLpdNotation;
-  PackedBoolean errorValid;
+  // These override what was specified in the SGML declaration.
+  PackedBoolean noUnclosedTag;
+  PackedBoolean noNet;
   Vector<StringC> includes;
-  Vector<StringC> recoveryEntities;
 };
 
 #ifdef SP_NAMESPACE

@@ -20,7 +20,7 @@
   document entity #required
   specid name #implied
 >
-<?ArcBase DSSSL>
+<?IS10744 ArcBase DSSSL>
 <!NOTATION DSSSL   PUBLIC "ISO/IEC 10179:1996//NOTATION
                    DSSSL Architecture Definition Document//EN"
                 -- A document architecture conforming to the

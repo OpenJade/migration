@@ -1,3 +1,21 @@
+* Finish the query_branch: We must sort the query rules together with the
+element rules/root rules. To do so we probably have to introduce a virtual
+base class MatchBase which would be a base class of Rule and of Pattern.
+It would provide the trivial() and matches() functions. The we must make
+sure that we can properly compare root/query rules and element/query rules.
+Perhaps introduce a RootRule subclass.
+
+* Redo the modules stuff. Move it from Interpreter to grove/. Ideally, the
+style engine shouldn't need any hardwired knowledge about the limitations
+of the grove implementation, but should query it.
+
+* Redo the features stuff to make it cleaner.  
+
+* Remove the SdataMapper hack from the grove interface. Rename SdataMapper
+to something like GroveConstructionParameters and pass it to the grove
+construction process. Eventually we want to add the standard-chars,
+combine-char and other stuff to the GroveConstructionParameters.
+
 * Fix spgrove for 32bit chars.
 
 * Add more error messages to the SchemeParser. Currently, many parser
@@ -61,6 +79,8 @@ Things which are missing and need a lot of work
   groups. Also adjust the inclusions/exclusions. Optimization: recompile 
   only those which actually use #ALL/#IMPLICIT.
 
+* Annex K #IMPLIED doctype name.
+
 * check table-auto-width and multi-process features.
 
 * A caching mechanism for DTDs, dsssl specs, ...
@@ -84,9 +104,6 @@ Things which are missing and need a lot of work
 
 Simple things
 =============
-
-* Concur: Forbit name groups in parameter entity references in 
-  document type specifications in tags.
 
 * install ports, ICs, etc only in SL Interpreters.
 

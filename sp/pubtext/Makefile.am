@@ -1,3 +1,5 @@
+## Process this file with automake to produce Makefile.in
+
 pkgdata_DATA = HTML32.dcl HTML32.dtd HTML32.soc HTML4-f.dtd \
 	HTML4-s.dtd HTML4.dcl HTML4.dtd HTML4.soc HTMLlat1.ent \
 	HTMLspec.ent HTMLsym.ent ISOlat1.ent ISOlat1.sgm html-1.dtd \

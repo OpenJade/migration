@@ -28,9 +28,6 @@
 /* ??? */
 #undef SP_ANSI_LIB       
 
-/* define this if  std:: namespace is not supported */
-#undef SP_NO_STD_NAMESPACE 
-
 /* define this to build a multi-byte version */
 #undef SP_MULTI_BYTE
 
@@ -39,9 +36,6 @@
 
 /* define this to compile explicit template instantiations */
 #undef SP_MANUAL_INST
-
-/* define this if new.h doesn't declare void *operator new(size_t, void *p) */
-#undef SP_DECLARE_PLACEMENT_OPERATOR_NEW
 
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
@@ -231,3 +225,10 @@
 #define SP_HAVE_PLACEMENT_OPERATOR_DELETE
 #endif /* HAVE_PLACEMENT_OPERATOR_DELETE */
 
+#ifndef HAVE_PLACEMENT_OPERATOR_NEW
+#define SP_DECLARE_PLACEMENT_OPERATOR_NEW
+#endif /* HAVE_PLACEMENT_OPERATOR_NEW */
+
+#ifndef HAVE_NAMESPACE_STD
+#define SP_NO_STD_NAMESPACE 
+#endif /* HAVE_NAMESPACE_STD */

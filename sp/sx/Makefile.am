@@ -1,15 +1,19 @@
+## Process this file with automake to produce Makefile.in
+
 bin_PROGRAMS = osx
 
 osx_SOURCES = sx.cxx XmlOutputEventHandler.cxx XmlOutputEventHandler.h \
 	sx_inst.cxx XmlOutputMessages.h SxMessages.h
 
-EXTRA_DIST = XmlOutputMessages.msg SxMessages.msg sx_inst.m4
+EXTRA_DIST = XmlOutputMessages.msg XmlOutputMessages.rc \
+	SxMessages.msg SxMessages.rc sx_inst.m4 sx.rc sx.dsp
 
 osx_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
-BUILT_SOURCES = XmlOutputMessages.h SxMessages.h sx_inst.cxx
+BUILT_SOURCES = XmlOutputMessages.h XmlOutputMessages.rc \
+	SxMessages.h SxMessages.rc sx_inst.cxx
 
 sx.o: SxMessages.h
 XmlOutputEventHandler.o: XmlOutputMessages.h

@@ -11,6 +11,7 @@
 #include "ArcEngine.h"
 #include "ProcessContext.h"
 #include "macros.h"
+#include "InternalInputSource.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -81,6 +82,14 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
     }
   }
 
+  if (cmdline.size() > 0) {  
+    Owner<InputSource> in(new InternalInputSource(cmdline,
+                          InputSourceOrigin::make()));
+    SchemeParser scm(*interpreter_, in);
+    scm.parse();
+    interpreter_->endPart();
+  }
+ 
   for (size_t i = 0; i < parts.size(); i++) {
     for (DssslSpecEventHandler::Part::Iter iter(parts[i]->iter());
          !iter.done();
@@ -97,9 +106,33 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   interpreter_->compile();
 }
 
-void StyleEngine::defineVariable(const StringC &ident)
+void StyleEngine::defineVariable(const StringC &str)
 {
-  interpreter_->defineVariable(ident);
+  // Dk: Interpret "name=value" as a string variable Setting.
+  if (str[0] == '(') {
+    cmdline += str;
+  } 
+  else {
+    int i;
+    for (i = 0; (i < str.size()) && (str[i] != '='); i++)
+      ;
+
+    // Dk: Not name=value?
+    if (!i || (i >= (str.size()))) {  
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += str;
+      cmdline += interpreter_->makeStringC(" #t)");
+    }
+    else {  
+      // Dk: name=value.
+      cmdline += interpreter_->makeStringC("(define ");
+      cmdline += StringC(str.begin(), i);
+      cmdline += interpreter_->makeStringC(" \"");
+      if (str.size() - (i + 1) > 0);
+        cmdline += StringC(str.begin() + i + 1, str.size() - (i + 1));
+      cmdline += interpreter_->makeStringC("\")");
+    }
+  }
 }
 
 StyleEngine::~StyleEngine()

@@ -66,7 +66,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   messenger_(messenger),
   extensionTable_(extensionTable),
   Collector(maxObjSize()),
-  partIndex_(1),  // 0 is for command-line definitions
+  partIndex_(0),  // 0 is for command-line definitions
   dPartIndex_(1),
   lexCategory_(lexOther),
   unitsPerInch_(unitsPerInch),
@@ -190,30 +190,6 @@ void Interpreter::installInitialValue(Identifier *ident, Owner<Expression> &expr
   initialValueValues_.resize(initialValueValues_.size() + 1);
   expr.swap(initialValueValues_.back());
   initialValueNames_.push_back(ident);
-}
-
-void Interpreter::defineVariable(const StringC &str)
-{
-  // Dk: Interpret "name=value" as a string variable Setting.
-  int Idx;
-  for (Idx = 0; (Idx < str.size()) && (str[Idx] != '='); Idx++)
-    ;
-
-  // Dk: Not name=value?
-  if (!Idx || (Idx >= (str.size())))
-  {  lookup(str)->setValue(makeTrue(), 0);
-  }
-  else
-  {  // Dk: name=value.
-     StringC Name(str.begin(), Idx);
-     Char Empty = 0;
-     StringC Value(&Empty, 0);
-     int Vlen = str.size() - Idx - 1;
-     if (Vlen) Value = StringC(str.begin() + Idx + 1, Vlen);
-     StringObj* Vs = new (*this) StringObj(Value);
-     makePermanent(Vs);
-     lookup(Name)->setValue(Vs, 0);
-  }
 }
 
 void Interpreter::installUnits()
@@ -2030,7 +2006,7 @@ void Interpreter::installBuiltins()
     scm.parse();
   }
   endPart();
-  partIndex_ = 1;
+  partIndex_ = 0;
 }
 
 void Interpreter::setDefaultLanguage(Owner<Expression> &expr,

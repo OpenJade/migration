@@ -2,12 +2,9 @@
 
 lib_LTLIBRARIES = libostyle.la
 
-libostyle_la_LDFLAGS = --version-info 0:0:0 
-## this doesn't seem to work for inter-library dependencies.
-##	-lm \
-##	$(top_builddir)/grove/libogrove.la \
-##	$(top_builddir)/spgrove/libospgrove.la \
-##	-losp
+libostyle_la_LDFLAGS = --version-info 0:0:0 -lm \
+	-L$(top_builddir)/grove -logrove \
+	-L$(top_builddir)/spgrove -lospgrove -losp
 
 libostyle_la_SOURCES = Collector.cxx Collector.h DssslApp.cxx \
 	DssslApp.h DssslAppMessages.h DssslSpecEventHandler.cxx \

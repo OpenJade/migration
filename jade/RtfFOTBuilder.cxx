@@ -1728,8 +1728,8 @@ void RtfFOTBuilder::paragraphBreak(const ParagraphNIC &nic)
     endDisplay();
     startDisplay(nic);
     paraFormat_ = specFormat_;
-    atomic();
   }
+  atomic();
 }
 
 void RtfFOTBuilder::startBox(const BoxNIC &nic)

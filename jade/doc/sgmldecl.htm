@@ -1,20 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>SP - SGML declaration</TITLE>
+<TITLE>OpenSP - SGML declaration</TITLE>
 </HEAD>
 <BODY>
-<H1>Handling of the SGML declaration in SP</H1>
+<H1>Handling of the SGML declaration in OpenSP</H1>
 <H2>Extended Naming Rules</H2>
 <P>
-SP supports the Extended Naming Rules as specified in Annex J
+OpenSP supports the Extended Naming Rules as specified in Annex J
 of ISO 8879:1986 (added by the 1996 technical corrigendum).
-
+<H2>Web SGML Adaptations</H2>
+<P>
+OpenSP supports most of the Web SGML Adaptations as specified in
+Annex K of ISO 8879:1996 (added by the second technical corrigendum, 1998)
 <H2>Default SGML declaration</H2>
 <P>
 If the SGML declaration is omitted
 and there is no applicable
 <A HREF="catalog.htm#sgmldecl"><SAMP>SGMLDECL</SAMP></A>
+or <A HREF="catalog.htm#dtddecl"><SAMP>DTDDECL</SAMP></A>
 entry in a catalog,
 the following declaration will be implied:
 <PRE>
@@ -106,7 +110,7 @@ or the keyword
 Character numbers in the universal character set can be as big as
 99999999.
 <P>
-In addition SP has built in knowledge of many character sets.
+In addition OpenSP has built in knowledge of many character sets.
 These are identified using the designating sequence in the
 public identifier.  The following designating sequences are
 recognized:

@@ -1103,6 +1103,10 @@ void FOTBuilder::setEscapementSpaceAfter(const InlineSpace &)
 {
 }
 
+void FOTBuilder::setInlineSpaceSpace(const OptInlineSpace &)
+{
+}
+
 void FOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
 }

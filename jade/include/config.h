@@ -294,4 +294,8 @@
 #define SP_NAMESPACE_SCOPE
 #endif
 
+#ifndef DEFAULT_SCHEME_BUILTINS
+#define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
+#endif
+
 #endif /* not config_INCLUDED */

@@ -1,5 +1,5 @@
 #include "config.h"
-
+#define OUTLINES
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
@@ -15,7 +15,9 @@ __instantiate(Vector<TeXFOTBuilder::Row>)
 __instantiate(Vector<TeXFOTBuilder::Cell>)
 __instantiate(Vector<TeXFOTBuilder::Column>)
 __instantiate(Vector<TeXFOTBuilder::TablePart>)
-
+#ifdef OUTLINES
+__instantiate(Vector<TeXFOTBuilder::ParHead>)
+#endif
 #ifdef DSSSL_NAMESPACE
 }
 #endif

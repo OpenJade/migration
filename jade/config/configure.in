@@ -41,7 +41,6 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_CXX
-AC_PATH_PROGS(M4, gm4 gnum4 m4, m4)
 AC_PATH_PROGS(PERL, perl, perl)
 test "$INSTALL" = "./config/install.sh -c" && INSTALL=`pwd`"/config/install.sh -c"
 
@@ -108,7 +107,8 @@ AC_CHECK_FUNC(strerror,,LIBOBJS="$LIBOBJS strerror.o")
 AC_CHECK_FUNC(strtoul,,LIBOBJS="$LIBOBJS strtoul.o")
 
 AC_CHECK_FUNC(setlocale,AC_DEFINE(SP_HAVE_LOCALE))
-AC_CHECK_LIB(intl,gettext,AC_DEFINE(SP_HAVE_GETTEXT) LIBS="$LIBS -lintl")
+AC_CHECK_FUNC(gettext,AC_DEFINE(SP_HAVE_GETTEXT),
+  AC_CHECK_LIB(intl,gettext,AC_DEFINE(SP_HAVE_GETTEXT) LIBS="$LIBS -lintl"))
 
 dnl 
 dnl  ANSI templates
@@ -155,6 +155,17 @@ AC_ARG_ENABLE(mif,
     if test $enableval
     then
 	AC_DEFINE(JADE_MIF)
+    fi)
+
+
+dnl
+dnl  html+css support
+dnl
+AC_ARG_ENABLE(html,
+[  --enable-html           bind in support for HTML+CSS output],
+    if test $enableval
+    then
+	AC_DEFINE(JADE_HTML)
     fi)
 
 

@@ -420,6 +420,9 @@ E1+sdTextClass++public text class of formal public identifier of SGML declaratio
 E0+sgmlDeclRefRequiresWww++SGML declaration reference was used but minimum literal was not "ISO 8879:1986 (WWW)"
 W0+pcdataGroupMemberOccurrenceIndicator++member of model group containing #PCDATA has occurrence indicator
 W0+pcdataGroupMemberModelGroup++member of model group containing #PCDATA is a model group
+E0+entityRefNone++reference to non-predefined entity
+E0+entityRefInternal++reference to external entity
+E0+implydefEntityDefault++declaration of default entity conflicts with IMPLYDEF ENTITY YES
 # message fragments
 =1000
 +delimStart++delimiter 

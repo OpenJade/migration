@@ -216,7 +216,7 @@ void ParserState::startDtd(const StringC &name)
     Text text;
     text.addChar(instanceSyntax_->entityChar(i), Location());
     Entity *entity
-      = new InternalCdataEntity(instanceSyntax_->entityName(i),
+      = new PredefinedEntity(instanceSyntax_->entityName(i),
 				Location(),
 				text);
     defDtd_->insertEntity(entity);
@@ -528,9 +528,11 @@ ParserState::lookupEntity(Boolean isParameter,
 
 ConstPtr<Entity> ParserState::createUndefinedEntity(const StringC &name, const Location &loc)
 {
-  Text text;
-  Ptr<Entity> entity(new InternalCdataEntity(name, loc, text));
+  ExternalId extid;
+  Ptr<Entity> entity(new ExternalTextEntity(name, EntityDecl::generalEntity, 
+					    loc, extid));
   undefinedEntityTable_.insert(entity);
+  entity->generateSystemId(*this);
   return entity;
 }
 
@@ -753,8 +755,19 @@ ConstPtr<Notation> ParserState::getAttributeNotation(const StringC &name,
 						     const Location &)
 {
   ConstPtr<Notation> notation;
-  if (haveCurrentDtd())
+  if (haveCurrentDtd()) {
     notation = currentDtd().lookupNotation(name);
+    if (notation.isNull() && sd().implydefNotation()) {
+      Ptr<Notation> nt = new Notation(name, 
+				      currentDtd().namePointer(), 
+				      currentDtd().isBase());
+      ExternalId id;
+      nt->setExternalId(id, Location());
+      nt->generateSystemId(*this);				       
+      currentDtdNonConst().insertNotation(nt);
+      notation = currentDtd().lookupNotation(name);      
+    }
+  }
   else if (resultAttributeSpecMode_) {
     const Dtd *resultDtd = defComplexLpd().resultDtd().pointer();
     if (!resultDtd)

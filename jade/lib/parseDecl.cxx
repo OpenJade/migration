@@ -1545,6 +1545,8 @@ Boolean Parser::parseEntityDecl()
     declType = Entity::generalEntity;
     if (parm.type == Param::entityName)
       parm.token.swap(name);
+    else if (sd().implydefEntity())
+      message(ParserMessages::implydefEntityDefault);
     else if (options().warnDefaultEntityDecl)
       message(ParserMessages::defaultEntityDecl);
   }
@@ -2055,7 +2057,7 @@ Boolean Parser::parseDoctypeDeclStart()
 #endif
   }
   else if (parm.type == Param::mdc) {
-    if (!sd().implydefElement()) {
+    if (sd().implydefElement() == Sd::implydefElementNo) {
       message(ParserMessages::noDtdSubset);
       enableImplydef();
     }
@@ -2102,7 +2104,7 @@ void Parser::implyDtd(const StringC &gi)
     currentMarkup()->addName(gi.data(), gi.size());
   }
 #endif
-  if (sd().implydefElement() && !sd().implydefDoctype()) {
+  if ((sd().implydefElement() != Sd::implydefElementNo) && !sd().implydefDoctype()) {
     eventHandler().startDtd(new (eventAllocator())
 				  StartDtdEvent(gi, ConstPtr<Entity>(), 0,
 					markupLocation(),
@@ -2215,7 +2217,7 @@ void Parser::checkDtd(Dtd &dtd)
   while ((p = elementIter.next()) != 0) {
     if (p->definition() == 0) {
       if (p->name() == dtd.name()) {
-	if (validate() && !implydefElement())
+	if (validate() && (implydefElement() == Sd::implydefElementNo))
 	  message(ParserMessages::documentElementUndefined);
       }
       else if (options().warnUndefinedElement)
@@ -2284,8 +2286,6 @@ void Parser::checkDtd(Dtd &dtd)
       }
     }
   }
-  if (!validate())
-    return;
   Dtd::ConstEntityIter entityIter(((const Dtd &)dtd).generalEntityIter());
   for (;;) {
     ConstPtr<Entity> entity(entityIter.next());
@@ -2295,21 +2295,35 @@ void Parser::checkDtd(Dtd &dtd)
     if (external) {
       const Notation *notation = external->notation();
       if (!notation->defined()) {
-	setNextLocation(external->defLocation());
-	message(ParserMessages::entityNotationUndefined,
-		StringMessageArg(notation->name()),
-		StringMessageArg(external->name()));
+	if (sd().implydefNotation()) {
+	  ExternalId id;
+	  ((Notation *)notation)->setExternalId(id, Location());
+	  ((Notation *)notation)->generateSystemId(*this);
+	} 
+	else if (validate()) {
+	  setNextLocation(external->defLocation());
+	  message(ParserMessages::entityNotationUndefined,
+		  StringMessageArg(notation->name()),
+		  StringMessageArg(external->name()));
+	}
       }
     }
   }
   Dtd::NotationIter notationIter(dtd.notationIter());
   for (;;) {
-    ConstPtr<Notation> notation(notationIter.next());
+    Ptr<Notation> notation(notationIter.next());
     if (notation.isNull())
       break;
-    if (!notation->defined() && !notation->attributeDef().isNull())
-      message(ParserMessages::attlistNotationUndefined,
-	      StringMessageArg(notation->name()));
+    if (!notation->defined() && !notation->attributeDef().isNull()) {
+	if (sd().implydefNotation()) {
+	  ExternalId id;
+	  notation->setExternalId(id, Location());
+	  notation->generateSystemId(*this);				       
+	} 
+	else if (validate())
+	  message(ParserMessages::attlistNotationUndefined,
+		  StringMessageArg(notation->name()));
+    }
   }
 }
 

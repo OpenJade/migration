@@ -483,8 +483,8 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
       if (haveApplicableDtd()) {
 	if (!isParameter) {
 	  entity = createUndefinedEntity(name, startLocation);
-	  message(ParserMessages::entityUndefined,
-		  StringMessageArg(name));
+	  if (!sd().implydefEntity())
+	    message(ParserMessages::entityUndefined, StringMessageArg(name));
 	}
 	else 
 	  message(ParserMessages::parameterEntityUndefined,
@@ -529,6 +529,18 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
 				markupPtr);
   else
     origin = (EntityOrigin *)0;
+  switch (sd().entityRef()) {
+  case Sd::entityRefNone:
+    if (!entity->isPredefined())
+      message(ParserMessages::entityRefNone);
+    break;
+  case Sd::entityRefInternal:
+    if (entity->asExternalEntity()) 
+      message(ParserMessages::entityRefInternal);
+    break;
+  default:
+    break;
+  }
   return 1;
 }
 

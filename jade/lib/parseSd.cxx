@@ -174,6 +174,8 @@ void Parser::doInit()
   }
   else {
     currentInput()->ungetToken();
+    if (subdocLevel() > 0)
+      return; // will use parent Sd 
     if (entityCatalog().sgmlDecl(initCharset, messenger(), systemId)) {
       InputSource *in = entityManager().open(systemId,
 					     sd().docCharset(),
@@ -2248,7 +2250,8 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
       none,
       boolean,
       number,
-      netenabl
+      netenabl,
+      implyelt
     } arg;
   };
   static FeatureInfo features[] = {
@@ -2272,7 +2275,7 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
     { Sd::rIMPLYDEF, FeatureInfo::none },
     { Sd::rATTLIST, FeatureInfo::boolean },
     { Sd::rDOCTYPE, FeatureInfo::boolean },
-    { Sd::rELEMENT, FeatureInfo::boolean },
+    { Sd::rELEMENT, FeatureInfo::implyelt },
     { Sd::rENTITY, FeatureInfo::boolean },
     { Sd::rNOTATION, FeatureInfo::boolean },
     { Sd::rLINK, FeatureInfo::none },
@@ -2332,7 +2335,7 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
 	return 0;
       break;
     }
-    switch (features[i].arg) {
+    switch (features[i].arg) {      
     case FeatureInfo::number:
       if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
 					SdParam::reservedName + Sd::rYES),
@@ -2363,6 +2366,24 @@ Boolean Parser::sdParseFeatures(SdBuilder &sdBuilder, SdParam &parm)
 	break;
       case SdParam::reservedName + Sd::rALL:
 	sdBuilder.sd->setStartTagNetEnable(Sd::netEnableAll);
+	break;
+      }
+      break;
+    case FeatureInfo::implyelt:
+      if (!parseSdParam(AllowedSdParams(SdParam::reservedName + Sd::rNO,
+					SdParam::reservedName + Sd::rYES,
+					SdParam::reservedName + Sd::rANYOTHER),
+			parm))
+	return 0;
+      switch (parm.type) {
+      case SdParam::reservedName + Sd::rNO:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementNo);
+	break;
+      case SdParam::reservedName + Sd::rYES:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementYes);
+	break;
+      case SdParam::reservedName + Sd::rANYOTHER:
+	sdBuilder.sd->setImplydefElement(Sd::implydefElementAnyother);
 	break;
       }
       break;

@@ -106,9 +106,14 @@ Boolean OpenElement::isFinished() const
 inline
 Boolean OpenElement::tryTransition(const ElementType *e)
 {
-  return (declaredContent_ == ElementDefinition::modelGroup
-	  ? matchState_.tryTransition(e)
-	  : (declaredContent_ == ElementDefinition::any));
+  switch (declaredContent_) {
+  case ElementDefinition::modelGroup:
+    return matchState_.tryTransition(e);
+  case ElementDefinition::any:
+    return (e != elementType_) || e->definition()->allowImmediateRecursion();
+  default:
+    return 0;
+  }
 }
 
 inline

@@ -105,8 +105,12 @@ Parser::Parser(const SgmlParser::Params &params)
       inheritActiveLinkTypes(*parent);
     if (subdocLevel() == sd().subdoc() + 1)
       message(ParserMessages::subdocLevel, NumberMessageArg(sd().subdoc()));
-    setPhase(prologPhase);
-    compilePrologModes();
+    if (sd().www()) 
+      setPhase(initPhase);
+    else { 
+      setPhase(prologPhase);
+      compilePrologModes();
+    }
     break;
   case SgmlParser::Params::dtd:
     compilePrologModes();
@@ -121,7 +125,8 @@ void Parser::setSdOverrides(Sd &sd)
   if (options().typeValid != ParserOptions::sgmlDeclTypeValid) {
     sd.setTypeValid(options().typeValid);
     sd.setBooleanFeature(Sd::fIMPLYDEFATTLIST, !options().typeValid);
-    sd.setBooleanFeature(Sd::fIMPLYDEFELEMENT, !options().typeValid);
+    if (!options().typeValid) 
+      sd.setImplydefElement(Sd::implydefElementYes);
   }
   if (options().noUnclosedTag) {
     sd.setBooleanFeature(Sd::fSTARTTAGUNCLOSED, 0);

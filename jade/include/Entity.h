@@ -64,6 +64,7 @@ public:
   virtual Boolean isDataOrSubdoc() const;
   // for determining whether we need to validate as character data
   virtual Boolean isCharacterData() const;
+  virtual Boolean isPredefined() const { return 0; }
   virtual const ExternalDataEntity *asExternalDataEntity() const;
   virtual const SubdocEntity *asSubdocEntity() const;
   virtual const InternalEntity *asInternalEntity() const;
@@ -132,6 +133,13 @@ public:
 		    Boolean) const;
   Entity *copy() const;
   Boolean isCharacterData() const;
+};
+
+class SP_API PredefinedEntity : public InternalCdataEntity {
+public:
+  PredefinedEntity(const StringC &s, const Location &l, Text &t)
+   : InternalCdataEntity(s,l,t) { }
+  Boolean isPredefined() const { return 1; }
 };
 
 class SP_API InternalSdataEntity : public InternalDataEntity {

@@ -35,7 +35,8 @@ public:
   ElementDefinition(const Location &location,
 		    size_t index,
 		    unsigned char omitFlags,
-		    DeclaredContent declaredContent);
+		    DeclaredContent declaredContent,
+		    Boolean allowImmediateRecursion = 1);
   ElementDefinition(const Location &location,
 		    size_t index,
 		    unsigned char omitFlags,
@@ -55,6 +56,7 @@ public:
   size_t nExclusions() const;
   const ElementType *exclusion(size_t) const;
   Boolean undefined() const;
+  Boolean allowImmediateRecursion() const;
   void setInclusions(Vector<const ElementType *> &inclusions);
   void setExclusions(Vector<const ElementType *> &exclusions);
   void setRank(StringC &suffix, Vector<const RankStem *> &rankStems);
@@ -69,6 +71,7 @@ private:
   size_t index_;
   unsigned char omitFlags_;
   DeclaredContent declaredContent_;
+  Boolean allowImmediateRecursion_;
   Owner<CompiledModelGroup> modelGroup_;
   Vector<const ElementType *> inclusions_;
   Vector<const ElementType *> exclusions_;
@@ -193,6 +196,12 @@ inline
 Boolean ElementDefinition::undefined() const
 {
   return index_ == size_t(undefinedIndex);
+}
+
+inline
+Boolean ElementDefinition::allowImmediateRecursion() const
+{
+  return allowImmediateRecursion_;
 }
 
 inline

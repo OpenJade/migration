@@ -42,7 +42,6 @@ public:
     fEMPTYNRM,
     fIMPLYDEFATTLIST,
     fIMPLYDEFDOCTYPE,
-    fIMPLYDEFELEMENT,
     fIMPLYDEFENTITY,
     fIMPLYDEFNOTATION,
     fIMPLICIT,
@@ -73,10 +72,16 @@ public:
     entityRefInternal,
     entityRefNone
   };
+  enum ImplydefElement {
+    implydefElementNo,
+    implydefElementYes,
+    implydefElementAnyother
+  };
   // These are names used in the SGML declaration.
   enum ReservedName {
     rALL,
     rANY,
+    rANYOTHER,
     rAPPINFO,
     rATTLIST,
     rATTRIB,
@@ -202,7 +207,8 @@ public:
   Boolean emptyElementNormal() const;
   Boolean implydefAttlist() const;
   Boolean implydefDoctype() const;
-  Boolean implydefElement() const;
+  ImplydefElement implydefElement() const;
+  void setImplydefElement(ImplydefElement);
   Boolean implydefEntity() const;
   Boolean implydefNotation() const;
   Number concur() const;
@@ -256,6 +262,7 @@ private:
   Boolean www_;
   NetEnable netEnable_;
   EntityRef entityRef_;
+  ImplydefElement implydefElement_;
   Boolean typeValid_;
   Boolean integrallyStored_;
   HashTable<StringC,int> namedCharTable_;
@@ -365,9 +372,15 @@ Boolean Sd::implydefDoctype() const
 }
 
 inline
-Boolean Sd::implydefElement() const
+Sd::ImplydefElement Sd::implydefElement() const
 {
-  return booleanFeature_[fIMPLYDEFELEMENT];
+  return implydefElement_;
+}
+
+inline
+void Sd::setImplydefElement(ImplydefElement i) 
+{
+  implydefElement_ = i;
 }
 
 inline

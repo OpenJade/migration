@@ -17,28 +17,12 @@ Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language</h4>
 
 <h2>
 SYNOPSIS</h2>
-<tt>onsgmls</tt> [
-<tt>-BCdeglnprsuvx</tt> ] [
-<tt>-a<i>type</i></tt>
-] [
-<tt>-b<i>bctf</i></tt> ] [
-<tt>-c<i>sysid</i></tt>
-] [
-<tt>-D<i>directory</i></tt> ] [
-<tt>-E<i>max_errors</i></tt> ] [
-<tt>-f<i>file</i></tt>
-] [
-<tt>-i<i>name</i></tt> ] [
-<tt>-o<i>output_option</i></tt> ] [
-<tt>-t<i>file</i></tt>
-] [
-<tt>-w<i>warning_type</i></tt> ] [
-<tt><i>sysid</i>...</tt> ]
+<tt>onsgmls</tt> [ <tt>option...</tt> ] <tt><i>sysid</i>...</tt>
 <h2>
 DESCRIPTION</h2>
 Onsgmls parses and validates the SGML document whose document entity is
 specified by the
-<a href="sysid.htm">system identifiers</a><tt><i>sysid</i>...</tt>
+<a href="sysid.htm">system identifiers</a><tt> <i>sysid</i>...</tt>
 and prints on the standard output a simple text representation of its Element
 Structure Information Set. (This is the information set which a structure-controlled
 conforming SGML application should act upon.) If more than one system identifier
@@ -56,41 +40,35 @@ refer to standard input.)
 OPTIONS</h2>
 The following options are available:
 <dl>
-<dt>
-<tt>-a<i>type</i></tt></dt>
+<dt><tt>-a<i>name</i></tt>, <tt>--activate=<i>name</i></tt></dt>
 
 <dd>
-Make link type or doctype <i><tt>type</tt></i> active. Not all ESIS
+Make link type or doctype <i><tt>name</tt></i> active. Not all ESIS
 information is output in this case: the active LPDs are not explicitly
 reported, although each link attribute is qualified with its link type name; there is no information
 about result elements; when there are multiple link rules applicable to
 the current element, nsgmls always chooses the first. You cannot mix
 active link types and doctypes. Only one active doctype can be specified.</dd>
 
-<dt>
-<tt>-b<i>bctf</i></tt></dt>
-
-<dt>
-<tt>-b<i>encoding</i></tt></dt>
+<dt><tt>-b<i>name</i></tt>, <tt>--bctf=<i>name</i></tt></dt>
+<dt><tt>-b<i>name</i></tt>, <tt>--encoding=<i>name</i></tt></dt>
 
 <dd>
 This determines the encoding used for output. If in <a href="charset.htm#fixed">fixed
 character set mode</a> it specifies the name of an encoding; if not, it
 specifies the name of a BCTF.</dd>
 
-<dt>
-<tt>-B</tt></dt>
+<dt><tt>-B</tt>, <tt>--batch-mode</tt></dt>
 
 <dd>
 Batch mode. Parse each <i><tt>sysid...</tt></i> specified on the command
 line separately, rather than concatenating them. This is useful mainly
-with <tt>-s</tt>.</dd>
-
+with <tt>-s</tt>.
 <p><br>If <tt>-t<i>filename</i></tt> is also specified, then the specified
 <i><tt>filename</tt></i> will be prefixed to the <i><tt>sysid</tt></i>
-to make the filename for the RAST result for each <i><tt>sysid</tt></i>.
-<dt>
-<tt>-c<i>sysid</i></tt></dt>
+to make the filename for the RAST result for each <i><tt>sysid</tt></i>.</dd>
+
+<dt><a NAME="optc"></a><tt>-c<i>sysid</i></tt>, <tt>--catalog=<i>sysid</i></tt></dt>
 
 <dd>
 Map public identifiers and entity names to system identifiers using the
@@ -103,58 +81,51 @@ in the same place as the document entity, it will be searched for immediately
 after those specified by
 <tt>-c</tt>.</dd>
 
-<dt>
-<a NAME="optC"></a><tt>-C</tt></dt>
+<dt><a NAME="optC"></a><tt>-C</tt>, <tt>--catalogs</tt></dt>
 
 <dd>
-The
-<tt><i>filename</i>...</tt> arguments specify catalog files rather
+The <tt><i>filename</i>...</tt> arguments specify catalog files rather
 than the document entity. The document entity is specified by the first
 <tt>DOCUMENT</tt>
 entry in the catalog files.</dd>
 
-<dt>
-<a NAME="optD"></a><tt>-D<i>directory</i></tt></dt>
+<dt><a NAME="optD"></a><tt>-D<i>directory</i></tt>, <tt>--directory=<i>directory</i></tt></dt>
 
 <dd>
-Search
-<i><tt>directory</tt></i> for files specified in system identifiers.
-Multiple
-<tt>-D</tt> options are allowed. See the description of the
-<tt>osfile</tt>
-storage manager for more information about file searching.</dd>
+Search <i><tt>directory</tt></i> for files specified in system identifiers.
+Multiple <tt>-D</tt> options are allowed. See the description of the
+<tt>osfile</tt> storage manager for more information about file searching.</dd>
 
-<dt>
-<tt>-e</tt></dt>
+<dt><tt>-e</tt>, <tt>--open-entities</tt></dt>
 
 <dd>
 Describe open entities in error messages. Error messages always include
 the position of the most recently opened external entity.</dd>
 
-<dt>
-<tt>-E<i>max_errors</i></tt></dt>
+<dt><tt>-E<i>number</i></tt>, <tt>--max-errors=<i>number</i></tt></dt>
 
 <dd>
-Onsgmls will exit after
-<i><tt>max_errors</tt></i> errors. If <i><tt>max_errors</tt></i>
+Onsgmls will exit after <tt><i>number</i></tt> errors. If <tt><i>number</i></tt>
 is 0, there is no limit on the number of errors. The default is 200.</dd>
 
-<dt>
-<tt>-f<i>file</i></tt></dt>
+<dt><tt>-f<i>file</i></tt>, <tt>--error-file=<i>file</i></tt></dt>
 
 <dd>
-Redirect errors to
-<i><tt>file</tt></i>. This is useful mainly with shells
+Redirect errors to <i><tt>file</tt></i>. This is useful mainly with shells
 that do not support redirection of stderr.</dd>
 
-<dt>
-<tt>-g</tt></dt>
+<dt><tt>-g</tt>, <tt>--open-elements</tt></dt>
 
 <dd>
 Show the generic identifiers of open elements in error messages.</dd>
 
+<dt><tt>-h</tt>, <tt>--help</tt></dt>
+
+<dd>
+Show a help message and exit.
+
 <dt>
-<a NAME="opti"></a><tt>-i<i>name</i></tt></dt>
+<a NAME="opti"></a><tt>-i<i>name</i></tt>, <tt>--include=<i>name</i></tt></dt>
 
 <dd>
 Pretend that
@@ -163,30 +134,25 @@ Pretend that
 occurs at the start of the document type declaration subset in the SGML
 document entity. Since repeated definitions of an entity are ignored, this
 definition will take precedence over any other definitions of this entity
-in the document type declaration. Multiple
-<tt>-i</tt> options are allowed.
-If the SGML declaration replaces the reserved name
-<tt>INCLUDE</tt> then
+in the document type declaration. Multiple <tt>-i</tt> options are allowed.
+If the SGML declaration replaces the reserved name <tt>INCLUDE</tt> then
 the new reserved name will be the replacement text of the entity. Typically
-the document type declaration will contain
+the document type declaration will contain 
 <pre>&lt;!ENTITY % <i>name</i> "IGNORE"></pre>
-and will use
-<tt>%<i>name</i>;</tt> in the status keyword specification
+and will use <tt>%<i>name</i>;</tt> in the status keyword specification
 of a marked section declaration. In this case the effect of the option
 will be to cause the marked section not to be ignored.</dd>
 
-<dt>
-<tt>-n</tt></dt>
+<dt><tt>-n</tt>, <tt>--error-numbers</tt></dt>
 
 <dd>
 Show message numbers in error messages.</dd>
 
-<dt>
-<tt>-o<i>output_option</i></tt></dt>
+<dt><tt>-o<i>option</i></tt>, <tt>--option=<i>option</i></tt></dt>
 
 <dd>
 Output additional information according to
-<i><tt>output_option</tt></i>:</dd>
+<i><tt>option</tt></i>:
 
 <dl>
 <dt>
@@ -249,42 +215,37 @@ DATA attributes are treated like CDATA attributes. For more details, see clause
 of ISO 8879</A>.</dd>
 </dl>
 Multiple
-<tt>-o</tt> options are allowed.
-<dt>
-<tt>-p</tt></dt>
+<tt>-o</tt> options are allowed.</dd>
+
+<dt><tt>-p</tt>, <tt>--only-prolog</tt></dt>
 
 <dd>
 Parse only the prolog. Onsgmls will exit after parsing the document type
 declaration. Implies <tt>-s</tt>.</dd>
 
-<dt>
-<tt>-s</tt></dt>
+<dt><tt>-s</tt>, <tt>--no-output</tt></dt>
 
 <dd>
 Suppress output. Error messages will still be printed.</dd>
 
-<dt>
-<tt>-t<i>file</i></tt></dt>
+<dt><tt>-t<i>file</i></tt>, <tt>--rast-file=<i>file</i></tt></dt>
 
 <dd>
-Output to
-<i><tt>file</tt></i> the RAST result as defined by ISO/IEC 13673:1995
+Output to <i><tt>file</tt></i> the RAST result as defined by ISO/IEC 13673:1995
 (actually this isn't quite an IS yet; this implements the Intermediate
 Editor's Draft of 1994/08/29, with changes to implement ISO/IEC JTC1/SC18/WG8
 N1777). The normal output is not produced.</dd>
 
-<dt>
-<tt>-v</tt></dt>
+<dt><tt>-v</tt>, <tt>--version</tt></dt>
 
 <dd>
 Print the version number.</dd>
 
-<dt>
-<a NAME="optw"></a><tt>-w<i>type</i></tt></dt>
+<dt><a NAME="optw"></a><tt>-w<i>type</i></tt>, <tt>--warning=<i>type</i></tt></dt>
 
 <dd>
 Control warnings and errors. Multiple <tt>-w</tt> options are allowed.
-The following values of <i><tt>type</tt></i> enable warnings:</dd>
+The following values of <i><tt>type</tt></i> enable warnings:
 
 <dl>
 <dt>
@@ -533,10 +494,9 @@ specified in the SGML declaration will be used.</dd>
 Do not give errors when AFDR meta-DTD notation features are used in the
 DTD. These errors are normally produced when parsing the DTD, but suppressed
 when parsing meta-DTDs.</dd>
-</dl>
+</dl></dd>
 
-<dt>
-<tt>-x</tt></dt>
+<dt><tt>-x</tt>, <tt>--references</tt></dt>
 
 <dd>
 Show information about relevant clauses (from ISO 8879:1986) in error messages.</dd> 
@@ -580,9 +540,5 @@ Same as
 <tt>-wundef</tt>.</dd>
 </dl>
 
-<address>
-James Clark</address>
-
-<br>jjc@jclark.com
 </body>
 </html>

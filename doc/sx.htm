@@ -18,29 +18,7 @@ Hypermedia/Time-based Structuring Language
 SYNOPSIS
 </H2>
 <P>
-<CODE>osx</CODE>
-[
-<CODE>-Cehilprvx</CODE>
-]
-[
-<CODE>-b<VAR>encoding</VAR></CODE>
-]
-[
-<CODE>-c<VAR>catalog_file</VAR></CODE>
-]
-[
-<CODE>-D<VAR>directory</VAR></CODE>
-]
-[
-<CODE>-f<VAR>file</VAR></CODE>
-]
-[
-<CODE>-w<VAR>warning_type</VAR></CODE>
-]
-[
-<CODE>-x<VAR>xml_output_option</VAR></CODE>
-]
-<CODE><VAR>sysid...</VAR></CODE>
+<CODE>osx</CODE> [ <CODE>option...</CODE> ] <CODE><VAR>sysid...</VAR></CODE>
 <H2>DESCRIPTION</H2>
 <P>
 Osx converts SGML to XML.
@@ -48,60 +26,72 @@ Osx parses and validates the SGML document contained in
 <CODE><VAR>sysid...</VAR></CODE>
 and writes an equivalent XML document to the standard output.
 Osx will warn about SGML constructs which have no XML equivalent.
+<H2>OPTIONS</H2>
 <P>
 The following options are available:
 <DL>
 <DT>
-<CODE>-b<VAR>encoding</VAR></CODE>
+<CODE>-b<VAR>name</VAR></CODE>,
+<CODE>--encoding=<VAR>name</VAR></CODE>
 <DD>
-Use <A HREF="charset.htm#encodings"><CODE><VAR>encoding</VAR></CODE></A> for output.
+Use the <A HREF="sysid.htm#encodings">BCTF</A> <VAR>name</VAR> for output.
 By default osx uses UTF-8.
 <DT>
-<CODE>-c<VAR>file</VAR></CODE>
+<CODE>-c<VAR>sysid</VAR></CODE>,
+<CODE>--catalog=<VAR>sysid</VAR></CODE>
 <DD>
-Use the catalog entry file
-<CODE><VAR>file</VAR></CODE>.
+Map public identifiers and entity names to system identifiers
+using the catalog entry file whose system identifier is <VAR>sysid</VAR>.
+This has the same effect as in <A HREF="nsgmls.htm#optc">onsgmls</A>.
 <DT>
-<CODE>-C</CODE>
+<CODE>-C</CODE>,
+<CODE>--catalogs</CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#optC">onsgmls</A>.
 <DT>
-<CODE>-D<VAR>directory</VAR></CODE>
+<CODE>-D<VAR>directory</VAR></CODE>,
+<CODE>--directory=<VAR>directory</VAR></CODE>
 <DD>
 Search
 <CODE><VAR>directory</VAR></CODE>
 for files specified in system identifiers.
 This has the same effect as in <A HREF="nsgmls.htm#optD">onsgmls</A>.
 <DT>
-<CODE>-e</CODE>
+<CODE>-e</CODE>,
+<CODE>--open-entities</CODE>
 <DD>
 Describe open entities in error messages.
 <DT>
-<CODE>-f<VAR>file</VAR></CODE>
+<CODE>-f<VAR>file</VAR></CODE>,
+<CODE>--error-file=<VAR>file</VAR></CODE>
 <DD>
 Redirect errors to
 <CODE><VAR>file</VAR></CODE>.
 This is useful mainly with shells that do not support redirection
 of stderr.
 <DT>
-<CODE>-i<VAR>name</VAR></CODE>
+<CODE>-i<VAR>name</VAR></CODE>,
+<CODE>--include=<VAR>name</VAR></CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 <DT>
-<CODE>-v</CODE>
+<CODE>-v</CODE>,
+<CODE>--version</CODE>
 <DD>
 Print the version number.
 <DT>
-<CODE>-w<VAR>type</VAR></CODE>
+<CODE>-w<VAR>type</VAR></CODE>,
+<CODE>--warning=<VAR>type</VAR></CODE>
 <DD>
 Control warnings and errors according to
 <CODE><VAR>type</VAR></CODE>.
 This has the same effect as in <A HREF="nsgmls.htm#optw">onsgmls</A>.
 <DT>
-<CODE>-x<VAR>xml_output_option</VAR></CODE>
+<CODE>-x<VAR>option</VAR></CODE>,
+<CODE>--xml-output-option=<VAR>option</VAR></CODE>
 <DD>
 Control the XML output according to the value of
-<CODE><VAR>xml_output_option</VAR></CODE> as follows:
+<CODE><VAR>option</VAR></CODE> as follows:
 <DL>
 <DT>
 <CODE>no-nl-in-tag</CODE>
@@ -165,10 +155,5 @@ Multiple
 <CODE>-x</CODE>
 options are allowed.
 </DL>
-<P>
-<ADDRESS>
-James Clark<BR>
-jjc@jclark.com
-</ADDRESS>
 </BODY>
 </HTML>

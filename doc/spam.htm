@@ -18,107 +18,84 @@ Hypermedia/Time-based Structuring Language
 SYNOPSIS
 </H2>
 <P>
-<CODE>ospam</CODE>
-[
-<CODE>-Cehilprvx</CODE>
-]
-[
-<CODE>-c<VAR>catalog_file</VAR></CODE>
-]
-[
-<CODE>-D<VAR>directory</VAR></CODE>
-]
-[
-<CODE>-f<VAR>file</VAR></CODE>
-]
-[
-<CODE>-m<VAR>markup_option</VAR></CODE>
-]
-[
-<CODE>-o<VAR>entity_name</VAR></CODE>
-]
-[
-<CODE>-w<VAR>warning_type</VAR></CODE>
-]
-<CODE><VAR>sysid...</VAR></CODE>
+<CODE>ospam</CODE> [ <CODE>option...</CODE> ] <CODE><VAR>sysid...</VAR></CODE>
 <H2>DESCRIPTION</H2>
 <P>
-Ospam (SP Add Markup)
-is an SGML markup stream editor implemented using the OpenSP parser.
-Ospam parses the SGML document contained in
-<CODE><VAR>sysid...</VAR></CODE>
-and copies to the standard output
-the portion of the document entity containing the document
-instance, adding or changing markup as specified by the
-<CODE>-m</CODE> options.
-The <CODE>-p</CODE>
-option can be used to include the SGML declaration and prolog
-in the output.
-The <CODE>-o</CODE>
-option can be used to output other entities.
-The
-<CODE>-x</CODE>
-option can be used to expand entity references.
+Ospam (SP Add Markup) is an SGML markup stream editor implemented using the 
+OpenSP parser. Ospam parses the SGML document contained in
+<CODE><VAR>sysid...</VAR></CODE> and copies to the standard output the portion 
+of the document entity containing the document instance, adding or changing 
+markup as specified by the <CODE>-m</CODE> options. The <CODE>-p</CODE> option
+can be used to include the SGML declaration and prolog in the output. The 
+<CODE>-o</CODE> option can be used to output other entities. The 
+<CODE>-x</CODE> option can be used to expand entity references.
+<H2>OPTIONS</H2>
 <P>
 The following options are available:
 <DL>
 <DT>
-<CODE>-c<VAR>file</VAR></CODE>
+<CODE>-c<VAR>sysid</VAR></CODE>,
+<CODE>--catalog=<VAR>sysid</VAR></CODE>,
 <DD>
-Use the catalog entry file
-<CODE><VAR>file</VAR></CODE>.
+Use the catalog entry file <CODE><VAR>sysid</VAR></CODE>.
 <DT>
-<CODE>-C</CODE>
+<CODE>-C</CODE>,
+<CODE>--catalogs</CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#optC">onsgmls</A>.
 <DT>
-<CODE>-D<VAR>directory</VAR></CODE>
+<CODE>-D<VAR>directory</VAR></CODE>,
+<CODE>--directory=<VAR>directory</VAR></CODE>
 <DD>
-Search
-<CODE><VAR>directory</VAR></CODE>
-for files specified in system identifiers.
-This has the same effect as in <A HREF="nsgmls.htm#optD">onsgmls</A>.
+Search <CODE><VAR>directory</VAR></CODE> for files specified in system 
+identifiers.  This has the same effect as in 
+<A HREF="nsgmls.htm#optD">onsgmls</A>.
 <DT>
-<CODE>-e</CODE>
+<CODE>-e</CODE>,
+<CODE>--open-entities</CODE>
 <DD>
 Describe open entities in error messages.
 <DT>
-<CODE>-f<VAR>file</VAR></CODE>
+<CODE>-f<VAR>file</VAR></CODE>,
+<CODE>--error-file=<VAR>file</VAR></CODE>
 <DD>
-Redirect errors to
-<CODE><VAR>file</VAR></CODE>.
+Redirect errors to <CODE><VAR>file</VAR></CODE>.
 This is useful mainly with shells that do not support redirection
 of stderr.
 <DT>
-<CODE>-h</CODE>
+<CODE>--help</CODE>
+<DD>Show a help message and exit.
+<DT>
+<CODE>-h</CODE>,
+<CODE>--hoist-omitted-tags</CODE>
 <DD>
 Hoist omitted tags out from the start of internal entities.
 If the text at the beginning of an internal entity causes
-a tag to be implied,
-the tag will usually be treated as being in that internal entity;
-this option will instead cause it to be treated as being in the entity
-that referenced the internal entity.
+a tag to be implied, the tag will usually be treated as being in that 
+internal entity; this option will instead cause it to be treated as 
+being in the entity that referenced the internal entity.
 This option makes a difference in conjunction with
 <CODE>-momittag</CODE>
 or
 <CODE>-x -x</CODE>.
 <DT>
-<CODE>-i<VAR>name</VAR></CODE>
+<CODE>-i<VAR>name</VAR></CODE>,
+<CODE>--include=<VAR>name</VAR></CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 <DT>
-<CODE>-l</CODE>
+<CODE>-l</CODE>,
+<CODE>--lowercase</CODE>
 <DD>
 Prefer lower-case.
 Added names that were subject to upper-case substitution
 will be converted to lower-case.
 <DT>
-<CODE>-m<VAR>markup_option</VAR></CODE>
+<CODE>-m<VAR>option</VAR></CODE>,
+<CODE>--markup-option=<VAR>option</VAR></CODE>
 <DD>
 Change the markup in the output according to the value
-of
-<CODE><VAR>markup_option</VAR></CODE>
-as follows:
+of <CODE><VAR>option</VAR></CODE> as follows:
 <DL>
 <DT>
 <CODE>omittag</CODE>
@@ -202,15 +179,15 @@ Multiple
 <CODE>-m</CODE>
 options are allowed.
 <DT>
-<CODE>-o<VAR>name</VAR></CODE>
+<CODE>-o<VAR>name</VAR></CODE>,
+<CODE>--output-entity=<VAR>name</VAR></CODE>
 <DD>
-Output the general entity
-<CODE><VAR>name</VAR></CODE>
-instead of the document entity.
-The output will correspond to the first time
+Output the general entity <CODE><VAR>name</VAR></CODE> instead of 
+the document entity.  The output will correspond to the first time
 that the entity is referenced in content.
 <DT>
-<CODE>-p</CODE>
+<CODE>-p</CODE>,
+<CODE>-output-prolog</CODE>
 <DD>
 Output the part of the document entity containing the SGML declaration
 (if it was explicitly present in the document entity)
@@ -223,23 +200,27 @@ containing the external subset of the DTD, if there is one.
 Note that the SGML declaration will not be included if it was
 specified by an SGMLDECL entry in a catalog.
 <DT>
-<CODE>-r</CODE>
+<CODE>-r</CODE>,
+<CODE>--raw</CODE>
 <DD>
 Don't perform any conversion on RSs and REs when outputting the entity.
 The entity would typically have the storage manager attribute
 <CODE>records=asis</CODE>.
 <DT>
-<CODE>-v</CODE>
+<CODE>-v</CODE>,
+<CODE>--version</CODE>
 <DD>
 Print the version number.
 <DT>
-<CODE>-w<VAR>type</VAR></CODE>
+<CODE>-w<VAR>type</VAR></CODE>,
+<CODE>--warning=<VAR>type</VAR></CODE>
 <DD>
 Control warnings and errors according to
 <CODE><VAR>type</VAR></CODE>.
 This has the same effect as in <A HREF="nsgmls.htm#optw">onsgmls</A>.
 <DT>
-<CODE>-x</CODE>
+<CODE>-x</CODE>,
+<CODE>--expand-references</CODE>
 <DD>
 Expand references to entities that are changed.
 If this option is specified two or more times,
@@ -266,10 +247,5 @@ an entity with that name is subsequently defined and that default
 value is added to the document instance, then the resulting document
 may not be equivalent to the original document.
 Ospam will give a warning when the first two conditions are met.
-<P>
-<ADDRESS>
-James Clark<BR>
-jjc@jclark.com
-</ADDRESS>
 </BODY>
 </HTML>

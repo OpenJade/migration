@@ -203,7 +203,7 @@ install-libosp:	$(install-common) debian/$(pkg-libosp).README.Debian
 
 	$(make_directory) $(libdir-libosp)
 
-	$(MAKE) install SUBDIRS="lib"					\
+	$(MAKE) install SUBDIRS="lib po"				\
 	    prefix=$(SRCDIR)/$(prefix-libosp)/usr $(am_inst_flags)	\
 	    pkgdocdir=$(docdir-libosp)
 #	 it insists on installing config.h

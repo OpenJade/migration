@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\osp133.dll" /base:0x21000000
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\osp14pre2.dll" /base:0x21000000
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\osp133d.dll" /base:0x21000000
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\osp14pre2d.dll" /base:0x21000000
 
 !ENDIF 
 
@@ -113,7 +113,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -127,7 +127,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -153,7 +153,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -167,7 +167,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -191,7 +191,7 @@ InputPath=.\ArcEngineMessages.msg
 InputName=ArcEngineMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -203,7 +203,7 @@ InputPath=.\ArcEngineMessages.msg
 InputName=ArcEngineMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -234,7 +234,7 @@ InputPath=.\CatalogMessages.msg
 InputName=CatalogMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -246,7 +246,7 @@ InputPath=.\CatalogMessages.msg
 InputName=CatalogMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -271,6 +271,14 @@ SOURCE=.\CmdLineApp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\DtdDeclEventHandler.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\DtdDeclEventHandler.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\CmdLineAppMessages.msg
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -281,7 +289,7 @@ InputPath=.\CmdLineAppMessages.msg
 InputName=CmdLineAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -293,7 +301,7 @@ InputPath=.\CmdLineAppMessages.msg
 InputName=CmdLineAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -342,6 +350,37 @@ SOURCE=.\EntityApp.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\EntityAppMessages.msg
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\EntityAppMessages.msg
+InputName=EntityAppMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l libModule $(InputPath)
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
+
+# Begin Custom Build - Processing $(InputPath)
+InputDir=.
+InputPath=.\EntityAppMessages.msg
+InputName=EntityAppMessages
+
+"$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	perl -w ..\msggen.pl -l libModule $(InputPath)
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\EntityCatalog.cxx
 # End Source File
 # Begin Source File
@@ -364,7 +403,7 @@ InputPath=.\EntityManagerMessages.msg
 InputName=EntityManagerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -376,7 +415,7 @@ InputPath=.\EntityManagerMessages.msg
 InputName=EntityManagerMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -401,7 +440,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -415,7 +454,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -485,10 +524,6 @@ SOURCE=.\InputSource.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\instmac.m4
-# End Source File
-# Begin Source File
-
 SOURCE=.\InternalInputSource.cxx
 # End Source File
 # Begin Source File
@@ -543,7 +578,7 @@ InputPath=.\MessageFormatterMessages.msg
 InputName=MessageFormatterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -555,7 +590,7 @@ InputPath=.\MessageFormatterMessages.msg
 InputName=MessageFormatterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -578,7 +613,7 @@ InputPath=.\MessageReporterMessages.msg
 InputName=MessageReporterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -590,7 +625,7 @@ InputPath=.\MessageReporterMessages.msg
 InputName=MessageReporterMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -687,7 +722,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -701,7 +736,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -725,7 +760,7 @@ InputPath=.\ParserAppMessages.msg
 InputName=ParserAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -737,7 +772,7 @@ InputPath=.\ParserAppMessages.msg
 InputName=ParserAppMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -764,7 +799,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl libModule $(InputPath)
 
 # End Custom Build
 
@@ -776,7 +811,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl libModule $(InputPath)
 
 # End Custom Build
 
@@ -815,7 +850,7 @@ InputPath=.\PosixStorageMessages.msg
 InputName=PosixStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -827,7 +862,7 @@ InputPath=.\PosixStorageMessages.msg
 InputName=PosixStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -895,7 +930,7 @@ InputPath=.\StdioStorageMessages.msg
 InputName=StdioStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -907,7 +942,7 @@ InputPath=.\StdioStorageMessages.msg
 InputName=StdioStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -917,10 +952,6 @@ InputName=StdioStorageMessages
 # Begin Source File
 
 SOURCE=.\StorageManager.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\StringVectorMessageArg.cxx
 # End Source File
 # Begin Source File
 
@@ -974,7 +1005,7 @@ InputPath=.\URLStorageMessages.msg
 InputName=URLStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -986,7 +1017,7 @@ InputPath=.\URLStorageMessages.msg
 InputName=URLStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -996,37 +1027,6 @@ InputName=URLStorageMessages
 # Begin Source File
 
 SOURCE=.\UTF8CodingSystem.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=..\VERSION
-
-!IF  "$(CFG)" == "lib - Win32 Release"
-
-# Begin Custom Build - Building version.h
-InputPath=..\VERSION
-
-"version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	del /f version.h 
-	perl -w mkversion.pl $(InputPath)>version.h 
-	attrib +r version.h 
-	
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
-
-# Begin Custom Build - Building version.h
-InputPath=..\VERSION
-
-"version.h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	del /f version.h 
-	perl -w mkversion.pl $(InputPath)>version.h 
-	attrib +r version.h 
-	
-# End Custom Build
-
-!ENDIF 
-
 # End Source File
 # Begin Source File
 
@@ -1052,7 +1052,7 @@ InputPath=.\WinInetStorageMessages.msg
 InputName=WinInetStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -1064,7 +1064,7 @@ InputPath=.\WinInetStorageMessages.msg
 InputName=WinInetStorageMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl -l $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -1089,7 +1089,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1103,7 +1103,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1458,6 +1458,10 @@ SOURCE=.\jis0212.h
 # Begin Source File
 
 SOURCE=.\ksc5601.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\koi8-r.h
 # End Source File
 # Begin Source File
 
@@ -1829,10 +1833,6 @@ SOURCE=..\include\StringResource.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\StringVectorMessageArg.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\SubstTable.cxx
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1913,10 +1913,6 @@ SOURCE=..\include\Vector.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\version.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\include\Win32CodingSystem.h
 # End Source File
 # Begin Source File
@@ -1966,6 +1962,11 @@ SOURCE=.\CatalogMessages.rc
 # Begin Source File
 
 SOURCE=.\CmdLineAppMessages.rc
+# PROP Exclude_From_Build 1
+# End Source File
+# Begin Source File
+
+SOURCE=.\EntityAppMessages.rc
 # PROP Exclude_From_Build 1
 # End Source File
 # Begin Source File

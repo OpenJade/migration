@@ -18,4 +18,4 @@ MSGGENFLAGS = -l appModule
 SUFFIXES = .msg .rc
 
 %.h %.cxx %.rc: %.msg
-	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
+	[ ! -f $(top_srcdir)/msggen.pl ] || $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

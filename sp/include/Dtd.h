@@ -31,6 +31,8 @@ class SP_API Dtd : public Resource {
 public:
   typedef NamedTableIter<ElementType> ElementTypeIter;
   typedef ConstNamedTableIter<ElementType> ConstElementTypeIter;
+  typedef NamedTableIter<RankStem> RankStemIter;
+  typedef ConstNamedTableIter<RankStem> ConstRankStemIter;
   typedef NamedTableIter<ShortReferenceMap> ShortReferenceMapIter;
   typedef ConstNamedResourceTableIter<Notation> ConstNotationIter;
   typedef NamedResourceTableIter<Notation> NotationIter;
@@ -66,6 +68,8 @@ public:
   RankStem *lookupRankStem(const StringC &);
   RankStem *insertRankStem(RankStem *);
   size_t nRankStem() const;
+  ConstRankStemIter rankStemIter() const;
+  RankStemIter rankStemIter();
 
   const ShortReferenceMap *lookupShortReferenceMap(const StringC &) const;
   ShortReferenceMap *lookupShortReferenceMap(const StringC &);
@@ -286,6 +290,20 @@ Dtd::ConstElementTypeIter Dtd::elementTypeIter() const
 {
   // Avoid use of typedef to work around MSVC 2.0 bug.
   return ConstNamedTableIter<ElementType>(elementTypeTable_);
+}
+
+inline
+Dtd::RankStemIter Dtd::rankStemIter()
+{
+  // Avoid use of typedef to work around MSVC 2.0 bug.
+  return NamedTableIter<RankStem>(rankStemTable_);
+}
+
+inline
+Dtd::ConstRankStemIter Dtd::rankStemIter() const
+{
+  // Avoid use of typedef to work around MSVC 2.0 bug.
+  return ConstNamedTableIter<RankStem>(rankStemTable_);
 }
 
 inline

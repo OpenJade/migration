@@ -9,7 +9,6 @@
 #include "MessageArg.h"
 #include "macros.h"
 #include "ParserMessages.h"
-#include "StringVectorMessageArg.h"
 #include "Syntax.h"
 #include "Entity.h"
 #include "Notation.h"

@@ -10,7 +10,7 @@
 #include "Hash.h"
 #include "HashTable.h"
 #include "HashTableItemBase.h"
-#include "Iset.h"
+#include "ISet.h"
 #include "OwnerTable.h"
 #include "Ptr.h"
 #include "RangeMap.h"

@@ -55,6 +55,14 @@
 #endif
 #endif /* not SP_DEFAULT_ENCODING */
 
+#ifndef SP_MESSAGE_DOMAIN
+#define SP_MESSAGE_DOMAIN ""
+#endif /* not SP_MESSAGE_DOMAIN */
+
+#ifndef SP_LOCALE_DIR
+#define SP_LOCALE_DIR ""
+#endif /* not SP_LOCALE_DIR */
+
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -103,12 +111,16 @@ void CmdLineApp::changeOptionRegistration(AppChar oldc, AppChar newc)
   for (size_t i = 0; i < opts_.size(); i++) {
     if (opts_[i].value == oldc) {
       opts_[i].value = newc;
+#ifdef SP_HAVE_LOCALE
       char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
       setlocale(LC_CTYPE, "C");
+#endif
       opts_[i].key = istalnum(newc) ? newc : 0;
+#ifdef SP_HAVE_LOCALE
       setlocale(LC_CTYPE, savedLocale);
       if (savedLocale)
         free(savedLocale);
+#endif
       return;
     }
   }
@@ -122,12 +134,16 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *name,
   ASSERT((c != '-') && (c != ':') && (c != '?') && (c != '=')); 
   LongOption<AppChar> opt;
   opt.value = c;
+#ifdef SP_HAVE_LOCALE
   char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
   setlocale(LC_CTYPE, "C");
+#endif
   opt.key = istalnum(c) ? c : 0;
+#ifdef SP_HAVE_LOCALE
   setlocale(LC_CTYPE, savedLocale);
   if (savedLocale)
     free(savedLocale);
+#endif
   opt.name = name;
   opt.hasArgument = (arg.module() != CmdLineAppMessages::noArg.module()
                     || arg.number() != CmdLineAppMessages::noArg.number());
@@ -308,9 +324,11 @@ int CmdLineApp::init(int, AppChar **argv)
   if (progName)
     setProgramName(convertInput(progName));
   MessageTable::instance()->registerMessageDomain(MessageFragment::libModule,
-                                                  SP_PACKAGE, SP_LOCALE_DIR);
+                                                  SP_MESSAGE_DOMAIN, 
+                                                  SP_LOCALE_DIR);
   MessageTable::instance()->registerMessageDomain(MessageFragment::appModule,
-                                                  SP_PACKAGE, SP_LOCALE_DIR);
+                                                  SP_MESSAGE_DOMAIN, 
+                                                  SP_LOCALE_DIR);
   return 0;
 }
 
@@ -425,8 +443,8 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
   case 'v':
     // print the version number
     message(CmdLineAppMessages::versionInfo,
-	    StringMessageArg(convertInput(SP_T(SP_PACKAGE))),
-	    StringMessageArg(convertInput(SP_T(SP_VERSION))));
+	    StringMessageArg(codingSystem()->convertIn(SP_PACKAGE)),
+	    StringMessageArg(codingSystem()->convertIn(SP_VERSION)));
     break;
   case 'h':
     action_ = usageAction;

@@ -318,9 +318,8 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
   Boolean hadHref = 0;
   StringC href;
   Boolean hadTitle = 0;
-  StringC title;
-  Boolean hadMedia = 0;
   Boolean isDsssl = 0;
+  Boolean isAlternate = 0;
   StringC name;
   StringC value;
   while (getAttribute(s, n, name, value)) {
@@ -344,8 +343,14 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
       value.swap(href);
     }
     else if (matchCi(name, "title")) {
+      if (specTitleOption_ && specTitle_ != value) { 
+	availableSpecTitles_.push_back(value);
+	return 0;
+      }
       hadTitle = 1;
-      value.swap(title);
+    }
+    else if (matchCi(name, "alternate")) {
+      isAlternate = matchCi(value, "yes");
     }
     else if (matchCi(name, "media")) { 
       /* There is no point in doing detailed comparisons if either
@@ -387,16 +392,17 @@ Boolean DssslApp::handleAttlistPi(const Char *s, size_t n,
         return 0;
     }
   }
-  if (!isDsssl || !hadHref || (specTitleOption_ && !hadTitle))
+  // PI doesn't contain useful information
+  if (!isDsssl || !hadHref)
     return 0;
-  if (specTitleOption_ && specTitle_ != title) { 
-    availableSpecTitles_.push_back(title);
+  // 
+  if (!(specTitleOption_ && hadTitle) && isAlternate && dssslSpecSysid_.size() > 0)
     return 0;
-  }
   splitOffId(href, dssslSpecId_);
   // FIXME should use location of attribute value rather than location of PI
   return entityManager()->expandSystemId(href, loc, 0, systemCharset(), 0, *this,
-				         dssslSpecSysid_);
+				         dssslSpecSysid_)
+    && ((specTitleOption_ && hadTitle) || !isAlternate);
 }
 
 void DssslApp::skipS(const Char *&s, size_t &n)

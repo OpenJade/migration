@@ -1,0 +1,5 @@
+PROG=osgmlnorm
+OBJS=sgmlnorm.o SGMLGenerator.o
+INCLUDE=-I$(srcdir)/../generic
+XLIBS=../lib/libosp.a
+GENSRCS=

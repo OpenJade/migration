@@ -1,5 +1,10 @@
 Changes in OpenJade 1.3
 
+* char-repertoire, add-name-chars and add-separator-chars
+  declaration element type forms are supported. When given
+  the -s cmdline flag, jade doesn't use its builtin 
+  character repertoire.
+  
 * Most of the derived procedures in the query language:
   current-root, node-list-reduce, node-list-contains?,
   node-list-remove-duplicates, node-list-union, 

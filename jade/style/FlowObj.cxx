@@ -3545,8 +3545,11 @@ void CompoundExtensionFlowObj::processInner(ProcessContext &context)
     CompoundFlowObj::processInner(context);
     context.popPorts();
   }
-  else
+  else {
+    context.pushPrincipalPort(new ProcessContext::Validator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
+  }
   fotb.endExtension(*fo_);
 }
 

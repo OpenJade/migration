@@ -94,6 +94,7 @@ ChangeLog:
 config.status Makefile:	ChangeLog
 	aclocal
 	autoheader
+	libtoolize --force
 	automake --add-missing
 	autoconf
 	./configure --prefix=/usr --sysconfdir=/etc			\
@@ -112,7 +113,7 @@ build:	config.status Makefile
 clean:
 	$(checkdir)
 	[ ! -f Makefile ] || $(MAKE) clean
-	[ ! -f Makefile ] || $(MAKE) maintainer-clean
+	[ ! -f Makefile ] || $(MAKE) maintainer-clean || true
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libosp).shlibs					\
 	    debian/README.Debian debian/$(pkg-libosp).README.Debian

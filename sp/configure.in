@@ -193,7 +193,7 @@ AC_DEFINE(SP_MULTI_BYTE,1,
           [define this to build a multi-byte version])
 AC_MSG_CHECKING(wether to include support for http)
 AC_ARG_ENABLE(http,
-[  --enable-http          include support for http],
+[  --enable-http           include support for http],
     if test $enableval
     then
         AC_MSG_RESULT(yes)

@@ -1,3 +1,8 @@
+2002-12-13  Karl Eichwalder  <ke@suse.de>
+
+	* tests/catalog-2: New file.
+	* tests/Makefile.am (SHOWSTOPPERS): Add catalog-2.
+
 2002-12-10  Karl Eichwalder  <ke@suse.de>
 
 	* tests/catalog-1: New file.

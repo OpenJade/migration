@@ -5,7 +5,7 @@
 content="text/html; charset=iso-8859-1">
 <meta name="ProgId" content="FrontPage.Editor.Document">
 <meta name="GENERATOR" content="Microsoft FrontPage Express 2.0">
-<title>DSSSL Paragraph object</title>
+<title>OpenJade</title>
 </head>
 
 <body background="images/background.gif">
@@ -20,7 +20,8 @@ content="text/html; charset=iso-8859-1">
 <TBODY>    <tr>
         <td valign="top" width="141"><font face="Arial"><img
         src="images/space.gif" alt="" width="145" height="10"></font></td>
-        <td valign="top"><h2><font face="Arial">Contents</font></h2>
+        <td valign="top"><h1><font face="Geneva, Arial">OpenJade</font></h1>
+	<h2><font face="Arial">Contents</font></h2>
         <ul>
             <li><a
                 href="#whatis"><font
@@ -164,13 +165,13 @@ the perl-generated files.
 <p>
 The following compilers should work:
 <ul>
-<li>gcc 2.95
+<li>gcc 2.95.1
 <li>egcs 1.1.2
 <li>egcs 1.0.2
 <li>gcc 2.8.1
 <li>gcc 2.7.2
 </ul>
-<p>Only the first has been tested by me.
+<p>Only the first two have been recently tested.
 <p>
 If you use gcc 2.7.2 with -O on an x86 processor you must use
 -fno-strength-reduce. gcc 2.7.2.1 fixes this problem.
@@ -531,7 +532,11 @@ openjade demo.sgm
         </font></p>
         <p><font face="Arial">An easy way to get access to all
         external procedures is to use the style specification
-        <code>dsssl/extensions.dsl#procedures</code>.
+        <code>dsssl/extensions.dsl#procedures</code>. The file
+        <code>dsssl/extensions.dsl</code> also contains style
+        specifications which make the nonstandard flow object classes
+        and inherited characteristics supported by the backends 
+        available in a convenient way.
         </font></p>
         <h3><font face="Arial">Debugging</font></h3>
         <pre><font face="Arial">
@@ -717,7 +722,7 @@ openjade demo.sgm
         the property of their respective owners.&nbsp; <br>
         Copyright ©&nbsp; 1999 OpenJade project, All rights
         reserved. Created by Didier PH Martin, modified: September
-        7, 1999</font></p>
+        9, 1999</font></p>
         </td>
     </tr>
     <tr>

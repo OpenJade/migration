@@ -2265,7 +2265,7 @@ Boolean Parser::parseDoctypeDeclStart()
 
 void Parser::implyDtd(const StringC &gi)
 {
-  startMarkup(eventsWanted().wantPrologMarkup(), Location());
+  startMarkup(eventsWanted().wantPrologMarkup(), currentLocation());
 #if 0
   if (currentMarkup()) {
     currentMarkup()->addDelim(Syntax::dMDO);
@@ -2353,7 +2353,7 @@ Boolean Parser::parseDoctypeDeclEnd(Boolean fake)
   Ptr<Dtd> tem(defDtdPointer());
   endDtd();
   if (fake) {
-    startMarkup(eventsWanted().wantPrologMarkup(), Location());
+    startMarkup(eventsWanted().wantPrologMarkup(), currentLocation());
 #if 0
     if (currentMarkup())
       currentMarkup()->addDelim(Syntax::dMDC);

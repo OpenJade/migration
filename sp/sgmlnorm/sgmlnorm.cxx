@@ -37,6 +37,10 @@ SgmlnormApp::SgmlnormApp()
   registerOption('m');
   registerOption('n');
   registerOption('r');
+  registerLongOption(SP_T("dtd"), 'd');
+  registerLongOption(SP_T("marked-sections"), 'm');
+  registerLongOption(SP_T("comments"), 'n');
+  registerLongOption(SP_T("raw"), 'r');
 }
 
 void SgmlnormApp::processOption(AppChar opt, const AppChar *arg)

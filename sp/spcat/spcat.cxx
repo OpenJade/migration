@@ -37,6 +37,14 @@ SpcatApp::SpcatApp()
   registerOption('e', SP_T("entity"));
   registerOption('n', SP_T("notation"));
   registerOption('s', SP_T("doctype"));
+  registerLongOption(SP_T("public-id"), 'P', SP_T("literal"));
+  registerLongOption(SP_T("system-id"), 'S', SP_T("literal"));
+  registerLongOption(SP_T("parameter-entity"), 'p', SP_T("name"));
+  registerLongOption(SP_T("doctype"), 'd', SP_T("name"));
+  registerLongOption(SP_T("linktype"), 'l', SP_T("name"));
+  registerLongOption(SP_T("entity"), 'e', SP_T("name"));
+  registerLongOption(SP_T("notation"), 'n', SP_T("name"));
+  registerLongOption(SP_T("declaration"), 's', SP_T("doctype"));
 }
 
 void SpcatApp::processOption(AppChar opt, const AppChar *arg)

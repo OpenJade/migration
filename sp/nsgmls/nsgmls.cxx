@@ -87,6 +87,11 @@ NsgmlsApp::NsgmlsApp()
   registerOption('s');
   registerOption('t', SP_T("rast_file"));
   registerOption('u');
+  registerLongOption(SP_T("batch-mode"), 'B');
+  registerLongOption(SP_T("output-option"), 'o', SP_T("option"));
+  registerLongOption(SP_T("only-prolog"), 'p');
+  registerLongOption(SP_T("no-output"), 's');
+  registerLongOption(SP_T("rast-file"), 't', SP_T("file"));
 }
 
 void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)

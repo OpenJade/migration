@@ -1,0 +1,669 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML
+><HEAD
+><TITLE
+>General overview</TITLE
+><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="docbook.css"><META
+NAME="CREATOR"
+CONTENT="Modular DocBook HTML Stylesheet version 1.08"><META
+NAME="form"
+CONTENT="html"></HEAD
+><BODY
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Jade internals</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1142.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Jade internals</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="t1478.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><H1
+><A
+NAME="AEN266"
+>General overview</A
+></H1
+><H2
+><A
+NAME="AEN268"
+>Program structure</A
+></H2
+><P
+>Most of SP and Jade is user-interface independent: it doesn't know
+	whether it's being run from the command line or from a GUI. The 
+	code is organized in several layers.</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>The lowest layer is a general purpose class library (mostly
+	  template based), which is independent of
+	  SGML/XML.
+	</P
+></LI
+><LI
+><P
+>The next layer is a general concept of an entity
+	  manager, which is basically an interface to set of services to an
+	  SGML parser; basically it's everything that the
+	  SGML standard leaves undefined or makes 
+	  system-dependent for an SGML parser.  This layer
+	  includes the message reporting API
+	  (MessageReporter,
+	  Message), catalog API 
+	  (EntityCatalog), 
+	  character set API (CharsetInfo), and the
+	  entity manager proper
+	  (EntityManager). Template instantations for
+	  this are in <TT
+CLASS="FILENAME"
+>entmgr_inst.m4</TT
+>.
+	</P
+></LI
+><LI
+><P
+>Dependent on the first two layers is the core
+	  SGML parser.  This only implements the behaviour
+	  defined in the SGML standard.  Main public  
+	  classes are SgmlParser and
+	  Event. Template instantations for this are in 
+	  <TT
+CLASS="FILENAME"
+>parser_inst.m4</TT
+>.
+	</P
+></LI
+><LI
+><P
+>The architectural forms engine. It depends on the
+	  SGML parser. Main class is
+	  ArcEngine. 
+	  Template instantiations are in
+	  <TT
+CLASS="FILENAME"
+>arc_inst.m4</TT
+>.</P
+></LI
+><LI
+><P
+>An implementation of the entity manager interface. This
+	  doesn't depend on the SGML parser or achitectural
+	  forms engine. Main class is
+	  ExtendEntityManager. This for example 
+	  determines what the syntax of a system identifier is. Template
+	  instantiations for this are in
+	  <TT
+CLASS="FILENAME"
+>xentmgr_inst.m4</TT
+>.</P
+></LI
+><LI
+><P
+>A generic interface to groves; in
+	  <TT
+CLASS="FILENAME"
+>grove/Node.h</TT
+>.  This doesn't depend 
+	  on any of the previous layers.</P
+></LI
+><LI
+><P
+>An implementation of the grove interface using SP;
+	  this is in the <TT
+CLASS="FILENAME"
+>spgrove/</TT
+> directory. Main class
+	  is GroveBuilder. This doesn't depend on the
+	  implementation of the entity manager interface.</P
+></LI
+><LI
+><P
+>An implementation of the DSSSL style
+	  language (the tree construction part, not the formatting part). 
+	  This is in the <TT
+CLASS="FILENAME"
+>style/</TT
+> directory.  There
+	  are really two sub parts:</P
+><P
+></P
+><OL
+TYPE="a"
+><LI
+><P
+>Packaging of the DSSSL
+		stylesheet as an SGML document using
+		architectural forms. Main classes are
+		DssslSpecEventHandler and  
+		StyleEngine. This doesn't depend on
+		the implemenation of the entity manager and grove
+		interfaces.</P
+></LI
+><LI
+><P
+>Processing of the contents of the elements in
+		the DSSSL stylesheet; this depends only
+		on the entity manager and grove interfaces.
+		The main interface here is FOTBuilder
+		which is the interface between the tree construction process
+		and the formatter.</P
+></LI
+></OL
+></LI
+><LI
+><P
+>Multiple implementations of the
+	    FOTBuilder interface (the backends).</P
+></LI
+></OL
+><P
+>Parallel to the hierarchy of layers is a hierarchy of convenience
+	classes that collect together various pieces in a convenient way for
+	command line apps.</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>CmdLineApp is the lowest level
+	  and depends only on the general purpose class library.</P
+></LI
+><LI
+><P
+>EntityApp additionally depends on 
+	  the entity manager interface and implementation; it's a convenience
+	  class for accessing the functionality of the entity manager with a
+	  command line program.</P
+></LI
+><LI
+><P
+>ParserApp additionally depends on the
+	  SGML parser; it packages the parser together with
+	  the entity manager for use in a command line program.</P
+></LI
+><LI
+><P
+>GroveApp additionally depends on the
+	  grove interface and implementation; this packages the functionality
+	  of the grove builder in a convenient way for command line
+	  apps.</P
+></LI
+><LI
+><P
+>DssslApp additionally depends on 
+	  DSSSL style language implementation, tieing it to
+	  the grove implementation; it is packaging up the functionality of
+	  the DSSSL tree construction in a way suitable for
+	  command line apps.</P
+></LI
+><LI
+><P
+>JadeApp additionally depends on the
+	  backends.</P
+></LI
+></OL
+><H2
+><A
+NAME="AEN352"
+>Other important classes</A
+></H2
+><P
+>Short descriptions of several central classes in the
+      DSSSL style language implementation, some of which
+	have not yet been mentioned.</P
+><P
+></P
+><DL
+><DT
+>StyleEngine</DT
+><DD
+><P
+>main class of the style
+	      library. DssslApp 
+	      uses an instance of this class to process the grove.</P
+></DD
+><DT
+>Interpreter</DT
+><DD
+><P
+>contains all the stylesheet-related state:
+	      there are no global
+	      variables. StyleEngine owns an instance
+	      of this class.</P
+></DD
+><DT
+>SchemeParser</DT
+><DD
+><P
+>parses a part of a DSSSL spec, creating
+	      expression language objects and binding variables using a given
+	      Interpreter.
+	      StyleEngine uses instances of this class 
+	      to parse the parts of its spec.</P
+></DD
+><DT
+>ProcessContext</DT
+><DD
+><P
+>holds the current state of the processing of a grove.</P
+></DD
+><DT
+>VM</DT
+><DD
+><P
+>represents the state of the virtual machine that
+	      implements the expression language.</P
+></DD
+><DT
+>Expression</DT
+><DD
+><P
+>Expressions are the result of parsing
+	      expression language constructs. They are compiled to
+	      Insns.</P
+></DD
+><DT
+>Insn</DT
+><DD
+><P
+>an instruction for the virtual machine.</P
+><P
+>When an instruction is executed it modifies the state of the
+	      virtual machine (usually) and then returns the next instruction
+	      to be executed. Returning a null Insn
+	    terminates execution.  Thus the inner loop of the expression
+	      evaluator is in a member function of VM
+	    and looks like:  
+	    </P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  
+while (insn)
+    insn = insn-&#62;execute(*this);</PRE
+></TD
+></TR
+></TABLE
+></DD
+><DT
+>ELObj</DT
+><DD
+><P
+>the abstract base class for all expression language
+	    types.</P
+></DD
+></DL
+><H2
+><A
+NAME="AEN408"
+>Garbage collection</A
+></H2
+><P
+>	For further information on the garbage collection technique used in
+	Jade, look at <A
+HREF=""
+>ftp://ftp.cs.utexas.edu/pub/garbage/bigsurv.ps</A
+> and
+	<A
+HREF="ftp://ftp.netcom.com/pub/hb/hbaker/NoMotionGC.html"
+>ftp://ftp.netcom.com/pub/hb/hbaker/NoMotionGC.html</A
+>.</P
+><P
+>Basically it works like a copying collector, but the copying is
+	logical rather than physical.  There are two doubly-linked lists one
+	for each of the two spaces of a copying collector.  Every object is
+	one of these two lists.  There's also a bit (the "color") which says
+	which space it is in. To "copy" an object from one space to another,
+	it is unlinked from one list, linked into the other, and its color is
+	flipped.  A key point is that unlike normal copying collectors, this
+	collector never changes the address of a GC object.
+      </P
+><P
+>This is a simplification. It is optimized so that there is one big 
+	circular list of all objects. A pointer into the list separates the 
+	allocated from the free list.  Allocating just moves the pointer along 
+	the list.
+      </P
+><P
+>Garbage collection starts with a set of root objects (more on this 
+	later). It finds all objects reachable from this set of root objects. 
+	All objects not reachable are considered garbage and are put on the
+	free list where they can be reused.  If garbage collection doesn't
+	free up enough objects, then more memory is allocated from the system.
+      </P
+><P
+>There are a couple of twists beyond what's described in the Wilson
+	paper:
+      </P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>It supports finalization (the ability to call an GC object's
+	  destructor when the object is GCed).  All finalizable objects occur
+	  before non-finalizable objects in the allocated list.  The garbage
+	  collection arranges so that immediately after completing the copy
+	  part of a garbage collection, the objects needing finalization are
+	  at the head of the free list, thus allowing the collector to
+	  efficiently perform finalization.
+	</P
+></LI
+><LI
+><P
+>Objects which are created during the parsing of the
+	  stylesheet, which can never become garbage during the processing of
+	  the source document, are separated off into a separate area (these
+	  are called "permanent").  All objects reachable from a permanent
+	  object must themselves be permanent.
+	</P
+></LI
+><LI
+><P
+>It has the concept of an object being read-only: it can mark
+	  an object and all objects reachable from that object as being
+	  read-only (needed for Jade extensions which allow limited mutation
+	  of objects). 
+	</P
+></LI
+><LI
+><P
+>It always allocates a fixed amount of space for a GC object;
+	  so the <B
+CLASS="FUNCTION"
+>sizeof()</B
+> any object derived from
+	  ELObj must be &#8804; this space. How big 
+	  is it? On a 32-bit machine there is space for 16 bytes (eg 4
+	  pointers, or a double+int+pointer) beyond what is used by the
+	  ELObj itself.  On a 64-bit machine it will be
+	  about twice that; <B
+CLASS="FUNCTION"
+>maxObjSize()</B
+> in
+	  <TT
+CLASS="FILENAME"
+>style/Interpreter.cxx</TT
+> figures it out at
+	  runtime, so to be safe add any new  types of
+	  ELObj to the table in
+	  <B
+CLASS="FUNCTION"
+>maxObjSize()</B
+>.  But make 
+	  sure you don't use more than 16 bytes on a 32-bit machine, otherwise
+	  you will significantly increase Jade's memory consumption.  If you
+	  need more space than this, then the ELObj
+	  should have a pointer to dynamcally alloacted memory; in this case
+	  you must deallocate the memory in the destructor.  In this case and
+	  any other case where an ELObj has a  
+	  destructor that must be called, you must declare an operator
+	  <B
+CLASS="FUNCTION"
+>new()</B
+>:
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>	  
+void *operator new(size_t, Collector &#60;c) 
+{
+  return c.allocateObject(1);
+}</PRE
+></TD
+></TR
+></TABLE
+>
+This tells the garbage collector that the object has a destructor that
+must be called when the object becomes garbage.</P
+></LI
+></OL
+><P
+>A key aspect of correct use of the garbage collector is to ensure
+	that the collector always has a sufficient set of roots.  Any time
+	that C++ code does anything that may allocate a GC object, any GC
+	object that is not reachable from a root object may get recycled by
+	the system.  The way to create a root is to use an auto variable of
+	type ELObjDynamicRoot.  An
+	ELObjDynamicRoot adds a single
+	ELObj as a root for the
+	Collector for as long as the
+	ELObjDynamicRoot is in scope.  The first
+	argument of the ELObjDynamicRoot constructor
+	specifies the collector. The second argument specifies the
+	ELObj that is to be made a root. The
+	ELObj that the
+	ELObjDynamicRoot causes to be a 
+	root can be changed by assiging an ELObj to the
+	ELObjDynamicRoot.  There's also a  
+	conversion from ELObjDynamicRoot to
+	ELObj *.</P
+><DIV
+CLASS="EXAMPLE"
+><P
+><B
+>Example 1. The <B
+CLASS="FUNCTION"
+>reverse()</B
+> function</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>DEFPRIMITIVE(Reverse, argc, argv, context, interp, loc)
+{
+  ELObjDynamicRoot protect(interp, interp.makeNil());
+  ELObj *p = argv[0];
+  while (!p-&#62;isNil()) {
+    PairObj *tem = p-&#62;asPair();
+    if (!tem)
+      return argError(interp, loc,
+		      InterpreterMessages::notAList, 0, argv[0]);
+    protect = new (interp) PairObj(tem-&#62;car(), protect);
+    p = tem-&#62;cdr();
+  }
+  return protect;
+}</PRE
+></TD
+></TR
+></TABLE
+><P
+>protect is a dynamic root that contains currently created part
+	  of the reversed node list.  Making this a root ensures that all the
+	  newly created PairObjs are reachable from a
+	  root.</P
+></DIV
+><DIV
+CLASS="EXAMPLE"
+><P
+><B
+>Example 2. The <B
+CLASS="FUNCTION"
+>NodeListRef()</B
+> function</B
+></P
+><P
+>The <B
+CLASS="FUNCTION"
+>NodeListRef()</B
+> function gives an example of
+	the sort of bug that can creep in if you're not very careful. This
+	used to end like this:
+	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>return new (interp) 
+    NodePtrNodeListObj(nl-&#62;nodeListRef(k, context, interp));
+	</PRE
+></TD
+></TR
+></TABLE
+>
+	  The <B
+CLASS="FUNCTION"
+>nodeListRef()</B
+> function sometimes
+	allocatesthat it takes an Interpreter argument
+	is a good clue).  So what could happen is:</P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>operator <B
+CLASS="FUNCTION"
+>new()</B
+> gets called to
+	    allocate a new object</P
+></LI
+><LI
+><P
+><B
+CLASS="FUNCTION"
+>nodeListRef()</B
+> gets called in a
+	    way that causes an allocation</P
+></LI
+><LI
+><P
+>the free list happens to be empty, so the garbage
+	    collector gets run; the newly allocated object is not reachable
+	    from a root, so it gets GCed and recycled</P
+></LI
+><LI
+><P
+>the constructor gets called with a GC object that
+	    the garbage collector thinks is free</P
+></LI
+></OL
+><P
+>	The fix was to rewrite it as:
+	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>  
+NodePtr nd(nl-&#62;nodeListRef(k, context, interp));
+return new (interp) NodePtrNodeListObj(nd);
+	</PRE
+></TD
+></TR
+></TABLE
+>	
+      </P
+></DIV
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1142.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="t1478.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Coding conventions</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>How to add a new application</TD
+></TR
+></TABLE
+></BODY
+></HTML
+>

@@ -1,0 +1,357 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML
+><HEAD
+><TITLE
+>Jade internals</TITLE
+><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="docbook.css"><META
+NAME="CREATOR"
+CONTENT="Modular DocBook HTML Stylesheet version 1.08"><META
+NAME="form"
+CONTENT="html"></HEAD
+><BODY
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+>&nbsp;</TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="t1142.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><DIV
+CLASS="ARTICLE"
+><H1
+CLASS="TITLE"
+>Jade internals</H1
+><P
+CLASS="AUTHOR"
+><I
+>Matthias Clasen</I
+></P
+><P
+CLASS="AFFILIATION"
+><I
+>	  clasen@mathematik.uni-freiburg.de
+	</I
+></P
+><BLOCKQUOTE
+CLASS="ABSTRACT"
+><P
+>This document describes the Jade DSSSL engine
+      from the programmers point of view. It was written to
+      help people who want to extend Jade.</P
+></BLOCKQUOTE
+><H1
+><A
+NAME="AEN13"
+>Package organization</A
+></H1
+><H2
+><A
+NAME="AEN15"
+>Directory contents</A
+></H2
+><P
+>The follwing directories contain files needed during the
+      build:</P
+><P
+></P
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>all/</TT
+></DT
+><DD
+><P
+>Visual C++ build process</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>config/</TT
+></DT
+><DD
+><P
+>autoconf build process</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>jadedist/</TT
+></DT
+><DD
+><P
+>creating a distribution</P
+></DD
+></DL
+><P
+>The following directories contain documentation:</P
+><P
+></P
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>doc/</TT
+></DT
+><DD
+><P
+>SP documentation</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>jadedoc/</TT
+></DT
+><DD
+><P
+>Jade documentation</P
+></DD
+></DL
+><P
+>The following directories contain
+      SGML/DSSSL text files:</P
+><P
+></P
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>dsssl/</TT
+></DT
+><DD
+><P
+>DTDs for style sheets and FOT output; jadetex;
+	      examples</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>pubtext/</TT
+></DT
+><DD
+><P
+>various DTDs and catalogs</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>unicode/</TT
+></DT
+><DD
+><P
+>SGML declaration and catalog for
+	  dealing with Unicode</P
+></DD
+></DL
+><P
+>The following directories contain the sources of the various
+      libraries:</P
+><P
+></P
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>include/</TT
+>, <TT
+CLASS="FILENAME"
+>lib/</TT
+></DT
+><DD
+><P
+>the SP library</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>style/</TT
+></DT
+><DD
+><P
+>the DSSSL style
+	      engine</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>grove/</TT
+></DT
+><DD
+><P
+>an abstract interface to groves</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>spgrove/</TT
+></DT
+><DD
+><P
+>an implementation of the grove
+	      interface</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>groveoa/</TT
+></DT
+><DD
+><P
+>an OLE-enabled version of the
+	      grove builder, Windows-only</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>generic</TT
+></DT
+><DD
+><P
+>simple API for applications
+	  derived from SP</P
+></DD
+></DL
+><P
+>Applications:</P
+><P
+></P
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>nsgmls/</TT
+></DT
+><DD
+><P
+>an SGML parser</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>sgmlnorm/</TT
+></DT
+><DD
+><P
+>an SGML normalizer</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>spam/</TT
+></DT
+><DD
+><P
+>a markup stream editor</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>spent/</TT
+></DT
+><DD
+><P
+>a frontend to the SP entity manager</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>sx/</TT
+></DT
+><DD
+><P
+>a simple SGML to
+	      XML converter</P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>jade/</TT
+></DT
+><DD
+><P
+>the source of the Jade application and its various
+	      backends</P
+></DD
+></DL
+><H2
+><A
+NAME="AEN139"
+>The build system</A
+></H2
+><P
+>TODO: What needs to be said here ? msggen.pl; What makefiles
+      are used and included where; list of defines in config.h;
+      building by hand vs. configure</P
+></DIV
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="t1142.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Coding conventions</TD
+></TR
+></TABLE
+></BODY
+></HTML
+>

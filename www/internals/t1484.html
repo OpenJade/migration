@@ -1,0 +1,564 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML
+><HEAD
+><TITLE
+>Extending Jade</TITLE
+><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="docbook.css"><META
+NAME="CREATOR"
+CONTENT="Modular DocBook HTML Stylesheet version 1.08"><META
+NAME="form"
+CONTENT="html"></HEAD
+><BODY
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Jade internals</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1478.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Jade internals</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+>&nbsp;</TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><H1
+><A
+NAME="AEN484"
+>Extending Jade</A
+></H1
+><H2
+><A
+NAME="AEN486"
+>Utility classes</A
+></H2
+><P
+>TODO: Explain Char, String, Vector, StringC, Ptr, Owner</P
+><P
+>TODO: Maybe move this to the "General overview".</P
+><H2
+><A
+NAME="AEN490"
+>Primitives</A
+></H2
+><P
+>Primitives are implemented as subclasses of
+      PrimitiveObj 
+	(<TT
+CLASS="FILENAME"
+>style/Insn.h</TT
+>,
+      <TT
+CLASS="FILENAME"
+>style/Insn.cxx</TT
+>). All primitives are defined in the
+	files <TT
+CLASS="FILENAME"
+>style/primitive.h</TT
+> and
+      <TT
+CLASS="FILENAME"
+>style/primitive.cxx</TT
+>. Adding a new primitive is done
+      by adding a macro call of the form
+	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>PRIMITIVE(<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;class name prefix&#62;</I
+></TT
+>,
+	  "<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;primitive name&#62;</I
+></TT
+>", 
+          <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;req. args&#62;</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;opt. args&#62;</I
+></TT
+>, <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;rest arg&#62;</I
+></TT
+>)
+	</PRE
+></TD
+></TR
+></TABLE
+>
+	to <TT
+CLASS="FILENAME"
+>style/primitive.h</TT
+> and a macro call of the form
+	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>DEFPRIMITIVE(<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;class name prefix&#62;</I
+></TT
+>, argc, argv,
+	     context, interp, loc)
+	</PRE
+></TD
+></TR
+></TABLE
+>
+	to <TT
+CLASS="FILENAME"
+>style/primitive.cxx</TT
+>, followed by the body of
+	the function 
+	<B
+CLASS="FUNCTION"
+>PrimitiveObj::primitiveCall()</B
+> as needed for the
+	function you want to add.</P
+><P
+>For a new external procedure, use XPRIMITIVE instead of PRIMITIVE.
+	The new procedure can be accessed using the public identifier</P
+><P
+>"UNREGISTERED::James Clark//Procedure::<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;primitive name&#62;</I
+></TT
+>".</P
+><DIV
+CLASS="EXAMPLE"
+><P
+><B
+>Example 3. The <B
+CLASS="FUNCTION"
+>sin</B
+> function</B
+></P
+><P
+>We can add the <B
+CLASS="FUNCTION"
+>sin</B
+> defined in clause
+	  8.5.7.18 of the DSSSL standard by appending
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>PRIMITIVE(Sin, "sin", 1, 0, 0)
+	  </PRE
+></TD
+></TR
+></TABLE
+>      
+	  to <TT
+CLASS="FILENAME"
+>style/primitive.h</TT
+> and 
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>DEFPRIMITIVE(Sin, argc, argv, context, interp, loc)
+{
+  double d;
+  if (!argv[0]-&#62;realValue(d)) 
+  return argError(interp, loc,
+		    InterpreterMessages::notANumber, 0, argv[0]);
+  return new (interp) RealObj(sin(d));
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+>      
+	  to <TT
+CLASS="FILENAME"
+>style/primitive.cxx</TT
+>.</P
+></DIV
+><H2
+><A
+NAME="AEN522"
+>Expression language types</A
+></H2
+><P
+>Relevant classes:</P
+><P
+></P
+><DL
+><DT
+>ELObj</DT
+><DD
+><P
+>Adding a new expression language type
+	      is done by adding a new subclass of
+	      ELObj. Make sure to follow the advise
+	      in the section on garbage collection with respect to the size of
+	      the subclass.</P
+></DD
+><DT
+>SchemeParser</DT
+><DD
+><P
+>You will have to add a method for generating
+	      objects of the new type. This will generally involve a line like 
+	      <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>result = new (*interp_) <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;your class&#62;</I
+></TT
+>(...)
+	      </PRE
+></TD
+></TR
+></TABLE
+>    
+       The *interp_ argument to new is important to make
+       the newly generated object properly garbage collected.</P
+></DD
+></DL
+><P
+>TODO: is this all ? add an example!</P
+><H2
+><A
+NAME="AEN539"
+>Backends</A
+></H2
+><P
+>In order to create a completely new backend, you first
+	need to create a new subclass of
+      SerialFOTBuilder implementing the output 
+	format you are interested in. It is probably a good idea to
+	take an existing backend as a skeleton.</P
+><P
+>TODO: More detail needed.</P
+><P
+>To make the new backend available to Jade, you have to
+	add new values for your backend to 
+	JadeApp::OutputType and
+	JadeApp::outputTypeNames and add a new 
+	case to the switch statement in 
+	<B
+CLASS="FUNCTION"
+>JadeApp::makeFOTBuilder()</B
+> 
+	returning an instance of your FOTBuilder
+	subclass.</P
+><H2
+><A
+NAME="AEN549"
+>Flow objects</A
+></H2
+><P
+>For a standard flow object, you must create
+	a new subclass of FlowObj (atomic)
+	or CompoundFlowObj (nonatomic).
+	Do not forget to add a FLOW_OBJ macro call for the new class
+	in the <B
+CLASS="FUNCTION"
+>Interpreter::installFlowObjs()</B
+> function
+	in <TT
+CLASS="FILENAME"
+>style/FlowObj.cxx</TT
+>.</P
+><P
+>The <B
+CLASS="FUNCTION"
+>processInner()</B
+> of the new class
+	is responsible for calling the FOTBuilder
+	function (or pair of functions for nonatomic flow objects) associated
+	with the flow object in question. You may have to add these
+	functions to the interface of the FOTBuilder
+	class and provide default definitions there. These have to
+	be overridden by the backends (FOTBuilder
+	subclass) in order to implement the flow object in question.</P
+><P
+>TODO: explain extension flow objects</P
+><H2
+><A
+NAME="AEN562"
+>Command line switches</A
+></H2
+><P
+>If you are adding a new Jade-specific option, add it to 
+	JadeApp. If the option you are adding
+	influences the behaviour of the style engine, add it to
+      DssslApp.</P
+><P
+>Adding an option amount to registering it in the constructor 
+	with <B
+CLASS="FUNCTION"
+>registerOption()</B
+> and handling it in
+	<B
+CLASS="FUNCTION"
+>processOption()</B
+>. 
+      </P
+><P
+>The CmdLineApp supports only single-letter options. You should
+	make sure that you don't choose a letter that is already taken:
+      </P
+><P
+></P
+><DL
+><DT
+>b, f, v</DT
+><DD
+><P
+>registered by
+		CmdLineApp</P
+></DD
+><DT
+>c, C, D</DT
+><DD
+><P
+>registered by
+		EntityApp</P
+></DD
+><DT
+>a, A, e, E, g, i, w</DT
+><DD
+><P
+>registered by
+		ParserApp</P
+></DD
+><DT
+>G, 2, d, V</DT
+><DD
+><P
+>registered by
+		DssslApp</P
+></DD
+><DT
+>t, o</DT
+><DD
+><P
+>registered by
+		JadeApp</P
+></DD
+></DL
+><DIV
+CLASS="EXAMPLE"
+><P
+><B
+>Example 4. A -s flag for DssslApp</B
+></P
+><P
+>Lets assume you have changed the
+	  StyleEngine constructor to accept one
+	  more bool parameter strict_, which you want to be set depending
+	  on the -s command line flag.</P
+><P
+>We add a new private member strict_ to
+	  DssslApp to hold the value until we pass
+	  it to the StyleEngine constructor. Thus we
+	  insert
+	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>bool strict_;	  
+	</PRE
+></TD
+></TR
+></TABLE
+>
+	  at the very end of the DssslApp class
+	  declaration in <TT
+CLASS="FILENAME"
+>style/DssslApp.h</TT
+>.</P
+><P
+>Now we change the constructor to
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>DssslApp::DssslApp(int unitsPerInch)
+: GroveApp("unicode"), unitsPerInch_(unitsPerInch),
+  dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
+  strict_(0)  // this line is new
+{
+  registerOption('G');
+  registerOption('2');
+  registerOption('d', SP_T("dsssl_spec"));
+  registerOption('V', SP_T("variable"));
+  registerOption('s'); // this line is new
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+> 
+	  and the function <B
+CLASS="FUNCTION"
+>processOption()</B
+> to
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void DssslApp::processOption(AppChar opt, const AppChar *arg)
+{
+  switch (opt) {
+  case 's':  // new case        
+    strict_ = 1;
+    break;
+  /* other cases stay the same */
+    }
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+>
+	  Finally, we change the call of the
+	  StyleEngine constructor in
+	  <B
+CLASS="FUNCTION"
+>processGrove()</B
+> to
+	  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
+               dsssl2_, strict_, extensions);
+	  </PRE
+></TD
+></TR
+></TABLE
+>
+	  </P
+></DIV
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1478.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>How to add a new application</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>&nbsp;</TD
+></TR
+></TABLE
+></BODY
+></HTML
+>

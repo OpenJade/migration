@@ -1,0 +1,664 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML
+><HEAD
+><TITLE
+>Coding conventions</TITLE
+><LINK
+REL="STYLESHEET"
+TYPE="text/css"
+HREF="docbook.css"><META
+NAME="CREATOR"
+CONTENT="Modular DocBook HTML Stylesheet version 1.08"><META
+NAME="form"
+CONTENT="html"></HEAD
+><BODY
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Jade internals</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="t1.html"
+>Prev</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Jade internals</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="t1266.html"
+>Next</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><H1
+><A
+NAME="AEN142"
+>Coding conventions</A
+></H1
+><H2
+><A
+NAME="AEN144"
+>Formatting</A
+></H2
+><P
+>The following list gives some hints on the coding conventions
+	used throughout the source.</P
+><P
+></P
+><UL
+><LI
+><P
+>Statement keywords have one space after them, and no space between
+	  the parentheses and the enclosed expression:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>if (foo)  /* good */
+if( foo ) /* bad */
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>In general there is never a space after an open parenthesis or
+	  before a close parenthesis:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   
+foo(arg)    /* good */
+foo( arg ) /* bad */
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>Expressions broken over more than one line are aligned LISP
+	  style:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>   
+if ((a
+      &#38;&#38; b)
+       || (c
+           &#38;&#38; d)) 
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>else is on a separate line from the preceding brace:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>if (foo) {
+}
+else if (bar) {
+}
+else {
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>case clauses without a break always have a
+	  "fall through" comment where the break would occur:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>switch (foo)
+case x:
+/* do something here */
+// fall through
+case y:
+}
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>A statement governed by if or else that is longer than a
+	  single line always is surrounded by {}. The following is
+	  unacceptable:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+else
+if (foo)
+    ;
+else
+    ;
+	  </PRE
+></TD
+></TR
+></TABLE
+></LI
+><LI
+><P
+>Long function headers should not be broken before the
+	  parenthesis that starts the argument list.</P
+></LI
+></UL
+><H2
+><A
+NAME="AEN168"
+>Headers</A
+></H2
+><P
+>Every header file should be surrounded by an ifndef. Here
+	is a skeleton for a header file named 
+	<TT
+CLASS="FILENAME"
+>filename.h</TT
+>:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/* copyright notice goes here */
+
+#ifndef filename_INCLUDED
+#define filename_INCLUDED 1
+
+/* contents go here */
+
+#endif /* not filename_INCLUDED */
+      </PRE
+></TD
+></TR
+></TABLE
+><H2
+><A
+NAME="AEN173"
+>Namespaces</A
+></H2
+><P
+>Every file should be surrounded by a namespace. Namespaces are
+	never used directly in order to support compilers which don't
+	understand namespaces. The general skeleton for a
+      <TT
+CLASS="FILENAME"
+>.cxx</TT
+> file in the namespace NAMESPACE is:</P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/* includes go here */
+
+#ifdef NAMESPACE
+namespace NAMESPACE {
+#endif
+
+/* content goes here */
+
+#ifdef NAMESPACE
+}
+#endif</PRE
+></TD
+></TR
+></TABLE
+><P
+>Files in the <TT
+CLASS="FILENAME"
+>lib/</TT
+>,
+	<TT
+CLASS="FILENAME"
+>nsgmls/</TT
+>, <TT
+CLASS="FILENAME"
+>sgmlnorm/</TT
+>,
+	<TT
+CLASS="FILENAME"
+>spam/</TT
+>, <TT
+CLASS="FILENAME"
+>spent/</TT
+>,  
+	<TT
+CLASS="FILENAME"
+>spgrove/</TT
+> and <TT
+CLASS="FILENAME"
+>sx/</TT
+>
+	directories use the namespace SP_NAMESPACE. Files in
+	<TT
+CLASS="FILENAME"
+>grove/</TT
+> use the namespace GROVE_NAMESPACE.
+	Files in <TT
+CLASS="FILENAME"
+>style/</TT
+> and
+	<TT
+CLASS="FILENAME"
+>jade/</TT
+> use DSSSL_NAMESPACE.</P
+><P
+>DSSSL_NAMESPACE imports everything from SP_NAMESPACE and
+	GROVE_NAMESPACE (see <TT
+CLASS="FILENAME"
+>style/dsssl_ns.h</TT
+>).</P
+><P
+>VC 5 and 6 have bugs in the namespace management, which mean that
+	all these 3 need to be defined to be the same.</P
+><P
+>The conditional stuff is to deal with compilers that don't support
+	namespaces.</P
+><H2
+><A
+NAME="AEN193"
+>Templates</A
+></H2
+><P
+>To cope with different compilers capabilities with respect to
+      templates, all template instantiations are collected in files with names
+	ending in <TT
+CLASS="FILENAME"
+>_inst.cxx</TT
+>. These are generated from
+	<TT
+CLASS="FILENAME"
+>_inst.m4</TT
+> files.</P
+><P
+>To add a new template instantiation, add a macro call of the
+	form
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>__instantiate(/* your template instatiation */)</PRE
+></TD
+></TR
+></TABLE
+>
+	to the appropriate <TT
+CLASS="FILENAME"
+>.m4</TT
+> file.</P
+><H2
+><A
+NAME="AEN201"
+>API definitions</A
+></H2
+><P
+>	When building DLLs on Windows, every class or
+	function which should be exported by the DLL
+	has to be prefixed with 
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>__declspec(dllexport)</PRE
+></TD
+></TR
+></TABLE
+>
+	when building the DLL and with
+<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>__declspec(dllimport)</PRE
+></TD
+></TR
+></TABLE
+>
+	when using it outside the DLL.</P
+><P
+>This is hidden behind the _API macros which get defined
+      appropriately. Every declaration of a class of function which is part of
+      the public interface of its library should be prefixed with the proper
+      _API macro. Files in <TT
+CLASS="FILENAME"
+>lib/</TT
+> and
+      <TT
+CLASS="FILENAME"
+>include/</TT
+> use SP_API,  
+	files in <TT
+CLASS="FILENAME"
+>grove/</TT
+> use GROVE_API,
+	files in <TT
+CLASS="FILENAME"
+>spgrove/</TT
+> use SPGROVE_API,
+	files in <TT
+CLASS="FILENAME"
+>style/</TT
+> use STYLE_API.
+      </P
+><H2
+><A
+NAME="AEN216"
+>Messages</A
+></H2
+><P
+>Messages for the main classes are collected in separate classes.
+	Eg there is a class InterpreterMessages for all
+	messages of the class Interpreter.</P
+><P
+>The sources (<TT
+CLASS="FILENAME"
+>.h</TT
+> and <TT
+CLASS="FILENAME"
+>.cxx</TT
+>
+	files and, on Windows, <TT
+CLASS="FILENAME"
+>.rc</TT
+> files) for the
+	<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;class&#62;</I
+></TT
+>Messages
+	classes are generated from <TT
+CLASS="FILENAME"
+>.msg</TT
+> files by
+	the <TT
+CLASS="FILENAME"
+>msggen.pl</TT
+> Perl script.
+      </P
+><P
+>Adding a new message amounts to adding one line to the correct
+	<TT
+CLASS="FILENAME"
+>.msg</TT
+> file. The lines in these files have the
+	following format:</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;message type&#62;</I
+></TT
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;args&#62;</I
+></TT
+>+<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;identifier&#62;</I
+></TT
+>+<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;relevant clause&#62;</I
+></TT
+>+<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;message text&#62;</I
+></TT
+></P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;message type&#62;</I
+></TT
+> must be one of the
+	I, W, Q, X or E. These stand for info, warning, quantity error, idref
+	error and error, respectively.</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;args&#62;</I
+></TT
+> is the number of placeholders
+	of the form %n in the <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;message
+	text&#62;</I
+></TT
+>.</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;identifier&#62;</I
+></TT
+> is the C++-identifier
+	used to refer to the message.</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;relevant clause&#62;</I
+></TT
+> is used in SP to
+	give an exact reference to the SGML standard for
+	each error message. Outside of SP, this field is usually left
+	empty.</P
+><P
+><TT
+CLASS="REPLACEABLE"
+><I
+>&#60;message text&#62;</I
+></TT
+> is the text of the
+   message. It can contain placeholders of the form %n where n is a number
+   between 0 and <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;args&#62;</I
+></TT
+> - 1. These placeholders
+   will be replaced by suitable arguments if the message is issued.</P
+><P
+>Message arguments come from classes derived from
+	MessageArg.
+	StringMessageArg is a string, 
+	NumberMessageArg is an unsigned long.</P
+><P
+>There is a special form of message which also gives a location for
+	the error which can be defined by adding one more field of the form
+	+<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;aux text&#62;</I
+></TT
+> at the end of message
+	definition. <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;aux text&#62;</I
+></TT
+> will usually be
+	an explanation of the location like "first definition was here" (for a
+	duplicate definition error). This form of message is only implemented
+	for <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;args&#62;</I
+></TT
+>&#8804;1.</P
+><P
+>Issuing a message is done by a call of the form
+	<B
+CLASS="FUNCTION"
+>message(<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;class&#62;</I
+></TT
+>Messages::<TT
+CLASS="REPLACEABLE"
+><I
+>&#60;identifier&#62;</I
+></TT
+>, ...)</B
+>
+	
+	where <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;class&#62;</I
+></TT
+> is the class to which the
+	message belongs and <TT
+CLASS="REPLACEABLE"
+><I
+>&#60;identifier&#62;</I
+></TT
+> is the
+	identifier used in the message definition. The remaining arguments to
+	the <B
+CLASS="FUNCTION"
+>message()</B
+> call must match the %n placeholders
+	in the message. For messages which give location information, the last
+	argument must be an object of type
+	Location.</P
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="t1.html"
+>Prev</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="t1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="t1266.html"
+>Next</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Jade internals</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>General overview</TD
+></TR
+></TABLE
+></BODY
+></HTML
+>

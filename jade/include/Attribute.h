@@ -372,7 +372,7 @@ private:
   ConstPtr<Notation> notation_;
 };
 
-class AttributeValue : public Resource {
+class SP_API AttributeValue : public Resource {
 public:
   enum Type {
     implied,

@@ -31,21 +31,14 @@ namespace SP_NAMESPACE {
 #ifdef __DECCXX
 #pragma define_template Vector<const CmdLineApp::AppChar *>
 #else
-#ifdef __xlC__
-#pragma define(Vector<const CmdLineApp::AppChar *>)
-#else
 #ifdef SP_ANSI_CLASS_INST
 template class Vector<const CmdLineApp::AppChar *>;
 #else
 typedef Vector<const CmdLineApp::AppChar *> Dummy_0;
 #endif
 #endif
-#endif
 #ifdef __DECCXX
 #pragma define_template Owner<Encoder>
-#else
-#ifdef __xlC__
-#pragma define(Owner<Encoder>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<Encoder>;
@@ -53,12 +46,8 @@ template class Owner<Encoder>;
 typedef Owner<Encoder> Dummy_1;
 #endif
 #endif
-#endif
 #ifdef __DECCXX
 #pragma define_template Options<CmdLineApp::AppChar>
-#else
-#ifdef __xlC__
-#pragma define(Options<CmdLineApp::AppChar>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Options<CmdLineApp::AppChar>;
@@ -66,18 +55,13 @@ template class Options<CmdLineApp::AppChar>;
 typedef Options<CmdLineApp::AppChar> Dummy_2;
 #endif
 #endif
-#endif
 #ifdef __DECCXX
 #pragma define_template Owner<EventHandler>
-#else
-#ifdef __xlC__
-#pragma define(Owner<EventHandler>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<EventHandler>;
 #else
 typedef Owner<EventHandler> Dummy_3;
-#endif
 #endif
 #endif
 

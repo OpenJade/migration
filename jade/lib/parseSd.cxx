@@ -994,7 +994,13 @@ Boolean Parser::sdParseCapacity(SdBuilder &sdBuilder, SdParam &parm)
 				    SdParam::reservedName + Sd::rSGMLREF),
 		    parm))
     return 0;
-  Boolean pushed = 0;
+#if _MSC_VER == 1100
+  // Workaround for Visual C++ 5.0 bug
+  int
+#else
+  Boolean
+#endif
+    pushed = 0;
   if (parm.type == SdParam::reservedName + Sd::rPUBLIC) {
     if (!parseSdParam(AllowedSdParams(SdParam::minimumLiteral), parm))
       return 0;

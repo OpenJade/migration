@@ -25,6 +25,9 @@ namespace SP_NAMESPACE {
 #include "IListIter.h"
 #include "IQueue.h"
 #include "HashTable.h"
+#ifdef SP_SIZEOF_BOOL_1
+#include "XcharMap.h"
+#endif
 #undef SP_DEFINE_TEMPLATES
 
 #include "Insn.h"
@@ -1152,7 +1155,60 @@ typedef Vector<ProcessContext::NodeStackEntry> Dummy_84;
 #endif
 #endif
 #endif
-
+#ifdef SP_SIZEOF_BOOL_1
+#ifdef __DECCXX
+#pragma define_template XcharMap<char>
+#else
+#ifdef __xlC__
+#pragma define(XcharMap<char>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class XcharMap<char>;
+#else
+typedef XcharMap<char> Dummy_85;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template SharedXcharMap<char>
+#else
+#ifdef __xlC__
+#pragma define(SharedXcharMap<char>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class SharedXcharMap<char>;
+#else
+typedef SharedXcharMap<char> Dummy_86;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<SharedXcharMap<char> >
+#else
+#ifdef __xlC__
+#pragma define(Ptr<SharedXcharMap<char> >)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<SharedXcharMap<char> >;
+#else
+typedef Ptr<SharedXcharMap<char> > Dummy_87;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template ConstPtr<SharedXcharMap<char> >
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<SharedXcharMap<char> >)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class ConstPtr<SharedXcharMap<char> >;
+#else
+typedef ConstPtr<SharedXcharMap<char> > Dummy_88;
+#endif
+#endif
+#endif
+#endif
 #ifdef DSSSL_NAMESPACE
 }
 #endif

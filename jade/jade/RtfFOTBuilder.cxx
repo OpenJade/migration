@@ -137,6 +137,7 @@ public:
   void setPageNColumns(long);
   void setPageColumnSep(Length);
   void setPageBalanceColumns(bool);
+  void setSpan(long);
   void startSimplePageSequence();
   void endSimplePageSequence();
   void startSimplePageSequenceHeaderFooter(unsigned);
@@ -430,6 +431,7 @@ private:
     int underMarkDepth; // in points
     int gridRowSep; // in points
     int gridColumnSep; // in points
+    bool span;
     // These are needed for handling LengthSpecs
     LengthSpec positionPointShiftSpec;
     LengthSpec leftIndentSpec;
@@ -527,6 +529,8 @@ private:
   long displaySize_;
   bool hadSection_;
   bool doBalance_;
+  unsigned spanDisplayLevels_;
+  unsigned currentCols_;
   BreakType doBreak_;
   bool keep_;
   bool hadParInKeep_;
@@ -535,6 +539,7 @@ private:
   PageFormat pageFormat_;
   Vector<PageFormat> pageFormatStack_;
   OutputFormat saveOutputFormat_;
+  OutputFormat leaderSaveOutputFormat_;
   Vector<unsigned> colorTable_;
   Ptr<ExtendEntityManager> entityManager_;
   Messenger *mgr_;
@@ -788,6 +793,8 @@ RtfFOTBuilder::RtfFOTBuilder(OutputByteStream *os,
   addRightIndent_(0),
   inSimplePageSequence_(0),
   doBalance_(0),
+  spanDisplayLevels_(0),
+  currentCols_(1),
   hyphenateSuppressed_(0),
   maxConsecHyphens_(0),
   doBreak_(breakNone),
@@ -1600,6 +1607,18 @@ void RtfFOTBuilder::newPar(bool allowSpaceBefore)
   default:
     break;
   }
+  if (currentCols_ > 1) {
+    if (spanDisplayLevels_) {
+      os() << "\\sect\\sbknone\\cols1";
+      currentCols_ = 1;
+    }
+  }
+  else if (spanDisplayLevels_ == 0 && currentCols_ == 1 && pageFormat_.nColumns > 1) {
+    if (inlineState_ != inlineFirst)
+      os() << "\\sect\\sbknone";
+    os() << "\\cols" << pageFormat_.nColumns << "\\colsx" << pageFormat_.columnSep;
+    currentCols_ = pageFormat_.nColumns;
+  }
   os() << "\\pard";
   if (tableLevel_)
     os() << "\\intbl";
@@ -1897,6 +1916,13 @@ void RtfFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
 
 void RtfFOTBuilder::startDisplay(const DisplayNIC &nic)
 {
+  if (spanDisplayLevels_)
+    spanDisplayLevels_++;
+  else if (specFormat_.span && pageFormat_.nColumns > 1 && tableLevel_ == 0) {
+    spanDisplayLevels_ = 1;
+    displaySize_ = pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin;
+    displaySizeChanged();
+  }
   long spaceBefore = computeLengthSpec(nic.spaceBefore.nominal);
   if (spaceBefore > accumSpace_)
     accumSpace_ = spaceBefore;
@@ -1971,6 +1997,14 @@ void RtfFOTBuilder::endDisplay()
   if (displayStack_.back().keepWithNext)
     keepWithNext_ = 1;
   displayStack_.resize(displayStack_.size() - 1);
+  if (spanDisplayLevels_) {
+    if (--spanDisplayLevels_ == 0) {
+      displaySize_ = pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin;
+      displaySize_ -= pageFormat_.columnSep * (pageFormat_.nColumns - 1);
+      displaySize_ /= pageFormat_.nColumns;
+      displaySizeChanged();
+    }
+  }
 }
 
 void RtfFOTBuilder::startLineField(const LineFieldNIC &)
@@ -2038,7 +2072,9 @@ void RtfFOTBuilder::startLeader(const LeaderNIC &)
 {
   start();
   inlinePrepare();
+  syncCharFormat();
   if (leaderDepth_++ == 0) {
+    leaderSaveOutputFormat_ = outputFormat_;
     preLeaderOsp_ = osp_;
     osp_ = &nullos_;
   }
@@ -2047,6 +2083,7 @@ void RtfFOTBuilder::startLeader(const LeaderNIC &)
 void RtfFOTBuilder::endLeader()
 {
   if (--leaderDepth_ == 0) {
+    outputFormat_ = leaderSaveOutputFormat_;
     osp_ = preLeaderOsp_;
     // MS Word doesn't mind if tabs aren't set at the beginning of the paragraph.
     os() << "\\tqr\\tldot\\tx" << (displaySize_ - paraFormat_.rightIndent) << "\\tab ";
@@ -2149,6 +2186,11 @@ void RtfFOTBuilder::setPageBalanceColumns(bool b)
     pageFormat_.balance = b;
 }
 
+void RtfFOTBuilder::setSpan(long n)
+{
+  specFormat_.span = n > 1;
+}
+
 void RtfFOTBuilder::startSimplePageSequence()
 {
   inSimplePageSequence_++;
@@ -2186,8 +2228,8 @@ void RtfFOTBuilder::startSimplePageSequence()
   if (pageFormat_.pageNumberRestart)
     os() << "\\pgnrestart";
   displaySize_ = pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin;
+  currentCols_ = 1;
   if (pageFormat_.nColumns > 1) {
-    os() << "\\cols" << pageFormat_.nColumns << "\\colsx" << pageFormat_.columnSep;
     displaySize_ -= pageFormat_.columnSep * (pageFormat_.nColumns - 1);
     displaySize_ /= pageFormat_.nColumns;
   }
@@ -3760,6 +3802,8 @@ void RtfFOTBuilder::endNode()
 
 void RtfFOTBuilder::currentNodePageNumber(const NodePtr &node)
 {
+  inlinePrepare();
+  syncCharFormat();
   GroveString id;
   unsigned long n;
   if (node->getId(id) == accessOK) {
@@ -3827,7 +3871,7 @@ RtfFOTBuilder::Format::Format()
   gridPosType(gridPosRowMajor), gridColumnAlignment('c'),
   gridRowSep(2), gridColumnSep(2),
   mathInline(0), mathPosture(0), superscriptHeight(5), subscriptDepth(3),
-  overMarkHeight(10), underMarkDepth(10)
+  overMarkHeight(10), underMarkDepth(10), span(0)
 {
 }
 

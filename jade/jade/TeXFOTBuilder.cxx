@@ -12,6 +12,7 @@
 #include "TeXMessages.h"
 #include "MessageArg.h"
 #include "TmpOutputByteStream.h"
+#include "dsssl_ns.h"
 #include <stdio.h>
 #include <stdlib.h>
 #undef TEXDEBUG

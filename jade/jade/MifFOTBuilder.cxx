@@ -49,6 +49,7 @@ authorization from ISOGEN International Corp. */
 #include "StorageManager.h"
 #include "StringC.h"
 #include "Vector.h"
+#include "dsssl_ns.h"
 
 #include <assert.h>
 #include <errno.h>

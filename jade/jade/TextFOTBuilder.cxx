@@ -6,6 +6,7 @@
 #include "config.h"
 #include "TextFOTBuilder.h"
 #include "macros.h"
+#include "dsssl_ns.h"
 
 #undef   DBG_TEXT_BACKEND
 #ifndef  DBG_TEXT_BACKEND

@@ -7,6 +7,7 @@
 #include "OutputCharStream.h"
 #include "MessageArg.h"
 #include "ErrnoMessageArg.h"
+#include "dsssl_ns.h"
 
 #include <errno.h>
 

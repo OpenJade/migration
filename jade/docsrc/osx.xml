@@ -48,7 +48,7 @@
    -ffile ] [ -wwarning_type ] [ -xxml_output_option ] sysid... ]
 -->
           <arg choice="opt"><option>-Cehilprvx</option></arg>
-	  <arg choice="opt"><option>-bencoding</option></arg>
+	  <arg choice="opt"><option>-b<replaceable>encoding</replaceable></option></arg>
 	  <arg choice="opt"><option>-c<replaceable>catalog_file</replaceable></option></arg>
 	  <arg choice="opt"><option>-D<replaceable>directory</replaceable></option></arg>
 	  <arg choice="opt"><option>-f<replaceable>file</replaceable></option></arg>
@@ -63,7 +63,7 @@
        <title>Description</title>
 <para>
    <command>osx</command> converts SGML to XML. <command>osx</command> parses and validates the SGML document
-   contained in sysid... and writes an equivalent XML document to the
+   contained in <replaceable>sysid</replaceable> and writes an equivalent XML document to the
    standard output. <command>osx</command> will warn about SGML constructs which have no XML
    equivalent.
 </para>
@@ -78,11 +78,11 @@
 <variablelist>
  <varlistentry>
   <term><option>
-   -bencoding
+   -b<replaceable>encoding</replaceable>
   </option></term>
   <listitem>
    <para>
-          Use [1]encoding for output. By default <command>osx</command> uses UTF-8.
+          Use <replaceable>encoding</replaceable> for output. By default <command>osx</command> uses UTF-8.
    </para>
   </listitem>
  </varlistentry>
@@ -102,7 +102,7 @@
   </option></term>
   <listitem>
    <para>
-          This has the same effect as in [2]onsgmls.
+          This has the same effect as in <command>onsgmls(1)</command>.
    </para>
   </listitem>
  </varlistentry>
@@ -112,8 +112,8 @@
   </option></term>
   <listitem>
    <para>
-          Search directory for files specified in system identifiers.
-          This has the same effect as in [3]onsgmls.
+          Search <replaceable>directory</replaceable> for files specified in system identifiers.
+          This has the same effect as in <command>onsgmls(1)</command>.
    </para>
   </listitem>
  </varlistentry>
@@ -133,7 +133,7 @@
   </option></term>
   <listitem>
    <para>
-          Redirect errors to file. This is useful mainly with shells that
+          Redirect errors to <replaceable>file</replaceable>. This is useful mainly with shells that
           do not support redirection of stderr.
    </para>
   </listitem>
@@ -144,7 +144,7 @@
   </option></term>
   <listitem>
    <para>
-          This has the same effect as in [4]onsgmls.
+          This has the same effect as in <command>onsgmls(1)</command>.
    </para>
   </listitem>
  </varlistentry>
@@ -165,7 +165,7 @@
   <listitem>
    <para>
           Control warnings and errors according to type. This has the
-          same effect as in [5]onsgmls.
+          same effect as in <command>onsgmls(1)</command>.
    </para>
   </listitem>
  </varlistentry>
@@ -178,125 +178,53 @@
           Control the XML output according to the value of
           xml_output_option as follows:
    </para>
-   <variablelist>
-    <varlistentry>
-     <term><option>   
-        no-nl-in-tag
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>no-nl-in-tag</option>
                 Don't use newlines inside start-tags. Usually <command>osx</command> uses
                 newlines inside start-tags so as to reduce the
                 probability of excessively long lines.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        id
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>id</option>
                 Output attribute declarations for ID attributes.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        notation
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>notation</option>
                 Output declarations for notations.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        ndata
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>ndata</option>
                 Output declarations for external data entities. XML
                 requires these to be NDATA. <command>osx</command> will warn about CDATA and
                 SDATA external data entities and output them as NDATA
                 entities.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        cdata
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>cdata</option>
                 Use XML CDATA sections for CDATA marked sections and for
                 elements with a declared content of CDATA.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        comment
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>comment</option>
                 Output comment declarations. Comment declarations in the
-                DTD will not be output.
-      </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        lower
-     </option></term>
-     <listitem>
-      <para>
+                DTD will not be output. </para>
+     <para><option>lower</option>
                 Prefer lower case. Names that were subjected to
                 upper-case substitution by SGML will be folded to lower
                 case. This does not include reserved names; XML requires
                 these to be in upper-case.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        pi-escape
-     </option></term>
-     <listitem>
-      <para>
+     <para><option>pi-escape</option>
                 Escape &amp;&lt;&gt; in the contents of processing instructions
                 using the amp, lt and gt entities. This allows processing
                 instructions to contain the string &gt;?, but requires that
                 applications handle the escapes.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        empty
-     </option></term>
-     <listitem>
-      <para>Use the &lt;e/&gt; syntax for element types e declared as
-                EMPTY.
+     <para><option>empty</option>
+      Use the &lt;e/&gt; syntax for element types e declared as EMPTY.
       </para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><option>                
-        attlist
-     </option></term>
-     <listitem>
-      <para>Output an ATTLIST declaration for every element specifying
+     <para><option>attlis</option>
+      Output an ATTLIST declaration for every element specifying
                 the type of all attributes. The default will always be
                 #IMPLIED.
                 
           
       </para>
-     </listitem>
-    </varlistentry>    
-   </variablelist>
-   <para>Multiple -x options are allowed.
+   <para>Multiple <option>-x</option> options are allowed.
    </para>
   </listitem>
  </varlistentry>    

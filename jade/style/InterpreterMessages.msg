@@ -177,3 +177,7 @@ E0+subgroveArgs++exactly one of node:, subgrove: and class: needed
 W0+subgroveSubgroveArgs++add:, null:, remove:, children:, sub: make no sense with subgrove:
 W0+subgroveClassArgs++remove: makes no sense with class:
 E3+notASubgroveSpec++%2 argument for primitive %1 of wrong type: %3 not a subgrove-spec
+E1+notACspecList++wrong type: %1 not a list of create-specs
+E1+notACspecOrCspecList++wrong type: %1 not a create-spec or list of create-specs
+E1+queryNotANodeList++query expression: %1 not a node list
+E1+priorityNotAnExactInteger++priority expression: %1 not an exact integer

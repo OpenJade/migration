@@ -5,9 +5,10 @@
 #include "TransformationMode.h"
 #include "Expression.h"
 #include "Interpreter.h"
+#include "InterpreterMessages.h"
+#include "ELObjMessageArg.h"
 #include "VM.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <stdlib.h> // for qsort
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -66,13 +67,10 @@ static int associationCompare(const void *p1, const void *p2)
 
 void TransformationMode::compile(Interpreter &interp, const NodePtr &node)
 {
-  printf("compiling associations with root node\n");
   for (size_t j = 0; j < associations_.size(); j++)
     associations_[j].compile(interp, node);
-  printf("sorting associations\n");
   qsort(&associations_[0], associations_.size(), 
         sizeof(associations_[0]), associationCompare);
-  printf("done\n");
 }
 
 TransformationMode::Action::Action(unsigned partIndex, Owner<Expression> &expr,
@@ -117,8 +115,12 @@ void TransformationMode::Association::compile(Interpreter &interp, const NodePtr
   }
   if (tem->asNodeList()) 
     nl_ = tem->asNodeList();
-  else 
-    printf("Aiee, notanodelist\n");
+  else {
+    interp.setNextLocation(qexpr_->location());
+    interp.message(InterpreterMessages::queryNotANodeList, 
+		   ELObjMessageArg(tem, interp));
+    nl_ = interp.makeEmptyNodeList();
+  }
 
   pexpr_->optimize(interp, Environment(), pexpr_);
   tem = pexpr_->constantValue();
@@ -128,10 +130,11 @@ void TransformationMode::Association::compile(Interpreter &interp, const NodePtr
     EvalContext::CurrentNodeSetter cns(node, 0, vm);
     tem = vm.eval(insn.pointer());
   }
-  if (!tem->exactIntegerValue(priority_)) {
-    printf("Aiee, notanexactinteger\n");
-  } else {
-    printf("priority %d\n", priority_);
+  if (!tem->exactIntegerValue(priority_)) { 
+    interp.setNextLocation(pexpr_->location());
+    interp.message(InterpreterMessages::priorityNotAnExactInteger,
+		   ELObjMessageArg(tem, interp));
+    priority_ = 0;
   }
 }
 
@@ -149,21 +152,27 @@ void TransformationMode::Action::compile(Interpreter &interp)
         if (pair) {
           CreateSpecObj *cspec = pair->car()->asCreateSpec();
           if (!cspec) {
-            printf("missing proper error message: notacspeclist\n");
-            return;
-          }
-          specs_.push_back(cspec);
+	    interp.setNextLocation(expr_->location());
+	    interp.message(InterpreterMessages::notACspecList, 
+			   ELObjMessageArg(tem, interp));
+	  }
+          else 
+	    specs_.push_back(cspec);
           tem = pair->cdr();
         } 
         else if (tem->isNil())
           break;
         else {
-          printf("missing proper error message: improperlist\n");
+	  interp.setNextLocation(expr_->location());
+	  interp.message(InterpreterMessages::notACspecList,
+			 ELObjMessageArg(tem, interp));
           return;
         }
       }
     else {
-      printf("missing proper error message: neitherlistnorcspec\n");
+      interp.setNextLocation(expr_->location());
+      interp.message(InterpreterMessages::notACspecOrCspecList,
+		     ELObjMessageArg(tem, interp));
       return;
     }
   }
@@ -178,7 +187,6 @@ void TransformationMode::addAssociation(Owner<Expression> &qexpr,
                                         const Location &loc,
                                         Interpreter &interp)
 {
-  printf("new association registered\n");
   Ptr<Action> action = new Action(interp.currentPartIndex(), texpr, loc);
   Association assoc(qexpr, pexpr, action);
   associations_.resize(associations_.size() + 1);

@@ -28,11 +28,9 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 	StringResource.h SubstTable.cxx SubstTable.h Syntax.h Text.h \
 	TranslateCodingSystem.h TypeId.h URLStorage.h UTF8CodingSystem.h \
 	UnicodeCodingSystem.h UnivCharsetDesc.h Vector.cxx Vector.h \
-	XMLCodingSystem.h XcharMap.cxx XcharMap.h config.h constant.h \
+	XMLCodingSystem.h XcharMap.cxx XcharMap.h constant.h \
 	macros.h rtti.h sptchar.h types.h xnew.h
-
-BUILT_SOURCES = config.h
 
 ## We don't install the windows-only headers on unix systems, but
 ## we still include it in the distribution
-EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h 
+EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old

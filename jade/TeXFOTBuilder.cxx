@@ -882,27 +882,35 @@ private:
   void dumpInherited();
 
   void message(const MessageType0 &);
+  static ParHead& top(Vector<ParHead>& s);
+  static ParHead* ptrTop(Vector<ParHead>& s);
+  static void pop(Vector<ParHead>& s);
+  static void push(Vector<ParHead>& s, ParHead p);
 };
 
 #ifdef OUTLINES
 // Stack Utilities
 
-TeXFOTBuilder::ParHead & top (Vector<TeXFOTBuilder::ParHead> &s) {
+TeXFOTBuilder::ParHead& 
+TeXFOTBuilder::top (Vector<TeXFOTBuilder::ParHead> &s) {
   //cerr << "top" <<s.back().level_<<'\n';
   return s.back();
 }
 
-TeXFOTBuilder::ParHead * ptrTop (Vector<TeXFOTBuilder::ParHead> &s) {
+TeXFOTBuilder::ParHead* 
+TeXFOTBuilder::ptrTop (Vector<TeXFOTBuilder::ParHead> &s) {
   //cerr << "top" <<s.back().level_<<'\n';
   return &(s.back());
 }
 
-void pop(Vector<TeXFOTBuilder::ParHead> &s){
+void 
+TeXFOTBuilder::pop(Vector<TeXFOTBuilder::ParHead> &s){
   //cerr << "popping" <<'\n';
   s.resize(s.size() - 1);
 }
     
-void push(Vector<TeXFOTBuilder::ParHead> &s,TeXFOTBuilder::ParHead p ){
+void 
+TeXFOTBuilder::push(Vector<TeXFOTBuilder::ParHead> &s,TeXFOTBuilder::ParHead p ){
   //cerr << "pushing" <<p.level_<<'\n';
   s.push_back(p);
 }

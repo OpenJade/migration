@@ -10,4 +10,5 @@ pkginclude_HEADERS = config.h
 BUILT_SOURCES = config.h msggen.pl
 
 ## Note that we include the windows-only aux files.
-EXTRA_DIST = instmac.pl jade.dsw jade.mak jade-generate.mak
+## We include msggen.pl, since it won't be generated on Windows.
+EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak jade-generate.mak

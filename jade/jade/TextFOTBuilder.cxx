@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "TextFOTBuilder.h"
+#include "macros.h"
 
 #undef  DBG_TEXT_BACKEND
 #ifndef DBG_TEXT_BACKEND
@@ -34,6 +35,7 @@ class TextFOTBuilder
 {
 public:
   TextFOTBuilder(OutputByteStream* os);
+  ~TextFOTBuilder();
 private:
   virtual void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
   virtual void endSimplePageSequenceHeaderFooter();
@@ -79,6 +81,7 @@ public:
     class ParaBuilder : Abstract {
     public:
       virtual void chars(const Char* chars, unsigned n) = 0;
+      virtual void pbreak() = 0;
     };
     class Area : Abstract {
     public:
@@ -120,11 +123,22 @@ public:
       Ordinate measuredHeight_;
       Ordinate measuredWidth_;
     };
+    class NestedParaBuilder : public ParaBuilder {
+    public:  
+      virtual void chars(const Char* chars, unsigned n);
+      virtual void pbreak();
+      void push(ParaBuilder* inner);
+      void pop();
+      ParaBuilder* top();
+    private:
+      Vector<ParaBuilder*> stack_;
+    };
     class FlowParaBuilder : public ParaBuilder {
     public:
       FlowParaBuilder(FlowPort& flow);
       ~FlowParaBuilder();
       virtual void chars(const Char* chars, unsigned n);
+      virtual void pbreak();
     private:
       void allocLine();
       void flushLine();
@@ -168,16 +182,21 @@ public:
 public:
   FOTBuilder bitBucket_;
   Output::FlowPort* principalPort_;
-  Output::ParaBuilder* para_;
+  Output::NestedParaBuilder* para_;
   OutputByteStream& os_;
   SaveFOTBuilder* spsHF;
 };
 
 TextFOTBuilder::TextFOTBuilder(OutputByteStream* os)
 : os_(*os)
-, para_(0)
+, para_(new Output::NestedParaBuilder)
 , principalPort_(0)
 {
+}
+
+TextFOTBuilder::~TextFOTBuilder()
+{
+  delete para_;
 }
  
 void 
@@ -236,17 +255,15 @@ void
 TextFOTBuilder::startParagraph(const ParagraphNIC &)
 {
   DBG(cout << "TextFOTBuilder::startParagraph()" << endl);
-  // FIXME: nested paragraphs
-  para_ = new Output::FlowParaBuilder(*principalPort_);
+  para_->push(new Output::FlowParaBuilder(*principalPort_));
 }
  
 void 
 TextFOTBuilder::endParagraph()
 {
   DBG(cout << "TextFOTBuilder::endParagraph()" << endl);
-  // FIXME: nested paragraphs
-  delete para_;
-  para_ = 0;
+  delete para_->top();
+  para_->pop();
 }
   
 void 
@@ -255,7 +272,6 @@ TextFOTBuilder::characters(const Char* chars, size_t n)
   DBG(cout << "TextFOTBuilder::characters()" << endl);
 	para_->chars(chars, n);
 }
-
 
 TextFOTBuilder::Output::Page::Page()
 {
@@ -393,7 +409,8 @@ void
 TextFOTBuilder::Output::FlowParaBuilder::flushLine()
 {
   if (line_) {
-    flow_.emitLine(line_, x_);
+    if (x_ > 0)
+      flow_.emitLine(line_, x_);
     delete[] line_;
     line_ = 0;
   }
@@ -415,6 +432,48 @@ TextFOTBuilder::Output::FlowParaBuilder::chars(const Char* chars, unsigned n)
         --n, line_[x_++] = *chars++;
     }
   }
+}
+
+void
+TextFOTBuilder::Output::FlowParaBuilder::pbreak()
+{
+  flushLine();
+}
+
+void
+TextFOTBuilder::Output::NestedParaBuilder::chars(const Char* chars, unsigned n)
+{
+  if (stack_.size() == 0)
+      CANNOT_HAPPEN();
+  top()->chars(chars, n);
+}
+
+void
+TextFOTBuilder::Output::NestedParaBuilder::pbreak()
+{
+  if (stack_.size() == 0)
+      CANNOT_HAPPEN();
+  top()->pbreak();
+}
+
+void
+TextFOTBuilder::Output::NestedParaBuilder::push(ParaBuilder* inner)
+{
+  if (stack_.size())
+    top()->pbreak();
+  stack_.push_back(inner);
+}
+
+void 
+TextFOTBuilder::Output::NestedParaBuilder::pop()
+{
+  stack_.erase(stack_.begin() + stack_.size()-1, stack_.begin() + stack_.size());
+}
+
+TextFOTBuilder::Output::ParaBuilder*
+TextFOTBuilder::Output::NestedParaBuilder::top()
+{
+  return stack_.back();
 }
 
 TextFOTBuilder::Output::AreaFlowPort::AreaFlowPort(Area& area)

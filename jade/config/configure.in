@@ -93,17 +93,28 @@ case "${host}" in
     LINKFLAGS="-no-undefined"
     ;;
   *)
-dnl    if test "$GXX"
-dnl    then
-dnl        if test "$ac_cv_c_gnu_automatic_templates" = yes; then
-dnl            AC_DEFINE(SP_DEFINE_TEMPLATES,1,
-dnl              [define this to include template definitions in the headers])
-dnl        else
-dnl            AC_DEFINE(SP_MANUAL_INST,1,
-dnl              [define this to compile explicit template instantiations])
-dnl            CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
-dnl        fi
-dnl    fi
+    if test "$GXX"
+    then
+dnl FIXME these need tests for non-GNU compilers
+       AC_CACHE_CHECK(whether GNU C++ supports automatic template instantiation,
+              ac_cv_c_gnu_automatic_templates,
+                  [AC_EGREP_CPP(yes,[
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 8)
+  yes
+#endif
+                 ],
+                    ac_cv_c_gnu_automatic_templates=yes,
+                    ac_cv_c_gnu_automatic_templates=no)
+                  ])
+        if test "$ac_cv_c_gnu_automatic_templates" = yes; then
+            AC_DEFINE(SP_DEFINE_TEMPLATES,1,
+              [define this to include template definitions in the headers])
+        else
+            AC_DEFINE(SP_MANUAL_INST,1,
+              [define this to compile explicit template instantiations])
+            CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
+        fi
+    fi
     ;;
 esac
 

@@ -34,7 +34,7 @@ AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
-ALL_LINGUAS="de"
+ALL_LINGUAS="de sv"
 AM_GNU_GETTEXT
 if test "x$prefix" = "xNONE"; then
   SP_LOCALE_DIR=/usr/local/share/locale

@@ -19,6 +19,12 @@
 #define GROVE_API /* as nothing */
 #endif /* not SP_USE_DLL */
 
+#ifdef GROVE_NAMESPACE
+#define GROVE_NAMESPACE_SCOPE GROVE_NAMESPACE::
+#else
+#define GROVE_NAMESPACE_SCOPE
+#endif
+
 // Supports the following modules:
 // baseabs prlgabs0 instabs basesds0 instsds0 subdcabs
 
@@ -222,9 +228,7 @@ public:
   enum Severity { info, warning, error };
   virtual AccessResult getSeverity(Severity &) const;
   AccessResult property(ComponentName::Id, const SdataMapper &, PropertyValue &) const;
-private:
-  // Used to implement sameGrove().
-  virtual const void *groveUniqueId() const = 0;
+  virtual unsigned groveIndex() const = 0;
 public:
   virtual void addRef() = 0;
   // You must call release rather than use delete.
@@ -517,7 +521,7 @@ AccessResult Node::getChar(const SdataMapper &mapper, GroveChar &c) const
 inline
 bool Node::sameGrove(const Node &node) const
 {
-  return groveUniqueId() == node.groveUniqueId();
+  return groveIndex() == node.groveIndex();
 }
 
 inline

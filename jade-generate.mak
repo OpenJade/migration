@@ -17,8 +17,8 @@ jade/TransformFOTBuilder_inst.cxx \
 jade/JadeMessages.h \
 jade/HtmlMessages.h \
 jade/RtfMessages.h \
-jade/DssslAppMessages.h \
 jade/TeXMessages.h \
+style/DssslAppMessages.h \
 style/InterpreterMessages.h
 
 .SUFFIXES: .m4 .msg

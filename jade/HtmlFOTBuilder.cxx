@@ -200,8 +200,8 @@ public:
   // Corresponds to <A NAME="..."></A>
   class Addressable : public Item, public AddressRef {
   public:
-    Addressable(size_t i)
-      : elementIndex_(i), referenced_(0), docIndex_(unsigned(-1)) { }
+    Addressable(size_t g, size_t e)
+      : groveIndex_(g), elementIndex_(e), referenced_(0), docIndex_(unsigned(-1)) { }
     void outputRef(bool end, OutputCharStream &, OutputState &) const;
     void output(OutputCharStream &, OutputState &);
     bool defined() const { return docIndex_ != unsigned(-1); }
@@ -213,6 +213,7 @@ public:
     }
     void setReferenced() { referenced_ = 1; }
   private:
+    size_t groveIndex_;
     // -1 if the whole document
     size_t elementIndex_;
     // unsigned(-1) if not defined
@@ -331,11 +332,11 @@ private:
     IList<Item> *list;
   };
 
-  void insertAddr(size_t);
+  void insertAddr(size_t, size_t);
   void outputStyleSheet(StringC &);
   void startDisplay(const DisplayNIC &);
   void endDisplay();
-  Addressable *elementAddress(size_t n);
+  Addressable *elementAddress(size_t g, size_t e);
 
   const CharStyleClass *makeCharStyleClass();
   const ParaStyleClass *makeParaStyleClass();
@@ -351,7 +352,7 @@ private:
   Container root_;
   // Number of HTML documents
   unsigned nDocuments_;
-  Vector<Addressable *> elements_;
+  Vector<Vector<Addressable *> > elements_;
   Vector<Vector<size_t> > pendingAddr_;
   String<CmdLineApp::AppChar> outputFilename_;
   CmdLineApp *app_;
@@ -407,9 +408,11 @@ HtmlFOTBuilder::~HtmlFOTBuilder()
   OutputState state(&outputFilename_, styleSheetFilename, app_);
   DiscardOutputCharStream os;
   root_.output(os, state);
-  for (size_t i = 0; i < elements_.size(); i++)
-    if (elements_[i] && !elements_[i]->defined())
-     delete elements_[i];
+  for (size_t i = 0; i < elements_.size(); i++) {
+    for (size_t j = 0; j < elements_[i].size(); j++)
+      if (elements_[i][j] && !elements_[i][j]->defined())
+	delete elements_[i][j];
+  }
 }
 
 void HtmlFOTBuilder::outputStyleSheet(StringC &styleSheetFilename)
@@ -705,14 +708,15 @@ void HtmlFOTBuilder::startScroll()
   destStack_.insert(new DestInfo(dest_));
   dest_ = doc->contentPtr();
   if (pendingAddr_.size()) {
-    for (size_t i = 0; i < pendingAddr_.back().size(); i++) {
-      Addressable *tem = elementAddress(pendingAddr_.back()[i]);
+    Vector<size_t> &v = pendingAddr_.back();
+    for (size_t i = 0; i < v.size(); i += 2) {
+      Addressable *tem = elementAddress(v[i], v[i + 1]);
       if (!tem->defined()) {
         dest_->insert(tem);
 	tem->setDefined(nextFlowObject_.docIndex, 1);
       }
     }
-    pendingAddr_.back().resize(0);
+    v.resize(0);
   }
 }
 
@@ -733,7 +737,7 @@ void HtmlFOTBuilder::startLink(const Address &addr)
     {
       unsigned long n;
       if (addr.node->elementIndex(n) == accessOK) {
-	Addressable *tem = elementAddress(n);
+	Addressable *tem = elementAddress(addr.node->groveIndex(), n);
 	tem->setReferenced();
 	aref = tem;
       }
@@ -753,7 +757,7 @@ void HtmlFOTBuilder::startLink(const Address &addr)
 	  && node->getElements(elements) == accessOK
 	  && elements->namedNode(GroveString(id.data(), i), node) == accessOK
 	  && node->elementIndex(n) == accessOK) {
-	Addressable *tem = elementAddress(n);
+	Addressable *tem = elementAddress(addr.node->groveIndex(), n);
 	tem->setReferenced();
 	aref = tem;
       }
@@ -776,13 +780,16 @@ void HtmlFOTBuilder::endLink()
   end();
 }
 
-HtmlFOTBuilder::Addressable *HtmlFOTBuilder::elementAddress(size_t n)
+HtmlFOTBuilder::Addressable *HtmlFOTBuilder::elementAddress(size_t g, size_t e)
 {
-  for (size_t i = elements_.size(); i <= n; i++)
-    elements_.push_back((Addressable *)0);
-  if (!elements_[n])
-    elements_[n] = new Addressable(n);
-  return elements_[n];
+  if (g >= elements_.size())
+    elements_.resize(g + 1);
+  Vector<Addressable *> &v = elements_[g];
+  for (size_t i = v.size(); i <= e; i++)
+    v.push_back((Addressable *)0);
+  if (!v[e])
+    v[e] = new Addressable(g, e);
+  return v[e];
 }
 
 void HtmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
@@ -793,8 +800,10 @@ void HtmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
     if (pendingAddr_.size() > 1)
       pendingAddr_.back() = pendingAddr_[pendingAddr_.size() - 2];
     unsigned long n;
-    if (node->elementIndex(n) == accessOK && mode.size() == 0)
+    if (node->elementIndex(n) == accessOK) {
+      pendingAddr_.back().push_back(node->groveIndex());
       pendingAddr_.back().push_back(size_t(n));
+    }
   }
   giStack_.resize(giStack_.size() + 1);
   GroveString str;
@@ -810,9 +819,9 @@ void HtmlFOTBuilder::endNode()
   giStack_.resize(giStack_.size() - 1);
 }
 
-void HtmlFOTBuilder::insertAddr(size_t n)
+void HtmlFOTBuilder::insertAddr(size_t g, size_t e)
 {
-  Addressable *tem = elementAddress(n);
+  Addressable *tem = elementAddress(g, e);
   if (!tem->defined() && nextFlowObject_.docIndex != (unsigned)-1) {
     dest_->insert(tem);
     tem->setDefined(nextFlowObject_.docIndex);
@@ -932,8 +941,8 @@ void HtmlFOTBuilder::setScrollTitle(const StringC &s)
 void HtmlFOTBuilder::flushPendingAddresses()
 {
   if (pendingAddr_.size()) {
-    for (size_t i = 0; i < pendingAddr_.back().size(); i++)
-      insertAddr(pendingAddr_.back()[i]);
+    for (size_t i = 0; i < pendingAddr_.back().size(); i += 2)
+      insertAddr(pendingAddr_.back()[i], pendingAddr_.back()[i + 1]);
     pendingAddr_.back().resize(0);
   }
 }
@@ -1053,8 +1062,12 @@ void HtmlFOTBuilder::Markup::output(OutputCharStream &os, OutputState &state)
 void HtmlFOTBuilder::Addressable::output(OutputCharStream &os, OutputState &)
 {
   ASSERT(defined());
-  if (referenced_ && elementIndex_ != (unsigned)-1)
-    os << "<A NAME=" << (unsigned long)elementIndex_ << "></A>";
+  if (referenced_ && elementIndex_ != (unsigned)-1) {
+    os << "<A NAME=";
+    if (groveIndex_)
+      os << (unsigned long)groveIndex_ << '.';
+    os << (unsigned long)elementIndex_ << "></A>";
+  }
 }
 
 void HtmlFOTBuilder::Addressable::outputRef(bool end, OutputCharStream &os,
@@ -1075,8 +1088,12 @@ void HtmlFOTBuilder::Addressable::outputRef(bool end, OutputCharStream &os,
 	for (; i < outputFilename.size(); i++)
 	  os.put(outputFilename[i]);
       }
-      if (elementIndex_ != (unsigned)-1)
-	os << "#" << (unsigned long)elementIndex_;
+      if (elementIndex_ != (unsigned)-1) {
+	os << "#";
+	if (groveIndex_)
+	  os << (unsigned long)groveIndex_ << '.';
+	os << (unsigned long)elementIndex_;
+      }
       os << "\">";
     }
   }

@@ -8,7 +8,7 @@
   map-sdata-entity | char-repertoire"
 >
 
-<!element style-sheet o o (style-specification,
+<!element style-sheet o o ((%declarations;)*, style-specification,
 			   (external-specification|style-specification)*)>
 <!element style-specification o o ((%declarations;)*, style-specification-body)>
 <!attlist style-specification

@@ -31,7 +31,8 @@ EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak .cvsignore all \
 	@PACKAGE@-@VERSION@.spec config.rpath onsgmls.1 \
 	osgmlnorm.1 ospam.1 ospent.1 osx.1 ospcat.1 \
-	releasenotes.html releasenotes.pdf releasenotes.ps
+	releasenotes.html releasenotes.pdf releasenotes.ps \
+	BUGS
 
 dist-hook:
 	mv $(distdir)/include/config.h.old $(distdir)/config.h

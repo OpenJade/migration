@@ -23,7 +23,7 @@
 #endif
 #undef SP_DEFINE_TEMPLATES
 
-#include <OpenSP/Insn.h>
+#include "Insn.h"
 #include "Expression.h"
 #include "Interpreter.h"
 #include "ELObj.h"
@@ -208,6 +208,41 @@ __instantiate(`OneRefArgCall<FOTBuilder::OptLengthSpec>')
 __instantiate(`OneArgCall<bool>')
 __instantiate(`OneRefArgCall<FOTBuilder::InlineSpace>')
 __instantiate(`OneRefArgCall<FOTBuilder::ExternalGraphicNIC>') 
+__instantiate(`Owner<CharMap<NCVector<CharProp::addedProp_>::size_type> >')
+__instantiate(`CharMap<NCVector<CharProp::addedProp_>::size_type>')
+__instantiate(`CharMapColumn<NCVector<CharProp::addedProp_>::size_type>')
+__instantiate(`CharMapPage<NCVector<CharProp::addedProp_>::size_type>')
+__instantiate(`NCVector<CharProp::addedProp_>')
+__instantiate(`Vector<Ptr<ProcessContext::Validator> >')
+__instantiate(`Ptr<ProcessContext::Validator>')
+__instantiate(`OneRefArgCall<FOTBuilder::OptInlineSpace>') 
+__instantiate(`NCVector<TransformationMode::Association>') 
+__instantiate(`CharMap<MaybeIntegerCharPropValues::ValT_>')
+__instantiate(`CharMapColumn<MaybeIntegerCharPropValues::ValT_>')
+__instantiate(`CharMapPage<MaybeIntegerCharPropValues::ValT_>')
+__instantiate(`Vector<ProcessContext::Validator *>')
+__instantiate(`CharMap<PublicIdCharPropValues::ValT_>')
+__instantiate(`CharMapColumn<PublicIdCharPropValues::ValT_>')
+__instantiate(`CharMapPage<PublicIdCharPropValues::ValT_>')
+__instantiate(`Ptr<TransformationMode::Action>')
+__instantiate(`CharMap<BooleanCharPropValues::ValT_>')
+__instantiate(`CharMapColumn<BooleanCharPropValues::ValT_>')
+__instantiate(`CharMapPage<BooleanCharPropValues::ValT_>')
+__instantiate(`CharMap<IntegerCharPropValues::ValT_>')
+__instantiate(`CharMapColumn<IntegerCharPropValues::ValT_>')
+__instantiate(`CharMapPage<IntegerCharPropValues::ValT_>')
+__instantiate(`CharMap<ELObj *>')
+__instantiate(`CharMapColumn<ELObj *>')
+__instantiate(`CharMapPage<ELObj *>')
+__instantiate(`CharMap<SymbolCharPropValues::ValT_>')
+__instantiate(`CharMapColumn<SymbolCharPropValues::ValT_>')
+__instantiate(`CharMapPage<SymbolCharPropValues::ValT_>')
+__instantiate(`Vector<CreateSpecObj *>')
+__instantiate(`Owner<String<unsigned short> >')
+__instantiate(`String<unsigned short>')
+__instantiate(`Vector<CharProp *>')
+__instantiate(`OneRefArgCall<Vector<FOTBuilder::CharacterNIC> >')
+__instantiate(`Vector<FOTBuilder::CharacterNIC>')
 #endif
 
 #ifdef SP_NAMESPACE

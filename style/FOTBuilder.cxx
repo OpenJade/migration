@@ -177,7 +177,7 @@ void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 
 void FOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.valid)
+  if (1 || nic.valid)
     characters(&nic.ch, 1);
   atomic();
 }

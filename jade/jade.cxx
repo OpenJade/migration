@@ -13,7 +13,9 @@
 #ifdef JADE_MIF
 #include "MifFOTBuilder.h"
 #endif
+#if 0
 #include "TextFOTBuilder.h"
+#endif
 #include <OpenSP/OutputCharStream.h>
 #include <OpenSP/macros.h>
 #include <OpenSP/sptchar.h>
@@ -185,8 +187,10 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Description *&descr)
   case sgmlType:
   case xmlType:
     return makeTransformFOTBuilder(this, outputType_ == xmlType, outputOptions_, descr);
+#if 0
   case txtType:
     return makeTextFOTBuilder(&outputFile_, this, descr);
+#endif
   default:
     break;
   }

@@ -11,12 +11,12 @@ dnl  autoconf script around SP made by Henry Thompson.
 dnl
 AC_INIT(dsssl)
 AM_INIT_AUTOMAKE(OpenJade, 1.4, no-define)
-AM_CONFIG_HEADER(style/config.h)
+AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
 dnl Use different names than usually to avoid conflicts.
-AC_DEFINE_UNQUOTED(OPENJADE_PACKAGE, "$PACKAGE", Package name)
-AC_DEFINE_UNQUOTED(OPENJADE_VERSION, "$VERSION", Package version)
+AC_DEFINE_UNQUOTED(OPENJADE_PACKAGE, "$PACKAGE", [Package name])
+AC_DEFINE_UNQUOTED(OPENJADE_VERSION, "$VERSION", [Package version])
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -31,6 +31,19 @@ AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
+ALL_LINGUAS=
+dnl AM_GNU_GETTEXT
+if test "x$prefix" = "xNONE"; then
+  OPENJADE_LOCALE_DIR=/usr/local/share/locale
+else
+  OPENJADE_LOCALE_DIR=$prefix/share/locale
+fi
+AC_DEFINE_UNQUOTED(OPENJADE_LOCALE_DIR, "$OPENJADE_LOCALE_DIR")
+AC_SUBST(OPENJADE_LOCALE_DIR)
+dnl intl/Makefile.in and po/Makefile.in from GNU gettext still
+dnl rely on PACKAGE and VERSION substitutions.
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -174,9 +187,6 @@ if test "$ac_cv_cxx_fancy_new_handler" = yes; then
   AC_DEFINE(SP_FANCY_NEW_HANDLER)
 fi
 
-dnl FIXME these need tests 
-AC_DEFINE(SP_ANSI_LIB)
-
 dnl Checks for library functions.
 AC_REPLACE_FUNCS(memcmp)
 AC_CHECK_FUNCS(setlocale)
@@ -227,6 +237,6 @@ changequote([,])dnl
   AC_MSG_RESULT(yes))
 
 AC_SUBST(LIBOBJS)
-AC_OUTPUT(Makefile style/Makefile grove/Makefile spgrove/Makefile
-	  jade/Makefile dsssl/Makefile jadedoc/Makefile 
-	  jadedoc/images/Makefile)
+AC_OUTPUT([Makefile style/Makefile grove/Makefile spgrove/Makefile
+	jade/Makefile dsssl/Makefile jadedoc/Makefile 
+	jadedoc/images/Makefile])

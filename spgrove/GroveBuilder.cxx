@@ -5061,7 +5061,7 @@ unsigned BaseNode::groveIndex() const
 
 bool BaseNode::operator==(const Node &node) const
 {
-  if (!sameGrove(node))
+  if (!sameGrove(node)) 
     return 0;
   return same((const BaseNode &)node);
 }

@@ -8,7 +8,6 @@
 #include "SosofoObj.h"
 #include <OpenSP/macros.h>
 #include <OpenSP/IListIter.h>
-#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -115,19 +114,14 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   ASSERT(processingMode != 0);
   GroveString str;
 
-  printf("ProcessContext::processNode\n");
   if (nodePtr->charChunk(*vm_.interp, str) == accessOK) {
-    printf("chars\n");
     if (!processingMode->hasQuery()) {
-      printf("shortcut\n");
       currentFOTBuilder().charactersFromNode(nodePtr, str.data(), chunk ? str.size() : 1);
       return;
     }
     else if (chunk) {
-      printf("chunks\n");
       NodePtr ptr = nodePtr;
       for (int i = 0; i < str.size(); i++) {
-        printf("chunk %d\n", i);
         processNode(ptr, processingMode, loc, 0);
         ptr->nextSibling(ptr);
       }
@@ -141,61 +135,46 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
   bool hadStyle = 0;
   currentFOTBuilder().startNode(nodePtr, processingMode->name());
   for (;;) {
-    printf("rule loop body\n");
     const ProcessingMode::Rule *rule
      = vm().processingMode->findMatch(nodePtr, *vm_.interp, *vm_.interp,
 					matchSpecificity_);
-    if (rule) printf("found rule\n");
-    else printf("no rule found\n");
     if (!rule) {
       if (hadStyle) {
         currentStyleStack().pushEnd(vm(), currentFOTBuilder());
         currentFOTBuilder().startSequence();
       }
-      if (nodePtr->charChunk(*vm_.interp, str) == accessOK) {
-        printf("default char rule\n");
+      if (nodePtr->charChunk(*vm_.interp, str) == accessOK) 
         currentFOTBuilder().charactersFromNode(nodePtr, str.data(), 1);
-      } else {
-        printf("default element rule\n");
+      else 
         processChildren(processingMode, loc);
-      }
       break;
     }
     if (!matchSpecificity_.isStyle()) {
-      printf("no style rule\n");
       SosofoObj *sosofoObj;
       InsnPtr insn;
       rule->action().get(insn, sosofoObj);
-      printf("got action\n");
       if (hadStyle) {
 	currentStyleStack().pushEnd(vm(), currentFOTBuilder());
 	currentFOTBuilder().startSequence();
       }
-      if (sosofoObj) {
-        printf("process sosofo\n");
+      if (sosofoObj) 
         sosofoObj->process(*this);
-      }
       else {
-        printf("process insn\n");
 	ELObj *obj = vm().eval(insn.pointer());
 	if (vm_.interp->isError(obj)) {
 	  if (processingMode->name().size() == 0)
 	    processChildren(processingMode, loc);
 	}
-        else {
-          printf("treat obj as sosofo\n");
+        else { 
           ELObjDynamicRoot protect(*vm_.interp, obj);
             ((SosofoObj *)obj)->process(*this);
         }
       }
       break;
     }
- 
-    printf("style rule\n");
     SosofoObj *sosofoObj;
     InsnPtr insn;
     rule->action().get(insn, sosofoObj);
-    printf("got action\n");
     ELObj *obj = vm().eval(insn.pointer());
     if (!vm_.interp->isError(obj)) {
       if (!hadStyle) {
@@ -209,10 +188,8 @@ void ProcessContext::processNode(const NodePtr &nodePtr,
     currentFOTBuilder().endSequence();
     currentStyleStack().pop();
   }
-  printf("after rule loop\n");
   currentFOTBuilder().endNode();
   matchSpecificity_ = saveSpecificity;
-  printf("exit processNode\n");
 }
 
 void ProcessContext::nextMatch(StyleObj *overridingStyle, const Location &loc)

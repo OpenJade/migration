@@ -6,12 +6,12 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "PointerTable.h"
-#include "Vector.h"
+#include <OpenSP/PointerTable.h>
+#include <OpenSP/Vector.h>
 #undef SP_DEFINE_TEMPLATES
 
-#include "Hash.h"
-#include "StringC.h"
+#include <OpenSP/Hash.h>
+#include <OpenSP/StringC.h>
 #include "Node.h"
 
 #ifdef SP_NAMESPACE

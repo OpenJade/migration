@@ -4601,7 +4601,7 @@ DEFPRIMITIVE(WithLanguage, argc, argv, context, interp, loc)
   LanguageObj *savedLanguage = context.currentLanguage;
   context.currentLanguage = lang;
   VM vm(context, interp);
-  InsnPtr insn(func->makeCallInsn(1, interp, loc, InsnPtr()));
+  InsnPtr insn(func->makeCallInsn(0, interp, loc, InsnPtr()));
   ELObj *ret = vm.eval(insn.pointer());
   context.currentLanguage = savedLanguage;
   return ret;

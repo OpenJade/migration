@@ -419,7 +419,8 @@ public:
 
   enum FotObjectClassType { oc_Unknown, oc_Cell };
  
-  static const Length lengthUnspecified = LONG_MAX;
+  enum { lengthUnspecified = LONG_MAX };
+//  static const Length lengthUnspecified = LONG_MAX;
   
   struct Format {
 

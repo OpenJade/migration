@@ -17,6 +17,11 @@
 <LI><A HREF="#building-win32">Win32</A>
 <LI><A HREF="#building-unix">Unix</A>
 </UL>
+<LI><A HREF="#install">Installing Jade</A>
+<UL>
+<LI><A HREF="#install-win32">Win32</A>
+<LI><A HREF="#install-unix">Unix</A>
+</UL>
 <LI><A HREF="#using">Using Jade</A>
 <LI><A HREF="#extensions">Jade Extensions</A>
 <LI><A HREF="#limitations">Current Jade Limitations</A>
@@ -199,6 +204,27 @@ also do <code>make depend</code>.
 Alternatively you can build using the <a
 HREF="autoconf.htm">experimental autoconf support</a>. This
 will soon be the recommended method.
+
+<h2><A NAME=install>Installing Jade</A></h2>
+
+<h3><A NAME=install-win32>Win32</A></h3>
+<p>
+OpenJade requires the file <code>dsssl/builtins.dsl</code> to operate. 
+You can tell OpenJade where this file is in one of two ways:
+<ul>
+<li>By including a SYSTEM catalog entry for "builtins.dsl" pointing to this 
+file. See <code>dsssl/catalog</code> for an example.</li>
+<li>By including the <code>dsssl/catalog</code> catalog with the 
+<code>-c</code> command line option or the <code>SGML_CATALOG_FILES</code>
+environment variable.</li>
+</ul>
+<h3><A NAME=install-unix>Unix</A></h3>
+<p>
+Run
+<pre>
+make install
+</pre>
+as <code>root</code>.
 
 <h2><A NAME=using>Using Jade</A></h2>
 <P>

@@ -51,6 +51,7 @@
 <!element element - - %flow>
 <!attlist element
   index number #required
+  grove-index number #implied -- default: the root grove --
   id cdata #implied
   mode cdata #implied
   rule-type (rule-root|rule-element|rule-id|rule-default|rule-query) #implied
@@ -340,6 +341,7 @@ glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
   destination.entity cdata #implied
   destination.system-id cdata #implied
   destination.element-index number #implied
+  destination.grove-index number #implied
   %inherited-characteristics
 >
 
@@ -432,4 +434,5 @@ glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
 
 <!attlist node-page-number
   element-index number #implied
+  grove-index number #implied
 >

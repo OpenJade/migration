@@ -195,7 +195,7 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
       return 0;
     }
     nl_ = val->asNodeList();
-    interp->makeReadOnly(nl_);
+    interp_->makeReadOnly(nl_);
   }
 
   NodeListObj *nl = nl_;

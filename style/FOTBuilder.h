@@ -720,12 +720,13 @@ class STYLE_API SaveFOTBuilder : public Link, public FOTBuilder {
 public:
   SaveFOTBuilder();
   SaveFOTBuilder(const SaveFOTBuilder&);
-  SaveFOTBuilder(const NodePtr &, const StringC &processingMode);
  ~SaveFOTBuilder();
   SaveFOTBuilder& operator = ( const SaveFOTBuilder& );
   void clear();
   SaveFOTBuilder *asSaveFOTBuilder();
-  void emit(FOTBuilder &) const;
+  virtual void emit(FOTBuilder &) const;
+  class Emitter;
+
   void characters(const Char *, size_t);
   void charactersFromNode(const NodePtr &, const Char *, size_t);
   void character(const CharacterNIC &);
@@ -1023,8 +1024,38 @@ private:
   };
   Call *calls_;
   Call **tail_;
+};
+
+class STYLE_API NodeSaveFOTBuilder : public SaveFOTBuilder {
+public:
+  NodeSaveFOTBuilder(const NodePtr &, const StringC &processingMode);
+  virtual void emit(FOTBuilder&) const;
+private:
   NodePtr currentNode_;
   StringC processingMode_;
+};
+
+class SaveFOTBuilder::Emitter {
+public:
+  class Mark;
+  Emitter(SaveFOTBuilder& source, FOTBuilder& sink);
+  Emitter(Emitter& source, Mark from, Mark to, FOTBuilder& sink);
+  void emit();
+  Mark mark() const;
+private:
+  SaveFOTBuilder& source_;
+  FOTBuilder& sink_;
+  Call* from_;
+  Call* to_;
+  Call* where_;
+};
+
+class SaveFOTBuilder::Emitter::Mark {
+public:
+private:
+  Mark(Call* where) : where_(where) {}
+  Call* where_;
+  friend class SaveFOTBuilder::Emitter;
 };
 
 // Would like to make this a member of SaveFOTBuilder, but can't because

@@ -82,7 +82,7 @@ private:
   struct Port {
     Port();
     FOTBuilder *fotb;
-    IQueue<SaveFOTBuilder> saveQueue;
+    IQueue<NodeSaveFOTBuilder> saveQueue;
     Vector<SymbolObj *> labels;
     unsigned connected;
   };
@@ -133,7 +133,7 @@ private:
   IList<Connectable> connectableStack_;
   unsigned connectableStackLevel_;
   IList<Table> tableStack_;
-  NCVector<IQueue<SaveFOTBuilder> > principalPortSaveQueues_;
+  NCVector<IQueue<NodeSaveFOTBuilder> > principalPortSaveQueues_;
   VM vm_;
   ProcessingMode::Specificity matchSpecificity_;
   unsigned flowObjLevel_;

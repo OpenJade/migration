@@ -1266,9 +1266,7 @@ SaveFOTBuilder::SaveFOTBuilder()
 }
 
 SaveFOTBuilder::SaveFOTBuilder(const SaveFOTBuilder& other)
-: currentNode_(other.currentNode_)
-, processingMode_(other.processingMode_)
-, calls_(0), tail_(&calls_)
+: calls_(0), tail_(&calls_)
 {
   for (Call* call = other.calls_; call; call = call->next) {
     *tail_ = call->clone();
@@ -1276,12 +1274,21 @@ SaveFOTBuilder::SaveFOTBuilder(const SaveFOTBuilder& other)
   }
 }
 
-SaveFOTBuilder::SaveFOTBuilder(const NodePtr &currentNode,
+NodeSaveFOTBuilder::NodeSaveFOTBuilder(const NodePtr &currentNode,
 			       const StringC &processingMode)
 : currentNode_(currentNode),
-  processingMode_(processingMode),
-  calls_(0), tail_(&calls_)
+  processingMode_(processingMode)
 {
+}
+
+void
+NodeSaveFOTBuilder::emit(FOTBuilder& fotb) const
+{
+  if (currentNode_)
+    fotb.startNode(currentNode_, processingMode_);
+  SaveFOTBuilder::emit(fotb);
+  if (currentNode_)
+    fotb.endNode();
 }
 
 SaveFOTBuilder::~SaveFOTBuilder()
@@ -1294,8 +1301,6 @@ SaveFOTBuilder::operator=(const SaveFOTBuilder& other)
 {
   if (this != &other) {
     clear();
-    currentNode_ = other.currentNode_;
-    processingMode_ = other.processingMode_;
     for (Call* call = other.calls_; call; call = call->next) {
       *tail_ = call->clone();
       tail_ = &(*tail_)->next;
@@ -1321,8 +1326,6 @@ SaveFOTBuilder *SaveFOTBuilder::asSaveFOTBuilder()
 
 void SaveFOTBuilder::emit(FOTBuilder &fotb) const
 {
-  if (currentNode_)
-    fotb.startNode(currentNode_, processingMode_);
 #if 0
   SaveFOTBuilder *save = fotb.asSaveFOTBuilder();
   if (save) {
@@ -1339,8 +1342,6 @@ void SaveFOTBuilder::emit(FOTBuilder &fotb) const
     for (const Call* tem = calls_; tem; tem = tem->next) 
       tem->emit(fotb);
   }
-  if (currentNode_)
-    fotb.endNode();
 }
 
 #define NO_ARG_CALL(F) \

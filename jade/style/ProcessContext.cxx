@@ -291,7 +291,7 @@ void ProcessContext::endConnection()
     Port *port = connectionStack_.head()->port;
     if (port && --(port->connected) == 0) {
       while (!port->saveQueue.empty()) {
-	SaveFOTBuilder *saved = port->saveQueue.get();
+	NodeSaveFOTBuilder *saved = port->saveQueue.get();
 	saved->emit(*port->fotb);
 	delete saved;
       }
@@ -312,7 +312,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
     Connection *c = new Connection(conn->styleStack, &port, connLevel);
     if (port.connected) {
       port.connected++;
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       port.saveQueue.append(save);
@@ -331,7 +331,7 @@ void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portInd
       c->fotb = &currentFOTBuilder();
     }
     else {
-      SaveFOTBuilder *save = new SaveFOTBuilder(vm().currentNode,
+      NodeSaveFOTBuilder *save = new NodeSaveFOTBuilder(vm().currentNode,
 						vm().processingMode->name());
       c->fotb = save;
       if (conn->flowObjLevel >= principalPortSaveQueues_.size())
@@ -348,9 +348,9 @@ void ProcessContext::endFlowObj()
 {
   flowObjLevel_--;
   if (flowObjLevel_ < principalPortSaveQueues_.size()) {
-    IQueue<SaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
+    IQueue<NodeSaveFOTBuilder> &saveQueue = principalPortSaveQueues_[flowObjLevel_];
     while (!saveQueue.empty()) {
-      SaveFOTBuilder *saved = saveQueue.get();
+      NodeSaveFOTBuilder *saved = saveQueue.get();
       saved->emit(currentFOTBuilder());
       delete saved;
     }

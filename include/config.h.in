@@ -35,9 +35,6 @@
 #define SP_NEW_H_MISSING
 // set_new_handler() has to be declared extern "C"
 #define SP_SET_NEW_HANDLER_EXTERN_C
-#ifndef SP_MANUAL_INST
-#define SP_MANUAL_INST
-#endif
 #ifdef __APPLE__
 #define SP_DEFINE_TEMPLATES
 #undef SP_MANUAL_INST

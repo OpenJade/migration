@@ -14,10 +14,11 @@ BUILT_SOURCES = grove_inst.cxx
 GroveBuilder.o: grove_inst.cxx
 GroveBuilder.lo: grove_inst.cxx
 
-SUFFIXES == .m4 .msg
+SUFFIXES = .m4 .msg
 
 .m4.cxx:
-        $(PERL) $(top_srcdir)/instmac.pl $< >$@
+	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
-        $(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
+	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
+

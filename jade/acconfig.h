@@ -1,3 +1,6 @@
+/* set this to the location of builtins.dsl */
+#define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
+
 /* define this to build the html backend */
 #undef JADE_HTML
 
@@ -110,8 +113,8 @@
 
 #ifdef HAVE_NAMESPACES
 #define SP_NAMESPACE OpenSP
-#define DSSSL_NAMESPACE OpenJade_DSSSL
-#define GROVE_NAMESPACE OpenJade_Grove
+#define DSSSL_NAMESPACE OpenSP
+#define GROVE_NAMESPACE OpenSP
 #endif /* HAVE_NAMESPACES */
 
 #ifdef SP_NAMESPACE

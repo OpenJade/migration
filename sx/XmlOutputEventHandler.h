@@ -128,7 +128,7 @@ OutputCharStream &XmlOutputEventHandler::os()
   return *os_;
 }
 
-class SP_API NullOutputByteStream : public OutputByteStream {
+class NullOutputByteStream : public OutputByteStream {
 public:
   NullOutputByteStream();
   virtual ~NullOutputByteStream();

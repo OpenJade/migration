@@ -1,4 +1,4 @@
-dnl @synopsis AC_CXX_PLACEMENT_DELETE
+dnl @synopsis AC_CXX_PLACEMENT_OPERATOR_DELETE
 dnl
 dnl If the compiler supports void delete(size_t,void*), define
 dnl HAVE_PLACEMENT_OPERATOR_DELETE.

@@ -447,6 +447,7 @@ E1+notationMustNotBeDeclared++#IMPLICIT attributes have already been specified f
 E0+peroGrpoStartTag+ISO 8879:1986 9.4.4p3+a name group is not allowed in a parameter entity reference in a start tag
 W0+peroGrpoEndTag+ISO 8879:1986 9.4.4p3+name group in a parameter entity reference in an end tag (SGML forbids them in start tags)
 # message fragments
+W0+notationConref++if the declared value is NOTATION a default value of CONREF is useless
 =1000
 +delimStart++delimiter 
 -+delimEnd++

@@ -139,6 +139,10 @@
   "UNREGISTERED::OpenJade//Characteristic::page-two-side?"
   #f)
 
+(declare-characteristic two-side-start-on-right?
+  "UNREGISTERED::OpenJade//Characteristic::two-side-start-on-right?"
+  #f)
+
 (declare-characteristic superscript-height
   "UNREGISTERED::James Clark//Characteristic::superscript-height"
   0pt)

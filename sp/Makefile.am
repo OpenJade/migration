@@ -29,7 +29,7 @@ dist-hook:
 	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
 	fi
 
-dist-zip: dist-dir
+dist-zip: distdir
 	-chmod -R a+r $(distdir)
 	zip -rql $(distdir).zip $(distdir)
 	-rm -rf $(distdir)

@@ -69,6 +69,7 @@ LIB_OBJS=Allocator.obj &
   MessageTable.obj &
   ModeInfo.obj &
   Notation.obj &
+  NotationStorage.obj &
   NumericCharRefOrigin.obj &
   OffsetOrderedList.obj &
   OpenElement.obj &

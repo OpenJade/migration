@@ -95,7 +95,7 @@ NULL=nul
 OUTDIR=.\lib\Release
 INTDIR=.\lib\Release
 
-ALL : ".\bin\sp115.dll"
+ALL : ".\bin\sp120.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -155,6 +155,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MessageTable.obj"
 	-@erase "$(INTDIR)\ModeInfo.obj"
 	-@erase "$(INTDIR)\Notation.obj"
+	-@erase "$(INTDIR)\NotationStorage.obj"
 	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
 	-@erase "$(INTDIR)\OffsetOrderedList.obj"
 	-@erase "$(INTDIR)\OpenElement.obj"
@@ -206,9 +207,9 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp115.exp"
-	-@erase "$(OUTDIR)\sp115.lib"
-	-@erase ".\bin\sp115.dll"
+	-@erase "$(OUTDIR)\sp120.exp"
+	-@erase "$(OUTDIR)\sp120.lib"
+	-@erase ".\bin\sp120.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -256,13 +257,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp115.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp120.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp115.pdb" /machine:I386 /out:"bin/sp115.dll"\
- /implib:"$(OUTDIR)/sp115.lib" 
+ /pdb:"$(OUTDIR)/sp120.pdb" /machine:I386 /out:"bin/sp120.dll"\
+ /implib:"$(OUTDIR)/sp120.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -320,6 +321,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MessageTable.obj" \
 	"$(INTDIR)\ModeInfo.obj" \
 	"$(INTDIR)\Notation.obj" \
+	"$(INTDIR)\NotationStorage.obj" \
 	"$(INTDIR)\NumericCharRefOrigin.obj" \
 	"$(INTDIR)\OffsetOrderedList.obj" \
 	"$(INTDIR)\OpenElement.obj" \
@@ -372,7 +374,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-".\bin\sp115.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp120.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -392,7 +394,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\Debug
 INTDIR=.\lib\Debug
 
-ALL : "$(OUTDIR)\sp115d.dll"
+ALL : "$(OUTDIR)\sp120d.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -452,6 +454,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MessageTable.obj"
 	-@erase "$(INTDIR)\ModeInfo.obj"
 	-@erase "$(INTDIR)\Notation.obj"
+	-@erase "$(INTDIR)\NotationStorage.obj"
 	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
 	-@erase "$(INTDIR)\OffsetOrderedList.obj"
 	-@erase "$(INTDIR)\OpenElement.obj"
@@ -504,11 +507,11 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp115d.dll"
-	-@erase "$(OUTDIR)\sp115d.exp"
-	-@erase "$(OUTDIR)\sp115d.ilk"
-	-@erase "$(OUTDIR)\sp115d.lib"
-	-@erase "$(OUTDIR)\sp115d.pdb"
+	-@erase "$(OUTDIR)\sp120d.dll"
+	-@erase "$(OUTDIR)\sp120d.exp"
+	-@erase "$(OUTDIR)\sp120d.ilk"
+	-@erase "$(OUTDIR)\sp120d.lib"
+	-@erase "$(OUTDIR)\sp120d.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -556,12 +559,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp115d.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp120d.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/sp115d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp115d.dll"\
- /implib:"$(OUTDIR)/sp115d.lib" 
+ /pdb:"$(OUTDIR)/sp120d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp120d.dll"\
+ /implib:"$(OUTDIR)/sp120d.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -619,6 +622,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MessageTable.obj" \
 	"$(INTDIR)\ModeInfo.obj" \
 	"$(INTDIR)\Notation.obj" \
+	"$(INTDIR)\NotationStorage.obj" \
 	"$(INTDIR)\NumericCharRefOrigin.obj" \
 	"$(INTDIR)\OffsetOrderedList.obj" \
 	"$(INTDIR)\OpenElement.obj" \
@@ -671,7 +675,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-"$(OUTDIR)\sp115d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\sp120d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -757,7 +761,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Release\sp115.lib"
+	".\lib\Release\sp120.lib"
 
 ".\bin\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -848,7 +852,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Debug\sp115d.lib"
+	".\lib\Debug\sp120d.lib"
 
 ".\lib\Debug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -934,7 +938,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Release\sp115.lib"
+	".\lib\Release\sp120.lib"
 
 ".\bin\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1023,7 +1027,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Debug\sp115d.lib"
+	".\lib\Debug\sp120d.lib"
 
 ".\lib\Debug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1100,7 +1104,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Release\sp115.lib"
+	".\lib\Release\sp120.lib"
 
 ".\bin\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1180,7 +1184,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /machine:I386 /out:"lib\Debug/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Debug\sp115d.lib"
+	".\lib\Debug\sp120d.lib"
 
 ".\lib\Debug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1259,7 +1263,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Release\sp115.lib"
+	".\lib\Release\sp120.lib"
 
 ".\bin\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1341,7 +1345,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Debug\sp115d.lib"
+	".\lib\Debug\sp120d.lib"
 
 ".\lib\Debug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1427,7 +1431,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeRelease\sp115u.lib"
+	".\lib\UnicodeRelease\sp120u.lib"
 
 ".\bin\spamu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1506,7 +1510,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeRelease\sp115u.lib"
+	".\lib\UnicodeRelease\sp120u.lib"
 
 ".\bin\sgmlnrmu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1583,7 +1587,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spentu.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeRelease\sp115u.lib"
+	".\lib\UnicodeRelease\sp120u.lib"
 
 ".\bin\spentu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1671,7 +1675,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeRelease\sp115u.lib"
+	".\lib\UnicodeRelease\sp120u.lib"
 
 ".\bin\nsgmlsu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1693,7 +1697,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\UnicodeRelease
 INTDIR=.\lib\UnicodeRelease
 
-ALL : ".\bin\sp115u.dll"
+ALL : ".\bin\sp120u.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -1753,6 +1757,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MessageTable.obj"
 	-@erase "$(INTDIR)\ModeInfo.obj"
 	-@erase "$(INTDIR)\Notation.obj"
+	-@erase "$(INTDIR)\NotationStorage.obj"
 	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
 	-@erase "$(INTDIR)\OffsetOrderedList.obj"
 	-@erase "$(INTDIR)\OpenElement.obj"
@@ -1802,11 +1807,12 @@ CLEAN :
 	-@erase "$(INTDIR)\URLStorage.obj"
 	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
+	-@erase "$(INTDIR)\WinApp.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp115u.exp"
-	-@erase "$(OUTDIR)\sp115u.lib"
-	-@erase ".\bin\sp115u.dll"
+	-@erase "$(OUTDIR)\sp120u.exp"
+	-@erase "$(OUTDIR)\sp120u.lib"
+	-@erase ".\bin\sp120u.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1855,13 +1861,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"lib\Release/sp108.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp115u.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp120u.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp115u.pdb" /machine:I386 /out:"bin/sp115u.dll"\
- /implib:"$(OUTDIR)/sp115u.lib" 
+ /pdb:"$(OUTDIR)/sp120u.pdb" /machine:I386 /out:"bin/sp120u.dll"\
+ /implib:"$(OUTDIR)/sp120u.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -1919,6 +1925,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MessageTable.obj" \
 	"$(INTDIR)\ModeInfo.obj" \
 	"$(INTDIR)\Notation.obj" \
+	"$(INTDIR)\NotationStorage.obj" \
 	"$(INTDIR)\NumericCharRefOrigin.obj" \
 	"$(INTDIR)\OffsetOrderedList.obj" \
 	"$(INTDIR)\OpenElement.obj" \
@@ -1968,10 +1975,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\URLStorage.obj" \
 	"$(INTDIR)\UTF8CodingSystem.obj" \
 	"$(INTDIR)\Win32CodingSystem.obj" \
+	"$(INTDIR)\WinApp.obj" \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-".\bin\sp115u.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp120u.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -2058,7 +2066,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeDebug\sp115ud.lib"
+	".\lib\UnicodeDebug\sp120ud.lib"
 
 ".\lib\UnicodeDebug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2140,7 +2148,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeDebug\sp115ud.lib"
+	".\lib\UnicodeDebug\sp120ud.lib"
 
 ".\lib\UnicodeDebug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2220,7 +2228,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /machine:I386 /out:"lib\UnicodeDebug/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeDebug\sp115ud.lib"
+	".\lib\UnicodeDebug\sp120ud.lib"
 
 ".\lib\UnicodeDebug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2311,7 +2319,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeDebug\sp115ud.lib"
+	".\lib\UnicodeDebug\sp120ud.lib"
 
 ".\lib\UnicodeDebug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2333,7 +2341,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\UnicodeDebug
 INTDIR=.\lib\UnicodeDebug
 
-ALL : "$(OUTDIR)\sp115ud.dll"
+ALL : "$(OUTDIR)\sp120ud.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -2393,6 +2401,7 @@ CLEAN :
 	-@erase "$(INTDIR)\MessageTable.obj"
 	-@erase "$(INTDIR)\ModeInfo.obj"
 	-@erase "$(INTDIR)\Notation.obj"
+	-@erase "$(INTDIR)\NotationStorage.obj"
 	-@erase "$(INTDIR)\NumericCharRefOrigin.obj"
 	-@erase "$(INTDIR)\OffsetOrderedList.obj"
 	-@erase "$(INTDIR)\OpenElement.obj"
@@ -2443,12 +2452,13 @@ CLEAN :
 	-@erase "$(INTDIR)\UTF8CodingSystem.obj"
 	-@erase "$(INTDIR)\vc40.pdb"
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
+	-@erase "$(INTDIR)\WinApp.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp115ud.dll"
-	-@erase "$(OUTDIR)\sp115ud.exp"
-	-@erase "$(OUTDIR)\sp115ud.lib"
-	-@erase "$(OUTDIR)\sp115ud.pdb"
+	-@erase "$(OUTDIR)\sp120ud.dll"
+	-@erase "$(OUTDIR)\sp120ud.exp"
+	-@erase "$(OUTDIR)\sp120ud.lib"
+	-@erase "$(OUTDIR)\sp120ud.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -2497,12 +2507,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp108d.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug/sp115ud.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug/sp120ud.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp115ud.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp115ud.dll"\
- /implib:"$(OUTDIR)/sp115ud.lib" 
+ /pdb:"$(OUTDIR)/sp120ud.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp120ud.dll"\
+ /implib:"$(OUTDIR)/sp120ud.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -2560,6 +2570,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\MessageTable.obj" \
 	"$(INTDIR)\ModeInfo.obj" \
 	"$(INTDIR)\Notation.obj" \
+	"$(INTDIR)\NotationStorage.obj" \
 	"$(INTDIR)\NumericCharRefOrigin.obj" \
 	"$(INTDIR)\OffsetOrderedList.obj" \
 	"$(INTDIR)\OpenElement.obj" \
@@ -2609,10 +2620,11 @@ LINK32_OBJS= \
 	"$(INTDIR)\URLStorage.obj" \
 	"$(INTDIR)\UTF8CodingSystem.obj" \
 	"$(INTDIR)\Win32CodingSystem.obj" \
+	"$(INTDIR)\WinApp.obj" \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-"$(OUTDIR)\sp115ud.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\sp120ud.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -2844,6 +2856,7 @@ DEP_CPP_XENTM=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -3064,6 +3077,7 @@ DEP_CPP_URLST=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -3269,6 +3283,7 @@ DEP_CPP_UNIVC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -3472,6 +3487,7 @@ DEP_CPP_UNICO=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -3675,6 +3691,7 @@ DEP_CPP_UNDO_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -3878,6 +3895,7 @@ DEP_CPP_TYPEI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -4081,6 +4099,7 @@ DEP_CPP_TRIEB=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -4300,6 +4319,7 @@ DEP_CPP_TOKEN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -4519,6 +4539,7 @@ DEP_CPP_TEXT_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -4722,6 +4743,7 @@ DEP_CPP_SYNTA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -4925,6 +4947,7 @@ DEP_CPP_STORA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -5128,6 +5151,7 @@ DEP_CPP_STDIO=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -5332,6 +5356,7 @@ DEP_CPP_SOENT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -5536,6 +5561,7 @@ DEP_CPP_SJISC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -5739,6 +5765,7 @@ DEP_CPP_SHORT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -5942,6 +5969,7 @@ DEP_CPP_SGMLP=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -6145,6 +6173,7 @@ DEP_CPP_SEARC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -6348,6 +6377,7 @@ DEP_CPP_SDTEX=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -6551,6 +6581,7 @@ DEP_CPP_SD_CX=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -6750,6 +6781,7 @@ DEP_CPP_REWIN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -6953,6 +6985,7 @@ DEP_CPP_RECOG=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -7156,6 +7189,7 @@ DEP_CPP_POSIX=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -7362,6 +7396,7 @@ DEP_CPP_PARTI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -7565,6 +7600,7 @@ DEP_CPP_PARSE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -7768,6 +7804,7 @@ DEP_CPP_PARSER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -7971,6 +8008,7 @@ DEP_CPP_PARSERO=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -8174,6 +8212,7 @@ DEP_CPP_PARSERM=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -8377,6 +8416,7 @@ DEP_CPP_PARSER_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -8595,6 +8635,7 @@ DEP_CPP_PARSER_C=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -8798,6 +8839,7 @@ DEP_CPP_PARSEP=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -9001,6 +9043,7 @@ DEP_CPP_PARSEM=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -9204,6 +9247,7 @@ DEP_CPP_PARSEI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -9407,6 +9451,7 @@ DEP_CPP_PARSED=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -9610,6 +9655,7 @@ DEP_CPP_PARSEC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -9813,6 +9859,7 @@ DEP_CPP_PARSEA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -10016,6 +10063,7 @@ DEP_CPP_PARAM=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -10219,6 +10267,7 @@ DEP_CPP_OUTPU=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -10422,6 +10471,7 @@ DEP_CPP_OUTPUT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -10625,6 +10675,7 @@ DEP_CPP_OPENE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -10844,6 +10895,7 @@ DEP_CPP_OFFSE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -11049,6 +11101,7 @@ DEP_CPP_NUMER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -11252,6 +11305,7 @@ DEP_CPP_NOTAT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -11455,6 +11509,7 @@ DEP_CPP_MODEI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -11658,6 +11713,7 @@ DEP_CPP_MESSA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -11862,6 +11918,7 @@ DEP_CPP_MESSAG=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -12065,6 +12122,7 @@ DEP_CPP_MESSAGE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -12268,6 +12326,7 @@ DEP_CPP_MESSAGE_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -12471,6 +12530,7 @@ DEP_CPP_MARKU=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -12674,6 +12734,7 @@ DEP_CPP_LPD_C=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -12877,6 +12938,7 @@ DEP_CPP_LOCAT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -13081,6 +13143,7 @@ DEP_CPP_LITER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -13284,6 +13347,7 @@ DEP_CPP_LINKP=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -13487,6 +13551,7 @@ DEP_CPP_LINK_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -13690,6 +13755,7 @@ DEP_CPP_INTER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -13893,6 +13959,7 @@ DEP_CPP_INPUT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -14096,6 +14163,7 @@ DEP_CPP_ILIST=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -14299,6 +14367,7 @@ DEP_CPP_IDENT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -14502,6 +14571,7 @@ DEP_CPP_ID_CX=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -14701,6 +14771,7 @@ DEP_CPP_HASH_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -14904,6 +14975,7 @@ DEP_CPP_GROUP=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -15107,6 +15179,7 @@ DEP_CPP_FIXED=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -15310,6 +15383,7 @@ DEP_CPP_EXTER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -15513,6 +15587,7 @@ DEP_CPP_EXTEN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -15719,6 +15794,7 @@ DEP_CPP_EVENT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -15922,6 +15998,7 @@ DEP_CPP_EUCJP=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -16125,6 +16202,7 @@ DEP_CPP_ERRNO=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -16328,6 +16406,7 @@ DEP_CPP_ENTMG=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -16546,6 +16625,7 @@ DEP_CPP_ENTIT=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -16749,6 +16829,7 @@ DEP_CPP_ENTITY=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -16952,6 +17033,7 @@ DEP_CPP_ENTITYC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -17155,6 +17237,7 @@ DEP_CPP_ENTITY_=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -17358,6 +17441,7 @@ DEP_CPP_ELEME=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -17561,6 +17645,7 @@ DEP_CPP_DTD_C=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -17764,6 +17849,7 @@ DEP_CPP_DESCR=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -17967,6 +18053,7 @@ DEP_CPP_CONTE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -18170,6 +18257,7 @@ DEP_CPP_CHARS=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -18388,6 +18476,7 @@ DEP_CPP_CHARSE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -18591,6 +18680,7 @@ DEP_CPP_CHARSET=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -18794,6 +18884,7 @@ DEP_CPP_ATTRI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -18997,6 +19088,7 @@ DEP_CPP_ASSER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -19200,6 +19292,7 @@ DEP_CPP_APP_I=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -19418,6 +19511,7 @@ DEP_CPP_ALLOC=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -19621,6 +19715,7 @@ DEP_CPP_ERROR=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -19824,6 +19919,7 @@ DEP_CPP_WIN32=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -20027,6 +20123,7 @@ DEP_CPP_UTF8C=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -20230,6 +20327,7 @@ DEP_CPP_STRIN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -20433,6 +20531,7 @@ DEP_CPP_PARSERA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -20637,6 +20736,7 @@ DEP_CPP_ENTITYA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -20842,6 +20942,7 @@ DEP_CPP_CMDLI=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -21048,6 +21149,7 @@ DEP_CPP_CONSO=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -21251,6 +21353,7 @@ DEP_CPP_CONTEN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -21454,6 +21557,7 @@ DEP_CPP_ARCEN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -21658,6 +21762,7 @@ DEP_CPP_ARC_I=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -21876,6 +21981,7 @@ DEP_CPP_SPLIB=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -22114,6 +22220,7 @@ DEP_CPP_SGMLA=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -22317,6 +22424,7 @@ DEP_CPP_PARSERE=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -22520,6 +22628,7 @@ DEP_CPP_GENER=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -22723,6 +22832,7 @@ DEP_CPP_EVENTG=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -22976,6 +23086,7 @@ DEP_CPP_MESSAGET=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -23179,6 +23290,7 @@ DEP_CPP_WININ=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -23496,6 +23608,7 @@ DEP_CPP_TRANS=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -23701,6 +23814,7 @@ DEP_CPP_CODIN=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -23937,6 +24051,7 @@ DEP_CPP_CODING=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -24141,6 +24256,7 @@ DEP_CPP_BIG5C=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -24344,6 +24460,7 @@ DEP_CPP_OUTPUTB=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -24549,6 +24666,7 @@ DEP_CPP_MESSAGEF=\
 	".\include\NamedTable.h"\
 	".\include\NCVector.h"\
 	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
 	".\include\OpenElement.h"\
 	".\include\Options.cxx"\
 	".\include\Options.h"\
@@ -24661,6 +24779,414 @@ DEP_CPP_MESSAGEF=\
 
 
 "$(INTDIR)\MessageFormatter.obj" : $(SOURCE) $(DEP_CPP_MESSAGEF) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\lib\WinApp.cxx
+DEP_CPP_WINAP=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\WinApp.h"\
+	".\include\WinInetStorage.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
+
+
+"$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) /nologo /MD /W3 /GX /O2 /I "include" /I "generic" /D "NDEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
+ SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /c $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
+
+
+"$(INTDIR)\WinApp.obj" : $(SOURCE) $(DEP_CPP_WINAP) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) /nologo /MDd /W3 /GX /Zi /Od /I "include" /I "generic" /D "_DEBUG" /D\
+ "_WINDOWS" /D "WINSOCK" /D "SP_MULTI_BYTE" /D "WIN32" /D\
+ SP_NAMESPACE=James_Clark_SP /Fp"$(INTDIR)/lib.pch" /Yu"splib.h" /Fo"$(INTDIR)/"\
+ /Fd"$(INTDIR)/" /c $(SOURCE)
+
+
+!ENDIF 
+
+# End Source File
+################################################################################
+# Begin Source File
+
+SOURCE=.\lib\NotationStorage.cxx
+DEP_CPP_NOTATI=\
+	".\generic\EventGenerator.h"\
+	".\generic\ParserEventGeneratorKit.h"\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\ArcEngine.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CharsetRegistry.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\ConsoleOutput.h"\
+	".\include\constant.h"\
+	".\include\ContentState.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\DescriptorManager.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrnoMessageArg.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\EUCJPCodingSystem.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\Fixed2CodingSystem.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\IdentityCodingSystem.h"\
+	".\include\IList.h"\
+	".\include\IListBase.h"\
+	".\include\IListIter.h"\
+	".\include\IListIterBase.h"\
+	".\include\InputSource.h"\
+	".\include\InternalInputSource.h"\
+	".\include\IQueue.cxx"\
+	".\include\IQueue.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\ISetIter.h"\
+	".\include\Link.h"\
+	".\include\LinkProcess.h"\
+	".\include\List.cxx"\
+	".\include\List.h"\
+	".\include\ListIter.h"\
+	".\include\LiteralStorage.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\macros.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageEventHandler.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\NotationStorage.h"\
+	".\include\OpenElement.h"\
+	".\include\Options.cxx"\
+	".\include\Options.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\PosixStorage.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\RewindStorageObject.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SearchResultMessageArg.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\SJISCodingSystem.h"\
+	".\include\SOEntityCatalog.h"\
+	".\include\sptchar.h"\
+	".\include\StdioStorage.h"\
+	".\include\StorageManager.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnicodeCodingSystem.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\URLStorage.h"\
+	".\include\UTF8CodingSystem.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\Win32CodingSystem.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\lib\ArcProcessor.h"\
+	".\lib\CatalogEntry.h"\
+	".\lib\EquivClass.h"\
+	".\lib\EventQueue.h"\
+	".\lib\events.h"\
+	".\lib\Group.h"\
+	".\lib\Id.h"\
+	".\lib\LpdEntityRef.h"\
+	".\lib\MarkupScan.h"\
+	".\lib\ModeInfo.h"\
+	".\lib\NameToken.h"\
+	".\lib\NumericCharRefOrigin.h"\
+	".\lib\OutputState.h"\
+	".\lib\Param.h"\
+	".\lib\Parser.h"\
+	".\lib\ParserMessages.h"\
+	".\lib\ParserState.h"\
+	".\lib\Partition.h"\
+	".\lib\Priority.h"\
+	".\lib\Recognizer.h"\
+	".\lib\SdFormalError.h"\
+	".\lib\splib.h"\
+	".\lib\splibpch.h"\
+	".\lib\SrInfo.h"\
+	".\lib\StorageObjectPosition.h"\
+	".\lib\StringVectorMessageArg.h"\
+	".\lib\token.h"\
+	".\lib\TokenMessageArg.h"\
+	".\lib\Trie.h"\
+	".\lib\TrieBuilder.h"\
+	".\lib\Undo.h"\
+	
+
+!IF  "$(CFG)" == "lib - Win32 Release"
+
+
+"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "lib - Win32 Debug"
+
+
+"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeRelease"
+
+
+"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
+ "$(INTDIR)\lib.pch"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "lib - Win32 UnicodeDebug"
+
+
+"$(INTDIR)\NotationStorage.obj" : $(SOURCE) $(DEP_CPP_NOTATI) "$(INTDIR)"\
  "$(INTDIR)\lib.pch"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
@@ -25937,9 +26463,6 @@ DEP_RSC_SPAM_R=\
 # Begin Source File
 
 SOURCE=.\spent\spent.cxx
-
-!IF  "$(CFG)" == "spent - Win32 Release"
-
 DEP_CPP_SPENT=\
 	".\include\Boolean.h"\
 	".\include\CharMap.cxx"\
@@ -25989,6 +26512,9 @@ DEP_CPP_SPENT=\
 	".\include\XcharMap.h"\
 	".\include\xnew.h"\
 	
+
+!IF  "$(CFG)" == "spent - Win32 Release"
+
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -25996,55 +26522,6 @@ DEP_CPP_SPENT=\
 
 !ELSEIF  "$(CFG)" == "spent - Win32 Debug"
 
-DEP_CPP_SPENT=\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityManager.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\InputSource.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26052,55 +26529,6 @@ DEP_CPP_SPENT=\
 
 !ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
 
-DEP_CPP_SPENT=\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityManager.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\InputSource.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26108,55 +26536,6 @@ DEP_CPP_SPENT=\
 
 !ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
 
-DEP_CPP_SPENT=\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityManager.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\InputSource.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26232,32 +26611,100 @@ SOURCE=.\spent\SpentMessages.msg
 # Begin Source File
 
 SOURCE=.\sgmlnorm\sgmlnorm.cxx
-
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
 DEP_CPP_SGMLN=\
 	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
 	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
 	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
 	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
 	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
 	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
 	".\include\OutputByteStream.h"\
 	".\include\OutputCharStream.h"\
 	".\include\Owner.cxx"\
 	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
 	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
 	".\include\Ptr.cxx"\
 	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
 	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
 	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
 	".\include\StringC.h"\
 	".\include\StringOf.cxx"\
 	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
 	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
 	".\include\xnew.h"\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26265,97 +26712,6 @@ DEP_CPP_SGMLN=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
 
-DEP_CPP_SGMLN=\
-	".\generic\SGMLApplication.h"\
-	".\include\Allocator.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetDecl.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\ContentToken.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\ElementType.h"\
-	".\include\Entity.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\GenericEventHandler.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Lpd.h"\
-	".\include\Markup.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Mode.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\NamedResourceTable.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SdText.h"\
-	".\include\SgmlParser.h"\
-	".\include\ShortReferenceMap.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26363,76 +26719,6 @@ DEP_CPP_SGMLN=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
 
-DEP_CPP_SGMLN=\
-	".\generic\SGMLApplication.h"\
-	".\include\Allocator.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExternalId.h"\
-	".\include\GenericEventHandler.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SgmlParser.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\xnew.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26440,97 +26726,6 @@ DEP_CPP_SGMLN=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
 
-DEP_CPP_SGMLN=\
-	".\generic\SGMLApplication.h"\
-	".\include\Allocator.h"\
-	".\include\Attribute.h"\
-	".\include\Attributed.h"\
-	".\include\Boolean.h"\
-	".\include\CharMap.cxx"\
-	".\include\CharMap.h"\
-	".\include\CharsetDecl.h"\
-	".\include\CharsetInfo.h"\
-	".\include\CmdLineApp.h"\
-	".\include\CodingSystem.h"\
-	".\include\CodingSystemKit.h"\
-	".\include\config.h"\
-	".\include\constant.h"\
-	".\include\ContentToken.h"\
-	".\include\CopyOwner.cxx"\
-	".\include\CopyOwner.h"\
-	".\include\Dtd.h"\
-	".\include\ElementType.h"\
-	".\include\Entity.h"\
-	".\include\EntityApp.h"\
-	".\include\EntityCatalog.h"\
-	".\include\EntityDecl.h"\
-	".\include\EntityManager.h"\
-	".\include\ErrorCountEventHandler.h"\
-	".\include\Event.h"\
-	".\include\EventsWanted.h"\
-	".\include\ExtendEntityManager.h"\
-	".\include\ExternalId.h"\
-	".\include\GenericEventHandler.h"\
-	".\include\Hash.h"\
-	".\include\HashTable.cxx"\
-	".\include\HashTable.h"\
-	".\include\HashTableItemBase.cxx"\
-	".\include\HashTableItemBase.h"\
-	".\include\ISet.cxx"\
-	".\include\ISet.h"\
-	".\include\Link.h"\
-	".\include\Location.h"\
-	".\include\Lpd.h"\
-	".\include\Markup.h"\
-	".\include\Message.h"\
-	".\include\MessageArg.h"\
-	".\include\MessageBuilder.h"\
-	".\include\MessageFormatter.h"\
-	".\include\MessageReporter.h"\
-	".\include\Mode.h"\
-	".\include\Named.h"\
-	".\include\NamedResource.h"\
-	".\include\NamedResourceTable.h"\
-	".\include\NamedTable.h"\
-	".\include\NCVector.h"\
-	".\include\Notation.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\OwnerTable.cxx"\
-	".\include\OwnerTable.h"\
-	".\include\ParserApp.h"\
-	".\include\ParserOptions.h"\
-	".\include\PointerTable.cxx"\
-	".\include\PointerTable.h"\
-	".\include\Ptr.cxx"\
-	".\include\Ptr.h"\
-	".\include\RangeMap.cxx"\
-	".\include\RangeMap.h"\
-	".\include\Resource.h"\
-	".\include\rtti.h"\
-	".\include\Sd.h"\
-	".\include\SdText.h"\
-	".\include\SgmlParser.h"\
-	".\include\ShortReferenceMap.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\include\StringResource.h"\
-	".\include\SubstTable.cxx"\
-	".\include\SubstTable.h"\
-	".\include\Syntax.h"\
-	".\include\Text.h"\
-	".\include\TypeId.h"\
-	".\include\UnivCharsetDesc.h"\
-	".\include\Vector.cxx"\
-	".\include\Vector.h"\
-	".\include\XcharMap.cxx"\
-	".\include\XcharMap.h"\
-	".\include\xnew.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26543,9 +26738,6 @@ DEP_CPP_SGMLN=\
 # Begin Source File
 
 SOURCE=.\sgmlnorm\SGMLGenerator.cxx
-
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
 DEP_CPP_SGMLG=\
 	".\generic\SGMLApplication.h"\
 	".\include\Boolean.h"\
@@ -26560,6 +26752,9 @@ DEP_CPP_SGMLG=\
 	".\include\StringOf.h"\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26567,20 +26762,6 @@ DEP_CPP_SGMLG=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
 
-DEP_CPP_SGMLG=\
-	".\generic\SGMLApplication.h"\
-	".\include\Boolean.h"\
-	".\include\CodingSystem.h"\
-	".\include\config.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26588,10 +26769,6 @@ DEP_CPP_SGMLG=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
 
-DEP_CPP_SGMLG=\
-	".\include\config.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26599,20 +26776,6 @@ DEP_CPP_SGMLG=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
 
-DEP_CPP_SGMLG=\
-	".\generic\SGMLApplication.h"\
-	".\include\Boolean.h"\
-	".\include\CodingSystem.h"\
-	".\include\config.h"\
-	".\include\OutputByteStream.h"\
-	".\include\OutputCharStream.h"\
-	".\include\Owner.cxx"\
-	".\include\Owner.h"\
-	".\include\StringC.h"\
-	".\include\StringOf.cxx"\
-	".\include\StringOf.h"\
-	".\sgmlnorm\SGMLGenerator.h"\
-	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)

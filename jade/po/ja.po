@@ -1,0 +1,851 @@
+# ja.po for openjade.
+# Copyright (C) 2000, 2001 SATO Satoru
+# Satoru Sato <ss@gnome.gr.jp>, 2001.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: openjade 1.4devel1\n"
+"POT-Creation-Date: 2001-03-26 02:32+0000\n"
+"PO-Revision-Date: 2000-10-15 23:59+09:00\n"
+"Last-Translator: Satoru Sato <ss@gnome.gr.jp>\n"
+"Language-Team: Japanese <translation@gnome.gr.jp>\n"
+"MIME-Version:: 1.0\n"
+"Content-Type: text/plain; charset=euc-jp\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "cannot open output file %1 (%2)"
+msgstr "ファイル %1 (%2) を開けません"
+
+msgid "unknown output type %1"
+msgstr "不明な出力タイプ %1"
+
+msgid "empty output filename"
+msgstr "出力ファイル名がありません"
+
+msgid "Use the backend %1."
+msgstr "バックエンド %1 を使用"
+
+msgid "Send output to %1."
+msgstr "出力を %1 に送ります"
+
+msgid "FILE"
+msgstr "FILE"
+
+msgid "TYPE"
+msgstr "TYPE"
+
+msgid "could not convert system identifier %1 to a single filename"
+msgstr "システム識別子 %1 を単一ファイル名に変換できませんでした"
+
+msgid "missing table column flow object (table-auto-width feature not fully supported)"
+msgstr ""
+"テーブル行フローオブジェクトがみつかりません"
+"(table-auto-width 機能のサポートは不完全です)"
+
+msgid "nested tables are not allowed in RTF"
+msgstr "入れ子のテーブルは RTF では許されていません"
+
+msgid "could not embed %1 with clsid %2"
+msgstr "%1 を clsid %2 に埋め込めませんでした"
+
+msgid "TeX backend does not currently support references to page numbers of nodes other than elements"
+msgstr ""
+"今のところ、TeX バックエンドはエレメント以外のノードのページ番号への"
+"参照をサポートしていません"
+
+msgid "TeX backend does not currently support links to nodes other than elements"
+msgstr ""
+"今のところ、TeX バックエンドはエレメント以外のノードへのリンクを"
+"サポートしていません"
+
+msgid "TeX backend does not currently support links to entities"
+msgstr ""
+"今のところ、TeX バックエンドはエンティティへのリンクを"
+"サポートしていません"
+
+msgid "TeX backend does not currently support links to other SGML documents"
+msgstr ""
+"今のところ、TeX バックエンドは他の SGML 文書へのリンクを"
+"サポートしていません"
+
+msgid "TeX backend does not currently support HyTime linkends"
+msgstr ""
+"今のところ、TeX バックエンドは HyTime linkend をサポートしていません"
+
+msgid "TeX backend does not currently support TEI links"
+msgstr ""
+"今のところ、TeX バックエンドは TEI リンクをサポートしていません"
+
+msgid "TeX backend does not currently support glyph substitution tables"
+msgstr ""
+"今のところ、TeX バックエンドは glyph 代用テーブルをサポートしていません"
+
+msgid "%1 version %2"
+msgstr "%1 バージョン %2"
+
+msgid "no DSSSL specification: use -d to specify"
+msgstr "DSSSL 未指定: -d オプションを使って指定して下さい"
+
+msgid "no applicable processing instruction with title %1; available titles: %2"
+msgstr "title %1 に対し不適切な処理命令です。可能な title は: %2"
+
+msgid "Options with a \"doc-\"/\"spec-\" prefix apply only to the document/specification."
+msgstr ""
+"\"doc-\"/\"spec-\" prefix 付のオプションは document/specification "
+"に対してのみ適用可能です"
+
+msgid "Enable experimental DSSSL extensions."
+msgstr "実験的な DSSSL 拡張を有効にする"
+
+msgid "Debug mode."
+msgstr "デバッグモード"
+
+msgid "Use DSSSL specification %1."
+msgstr "DSSSL 指定 %1 を使用"
+
+msgid "Use DSSSL specification with title %1."
+msgstr "title %1 とともに DSSSL 指定を使用"
+
+msgid "Pretend that %1 appeared in the specification."
+msgstr "%1 が指定されているようなふりをする"
+
+msgid "Strict DSSSL compliance mode."
+msgstr "厳格な DSSSL 追従モード"
+
+msgid "Show open entities in error messages."
+msgstr "開かれたエンティティをエラーメッセージ内で表示"
+
+msgid "Show open elements in error messages."
+msgstr "開かれたエレメントをエラーメッセージ内で表示"
+
+msgid "Show error numbers in error messages."
+msgstr "エラーメッセージ内にエラー番号を表示"
+
+msgid "Show references in error messages."
+msgstr "エラーメッセージ内に参照を表示"
+
+msgid "Define parameter entity %1 as \"INCLUDE\"."
+msgstr ""
+"パラメータエンティティ %1 を \"INCLUDE\" するように定義"
+
+msgid "Enable warning %1."
+msgstr "警告 %1 を有効にする"
+
+msgid "SYSID"
+msgstr "SYSID"
+
+msgid "DEFINITION"
+msgstr "DEFINITION"
+
+msgid "NAME"
+msgstr "NAME"
+
+msgid "unexpected end of file"
+msgstr "予期せぬ EOF"
+
+msgid "invalid character"
+msgstr "不適切なキャラクタ"
+
+msgid "invalid character after '#'"
+msgstr "'#' の後で不適切なキャラクタ"
+
+msgid "unknown #! named constant %1"
+msgstr "不明な定数名 %1 の #!"
+
+msgid "unexpected token %1"
+msgstr "予期せぬトークン %1"
+
+msgid "string with no closing quote"
+msgstr "クォートで閉じていない文字列"
+
+msgid "missing closing parenthesis"
+msgstr "閉じ括弧がありません"
+
+msgid "invalid number %1"
+msgstr "不適切な番号 %1"
+
+msgid "invalid AFII glyph identifier %1"
+msgstr "不適切な AFII glyph 識別子 %1"
+
+msgid "call of non-function object %1"
+msgstr "非関数オブジェクト %1 の呼出し"
+
+msgid "too many arguments for function"
+msgstr "関数に対して引数が多すぎます"
+
+msgid "odd number of keyword/value arguments"
+msgstr "keyword/value 引数が奇数個あります"
+
+msgid "missing argument for function call"
+msgstr "関数呼出しに対する引数がありません"
+
+msgid "syntactic keyword %1 used as variable"
+msgstr "構文 keyword %1 が変数として使われています"
+
+msgid "reference to undefined variable %1"
+msgstr "未定義の変数 %1 への参照"
+
+msgid "no character with name %1"
+msgstr "名前 %1 についてキャラクタなし"
+
+msgid "unknown top level form %1"
+msgstr "不明な最上階層での form %1"
+
+msgid "bad form %1 in mode group"
+msgstr "モードグループ内で不適切な form %1"
+
+msgid "identifier %1 already defined in same part"
+msgstr "識別子 %1 は同じ部分で既に定義されています"
+
+msgid "first definition was here"
+msgstr "最初の定義はここでした"
+
+msgid "loop in specification of value of %1"
+msgstr "%1 の値の指定内にループがあります"
+
+msgid "argument out of range"
+msgstr "引数は範囲外です"
+
+msgid "loop in specification of value of unit %1"
+msgstr "ユニット %1 の値の指定内でループがあります"
+
+msgid "bad value specified for unit %1"
+msgstr "ユニット %1 に対して不適切な値が指定されました"
+
+msgid "unit %1 already defined in same part"
+msgstr "ユニット %1 は同じ部分で既に定義されています"
+
+msgid "quantity %1 undefined"
+msgstr "quantity %1 は未定義です"
+
+msgid "incompatible dimensions"
+msgstr "矛盾する dimension"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a boolean"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は論理値 (boolean) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a pair"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はペア (pair) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はリスト (list) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a symbol"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はシンボル (symbol) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a string"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は文字列 (string) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a string or symbol"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は文字列 (string) でもシンボル (symbol) でもありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a char"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は文字 (char) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an ISO8601 time string"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は ISO8601 time 文字列ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a style"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はスタイル (style) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an exact integer"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は厳密な整数 (exact integer) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a quantity"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は quantity ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a color-space"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: %3 は\n"
+"color-space ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a number"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は数字 (number) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a sosofo"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は sosofo ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an optional singleton node list"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はオプションの単一ノードリスト (optional singleton node list) "
+"ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a singleton node list"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は単一ノードリスト (singleton node list) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a node list"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はノードリスト (node list) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a named node list"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は名前付きノードリスト (named node list) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a length or length-spec"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は length あるいは length-spec ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a quantity or length-spec"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は quantity あるいは length-spec ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an integer or the symbol \"force\""
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は整数 (integer) あるいはシンボル (symbol) \"force\" "
+"ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an address"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はアドレス (address) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a glyph-id"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は glyph-id ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a glyph-subst-table"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は glyph-subset-table ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list of pairs of glyph-ids"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は glyph-id のペア (pair) のリスト (list) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a procedure"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 は手続き (procedure) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a vector"
+msgstr ""
+"%2 引数(プリミティブ %1 に対する)は不適切なタイプです: "
+"%3 はベクトル (vector) ではありません"
+
+msgid "root rule already defined in same part with same importance"
+msgstr ""
+"root rule は既に同じ部分で同じ重要度で定義されています"
+
+msgid "initial value already declared for characteristic %1 in same part"
+msgstr "初期値は既に同じ部分で特性 %1 に対して定義されています"
+
+msgid "first declaration was here"
+msgstr "最初の宣言はここです"
+
+msgid "%1 is not a valid keyword in a style expression"
+msgstr "%1 はスタイル表現内では不適切な keyword です"
+
+msgid "%1 is not a valid keyword in a make expression for flow object class %2"
+msgstr "%1 はフローオブジェクトクラス %2 に対する表現内では不適切な keyword です"
+
+msgid "%1 is not the name of any flow object class"
+msgstr "%1 はフローオブジェクトクラスの名前ではありません"
+
+msgid "content expression cannot be specified in make expression for atomic flow object class %1"
+msgstr ""
+"アトミック (atomic) フローオブジェクトクラス %1 に対する表現内では"
+"内容表現 (content expression) は指定できません"
+
+msgid "value for \"label:\" not a symbol"
+msgstr "\"label:\" に対する値がシンボル (symbol) ではありません"
+
+msgid "no port for label %1"
+msgstr "label %1 に対する port がありません"
+
+msgid "invalid content map"
+msgstr "不適切な content map"
+
+msgid "content map references non-existent port %1"
+msgstr "content map は存在しない port %1 を参照しています"
+
+msgid "invalid value for %1 characteristic"
+msgstr "%1 特性に対する不適切な値"
+
+msgid "no clause in cond expression matched"
+msgstr "cond 表現内で対応する clause がありません"
+
+msgid "no clause in case expression matched %1"
+msgstr "case 表現内で %1 に対応する clause がありません"
+
+msgid "expected \"else\" not %1"
+msgstr "予期される \"else\" が %1 ではありません"
+
+msgid "sorry, cannot handle unresolvable quantities in datums in case expression"
+msgstr "残念ながら case 表現の data 内の未解決の quantity を処理できませんでした"
+
+msgid "%1"
+msgstr "%1"
+
+msgid "division by zero"
+msgstr "0 除算"
+
+msgid "procedure does not have %1 keyword argument"
+msgstr "手続き (procedure) が %1 キーワード引数を持っていません"
+
+msgid "argument not a keyword"
+msgstr "引数がキーワードではありません"
+
+msgid "specification document does not have the DSSSL architecture as a base architecture"
+msgstr "指定文書はベースとなる DSSSL アーキテクチャを持っていません"
+
+msgid "specification document did not contain a style-specification-body element"
+msgstr ""
+"指定文書は style-specification-body エレメントを含んでいませんでした"
+
+msgid "unknown character name %1"
+msgstr "不明なキャラクタ名 %1"
+
+msgid "attempt to use current node when there is none"
+msgstr "何もないときには今のノードを使うようにします"
+
+msgid "attempt to process node in illegal context"
+msgstr "不適切なコンテキスト内のノードを処理するようにします"
+
+msgid "radix must be 2, 8, 10 or 16"
+msgstr "基数は 2、8、10、16 でなければなりません"
+
+msgid "this context requires a sosofo"
+msgstr "このコンテキストは sosofo を必要とします"
+
+msgid "this context requires a style object"
+msgstr "このコンテキストはスタイル (style) オブジェクトを必要とします"
+
+msgid "procedure can only be used in evaluation of characteristic value"
+msgstr "procedure は特性値の評価内でのみ使用できます"
+
+msgid "%1 color requires three arguments"
+msgstr "%1 カラーは三つの引数を必要とします"
+
+msgid "arguments for %1 color must be numbers"
+msgstr "%1 カラーに対する引数は数字でなければなりません"
+
+msgid "arguments for %1 color must be in the range 0 to 1"
+msgstr "%1 カラーに対する引数は 0 から 1 までの範囲内になければなりません"
+
+msgid "result of procedure in %1 color must be a number"
+msgstr "%1 カラー内の procedure の返り値は数字でなければなりません"
+
+msgid "unknown color-space family %1"
+msgstr "不明な color-space ファミリ %1"
+
+msgid "%1 color-space family does not take any arguments"
+msgstr "%1 color-space ファミリは引数をとりません"
+
+msgid "invalid parameters for %1 color-space family"
+msgstr "%1 color-space ファミリに対して不適切なパラメータ"
+
+msgid "%1 is not a pre-defined inherited characteristic"
+msgstr "%1 は定義済みの継承された特性ではありません"
+
+msgid "invalid number format %1"
+msgstr "不適切な数字フォーマット %1"
+
+msgid "invalid character %1 in public identifier"
+msgstr "公開識別子内に不適切な文字 %1"
+
+msgid "debug %1"
+msgstr "デバッグ %1"
+
+msgid "circular use of specification parts"
+msgstr "指定部分の循環使用"
+
+msgid "no style-specification or external-specification with ID %1"
+msgstr ""
+"ID %1 について style-specification あるいは external-specification がありません"
+
+msgid "document did not contain any style-specifications or external-specifications"
+msgstr ""
+"文書は style-specification あるいは external-specification を含んでいません"
+
+msgid "table-cell flow object not inside a table"
+msgstr "table-cell フローオブジェクトはテーブル内にありません"
+
+msgid "table-row flow object not inside a table"
+msgstr "table-row フローオブジェクトはテーブル内にありません"
+
+msgid "no value for node property %1"
+msgstr "ノード属性 %1 に対する値がありません"
+
+msgid "value returned by procedure was not a node-list"
+msgstr "procedure の返り値はノードリストではありませんでした"
+
+msgid "called from here"
+msgstr "ここから呼ばれました"
+
+msgid "called from here...(%1 calls omitted)"
+msgstr "ここから呼ばれました... (%1 呼出しは省略されました)"
+
+msgid "node processing loop detected"
+msgstr "ノード処理ループを検出しました"
+
+msgid "unquote-splicing expression does not evaluate to a list"
+msgstr "unquote-splicing 表式はリストに評価されません"
+
+msgid "object is read-only"
+msgstr "オブジェクトは read-only です"
+
+msgid "assignment to top-level variable %1"
+msgstr "最上階層の変数 %1 に割り当て"
+
+msgid "invalid call to continuation"
+msgstr "継続について不適切な呼出し"
+
+msgid "empty generic identifier in pattern"
+msgstr "パターン内に空の一般識別子"
+
+msgid "pattern is not a list"
+msgstr "パターンはリストではありません"
+
+msgid "%1 cannot be used as a generic identifier in a pattern"
+msgstr "%1 はパターン内の一般識別子としては使用できません"
+
+msgid "%1 cannot occur in a pattern"
+msgstr "%1 はパターン内にありません"
+
+msgid "value missing for qualifier in pattern"
+msgstr "パターン内の qualifier に対する値がありません"
+
+msgid "unknown pattern qualifier %1"
+msgstr "不明なパターン qualifier %1"
+
+msgid "bad value %1 for %2 qualifier in pattern"
+msgstr "パターン内の不適切な値 %1 (%2 に対する) qualifier"
+
+msgid "repeat qualifier not allowed inside children qualifier"
+msgstr "繰り返し qualifier は子の qualifier 内では許されません"
+
+msgid "bad value for attributes qualifier in pattern"
+msgstr "パターン内の属性 qualifier に対する不適切な値"
+
+msgid "characteristic %1 applied in style rule with same specificity"
+msgstr "特性 %1 は同じ指定のスタイルルールに適用されています"
+
+msgid "other style rule is here"
+msgstr "他のスタイルルールはここです"
+
+msgid "node matches more than one pattern with the same specificity"
+msgstr "ノードは同じ指定で一つ以上のパターンに一致します"
+
+msgid "reference to uninitialized variable %1"
+msgstr "初期化されていな変数 %1 への参照"
+
+msgid "circular use of actual value of characteristic %1"
+msgstr "特性 %1 の実際の値を循環して使用しています"
+
+msgid "characteristic %1 already defined in same part"
+msgstr "特性 %1 は同じ部分で既に定義されています"
+
+msgid "flow object class %1 already defined in same part"
+msgstr "フローオブジェクトクラス %1 は同じ部分で既に定義されています"
+
+msgid "mode %1 not defined"
+msgstr "ノード %1 は未定義です"
+
+msgid "duplicate character name %1"
+msgstr "重複する特性名 %1"
+
+msgid "duplicate SDATA entity name %1"
+msgstr "重複する SDATA エンティティ名 %1"
+
+msgid "duplicate SDATA entity text %1"
+msgstr "重複する SDATA エンティティテキスト %1"
+
+msgid "unsupported declaration will be ignored"
+msgstr "サポートされていない宣言は無視されます"
+
+msgid "unsupported character repertoire %1 will be ignored"
+msgstr "サポートされていないキャラクタレパートリー %1 は無視されます"
+
+msgid "error in declaration element"
+msgstr "宣言エレメント内でエラー"
+
+msgid "%1 is not a valid identifier"
+msgstr "%1 は不適切な識別子です"
+
+msgid "error in language definition"
+msgstr "言語定義部分内でエラー"
+
+msgid "no current language"
+msgstr "言語が指定されていません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a language"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は言語ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a positive integer"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は正の整数ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an integer"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は整数ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a keyword"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 はキーワードではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an alist"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は連想リスト (alist) ではありません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は文字のリストではありません"
+
+msgid "%2 argument for primitive %1 has wrong length"
+msgstr ""
+"%2 引数(プリミティブ %1 に対して)は不適切な length を持っています"
+
+msgid "quantity %1 can't be represented exactly"
+msgstr "quantity %1 を正確に表現できません"
+
+msgid "default language already declared in this part"
+msgstr "標準の言語はこの部分で既に宣言されています"
+
+msgid "%1 not a language as required in a default-language-declaration"
+msgstr "%1 は default-language-declaration 内で要求された言語ではありません"
+
+msgid "%1 not a valid unit name"
+msgstr "%1 は不適切なユニット名です"
+
+msgid "%1 not a valid character name"
+msgstr "%1 は不適切なキャラクタ名です"
+
+msgid "%1 not a valid character number"
+msgstr "%1 は不適切なキャラクタ番号です"
+
+msgid "unknown character property %1"
+msgstr "不明なキャラクタ属性 %1"
+
+msgid "error in character property declaration"
+msgstr "キャラクタ属性宣言内でエラー"
+
+msgid "character property %1 already declared in same part"
+msgstr "キャラクタ属性 %1 は同じ部分で既に宣言されています"
+
+msgid "added value for character property %1 already declared in same part"
+msgstr ""
+"キャラクタ属性 %1 のために追加された値は同じ部分で既に宣言されています"
+
+msgid "previous declaration was here"
+msgstr "前の宣言はここでした"
+
+msgid "value returned by procedure was not a sosofo"
+msgstr "procedure の返り値は sosofo ではありませんでした"
+
+msgid "loop in specification of value of character property %1"
+msgstr "キャラクタ属性 %1 の値の指定内でループ"
+
+msgid "value for character property %1 of wrong type: %2 not an integer"
+msgstr ""
+"不適切なタイプのキャラクタ属性 %1 の値: %2 は整数ではありません"
+
+msgid "value for character property %1 of wrong type: %2 not an integer or the value \"#f\""
+msgstr ""
+"不適切なタイプのキャラクタプロパティ %1 の値: "
+"%2 は整数でも値 \"#f\" でもありません"
+
+msgid "%1 not a style or transformation language feature"
+msgstr "%1 はスタイルでも変換言語特性でもありません"
+
+msgid "undeclared use of feature %1"
+msgstr "宣言されていない特性 %1 の使用"
+
+msgid "feature %1 not supported"
+msgstr "特性 %1 はサポートされていません"
+
+msgid "feature %1 only partially supported"
+msgstr "特性 %1 は一部のみのサポートです"
+
+msgid "only allowed in style language"
+msgstr "スタイル言語内でのみ許されています"
+
+msgid "only allowed in transformation language"
+msgstr "変換言語内でのみ許されています"
+
+msgid "style and transformation language parts mixed"
+msgstr "スタイルと変換言語部分が混合されています"
+
+msgid "specification is marked as partial"
+msgstr "specification が partial としてマークされています"
+
+msgid "grove plan excluding module %1 not supported"
+msgstr "grove plan excluding モジュール %1 はサポートされていません"
+
+msgid "grove plan including module %1 not supported"
+msgstr "grove plan including モジュール %1 はサポートされていません"
+
+msgid "%1 not an SGML property set module"
+msgstr "%1 は SGML 属性設定モジュールではありません"
+
+msgid "Function for char-map characteristic returned non-char object %2 for character %1"
+msgstr ""
+"char-map 特性関数は non-char オブジェクト %2 を"
+"返しました(文字 %1 に対して)"
+
+msgid "value for character property %1 of wrong type: %2 not a public identifier or the value \"#f\""
+msgstr ""
+"不適切な文字属性 %1 の値: %2 は公開識別子でも値 \"#f\" でもありません"
+
+msgid "variable %1 occurs more than once in bindings"
+msgstr "変数 %1 には一つ以上のバインドがなされています"
+
+msgid "exactly one of node:, subgrove: and class: needed"
+msgstr ""
+"厳密には node:、subgrove:、class: の内のどれか一つが必要とされます"
+
+msgid "add:, null:, remove:, children:, sub: make no sense with subgrove:"
+msgstr ""
+"add:, null:, remove:, children:, sub: subgrove について意味をなしません:"
+
+msgid "remove: makes no sense with class:"
+msgstr "remove: クラスについて意味をなしません"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a subgrove-spec"
+msgstr ""
+"不適切なタイプの %2 引数(プリミティブ %1 に対して): "
+"%3 は subgrove-spec ではありません"
+
+msgid "wrong type: %1 not a list of create-specs"
+msgstr ""
+"不適切なタイプ: %1 は create-spec のリストではありません"
+
+msgid "wrong type: %1 not a create-spec or list of create-specs"
+msgstr ""
+"不適切なタイプ: %1 は create-spec でも create-spec のリストでもありません"
+
+msgid "query expression: %1 not a node list"
+msgstr "問い合わせ表式: %1 はノードリストではありません"
+
+msgid "priority expression: %1 not an exact integer"
+msgstr "優先度表式: %1 は厳密な整数ではありません"
+
+msgid "flow objects at the root must be all of class scroll or all of class page-sequence or simple-page-sequence"
+msgstr ""
+"root でのフローオブジェクトはすべてのクラス scroll か"
+"すべてのクラス page-sequence か simple-page-sequence "
+"でなければなりません"
+
+msgid "current flow parent has no principal port"
+msgstr "現在のフロー parent は principal port を持ちません"
+
+msgid "this flow object requires a paragraph as an ancestor flow object"
+msgstr ""
+"このフローオブジェクトは原型フローオブジェクトとしての"
+"パラグラフを必要とします"
+
+msgid "flow object not accepted by port; only inline flow objects accepted"
+msgstr ""
+"port はフローオブジェクトを許しません: "
+"inline フローオブジェクトだけを許します"
+
+msgid "flow object not accepted by port; only display flow objects accepted"
+msgstr ""
+"port はフローオブジェクトを許しません: "
+"display フローオブジェクトだけを許します"
+
+msgid "flow object not accepted by port; only display or inline flow objects accepted"
+msgstr ""
+"port はフローオブジェクトを許しません: "
+"display あるいは inline フローオブジェクトだけを許します"
+
+msgid "flow object not accepted in a paragraph; only inline, display or paragraph-break flow objects accepted"
+msgstr ""
+"paragraph 内ではフローオブジェクトは許されていません: "
+"inline あるいは display 、paragraph-break フローオブジェクト"
+"だけを許します"
+
+msgid "a side-by-side flow object only accepts side-by-side-item flow objects as children"
+msgstr ""
+"side-by-side フローオブジェクトは子としての side-by-side-item "
+"フローオブジェクトだけを許します"
+
+msgid "flow object not accepted by port; only math-sequence, unmath, subscript, superscript, script, mark, fence, fraction, radical, math-operator, grid, character and alignment-point flow objects accepted"
+msgstr ""
+"port はフローオブジェクトを許しません; math-sequence、"
+"unmath、subscript、superscript、script、mark、fence、"
+"fraction、radical、math-operator、grid、character そして "
+"alignment-point フローオブジェクトだけを許します"
+
+msgid "flow object not accepted by port; must be grid-cell"
+msgstr ""
+"port はフローオブジェクトを許しません; grid-call でなければなりません"
+
+msgid "flow object not accepted by port; only a single character flow object accepted"
+msgstr ""
+"port はフローオブジェクトを許しません; single character "
+"フローオブジェクトのみが受け入れられます"
+
+msgid "flow object not accepted by port; in a table, only either table-part flow objects or table-column flow objects followed by table-row or table-cell flow objects are allowed"
+msgstr ""
+"port はフローオブジェクトを許しません: "
+"table 内で、table-row あるいは table-cell フローオブジェクトが"
+"続く、table-part あるいは table-column フローオブジェクトのみを"
+"許します"
+
+msgid "flow object not accepted by port; only table-row or table-cell flow objects accepted"
+msgstr ""
+"port はフローオブジェクトを許しません; "
+"table-row あるいは table-cell フローオブジェクトのみ許します。"
+
+msgid "flow object not accepted by port; only table-column flow objects followed by table-row or table-cell flow objects allowd"
+msgstr ""
+"port はフローオブジェクトを許可しません; "
+"table-row あるいは table-cell フローオブジェクトが続く、"
+"table-column フローオブジェクトのみが受け入れられます"
+
+msgid "flow object not accepted by port; only table-cell flow objects accepted"
+msgstr ""
+"porc はフローオブジェクトを許しません; table-cell "
+"フローオブジェクトのみを許します。"
+
+msgid "priority-expression must be a number"
+msgstr "priority-expression は数字でなければなりません"
+
+msgid "query-expression must be a node-list"
+msgstr "query-expression は node-list でなければなりません"
+
+msgid "Sorry, non-integral priorities not implemented"
+msgstr "残念ながら、non-integral priority は実装されていません"

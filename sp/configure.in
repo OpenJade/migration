@@ -36,7 +36,7 @@ AM_PROG_LIBTOOL
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv"
-AM_GNU_GETTEXT
+dnl AM_GNU_GETTEXT
 AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale)
 SP_MESSAGE_DOMAIN=sp
@@ -46,9 +46,10 @@ AC_SUBST(SP_MESSAGE_DOMAIN)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h io.h osfcn.h)
+AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_CHECK_HEADERS(new cassert)
-AC_LANG_C
+AC_LANG_RESTORE
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -71,9 +72,10 @@ AC_CHECK_SIZEOF(unsigned short)
 OJ_CHECK_SIZEOF(wchar_t, wchar.h)
 AC_CXX_BOOL
 if test "$ac_cv_cxx_bool" = yes; then
+  AC_LANG_SAVE
   AC_LANG_CPLUSPLUS
   AC_CHECK_SIZEOF(bool)
-  AC_LANG_C
+  AC_LANG_RESTORE
 fi
 AC_CXX_MUTABLE
 AC_CXX_TYPENAME
@@ -132,13 +134,16 @@ if test "$GXX"; then
 dnl FIXME these need tests for non-GNU compilers
   AC_CACHE_CHECK(whether GNU C++ supports automatic template instantiation,
 	         ac_cv_c_gnu_automatic_templates,
-                 AC_EGREP_CPP(yes,[
+                 [AC_LANG_SAVE
+                  AC_LANG_CPLUSPLUS
+                  AC_EGREP_CPP(yes,[
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 8)
   yes
 #endif
-	         ],
-                 ac_cv_c_gnu_automatic_templates=yes,
-                 ac_cv_c_gnu_automatic_templates=no))
+	            ],
+                    ac_cv_c_gnu_automatic_templates=yes,
+                    ac_cv_c_gnu_automatic_templates=no)
+                  AC_LANG_RESTORE])
   if test "$ac_cv_c_gnu_automatic_templates" = yes; then
     AC_DEFINE(SP_DEFINE_TEMPLATES)
   else 
@@ -147,13 +152,16 @@ dnl FIXME these need tests for non-GNU compilers
   fi
   AC_CACHE_CHECK(whether GNU C++ links with libg++ if we include new.h,
 	         ac_cv_cxx_gnu_avoid_new_h,
-                 AC_EGREP_CPP(yes,[
+                 [AC_LANG_SAVE
+                  AC_LANG_CPLUSPLUS
+                  AC_EGREP_CPP(yes,[
 #if (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
   yes
 #endif
-	         ],
-	         ac_cv_cxx_gnu_avoid_new_h=yes,
-	         ac_cv_cxx_gnu_avoid_new_h=no))
+	            ],
+	            ac_cv_cxx_gnu_avoid_new_h=yes,
+	            ac_cv_cxx_gnu_avoid_new_h=no)
+                  AC_LANG_RESTORE])
   if test "$ac_cv_cxx_gnu_avoid_new_h" = yes; then
     AC_DEFINE(SP_NEW_H_MISSING)
     AC_CACHE_CHECK(whether to declare set_new_handler extern "C",

@@ -4660,7 +4660,7 @@ DEFPRIMITIVE(CharDowncase, argc, argv, context, interp, loc)
 DEFPRIMITIVE(StringEquiv, argc, argv, context, interp, loc)
 {
   GETCURLANG(lang, context, interp);
-  Char *s[2];
+  const Char *s[2];
   size_t n[2];
   for (unsigned i = 0; i < 2; i++)
     if (!argv[i]->stringData(s[i], n[i]))
@@ -4679,7 +4679,7 @@ DEFPRIMITIVE(StringEquiv, argc, argv, context, interp, loc)
 DEFPRIMITIVE(StringLess, argc, argv, context, interp, loc)
 {
   GETCURLANG(lang, context, interp);
-  Char *s[2];
+  const Char *s[2];
   size_t n[2];
   for (unsigned i = 0; i < 2; i++)
     if (!argv[i]->stringData(s[i], n[i]))
@@ -4694,7 +4694,7 @@ DEFPRIMITIVE(StringLess, argc, argv, context, interp, loc)
 DEFPRIMITIVE(StringLessOrEqual, argc, argv, context, interp, loc)
 {
   GETCURLANG(lang, context, interp);
-  Char *s[2];
+  const Char *s[2];
   size_t n[2];
   for (unsigned i = 0; i < 2; i++)
     if (!argv[i]->stringData(s[i], n[i]))

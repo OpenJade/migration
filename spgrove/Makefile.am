@@ -2,8 +2,10 @@
 
 lib_LTLIBRARIES = libospgrove.la
 
-libospgrove_la_LDFLAGS = --version-info 0:0:0 -lm \
-	$(top_builddir)/grove/libogrove.la -losp 
+libospgrove_la_LDFLAGS = --version-info 0:0:0 
+## this doesn't seem to work
+## -lm \
+## $(top_builddir)/grove/libogrove.la -osp
 
 libospgrove_la_SOURCES = GroveApp.cxx GroveApp.h GroveBuilder.cxx \
 	GroveBuilder.h SdNode.cxx SdNode.h grove_inst.cxx threads.h

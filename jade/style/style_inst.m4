@@ -180,6 +180,7 @@ __instantiate(Ptr<CharMapResource<ELObjPart> >)
 __instantiate(ConstPtr<CharMapResource<ELObjPart> >)
 __instantiate(`HashTable<StringC,CharProp>')
 __instantiate(`HashTableItem<StringC,CharProp>')
+__instantiate(`HashTableIter<StringC,CharProp>')
  
 
 #ifdef SP_NAMESPACE

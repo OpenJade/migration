@@ -1,5 +1,7 @@
 Changes in OpenJade 1.4
 
+* Internal defines (ie defines at the begin of a body) are supported. 
+  
 * The char-map inherited characteristic is supported. 
 
 * spcat: a cmdline interface to the catalog manager.

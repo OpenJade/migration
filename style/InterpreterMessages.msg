@@ -169,3 +169,4 @@ W1+cantAddModule++grove plan including module %1 not supported
 E1+unknownModule++%1 not an SGML property set module
 E2+notACharInCharMap++Function for char-map characteristic returned non-char object %2 for character %1
 E2+charPropertyNotPublicId++value for character property %1 of wrong type: %2 not a public identifier or the value "#f"
+E1+duplicateVariableBinding++variable %1 occurs more than once in bindings

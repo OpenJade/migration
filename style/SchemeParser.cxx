@@ -275,8 +275,8 @@ bool SchemeParser::doMode()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -335,8 +335,8 @@ bool SchemeParser::doElement()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -360,8 +360,8 @@ bool SchemeParser::doOrElement()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -396,8 +396,8 @@ bool SchemeParser::doId()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -423,8 +423,8 @@ bool SchemeParser::doDefault()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Owner<Expression> expr;
@@ -444,8 +444,8 @@ bool SchemeParser::doRoot()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Owner<Expression> expr;
@@ -494,8 +494,8 @@ bool SchemeParser::doDeclareInitialValue()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -521,8 +521,8 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -544,25 +544,23 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
   Location defLoc;
   unsigned defPart;
   if (ident->inheritedCDefined(defPart, defLoc)) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::duplicateCharacteristic,
-		     StringMessageArg(ident->name()),
-		     defLoc);
+    setNextLocation(loc);
+    message(InterpreterMessages::duplicateCharacteristic,
+	    StringMessageArg(ident->name()), defLoc);
   } 
   else if (ident->charNICDefined(defPart, defLoc)
            && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateCharacteristic,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateCharacteristic,
+	      StringMessageArg(ident->name()), defLoc);
     }
   }
   else if (cp->declared (defPart, defLoc)
 	   && defPart <= interp_->currentPartIndex()) {
+    setNextLocation(loc);
     message(InterpreterMessages::duplicateCharPropertyDecl,
-	    StringMessageArg(cp->name()),
-	    defLoc);
+	    StringMessageArg(cp->name()), defLoc);
   }
   else {
     cp->declare(expr, interp_->currentPartIndex(), loc,
@@ -575,8 +573,8 @@ bool SchemeParser::doDeclareCharacteristic()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -597,18 +595,16 @@ bool SchemeParser::doDeclareCharacteristic()
   Location defLoc;
   unsigned defPart;
   if (ident->charNICDefined(defPart, defLoc)) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateCharacteristic,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateCharacteristic,
+	      StringMessageArg(ident->name()), defLoc);
   } 
   else if (ident->inheritedCDefined(defPart, defLoc)
            && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateCharacteristic,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateCharacteristic,
+	      StringMessageArg(ident->name()), defLoc);
     }
   }
   else {
@@ -622,8 +618,8 @@ bool SchemeParser::doDeclareFlowObjectClass()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -637,10 +633,9 @@ bool SchemeParser::doDeclareFlowObjectClass()
   if (ident->inheritedCDefined(defPart, defLoc)
       && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateFlowObjectClass,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateFlowObjectClass,
+	      StringMessageArg(ident->name()), defLoc);
     }
   }
   else
@@ -654,8 +649,8 @@ bool SchemeParser::doDeclareFlowObjectMacro()
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -715,10 +710,9 @@ bool SchemeParser::doDeclareFlowObjectMacro()
   if (ident->inheritedCDefined(defPart, defLoc)
       && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::duplicateFlowObjectClass,
-		       StringMessageArg(ident->name()),
-		       defLoc);
+      setNextLocation(loc);
+      message(InterpreterMessages::duplicateFlowObjectClass,
+	      StringMessageArg(ident->name()), defLoc);
     }
   }
   else {
@@ -755,11 +749,29 @@ bool SchemeParser::doDeclareIdAttribute()
 bool SchemeParser::doDefine()
 {
   Location loc(in_->currentLocation());
+  bool internal = 0;
+  Interpreter::Feature feature = Interpreter::noFeature;
+  if (interp_->currentPartIndex() == unsigned(-1)) {
+    Token tok;
+    if (!getToken(allowOpenParen|allowIdentifier|allowKeyword, tok))
+      return 0;
+    if (tok == tokenKeyword) {
+      if (currentToken_ == interp_->makeStringC("internal"))
+        internal = 1;
+      else if (currentToken_ == interp_->makeStringC("feature")) {
+        if (!getToken(allowIdentifier, tok)
+          || !interp_->convertFeature(currentToken_, feature))
+          return 0;
+      }
+      else
+        return 0;
+    }
+    else
+      in_->ungetToken();
+  }
   Identifier *ident = 0;
   Owner<Expression> expr;
-  bool internal;
-  Interpreter::Feature feature;
-  if (!parseDefine(ident, expr, internal, feature)) 
+  if (!parseDefine(ident, expr)) 
     return 0;
   Location defLoc;
   unsigned defPart;
@@ -778,32 +790,14 @@ bool SchemeParser::doDefine()
   return 1;
 }
   
-bool SchemeParser::parseDefine(Identifier *&ident, Owner<Expression> &expr,
-                               bool &internal, Interpreter::Feature &feature)
+bool SchemeParser::parseDefine(Identifier *&ident, Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
   Token tok;
-  internal = 0;
-  feature = Interpreter::noFeature;
-  if (!getToken(allowOpenParen|allowIdentifier|
-         ((interp_->currentPartIndex() == unsigned(-1)) ? allowKeyword : 0), tok))
-    return 0;
-  if (tok == tokenKeyword) {
-    if (currentToken_ == interp_->makeStringC("internal")) 
-      internal = 1; 
-    else if (currentToken_ == interp_->makeStringC("feature")) {
-      if (!getToken(allowIdentifier, tok) 
-          || !interp_->convertFeature(currentToken_, feature))
-        return 0;
-    }
-    else
-      return 0;
-    if (!getToken(allowOpenParen|allowIdentifier, tok))
-      return 0;
-  }
-
   Vector<const Identifier *> formals;
   bool isProcedure;
+  if (!getToken(allowOpenParen|allowIdentifier, tok))
+    return 0;
   if (tok == tokenOpenParen) {
     interp_->requireFeature(Interpreter::expression, loc);
     if (!getToken(allowIdentifier, tok))
@@ -1466,11 +1460,16 @@ bool SchemeParser::parseBody(Owner<Expression> &expr)
     if (!getToken(allowOpenParen, tok) || !getToken(allowIdentifier, tok)) 
       return 0; // FIXME: Should never happen since we have peeked
     Identifier *var;  
-    bool internal;
-    Interpreter::Feature feature;
     inits.resize(inits.size() + 1);
-    if (!parseDefine(var, inits.back(), internal, feature)) 
+    if (!parseDefine(var, inits.back())) 
       return 0;
+    for (size_t i = 0; i < vars.size(); i++) 
+      if (vars[i]->name() == var->name()) {
+	setNextLocation(in_->currentLocation());
+	message(InterpreterMessages::duplicateVariableBinding,
+		StringMessageArg(var->name()));
+	return 0;
+      }
     vars.push_back(var);
   }
   if (!parseBegin(expr)) 
@@ -1529,8 +1528,8 @@ bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -1555,8 +1554,8 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   Token tok;
@@ -1598,8 +1597,8 @@ bool SchemeParser::parseStyle(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
   if (!interp_->style()) {
-    interp_->setNextLocation(loc);
-    interp_->message(InterpreterMessages::styleLanguage);
+    setNextLocation(loc);
+    message(InterpreterMessages::styleLanguage);
     return 0;
   }
   NCVector<Owner<Expression> > exprs;
@@ -1799,7 +1798,15 @@ bool SchemeParser::parseBindingsAndBody1(Vector<const Identifier *> &vars,
       break;
     if (!getToken(allowIdentifier, tok))
       return 0;
-    vars.push_back(lookup(currentToken_));
+    Identifier *var = lookup(currentToken_); 
+    for (size_t i = 0; i < vars.size(); i++) 
+      if (vars[i]->name() == var->name()) {
+	setNextLocation(in_->currentLocation());
+	message(InterpreterMessages::duplicateVariableBinding,
+		StringMessageArg(var->name()));
+	return 0;
+      }
+    vars.push_back(var);
     inits.resize(inits.size() + 1);
     if (!parseExpression(0, inits.back(), key, tok))
       return 0;
@@ -1926,8 +1933,8 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
     break;
   case tokenGlyphId:
     if (!interp_->style()) {
-      interp_->setNextLocation(loc);
-      interp_->message(InterpreterMessages::styleLanguage);
+      setNextLocation(loc);
+      message(InterpreterMessages::styleLanguage);
       return 0;
     }
     result = convertAfiiGlyphId(currentToken_);
@@ -2104,8 +2111,8 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	currentToken_.assign(in->currentTokenStart() + 2,
                              in->currentTokenLength() - 2);
         if (!interp_->style()) {
-          interp_->setNextLocation(loc);
-          interp_->message(InterpreterMessages::styleLanguage);
+          setNextLocation(loc);
+          message(InterpreterMessages::styleLanguage);
         }
 	return 1;
       case InputSource::eE:
@@ -2713,8 +2720,7 @@ bool SchemeParser::doDeclareCharProperty()
       && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex())
       message(InterpreterMessages::duplicateCharPropertyDecl,
-	      StringMessageArg(cp->name()),
-	      defLoc);
+	      StringMessageArg(cp->name()), defLoc);
   }
   cp->declare(expr, interp_->currentPartIndex(), loc);
   return 1;
@@ -2761,9 +2767,8 @@ bool SchemeParser::doAddCharProperties()
       if (cps[i]->hasAddedValue (chars[j], defPart, defLoc)
 	  && defPart <= interp_->currentPartIndex()) {
 	if (defPart == interp_->currentPartIndex()) {
-	  message (InterpreterMessages::duplicateAddCharProperty,
-		   StringMessageArg(cps[i]->name()),
-		   defLoc);
+	  message(InterpreterMessages::duplicateAddCharProperty,
+		  StringMessageArg(cps[i]->name()), defLoc);
 	}
       }
       else

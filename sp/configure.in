@@ -46,13 +46,10 @@ AC_SUBST(SP_MESSAGE_DOMAIN)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(limits.h unistd.h io.h osfcn.h)
-AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AC_CHECK_HEADERS(new cassert)
-AC_LANG_RESTORE
 
 dnl Checks for typedefs, structures, and compiler characteristics.
-AC_LANG_CPLUSPLUS
 AC_C_BIGENDIAN
 AC_TYPE_SIZE_T
 AC_STRUCT_ST_BLKSIZE

@@ -20,7 +20,7 @@ CharMap<T>::CharMap(T dflt)
 {
   for (size_t i = 0; i < 256; i++)
     lo_[i] = dflt;
-  for (size_t i = 0; i < planes; i++)
+  for (size_t i = 0; i < CharMapBits::planes; i++)
     values_[i].value = dflt;
 }
 
@@ -29,7 +29,7 @@ void CharMap<T>::setAll(T val)
 {
   for (size_t i = 0; i < 256; i++)
     lo_[i] = val;
-  for (size_t i = 0; i < planes; i++) {
+  for (size_t i = 0; i < CharMapBits::planes; i++) {
     values_[i].value = val;
     delete [] values_[i].values;
     values_[i].values = 0;
@@ -44,7 +44,7 @@ void CharMap<T>::swap(CharMap<T> &map)
     lo_[i] = map.lo_[i];
     map.lo_[i] = tem;
   }
-  for (size_t i = 0; i < planes; i++)
+  for (size_t i = 0; i < CharMapBits::planes; i++)
     values_[i].swap(map.values_[i]);
 }
 
@@ -55,46 +55,46 @@ void CharMap<T>::setChar(Char c, T val)
     lo_[c] = val;
     return;
   }
-  CharMapPlane<T> &pl = values_[planeIndex(c)];
+  CharMapPlane<T> &pl = values_[CharMapBits::planeIndex(c)];
   if (pl.values) {
-    CharMapPage<T> &pg = pl.values[pageIndex(c)];
+    CharMapPage<T> &pg = pl.values[CharMapBits::pageIndex(c)];
     if (pg.values) {
-      CharMapColumn<T> &column = pg.values[columnIndex(c)];
+      CharMapColumn<T> &column = pg.values[CharMapBits::columnIndex(c)];
       if (column.values)
-        column.values[cellIndex(c)] = val;
+        column.values[CharMapBits::cellIndex(c)] = val;
       else if (val != column.value) {
-        column.values = new T[columnSize];
-        for (size_t i = 0; i < columnSize; i++)
+        column.values = new T[CharMapBits::columnSize];
+        for (size_t i = 0; i < CharMapBits::columnSize; i++)
   	  column.values[i] = column.value;
-        column.values[cellIndex(c)] = val;
+        column.values[CharMapBits::cellIndex(c)] = val;
       }
     }
     else if (val != pg.value) {
-      pg.values = new CharMapColumn<T>[columnsPerPage];
-      for (size_t i = 0; i < columnsPerPage; i++)
+      pg.values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+      for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
         pg.values[i].value = pg.value;
-      CharMapColumn<T> &column = pg.values[columnIndex(c)];
-      column.values = new T[cellsPerColumn];
-      for (size_t i = 0; i < cellsPerColumn; i++)
+      CharMapColumn<T> &column = pg.values[CharMapBits::columnIndex(c)];
+      column.values = new T[CharMapBits::cellsPerColumn];
+      for (size_t i = 0; i < CharMapBits::cellsPerColumn; i++)
         column.values[i] = column.value;
-      column.values[cellIndex(c)] = val;
+      column.values[CharMapBits::cellIndex(c)] = val;
     }
   }
   else if (val != pl.value) {
-    pl.values = new CharMapPage<T>[pagesPerPlane];
-    for (size_t i = 0; i < pagesPerPlane; i++)
+    pl.values = new CharMapPage<T>[CharMapBits::pagesPerPlane];
+    for (size_t i = 0; i < CharMapBits::pagesPerPlane; i++)
       pl.values[i].value = pl.value;
-    CharMapPage<T> &page = pl.values[pageIndex(c)];
-    page.values = new CharMapColumn<T>[columnsPerPage];
-    for (size_t i = 0; i < columnsPerPage; i++)
+    CharMapPage<T> &page = pl.values[CharMapBits::pageIndex(c)];
+    page.values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+    for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
       page.values[i].value = page.value;
-    CharMapColumn<T> &column = page.values[columnIndex(c)];
-    column.values = new T[cellsPerColumn];
-    for (size_t i = 0; i < cellsPerColumn; i++)
+    CharMapColumn<T> &column = page.values[CharMapBits::columnIndex(c)];
+    column.values = new T[CharMapBits::cellsPerColumn];
+    for (size_t i = 0; i < CharMapBits::cellsPerColumn; i++)
       column.values[i] = column.value;
-    column.values[cellIndex(c)] = val;
+    column.values[CharMapBits::cellIndex(c)] = val;
   }
-} 
+}
 
 template<class T>
 void CharMap<T>::setRange(Char from, Char to, T val)
@@ -105,74 +105,74 @@ void CharMap<T>::setRange(Char from, Char to, T val)
       return;
   }
   do {
-    if ((from & (columnSize - 1)) == 0
-        && to - from >= columnSize - 1) {
-      if ((from & (pageSize - 1)) == 0
-	  && to - from >= pageSize - 1) {
-        if ((from & (planeSize - 1)) == 0
-	    && to - from >= planeSize - 1) {
+    if ((from & (CharMapBits::columnSize - 1)) == 0
+        && to - from >= CharMapBits::columnSize - 1) {
+      if ((from & (CharMapBits::pageSize - 1)) == 0
+	  && to - from >= CharMapBits::pageSize - 1) {
+        if ((from & (CharMapBits::planeSize - 1)) == 0
+	    && to - from >= CharMapBits::planeSize - 1) {
 	  // Set a complete plane.
-	  CharMapPlane<T> &pl = values_[planeIndex(from)];
+	  CharMapPlane<T> &pl = values_[CharMapBits::planeIndex(from)];
           pl.value = val;
-          delete [] pl.values;  
+          delete [] pl.values;
           pl.values = 0; 
-	  from += planeSize - 1;
+	  from += CharMapBits::planeSize - 1;
         }
         else {
 	  // Set a complete page.
-	  CharMapPlane<T> &pl = values_[planeIndex(from)];
+	  CharMapPlane<T> &pl = values_[CharMapBits::planeIndex(from)];
           if (pl.values) {
-	    CharMapPage<T> &pg = pl.values[pageIndex(from)];
+	    CharMapPage<T> &pg = pl.values[CharMapBits::pageIndex(from)];
 	    pg.value = val;
 	    delete [] pg.values;
 	    pg.values = 0;
           }
           else if (val != pl.value) {
 	    // split the plane
-	    pl.values = new CharMapPage<T>[pagesPerPlane];
-            for (size_t i = 0; i < pagesPerPlane; i++)
+	    pl.values = new CharMapPage<T>[CharMapBits::pagesPerPlane];
+            for (size_t i = 0; i < CharMapBits::pagesPerPlane; i++)
 	      pl.values[i].value = pl.value;
-	    CharMapPage<T> &page = pl.values[pageIndex(from)];
+	    CharMapPage<T> &page = pl.values[CharMapBits::pageIndex(from)];
             page.value = val;
 	  }
-	  from += pageSize - 1;
+	  from += CharMapBits::pageSize - 1;
         }
       }
       else {
 	// Set a complete column.
-	CharMapPlane<T> &pl = values_[planeIndex(from)];
+	CharMapPlane<T> &pl = values_[CharMapBits::planeIndex(from)];
         if (pl.values) {
-	  CharMapPage<T> &pg = pl.values[pageIndex(from)];
+	  CharMapPage<T> &pg = pl.values[CharMapBits::pageIndex(from)];
 	  if (pg.values) {
-	    CharMapColumn<T> &column = pg.values[columnIndex(from)];
+	    CharMapColumn<T> &column = pg.values[CharMapBits::columnIndex(from)];
 	    column.value = val;
 	    delete [] column.values;
 	    column.values = 0;
 	  }
 	  else if (val != pg.value) {
 	    // split the page
-	    pg.values = new CharMapColumn<T>[columnsPerPage];
-            for (size_t i = 0; i < columnsPerPage; i++)
+	    pg.values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+            for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
 	      pg.values[i].value = pg.value;
-	    CharMapColumn<T> &column = pg.values[columnIndex(from)];
+	    CharMapColumn<T> &column = pg.values[CharMapBits::columnIndex(from)];
 	    column.value = val;
 	  }
         }
         else if (val != pl.value) {
 	  // split the plane
-	  pl.values = new CharMapPage<T>[pagesPerPlane];
-          for (size_t i = 0; i < pagesPerPlane; i++)
+	  pl.values = new CharMapPage<T>[CharMapBits::pagesPerPlane];
+          for (size_t i = 0; i < CharMapBits::pagesPerPlane; i++)
 	    pl.values[i].value = pl.value;
-	  CharMapPage<T> &pg = pl.values[pageIndex(from)];
+	  CharMapPage<T> &pg = pl.values[CharMapBits::pageIndex(from)];
           pg.value = val;
 	  // split the page
-	  pg.values = new CharMapColumn<T>[columnsPerPage];
-          for (size_t i = 0; i < columnsPerPage; i++)
+	  pg.values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+          for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
 	    pg.values[i].value = pg.value;
-	  CharMapColumn<T> &column = pg.values[columnIndex(from)];
+	  CharMapColumn<T> &column = pg.values[CharMapBits::columnIndex(from)];
 	  column.value = val;
 	}
-	from += columnSize - 1;
+	from += CharMapBits::columnSize - 1;
       }
     }
     else
@@ -190,8 +190,8 @@ template<class T>
 CharMapPlane<T>::CharMapPlane(const CharMapPlane<T> &pl)
 {
   if (pl.values) {
-    values = new CharMapPage<T>[pagesPerPlane];
-    for (size_t i = 0; i < pagesPerPlane; i++)
+    values = new CharMapPage<T>[CharMapBits::pagesPerPlane];
+    for (size_t i = 0; i < CharMapBits::pagesPerPlane; i++)
       values[i] = pl.values[i];
   }
   else {
@@ -205,8 +205,8 @@ void CharMapPlane<T>::operator=(const CharMapPlane<T> &pl)
 {
   if (pl.values) {
     if (!values)
-      values = new CharMapPage<T>[pagesPerPlane];
-    for (size_t i = 0; i < pagesPerPlane; i++)
+      values = new CharMapPage<T>[CharMapBits::pagesPerPlane];
+    for (size_t i = 0; i < CharMapBits::pagesPerPlane; i++)
       values[i] = pl.values[i];
   }
   else {
@@ -249,8 +249,8 @@ template<class T>
 CharMapPage<T>::CharMapPage(const CharMapPage<T> &pg)
 {
   if (pg.values) {
-    values = new CharMapColumn<T>[columnsPerPage];
-    for (size_t i = 0; i < columnsPerPage; i++)
+    values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+    for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
       values[i] = pg.values[i];
   }
   else {
@@ -264,8 +264,8 @@ void CharMapPage<T>::operator=(const CharMapPage<T> &pg)
 {
   if (pg.values) {
     if (!values)
-      values = new CharMapColumn<T>[columnsPerPage];
-    for (size_t i = 0; i < columnsPerPage; i++)
+      values = new CharMapColumn<T>[CharMapBits::columnsPerPage];
+    for (size_t i = 0; i < CharMapBits::columnsPerPage; i++)
       values[i] = pg.values[i];
   }
   else {
@@ -308,8 +308,8 @@ template<class T>
 CharMapColumn<T>::CharMapColumn(const CharMapColumn<T> &col)
 {
   if (col.values) {
-    values = new T[cellsPerColumn];
-    for (size_t i = 0; i < cellsPerColumn; i++)
+    values = new T[CharMapBits::cellsPerColumn];
+    for (size_t i = 0; i < CharMapBits::cellsPerColumn; i++)
       values[i] = col.values[i];
   }
   else {
@@ -323,8 +323,8 @@ void CharMapColumn<T>::operator=(const CharMapColumn<T> &col)
 {
   if (col.values) {
     if (!values)
-      values = new T[cellsPerColumn];
-    for (size_t i = 0; i < cellsPerColumn; i++)
+      values = new T[CharMapBits::cellsPerColumn];
+    for (size_t i = 0; i < CharMapBits::cellsPerColumn; i++)
       values[i] = col.values[i];
   }
   else {

@@ -3,6 +3,7 @@
 
 #include "config.h"
 
+#include "sptchar.h"
 #include "EntityApp.h"
 #include "InputSource.h"
 #include "OutputCharStream.h"

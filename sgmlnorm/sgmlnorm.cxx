@@ -2,6 +2,7 @@
 // See the file COPYING for copying permission.
 
 #include "config.h"
+#include "sptchar.h"
 #include "ParserApp.h"
 #include "GenericEventHandler.h"
 #include "SGMLGenerator.h"

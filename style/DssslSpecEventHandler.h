@@ -195,7 +195,7 @@ private:
   void endProlog(EndPrologEvent *);
   EventHandler *arcEventHandler(const Notation *,
 				const Vector<StringC> &,
-				const SubstTable<Char> *);
+				const SubstTable *);
   void loadDoc(SgmlParser &, Doc &);
   void resolveParts(Part *, Vector<Part *> &);
   Doc *findDoc(const StringC &);

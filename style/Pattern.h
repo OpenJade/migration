@@ -18,7 +18,7 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-class Pattern {
+class MatchBase {
 public:
   class MatchContext : public SdataMapper {
   public:
@@ -28,6 +28,21 @@ public:
     Vector<StringC> classAttributeNames_;
     Vector<StringC> idAttributeNames_;
   };
+  MatchBase() : trivial_(0) {} 
+  MatchBase(bool trivial) : trivial_(trivial) {} 
+  bool trivial() const { return trivial_; }
+  virtual bool matches(const NodePtr &, MatchContext &) const = 0;
+  void swap(MatchBase &mb) {
+    bool tem = trivial_;
+    trivial_ = mb.trivial_;
+    mb.trivial_ = tem;
+  }
+private:
+  bool trivial_;
+};
+
+class Pattern : virtual public MatchBase {
+public:
   class Qualifier : public Link {
   public:
     virtual ~Qualifier();
@@ -169,7 +184,6 @@ public:
   // A pattern is trivial if any element that has the gi returned my mustHaveGi
   // matches the pattern, or, if mustHaveGi returns false, if any element matches
   // the pattern.
-  bool trivial() const;
   static int compareSpecificity(const Pattern &, const Pattern &);
   enum {
     importanceSpecificity,
@@ -197,7 +211,6 @@ private:
 			      MatchContext &);
 
   IList<Element> ancestors_; // first is self, second is parent ...
-  bool trivial_;
 };
 
 inline
@@ -244,10 +257,8 @@ bool Pattern::matches(const NodePtr &nd, MatchContext &context) const
 inline
 void Pattern::swap(Pattern &pattern)
 {
+  MatchBase::swap(pattern);
   ancestors_.swap(pattern.ancestors_);
-  bool tem = trivial_;
-  trivial_ = pattern.trivial_;
-  pattern.trivial_ = tem;
 }
 
 inline
@@ -281,11 +292,6 @@ const Vector<StringC> &Pattern::MatchContext::idAttributeNames() const
   return idAttributeNames_;
 }
 
-inline
-bool Pattern::trivial() const
-{
-  return trivial_;
-}
 
 #ifdef DSSSL_NAMESPACE
 }

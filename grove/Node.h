@@ -8,6 +8,7 @@
 #endif
 
 #include <stddef.h>
+#include <limits.h>
 #include <OpenSP/IList.h>
 
 #ifdef SP_USE_DLL
@@ -34,10 +35,10 @@ namespace GROVE_NAMESPACE {
 #endif
 
 #ifdef SP_MULTI_BYTE
-#ifdef SP_WCHAR_T_USHORT
-typedef wchar_t GroveChar;
+#if UINT_MAX >= 0xffffffffL /* 2^32 - 1 */
+typedef unsigned int GroveChar;
 #else
-typedef unsigned short GroveChar;
+typedef unsigned long GroveChar;
 #endif
 #else /* not SP_MULTI_BYTE */
 typedef unsigned char GroveChar;

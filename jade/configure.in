@@ -130,6 +130,33 @@ then
             CXXFLAGS="$CXXFLAGS -fno-implicit-templates"))
 fi
 
+dnl
+dnl Check for OpenSP
+dnl
+unset ac_cv_header_OpenSP_ParserApp_h
+unset ac_cv_lib_osp_main
+smr_CHECK_LIB(OpenSP, osp, , main, OpenSP/ParserApp.h)
+
+if test "$with_OpenSP" = "no"; then
+  AC_MSG_ERROR(can't built OpenJade without OpenSP libs and headers)
+dnl FIXME uncomment this once we have config.h generated with SP_MULTI_BYTE in it.
+dnl else
+dnl  AC_MSG_CHECKING(wether the OpenSP libs are multi-byte)
+dnl  saved_CPPFLAGS="$CPPFLAGS"
+dnl  CPPFLAGS="$CPPFLAGS $OpenSP_CFLAGS"
+dnl  AC_EGREP_CPP(yes,
+dnl [#include "OpenSP/config.h"
+dnl #ifdef SP_MULTI_BYTE
+dnl  yes
+dnl #endif]
+dnl    , AC_MSG_RESULT(yes),
+dnl    AC_MSG_RESULT(no)
+dnl    AC_MSG_ERROR(can't built OpenJade without multi-byte OpenSP libs)
+dnl    CPPFLAGS="$saved_CPPFLAGS")
+fi
+AC_SUBST(OpenSP_LIBS)
+AC_SUBST(OpenSP_CFLAGS)
+
 
 dnl
 dnl  HTTP support

@@ -10,6 +10,7 @@
 # Original SP Makefile Copyright (c) 1994, 1995, 1996 James Clark
 
 TOP=@TOP@
+top_builddir=.
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
@@ -19,9 +20,8 @@ libdir=@libdir@
 
 LIBTOOL=@LIBTOOL@
 
-SP_LIBDIRS=lib $(XLIBDIRS)
-LIBDIRS=lib grove spgrove style
-PROGDIRS=spcat jade nsgmls spam sgmlnorm spent sx 
+LIBDIRS=grove spgrove style
+PROGDIRS=jade
 dodirs=$(LIBDIRS) $(PROGDIRS)
 
 # Automatic template instantiation can cause compilers to generate
@@ -73,13 +73,11 @@ $(PROGDIRS): FORCE
 		-f $$srcdir/Makefile.lt -f $$srcdir/../Makefile.prog \
 		-f $$srcdir/Makefile.dep $(do)
 
-$(PROGDIRS): $(SP_LIBDIRS)
+jade: grove spgrove style
 
-jade: grove spgrove style lib
+spgrove: grove
 
-spgrove: grove lib
-
-style: grove spgrove lib
+style: grove spgrove
 
 # GNU tar
 TAR=tar

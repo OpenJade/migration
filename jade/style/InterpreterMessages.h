@@ -277,14 +277,26 @@ struct InterpreterMessages {
   // 138
   static const MessageType0 badDeclaration;
   // 139
-  static const MessageType3 notAnInteger;
+  static const MessageType1 duplicateDeclaration;
   // 140
-  static const MessageType3 notAKeyword;
+  static const MessageType1 invalidIdentifier;
   // 141
-  static const MessageType3 notAnAlist;
+  static const MessageType0 badLanguageDefinition;
   // 142
-  static const MessageType3 notACharList;
+  static const MessageType0 noCurrentLanguage;
   // 143
+  static const MessageType3 notALanguage;
+  // 144
+  static const MessageType3 notAPositiveInteger;
+  // 145
+  static const MessageType3 notAnInteger;
+  // 146
+  static const MessageType3 notAKeyword;
+  // 147
+  static const MessageType3 notAnAlist;
+  // 148
+  static const MessageType3 notACharList;
+  // 149
   static const MessageType3 lengthError;
 };
 

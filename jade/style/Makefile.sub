@@ -1,5 +1,6 @@
 LIB=style
-OBJS=Collector.o \
+OBJS=LangObj.o \
+  Collector.o \
   DssslApp.o \
   DssslSpecEventHandler.o \
   ELObj.o \

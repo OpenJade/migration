@@ -15,6 +15,7 @@
 #include "macros.h"
 #include "InternalInputSource.h"
 #include <stdlib.h>
+#include "LangObj.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -42,6 +43,8 @@ size_t maxObjSize()
     sizeof(LabelSosofoObj),
     sizeof(MacroFlowObj),
     sizeof(FlowObj) + sizeof(StringC), // for FormattingInstructionFlowObj
+    sizeof(LangObj),
+    sizeof(RefLangObj),
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)
@@ -83,6 +86,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
                 = new (*this) AddressObj(FOTBuilder::Address::none));
   makePermanent(emptyNodeListObj_
 		= new (*this) NodePtrNodeListObj);
+  defaultLanguage_ = theFalseObj_;
   installSyntacticKeys();
   installCValueSymbols();
   installPortNames();
@@ -337,6 +341,13 @@ void Interpreter::installSyntacticKeys()
     { "class", Identifier::keyClass },
     { "importance", Identifier::keyImportance },
     { "position-preference", Identifier::keyPositionPreference },
+    { "collate", Identifier::keyCollate },
+    { "toupper", Identifier::keyToupper },
+    { "tolower", Identifier::keyTolower },
+    { "symbol", Identifier::keySymbol },
+    { "order", Identifier::keyOrder },
+    { "forward", Identifier::keyForward },
+    { "backward", Identifier::keyBackward },
     { "architecture", Identifier::keyArchitecture },
   }, keys2[] = {
     { "declare-class-attribute", Identifier::keyDeclareClassAttribute },
@@ -2055,6 +2066,16 @@ void Interpreter::installBuiltins()
   }
   endPart();
   partIndex_ = 1;
+}
+
+void Interpreter::setDefaultLanguage(ELObj *lang)
+{
+  defaultLanguage_ = (lang->asLanguage()) ? lang : theFalseObj_;
+}
+
+ELObj *Interpreter::defaultLanguage() const
+{
+  return defaultLanguage_;
 }
 
 #ifdef DSSSL_NAMESPACE

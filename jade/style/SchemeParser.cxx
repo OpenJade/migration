@@ -8,6 +8,9 @@
 #include "MacroFlowObj.h"
 #include "macros.h"
 #include <stdlib.h>
+#include "LangObj.h"
+#include "VM.h"
+#include "ELObjMessageArg.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -19,7 +22,8 @@ SchemeParser::SchemeParser(Interpreter &interp,
 			   Owner<InputSource> &in)
 : interp_(&interp),
   defMode_(interp.initialProcessingMode()),
-  dsssl2_(interp.dsssl2())
+  dsssl2_(interp.dsssl2()),
+  lang_(0)
 {
   in_.swap(in);
   {
@@ -96,13 +100,17 @@ void SchemeParser::parse()
 	  case Identifier::keyDeclareFlowObjectMacro:
 	    recovering = !doDeclareFlowObjectMacro();
 	    break;
+	  case Identifier::keyDeclareDefaultLanguage:
+            recovering = !doDeclareDefaultLanguage();
+            break;
+	  case Identifier::keyDefineLanguage:
+            recovering = !doDefineLanguage();
+            break;
 	  case Identifier::keyDeclareCharCharacteristicAndProperty:
 	  case Identifier::keyDeclareReferenceValueType:
-	  case Identifier::keyDeclareDefaultLanguage:
 	  case Identifier::keyDeclareCharProperty:
 	  case Identifier::keyDefinePageModel:
 	  case Identifier::keyDefineColumnSetModel:
-	  case Identifier::keyDefineLanguage:
 	  case Identifier::keyAddCharProperties:
 	    recovering = !skipForm();
 	    break;
@@ -1916,6 +1924,325 @@ void SchemeParser::initMessage(Message &msg)
 {
   if (in_)
     msg.loc = in_->currentLocation();
+}
+
+bool SchemeParser::doDeclareDefaultLanguage()
+{
+  Owner<Expression> expr;
+  Token tok;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  InsnPtr insn = Expression::optimizeCompile(expr, *interp_,
+                                             Environment(), 0, InsnPtr());
+  VM vm(*interp_);
+  ELObj *obj = vm.eval(insn.pointer());
+  if (!obj)
+    return 0;
+  if (!obj->asLanguage()) {
+    interp_->message(InterpreterMessages::notALanguage,
+                     StringMessageArg(interp_->makeStringC
+                                      ("declare-default-language")),
+                     OrdinalMessageArg(1),
+                     ELObjMessageArg(obj, *interp_));
+    return 0;
+  }
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  interp_->setDefaultLanguage(obj);
+  return 1;
+}
+
+bool SchemeParser::doDefineLanguage()
+{
+  Location loc(in_->currentLocation());
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Identifier *ident = lookup(currentToken_);
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key) && (key <= int(Identifier::lastSyntacticKey)))
+    message(InterpreterMessages::syntacticKeywordAsVariable,
+            StringMessageArg(currentToken_));
+  Location defLoc;
+  unsigned defPart;
+  if (ident->defined(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex()) {
+      message(InterpreterMessages::duplicateDefinition,
+              StringMessageArg(ident->name()),
+              defLoc);
+      return 0;
+    }
+  }
+  lang_ = new (*interp_) LangObj;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyCollate:
+        if (!doCollate())
+          return 0;
+        break;
+      case Identifier::keyToupper:
+        if (!doToupper())
+          return 0;
+        break;
+      case Identifier::keyTolower:
+        if (!doTolower())
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+  }
+  if (!lang_->compile())
+    return 0;
+  interp_->makePermanent(lang_);
+  Owner<Expression> expr;
+  expr = new ConstantExpression(lang_, in_->currentLocation());
+  lang_ = 0;
+  ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doCollate()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key)) {
+      return 0;
+    } else {
+      switch (key) {
+      case Identifier::keyElement:
+        if (!doMultiCollatingElement())
+          return 0;
+        break;
+      case Identifier::keySymbol:
+        if (!doCollatingSymbol())
+          return 0;
+        break;
+      case Identifier::keyOrder:
+        if (!doCollatingOrder())
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+bool SchemeParser::doMultiCollatingElement()
+{
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!getToken(allowString, tok))
+    return 0;
+  StringC str(currentToken_);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  lang_->addMultiCollatingElement(sym, str);
+  return 1;
+}
+
+bool SchemeParser::doCollatingSymbol()
+{
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  lang_->addCollatingSymbol(sym);
+  return 1;
+}
+
+bool SchemeParser::doCollatingOrder()
+{
+  Token tok;
+  if (!getToken(allowOpenParen, tok))
+    return 0;
+  int nested = 0;
+  LangObj::LevelSort sort = { 0, 0, 0};
+  for (;;) {
+    if (!getToken(((nested == 0) ? allowOpenParen : 0)|
+                  allowCloseParen|allowIdentifier, tok))
+      return 0;
+    if (tok == tokenOpenParen)
+      nested++;
+    else if (tok == tokenCloseParen)
+      nested--;
+    else {
+      const Identifier *ident = lookup(currentToken_);
+      Identifier::SyntacticKey key;
+      if (!ident->syntacticKey(key))
+        return 0;
+      switch (key) {
+        case Identifier::keyForward:
+          if (sort.backward)
+            return 0;
+          sort.forward = 1;
+          break;
+        case Identifier::keyBackward:
+          if (sort.forward)
+            return 0;
+          sort.backward = 1;
+          break;
+        case Identifier::keyPosition:
+          sort.position = 1;
+          break;
+        default:
+          return 0;
+        }
+      }
+    if (nested < 0)
+      break;
+    if (nested == 0) {
+      if (!sort.backward)
+        sort.forward = 1;
+      lang_->addLevel(sort);
+    }
+  }
+  for (;;) {
+    if (!getToken(allowOpenParen|
+                  allowCloseParen|
+                  allowIdentifier|
+                  allowOtherExpr, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    StringC empty;
+    switch (tok) {
+    case tokenTrue:
+      lang_->addDefaultPos();
+      for(Char i = 0; i < lang_->levels(); i++)
+        lang_->addLevelWeight(i, empty);
+      break;
+    case tokenIdentifier:
+    case tokenChar:
+       if (!lang_->addCollatingPos(currentToken_))
+        return 0;
+      for (unsigned i = 0; i < lang_->levels(); i++)
+        lang_->addLevelWeight(i, currentToken_);
+      break;
+    case tokenOpenParen:
+      if (!doWeights())
+        return 0;
+      break;
+    default:
+      return 0;
+    }
+  }
+  return 1;
+}
+
+bool SchemeParser::doWeights()
+{
+  Token tok;
+  if (!getToken(allowIdentifier|allowOtherExpr, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!lang_->addCollatingPos(sym))
+    return 0;
+  int nested = 0;
+  unsigned l = 0;
+  for (;;) {
+    if (!getToken((nested ? 0 : allowOpenParen)|
+                  allowCloseParen|
+                  allowIdentifier|
+                  allowOtherExpr|
+                  allowString, tok))
+      return 0;
+    if (tok == tokenOpenParen)
+      nested++;
+    else if (tok == tokenCloseParen)
+      nested--;
+    else {
+      switch (tok) {
+      case tokenString:
+         for (size_t i = 0; i < currentToken_.size(); i++) {
+          StringC ctok(&(currentToken_[i]), 1);
+          if (!lang_->addLevelWeight(l, ctok))
+            return 0;
+        }
+        break;
+      case tokenIdentifier:
+      case tokenChar:
+        if (!lang_->addLevelWeight(l, currentToken_))
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+    if (nested < 0)
+      break;
+    if (nested == 0)
+      l++;
+  }
+  return 1;
+}
+
+bool SchemeParser::doToupper()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen) break;
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char lc = currentToken_[0];
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char uc = currentToken_[0];
+    if (!getToken(allowCloseParen, tok))
+      return 0;
+    lang_->addToupper(lc, uc);
+  }
+  return 1;
+}
+
+bool SchemeParser::doTolower()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen) break;
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char uc = currentToken_[0];
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char lc = currentToken_[0];
+    if (!getToken(allowCloseParen, tok))
+      return 0;
+    lang_->addTolower(uc, lc);
+  }
+  return 1;
 }
 
 #ifdef DSSSL_NAMESPACE

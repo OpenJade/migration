@@ -1602,7 +1602,7 @@ MessageFragment::appModule,
 ,"error in declaration element"
 #endif
 );
-const MessageType3 InterpreterMessages::notAnInteger(
+const MessageType1 InterpreterMessages::duplicateDeclaration(
 MessageType::error,
 #ifdef BUILD_LIBSP
 MessageFragment::libModule,
@@ -1610,6 +1610,78 @@ MessageFragment::libModule,
 MessageFragment::appModule,
 #endif
 139
+#ifndef SP_NO_MESSAGE_TEXT
+,"duplicate declaration element (%1)"
+#endif
+);
+const MessageType1 InterpreterMessages::invalidIdentifier(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+140
+#ifndef SP_NO_MESSAGE_TEXT
+,"%1 is not a valid identifier"
+#endif
+);
+const MessageType0 InterpreterMessages::badLanguageDefinition(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+141
+#ifndef SP_NO_MESSAGE_TEXT
+,"error in language definition"
+#endif
+);
+const MessageType0 InterpreterMessages::noCurrentLanguage(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+142
+#ifndef SP_NO_MESSAGE_TEXT
+,"no current language"
+#endif
+);
+const MessageType3 InterpreterMessages::notALanguage(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+143
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a language"
+#endif
+);
+const MessageType3 InterpreterMessages::notAPositiveInteger(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+144
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a po"
+#endif
+);
+const MessageType3 InterpreterMessages::notAnInteger(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+145
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an integer"
 #endif
@@ -1621,7 +1693,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-140
+146
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a keyword"
 #endif
@@ -1633,7 +1705,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-141
+147
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not an alist"
 #endif
@@ -1645,7 +1717,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-142
+148
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 of wrong type: %3 not a list of characters"
 #endif
@@ -1657,7 +1729,7 @@ MessageFragment::libModule,
 #else
 MessageFragment::appModule,
 #endif
-143
+149
 #ifndef SP_NO_MESSAGE_TEXT
 ,"%2 argument for primitive %1 has wrong length"
 #endif

@@ -2,13 +2,12 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2000-03-09 17:35+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2000-03-15 17:19+01:00\n"
+"Last-Translator: Matthias Clasen <clasen@mathematik.uni-freiburg.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
@@ -103,21 +102,17 @@ msgstr "Ungültige Ziffer %1"
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "Nur der Wert nArcIndr für das ArcIndr Attribut wird unterstützt"
 
-#, fuzzy
 msgid "#ARCCONT attribute already specified"
-msgstr "Kapazität %1 bereits spezifiziert"
+msgstr "#ARCCONT Attribut bereits spezifiziert"
 
-#, fuzzy
 msgid "invalid value %1 for #ARCCONT"
-msgstr "Ungültiger Wert %1 für ArcSupr Attribut"
+msgstr "Ungültiger Wert %1 für #ARCCONT"
 
-#, fuzzy
 msgid "%1 already used as a substitute name"
-msgstr "%1 ist bereits ein Funktionsname"
+msgstr "%1 ist schon Ersetzungsname"
 
-#, fuzzy
 msgid "substitute name #CONTENT already specified"
-msgstr "Ersetzungsname für %1 bereits definiert"
+msgstr "Ersetzungsname #CONTENT bereits spezifiziert"
 
 msgid "name expected"
 msgstr "Name erwartet"
@@ -2242,11 +2237,10 @@ msgid "notation %1 for external subset undefined"
 msgstr "Notation %1 für externe Teilmenge undefiniert"
 
 msgid "attribute %1 can't be redeclared"
-msgstr ""
+msgstr "Attribut %1 kann nicht redeklariert werden"
 
-#, fuzzy
 msgid "#IMPLICIT attributes have already been specified for notation %1"
-msgstr "Keine Atttribute für Notation %1 definiert"
+msgstr "#IMPLICIT Attribut für Notationo %1 bereits spezifiziert"
 
 msgid "delimiter "
 msgstr "Begrenzer "
@@ -2715,9 +2709,3 @@ msgstr "%1 gibt die Verkettung der Entitäten mit den Systembezeichnern"
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... auf der Standardausgabe aus."
-
-#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
-#~ msgstr "Ungültiger Wert %1 für ArcIndr Architekturunterstützungsattribut"
-
-#~ msgid "NAME "
-#~ msgstr "NAME"

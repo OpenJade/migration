@@ -4,7 +4,7 @@ JADETEX=jadetex
 PDFJADETEX=pdfjadetex
 XMLDECL=/usr/share/sgml/xml.dcl
 
-MAN_PAGES=onsgmls.1 openjade.1 osgmlnorm.1 ospam.1 osx.1
+MAN_PAGES=onsgmls.1 openjade.1 osgmlnorm.1 ospam.1 osx.1 ospent.1
 
 all: $(MAN_PAGES)
 
@@ -31,4 +31,4 @@ clean:
 	-rm -f *.out *.aux *.log *.dvi *.tex
 
 realclean: clean
-	-rm -f *.html *.pdf *.1
+	-rm -f *.html *.pdf $(MAN_PAGES)

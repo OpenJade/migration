@@ -522,6 +522,10 @@ to html</para>
     <para>openjade -t sgml -i html -d docbook.dsl#html file.sgml</para>
 </refsect1>
 
+    <refsect1>
+      <title>See Also</title>
+      <para><command>onsgmls(1)</command></para>
+    </refsect1>
     </refentry>
   </section>
 </article>

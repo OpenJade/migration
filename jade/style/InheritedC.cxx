@@ -120,7 +120,7 @@ ELObj *PublicIdInheritedC::value(VM &vm, const VarStyleObj *, Vector<size_t> &) 
 {
   Interpreter &interp = *vm.interp;
   if (pubid_)
-    return interp.makeSymbol(interp.makeStringC(pubid_));
+    return new (interp) StringObj(interp.makeStringC(pubid_));
   else
     return interp.makeFalse();
 }
@@ -748,6 +748,74 @@ GenericLengthSpecInheritedC::make(ELObj *obj, const Location &loc,
   return copy;
 }
 
+class GenericOptInlineSpaceInheritedC : public InheritedC {
+public:
+  typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptInlineSpace &);
+  GenericOptInlineSpaceInheritedC(const Identifier *, unsigned index, Setter);
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&value, Vector<size_t> &dependencies) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+private:
+  FOTBuilder::OptInlineSpace value_;
+  Setter setter_;
+};
+
+GenericOptInlineSpaceInheritedC
+::GenericOptInlineSpaceInheritedC(const Identifier *ident, unsigned index,
+                                  Setter setter)
+: InheritedC(ident, index), setter_(setter)
+{
+}
+
+ELObj *GenericOptInlineSpaceInheritedC::value(VM &vm, const VarStyleObj *,
+                                              Vector<size_t> &) const
+{
+  if (!value_.hasSpace)
+    return vm.interp->makeFalse();
+  else
+    return new (*vm.interp) InlineSpaceObj(value_.space);
+}
+
+
+void GenericOptInlineSpaceInheritedC::set(VM &, const VarStyleObj *,
+                                          FOTBuilder &fotb,
+                                          ELObj *&,
+                                          Vector<size_t> &) const
+{
+  (fotb.*setter_)(value_);
+}
+
+ConstPtr<InheritedC>
+GenericOptInlineSpaceInheritedC::make(ELObj *obj, const Location &loc,
+                                      Interpreter &interp) const
+{
+  GenericOptInlineSpaceInheritedC *copy
+    = new GenericOptInlineSpaceInheritedC(identifier(), index(), setter_);
+  InlineSpaceObj *iso = obj->asInlineSpace();
+  if (iso) {
+    copy->value_.space = iso->inlineSpace();
+    copy->value_.hasSpace = 1;
+  }
+  else {
+    FOTBuilder::OptLengthSpec res;
+    if (interp.convertOptLengthSpecC(obj, identifier(), loc, res))  {
+      if (res.hasLength) {
+        copy->value_.space.nominal = res.length;
+        copy->value_.space.min     = res.length; 
+        copy->value_.space.max     = res.length; 
+        copy->value_.hasSpace = 1;
+      } else 
+        copy->value_.hasSpace = 0;
+    } else {
+      delete copy;
+      copy = 0;
+    }
+  } 
+  return copy;
+}
+
+
 class GenericOptLengthSpecInheritedC : public OptLengthSpecInheritedC {
 public:
   typedef void (FOTBuilder::*Setter)(const FOTBuilder::OptLengthSpec &);
@@ -1034,7 +1102,6 @@ private:
   ELObj *value_;
 };
 
-
 IgnoredC::IgnoredC(const Identifier *ident, unsigned index, ELObj *value, Interpreter &interp)
 : InheritedC(ident, index), Collector::DynamicRoot(interp), value_(value)
 {
@@ -1059,6 +1126,86 @@ void IgnoredC::trace(Collector &c) const
 {
   c.trace(value_);
 }
+
+class CharMapC : public InheritedC, private Collector::DynamicRoot {
+public:
+  CharMapC(const Identifier *, unsigned index, ELObj *, Interpreter &);
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&, Vector<size_t> &) const;
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+  void trace(Collector &) const;
+private:
+  ELObj *value_;
+  FOTBuilder::Symbol sym_;
+};
+
+CharMapC::CharMapC(const Identifier *ident, unsigned index,
+		   ELObj *value, Interpreter &interp)
+  : InheritedC(ident, index), Collector::DynamicRoot(interp),
+    value_(value), sym_(FOTBuilder::symbolFalse)
+{
+}
+
+void CharMapC::set(VM &, const VarStyleObj *, FOTBuilder &fotb,
+           ELObj *&, Vector<size_t> &) const
+{
+  fotb.setCharMap(sym_);
+}
+
+ConstPtr<InheritedC> CharMapC::make(ELObj *obj, const Location &loc,
+				    Interpreter &interp) const
+{
+  if (obj == interp.makeFalse())
+    return new CharMapC(identifier(), index(), obj, interp);
+  FunctionObj *func = obj->asFunction();
+  if (func) {
+    if (func->nRequiredArgs() > 1) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::missingArg);
+      return ConstPtr<InheritedC>();
+    }
+    if ((func->nRequiredArgs() + func->nOptionalArgs()
+	      + func->restArg() ? 1 : 0) == 0) {
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::tooManyArgs);
+      return ConstPtr<InheritedC>();
+    }
+    return new CharMapC (identifier(), index(), obj, interp);
+  }
+  if (interp.dsssl2()) {
+  static FOTBuilder::Symbol syms[] = {
+    FOTBuilder::symbolUppercase,
+    FOTBuilder::symbolLowercase,
+    FOTBuilder::symbolCapitalize,
+  };
+  FOTBuilder::Symbol sym;
+    if (interp.convertEnumC(syms, SIZEOF(syms), obj, identifier(), loc, sym)) {
+      CharMapC *cm(new CharMapC(identifier(), index(), obj, interp));
+      cm->sym_ = sym;
+      return cm;
+    }
+    else
+      return ConstPtr<InheritedC>();
+  }
+  // Not dsssl2.
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::invalidCharacteristicValue,
+		 StringMessageArg(identifier()->name()));
+  return ConstPtr<InheritedC>();
+}
+
+ELObj *CharMapC::value(VM &, const VarStyleObj *, Vector<size_t> &) const
+{
+  return value_;
+}
+
+void CharMapC::trace(Collector &c) const
+{
+  c.trace(value_);
+}
+
+
 
 class BorderC : public IgnoredC {
 public:
@@ -1127,6 +1274,8 @@ ELObj *InheritedCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec,
 					     Interpreter &interp,
 					     const Location &loc)
 {
+  if (!interp.style())
+    return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::notInCharacteristicValue);
@@ -1156,12 +1305,17 @@ const Signature ActualCPrimitiveObj::signature_ = { 0, 0, 0 };
 ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interpreter &interp,
 					  const Location &loc)
 {
+  interp.requireFeature(Interpreter::actualCharacteristic, loc);
+  if (!interp.style())
+    return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::notInCharacteristicValue);
     return interp.makeError();
   }
   ELObj *obj = ec.styleStack->actual(inheritedC_, loc, interp, *ec.actualDependencies);
+  const Char *s;
+  size_t n;
   interp.makeReadOnly(obj);
   return obj;
 }
@@ -1303,6 +1457,12 @@ void Interpreter::installInheritedCs()
   INHERITED_C2("numbered-lines?", GenericBoolInheritedC, &FOTBuilder::setNumberedLines, 1);
   INHERITED_C2("hanging-punct?", GenericBoolInheritedC, &FOTBuilder::setHangingPunct, 0);
   INHERITED_C2("box-open-end?", GenericBoolInheritedC, &FOTBuilder::setBoxOpenEnd, 0);
+  INHERITED_C2("side-by-side-overlap-control", GenericSymbolInheritedC, &FOTBuilder::setSideBySideOverlapControl,
+	       FOTBuilder::symbolIndent);
+  INHERITED_C2("side-by-side-pre-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePreAlign,
+	       FOTBuilder::symbolInitial);
+  INHERITED_C2("side-by-side-post-align", GenericSymbolInheritedC, &FOTBuilder::setSideBySidePostAlign,
+	       FOTBuilder::symbolInitial);
   INHERITED_C2("truncate-leader?", GenericBoolInheritedC, &FOTBuilder::setTruncateLeader, 0);
   INHERITED_C2("align-leader?", GenericBoolInheritedC, &FOTBuilder::setAlignLeader, 1);
   INHERITED_C2("table-part-omit-middle-header?", GenericBoolInheritedC,
@@ -1416,7 +1576,7 @@ void Interpreter::installInheritedCs()
   INHERITED_C("glyph-subst-table", GlyphSubstTableC, 0);
 
   // #f or inline-space
-  IGNORED_C("inline-space-space", makeFalse());
+  INHERITED_C("inline-space-space", GenericOptInlineSpaceInheritedC, &FOTBuilder::setInlineSpaceSpace);
   // integers
   // float
   IGNORED_C("line-miter-limit", makeInteger(10));
@@ -1443,7 +1603,7 @@ void Interpreter::installInheritedCs()
   // integer or 'force
   IGNORED_C("line-spacing-priority", makeInteger(0));
   // procedure or #f
-  IGNORED_C("char-map", makeFalse());
+  STORE_INHERITED_C2(charMapC_, "char-map", CharMapC, makeFalse(), *this);
 }
 
 void Interpreter::installInheritedC(const char *s, InheritedC *ic)
@@ -1467,8 +1627,9 @@ void Interpreter::installExtensionInheritedC(Identifier *ident,
 					     const Location &loc)
 {
   ConstPtr<InheritedC> ic;
-  if (pubid.size() != 0 && extensionTable_) {
-    for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
+  if (pubid.size() != 0 && fotbDescr_.extensions) {
+    for (const FOTBuilder::Extension *ep = fotbDescr_.extensions;
+	 ep->pubid; ep++) {
       if (pubid == ep->pubid) {
 	if (ep->boolSetter)
 	  ic = new ExtensionBoolInheritedC(ident, nInheritedC_++, ep->boolSetter);

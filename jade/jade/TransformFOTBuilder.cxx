@@ -243,7 +243,7 @@ private:
 
 FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
 				    bool xml,
-				    const FOTBuilder::Extension *&ext)
+				    const FOTBuilder::Description *&descr)
 {
   static const TransformFOTBuilder::ProcessingInstructionFlowObj pi;
   static const TransformFOTBuilder::ElementFlowObj element;
@@ -310,7 +310,12 @@ FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
     },
     { 0 }
   };
-  ext = extensions;
+  static const FOTBuilder::Description description = {
+    extensions,
+    0,  // Features
+    false
+  };
+  descr = &description;
   return new TransformFOTBuilder(app, xml);
 }
 

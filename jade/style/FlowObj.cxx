@@ -5,6 +5,7 @@
 #include "ProcessContext.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
+#include "ELObjMessageArg.h"
 #include "SosofoObj.h"
 #include "macros.h"
 
@@ -623,6 +624,7 @@ void SidelineFlowObj::processInner(ProcessContext &context)
   CompoundFlowObj::processInner(context);
   fotb.endSideline();
 }
+
 void SequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
@@ -745,18 +747,19 @@ void SimplePageSequenceFlowObj::traceSubObjects(Collector &c) const
 void SimplePageSequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
-  fotb.startSimplePageSequence();
+  FOTBuilder* hf_fotb[FOTBuilder::nHF];
+  fotb.startSimplePageSequence(hf_fotb);
   for (int i = 0; i < (1 << nPageTypeBits); i++) {
     context.setPageType(i);
     for (int j = 0; j < HeaderFooter::nParts; j++) {
-      fotb.startSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
-      if (hf_->part[j])
+      if (hf_->part[j]) {
+        context.pushPrincipalPort(hf_fotb[i | (j << nPageTypeBits)]);
 	hf_->part[j]->process(context);
-      fotb.endSimplePageSequenceHeaderFooter(i | (j << nPageTypeBits));
+        context.popPrincipalPort();
     }
   }
-  fotb.endAllSimplePageSequenceHeaderFooter();
-  context.clearPageType();
+  }
+  fotb.endSimplePageSequenceHeaderFooter();
   CompoundFlowObj::processInner(context);
   fotb.endSimplePageSequence();
 }
@@ -1277,6 +1280,79 @@ FlowObj *BoxFlowObj::copy(Collector &c) const
   return new (c) BoxFlowObj(*this);
 }
 
+class SideBySideFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SideBySideFlowObj();
+  SideBySideFlowObj(const SideBySideFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+protected:
+  Owner<FOTBuilder::DisplayNIC> nic_;
+};
+
+SideBySideFlowObj::SideBySideFlowObj()
+: nic_(new FOTBuilder::DisplayNIC)
+{
+}
+
+SideBySideFlowObj::SideBySideFlowObj(const SideBySideFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::DisplayNIC(*fo.nic_))
+{
+}
+
+void SideBySideFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySide(*nic_);
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySide();
+}
+
+bool SideBySideFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  return isDisplayNIC(ident);
+}
+
+void SideBySideFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+					   const Location &loc, Interpreter &interp)
+{
+  if (!setDisplayNIC(*nic_, ident, obj, loc, interp)) 
+    CANNOT_HAPPEN();
+}
+
+FlowObj *SideBySideFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideFlowObj(*this);
+}
+
+class SideBySideItemFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+};
+
+void SideBySideItemFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySideItem();
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySideItem();
+}
+
+FlowObj *SideBySideItemFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideItemFlowObj(*this);
+}
+
 class LeaderFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -1366,8 +1442,11 @@ public:
   FlowObj *copy(Collector &) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  void setImplicitChar(Char);
   bool hasNonInheritedC(const Identifier *) const;
-  bool characterStyle(ProcessContext &, StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
+  bool characterStyle(ProcessContext &context,
+		      StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
+    fixNICs_(context);
     style = style_;
     nic = *nic_;
     return 1;
@@ -1375,21 +1454,178 @@ public:
   bool isCharacter() { return 1; }
 private:
   Owner<FOTBuilder::CharacterNIC> nic_;
+  bool needFixNICs_;
+  void fixNICs_(ProcessContext &context) {
+    if (needFixNICs_) {
+      // FIXME. Location.
+      fixCharNICs(&nic_->ch, 1, nic_.pointer(), Location(), context);
+      needFixNICs_ = false;
+    }
+  }
 };
 
 CharacterFlowObj::CharacterFlowObj()
-: nic_(new FOTBuilder::CharacterNIC)
+: nic_(new FOTBuilder::CharacterNIC), needFixNICs_(false)
 {
 }
 
 CharacterFlowObj::CharacterFlowObj(const CharacterFlowObj &fo)
-: FlowObj(fo), nic_(new FOTBuilder::CharacterNIC(*fo.nic_))
+: FlowObj(fo), nic_(new FOTBuilder::CharacterNIC(*fo.nic_)),
+  needFixNICs_(fo.needFixNICs_)
 {
 }
 
 void CharacterFlowObj::processInner(ProcessContext &context)
 {
+  fixNICs_(context);
   context.currentFOTBuilder().character(*nic_);
+}
+
+void FlowObj::setImplicitChar(Char)
+{
+  CANNOT_HAPPEN();
+}
+
+void CharacterFlowObj::setImplicitChar(Char ch)
+{
+  if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cChar))) {
+    nic_->ch = ch;
+    nic_->specifiedC |= FOTBuilder::CharacterNIC::cChar;
+    needFixNICs_ = true;
+  }
+}
+
+void FlowObj::fixCharNICs(const Char *ch, size_t n,
+			  FOTBuilder::CharacterNIC *nic,
+			  const Location &loc,
+			  ProcessContext &context)
+{
+  ASSERT(ch);
+  ASSERT(nic);
+  Interpreter &interp = *context.vm().interp;
+  Vector<size_t> dep;
+  FunctionObj *func = context.currentStyleStack().
+    actual(interp.charMapC(), interp, dep)->asFunction();
+  if (func->nRequiredArgs()>1
+      || (func->nRequiredArgs() + func->nOptionalArgs()
+	  + func->restArg() ? 1 : 0) == 0)
+    func = 0;
+  InsnPtr insn(func != 0 ? func->makeCallInsn(1, interp, loc, InsnPtr()) : InsnPtr());
+  VM vm(interp);
+  ELObjDynamicRoot protect(interp);
+  for (; n > 0; ++ch, ++nic, --n) {
+    if (!insn.isNull()) {
+      protect = interp.makeChar(*ch);
+      ELObj *res = vm.eval(insn.pointer(), 0, protect);
+      if (!res->charValue(nic->ch)) {
+	if (!interp.isError(res)) {
+	  interp.setNextLocation(loc);
+	  interp.message(InterpreterMessages::notACharInCharMap,
+			 ELObjMessageArg(protect, interp),
+			 ELObjMessageArg(res, interp));
+	}
+	nic->ch = *ch;
+      }
+    }
+    else
+      nic->ch = *ch;
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsSpace)))  
+      nic->isSpace = interp.isSpace().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsRecordEnd)))  
+      nic->isRecordEnd = interp.isRecordEnd().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsInputTab))) 
+      nic->isInputTab = interp.isInputTab().getValue(nic->ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace)))  
+      nic->isInputWhitespace = interp.isInputWhitespace().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cIsPunct)))  
+      nic->isPunct = interp.isPunct().getValue(nic->ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak)))  
+      nic->isDropAfterLineBreak =
+	interp.isDropAfterLineBreak().getValue(nic->ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak)))  
+      nic->isDropUnlessBeforeLineBreak =
+	interp.isDropUnlessBeforeLineBreak().getValue(nic->ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority))) 
+      nic->breakBeforePriority =
+	interp.breakBeforePriority().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority))) 
+      nic->breakAfterPriority =
+	interp.breakAfterPriority().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cScript)))
+      nic->script = interp.script().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId)))
+      nic->glyphId = interp.glyphId().getValue(nic->ch);
+    if (!(nic->specifiedC
+	  & (1 << FOTBuilder::CharacterNIC::cMathFontPosture)))
+      nic->mathFontPosture = interp.mathFontPosture().getValue(nic->ch);
+    if (!(nic->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass)))
+      nic->mathClass = interp.mathClass().getValue(nic->ch);
+    nic->specifiedC |=
+      ((1 << FOTBuilder::CharacterNIC::cChar) |
+       (1 << FOTBuilder::CharacterNIC::cIsSpace) |
+       (1 << FOTBuilder::CharacterNIC::cIsRecordEnd) |
+       (1 << FOTBuilder::CharacterNIC::cIsInputTab) |
+       (1 << FOTBuilder::CharacterNIC::cIsInputWhitespace) |
+       (1 << FOTBuilder::CharacterNIC::cIsPunct) |
+       (1 << FOTBuilder::CharacterNIC::cIsDropAfterLineBreak) |
+       (1 << FOTBuilder::CharacterNIC::cIsDropUnlessBeforeLineBreak) |
+       (1 << FOTBuilder::CharacterNIC::cBreakBeforePriority) |
+       (1 << FOTBuilder::CharacterNIC::cBreakAfterPriority) |
+       (1 << FOTBuilder::CharacterNIC::cScript) |
+       (1 << FOTBuilder::CharacterNIC::cGlyphId) |
+       (1 << FOTBuilder::CharacterNIC::cMathFontPosture) |
+       (1 << FOTBuilder::CharacterNIC::cMathClass));
+  }    
+#if 0
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cGlyphId))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("glyph-id"), 
+                                        nic_->ch, loc, 0);
+      if (prop == interp.makeFalse()) 
+        nic_->glyphId = FOTBuilder::GlyphId();
+      else {
+        const FOTBuilder::GlyphId *p = prop->glyphId();
+        if (p) 
+          nic_->glyphId = *p;
+      }
+    }
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathFontPosture))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("math-font-posture"), 
+                                        nic_->ch, loc, 0);
+      static FOTBuilder::Symbol vals[] = {
+        FOTBuilder::symbolFalse,
+        FOTBuilder::symbolNotApplicable,
+        FOTBuilder::symbolUpright,
+        FOTBuilder::symbolOblique,
+        FOTBuilder::symbolBackSlantedOblique,
+        FOTBuilder::symbolItalic,
+        FOTBuilder::symbolBackSlantedItalic,
+      };
+      interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathFontPosture);
+    }
+    
+    if (!(nic_->specifiedC & (1 << FOTBuilder::CharacterNIC::cMathClass))) {
+      ELObj *prop = interp.charProperty(interp.makeStringC("math-class"), 
+                                        nic_->ch, loc, 0);
+      static FOTBuilder::Symbol vals[] = {
+        FOTBuilder::symbolOrdinary,
+        FOTBuilder::symbolOperator,
+        FOTBuilder::symbolBinary,
+        FOTBuilder::symbolRelation,
+        FOTBuilder::symbolOpening,
+        FOTBuilder::symbolClosing,
+        FOTBuilder::symbolPunctuation,
+        FOTBuilder::symbolInner,
+        FOTBuilder::symbolSpace,
+      };
+      interp.convertEnumC(vals, SIZEOF(vals), prop, ident, loc, nic_->mathClass);
+    }
+    
+#endif
 }
 
 void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
@@ -1448,8 +1684,10 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       }
       return;
     case Identifier::keyChar:
-      if (interp.convertCharC(obj, ident, loc, nic_->ch))
-        nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+      if (interp.convertCharC(obj, ident, loc, nic_->ch)) {
+	nic_->specifiedC |= (1 << FOTBuilder::CharacterNIC::cChar);
+	needFixNICs_ = true;
+      }
       return;
     case Identifier::keyGlyphId:
       {
@@ -1508,6 +1746,12 @@ void CharacterFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
       break;
     }
   }
+  else {
+    unsigned part;
+    Location loc;
+    if (ident->charNICDefined(part, loc))
+      return;
+  }
   CANNOT_HAPPEN();
 }
 
@@ -1535,7 +1779,11 @@ bool CharacterFlowObj::hasNonInheritedC(const Identifier *ident) const
     default:
       break;
     }
-  }
+  } 
+  unsigned part;
+  Location loc;
+  if (ident->charNICDefined(part, loc))
+    return 1;
   return 0;
 }
 
@@ -1647,7 +1895,6 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) ScriptFlowObj(*this);
   }
-
 };
 
 void ScriptFlowObj::processInner(ProcessContext &context)
@@ -2809,53 +3056,58 @@ FlowObj *CompoundExtensionFlowObj::copy(Collector &c) const
   return new (c) CompoundExtensionFlowObj(*this);
 }
 
-#define FLOW_OBJ(name, string) \
+#define FLOW_OBJ(name, string, feature) \
 { FlowObj *tem = new (*this) name; \
-  lookup(makeStringC(string))->setFlowObj(tem); \
-  makePermanent(tem); }
+  makePermanent(tem); \
+  Identifier *ident = lookup(makeStringC(string)); \
+  ident->setFlowObj(tem); \
+  ident->setFeature(feature); \
+}
 
 void Interpreter::installFlowObjs()
 {
-  FLOW_OBJ(SequenceFlowObj, "sequence");
-  FLOW_OBJ(DisplayGroupFlowObj, "display-group");
-  FLOW_OBJ(ParagraphFlowObj, "paragraph");
-  FLOW_OBJ(ParagraphBreakFlowObj, "paragraph-break");
-  FLOW_OBJ(LineFieldFlowObj, "line-field");
-  FLOW_OBJ(ScoreFlowObj, "score");
-  FLOW_OBJ(ExternalGraphicFlowObj, "external-graphic");
-  FLOW_OBJ(RuleFlowObj, "rule");
-  FLOW_OBJ(LeaderFlowObj, "leader");
-  FLOW_OBJ(CharacterFlowObj, "character");
-  FLOW_OBJ(BoxFlowObj, "box");
-  FLOW_OBJ(AlignmentPointFlowObj, "alignment-point");
-  FLOW_OBJ(SidelineFlowObj, "sideline");
+  FLOW_OBJ(SequenceFlowObj, "sequence", noFeature);
+  FLOW_OBJ(DisplayGroupFlowObj, "display-group", noFeature);
+  FLOW_OBJ(ParagraphFlowObj, "paragraph", noFeature);
+  FLOW_OBJ(ParagraphBreakFlowObj, "paragraph-break", noFeature);
+  FLOW_OBJ(LineFieldFlowObj, "line-field", noFeature);
+  FLOW_OBJ(ScoreFlowObj, "score", noFeature);
+  FLOW_OBJ(ExternalGraphicFlowObj, "external-graphic", noFeature);
+  FLOW_OBJ(RuleFlowObj, "rule", noFeature);
+  FLOW_OBJ(LeaderFlowObj, "leader", noFeature);
+  FLOW_OBJ(CharacterFlowObj, "character", noFeature);
+  FLOW_OBJ(BoxFlowObj, "box", noFeature);
+  FLOW_OBJ(SideBySideFlowObj, "side-by-side", sideBySide);
+  FLOW_OBJ(SideBySideItemFlowObj, "side-by-side-item", sideBySide);
+  FLOW_OBJ(AlignmentPointFlowObj, "alignment-point", noFeature);
+  FLOW_OBJ(SidelineFlowObj, "sideline", sideline);
   // simple-page
-  FLOW_OBJ(SimplePageSequenceFlowObj, "simple-page-sequence");
+  FLOW_OBJ(SimplePageSequenceFlowObj, "simple-page-sequence", simplePage);
   // tables
-  FLOW_OBJ(TableFlowObj, "table");
-  FLOW_OBJ(TablePartFlowObj, "table-part");
-  FLOW_OBJ(TableColumnFlowObj, "table-column");
-  FLOW_OBJ(TableRowFlowObj, "table-row");
-  FLOW_OBJ(TableCellFlowObj, "table-cell");
-  FLOW_OBJ(TableBorderFlowObj, "table-border");
+  FLOW_OBJ(TableFlowObj, "table", table);
+  FLOW_OBJ(TablePartFlowObj, "table-part", table);
+  FLOW_OBJ(TableColumnFlowObj, "table-column", table);
+  FLOW_OBJ(TableRowFlowObj, "table-row", table);
+  FLOW_OBJ(TableCellFlowObj, "table-cell", table);
+  FLOW_OBJ(TableBorderFlowObj, "table-border", table);
   // online
-  FLOW_OBJ(LinkFlowObj, "link");
-  FLOW_OBJ(ScrollFlowObj, "scroll");
-  FLOW_OBJ(MarginaliaFlowObj, "marginalia");
-  FLOW_OBJ(MultiModeFlowObj, "multi-mode");
+  FLOW_OBJ(LinkFlowObj, "link", online);
+  FLOW_OBJ(ScrollFlowObj, "scroll", online);
+  FLOW_OBJ(MarginaliaFlowObj, "marginalia", online);
+  FLOW_OBJ(MultiModeFlowObj, "multi-mode", online);
   // math
-  FLOW_OBJ(MathSequenceFlowObj, "math-sequence");
-  FLOW_OBJ(FractionFlowObj, "fraction");
-  FLOW_OBJ(UnmathFlowObj, "unmath");
-  FLOW_OBJ(SuperscriptFlowObj, "superscript");
-  FLOW_OBJ(SubscriptFlowObj, "subscript");
-  FLOW_OBJ(ScriptFlowObj, "script");
-  FLOW_OBJ(MarkFlowObj, "mark");
-  FLOW_OBJ(FenceFlowObj, "fence");
-  FLOW_OBJ(RadicalFlowObj, "radical");
-  FLOW_OBJ(MathOperatorFlowObj, "math-operator");
-  FLOW_OBJ(GridFlowObj, "grid");
-  FLOW_OBJ(GridCellFlowObj, "grid-cell");
+  FLOW_OBJ(MathSequenceFlowObj, "math-sequence", math);
+  FLOW_OBJ(FractionFlowObj, "fraction", math);
+  FLOW_OBJ(UnmathFlowObj, "unmath", math);
+  FLOW_OBJ(SuperscriptFlowObj, "superscript", math);
+  FLOW_OBJ(SubscriptFlowObj, "subscript", math);
+  FLOW_OBJ(ScriptFlowObj, "script", math);
+  FLOW_OBJ(MarkFlowObj, "mark", math);
+  FLOW_OBJ(FenceFlowObj, "fence", math);
+  FLOW_OBJ(RadicalFlowObj, "radical", math);
+  FLOW_OBJ(MathOperatorFlowObj, "math-operator", math);
+  FLOW_OBJ(GridFlowObj, "grid", math);
+  FLOW_OBJ(GridCellFlowObj, "grid-cell", math);
 }
 
 void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
@@ -2863,8 +3115,9 @@ void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
 						  const Location &loc)
 {
   FlowObj *tem = 0;
-  if (extensionTable_) {
-    for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
+  if (fotbDescr_.extensions) {
+    for (const FOTBuilder::Extension *ep = fotbDescr_.extensions;
+	 ep->pubid; ep++) {
       if (pubid == ep->pubid) {
 	if (ep->flowObj) {
 	  const FOTBuilder::CompoundExtensionFlowObj *cFlowObj

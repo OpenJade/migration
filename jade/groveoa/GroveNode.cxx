@@ -38,6 +38,9 @@ using GROVE_NAMESPACE::NodePtr;
 using GROVE_NAMESPACE::NodeListPtr;
 using GROVE_NAMESPACE::NamedNodeListPtr;
 using GROVE_NAMESPACE::GroveString;
+using GROVE_NAMESPACE::GroveStringList;
+using GROVE_NAMESPACE::GroveStringListPtr;
+using GROVE_NAMESPACE::ConstGroveStringListIter;
 using GROVE_NAMESPACE::GroveChar;
 using GROVE_NAMESPACE::accessOK;
 using GROVE_NAMESPACE::accessNull;
@@ -46,6 +49,24 @@ using GROVE_NAMESPACE::SdataMapper;
 
 class NodeTable;
 typedef SP_NAMESPACE::Ptr<NodeTable> NodeTablePtr;
+
+class ATL_NO_VTABLE CStringList :
+	public CComObjectRoot,
+	public IDispatchImpl<StringList, &IID_StringList, &LIBID_GROVE> {
+public:
+    CStringList() { }
+BEGIN_COM_MAP(CStringList)
+   COM_INTERFACE_ENTRY(IDispatch)
+   COM_INTERFACE_ENTRY(StringList)
+END_COM_MAP()
+    STDMETHOD(get_Count)(long *);
+    STDMETHOD(get_Item)(long, BSTR *retval);
+    STDMETHOD(First)(BSTR *retval);
+    STDMETHOD(Rest)(StringList **);
+    static HRESULT make(const GroveStringListPtr &, StringList **);
+private:
+  GroveStringListPtr sl_;    
+};
 
 class CNodeBase {
 public:
@@ -234,6 +255,18 @@ private:
     }
 #define NODE_LIST_PROP(Name) NODE_LIST_PROP2(get_##Name, get##Name)
 
+#define STRING_LIST_PROP2(xfunc, ifunc) \
+    STDMETHOD(xfunc)(StringList **retval) { \
+      TRY \
+      *retval = 0; \
+      GroveStringListPtr sl; \
+      if (nd_->ifunc(sl) == accessOK) \
+	return CStringList::make(sl, retval); \
+      return NOERROR; \
+      CATCH \
+    }
+#define STRING_LIST_PROP(Name) STRING_LIST_PROP2(get_##Name, get##Name)
+
 #define CHUNK_NODE_LIST_PROP2(xfunc, ifunc) \
     STDMETHOD(xfunc)(NodeList **retval) { \
       TRY \
@@ -271,6 +304,19 @@ private:
     }
 #define BOOL_PROP(Name) BOOL_PROP2(get_##Name, get##Name)
 
+#define INTEGER_PROP2(xfunc, ifunc) \
+    STDMETHOD(xfunc)(long *retval) { \
+      TRY \
+      long l; \
+      if (nd_->ifunc(l) == accessOK) \
+        *retval = l; \
+      else \
+	*retval = 0; \
+      return NOERROR; \
+      CATCH \
+    }
+#define INTEGER_PROP(Name) INTEGER_PROP2(get_##Name, get##Name)
+
 #define STRING_PROP2(xfunc, ifunc) \
     STDMETHOD(xfunc)(BSTR *retval) { \
       TRY \
@@ -284,6 +330,15 @@ private:
       CATCH \
     }
 #define STRING_PROP(Name) STRING_PROP2(get_##Name, get##Name)
+
+#define ENUM_PROP2(enumClass, xfunc, ifunc) \
+  STDMETHOD(xfunc)(enumClass *retval) { \
+    GROVE_NAMESPACE::Node::##enumClass##::Enum type; \
+    if (nd_->ifunc(type) == accessOK) \
+      *retval = enumClass##(type); \
+    return NOERROR; \
+  }
+#define ENUM_PROP(Name) ENUM_PROP2(Name, get_##Name, get##Name)
 
 #define NULL_STRING_PROP(Name) \
     STRING_PROP(Name) \
@@ -349,6 +404,7 @@ END_COM_MAP()
    CHUNK_NODE_LIST_PROP2(get_ChunkContent, getContent)
    BOOL_PROP(Included)
    BOOL_PROP(MustOmitEndTag) 
+   DERIVED_NODE_PROP(ElementType, ElementType)
 };
 
 class ATL_NO_VTABLE CAttributeAssignmentNode :
@@ -413,7 +469,8 @@ END_COM_MAP()
      return NOERROR;
      CATCH
    }
-};
+   DERIVED_NODE_PROP(AttributeDef, AttributeDef)
+ };
 
 class ATL_NO_VTABLE CAttributeValueTokenNode :
 	public CComObjectRoot,
@@ -525,6 +582,9 @@ END_COM_MAP()
   BOOL_PROP(Governing)
   NAMED_NODE_LIST_PROP(GeneralEntities)
   NAMED_NODE_LIST_PROP(Notations)
+  NAMED_NODE_LIST_PROP(ElementTypes)
+  NAMED_NODE_LIST_PROP(ParameterEntities)
+  DERIVED_NODE_PROP(DefaultEntity, DefaultEntity)
 };
 
 class ATL_NO_VTABLE CEntityNode :
@@ -544,13 +604,28 @@ END_COM_MAP()
   BOOL_PROP(Defaulted)
   NAMED_NODE_LIST_PROP(Attributes)
   DERIVED_NODE_PROP(ExternalId, ExternalId)
-  STDMETHOD(get_EntityType)(EntityType *retval) {
-    GROVE_NAMESPACE::Node::EntityType type;
-    if (nd_->getEntityType(type) == accessOK)
-      *retval = EntityType(type);
-    return NOERROR;
-  }
+  ENUM_PROP(EntityType)
 };
+
+class ATL_NO_VTABLE CDefaultEntityNode :
+    public CComObjectRoot,
+    public INodeImpl<DefaultEntityNode, &IID_DefaultEntityNode, &LIBID_GROVE, nodeClassDefaultEntity> {
+public:
+      CDefaultEntityNode() { }
+BEGIN_COM_MAP(CDefaultEntityNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(DefaultEntityNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
+  STRING_PROP(Name)
+  NULL_STRING_PROP(Text)
+  DERIVED_NODE_PROP(Notation, Notation)
+  STRING_PROP(NotationName)
+  NAMED_NODE_LIST_PROP(Attributes)
+  DERIVED_NODE_PROP(ExternalId, ExternalId)
+  ENUM_PROP(EntityType)
+};
+
 
 class ATL_NO_VTABLE CNotationNode :
     public CComObjectRoot,
@@ -564,6 +639,7 @@ BEGIN_COM_MAP(CNotationNode)
 END_COM_MAP()
   STRING_PROP(Name)
   DERIVED_NODE_PROP(ExternalId, ExternalId)
+  NAMED_NODE_LIST_PROP(AttributeDefs)
 };
 
 class ATL_NO_VTABLE CExternalIdNode :
@@ -607,6 +683,86 @@ BEGIN_COM_MAP(CSubdocNode)
 END_COM_MAP()
   DERIVED_NODE_PROP(Entity, Entity)
   STRING_PROP(EntityName)
+};
+
+class ATL_NO_VTABLE CElementTypeNode :
+    public CComObjectRoot,
+    public INodeImpl<ElementTypeNode, &IID_ElementTypeNode, &LIBID_GROVE, nodeClassElementType> {
+public:
+      CElementTypeNode() { }
+BEGIN_COM_MAP(CElementTypeNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(ElementTypeNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
+  STRING_PROP(Gi)
+  NAMED_NODE_LIST_PROP(AttributeDefs)
+  ENUM_PROP(ContentType)
+  STRING_LIST_PROP(Exclusions)
+  STRING_LIST_PROP(Inclusions)
+  DERIVED_NODE_PROP(ModelGroup, ModelGroup)
+  BOOL_PROP(OmitEndTag)
+  BOOL_PROP(OmitStartTag)
+};
+
+class ATL_NO_VTABLE CAttributeDefNode :
+    public CComObjectRoot,
+    public INodeImpl<AttributeDefNode, &IID_AttributeDefNode, &LIBID_GROVE, nodeClassAttributeDef> {
+public:
+      CAttributeDefNode() { }
+BEGIN_COM_MAP(CElementTypeNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(ElementTypeNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
+  STRING_PROP(Name)
+  ENUM_PROP(DeclValueType)
+  ENUM_PROP(DefaultValueType)
+  STRING_LIST_PROP(Tokens)
+  INTEGER_PROP(CurrentAttributeIndex)
+  NODE_LIST_PROP(CurrentGroup)
+  NODE_LIST_PROP(DefaultValue)
+};
+
+class ATL_NO_VTABLE CModelGroupNode :
+    public CComObjectRoot,
+    public INodeImpl<ModelGroupNode, &IID_ModelGroupNode, &LIBID_GROVE, nodeClassModelGroup> {
+public:
+      CModelGroupNode() { }
+BEGIN_COM_MAP(CModelGroupNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(ModelGroupNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
+  ENUM_PROP(Connector)
+  ENUM_PROP(OccurIndicator)
+  NODE_LIST_PROP(ContentTokens)
+};
+
+class ATL_NO_VTABLE CElementTokenNode :
+    public CComObjectRoot,
+    public INodeImpl<ElementTokenNode, &IID_ElementTokenNode, &LIBID_GROVE, nodeClassElementToken> {
+public:
+      CElementTokenNode() { }
+BEGIN_COM_MAP(CElementTokenNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(ElementTokenNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
+  STRING_PROP(Gi)
+  ENUM_PROP(OccurIndicator)
+};
+
+class ATL_NO_VTABLE CPcdataTokenNode :
+    public CComObjectRoot,
+    public INodeImpl<PcdataTokenNode, &IID_PcdataTokenNode, &LIBID_GROVE, nodeClassPcdataToken> {
+public:
+      CPcdataTokenNode() { }
+BEGIN_COM_MAP(CPcdataTokenNode)
+  COM_INTERFACE_ENTRY(IDispatch)
+  COM_INTERFACE_ENTRY(PcdataTokenNode)
+  COM_INTERFACE_ENTRY(Node)
+END_COM_MAP()
 };
 
 class ATL_NO_VTABLE CMessageNode :
@@ -699,6 +855,12 @@ public:
   BUILD(externalData, CExternalDataNode)
   BUILD(subdocument, CSubdocNode)
   BUILD(message, CMessageNode)
+  BUILD(elementType, CElementTypeNode)
+  BUILD(modelGroup, CModelGroupNode)
+  BUILD(elementToken, CElementTokenNode)
+  BUILD(pcdataToken, CPcdataTokenNode)
+  BUILD(defaultEntity, CDefaultEntityNode)
+  BUILD(attributeDef, CAttributeDefNode)
 #undef BUILD
   NodePtr nd;
   HRESULT hRes;
@@ -803,6 +965,73 @@ STDMETHODIMP CDataCharNode::get_NonSgml(long *retval)
   return NOERROR;
   CATCH
 }
+// ----------
+
+HRESULT CStringList::make(const GroveStringListPtr &sl, StringList **retval)
+{
+  CComObject<CStringList> *p;
+  HRESULT hRes = CComObject<CStringList>::CreateInstance(&p);
+  if (FAILED(hRes))
+    return hRes;
+  CStringList *np = p;
+  np->sl_ = sl;
+  *retval = p;
+  (*retval)->AddRef();
+  return NOERROR;
+}
+
+STDMETHODIMP CStringList::First(BSTR *retval)
+{
+  TRY
+  *retval = 0;
+  GroveString str;
+  if (sl_->first(str) == accessOK) {
+    *retval = CNodeBase::makeBSTR(str);
+  }
+  return NOERROR;
+  CATCH
+}
+
+STDMETHODIMP CStringList::Rest(StringList **retval)
+{
+  TRY
+  *retval = 0;
+  GroveStringListPtr sl;
+  if (sl_->rest(sl) == accessOK)
+    return CStringList::make(sl, retval);
+  return NOERROR;
+  CATCH
+}
+
+STDMETHODIMP CStringList::get_Count(long *retval)
+{
+  TRY
+  long n = 0;
+  for (ConstGroveStringListIter iter(sl_->iter()); !iter.done(); iter.next())
+    n++;
+  *retval = n;
+  return NOERROR;
+  CATCH
+}
+
+STDMETHODIMP CStringList::get_Item(long i, BSTR *retval)
+{
+  TRY
+  *retval = 0;
+  if (i <= 0)
+    return E_INVALIDARG;
+  ConstGroveStringListIter iter(*sl_);
+  for (long n = 1; n < i && !iter.done(); n++)
+    iter.next();
+  if (iter.done())
+    return E_INVALIDARG;
+  GroveString str;
+  str = iter.cur();
+  *retval = CNodeBase::makeBSTR(str);
+  return NOERROR;
+  CATCH
+}
+// -----------
 
 HRESULT CNodeList::make(const NodeListPtr &nl, const NodeTablePtr &table, NodeList **retval)
 {
@@ -1034,6 +1263,8 @@ STDMETHODIMP CNamedNodeList::NodeName(Node *nd, BSTR *retval)
     CASE(notations,NotationNode,Name)
     CASE(attributes,AttributeAssignmentNode,Name)
     CASE(doctypesAndLinktypes,DocumentTypeNode,Name)
+    CASE(elementTypes,ElementTypeNode,Gi)
+    CASE(attributeDefs,AttributeDefNode,Name)
   }
   return NOERROR;
   CATCH

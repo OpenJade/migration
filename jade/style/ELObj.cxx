@@ -124,6 +124,11 @@ GlyphSubstTableObj *ELObj::asGlyphSubstTable()
   return 0;
 }
 
+LanguageObj *ELObj::asLanguage()
+{
+  return 0;
+}
+
 bool ELObj::optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &)
 {
   return 0;
@@ -213,8 +218,18 @@ ErrorObj::ErrorObj()
 {
 }
 
+void ErrorObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#<error>";
+}
+
 UnspecifiedObj::UnspecifiedObj()
 {
+}
+
+void UnspecifiedObj::print(Interpreter &interp, OutputCharStream &out)
+{
+  out << "#v";
 }
 
 NilObj::NilObj()

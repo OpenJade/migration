@@ -1,18 +1,18 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <html>
 <head>
-<title>The generic API to SP</title>
+<title>The generic API to OpenSP</title>
 </head>
 <body>
-<h1>The generic API to SP</h1>
+<h1>The generic API to OpenSP</h1>
 <p>
-SP provides a generic API in addition to its native API.  The generic
+OpenSP provides a generic API in addition to its native API.  The generic
 interface is much simpler than the native interface.  It is generic in
 the sense that it could be easily implemented using parsers other than
-SP.  It provides all ESIS information as well as some other
+OpenSP.  It provides all ESIS information as well as some other
 information about the instance that is commonly needed by
 applications.  However, it doesn't provide access to all information
-available from SP; in particular, it doesn't provide information about
+available from OpenSP; in particular, it doesn't provide information about
 the DTD.  It is also slightly less efficient than the native
 interface.
 <p>
@@ -23,7 +23,7 @@ document.  An <code>EventGenerator</code> is an object that can
 generate a sequence of events of the kinds handled by an
 <code>SGMLApplication</code>.  The
 <code>ParserEventGeneratorKit</code> class makes an
-<code>EventGenerator</code> that generates events using SP.
+<code>EventGenerator</code> that generates events using OpenSP.
 
 <h2>Types</h2>
 <p>
@@ -99,7 +99,7 @@ An empty string if invalid.
 <code>const void *other</code>
 <dd>
 Other implementation-dependent information about the location.  In the
-SP implementation it will be a pointer to a StorageObjectSpec.  0 if
+OpenSP implementation it will be a pointer to a StorageObjectSpec.  0 if
 invalid.
 </dl>
 <p>
@@ -909,7 +909,7 @@ called <code>run()</code>.
 <h2>ParserEventGeneratorKit</h2>
 <p>
 The <code>ParserEventGeneratorKit</code> class is used to create an
-<code>EventGenerator</code> that  generate events using SP.  It
+<code>EventGenerator</code> that  generate events using OpenSP.  It
 provides the following members:
 <dl>
 <dt>
@@ -1019,7 +1019,7 @@ directory.  If your compiler does not support the standard C++
 <code>bool</code> type, you must ensure that <code>bool</code> is
 defined as a typedef for <code>int</code>, before including this.  One
 way to do this is to include <code>config.h</code> and then
-<code>Boolean.h</code> from the <code>lib</code> subdirectory of the SP
+<code>Boolean.h</code> from the <code>lib</code> subdirectory of the OpenSP
 distribution.
 <p>
 On Unix, the application must be linked with the
@@ -1071,12 +1071,12 @@ int main(int argc, char **argv)
 }
 </pre>
 <p>
-This example will only work for the non-multibyte version of SP;
+This example will only work for the non-multibyte version of OpenSP;
 for the multibyte version you will need to use the standard C++ library's
 facilities for wide character output, or roll your own equivalents
-(like the OutputCharStream used by SP applications).
+(like the OutputCharStream used by OpenSP applications).
 <p>
-There's a bigger example in the <code>sgmlnorm</code> directory in the SP
+There's a bigger example in the <code>osgmlnorm</code> directory in the OpenSP
 distribution.
 This uses the <code>SGMLApplication</code> interface, but it doesn't
 use the <code>ParserEventGeneratorKit</code> interface.

@@ -1,17 +1,14 @@
 <!doctype html public "-//w3c//dtd html 4.0 transitional//en">
 <html>
 <head>
-   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.6 [en] (X11; I; Linux 2.2.5-15 i586) [Netscape]">
-   <title>NSGMLS</title>
+   <title>ONSGMLS</title>
 </head>
 <body>
 
-<h1>
-NSGMLS</h1>
+<h1>ONSGMLS</h1>
 
 <h4>
-An SGML System Conforming to International Standard ISO 8879 --<br>
+An SGML System Conforming to International Standard ISO 8879 --
 Standard Generalized Markup Language</h4>
 
 <h4>
@@ -20,10 +17,10 @@ Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language</h4>
 
 <h2>
 SYNOPSIS</h2>
-<tt>nsgmls</tt> [
+<tt>onsgmls</tt> [
 <tt>-BCdeglprsuv</tt> ] [
 <tt>-a<i>type</i></tt>
-] [ -x<i>doctype</i> ] [
+] [
 <tt>-b<i>bctf</i></tt> ] [
 <tt>-c<i>sysid</i></tt>
 ] [
@@ -39,7 +36,7 @@ SYNOPSIS</h2>
 <tt><i>sysid</i>...</tt> ]
 <h2>
 DESCRIPTION</h2>
-Nsgmls parses and validates the SGML document whose document entity is
+Onsgmls parses and validates the SGML document whose document entity is
 specified by the
 <a href="sysid.htm">system identifiers</a><tt><i>sysid</i>...</tt>
 and prints on the standard output a simple text representation of its Element
@@ -138,9 +135,8 @@ the position of the most recently opened external entity.</dd>
 <tt>-E<i>max_errors</i></tt></dt>
 
 <dd>
-Nsgmls will exit after
-<i><tt>max_errors</tt></i> errors. If
-<i><tt>max_errors</tt></i>
+Onsgmls will exit after
+<i><tt>max_errors</tt></i> errors. If <i><tt>max_errors</tt></i>
 is 0, there is no limit on the number of errors. The default is 200.</dd>
 
 <dt>
@@ -182,7 +178,7 @@ will be to cause the marked section not to be ignored.
 <tt>-o<i>output_option</i></tt></dt>
 
 <dd>
-Output additional information accordig to
+Output additional information according to
 <i><tt>output_option</tt></i>:</dd>
 
 <dl>
@@ -235,6 +231,15 @@ identifier could be generated for that notation.</dd>
 In <a href="charset.htm#fixed">fixed character set mode</a>, output <tt>\%</tt>
 escape sequences for non-SGML data characters. Non-SGML data characters
 can result from numeric character references.</dd>
+
+<dt>
+<tt>data-attribute</tt></dt>
+
+<dd>
+Output the notation name and attributes for DATA attributes. Otherwise,
+DATA attributes are treated like CDATA attributes. For more details, see clause
+4.4.3 of <A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
 </dl>
 Multiple
 <tt>-o</tt> options are allowed.
@@ -242,9 +247,8 @@ Multiple
 <tt>-p</tt></dt>
 
 <dd>
-Parse only the prolog. Nsgmls will exit after parsing the document type
-declaration. Implies
-<tt>-s</tt>.</dd>
+Parse only the prolog. Onsgmls will exit after parsing the document type
+declaration. Implies <tt>-s</tt>.</dd>
 
 <dt>
 <tt>-s</tt></dt>
@@ -272,10 +276,8 @@ Print the version number.</dd>
 <a NAME="optw"></a><tt>-w<i>type</i></tt></dt>
 
 <dd>
-Control warnings and errors. Multiple
-<tt>-w</tt> options are allowed.
-The following values of
-<i><tt>type</tt></i> enable warnings:</dd>
+Control warnings and errors. Multiple <tt>-w</tt> options are allowed.
+The following values of <i><tt>type</tt></i> enable warnings:</dd>
 
 <dl>
 <dt>
@@ -289,7 +291,7 @@ The warnings can be enabled <a href="xmlwarn.htm">individually.</a></dd>
 <tt>mixed</tt></dt>
 
 <dd>
-Warn about mixed content models that do not allow #pcdata anywhere.</dd>
+Warn about mixed content models that do not allow #PCDATA anywhere.</dd>
 
 <dt>
 <tt>sgmldecl</tt></dt>
@@ -346,27 +348,22 @@ Warn about net-enabling start-tags and null end-tags.</dd>
 
 <dd>
 Warn about minimized start and end-tags. Equivalent to combination of
-<tt>unclosed</tt>,
-<tt>empty</tt>
-and
-<tt>net</tt> warnings.</dd>
+<tt>unclosed</tt>, <tt>empty</tt> and <tt>net</tt> warnings.</dd>
 
 <dt>
 <tt>unused-map</tt></dt>
 
 <dd>
 Warn about unused short reference maps: maps that are declared with a short
-reference mapping declaration but never used in a short reference use declaration
-in the DTD.</dd>
+reference mapping declaration but never used in a short reference use 
+declaration in the DTD.</dd>
 
 <dt>
 <tt>unused-param</tt></dt>
 
 <dd>
 Warn about parameter entities that are defined but not used in a DTD. Unused
-internal parameter entities whose text is
-<tt>INCLUDE</tt> or
-<tt>IGNORE</tt>
+internal parameter entities whose text is <tt>INCLUDE</tt> or <tt>IGNORE</tt> 
 won't get the warning.</dd>
 
 <dt>
@@ -391,6 +388,98 @@ the author). Equivalent to:
 <tt>empty</tt>
 and
 <tt>unclosed</tt>.</dd>
+
+<dt>
+<tt>immediate-recursion</tt></dt>
+
+<dd>
+Warn about immediately recursive elements. For more details, see clause
+2.2.5 of <A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>fully-declared</tt></dt>
+
+<dd>
+Warn if the document instance fails to be fully-declared.  
+This has the effect of changing the SGML declaration to specify 
+<tt>IMPLYDEF ATTLIST NO ELEMENT NO ENTITY NO NOTATION NO</tt>.
+For more details, see clause 2.2.1 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>fully-tagged</tt></dt>
+
+<dd>
+Warn if the document instance fails to be fully-tagged. 
+This has the effect of changing the SGML declaration to specify 
+<tt>DATATAG NO</tt>, <tt>RANK NO</tt>, <tt>OMITTAG NO</tt>, 
+<tt>SHORTTAG STARTTAG EMPTY NO</tt> and 
+<tt>SHORTTAG ATTRIB OMITNAME NO</tt>.
+For more details, see clause 2.2.2 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>amply-tagged</tt>, <tt>amply-tagged-recursive</tt></dt>
+
+<dd>
+Warn if the document instance fails to be amply-tagged. Implicitly defined
+elements may be immediately recursive if <tt>-recursive</tt> is specified. 
+This has the effect of changing the SGML declaration to specify 
+<tt>DATATAG NO</tt>, <tt>RANK NO</tt>, <tt>OMITTAG NO</tt>, 
+<tt>SHORTTAG ATTRIB OMITNAME NO</tt> and either
+<tt>IMPLYDEF ELEMENT ANYOTHER</tt> or
+<tt>IMPLYDEF ELEMENT YES</tt>.
+For more details, see clause 2.2.4 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>type-valid</tt></dt>
+
+<dd>
+Warn if the document instance fails to be type-valid.
+This has the effect of changing the SGML declaration to specify 
+<tt>VALIDITY YES</tt>.
+For more details, see clause 2.2.3 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>entity-ref</tt></dt>
+
+<dd>
+Warn about references to non-predefined entities. 
+This has the effect of changing the SGML declaration to specify 
+<tt>ENTITIES REF NONE</tt>.
+For more details, see clause 2.3.2 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>external-entity-ref</tt></dt>
+
+<dd>
+Warn about references to external entities. This includes references to an
+external DTD subset. 
+This has the effect of changing the SGML declaration to specify 
+<tt>ENTITIES REF INTERNAL</tt>.
+For more details, see clause 2.3.3 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
+
+<dt>
+<tt>integral</tt></dt>
+
+<dd>
+Warn if the document instance is not integrally stored. i
+This has the effect of changing the SGML declaration to specify 
+<tt>ENTITIES INTEGRAL YES</tt>.
+For more details, see clause 2.3.1 of 
+<A HREF="http://www.ornl.gov/sgml/wg8/document/1955.htm">Annex K 
+of ISO 8879</A>.</dd>
 </dl>
 A warning can be disabled by using its name prefixed with
 <tt>no-</tt>.
@@ -422,9 +511,11 @@ This may be useful in conjunction with certain buggy test suites.</dd>
 <dd>
 Do not require the document to be type-valid. This has the effect of changing
 the SGML declaration to specify <tt>VALIDITY NOASSERT</tt> and <tt>IMPLYDEF
-ATTLIST YES ELEMENT YES</tt>. An option of <tt>-wvalid</tt> has the effect
+ATTLIST YES ELEMENT YES ENTITY YES NOTATION YES</tt>. An option of 
+<tt>-wvalid</tt> has the effect
 of changing the SGML declaration to specify <tt>VALIDITY TYPE</tt> and
-<tt>IMPLYDEF ATTLIST NO ELEMENT NO</tt>. If neither <tt>-wvalid</tt> nor
+<tt>IMPLYDEF ATTLIST NO ELEMENT NO ENTITY NO NOTATION NO</tt>. 
+If neither <tt>-wvalid</tt> nor
 <tt>-wno-valid</tt> are specified, then the <tt>VALIDITY</tt> and <tt>IMPLYDEF</tt>
 specified in the SGML declaration will be used.</dd>
 

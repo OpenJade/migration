@@ -1,17 +1,17 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
 <HTML>
 <HEAD>
-<TITLE>SP - Character sets</TITLE>
+<TITLE>OpenSP - Character sets</TITLE>
 </HEAD>
 <BODY>
-<H1>Handling of character sets in SP</H1>
+<H1>Handling of character sets in OpenSP</H1>
 <P>
 The following description applies only to the multi-byte version of
-SP.  In the single-byte version of SP, each character is represented
+OpenSP.  In the single-byte version of OpenSP, each character is represented
 both internally and in storage objects by a single byte equal to the
 number of the character in the document character set.
 <P>
-SP's entity manager converts the bytes comprising a storage object
+OpenSP's entity manager converts the bytes comprising a storage object
 into a sequence of characters.
 This conversion is determined by the encoding associated with
 the storage object.
@@ -36,15 +36,15 @@ combination transformation format (BCTF).
 A document character set relative encoding is specified by giving
 the name of a BCTF.
 <P>
-An application receives characters from SP represented as non-negative
+An application receives characters from OpenSP represented as non-negative
 integers.
-The mapping from characters to integers is determined by SP's internal
+The mapping from characters to integers is determined by OpenSP's internal
 character set.
-SP can operate in a mode in which the internal character set is the
+OpenSP can operate in a mode in which the internal character set is the
 same as the document character set.
 (Versions of SP up to 1.1.1 always operated in this mode.)
 <A NAME="fixed">
-The multibyte version of SP can also operate in a mode in which the
+The multibyte version of OpenSP can also operate in a mode in which the
 internal character set does not vary with the document character set,
 but is always a fixed character set, known as the system character set;
 this mode of operation is called fixed character set mode.</A>
@@ -57,7 +57,7 @@ environment variables:
 <DT>
 SP_CHARSET_FIXED
 <DD>
-If this variable is 1 or YES, then SP will operate in fixed character set mode.
+If this variable is 1 or YES, then OpenSP will operate in fixed character set mode.
 <DT>
 SP_SYSTEM_CHARSET
 <DD>
@@ -106,7 +106,7 @@ only on Windows NT.)
 Under other operating systems, the default encoding must be one in
 which ASCII characters are represented by a single byte.
 <P>
-Applications built with SP may require fixed character set mode and a
+Applications built with OpenSP may require fixed character set mode and a
 particular system character set; such applications will ignore the
 SP_SYSTEM_CHARSET and SP_CHARSET_FIXED environment variables.
 

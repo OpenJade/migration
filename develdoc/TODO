@@ -67,3 +67,7 @@ Reorganization
 * Move japan.sgmldecl to pubtext/japan.sd
 
 * Remove config/
+
+* change all includes of OpenSP headers to read
+
+#include <OpenSP/...> (or should that be "OpenSP/..." ?)

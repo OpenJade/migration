@@ -42,9 +42,21 @@ libdir-libosp-dev	:= $(prefix-libosp-dev)/usr/lib
 # build tool abstraction
 install_file	:= install -o root -g root -m 644 -p
 install_script	:= install -o root -g root -m 755 -p
-install_program	:= install -o root -g root -m 755 -p --strip
+install_program	:= install -o root -g root -m 755 -p
+ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
+  install_program += --strip
+endif
 make_directory	:= install -d -o root -g root -m 755
 compress	:= gzip -9f
+
+CFLAGS		:= -O2 --pipe
+CXXFLAGS	:= -O2 --pipe
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+  CFLAGS += -g
+  CXXFLAGS += -g
+endif
+export CFLAGS
+export CXXFLAGS
 
 # flags to get automake to use the above
 am_inst_flags	:= INSTALL='install -o root -g root -p' INSTALL_PROGRAM='$(install_program)' INSTALL_SCRIPT='$(install_script)' INSTALL_DATA='$(install_file)'
@@ -84,13 +96,11 @@ config.status:	ChangeLog
 	autoheader
 	automake --add-missing
 	autoconf
-	CFLAGS="-O2 --pipe" CXXFLAGS="-O2 --pipe" 			\
-	   ./configure --prefix=/usr --sysconfdir=/etc			\
+	./configure --prefix=/usr --sysconfdir=/etc			\
 	   --mandir='$${prefix}/share/man'				\
-	   --enable-http --enable-shared				\
+	   --enable-http --enable-shared --enable-static		\
 	   --enable-default-catalog=$(default-catalogs)			\
-	   --enable-default-search-path=$(default-sgml-path)		\
-	   --enable-static
+	   --enable-default-search-path=$(default-sgml-path)
 
 
 build:	config.status

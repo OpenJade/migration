@@ -13,7 +13,6 @@
 #include "LocNode.h"
 #include <OpenSP/macros.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -194,10 +193,8 @@ ProcessingMode::findMatch(const NodePtr &node,
 			  Messenger &mgr,
 			  Specificity &specificity) const
 {
-  printf("ProcessingMode::findMatch\n");
   GroveString gi;
   if ((node->getGi(gi) == accessOK) || hasQuery()) {
-    printf("finding element match\n");
     // This is necessary, since root nodes may now go through
     // findElementMatch() *and* findRootMatch(), which won't work
     // if findElementMatch() directly modifies specificity.
@@ -212,7 +209,6 @@ ProcessingMode::findMatch(const NodePtr &node,
   }
   NodePtr tem;
   if (node->getOrigin(tem) != accessOK) {
-    printf("finding root match\n");
     return findRootMatch(node, context, mgr, specificity);
   }
   return 0;
@@ -226,13 +222,10 @@ ProcessingMode::findElementMatch(const StringC &gi,
 				 Messenger &mgr,
 				 Specificity &specificity) const
 {
-  printf("ProcessingMode::findElementMatch\n");
   const Vector<const ElementRule *> *vecP = 0;
 
   for (;;) {
-    printf("specifity loop\n");
     for (;;) {
-      printf("mode loop\n");
       const ProcessingMode &mode
 	= *(initial_ && specificity.toInitial_ ? initial_ : this);
       if (!vecP) {
@@ -243,11 +236,9 @@ ProcessingMode::findElementMatch(const StringC &gi,
       const Vector<const ElementRule *> &vec = vecP[specificity.ruleType_];
       ASSERT(specificity.nextRuleIndex_ <= vec.size());
       for (size_t &i = specificity.nextRuleIndex_; i < vec.size(); i++) {
-        printf("rule loop\n");
 	if (vec[i]->trivial() || vec[i]->matches(node, context)) {
 	  const Rule *rule = vec[i];
 	  elementRuleAdvance(node, context, mgr, specificity, vec);
-          printf("exit findElementMatch successfully\n");
 	  return rule;
 	}
       }
@@ -265,7 +256,6 @@ ProcessingMode::findElementMatch(const StringC &gi,
     specificity.nextRuleIndex_ = 0;
     specificity.toInitial_ = 0;
   }
-  printf("exit findElementMatch unsuccessfully\n");
   return 0;
 }
 
@@ -313,7 +303,6 @@ void ProcessingMode::elementRuleAdvance(const NodePtr &node,
 				        Specificity &specificity,
 				        const Vector<const ElementRule *> &vec)
 {
-  printf("ProcessingMode::elementRuleAdvance\n");
   size_t &i = specificity.nextRuleIndex_;
   if (specificity.ruleType_ != constructionRule) {
     ++i;
@@ -337,7 +326,6 @@ void ProcessingMode::elementRuleAdvance(const NodePtr &node,
     ++i;
   } while (i < vec.size()
            && vec[hit]->ElementRule::compareSpecificity(*vec[i]) == 0);
-  printf("exit elementRuleAdvance\n");
 }
 
 #ifdef DSSSL_NAMESPACE

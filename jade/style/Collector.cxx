@@ -6,7 +6,7 @@
 #include <OpenSP/macros.h>
 #include <stdlib.h>
 
-#if 0
+#if 1 
 #define DEBUG
 #endif
 

@@ -104,9 +104,9 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
+  void traceSubObjects(Collector &c) const;
   SelectElementsNodeListObj(NodeListObj *, NCVector<Pattern> &);
   SelectElementsNodeListObj(NodeListObj *, const ConstPtr<PatternSet> &);
-  void traceSubObjects(Collector &) const;
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
 private:

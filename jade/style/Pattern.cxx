@@ -9,7 +9,6 @@
 #include "ProcessingMode.h"
 #include "VM.h"
 #include "ELObj.h"
-#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -48,21 +47,15 @@ Pattern::Element::Element(const StringC &gi, bool forceGi)
 
 bool Pattern::Element::matches(const NodePtr &nd, MatchContext &context) const
 {
-  printf("Pattern::Element::matches\n");
   if (gi_.size()) {
     if (!nd->hasGi(GroveString(gi_.data(), gi_.size()))) {
-      printf("exit matches 0\n");
       return 0;
     }
   }
   for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next()) {
-    printf("qualifier loop\n");
-    if (!iter.cur()->satisfies(nd, context)) {
-      printf("exit matches 0\n");
+    if (!iter.cur()->satisfies(nd, context)) 
       return 0;
-    }
   }
-  printf("exit matches 1\n");
   return 1;
 }
 
@@ -187,78 +180,32 @@ Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &expr, unsigned priority
 
 bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
 {
-  printf("Pattern::NodeQualifier::satisfies\n");
   NodePtr root;
   m->getGroveRoot(root);
   EvalContext ec;
   EvalContext::CurrentNodeSetter cns(root, pm_, ec);
 
-  if (!nl_) {
-    InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
-    VM vm(ec, *interp_);
-    ELObj *val = vm.eval(insn.pointer());
-    if (!val || !val->asNodeList()) {
-      printf("no nodelist\n");
-      //FIXME: error
-      return 0;
-    }
-    nl_ = val->asNodeList();
-    interp_->makePermanent(nl_);
-    printf("made perm\n");
-    printf("nodelist length %d\n", nl_->nodeListLength(ec, *interp_));
-    {
-      NodePtr p(nl_->nodeListFirst(ec, *interp_));
-      GroveString gi;
-      if (p->getGi(gi)) {
-        printf("gi of first node: ");
-        for (int i = 0; i < gi.size(); i++) 
-          printf("%c", char(gi[i]));
-        printf("\n");
-      }
-      else 
-        printf("first node not element\n");
-    } 
-    {
-      NodePtr p(nl_->nodeListFirst(ec, *interp_));
-      GroveString gi;
-      if (p->getGi(gi)) {
-        printf("gi of first node: ");
-        for (int i = 0; i < gi.size(); i++) 
-          printf("%c", char(gi[i]));
-        printf("\n");
-      }
-      else 
-        printf("first node not element\n");
-    } 
-  }
+  ELObjDynamicRoot protect(*interp_, 0);
 
-  NodeListObj *nl = nl_;
-  {
-    NodePtr p(nl->nodeListFirst(ec, *interp_));
-    GroveString gi;
-    if (p->getGi(gi)) {
-      printf("gi of first node: ");
-      for (int i = 0; i < gi.size(); i++) 
-        printf("%c", char(gi[i]));
-      printf("\n");
-    }
-    else 
-      printf("first node not element\n");
-  } 
+  InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
+  VM vm(ec, *interp_);
+  ELObj *val = vm.eval(insn.pointer());
+  protect = val;
+  if (!val || !val->asNodeList()) { 
+    //FIXME: error
+    return 0;
+  }
+  NodeListObj *nl = val->asNodeList();
+
   for (;;) {
-    printf("going loop\n");
-    ELObjDynamicRoot protect(*interp_, nl);
-    NodePtr nd(nl->nodeListFirst(ec, *interp_));
+    protect = nl;
+    NodePtr nd = nl->nodeListFirst(ec, *interp_);
     if (!nd)
       break;
-    printf("checking node\n");
-    if (*nd == *m) {
-      printf("found\n");
+    if (*nd == *m)  
       return 1;
-    }
     nl = nl->nodeListRest(ec, *interp_); 
   }
-  printf("not found\n");
   return 0;
 }
 

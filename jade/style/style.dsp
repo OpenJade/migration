@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir "."
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /YX /c
-# ADD CPP /nologo /MDd /W3 /GX /ZI /Od /I "..\spgrove" /I "..\grove" /I "..\include" /D "_WINDOWS" /D "_DEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /FR /YX /FD /c
+# ADD CPP /nologo /MDd /W3 /GX /ZI /Od /I "..\spgrove" /I "..\grove" /I "..\include" /D "_WINDOWS" /D "_DEBUG" /D DSSSL_NAMESPACE=James_Clark_DSSSL /D "WIN32" /D SP_NAMESPACE=James_Clark_SP /D GROVE_NAMESPACE=James_Clark_GROVE /D "SP_MULTI_BYTE" /D SP_HAVE_LOCALE=1 /FR /YX /FD /c
 # ADD BASE MTL /nologo /D "_DEBUG" /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x809 /d "_DEBUG"

@@ -2023,6 +2023,7 @@ TeXFOTBuilder::TeXFOTBuilder(OutputByteStream *o, Messenger *mgr)
 #ifdef OUTLINES
   return_ += Char('\n');
   protectedChar_ += Char('\\');
+  protectedChar_ += Char('?');
 #endif
 }
 

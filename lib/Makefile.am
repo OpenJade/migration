@@ -55,8 +55,8 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx splib.h \
 	splibpch.h token.h app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
-	parser_inst.cxx xentmgr_inst.cxx \
-	SubstTable.cxx
+	parser_inst.cxx xentmgr_inst.cxx SubstTable.cxx \
+	UTF16CodingSystem.cxx Fixed4CodingSystem.cxx
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 

@@ -10,7 +10,9 @@
 #include "TranslateCodingSystem.h"
 #ifdef SP_MULTI_BYTE
 #include "UTF8CodingSystem.h"
+#include "UTF16CodingSystem.h"
 #include "Fixed2CodingSystem.h"
+#include "Fixed4CodingSystem.h"
 #include "UnicodeCodingSystem.h"
 #include "XMLCodingSystem.h"
 #include "EUCJPCodingSystem.h"
@@ -52,7 +54,9 @@ public:
   enum CodingSystemId {
     identity,
     fixed2,
+    fixed4,
     utf8,
+    utf16,
     unicode,
     eucjp,
     euccn,
@@ -91,8 +95,10 @@ private:
     makeCodingSystem(CodingSystemId) const;
   const Entry *firstEntry(Boolean isBctf) const;
 #ifdef SP_MULTI_BYTE
-  UTF8CodingSystem utf8CodingSystem_;
   Fixed2CodingSystem fixed2CodingSystem_;
+  Fixed4CodingSystem fixed4CodingSystem_;
+  UTF8CodingSystem utf8CodingSystem_;
+  UTF16CodingSystem utf16CodingSystem_;
   UnicodeCodingSystem unicodeCodingSystem_;
   XMLCodingSystem xmlCodingSystem_;
   EUCJPCodingSystem eucBctf_;
@@ -122,7 +128,7 @@ private:
   IdentityCodingSystem identityCodingSystem_;
   const TranslateCodingSystem::Desc *systemCharsetDesc_;
   static const Entry bctfTable_[];
-  enum { nEncodingsRequireUnicode = 8 };
+  enum { nEncodingsRequireUnicode = 12 };
   static const Entry encodingTable_[];
 };
 
@@ -276,15 +282,18 @@ const CodingSystemKitImpl::Entry CodingSystemKitImpl::encodingTable_[] = {
   { "UTF-8", utf8 },
   { "UCS-2", fixed2 },
   { "ISO-10646-UCS-2", fixed2 },
+  { "UCS-4", fixed4 },
+  { "ISO-10646-UCS-4", fixed4 },
+  { "UTF-32", fixed4 },  
   { "UNICODE", unicode },
   // We don't really support UTF-16, but treating it
   // as Unicode should work for the most part.
-  { "UTF-16", unicode },
+  { "UTF-16", utf16 },
   { "WINDOWS", ansi },
   { "MS-DOS", oem },
   { "WUNICODE", maybeUnicode },
   { "XML", xml },
-  // nEncodingsRequireUnicode = 8
+  // nEncodingsRequireUnicode = 12
   { "IS8859-1", iso8859_1 },
   { "ISO-8859-1", iso8859_1 },
   { "IS8859-2", iso8859_2 },
@@ -445,8 +454,12 @@ CodingSystemKitImpl::makeCodingSystem(CodingSystemId id) const
 #ifdef SP_MULTI_BYTE
   case fixed2:
     return &fixed2CodingSystem_;
+  case fixed4:
+    return &fixed4CodingSystem_;
   case utf8:
     return &utf8CodingSystem_;
+  case utf16:
+    return &utf16CodingSystem_;
   case unicode:
     return &unicodeCodingSystem_;
   case eucBctf:

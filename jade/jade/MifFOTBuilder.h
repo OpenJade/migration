@@ -21,7 +21,7 @@ makeMifFOTBuilder(const String<CmdLineApp::AppChar> &fileLoc,
 		  const Ptr<ExtendEntityManager> &,
 		  const CharsetInfo &,
 		  CmdLineApp *app,
-		  const FOTBuilder::Extension *&ext);
+		  const FOTBuilder::Description *&descr);
 
 #ifdef DSSSL_NAMESPACE
 }

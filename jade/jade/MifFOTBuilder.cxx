@@ -1281,8 +1281,8 @@ class MifFOTBuilder : public SerialFOTBuilder {
     void start();
     void end();
 
-    void startSimplePageSequence();
-    void endSimplePageSequence();
+    void startSimplePageSequenceSerial();
+    void endSimplePageSequenceSerial();
     void startSimplePageSequenceHeaderFooter( unsigned );
     void endSimplePageSequenceHeaderFooter( unsigned );
     void endAllSimplePageSequenceHeaderFooter();
@@ -2540,7 +2540,7 @@ void MifFOTBuilder::endDisplay() {
     delete di;
 }
 
-void MifFOTBuilder::startSimplePageSequence() {
+void MifFOTBuilder::startSimplePageSequenceSerial() {
 
     inSimplePageSequence = true;
     firstHeaderFooter = true;
@@ -2577,7 +2577,7 @@ void MifFOTBuilder::startSimplePageSequence() {
     FotSimplePageSequence.paragraphFormat = format();
 }
 
-void MifFOTBuilder::endSimplePageSequence() {
+void MifFOTBuilder::endSimplePageSequenceSerial() {
 
     end();
     mifDoc.exitTextFlow();
@@ -4291,11 +4291,10 @@ unsigned long StringHash::hash( const String<char> &str ) {
 
 FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
                                const Ptr<ExtendEntityManager> &entityManager,
- 			                   const CharsetInfo &systemCharset,
+			       const CharsetInfo &systemCharset,
                                CmdLineApp *app,
-                               const FOTBuilder::Extension *&ext ) {
+                               const FOTBuilder::Description *&descr) {
 
-    
     MifFOTBuilder::IndexEntryFlowObj *indexEntryFlowObject
      = new MifFOTBuilder::IndexEntryFlowObj;
 
@@ -4330,7 +4329,21 @@ FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
     },
     { 0, 0, 0}
   };
-  ext = extensions;
+
+  static const FOTBuilder::Feature features[] = {
+    { "table", 0},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+
+  static const FOTBuilder::Description description = {
+    extensions,
+    features,
+    false
+  };
+
+  descr = &description;
+
   return new MifFOTBuilder( fileLoc, entityManager, systemCharset, app );
 }
 

@@ -22,10 +22,12 @@ SCOPE    DOCUMENT
 SYNTAX   PUBLIC  "ISO 8879:1986//SYNTAX Reference//EN"
 SYNTAX   PUBLIC  "ISO 8879:1986//SYNTAX Core//EN"
 			       VALIDATE
-	 GENERAL YES       MODEL    YES     EXCLUDE  YES   CAPACITY NO
-	 NONSGML YES       SGML     YES     FORMAL   YES
+	 GENERAL  YES      MODEL     YES     EXCLUDE  YES   CAPACITY NO
+	 NONSGML  YES      SGML      YES     FORMAL   YES
 				 SDIF
-	 PACK    NO        UNPACK   NO&gt;
+	 PACK     NO       UNPACK   NO
+				 AFDR
+	 VALIDATE YES      CONSTRUCT YES&gt;
 </PRE>
 <P>
 The limit for the SUBDOC parameter is memory dependent.

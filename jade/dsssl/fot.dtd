@@ -22,6 +22,8 @@
 |leader
 |sideline
 |box
+|side-by-side
+|side-by-side-item
 |score
 |table-row
 |math-sequence
@@ -68,6 +70,8 @@
 <!ELEMENT leader %flow;>
 <!ELEMENT sideline %flow;>
 <!ELEMENT box %flow;>
+<!ELEMENT side-by-side %flow;>
+<!ELEMENT side-by-side-item %flow;>
 <!ELEMENT score %flow;>
 <!ELEMENT table-row %flow;>
 <!ELEMENT math-sequence %flow;>
@@ -273,6 +277,9 @@ grid-position-cell-type %enum; #IMPLIED
 grid-column-alignment %enum; #IMPLIED
 grid-row-Alignment %enum; #IMPLIED
 box-type %enum; #IMPLIED
+side-by-side-overlap-control %enum; #IMPLIED
+side-by-side-pre-align %enum; #IMPLIED
+side-by-side-post-align %enum; #IMPLIED
 glyph-alignment-mode %enum; #IMPLIED
 box-border-alignment %enum; #IMPLIED
 cell-row-alignment %enum; #IMPLIED
@@ -326,6 +333,8 @@ table-auto-width-method CDATA #IMPLIED
 font-name CDATA #IMPLIED
 escapement-space-before CDATA #IMPLIED
 escapement-space-after CDATA #IMPLIED
+inline-space-space CDATA #IMPLIED
+char-map (false|uppercase|lowercase|capitalize) #IMPLIED
 glyph-subst-table NMTOKENS #IMPLIED
 ">
 

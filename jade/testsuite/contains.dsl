@@ -18,4 +18,3 @@
 			   (sosofo-append 
 			    ret2 
 			    (check-node nl1 (node-list-first nl2)))))))))))
-		

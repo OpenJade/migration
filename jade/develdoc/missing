@@ -7,8 +7,8 @@ A '*' indicates it is already in CVS.
 missing DSSSL architectural element forms
 =========================================
 
-7.1.1	features
-7.1.2	sgml-grove-plan
+7.1.1	features                * 
+7.1.2	sgml-grove-plan         * 
 7.1.3	char-repertoire		* 
 7.1.5	other-chars             +
 7.1.6	baseset-encoding        + (the patch is only semi-functional)
@@ -211,8 +211,8 @@ column-set-sequence (and related expression language primitives and types)
 anchor
 embedded-text
 included-container-area
-side-by-side
-side-by-side-item
+side-by-side                    * (only some backends)
+side-by-side-item               * (only some backends)
 glyph-annotation
 aligned-column
 multi-line-inline-note

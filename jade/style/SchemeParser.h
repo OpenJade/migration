@@ -23,6 +23,7 @@ public:
   void parseNameChars();
   void parseSeparatorChars();
   void parseFeatures();
+  void parseGrovePlan();
   bool parseExpression(Owner<Expression> &);
 private:
   SchemeParser(const SchemeParser &); // undefined

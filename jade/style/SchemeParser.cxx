@@ -105,12 +105,25 @@ void SchemeParser::parseSeparatorChars()
 
 void SchemeParser::parseFeatures()
 {
+  interp_->explicitFeatures();
   for (;;) {
     Token tok;
     if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
          || tok == tokenEndOfEntity)
       break;
     interp_->declareFeature(currentToken_);
+  }
+}
+
+void SchemeParser::parseGrovePlan()
+{
+  interp_->explicitModules();
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->addModule(currentToken_);
   }
 }
 

@@ -58,34 +58,41 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
                diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::standardChars)
 	      ? phase == 1 
 	      : phase == 2)) {
-	    Owner<InputSource> in;
-	    diter.cur()->makeInputSource(specHandler, in);
-	    SchemeParser scm(*interpreter_, in);
-	    switch (diter.cur()->type()) {
-            case DssslSpecEventHandler::DeclarationElement::charRepertoire:
-              interpreter_->setCharRepertoire(diter.cur()->name());
-              break;
-            case DssslSpecEventHandler::DeclarationElement::standardChars:
-              scm.parseStandardChars(); 
-              break;
-            case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
-              scm.parseMapSdataEntity(diter.cur()->name(), diter.cur()->text());
-              break;
-            case DssslSpecEventHandler::DeclarationElement::addNameChars:
-              scm.parseNameChars();
-              break;
-            case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
-              scm.parseSeparatorChars();
-              break;
-            case DssslSpecEventHandler::DeclarationElement::features:
-              scm.parseFeatures(); 
-              break;
-            default:
-              interpreter_->message(
-                     InterpreterMessages::unsupportedDeclaration);
-             break;
- 
-            }
+            if (diter.cur()->type() == DssslSpecEventHandler::DeclarationElement::sgmlGrovePlan) {
+              Owner<InputSource> in(new InternalInputSource(
+                           diter.cur()->modadd(), InputSourceOrigin::make()));
+	      SchemeParser scm(*interpreter_, in);
+              scm.parseGrovePlan();
+            } 
+            else {
+	      Owner<InputSource> in;
+	      diter.cur()->makeInputSource(specHandler, in);
+	      SchemeParser scm(*interpreter_, in);
+	      switch (diter.cur()->type()) {
+              case DssslSpecEventHandler::DeclarationElement::charRepertoire:
+                interpreter_->setCharRepertoire(diter.cur()->name());
+                break;
+              case DssslSpecEventHandler::DeclarationElement::standardChars:
+                scm.parseStandardChars(); 
+                break;
+              case DssslSpecEventHandler::DeclarationElement::mapSdataEntity:
+                scm.parseMapSdataEntity(diter.cur()->name(), diter.cur()->text());
+                break;
+              case DssslSpecEventHandler::DeclarationElement::addNameChars:
+                scm.parseNameChars();
+                break;
+              case DssslSpecEventHandler::DeclarationElement::addSeparatorChars:
+                scm.parseSeparatorChars();
+                break;
+              case DssslSpecEventHandler::DeclarationElement::features:
+                scm.parseFeatures(); 
+                break;
+              default:
+                interpreter_->message(
+                       InterpreterMessages::unsupportedDeclaration);
+               break;
+              }
+            }   
           }
 	}
       } while (local);

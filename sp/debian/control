@@ -6,7 +6,7 @@ Standards-Version: 3.1.1
 
 Package: opensp
 Architecture: any
-Depends: ${shlibs-opensp:Depends}, ${libosp1:ShlibVersion}, sgml-base
+Depends: ${shlibs-opensp:Depends}, ${libosp:ShlibVersion}, sgml-base
 Suggests: doc-base, sgml-data
 Description: OpenJade group's SGML parsing tools
  This package is a collection of SGML/XML tools called OpenSP.
@@ -26,9 +26,9 @@ Description: Runtime library for OpenJade group's SP suite
  .
  This shared library is used by the opensp and openjade packages.
 
-Package: libosp1-dev
+Package: libosp-dev
 Architecture: any
-Depends: ${libosp1:Version}, libc6-dev, libstdc++-dev
+Depends: ${opensp:Version}, ${libosp:Version}, libc6-dev, libstdc++-dev
 Recommends: c++-compiler
 Description: OpenJade group's SP suite, developer support
  This contains include files and the static library for libosp1.

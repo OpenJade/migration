@@ -232,7 +232,7 @@ changequote([,])dnl
   AC_MSG_RESULT(yes))
 
 AC_SUBST(LIBOBJS)
-AC_OUTPUT([Makefile style/Makefile grove/Makefile spgrove/Makefile
+AC_OUTPUT([Makefile msggen.pl style/Makefile grove/Makefile spgrove/Makefile
 	jade/Makefile dsssl/Makefile jadedoc/Makefile 
 	jadedoc/images/Makefile intl/Makefile po/Makefile.in],
 	[echo creating po/Makefile

@@ -7,9 +7,7 @@ SUBDIRS = jadedoc dsssl grove spgrove style jade intl po
 
 pkginclude_HEADERS = config.h
 
-BUILT_SOURCES = config.h
+BUILT_SOURCES = config.h msggen.pl
 
 ## Note that we include the windows-only aux files.
-EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak jade-generate.mak
-
-
+EXTRA_DIST = instmac.pl jade.dsw jade.mak jade-generate.mak

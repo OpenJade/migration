@@ -19,7 +19,7 @@ Changes in OpenSP 1.5.1
 
 * Enhancements to osx. Preserve case option, security fixes (Jessica Perry Hekman)
 
-* Start adding a testsuite.
+* Start adding a testsuite. (Karl Eichwalder)
 
 Changes in OpenSP 1.5
 

@@ -1,0 +1,11 @@
+Resolve AF bugs:
+
+1. #MAPTOKEN does not work; cf. tests/af-7 and tests/af-8.
+   Sourceforge bug report #646312 (version 1.5).
+
+   Features is implemented since 1.5pre4.
+
+
+2. Deriving attribute values from content causes segfaults; cf.
+   tests/af-9.
+   Sourceforge bug report #646313 (version 1.5).

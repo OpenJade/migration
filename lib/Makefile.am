@@ -61,7 +61,7 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 
 ## We include the windows-only source and aux files here, so that
 ## make dist-zip produces a working windows distribution.
-EXTRA_DIST = ArcEngineMessages.msg ArgEngineMessages.rc \
+EXTRA_DIST = ArcEngineMessages.msg ArcEngineMessages.rc \
 	CatalogMessages.msg CatalogMessages.rc \
 	CmdLineAppMessages.msg CmdLineAppMessages.rc \
 	EntityAppMessages.msg EntityAppMessages.rc \

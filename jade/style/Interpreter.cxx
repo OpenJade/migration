@@ -61,7 +61,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
 			 bool debugMode,
 			 bool dsssl2,
                          bool strictMode,
-			 const FOTBuilder::Extension *extensionTable)
+			 const FOTBuilder::Extension *extensionTable,
+			 const FOTBuilder::Feature *backendFeatures)
 : groveManager_(groveManager),
   messenger_(messenger),
   extensionTable_(extensionTable),
@@ -77,7 +78,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
   nextGlyphSubstTableUniqueId_(0),
   debugMode_(debugMode),
   dsssl2_(dsssl2),
-  strictMode_(strictMode)
+  strictMode_(strictMode),
+  explicitFeatures_(0)
 {
   makePermanent(theNilObj_ = new (*this) NilObj);
   makePermanent(theFalseObj_ = new (*this) FalseObj);
@@ -94,6 +96,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installPortNames();
   installPrimitives();
   installUnits();
+  installFeatures(backendFeatures);
   if (!strictMode_) {
     installCharNames();
     installSdata();
@@ -2377,6 +2380,133 @@ void Interpreter::installExtensionCharNIC(Identifier *ident,
 					  const Location &loc)
 {
   ident->setCharNIC(currentPartIndex(), loc);
+}
+
+void Interpreter::installFeatures(const FOTBuilder::Feature *backendFeatures)
+{
+  feature_[combineChar].name =          makeStringC("combine-char");
+  feature_[keyword].name =              makeStringC("keyword");
+  feature_[multiSource].name =          makeStringC("multi-source");
+  feature_[multiResult].name =          makeStringC("multi-result");
+  feature_[regexp].name =               makeStringC("regexp");
+  feature_[word].name =                 makeStringC("word");
+  feature_[hytime].name =               makeStringC("hytime");
+  feature_[charset].name =              makeStringC("charset");
+  feature_[expression].name =           makeStringC("expression");
+  feature_[multiProcess].name =         makeStringC("multi-process");
+  feature_[query].name =                makeStringC("query");
+  feature_[sideBySide].name =           makeStringC("side-by-side");
+  feature_[sideline].name =             makeStringC("sideline");
+  feature_[alignedColumn].name =        makeStringC("aligned-column");
+  feature_[bidi].name =                 makeStringC("bidi");
+  feature_[vertical].name =             makeStringC("vertical");
+  feature_[math].name =                 makeStringC("math");
+  feature_[table].name =                makeStringC("table");
+  feature_[tableAutoWidth].name =       makeStringC("table-auto-width");
+  feature_[simplePage].name =           makeStringC("simple-page");
+  feature_[page].name =                 makeStringC("page");
+  feature_[multiColumn].name =          makeStringC("multi-column");
+  feature_[nestedColumnSet].name =      makeStringC("nested-column-set");
+  feature_[generalIndirect].name =      makeStringC("general-indirect");
+  feature_[inlineNote].name =           makeStringC("inline-note");
+  feature_[glyphAnnotation].name =      makeStringC("glyph-annotation");
+  feature_[emphasizingMark].name =      makeStringC("emphasizing-mark");
+  feature_[includedContainer].name =    makeStringC("included-container");
+  feature_[actualCharacteristic].name = makeStringC("actual-characteristic");
+  feature_[online].name =               makeStringC("online");
+  feature_[fontInfo].name =             makeStringC("font-info");
+  feature_[crossReference].name =       makeStringC("cross-reference");
+
+  for (int i = 0; i < nFeatures; i++) 
+    feature_[i].supported = notSupported;
+  feature_[charset].supported = partiallySupported;
+  feature_[expression].supported = Supported;
+  feature_[multiProcess].supported = Supported;
+  feature_[query].supported = partiallySupported;
+  feature_[actualCharacteristic].supported = Supported;
+  feature_[crossReference].supported = Supported;
+  feature_[style].supported = Supported;
+  if (backendFeatures) 
+    for (const FOTBuilder::Feature *b = backendFeatures; b->name; b++) {
+      StringC name = makeStringC(b->name);
+      for (int i = 0; i < dssslFeatures; i++) 
+	if (name == feature_[i].name) {
+	  feature_[i].supported = b->partial ? partiallySupported : Supported;
+	  break;
+	}
+    }
+
+  for (int i = 0; i < nFeatures; i++) 
+    feature_[i].declared = 0;
+  if (!strictMode_) 
+    for (int i = 0; i < dssslFeatures; i++) 
+      if (feature_[i].supported != notSupported)
+	feature_[i].declared = 1;
+}
+
+bool Interpreter::requireFeature(const Interpreter::Feature &f,
+                                 const Location &loc)
+{
+   //FIXME: Hack to avoid warnings about features used in builtins.dsl
+   if (!feature_[f].declared 
+       && !Identifier::preferBuiltin_  
+       && (partIndex_ != unsigned(-1))) {
+     setNextLocation(loc);
+     message(InterpreterMessages::missingFeature,
+             StringMessageArg(feature_[f].name));
+   }
+   return feature_[f].declared;
+}
+
+void Interpreter::declareFeature(const StringC &f)
+{  
+  int i;
+  if (!explicitFeatures_) {
+    explicitFeatures_ = 1;
+    for (i = 0; i < dssslFeatures; i++) 
+      feature_[i].declared = 0;
+  }
+  for (i = 0; i < dssslFeatures; i++) 
+    if (feature_[i].name == f) 
+      break; 
+  if (i == dssslFeatures) {
+    message(InterpreterMessages::unknownFeature,
+	     StringMessageArg(f));
+    return;
+  }
+  declareFeature(Feature(i));
+}
+
+void Interpreter::declareFeature(const Feature &feature)
+{
+  FeatureStatus &f = feature_[feature];
+  f.declared = 1;
+  if (f.supported == notSupported) 
+    message(InterpreterMessages::unsupportedFeature,
+	    StringMessageArg(f.name));
+  else if (f.supported == partiallySupported) 
+    message(InterpreterMessages::partiallySupportedFeature,
+	    StringMessageArg(f.name));
+  // Handle implied features
+  switch (feature) {
+  case transformation:
+    declareFeature(query);
+    declareFeature(expression);
+    break;
+  case query:
+    declareFeature(multiProcess);
+    break;
+  case tableAutoWidth:
+    declareFeature(table);
+    break;
+  case nestedColumnSet:
+    declareFeature(multiColumn);
+    break;
+  case multiColumn:
+    declareFeature(page);
+    break;
+  default:; // do nothing
+  }
 }
 
 #ifdef DSSSL_NAMESPACE

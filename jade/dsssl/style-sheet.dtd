@@ -4,7 +4,7 @@
 -->
 
 <!ENTITY % declarations
- "add-name-chars | add-separator-chars | standard-chars | 
+ "features | add-name-chars | add-separator-chars | standard-chars | 
   map-sdata-entity | char-repertoire"
 >
 
@@ -25,8 +25,13 @@
   document entity #required
   specid name #implied
 >
+
+<!-- Declares features used by specification. -->
+<!element features - O (#PCDATA) 
+  -- dlextype(featurename*) -->
+
 <!-- Declare additional characters allowed in name within DSSSL notation. -->
-<!element add-name-chars - O (#PCDATA)
+<!element add-name-chars - O (#PCDATA) 
   -- dlextype(charname*) -->
 
 <!-- Declare additional characters allowed as separators within

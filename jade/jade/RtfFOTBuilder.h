@@ -20,7 +20,8 @@ makeRtfFOTBuilder(OutputByteStream *,
 		  const Vector<StringC> &options,
 		  const Ptr<ExtendEntityManager> &,
 		  const CharsetInfo &, Messenger *,
-		  const FOTBuilder::Extension *&);
+		  const FOTBuilder::Extension *&,
+		  const FOTBuilder::Feature *&);
 
 
 #ifdef DSSSL_NAMESPACE

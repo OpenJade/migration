@@ -35,6 +35,8 @@ SchemeParser::SchemeParser(Interpreter &interp,
 
 void SchemeParser::parseStandardChars() 
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
   for (;;) {
     Token tok;
     if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
@@ -77,8 +79,9 @@ void SchemeParser::parseStandardChars()
 
 void SchemeParser::parseNameChars()
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
   for (;;) {
-    // FIXME we do not check that we have valid character names
     Token tok;
     if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
          || tok == tokenEndOfEntity)
@@ -89,8 +92,9 @@ void SchemeParser::parseNameChars()
 
 void SchemeParser::parseSeparatorChars()
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
   for (;;) {
-    // FIXME we do not check that we have valid character names
     Token tok;
     if (!getToken(allowIdentifier|allowEndOfEntity, tok)
         || tok == tokenEndOfEntity)
@@ -99,8 +103,21 @@ void SchemeParser::parseSeparatorChars()
   }
 }
 
+void SchemeParser::parseFeatures()
+{
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->declareFeature(currentToken_);
+  }
+}
+
 void SchemeParser::parseMapSdataEntity(const StringC &ename, const StringC &etext)
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
   Token tok;
   if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
        || tok == tokenEndOfEntity) {
@@ -243,6 +260,8 @@ bool SchemeParser::parseExpression(Owner<Expression> &expr)
 
 bool SchemeParser::doMode()
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -298,6 +317,7 @@ bool SchemeParser::doMode()
 bool SchemeParser::doElement()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   ELObj *obj;
   if (!parseDatum(0, obj, loc, tok))
@@ -318,6 +338,7 @@ bool SchemeParser::doElement()
 bool SchemeParser::doOrElement()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowOpenParen, tok))
     return 0;
@@ -349,6 +370,7 @@ bool SchemeParser::doOrElement()
 bool SchemeParser::doId()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowString|allowIdentifier, tok))
     return 0;
@@ -371,6 +393,7 @@ bool SchemeParser::doId()
 bool SchemeParser::doDefault()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -387,6 +410,7 @@ bool SchemeParser::doDefault()
 bool SchemeParser::doRoot()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -431,6 +455,8 @@ bool SchemeParser::parseRuleBody(Owner<Expression> &expr, ProcessingMode::RuleTy
 
 bool SchemeParser::doDeclareInitialValue()
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -453,6 +479,7 @@ bool SchemeParser::doDeclareInitialValue()
 bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -495,6 +522,7 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 bool SchemeParser::doDeclareCharacteristic()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -537,6 +565,7 @@ bool SchemeParser::doDeclareCharacteristic()
 bool SchemeParser::doDeclareFlowObjectClass()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -564,6 +593,7 @@ bool SchemeParser::doDeclareFlowObjectClass()
 bool SchemeParser::doDeclareFlowObjectMacro()
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -676,6 +706,7 @@ bool SchemeParser::doDefine()
   Vector<const Identifier *> formals;
   bool isProcedure;
   if (tok == tokenOpenParen) {
+    interp_->requireFeature(Interpreter::expression, loc);
     if (!getToken(allowIdentifier, tok))
       return 0;
     isProcedure = 1;
@@ -950,6 +981,8 @@ bool SchemeParser::parseQuasiquoteTemplate(unsigned level,
 					  Token &tok,
 					  bool &spliced)
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   key = Identifier::notKey;
   spliced = 0;
   ELObj *obj;
@@ -1137,26 +1170,29 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
     return 0;
   if (key == Identifier::keyArrow) {
     arrow = 1;
+    interp_->requireFeature(Interpreter::expression, testExpr->location());
     if (!parseExpression(0, tem, key, tok))
       return 0;
   }
-  if (tem) {
+  if (!tem) 
+    interp_->requireFeature(Interpreter::expression, testExpr->location());
+  else { 
     valExprs.resize(valExprs.size() + 1);
     tem.swap(valExprs.back());
     if (arrow || !dsssl2()) {
-      if (!getToken(allowCloseParen, tok))
+      if (!getToken(allowCloseParen, tok)) 
         return 0;
     }
-    else
+    else  
       for (;;) {
         if (!parseExpression(allowCloseParen, tem, key, tok))
           return 0;
-        if (!tem)
+        if (!tem) 
           break;
         valExprs.resize(valExprs.size() + 1);
         tem.swap(valExprs.back());
       }
-  }
+    }
   Owner<Expression> valExpr;
   if (valExprs.size() == 1)
     valExprs[0].swap(valExpr);
@@ -1169,15 +1205,15 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
     const Identifier *ident = interp_->lookup(interp_->makeStringC("cond"));
     Vector<const Identifier *> vars;
     NCVector<Owner<Expression> > inits(1), args(1);
-    Owner<Expression> thenExpr, body;
+    Owner<Expression> thenExpr, body; 
     vars.push_back(ident);
     testExpr.swap(inits.back());
-    testExpr = new VariableExpression(ident, loc);
+    testExpr = new VariableExpression(ident, loc); 
     args.back() = new VariableExpression(ident, loc);
     thenExpr = new CallExpression(valExpr, args, loc);
     body = new IfExpression(testExpr, thenExpr, elseExpr, loc);
-    expr = new LetExpression(vars, inits, body, loc);
-  }
+    expr = new LetExpression(vars, inits, body, loc); 
+  } 
   else if (valExpr)
     expr = new IfExpression(testExpr, valExpr, elseExpr, loc);
   else
@@ -1333,6 +1369,7 @@ bool SchemeParser::parseSet(Owner<Expression> &expr)
 bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier|allowFalse, tok))
     return 0;
@@ -1354,6 +1391,7 @@ bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 bool SchemeParser::parseMake(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -1392,6 +1430,7 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
 bool SchemeParser::parseStyle(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::style, loc);
   NCVector<Owner<Expression> > exprs;
   Vector<const Identifier *> keys;
   for (;;) {
@@ -1414,6 +1453,7 @@ bool SchemeParser::parseStyle(Owner<Expression> &expr)
 bool SchemeParser::parseLambda(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Token tok;
   if (!getToken(allowOpenParen, tok))
     return 0;
@@ -1440,6 +1480,7 @@ bool SchemeParser::parseFormals(Vector<const Identifier *> &formals,
 			       bool &hasRest,
 			       int &nKey)
 {
+  Location loc(in_->currentLocation());
   Token tok;
   enum FormalType { required, optional, rest, key } type = required;
   unsigned allowed = (allowCloseParen|allowIdentifier
@@ -1461,6 +1502,7 @@ bool SchemeParser::parseFormals(Vector<const Identifier *> &formals,
       type = rest;
       break;
     case tokenHashKey:
+      interp_->requireFeature(Interpreter::keyword, loc);
       allowed = (allowOpenParen|allowCloseParen|allowIdentifier);
       type = key;
       break;
@@ -1503,6 +1545,7 @@ done:
 bool SchemeParser::parseLet(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Token tok;
   if (!getToken(allowOpenParen|allowIdentifier, tok))
     return 0;
@@ -1539,6 +1582,7 @@ bool SchemeParser::parseLet(Owner<Expression> &expr)
 bool SchemeParser::parseLetStar(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Vector<const Identifier *> vars;
   NCVector<Owner<Expression> > inits;
   Owner<Expression> body;
@@ -1551,6 +1595,7 @@ bool SchemeParser::parseLetStar(Owner<Expression> &expr)
 bool SchemeParser::parseLetrec(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Vector<const Identifier *> vars;
   NCVector<Owner<Expression> > inits;
   Owner<Expression> body;
@@ -1678,6 +1723,7 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
 				      ELObj *&result,
 				      Token &tok)
 {
+  Location loc(in_->currentLocation());
   if (!getToken(allowExpr|otherAllowed, tok))
     return 0;
   switch (tok) {
@@ -1708,6 +1754,7 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
     }
     break;
   case tokenGlyphId:
+    interp_->requireFeature(Interpreter::style, loc);
     result = convertAfiiGlyphId(currentToken_);
     break;
   default:
@@ -1733,6 +1780,7 @@ bool SchemeParser::parseAbbreviation(const char *sym, ELObj *&result)
 
 bool SchemeParser::getToken(unsigned allowed, Token &tok)
 {
+  Location loc(in_->currentLocation());
   InputSource *in = in_.pointer();
   for (;;) {
     in->startToken();
@@ -1880,6 +1928,7 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	tok = tokenGlyphId;
 	currentToken_.assign(in->currentTokenStart() + 2,
                              in->currentTokenLength() - 2);
+        interp_->requireFeature(Interpreter::style, loc);
 	return 1;
       case InputSource::eE:
 	message(InterpreterMessages::unexpectedEof);
@@ -2442,6 +2491,7 @@ bool SchemeParser::doTolower()
 bool SchemeParser::parseSpecialQuery(Owner<Expression> &rexp, const char *query)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::query, loc);
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;

@@ -1195,6 +1195,8 @@ ELObj *InheritedCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec,
 					     Interpreter &interp,
 					     const Location &loc)
 {
+  if (!interp.requireFeature(Interpreter::style, loc))
+    return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::notInCharacteristicValue);
@@ -1224,6 +1226,9 @@ const Signature ActualCPrimitiveObj::signature_ = { 0, 0, 0 };
 ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interpreter &interp,
 					  const Location &loc)
 {
+  interp.requireFeature(Interpreter::actualCharacteristic, loc);
+  if (!interp.requireFeature(Interpreter::style, loc))
+    return interp.makeError();
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
     interp.message(InterpreterMessages::notInCharacteristicValue);

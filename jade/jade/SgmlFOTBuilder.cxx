@@ -513,8 +513,19 @@ OutputCharStream &operator<<(OutputCharStream &os,
   return os;
 }
 
-FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os)
+FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os, 
+	                       const FOTBuilder::Feature *&f)
 {
+  static const FOTBuilder::Feature features[] = {
+    { "sideline", 0},
+    { "side-by-side", 0},
+    { "table", 0},
+    { "math", 0},
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  f = features;
+
   return new SgmlFOTBuilder(os);
 }
 

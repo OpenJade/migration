@@ -154,5 +154,8 @@ E0+badAddCharProperty++error in character property declaration
 E1+duplicateCharPropertyDecl++duplicate definition for character property %1+first definition was here
 E2+duplicateAddCharProperty++duplicate character property declaration %1 for character %2
 E0+returnNotSosofo++value returned by procedure was not a sosofo
-
+E1+unknownFeature++%1 is not a style or transformation language feature
+E1+missingFeature++undeclared use of feature %1
+W1+unsupportedFeature++feature %1 is not supported
+W1+partiallySupportedFeature++feature %1 only partially supported 
 

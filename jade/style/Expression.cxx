@@ -1266,6 +1266,7 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     flowObj = new (interp) SequenceFlowObj;
     interp.makePermanent(flowObj);
   }
+  flowObj->requireFeature(interp);
   Owner<Expression> *contentMapExpr = 0;
   InsnPtr rest(next);
   for (size_t i = 0; i < keys_.size(); i++) {

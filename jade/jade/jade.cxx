@@ -32,7 +32,8 @@ public:
   enum { u = 72000 };
   JadeApp();
   void processOption(AppChar opt, const AppChar *arg);
-  FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&);
+  FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&, 
+			     const FOTBuilder::Feature *&);
 private:
   enum OutputType { fotType, rtfType,
 #ifdef JADE_HTML
@@ -124,7 +125,8 @@ void JadeApp::processOption(AppChar opt, const AppChar *arg)
   }
 }
 
-FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
+FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts,
+				    const FOTBuilder::Feature *&features)
 {
   if (outputFilename_.size() == 0) {
     if (defaultOutputBasename_.size() != 0) {
@@ -162,25 +164,26 @@ FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
   switch (outputType_) {
   case rtfType:
     unitsPerInch_ = 20*72; // twips
-    return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts);
+    return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts, features);
   case texType:
-    return makeTeXFOTBuilder(&outputFile_, this, exts);
+    return makeTeXFOTBuilder(&outputFile_, this, exts, features);
 #ifdef JADE_HTML
   case htmlType:
-    return makeHtmlFOTBuilder(outputFilename_, this, exts);
+    return makeHtmlFOTBuilder(outputFilename_, this, exts, features);
 #endif /* JADE_HTML */
 #ifdef JADE_MIF
   case mifType:
-    return makeMifFOTBuilder(outputFilename_, entityManager(), systemCharset(), this, exts);
+    return makeMifFOTBuilder(outputFilename_, entityManager(), systemCharset(), this, exts, features);
 #endif /* JADE_MIF */
   case fotType:
-    return makeSgmlFOTBuilder(new RecordOutputCharStream(new EncodeOutputCharStream(&outputFile_,
-						         outputCodingSystem_)));
+    return makeSgmlFOTBuilder(new RecordOutputCharStream(
+                                  new EncodeOutputCharStream(&outputFile_,
+                                      outputCodingSystem_)), features);
   case sgmlType:
   case xmlType:
     return makeTransformFOTBuilder(this, outputType_ == xmlType, exts);
   case txtType:
-    return makeTextFOTBuilder(&outputFile_, this, exts);
+//    return makeTextFOTBuilder(&outputFile_, this, exts);
   default:
     break;
   }

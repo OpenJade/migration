@@ -225,6 +225,7 @@ private:
   void maybeSaveBuiltin();
   Identifier *builtin_;
   static bool preferBuiltin_;
+  friend class Interpreter;
 };
 
 class Unit : public Named {
@@ -319,7 +320,8 @@ public:
   };
   enum { nPortNames = portFooter + 1 };
   Interpreter(GroveManager *, Messenger *, int unitsPerInch, bool debugMode,
-	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *);
+	      bool dsssl2, bool strictMode, const FOTBuilder::Extension *,
+	      const FOTBuilder::Feature *);
   void endPart();
   void dEndPart();
   FalseObj *makeFalse();
@@ -427,6 +429,57 @@ public:
   void addNameChar(const StringC &);
   void addSeparatorChar(const StringC &);
   void setCharRepertoire(const StringC &);
+  enum Feature {
+    combineChar,
+    keyword,
+    multiSource,
+    multiResult,
+    regexp,
+    word,
+    hytime,
+    charset,
+    expression,
+    multiProcess,
+    query,
+    sideBySide,
+    sideline,
+    alignedColumn,
+    bidi,
+    vertical,
+    math,
+    table,
+    tableAutoWidth,
+    simplePage,
+    page,
+    multiColumn,
+    nestedColumnSet,
+    generalIndirect,
+    inlineNote,
+    glyphAnnotation,
+    emphasizingMark,
+    includedContainer,
+    actualCharacteristic,
+    online,
+    fontInfo,
+    crossReference,
+    style,
+    transformation
+  };
+  enum { dssslFeatures = crossReference + 1 };
+  enum { nFeatures = transformation + 1 };
+  enum FeatureSupport {
+    notSupported,
+    partiallySupported,
+    Supported
+  };
+  struct FeatureStatus {
+    bool declared;
+    FeatureSupport supported;
+    StringC name;
+  };
+  void declareFeature(const StringC &);
+  void declareFeature(const Feature &);
+  bool requireFeature(const Feature &, const Location &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -446,6 +499,7 @@ private:
   void installSdata();
   void installNodeProperties();
   void installCharProperties();
+  void installFeatures(const FOTBuilder::Feature *);
   void compileInitialValues();
   bool sdataMap(GroveString, GroveString, GroveChar &) const;
   static bool convertUnicodeCharName(const StringC &str, Char &c);
@@ -524,6 +578,8 @@ private:
   Location defaultLanguageDefLoc_;
   friend class Identifier;
   HashTable<StringC, CharProp> charProperties_;
+  FeatureStatus feature_[nFeatures];
+  bool explicitFeatures_;
 };
 
 inline

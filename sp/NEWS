@@ -1,3 +1,9 @@
+Changes in OpenSP 1.5
+
+* Fix crash when "-m" option specified.
+
+* Updated Translations (new "fr" translation).
+
 Changes in OpenSP 1.5pre9
 
 * Support for "-restricted" option to restrict parsing of web based documents

@@ -755,9 +755,36 @@ bool SchemeParser::doDeclareIdAttribute()
 bool SchemeParser::doDefine()
 {
   Location loc(in_->currentLocation());
+  Identifier *ident = 0;
+  Owner<Expression> expr;
+  bool internal;
+  Interpreter::Feature feature;
+  if (!parseDefine(ident, expr, internal, feature)) 
+    return 0;
+  Location defLoc;
+  unsigned defPart;
+  if (ident->defined(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex())
+      message(InterpreterMessages::duplicateDefinition,
+	      StringMessageArg(ident->name()),
+	      defLoc);
+  }
+  else if (internal)
+    ident->setBuiltinDefinition(expr, interp_->currentPartIndex(), loc);
+  else  
+    ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  ident->setFeature(feature);
+  return 1;
+}
+  
+bool SchemeParser::parseDefine(Identifier *&ident, Owner<Expression> &expr,
+                               bool &internal, Interpreter::Feature &feature)
+{
+  Location loc(in_->currentLocation());
   Token tok;
-  bool internal = 0;
-  Interpreter::Feature feature = Interpreter::noFeature;
+  internal = 0;
+  feature = Interpreter::noFeature;
   if (!getToken(allowOpenParen|allowIdentifier|
          ((interp_->currentPartIndex() == unsigned(-1)) ? allowKeyword : 0), tok))
     return 0;
@@ -785,7 +812,7 @@ bool SchemeParser::doDefine()
   }
   else
     isProcedure = 0;
-  Identifier *ident = lookup(currentToken_);
+  ident = lookup(currentToken_);
   Identifier::SyntacticKey key;
   if (ident->syntacticKey(key) && key <= int(Identifier::lastSyntacticKey))
     message(InterpreterMessages::syntacticKeywordAsVariable,
@@ -796,9 +823,8 @@ bool SchemeParser::doDefine()
   bool hasRest;
   if (isProcedure && !parseFormals(formals, inits, nOptional, hasRest, nKey))
     return 0;
-  Owner<Expression> expr;
   if (isProcedure) {
-    if (!parseBegin(expr))
+    if (!parseBody(expr))
       return 0;
   }
   else {
@@ -810,20 +836,6 @@ bool SchemeParser::doDefine()
   if (isProcedure)
     expr = new LambdaExpression(formals, inits, nOptional, hasRest, nKey,
 				expr, loc);
-  Location defLoc;
-  unsigned defPart;
-  if (ident->defined(defPart, defLoc)
-      && defPart <= interp_->currentPartIndex()) {
-    if (defPart == interp_->currentPartIndex())
-      message(InterpreterMessages::duplicateDefinition,
-	      StringMessageArg(ident->name()),
-	      defLoc);
-  }
-  else if (internal)
-    ident->setBuiltinDefinition(expr, interp_->currentPartIndex(), loc);
-  else  
-    ident->setDefinition(expr, interp_->currentPartIndex(), loc);
-  ident->setFeature(feature);
   return 1;
 }
 
@@ -1394,6 +1406,80 @@ bool SchemeParser::parseAnd(Owner<Expression> &expr, bool opt)
   return 1;
 }
 
+void SchemeParser::skipIntertokenSpace()
+{
+  for (;;) { 
+    Xchar c = *in_->currentTokenEnd();
+    switch (c) {
+    case InputSource::eE:
+      return;
+    case ' ':
+    case '\r':
+    case '\n':
+    case '\t':
+    case '\f':
+      break;
+    case ';': 
+      for (;;) {
+        Xchar c1 = in_->tokenChar(*this);
+        if (c1 == InputSource::eE || c1 == '\r')
+          break;
+      }
+      break;
+    default:
+      if (interp_->lexCategory(c) != Interpreter::lexAddWhiteSpace) 
+        return; 
+    }
+    in_->tokenChar(*this);
+  }
+}
+
+bool SchemeParser::peekDefine()
+{
+  // return true if we see (define, possibly with intertoken space
+  // around the paren. Do not change the current pos of in_. 
+  size_t i = 0;
+  StringC seen;
+  in_->startToken();
+  skipIntertokenSpace();
+  if (in_->tokenChar(*this) == '(') {
+    static char txt[] = "define";
+    skipIntertokenSpace();
+    for (i = 0; i < 6; i++) 
+      if (in_->tokenChar(*this) != txt[i])
+	break;
+  }
+  in_->ungetToken();
+  return (i == 6);
+}
+
+bool SchemeParser::parseBody(Owner<Expression> &expr)
+{
+  Location loc(in_->currentLocation());
+  Vector<const Identifier *> vars;
+  NCVector<Owner<Expression> > inits;
+  // FIXME: This is an ugly workaround to unget two tokens
+  // having something like setMark() and rewindToMark() in InputSource
+  // would be much nicer 
+  while (peekDefine()) {
+    Token tok; 
+    if (!getToken(allowOpenParen, tok) || !getToken(allowIdentifier, tok)) 
+      return 0; // FIXME: Should never happen since we have peeked
+    Identifier *var;  
+    bool internal;
+    Interpreter::Feature feature;
+    inits.resize(inits.size() + 1);
+    if (!parseDefine(var, inits.back(), internal, feature)) 
+      return 0;
+    vars.push_back(var);
+  }
+  if (!parseBegin(expr)) 
+    return 0;
+  if (vars.size() > 0) 
+    expr = new LetrecExpression(vars, inits, expr, loc);
+  return 1;
+}
+
 bool SchemeParser::parseBegin(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
@@ -1550,7 +1636,7 @@ bool SchemeParser::parseLambda(Owner<Expression> &expr)
   if (!parseFormals(formals, inits, nOptional, hasRest, nKey))
     return 0;
   Owner<Expression> body;
-  if (!parseBegin(body))
+  if (!parseBody(body))
     return 0;
   expr = new LambdaExpression(formals, inits, nOptional, hasRest, nKey,
 			      body, loc);
@@ -1720,7 +1806,7 @@ bool SchemeParser::parseBindingsAndBody1(Vector<const Identifier *> &vars,
     if (!getToken(allowCloseParen, tok))
       return 0;
   }
-  return parseBegin(body);
+  return parseBody(body);
 }
 
 bool SchemeParser::parseDatum(unsigned otherAllowed,

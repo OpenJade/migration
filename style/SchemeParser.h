@@ -106,10 +106,13 @@ private:
   bool doDeclareCharProperty();
   bool doAddCharProperties();
   bool skipForm();
+  bool parseDefine(Identifier *&, Owner<Expression> &, 
+                   bool &, Interpreter::Feature &);
   bool parseSpecialQuery(Owner<Expression> &expr, const char *query);
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);
   bool parseBegin(Owner<Expression> &expr);
+  bool parseBody(Owner<Expression> &expr);
   bool parseSet(Owner<Expression> &expr);
   bool parseLambda(Owner<Expression> &);
   bool parseLet(Owner<Expression> &);
@@ -151,6 +154,8 @@ private:
   void extendToken();
   bool scanString();
   void skipComment();
+  void skipIntertokenSpace();
+  bool peekDefine();
   bool tokenRecover(unsigned, Token &);
   bool scanString(unsigned, Token &);
   ELObj *convertAfiiGlyphId(const StringC &);

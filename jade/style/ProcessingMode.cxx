@@ -10,7 +10,9 @@
 #include "Insn.h"
 #include "Insn2.h"
 #include "IListIter.h"
+#include "LocNode.h"
 #include "macros.h"
+#include <stdlib.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -21,302 +23,151 @@ ProcessingMode::ProcessingMode(const StringC &name, const ProcessingMode *initia
 {
 }
 
-ProcessingMode::ElementRules::ElementRules(const StringC &name)
-: Named(name), unqual_(0)
-{
-}
-
-void ProcessingMode::addElement(Vector<StringC> &qgi, Owner<Expression> &expr,
-				const Location &loc, Interpreter &interp)
-{
-  if (interp.currentPartIndex() >= parts_.size())
-    parts_.resize(interp.currentPartIndex() + 1);
-
-  parts_[interp.currentPartIndex()].complexRules.insert(new ElementRule(qgi, expr, loc));
-}
-
-void ProcessingMode::ElementRule::add(GroveRules &groveRules, const NodePtr &node, Messenger &mgr) const
-{
-  Vector<StringC> normQGi(qGi_);
-  for (size_t i = 0; i < qGi_.size(); i++)
-    Interpreter::normalizeGeneralName(node, normQGi[i]);
-  ElementRules::add(groveRules.elementTable, normQGi.begin(), normQGi.size(),
-		    this, mgr);
-}
-
-void ProcessingMode::addDefault(Owner<Expression> &expr,
-				const Location &loc, Interpreter &interp)
-{
-  unsigned pi = interp.currentPartIndex();
-  if (pi >= parts_.size())
-    parts_.resize(pi + 1);
-  else if (parts_[pi].defaultRule) {
-    interp.setNextLocation(loc);
-    interp.message(InterpreterMessages::duplicateDefaultRule,
-		   parts_[pi].defaultRule->location());
-    return;
-  }
-  parts_[pi].defaultRule = new Rule(expr, loc);
-}
-
-void ProcessingMode::addId(const StringC &id, Owner<Expression> &expr,
-			   const Location &loc, Interpreter &interp)
-{
-  unsigned pi = interp.currentPartIndex();
-  if (pi >= parts_.size())
-    parts_.resize(pi + 1);
-  parts_[pi].complexRules.insert(new IdRule(id, expr, loc));
-}
-
-void ProcessingMode::IdRule::add(GroveRules &groveRules, const NodePtr &nd,
-				 Messenger &mgr) const
-{
-  StringC normId(id_);
-  Interpreter::normalizeGeneralName(nd, normId);
-  const GroveIdRule *r = groveRules.idTable.lookup(normId);
-  if (r) {
-    mgr.setNextLocation(location());
-    mgr.message(InterpreterMessages::duplicateIdRule,
-	        StringMessageArg(normId),
-		r->rule->location());
-    return;
-  }
-  groveRules.idTable.insert(new GroveIdRule(normId, this));
-}
-
-void ProcessingMode::addRoot(Owner<Expression> &expr,
-			     const Location &loc, Interpreter &interp)
-{
-  unsigned pi = interp.currentPartIndex();
-  if (pi >= parts_.size())
-    parts_.resize(pi + 1);
-  else if (parts_[pi].rootRule) {
-    interp.setNextLocation(loc);
-    interp.message(InterpreterMessages::duplicateRootRule,
-		   parts_[pi].rootRule->location());
-    return;
-  }
-  parts_[pi].rootRule = new Rule(expr, loc);
-}
-
-// Specificity gives specificity of last match; get specificity of current match.
-
-bool ProcessingMode::findMatch(const NodePtr &node, Messenger &mgr,
-			       Specificity &specificity,
-			       InsnPtr &insn, SosofoObj *&sosofoObj) const
-{
-  if (initial_ && specificity.toInitial_)
-    return initial_->findMatch(node, mgr, specificity, insn, sosofoObj);
-  GroveString gi;
-  if (node->getGi(gi) == accessOK) {
-    for (; specificity.part_ < parts_.size(); specificity.part_++) {
-      const Part &part = parts_[specificity.part_];
-      switch (specificity.ruleType_) {
-      case Specificity::noRule:
-      case Specificity::queryRule:
-	// try the id rule
-	{
-	  part.prepare(node, mgr);
-	  const NamedTable<GroveIdRule> &idTable
-	    = part.groveRules[node->groveIndex()].idTable;
-	  if (idTable.count() > 0) {
-	    GroveString str;
-	    if (node->getId(str) == accessOK) {
-	      StringC tem(str.data(), str.size());
-	      const GroveIdRule *r = idTable.lookup(tem);
-	      if (r) {
-		r->rule->get(insn, sosofoObj);
-		specificity.ruleType_ = Specificity::idRule;
-		return 1;
-	      }
-	    }
-	  }
-	}
-	// fall through
-      case Specificity::idRule:
-	// try the element rule
-	specificity.nQual_ = unsigned(-1);
-	// fall through
-      case Specificity::elementRule:
-	if (specificity.nQual_ > 0) {
-	  part.prepare(node, mgr);
-	  StringC tem(gi.data(), gi.size());
-	  const NamedTable<ElementRules> &elementTable
-	    = part.groveRules[node->groveIndex()].elementTable;
-	  const ElementRules *er = elementTable.lookup(tem);
-	  if (er) {
-	    const Rule *r = er->findMatch(node, specificity.nQual_);
-	    if (r) {
-	      r->get(insn, sosofoObj);
-	      specificity.ruleType_ = Specificity::elementRule;
-	      return 1;
-	    }
-	  }
-	}
-	if (part.defaultRule) {
-	  part.defaultRule->get(insn, sosofoObj);
-	  specificity.ruleType_ = Specificity::defaultRule;
-	  return 1;
-	}
-	// fall through
-      case Specificity::defaultRule:
-      case Specificity::rootRule:
-	break;
-      }
-      specificity.ruleType_ = Specificity::noRule;
-    }	
-  }
-  else {
-    NodePtr nd;
-    if (node->getDocumentElement(nd) == accessOK) {
-      for (; specificity.part_ < parts_.size(); specificity.part_++) {
-	if (specificity.ruleType_ == Specificity::rootRule)
-	  specificity.ruleType_ = Specificity::noRule;
-	else {
-	  const Part &part = parts_[specificity.part_];
-	  if (part.rootRule) {
-	    part.rootRule->get(insn, sosofoObj);
-	    specificity.ruleType_ = Specificity::rootRule;
-	    return 1;
-	  }
-	}
-      }
-    }
-  }
-  if (initial_) {
-    specificity.toInitial_ = 1;
-    specificity.ruleType_ = Specificity::noRule;
-    specificity.part_ = 0;
-    return initial_->findMatch(node, mgr, specificity, insn, sosofoObj);
-  }
-  return 0;
-}
-
 void ProcessingMode::compile(Interpreter &interp)
 {
-  for (size_t i = 0; i < parts_.size(); i++) {
-    Part &part = parts_[i];
-    if (part.defaultRule)
-      part.defaultRule->compile(interp);
-    if (part.rootRule)
-      part.rootRule->compile(interp);
-    for (IListIter<ComplexRule> iter(part.complexRules);
-         !iter.done();
-	 iter.next())
-      iter.cur()->compile(interp);
+  for (int i = 0; i < nRuleType; i++) {
+    for (size_t j = 0; j < rootRules_[i].size(); j++)
+      rootRules_[i][j].action().compile(interp, RuleType(i));
+    for (IListIter<ElementRule> iter(elementRules_[i]); !iter.done(); iter.next())
+      iter.cur()->action().compile(interp, RuleType(i));
   }
 }
 
-void ProcessingMode::ElementRules::addRule(const StringC *parents, size_t nParents,
-					   const ElementRule *rule,
-					   Messenger &mgr)
+void ProcessingMode::GroveRules::build(const IList<ElementRule> *lists,
+				       const NodePtr &node,
+				       Messenger &)
 {
-  if (nParents == 0) {
-    if (unqual_) {
-      mgr.setNextLocation(rule->location());
-      mgr.message(InterpreterMessages::duplicateElementRule,
-		  unqual_->location());
-    }
-    else
-      unqual_ = rule;
-  }
-  else
-    add(parent_, parents, nParents, rule, mgr);
-}
-
-void ProcessingMode::ElementRules::add(NamedTable<ElementRules> &table,
-				       const StringC *gis, size_t nGis,
-				       const ElementRule *rule,
-				       Messenger &mgr)
-{
-  ASSERT(nGis > 0);
-  ElementRules *er = table.lookup(gis[nGis - 1]);
-  if (!er) {
-    er = new ElementRules(gis[nGis - 1]);
-    table.insert(er);
-  }
-  er->addRule(gis, nGis - 1, rule, mgr);
-}
-
-
-const ProcessingMode::Rule *
-ProcessingMode::ElementRules::findMatch(const NodePtr &node, unsigned &nQual) const
-{
-  ASSERT(nQual > 0);
-  // nQual is number of qualifiers in previous match
-  // we must have fewer than that number
-  if (nQual > 1 && parent_.count() > 0) {
-    NodePtr parent;
-    if (node->getParent(parent) == accessOK) {
-      GroveString gi;
-      if (parent->getGi(gi) == accessOK) {
-	StringC tem(gi.data(), gi.size());
-	ElementRules *er = parent_.lookup(tem);
-        if (er) {
-	  unsigned nPQual = nQual - 1;
-	  const Rule *r = er->findMatch(parent, nPQual);
-	  if (r) {
-	    nQual = nPQual + 1;
-	    return r;
-	  }
+  built = 1;
+  for (int ruleType = 0; ruleType < nRuleType; ruleType++) {
+    for (IListIter<ElementRule> iter(lists[ruleType]); !iter.done(); iter.next()) {
+      StringC gi;
+      if (iter.cur()->mustHaveGi(gi)) {
+	Interpreter::normalizeGeneralName(node, gi);
+	ElementRules *p = elementTable.lookup(gi);
+	if (!p) {
+	  p = new ElementRules(gi);
+	  elementTable.insert(p);
 	}
+	p->rules[ruleType].push_back(iter.cur());
       }
+      else
+	otherRules[ruleType].push_back(iter.cur());
     }
   }
-  if (!unqual_)
-    return 0;
-  nQual = 0;
-  return unqual_;
+  for (int ruleType = 0; ruleType < nRuleType; ruleType++) {
+    NamedTableIter<ElementRules> iter(elementTable);
+    for (;;) {
+      ElementRules *p = iter.next();
+      if (!p)
+	break;
+      size_t j = p->rules[ruleType].size();
+      p->rules[ruleType].resize(p->rules[ruleType].size() + otherRules[ruleType].size());
+      for (size_t i = 0; i < otherRules[ruleType].size(); i++)
+	p->rules[ruleType][j++] = otherRules[ruleType][i];
+      sortRules(p->rules[ruleType]);
+    }
+    sortRules(otherRules[ruleType]);
+  }
 }
 
-ProcessingMode::Rule::Rule(Owner<Expression> &expr, const Location &loc)
-: defLoc_(loc), obj_(0)
+extern "C" {
+
+static
+int ruleCompare(const void *p1, const void *p2)
+{
+  return (*(const ProcessingMode::Rule *const *)p1)
+         ->compareSpecificity(**(const ProcessingMode::Rule *const *)p2);
+}
+
+}
+
+void ProcessingMode::GroveRules::sortRules(Vector<const ElementRule *> &v)
+{
+  qsort(&v[0], v.size(), sizeof(v[0]), ruleCompare);
+}
+
+ProcessingMode::Action::Action(unsigned partIndex, Owner<Expression> &expr,
+			   const Location &loc)
+: partIndex_(partIndex), defLoc_(loc), sosofo_(0)
 {
   expr.swap(expr_);
 }
 
-void ProcessingMode::Rule::compile(Interpreter &interp)
+ProcessingMode::Rule::Rule()
+{
+}
+
+ProcessingMode::Rule::Rule(const Ptr<Action> &action)
+: action_(action)
+{
+}
+
+int ProcessingMode::Rule::compareSpecificity(const Rule &r) const
+{
+  unsigned i1 = action().partIndex();
+  unsigned i2 = r.action().partIndex();
+  if (i1 == i2)
+    return 0;
+  return i1 < i2 ? -1 : 1;
+}
+
+void ProcessingMode::Action::compile(Interpreter &interp, RuleType ruleType)
 {
   expr_->optimize(interp, Environment(), expr_);
   ELObj *tem = expr_->constantValue();
   if (tem) {
-    obj_ = tem->asSosofo();
-    if (obj_)
-      return;
-  }
-  insn_ = expr_->compile(interp, Environment(), 0,
-			 new CheckSosofoInsn(defLoc_, InsnPtr()));
-}
-
-const Location &ProcessingMode::Rule::location() const
-{
-  return defLoc_;
-}
-
-ProcessingMode::IdRule::IdRule(const StringC &id, Owner<Expression> &expr, const Location &loc)
-: id_(id), ProcessingMode::ComplexRule(expr, loc)
-{
-}
-
-void ProcessingMode::Part::prepare(const NodePtr &node, Messenger &mgr) const
-{
-  unsigned long n = node->groveIndex();
-  ProcessingMode::Part *cache
-    = (ProcessingMode::Part *)this;
-  if (n >= groveRules.size()) {
-    if (groveRules.size() == 0) {
-      // reverse the list
-      IList<ComplexRule> tem;
-      tem.swap(cache->complexRules);
-      while (!tem.empty())
-	cache->complexRules.insert(tem.get());
+    if (ruleType == constructionRule) {
+      sosofo_ = tem->asSosofo();
+      if (sosofo_)
+	return;
     }
-    cache->groveRules.resize(n + 1);
   }
-  if (!groveRules[n].built) {
-    cache->groveRules[n].built = 1;
-    for (IListIter<ComplexRule> iter(complexRules); !iter.done(); iter.next())
-      iter.cur()->add(cache->groveRules[n], node, mgr);
+  InsnPtr check;
+  if (ruleType == constructionRule)
+    check = new CheckSosofoInsn(defLoc_, check);
+  insn_ = expr_->compile(interp, Environment(), 0, check);
+}
+
+ProcessingMode::ElementRule::ElementRule(const Ptr<Action> &action,
+					 Pattern &pattern)
+: Rule(action)
+{
+  pattern.swap(*this);
+}
+
+int ProcessingMode::ElementRule::compareSpecificity(const Rule &r) const
+{
+  int result = Rule::compareSpecificity(r);
+  if (result)
+    return result;
+  return Pattern::compareSpecificity(*this, (const ElementRule &)r);
+}
+
+void ProcessingMode::addRule(bool root,
+			     NCVector<Pattern> &patterns,
+			     Owner<Expression> &expr,
+			     RuleType ruleType,
+			     const Location &loc,
+			     Interpreter &interp)
+{
+  Ptr<Action> action = new Action(interp.currentPartIndex(), expr, loc);
+  for (size_t i = 0; i < patterns.size(); i++)
+    elementRules_[ruleType].insert(new ElementRule(action, patterns[i]));
+  if (!root)
+    return;
+  Vector<Rule> &rules = rootRules_[ruleType];
+  rules.push_back(Rule(action));
+  for (size_t i = rules.size() - 1; i > 0; i--) {
+    int cmp = rules[i - 1].compareSpecificity(rules[i]);
+    if (cmp <= 0) {
+      if (cmp == 0 && ruleType == constructionRule) {
+	interp.setNextLocation(loc);
+	interp.message(InterpreterMessages::duplicateRootRule,
+		       rules[i - 1].location());
+      }
+      break;
+    }
+    rules[i - 1].swap(rules[i]);
   }
 }
 
@@ -325,20 +176,141 @@ ProcessingMode::GroveRules::GroveRules()
 {
 }
 
-ProcessingMode::ComplexRule::ComplexRule(Owner<Expression> &expr, const Location &loc)
-: Rule(expr, loc)
+ProcessingMode::ElementRules::ElementRules(const StringC &name)
+: Named(name)
 {
 }
 
-ProcessingMode::GroveIdRule::GroveIdRule(const StringC &id, const IdRule *r)
-: Named(id), rule(r)
+// Specificity gives specificity of last match; get specificity of current match.
+
+const ProcessingMode::Rule *
+ProcessingMode::findMatch(const NodePtr &node,
+			  Pattern::MatchContext &context,
+			  Messenger &mgr,
+			  Specificity &specificity) const
 {
+  GroveString gi;
+  if (node->getGi(gi) == accessOK)
+    return findElementMatch(StringC(gi.data(), gi.size()), node, context, mgr,
+		            specificity);
+  NodePtr tem;
+  if (node->getOrigin(tem) != accessOK)
+    return findRootMatch(node, context, mgr, specificity);
+  return 0;
 }
 
-ProcessingMode::ElementRule::ElementRule(Vector<StringC> &qGi, Owner<Expression> &expr, const Location &loc)
-: ComplexRule(expr, loc)
+
+const ProcessingMode::Rule *
+ProcessingMode::findElementMatch(const StringC &gi,
+				 const NodePtr &node,
+				 Pattern::MatchContext &context,
+				 Messenger &mgr,
+				 Specificity &specificity) const
 {
-  qGi_.swap(qGi);
+  const Vector<const ElementRule *> *vecP = 0;
+
+  for (;;) {
+    for (;;) {
+      const ProcessingMode &mode
+	= *(initial_ && specificity.toInitial_ ? initial_ : this);
+      if (!vecP) {
+	const GroveRules &gr = mode.groveRules(node, mgr);
+	const ElementRules *er = gr.elementTable.lookup(gi);
+	vecP = er ? er->rules : gr.otherRules;
+      }
+      const Vector<const ElementRule *> &vec = vecP[specificity.ruleType_];
+      ASSERT(specificity.nextRuleIndex_ <= vec.size());
+      for (size_t &i = specificity.nextRuleIndex_; i < vec.size(); i++) {
+	if (vec[i]->trivial() || vec[i]->matches(node, context)) {
+	  const Rule *rule = vec[i];
+	  elementRuleAdvance(node, context, mgr, specificity, vec);
+	  return rule;
+	}
+      }
+      if (!initial_)
+	break;
+      vecP = 0;
+      if (specificity.toInitial_)
+	break;
+      specificity.nextRuleIndex_ = 0;
+      specificity.toInitial_ = 1;
+    }
+    if (specificity.ruleType_ == constructionRule)
+      break;
+    specificity.ruleType_ = constructionRule;
+    specificity.nextRuleIndex_ = 0;
+    specificity.toInitial_ = 0;
+  }
+  return 0;
+}
+
+const ProcessingMode::Rule *
+ProcessingMode::findRootMatch(const NodePtr &node,
+			      Pattern::MatchContext &context,
+			      Messenger &mgr,
+			      Specificity &specificity) const
+{
+  for (;;) {
+    for (;;) {
+      const ProcessingMode &mode = *(initial_ && specificity.toInitial_ ? initial_ : this);
+      const Vector<Rule> &rules = mode.rootRules_[specificity.ruleType_];
+      if (specificity.nextRuleIndex_ < rules.size())
+	return &rules[specificity.nextRuleIndex_++];
+      if (!initial_ || specificity.toInitial_)
+	break;
+      specificity.nextRuleIndex_ = 0;
+      specificity.toInitial_ = 1;
+    }
+    if (specificity.ruleType_ == constructionRule)
+      break;
+    specificity.ruleType_ = constructionRule;
+    specificity.nextRuleIndex_ = 0;
+    specificity.toInitial_ = 0;
+  }
+  return 0;
+}
+
+const ProcessingMode::GroveRules &ProcessingMode::groveRules(const NodePtr &node,
+							     Messenger &mgr) const
+{
+  unsigned long n = node->groveIndex();
+  ProcessingMode *cache = (ProcessingMode *)this;
+  if (n >= groveRules_.size())
+    cache->groveRules_.resize(n + 1);
+  if (!groveRules_[n].built)
+    cache->groveRules_[n].build(elementRules_, node, mgr);
+  return groveRules_[n];
+}
+
+void ProcessingMode::elementRuleAdvance(const NodePtr &node,
+				        Pattern::MatchContext &context,
+				        Messenger &mgr,
+				        Specificity &specificity,
+				        const Vector<const ElementRule *> &vec)
+{
+  size_t &i = specificity.nextRuleIndex_;
+  if (specificity.ruleType_ != constructionRule) {
+    ++i;
+    return;
+  }
+  size_t hit = i;
+  do {
+    ++i;
+    if (i >= vec.size()
+	|| vec[hit]->ElementRule::compareSpecificity(*vec[i]) != 0)
+      return;
+  } while (!(vec[i]->trivial() || vec[i]->matches(node, context)));
+
+  const LocNode *lnp;
+  Location nodeLoc;
+  if ((lnp = LocNode::convert(node)) != 0
+      && lnp->getLocation(nodeLoc) == accessOK)
+    mgr.setNextLocation(nodeLoc);
+  mgr.message(InterpreterMessages::ambiguousMatch);
+  do {
+    ++i;
+  } while (i < vec.size()
+           && vec[hit]->ElementRule::compareSpecificity(*vec[i]) == 0);
 }
 
 #ifdef DSSSL_NAMESPACE

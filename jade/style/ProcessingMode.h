@@ -16,6 +16,7 @@
 #include "Node.h"
 #include "FOTBuilder.h"
 #include "IList.h"
+#include "Pattern.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -26,138 +27,152 @@ class SosofoObj;
 
 class ProcessingMode : public Named {
 public:
+  enum RuleType {
+    styleRule,
+    constructionRule
+  };
+  enum { nRuleType = 2 };
+
   class Specificity {
   public:
     Specificity();
-    FOTBuilder::RuleType ruleType() const;
+    bool isStyle() const;
   private:
-    unsigned part_;
-    enum RuleType {
-      noRule,
-      queryRule,
-      idRule,
-      elementRule,
-      defaultRule,
-      rootRule
-    };
-    RuleType ruleType_;
-    unsigned nQual_; // number of qualifying elements applies if ruleType_ == elementRule
     bool toInitial_; // 1 if the match fell through from a named processing mode to
 	             // the initial processing mode
+    RuleType ruleType_;
+    size_t nextRuleIndex_;
     friend class ProcessingMode;
   };
-  ProcessingMode(const StringC &, const ProcessingMode *initial = 0);
-  void addRoot(Owner<Expression> &expr, const Location &loc, Interpreter &);
-  // ids and gis must have been normalized using documents substitution rules
-  void addId(const StringC &id, Owner<Expression> &expr, const Location &loc, Interpreter &);
-  void addDefault(Owner<Expression> &expr, const Location &loc, Interpreter &);
-  void addElement(Vector<StringC> &qgi, Owner<Expression> &expr,
-		  const Location &loc, Interpreter &);
-  // Specificity gives specificity of last match; get specificity of current match.
-  bool findMatch(const NodePtr &, Messenger &,
-		 Specificity &, InsnPtr &, SosofoObj *&) const;
-  void compile(Interpreter &);
-  class Rule {
+
+  class Action : public Resource {
   public:
-    Rule(Owner<Expression> &, const Location &);
-    virtual ~Rule() { }
-    void compile(Interpreter &);
+    Action(unsigned partIndex, Owner<Expression> &, const Location &);
+    void compile(Interpreter &, RuleType);
     void get(InsnPtr &, SosofoObj *&) const;
     const Location &location() const;
+    unsigned partIndex() const;
   private:
     Location defLoc_;
     Owner<Expression> expr_;
     // One of these will be non-null.
     InsnPtr insn_;
     // must be permanent
-    SosofoObj *obj_;
+    SosofoObj *sosofo_;
+    unsigned partIndex_;
   };
-  struct GroveRules;
-  class ComplexRule : public Rule, public Link {
+
+  class Rule {
   public:
-    ComplexRule(Owner<Expression> &, const Location &);
-    virtual void add(GroveRules &, const NodePtr &, Messenger &) const = 0;
-  };
-  class IdRule : public ComplexRule {
-  public:
-    IdRule(const StringC &, Owner<Expression> &, const Location &);
-    void add(GroveRules &, const NodePtr &, Messenger &) const;
+    Rule();
+    Rule(const Ptr<Action> &);
+    const Action &action() const;
+    Action &action();
+    virtual int compareSpecificity(const Rule &) const;
+    const Location &location() const;
+    void swap(Rule &);
   private:
-    StringC id_;
+    Ptr<Action> action_;
   };
-  struct ElementRule : public ComplexRule {
+
+  class ElementRule : public Rule, public Pattern, public Link {
   public:
-    ElementRule(Vector<StringC> &, Owner<Expression> &, const Location &);
-    void add(GroveRules &, const NodePtr &, Messenger &) const;
-  private:
-    Vector<StringC> qGi_;
+    ElementRule(const Ptr<Action> &, Pattern &);
+    int compareSpecificity(const Rule &) const;
   };
-  struct GroveIdRule : public Named {
-    GroveIdRule(const StringC &, const IdRule *);
-    const IdRule *rule;
-  };
-  class ElementRules : public Named {
+
+  ProcessingMode(const StringC &, const ProcessingMode *initial = 0);
+  void addRule(bool matchesRoot, NCVector<Pattern> &, Owner<Expression> &expr,
+	       RuleType, const Location &, Interpreter &);
+  // Specificity gives specificity of last match; gets specificity of current match.
+  const Rule *findMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
+			Specificity &) const;
+  void compile(Interpreter &);
+
+  struct ElementRules : public Named {
   public:
     ElementRules(const StringC &);
-    void addRule(const StringC *parents, size_t nParents, const ElementRule *,
-		 Messenger &);
-    const Rule *findMatch(const NodePtr &, unsigned &nQual) const;
-    static void add(NamedTable<ElementRules> &, const StringC *gis, size_t nGis,
-		    const ElementRule *, Messenger &);
-  private:
-    const ElementRule *unqual_;
-    NamedTable<ElementRules> parent_;
+    Vector<const ElementRule *> rules[nRuleType];
   };
+
   struct GroveRules {
     GroveRules();
     bool built;
     NamedTable<ElementRules> elementTable;
-    NamedTable<GroveIdRule> idTable;
-  };
-  struct Part {
-    Owner<Rule> defaultRule;
-    Owner<Rule> rootRule;
-    IList<ComplexRule> complexRules;
-    // Indexed by the groveIndex
-    NCVector<GroveRules> groveRules;
-    void prepare(const NodePtr &, Messenger &) const;
+    Vector<const ElementRule *> otherRules[nRuleType];
+    void build(const IList<ElementRule> *, const NodePtr &, Messenger &);
+    static void sortRules(Vector<const ElementRule *> &v);
   };
 private:
-  NCVector<Part> parts_;
+  const Rule *findElementMatch(const StringC &, const NodePtr &,
+			       Pattern::MatchContext &, Messenger &,
+			       Specificity &) const;
+  const Rule *findRootMatch(const NodePtr &, Pattern::MatchContext &, Messenger &,
+			    Specificity &) const;
+  const GroveRules &groveRules(const NodePtr &, Messenger &) const;
+  static void elementRuleAdvance(const NodePtr &nd, Pattern::MatchContext &context,
+		          Messenger &mgr, Specificity &specificity,
+			  const Vector<const ElementRule *> &vec);
+
+  Vector<Rule> rootRules_[nRuleType];
+  IList<ElementRule> elementRules_[nRuleType];
+  NCVector<GroveRules> groveRules_;
   const ProcessingMode *initial_; // 0 for initial mode
 };
 
 inline
 ProcessingMode::Specificity::Specificity()
-: part_(0), ruleType_(noRule), toInitial_(0)
+: toInitial_(0), nextRuleIndex_(0), ruleType_(styleRule)
 {
 }
 
 inline
-void ProcessingMode::Rule::get(InsnPtr &insn, SosofoObj *&obj) const
+bool ProcessingMode::Specificity::isStyle() const
+{
+  return ruleType_ == styleRule;
+}
+
+inline
+void ProcessingMode::Action::get(InsnPtr &insn, SosofoObj *&sosofo) const
 {
   insn = insn_;
-  obj = obj_;
+  sosofo = sosofo_;
 }
 
 inline
-FOTBuilder::RuleType ProcessingMode::Specificity::ruleType() const
+const Location &ProcessingMode::Action::location() const
 {
-  switch (ruleType_) {
-  case queryRule:
-    return FOTBuilder::ruleQuery;
-  case idRule:
-    return FOTBuilder::ruleId;
-  case elementRule:
-    return FOTBuilder::RuleType(FOTBuilder::ruleElement1 + nQual_);
-  case defaultRule:
-    return FOTBuilder::ruleDefault;
-  case rootRule:
-    return FOTBuilder::ruleRoot;
-  default:
-    break;
-  }
-  return FOTBuilder::ruleNone;
+  return defLoc_;
+}
+
+inline
+ProcessingMode::Action &ProcessingMode::Rule::action()
+{
+  return *action_;
+}
+
+inline
+const ProcessingMode::Action &ProcessingMode::Rule::action() const
+{
+  return *action_;
+}
+
+inline
+unsigned ProcessingMode::Action::partIndex() const
+{
+  return partIndex_;
+}
+
+inline
+const Location &ProcessingMode::Rule::location() const
+{
+  return action_->location();
+}
+
+inline
+void ProcessingMode::Rule::swap(Rule &r)
+{
+  action_.swap(r.action_);
 }
 
 #ifdef DSSSL_NAMESPACE

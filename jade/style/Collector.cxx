@@ -168,6 +168,7 @@ void Collector::makePermanent(Object *obj)
     if (obj->color() != Object::permanentColor) {
       totalObjects_--;
       obj->setColor(Object::permanentColor);
+      obj->readOnly_ = 1;
       if (obj->hasFinalizer_)
 	obj->moveAfter(&permanentFinalizersList_);
       else {
@@ -184,6 +185,7 @@ void Collector::makePermanent(Object *obj)
     if (lastTraced_ != &allObjectsList_) {
       Object *scanPtr = allObjectsList_.next();
       for (;;) {
+	scanPtr->readOnly_ = 1;
 	if (scanPtr->hasSubObjects())
 	  scanPtr->traceSubObjects(*this);
 	totalObjects_--;
@@ -204,6 +206,64 @@ void Collector::makePermanent(Object *obj)
     currentColor_ = saveColor;
   }
 }
+
+void Collector::makeReadOnly1(Object *obj)
+{
+  Object::Color saveColor = currentColor_;
+  currentColor_ = (currentColor_ == Object::someColor 
+		   ? Object::anotherColor
+		   : Object::someColor);
+  lastTraced_ = &allObjectsList_;
+  trace(obj);
+  if (lastTraced_ != &allObjectsList_) {
+    Object *scanPtr = allObjectsList_.next();
+    Object *firstNonFinal = 0;
+    Object *lim;
+    for (;;) {
+      if (scanPtr->hasSubObjects())
+  	scanPtr->traceSubObjects(*this);
+      Object *next = scanPtr->next();
+      if (scanPtr->hasFinalizer_)
+	scanPtr->moveAfter(&allObjectsList_);
+      else if (!firstNonFinal)
+	firstNonFinal = scanPtr;
+      if (scanPtr == lastTraced_) {
+	lim = next;
+  	break;
+      }
+      scanPtr = next;
+    }
+    // We have 1 or more objects to be made read-only in currentColor
+    // Followed by 0 or more objects with finalizers in saveColor
+    // Followed by 0 or more objects without finalizers in saveColor
+    for (scanPtr = allObjectsList_.next(); scanPtr != lim; scanPtr = scanPtr->next()) {
+      scanPtr->readOnly_ = 1;
+      scanPtr->setColor(saveColor);
+    }
+    if (firstNonFinal) {
+      for (;
+           scanPtr != freePtr_ && scanPtr->hasFinalizer_;
+	   scanPtr = scanPtr->next())
+	;
+      if (scanPtr != lim) {
+	Object *last = lim->prev();
+	// Move section of list from firstNonFinal up to lastTraced but not including
+	// lim to before scanPtr
+	firstNonFinal->prev()->next_ = last->next();
+	last->next()->prev_ = firstNonFinal->prev();
+	firstNonFinal->prev_ = scanPtr->prev();
+	last->next_ = scanPtr->prev()->next();
+	firstNonFinal->prev()->next_ = firstNonFinal;
+	last->next()->prev_ = last;
+      }
+    }
+  }
+  lastTraced_ = 0;
+  currentColor_ = saveColor;
+#ifdef DEBUG
+  check();
+#endif
+} 
 
 void Collector::traceDynamicRoots()
 {

@@ -34,7 +34,7 @@ const Identifier *Expression::keyword() const
   return 0;
 }
 
-void Expression::markBoundVars(BoundVarList &)
+void Expression::markBoundVars(BoundVarList &, bool)
 {
 }
 
@@ -175,11 +175,11 @@ InsnPtr CallExpression::compile(Interpreter &interp, const Environment &env,
   return result;
 }
 
-void CallExpression::markBoundVars(BoundVarList &vars)
+void CallExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  op_->markBoundVars(vars);
+  op_->markBoundVars(vars, shared);
   for (size_t i = 0; i < args_.size(); i++)
-    args_[i]->markBoundVars(vars);
+    args_[i]->markBoundVars(vars, shared);
 }
 
 VariableExpression::VariableExpression(const Identifier *ident,
@@ -195,8 +195,9 @@ InsnPtr VariableExpression::compile(Interpreter &interp,
 {
   bool isFrame;
   int index;
-  bool boxed;
-  if (env.lookup(ident_, isFrame, index, boxed)) {
+  unsigned flags;
+  if (env.lookup(ident_, isFrame, index, flags)) {
+    bool boxed = BoundVar::flagsBoxed(flags);
     InsnPtr tem;
     int n;
     if (isFrame
@@ -204,16 +205,20 @@ InsnPtr VariableExpression::compile(Interpreter &interp,
         && next->isPopBindings(n, tem)
 	&& n == 1
 	&& index - stackPos == -1) {
+      if (flags & BoundVar::uninitFlag)
+	tem = new CheckInitInsn(ident_, location(), tem);
       // This happens with named let.
       if (boxed)
-      	return new UnboxInsn(ident_, location(), tem);
+      	return new UnboxInsn(tem);
       else
       	return tem;
     }
-    if (boxed)
-      tem = new UnboxInsn(ident_, location(), next);
+    if (flags & BoundVar::uninitFlag)
+      tem = new CheckInitInsn(ident_, location(), next);
     else
       tem = next;
+    if (boxed)
+      tem = new UnboxInsn(tem);
     if (isFrame)
       return new StackRefInsn(index - stackPos, index, tem);
     else
@@ -241,8 +246,8 @@ void VariableExpression::optimize(Interpreter &interp, const Environment &env,
 {
   bool isFrame;
   int index;
-  bool boxed;
-  if (env.lookup(ident_, isFrame, index, boxed))
+  unsigned flags;
+  if (env.lookup(ident_, isFrame, index, flags))
     return;
   isTop_ = 1;
   Location loc;
@@ -262,9 +267,9 @@ bool VariableExpression::canEval(bool) const
   return !isTop_ || ident_->evaluated();
 }
 
-void VariableExpression::markBoundVars(BoundVarList &vars)
+void VariableExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  vars.mark(ident_);
+  vars.mark(ident_, BoundVar::usedFlag | (shared ? BoundVar::sharedFlag : 0));
 }
 
 IfExpression::IfExpression(Owner<Expression> &test,
@@ -321,11 +326,11 @@ InsnPtr IfExpression::compile(Interpreter &interp, const Environment &env,
 							   stackPos, next)));
 }
 
-void IfExpression::markBoundVars(BoundVarList &vars)
+void IfExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  test_->markBoundVars(vars);
-  consequent_->markBoundVars(vars);
-  alternate_->markBoundVars(vars);
+  test_->markBoundVars(vars, shared);
+  consequent_->markBoundVars(vars, shared);
+  alternate_->markBoundVars(vars, shared);
 }
 
 OrExpression::OrExpression(Owner<Expression> &test1,
@@ -367,10 +372,10 @@ InsnPtr OrExpression::compile(Interpreter &interp, const Environment &env,
 				    next));
 }
 
-void OrExpression::markBoundVars(BoundVarList &vars)
+void OrExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  test1_->markBoundVars(vars);
-  test2_->markBoundVars(vars);
+  test1_->markBoundVars(vars, shared);
+  test2_->markBoundVars(vars, shared);
 }
 
 CondFailExpression::CondFailExpression(const Location &loc)
@@ -418,14 +423,13 @@ InsnPtr CaseExpression::compile(Interpreter &interp,
   return key_->compile(interp, env, stackPos, finish);
 }
 
-
-void CaseExpression::markBoundVars(BoundVarList &vars)
+void CaseExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  key_->markBoundVars(vars);
+  key_->markBoundVars(vars, shared);
   for (size_t i = 0; i < cases_.size(); i++)
-    cases_[i].expr->markBoundVars(vars);
+    cases_[i].expr->markBoundVars(vars, shared);
   if (else_)
-    else_->markBoundVars(vars);
+    else_->markBoundVars(vars, shared);
 }
 
 bool CaseExpression::canEval(bool maybeCall) const
@@ -457,7 +461,7 @@ void CaseExpression::optimize(Interpreter &interp, const Environment &env,
       ELObj *tem = cases_[i].datums[j]->resolveQuantities(0, interp,
 							  location());
       if (tem) {
-	if (k && *k == *tem) {
+	if (k && ELObj::eqv(*k, *tem)) {
 	  expr = cases_[i].expr.extract();
 	  return;
 	}
@@ -522,11 +526,21 @@ InsnPtr LambdaExpression::compile(Interpreter &interp, const Environment &env,
 {
   BoundVarList boundVars;
   env.boundVars(boundVars);
-  markBoundVars(boundVars);
+  markBoundVars(boundVars, 0);
   boundVars.removeUnused();
+  BoundVarList formalVars(formals_, sig_.nRequiredArgs);
+  for (int i = 0; i < sig_.nOptionalArgs + sig_.nKeyArgs; i++) {
+    if (inits_[i])
+      inits_[i]->markBoundVars(formalVars, 0);
+    formalVars.append(formals_[sig_.nRequiredArgs + i], 0);
+  }
+  if (sig_.restArg)
+    formalVars.append(formals_.back(), 0);
+  ASSERT(formalVars.size() == formals_.size());
+  body_->markBoundVars(formalVars, 0);
   InsnPtr code
     = optimizeCompile(body_, interp,
-		      Environment(formals_, boundVars), formals_.size(),
+		      Environment(formalVars, boundVars), formals_.size(),
 		      new ReturnInsn(formals_.size()));
   if (sig_.nOptionalArgs || sig_.restArg || sig_.nKeyArgs) {
     Vector<InsnPtr> entryPoints(sig_.nOptionalArgs
@@ -539,19 +553,24 @@ InsnPtr LambdaExpression::compile(Interpreter &interp, const Environment &env,
     // Next entry is for all optional args, no other args
     // Last entry is for all optional args supplied, and other args
     //  (for this entry point all args are pushed; unspecified
-    //   keyword args are bound to unspecified values).
+    //   keyword args are bound to 0).
     entryPoints.back() = code;
+    // Box the rest arg if necessary.
+    if (sig_.restArg && formalVars.back().boxed())
+      entryPoints.back() = new BoxStackInsn(-1 - sig_.nKeyArgs, entryPoints.back());
     if (sig_.nKeyArgs) {
-      // For each keyword argument test whether it was
-      // unspecified, and if so initialize it.
+      // For each keyword argument test whether it is 0,
+      // and if so initialize it.
       for (int i = sig_.nOptionalArgs + sig_.nKeyArgs - 1;
 	   i >= sig_.nOptionalArgs;
 	   i--) {
 	int offset = i - (sig_.nOptionalArgs + sig_.nKeyArgs);
 	InsnPtr &next = entryPoints.back();
 	InsnPtr set(new SetKeyArgInsn(offset, next));
+	if (formalVars[sig_.nRequiredArgs + i].boxed())
+	  set = new BoxInsn(set);
 	if (inits_[i]) {
-	  Vector<const Identifier *> f(formals_);
+	  BoundVarList f(formalVars);
 	  f.resize(sig_.nRequiredArgs + i + sig_.restArg);
 	  set = optimizeCompile(inits_[i], interp,
 				Environment(f, boundVars),
@@ -560,15 +579,17 @@ InsnPtr LambdaExpression::compile(Interpreter &interp, const Environment &env,
 	}
 	else
 	  set = new ConstantInsn(interp.makeFalse(), set);
-	next = new TestUnspecifiedInsn(offset, set, next);
+	next = new TestNullInsn(offset, set, next);
       }
     }
     if (sig_.restArg || sig_.nKeyArgs) {
       for (int i = sig_.nOptionalArgs + sig_.nKeyArgs - 1;
 	   i >= sig_.nOptionalArgs;
 	   i--) {
+	if (formalVars[sig_.nRequiredArgs + i].boxed())
+	  code = new BoxInsn(code);
 	if (inits_[i]) {
-	  Vector<const Identifier *> f(formals_);
+	  BoundVarList f(formalVars);
 	  f.resize(sig_.nRequiredArgs + i + sig_.restArg);
 	  code = optimizeCompile(inits_[i], interp,
 				 Environment(f, boundVars),
@@ -578,26 +599,45 @@ InsnPtr LambdaExpression::compile(Interpreter &interp, const Environment &env,
 	else
 	  code = new ConstantInsn(interp.makeFalse(), code);
       }
-      if (sig_.restArg)
+      if (sig_.restArg) {
+	if (formalVars.back().boxed())
+	  code = new BoxInsn(code);
 	code = new ConstantInsn(interp.makeNil(), code);
+      }
       entryPoints[sig_.nOptionalArgs] = code;
     }
     for (int i = sig_.nOptionalArgs - 1; i >= 0; i--) {
+      InsnPtr tem(entryPoints[i + 1]);
+      if (formalVars[sig_.nRequiredArgs + i].boxed())
+  	tem = new BoxInsn(tem);
       if (inits_[i]) {
-	Vector<const Identifier *> f(formals_);
+	BoundVarList f(formalVars);
 	f.resize(sig_.nRequiredArgs + i);
 	entryPoints[i]
 	  = optimizeCompile(inits_[i], interp,
 			    Environment(f, boundVars),
 			    f.size(),
-			    entryPoints[i + 1]);
+			    tem);
       }
       else
 	entryPoints[i] = new ConstantInsn(interp.makeFalse(),
-					  entryPoints[i + 1]);
+					  tem);
+    }
+    for (int i = 0; i < sig_.nOptionalArgs; i++) {
+      if (formalVars[sig_.nRequiredArgs + i].boxed()) {
+        for (int j = i; j < sig_.nOptionalArgs; j++)
+	  entryPoints[j + 1] = new BoxArgInsn(i + sig_.nRequiredArgs, entryPoints[j + 1]);
+	if (sig_.nKeyArgs || sig_.restArg)
+	  entryPoints.back() = new BoxStackInsn(i - sig_.nKeyArgs - sig_.restArg
+					        - sig_.nOptionalArgs,
+					        entryPoints.back());
+      }
     }
     code = new VarargsInsn(sig_, entryPoints, location());
   }
+  for (int i = 0; i < sig_.nRequiredArgs; i++)
+    if (formalVars[i].boxed())
+      code = new BoxArgInsn(i, code);
   return compilePushVars(interp, env, stackPos, boundVars, 0,
 			 new ClosureInsn(&sig_, code,
 					 boundVars.size(), next));
@@ -614,8 +654,8 @@ InsnPtr Expression::compilePushVars(Interpreter &interp,
     return next;
   bool isFrame;
   int index;
-  bool boxed;
-  if (!env.lookup(vars[varIndex].ident, isFrame, index, boxed))
+  unsigned flags;
+  if (!env.lookup(vars[varIndex].ident, isFrame, index, flags))
     CANNOT_HAPPEN();
   if (isFrame)
     return new FrameRefInsn(index,
@@ -627,7 +667,7 @@ InsnPtr Expression::compilePushVars(Interpreter &interp,
 					      varIndex + 1, next));
 }
 
-void LambdaExpression::markBoundVars(BoundVarList &vars)
+void LambdaExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
   for (int i = 0; i < sig_.nOptionalArgs + sig_.nKeyArgs; i++)
     if (inits_[i]) {
@@ -635,11 +675,11 @@ void LambdaExpression::markBoundVars(BoundVarList &vars)
       f.resize(sig_.nRequiredArgs + i
 	       + (sig_.restArg && i >= sig_.nOptionalArgs));
       vars.rebind(f);
-      inits_[i]->markBoundVars(vars);
+      inits_[i]->markBoundVars(vars, 1);
       vars.unbind(f);
     }
   vars.rebind(formals_);
-  body_->markBoundVars(vars);
+  body_->markBoundVars(vars, 1);
   vars.unbind(formals_);
 }
 
@@ -669,8 +709,10 @@ InsnPtr LetExpression::compile(Interpreter &interp, const Environment &env,
 {
   int nVars = vars_.size();
   Environment bodyEnv(env);
-  bodyEnv.augmentFrame(vars_, stackPos, false);
-  return compileInits(interp, env, 0, stackPos,
+  BoundVarList boundVars(vars_);
+  body_->markBoundVars(boundVars, 0);
+  bodyEnv.augmentFrame(boundVars, stackPos);
+  return compileInits(interp, env, boundVars, 0, stackPos,
 		      optimizeCompile(body_, interp, bodyEnv,
 				      stackPos + nVars,
 				      PopBindingsInsn::make(nVars, next)));
@@ -678,23 +720,25 @@ InsnPtr LetExpression::compile(Interpreter &interp, const Environment &env,
 
 InsnPtr LetExpression::compileInits(Interpreter &interp,
 				    const Environment &env,
+				    const BoundVarList &initVars,
 				    size_t initIndex,
 				    int stackPos,
 				    const InsnPtr &next)
 {
   if (initIndex >= inits_.size())
     return next;
-  return optimizeCompile(inits_[initIndex], interp, env, stackPos,
-				   compileInits(interp, env, initIndex + 1,
-						stackPos + 1, next));
+  InsnPtr tem = compileInits(interp, env, initVars, initIndex + 1, stackPos + 1, next);
+  if (initVars[initIndex].boxed())
+    tem = new BoxInsn(tem);
+  return optimizeCompile(inits_[initIndex], interp, env, stackPos, tem);
 }
 
-void LetExpression::markBoundVars(BoundVarList &vars)
+void LetExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
   for (size_t i = 0; i < inits_.size(); i++)
-    inits_[i]->markBoundVars(vars);
+    inits_[i]->markBoundVars(vars, shared);
   vars.rebind(vars_);
-  body_->markBoundVars(vars);
+  body_->markBoundVars(vars, shared);
   vars.unbind(vars_);
 }
 
@@ -713,8 +757,15 @@ InsnPtr LetStarExpression::compile(Interpreter &interp,
 {
   int nVars = vars_.size();
   Environment bodyEnv(env);
-  bodyEnv.augmentFrame(vars_, stackPos, false);
-  return compileInits(interp, env, 0, stackPos,
+  BoundVarList vars;
+  for (int i = 0; i < nVars; i++) {
+    if (i > 0)
+      inits_[i]->markBoundVars(vars, 0);
+    vars.append(vars_[i], 0);
+  }
+  body_->markBoundVars(vars, 0);
+  bodyEnv.augmentFrame(vars, stackPos);
+  return compileInits(interp, env, vars, 0, stackPos,
 		      optimizeCompile(body_, interp, bodyEnv,
 				      stackPos + vars_.size(),
 				      PopBindingsInsn::make(nVars, next)));
@@ -722,6 +773,7 @@ InsnPtr LetStarExpression::compile(Interpreter &interp,
 
 InsnPtr LetStarExpression::compileInits(Interpreter &interp,
 					const Environment &env,
+					const BoundVarList &initVars,
 					size_t initIndex,
 					int stackPos,
 					const InsnPtr &next)
@@ -729,12 +781,14 @@ InsnPtr LetStarExpression::compileInits(Interpreter &interp,
   if (initIndex >= inits_.size())
     return next;
   Environment nextEnv(env);
-  Vector<const Identifier *> v(1);
-  v[0] = vars_[initIndex];
-  nextEnv.augmentFrame(v, stackPos, false);
-  return optimizeCompile(inits_[initIndex], interp, env, stackPos,
-			 compileInits(interp, nextEnv, initIndex + 1,
-				      stackPos + 1, next));
+  BoundVarList vars;
+  vars.append(initVars[initIndex].ident, initVars[initIndex].flags);
+  nextEnv.augmentFrame(vars, stackPos);
+  InsnPtr tem
+    = compileInits(interp, nextEnv, initVars, initIndex + 1, stackPos + 1, next);
+  if (initVars[initIndex].boxed())
+    tem = new BoxInsn(tem);
+  return optimizeCompile(inits_[initIndex], interp, env, stackPos, tem);
 }
 
 LetrecExpression::LetrecExpression(Vector<const Identifier *> &vars,
@@ -763,17 +817,33 @@ InsnPtr LetrecExpression::compile(Interpreter &interp, const Environment &env,
 				  int stackPos, const InsnPtr &next)
 {
   int nVars = vars_.size();
-  Environment initEnv(env);
-  initEnv.augmentFrame(vars_, stackPos, true);
+
+  BoundVarList vars(vars_, nVars, BoundVar::assignedFlag);
+
   Environment bodyEnv(env);
-  bodyEnv.augmentFrame(vars_, stackPos, false);
-  return new MakeBoxesInsn(nVars,
-			   compileInits(interp, initEnv, 0,
-					stackPos + nVars,
-					new SetBoxesInsn(nVars,
-							 optimizeCompile(body_, interp, bodyEnv,
-									stackPos + nVars,
-									PopBindingsInsn::make(nVars, next)))));
+  for (size_t i = 0; i < nVars; i++)
+    inits_[i]->markBoundVars(vars, 0);
+  body_->markBoundVars(vars, 0);
+  bodyEnv.augmentFrame(vars, stackPos);
+  InsnPtr tem = optimizeCompile(body_, interp, bodyEnv, stackPos + nVars,
+			        PopBindingsInsn::make(nVars, next));
+
+  for (size_t i = 0; i < nVars; i++)
+    vars[i].flags |= BoundVar::uninitFlag;
+
+  for (int i = 0; i < nVars; i++) {
+    if (vars[i].boxed())
+      tem = new SetBoxInsn(nVars, tem);
+    else
+      tem = new SetImmediateInsn(nVars, tem);
+  }
+  tem = compileInits(interp, bodyEnv, 0, stackPos + nVars, tem);
+  for (int i = nVars; i > 0; --i) {
+    if (vars[i - 1].boxed())
+      tem = new BoxInsn(tem);
+    tem = new ConstantInsn(0, tem);
+  }
+  return tem;
 }
 
 InsnPtr LetrecExpression::compileInits(Interpreter &interp,
@@ -789,20 +859,20 @@ InsnPtr LetrecExpression::compileInits(Interpreter &interp,
 						 stackPos + 1, next));
 }
 
-void LetrecExpression::markBoundVars(BoundVarList &vars)
+void LetrecExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
   vars.rebind(vars_);
   for (size_t i = 0; i < inits_.size(); i++)
-    inits_[i]->markBoundVars(vars);
-  body_->markBoundVars(vars);
+    inits_[i]->markBoundVars(vars, shared);
+  body_->markBoundVars(vars, shared);
   vars.unbind(vars_);
 }
 
 QuasiquoteExpression::QuasiquoteExpression(NCVector<Owner<Expression> > &members,
 					   Vector<PackedBoolean> &spliced,
-					   bool improper,
+					   Type type,
 					   const Location &loc)
-: Expression(loc), spliced_(spliced), improper_(improper)
+: Expression(loc), spliced_(spliced), type_(type)
 {
   members.swap(members_);
 }
@@ -812,7 +882,23 @@ InsnPtr QuasiquoteExpression::compile(Interpreter &interp, const Environment &en
 {
   InsnPtr tem(next);
   size_t n = members_.size();
-  if (improper_)
+  if (type_ == vectorType) {
+    bool splicy = 0;
+    for (size_t i = 0; i < n; i++) {
+      if (spliced_[i]) {
+        splicy = 1;
+	break;
+      }
+    }
+    if (!splicy) {
+      tem = new VectorInsn(n, tem);
+      for (size_t i = n; i > 0; i--)
+	tem = members_[i - 1]->compile(interp, env, stackPos + (i - 1), tem);
+      return tem;
+    }
+    tem = new ListToVectorInsn(tem);
+  }
+  else if (type_ == improperType)
     n--;
   for (size_t i = 0; i < n; i++) {
     if (spliced_[i])
@@ -821,17 +907,17 @@ InsnPtr QuasiquoteExpression::compile(Interpreter &interp, const Environment &en
       tem = new ConsInsn(tem);
     tem = members_[i]->compile(interp, env, stackPos + 1, tem);
   }
-  if (improper_)
+  if (type_ == improperType)
     tem = members_.back()->compile(interp, env, stackPos, tem);
   else
     tem = new ConstantInsn(interp.makeNil(), tem);
   return tem;
 }
 
-void QuasiquoteExpression::markBoundVars(BoundVarList &vars)
+void QuasiquoteExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
   for (size_t i = 0; i < members_.size(); i++)
-    members_[i]->markBoundVars(vars);
+    members_[i]->markBoundVars(vars, shared);
 }
 
 bool QuasiquoteExpression::canEval(bool maybeCall) const
@@ -844,16 +930,19 @@ bool QuasiquoteExpression::canEval(bool maybeCall) const
 
 void QuasiquoteExpression::optimize(Interpreter &interp, const Environment &env, Owner<Expression> &expr)
 {
+  for (size_t i = 0; i < members_.size(); i++)
+    members_[i]->optimize(interp, env, members_[i]);
+  if (type_ == vectorType)
+    return;
   if (members_.size() == 0) {
     expr = new ResolvedConstantExpression(interp.makeNil(), location());
     return;
   }
-  for (size_t i = 0; i < members_.size(); i++)
-    members_[i]->optimize(interp, env, members_[i]);
   ELObj *tail = members_.back()->constantValue();
   if (!tail)
     return;
-  if (!improper_ && !spliced_.back()) {
+  ASSERT(!(spliced_.back() && type_ == improperType));
+  if (type_ != improperType && !spliced_.back()) {
     tail = interp.makePair(tail, interp.makeNil());
     interp.makePermanent(tail);
   }
@@ -862,7 +951,7 @@ void QuasiquoteExpression::optimize(Interpreter &interp, const Environment &env,
     // FIXME optimize splice as well
     if (!tem || spliced_[i]) {
       members_.resize(i + 2);
-      improper_ = 1;
+      type_ = improperType;
       members_[i + 1] = new ResolvedConstantExpression(tail, location());
       return;
     }
@@ -872,6 +961,117 @@ void QuasiquoteExpression::optimize(Interpreter &interp, const Environment &env,
   expr = new ResolvedConstantExpression(tail, location());
 }
 
+SequenceExpression::SequenceExpression(NCVector<Owner<Expression> > &sequence,
+				       const Location &loc)
+: Expression(loc)
+{
+  ASSERT(sequence.size() > 0);
+  sequence.swap(sequence_);
+}
+
+InsnPtr
+SequenceExpression::compile(Interpreter &interp, const Environment &env,
+			    int stackPos, const InsnPtr &next)
+{
+  // FIXME optimize this
+  InsnPtr result(sequence_.back()->compile(interp, env, stackPos, next));
+  for (size_t i = sequence_.size() - 1; i > 0; i--)
+    result = sequence_[i - 1]->compile(interp, env, stackPos,
+                                       new PopInsn(result));
+  return result;
+}
+
+void SequenceExpression::markBoundVars(BoundVarList &vars, bool shared)
+{
+  for (size_t i = 0; i < sequence_.size(); i++)
+    sequence_[i]->markBoundVars(vars, shared);
+}
+
+bool SequenceExpression::canEval(bool maybeCall) const
+{
+  for (size_t i = 0; i < sequence_.size(); i++)
+    if (!sequence_[i]->canEval(maybeCall))
+      return 0;
+  return 1;
+}
+
+void SequenceExpression::optimize(Interpreter &interp, const Environment &env,
+				  Owner<Expression> &expr)
+{
+  size_t j = 0;
+  for (size_t i = 0;; i++) {
+    if (j != i)
+      sequence_[j].swap(sequence_[i]);
+    sequence_[j]->optimize(interp, env, sequence_[j]);
+    if (i == sequence_.size() - 1)
+      break;
+    if (!sequence_[j]->constantValue())
+      j++;  
+  }
+  if (j == 0)
+    sequence_[0].swap(expr);
+  else
+    sequence_.resize(j + 1);
+}
+
+AssignmentExpression::AssignmentExpression(const Identifier *var,
+					   Owner<Expression> &value,
+					   const Location &loc)
+: Expression(loc), var_(var)
+{
+  value.swap(value_);
+}
+
+InsnPtr AssignmentExpression::compile(Interpreter &interp, const Environment &env,
+				      int stackPos, const InsnPtr &next)
+{
+  bool isFrame;
+  int index;
+  unsigned flags;
+  if (!env.lookup(var_, isFrame, index, flags)) {
+    interp.setNextLocation(location());
+    unsigned part;
+    Location loc;
+    if (var_->defined(part, loc))
+      interp.message(InterpreterMessages::topLevelAssignment,
+	  	     StringMessageArg(var_->name()));
+    else
+      interp.message(InterpreterMessages::undefinedVariableReference,
+  		     StringMessageArg(var_->name()));
+    return new ErrorInsn;
+  }
+  InsnPtr result;
+  if (flags & BoundVar::uninitFlag)
+    result = new CheckInitInsn(var_, location(), next);
+  else
+    result = next;
+  if (isFrame) {
+    if (BoundVar::flagsBoxed(flags))
+      result = new StackSetBoxInsn(index - (stackPos + 1), index, location(), result);
+    else
+      result = new StackSetInsn(index - (stackPos + 1), index, result);
+  }
+  else {
+    ASSERT(BoundVar::flagsBoxed(flags));
+    result = new ClosureSetBoxInsn(index, location(), result);
+  }
+  return optimizeCompile(value_, interp, env, stackPos, result);
+}
+ 
+void AssignmentExpression::markBoundVars(BoundVarList &vars, bool shared)
+{
+  vars.mark(var_,
+            (BoundVar::usedFlag
+	     |BoundVar::assignedFlag
+	     |(shared ? BoundVar::sharedFlag : 0)));
+  value_->markBoundVars(vars, shared);
+}
+ 
+bool AssignmentExpression::canEval(bool maybeCall) const
+{
+  return value_->canEval(maybeCall);
+}
+ 
 WithModeExpression::WithModeExpression(const ProcessingMode *mode, Owner<Expression> &expr,
 				       const Location &loc)
 : Expression(loc), mode_(mode)
@@ -887,9 +1087,9 @@ InsnPtr WithModeExpression::compile(Interpreter &interp, const Environment &env,
 					  new PopModeInsn(next)));
 }
 
-void WithModeExpression::markBoundVars(BoundVarList &vars)
+void WithModeExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
-  expr_->markBoundVars(vars);
+  expr_->markBoundVars(vars, shared);
 }
 
 bool WithModeExpression::canEval(bool maybeCall) const
@@ -906,6 +1106,11 @@ StyleExpression::StyleExpression(Vector<const Identifier *> &keys,
   exprs.swap(exprs_);
 }
 
+// Interpret keywords in the following order of preference
+// 1. non-inherited characteristics
+// 2. DSSSL defined meaning (use: content-map:) etc
+// 3. inherited characteristics
+
 InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
 				 int stackPos, const InsnPtr &next)
 {
@@ -917,9 +1122,12 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
   BoundVarList boundVars;
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
-    if (!keys_[i]->inheritedC().isNull()) {
+    Identifier::SyntacticKey sk;
+    if (maybeStyleKeyword(keys_[i])
+	&& !(keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse)
+        && !keys_[i]->inheritedC().isNull()) {
       ics.resize(ics.size() + 1);
-      exprs_[i]->markBoundVars(boundVars);
+      exprs_[i]->markBoundVars(boundVars, 0);
     }
   }
   // FIXME optimize case where ics.size() == 0
@@ -929,7 +1137,15 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
   size_t j = 0;
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey sk;
-    if (!keys_[i]->inheritedC().isNull()) {
+    if (!maybeStyleKeyword(keys_[i]))
+      ;
+    else if (keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse) {
+      if (!hasUse) {
+	hasUse = 1;
+	useIndex = i;
+      }
+    }
+    else if (!keys_[i]->inheritedC().isNull()) {
       exprs_[i]->optimize(interp, newEnv, exprs_[i]);
       ELObj *val = exprs_[i]->constantValue();
       if (val) {
@@ -945,10 +1161,6 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
 				     exprs_[i]->compile(interp, newEnv, 0, InsnPtr()),
 				     exprs_[i]->location());
       }
-    }
-    else if (keys_[i]->syntacticKey(sk) && sk == Identifier::keyUse && !hasUse) {
-      hasUse = 1;
-      useIndex = i;
     }
     else
       unknownStyleKeyword(keys_[i], interp, location());
@@ -966,10 +1178,10 @@ InsnPtr StyleExpression::compile(Interpreter &interp, const Environment &env,
   }
 }
 
-void StyleExpression::markBoundVars(BoundVarList &vars)
+void StyleExpression::markBoundVars(BoundVarList &vars, bool shared)
 {
   for (size_t i = 0; i < exprs_.size(); i++)
-    exprs_[i]->markBoundVars(vars);
+    exprs_[i]->markBoundVars(vars, 1);
 }
 
 bool StyleExpression::canEval(bool maybeCall) const
@@ -988,6 +1200,11 @@ void StyleExpression::unknownStyleKeyword(const Identifier *ident, Interpreter &
   tem += Char(':');
   interp.message(InterpreterMessages::invalidStyleKeyword,
   		 StringMessageArg(tem));
+}
+
+bool StyleExpression::maybeStyleKeyword(const Identifier *ident) const
+{
+  return 1;
 }
 
 MakeExpression::MakeExpression(const Identifier *foc,
@@ -1013,7 +1230,7 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
   InsnPtr rest(next);
   for (size_t i = 0; i < keys_.size(); i++) {
     Identifier::SyntacticKey syn;
-    if (keys_[i]->syntacticKey(syn)) {
+    if (!flowObj->hasNonInheritedC(keys_[i]) && keys_[i]->syntacticKey(syn)) {
       if (syn == Identifier::keyLabel)
 	rest = optimizeCompile(exprs_[i],
 			       interp,
@@ -1034,11 +1251,20 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     nContent = 0;
   }
   rest = compileNonInheritedCs(interp, env, stackPos + 1, rest);
+  for (size_t i = 0; i < keys_.size(); i++) {
+    if (flowObj->hasPseudoNonInheritedC(keys_[i])
+        && !exprs_[i]->constantValue()) {
+      rest = exprs_[i]->compile(interp, env, stackPos + 1,
+			        new SetNonInheritedCInsn(keys_[i],
+						         exprs_[i]->location(),
+						         rest));
+    }
+  }
   // FIXME optimize case where there are no non-inherited styles.
   rest = StyleExpression::compile(interp, env, stackPos + 1, new SetStyleInsn(rest));
   if (nContent == 0 && !contentMapExpr) {
     if (cFlowObj)
-      return new SetDefaultContentInsn(cFlowObj, rest);
+      return new SetDefaultContentInsn(cFlowObj, location(), rest);
     else
       return new CopyFlowObjInsn(flowObj, rest);
   }
@@ -1047,7 +1273,7 @@ InsnPtr MakeExpression::compile(Interpreter &interp, const Environment &env, int
     rest = optimizeCompile(*contentMapExpr, interp, env, stackPos + 1,
 			   new ContentMapSosofoInsn((*contentMapExpr)->location(), rest));
     if (nContent == 0)
-      return new MakeDefaultContentInsn(rest);
+      return new MakeDefaultContentInsn(location(), rest);
   }
   // FIXME get rid of CheckSosofoInsn if we can guarantee result is a SosofoObj.
   if (nContent == 1)
@@ -1065,7 +1291,8 @@ FlowObj *MakeExpression::applyConstNonInheritedCs(FlowObj *flowObj, Interpreter 
 {
   FlowObj *result = flowObj;
   for (size_t i = 0; i < keys_.size(); i++)
-    if (flowObj->hasNonInheritedC(keys_[i])) {
+    if (flowObj->hasNonInheritedC(keys_[i])
+        || flowObj->hasPseudoNonInheritedC(keys_[i])) {
       exprs_[i]->optimize(interp, env, exprs_[i]);
       ELObj *val = exprs_[i]->constantValue();
       if (val) {
@@ -1093,7 +1320,7 @@ InsnPtr MakeExpression::compileNonInheritedCs(Interpreter &interp, const Environ
   env.boundVars(boundVars);
   for (size_t i = 0; i < keys_.size(); i++) {
     if (flowObj->hasNonInheritedC(keys_[i]) && !exprs_[i]->constantValue()) {
-      exprs_[i]->markBoundVars(boundVars);
+      exprs_[i]->markBoundVars(boundVars, 0);
       gotOne = 1;
     }
   }
@@ -1129,7 +1356,8 @@ void MakeExpression::unknownStyleKeyword(const Identifier *ident, Interpreter &i
       break;
     }
   }
-  if (flowObj->hasNonInheritedC(ident))
+  if (flowObj->hasNonInheritedC(ident)
+      || flowObj->hasPseudoNonInheritedC(ident))
     return;
   interp.setNextLocation(loc);
   StringC tem(ident->name());
@@ -1138,12 +1366,21 @@ void MakeExpression::unknownStyleKeyword(const Identifier *ident, Interpreter &i
   		 StringMessageArg(tem), StringMessageArg(foc_->name()));
 }
 
+bool MakeExpression::maybeStyleKeyword(const Identifier *ident) const
+{
+  FlowObj *flowObj = foc_->flowObj();
+  if (!flowObj)
+    return 1;
+  return (!flowObj->hasNonInheritedC(ident)
+          && !flowObj->hasPseudoNonInheritedC(ident));
+}
+
 Environment::Environment()
 : closureVars_(0)
 {
 }
 
-Environment::Environment(const Vector<const Identifier *> &frameVars,
+Environment::Environment(const BoundVarList &frameVars,
 			 const BoundVarList &closureVars)
 : closureVars_(&closureVars)
 {
@@ -1151,7 +1388,6 @@ Environment::Environment(const Vector<const Identifier *> &frameVars,
   frameVarList_ = tem;
   tem->vars = &frameVars;
   tem->stackPos = 0;
-  tem->boxed = 0;
 }
 
 void Environment::boundVars(BoundVarList &result) const
@@ -1159,28 +1395,28 @@ void Environment::boundVars(BoundVarList &result) const
   if (closureVars_) {
     for (size_t i = 0; i < closureVars_->size(); i++)
       result.append((*closureVars_)[i].ident,
-  		    (*closureVars_)[i].boxed);
+  		    (*closureVars_)[i].flags);
   }
   for (const FrameVarList *f = frameVarList_.pointer();
        f;
        f = f->next.pointer()) {
     for (size_t i = 0; i < f->vars->size(); i++)
-      result.append((*f->vars)[i], f->boxed);
+      result.append((*f->vars)[i].ident, (*f->vars)[i].flags);
   }
 }
 
 bool Environment::lookup(const Identifier *ident,
-			 bool &isFrame, int &index, bool &boxed)
+			 bool &isFrame, int &index, unsigned &flags)
      const
 {
   for (const FrameVarList *p = frameVarList_.pointer();
        p;
        p = p->next.pointer()) {
     for (size_t i = 0; i < p->vars->size(); i++)
-      if ((*p->vars)[i] == ident) {
+      if ((*p->vars)[i].ident == ident) {
 	isFrame = true;
 	index = i + p->stackPos;
-	boxed = p->boxed;
+	flags = (*p->vars)[i].flags;
 	return true;
       }
   }
@@ -1189,31 +1425,51 @@ bool Environment::lookup(const Identifier *ident,
       if ((*closureVars_)[i].ident == ident) {
 	isFrame = false;
 	index = i;
-	boxed = (*closureVars_)[i].boxed;
+	flags = (*closureVars_)[i].flags;
 	return true;
       }
   }
   return false;
 }
 
-void Environment::augmentFrame(const Vector<const Identifier *> &vars,
-			       int stackPos, bool boxed)
+void Environment::augmentFrame(const BoundVarList &vars, int stackPos)
 {
   FrameVarList *tem = new FrameVarList;
   tem->stackPos = stackPos;
   tem->vars = &vars;
   tem->next = frameVarList_;
-  tem->boxed = boxed;
   frameVarList_ = tem;
 }
 
-void BoundVarList::append(const Identifier *id, bool b)
+BoundVarList::BoundVarList(const Vector<const Identifier *> &idents)
+: Vector<BoundVar>(idents.size())
+{
+  for (size_t i = 0; i < size(); i++) {
+    BoundVar &tem = (*this)[i];
+    tem.ident = idents[i];
+    tem.reboundCount = 0;
+    tem.flags = 0;
+  }
+}
+
+BoundVarList::BoundVarList(const Vector<const Identifier *> &idents, size_t n,
+			   unsigned flags)
+: Vector<BoundVar>(n)
+{
+  for (size_t i = 0; i < n; i++) {
+    BoundVar &tem = (*this)[i];
+    tem.ident = idents[i];
+    tem.reboundCount = 0;
+    tem.flags = (flags & ~BoundVar::usedFlag);
+  }
+}
+
+void BoundVarList::append(const Identifier *id, unsigned flags)
 {
   resize(size() + 1);
   BoundVar &tem = back();
   tem.ident = id;
-  tem.boxed = b;
-  tem.used = 0;
+  tem.flags = (flags & ~BoundVar::usedFlag);
   tem.reboundCount = 0;
 }
 
@@ -1240,7 +1496,7 @@ void BoundVarList::removeUnused()
 {
   size_t j = 0;
   for (size_t i = 0; i < size(); i++) {
-    if ((*this)[i].used) {
+    if ((*this)[i].flags & BoundVar::usedFlag) {
       if (j != i)
 	(*this)[j] = (*this)[i];
       j++;
@@ -1249,11 +1505,11 @@ void BoundVarList::removeUnused()
   resize(j);
 }
 
-void BoundVarList::mark(const Identifier *ident)
+void BoundVarList::mark(const Identifier *ident, unsigned flags)
 {
   BoundVar *bv = find(ident);
   if (bv && !bv->reboundCount)
-    bv->used = 1;
+    bv->flags |= flags;
 }
 
 void BoundVarList::rebind(const Vector<const Identifier *> &idents)

@@ -50,22 +50,6 @@ WinApp::WinApp()
   if (defaultEncoding_.size() == 0 || !getCodingSystem(defaultEncoding_)) {
     defaultEncoding_ = asStringC(SP_DEFAULT_ENCODING);
   }
-  static struct {
-    const char *name;
-    char c;
-  } entities[] = {
-    { "lt", '<' },
-    { "gt", '>' },
-    { "amp", '&' },
-    { "quot", '"' },
-    { "apos", '\'' },
-  };
-  Vector<StringC> &v = options.recoveryEntities;
-  for (size_t i = 0; i < SIZEOF(entities); i++) {
-    v.push_back(asStringC(entities[i].name));
-    Char c = entities[i].c;
-    v.push_back(StringC(&c, 1));
-  }
 }
 
 const InputCodingSystem *
@@ -148,7 +132,8 @@ void WinApp::initParser(const StringC &sysid, SgmlParser &parser,
   xem->setCatalogManager(SOCatalogManager::make(catalogSysids,
 					        nExtra,
 					        systemCharset,
-					        systemCharset));
+					        systemCharset,
+						1));
   SgmlParser::Params params;
   params.sysid = sysid;
   params.entityManager = em.pointer();

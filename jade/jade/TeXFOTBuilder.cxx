@@ -204,7 +204,7 @@ public:
   void endGrid();
   void startGridCell(const GridCellNIC &);
   void endGridCell();
-  void startNode(const NodePtr &, const StringC &, RuleType);
+  void startNode(const NodePtr &, const StringC &);
   void endNode();
   void startLink(const Address &);
   void endLink();
@@ -292,7 +292,6 @@ public:
   void setBorderAlignment(Symbol);
   void setSidelineSide(Symbol);
   void setHyphenationKeep(Symbol);
-  void setPositionPreference(Symbol);
   void setFontStructure(Symbol);
   void setFontProportionateWidth(Symbol);
   void setCellCrossed(Symbol);
@@ -1288,8 +1287,7 @@ void TeXFOTBuilder::endGridCell()
 }
 
 void TeXFOTBuilder::startNode(const NodePtr &node,
-			      const StringC &processingMode, 
-			      RuleType ruleType)
+			      const StringC &processingMode)
 {
   GroveString id;
   unsigned long ei;
@@ -1763,11 +1761,6 @@ void TeXFOTBuilder::setSidelineSide(Symbol side)
 void TeXFOTBuilder::setHyphenationKeep(Symbol keep)
 {
   set("HyphenationKeep",keep);
-}
-
-void TeXFOTBuilder::setPositionPreference(Symbol pref)
-{
-  set("PositionPreference",pref);
 }
 
 void TeXFOTBuilder::setFontStructure(Symbol structure)
@@ -2627,6 +2620,7 @@ void TeXFOTBuilder::setDisplayNIC(const DisplayNIC &nic)
 {
   set("sb",nic.spaceBefore);
   set("sa",nic.spaceAfter);
+  MAYBESET("PositionPreference",nic.positionPreference,symbolFalse);
   MAYBESET("Keep",nic.keep,symbolFalse);
   MAYBESET("BreakBefore",nic.breakBefore,symbolFalse);
   MAYBESET("BreakAfter",nic.breakAfter,symbolFalse);

@@ -315,7 +315,7 @@ public:
   void endLink();
   void startScroll();
   void endScroll();
-  void startNode(const NodePtr &, const StringC &, RuleType);
+  void startNode(const NodePtr &, const StringC &);
   void endNode();
   void flushPendingAddresses();
   static void outputCdata(const Char *, size_t, OutputCharStream &);
@@ -792,8 +792,7 @@ HtmlFOTBuilder::Addressable *HtmlFOTBuilder::elementAddress(size_t g, size_t e)
   return v[e];
 }
 
-void HtmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
-			       RuleType)
+void HtmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode)
 {
   pendingAddr_.resize(pendingAddr_.size() + 1);
   if (mode.size() == 0) {

@@ -134,6 +134,7 @@ public:
   unsigned specialParseInputLevel() const;
   unsigned markedSectionLevel() const;
   unsigned markedSectionSpecialLevel() const;
+  unsigned currentInputElementIndex() const;
   const Location &currentMarkedSectionStartLocation() const;
   Boolean entityIsOpen(const Entity *) const;
   void popInputStack();
@@ -153,8 +154,7 @@ public:
 				const Location &,
 				Boolean referenced);
   ConstPtr<Entity> createUndefinedEntity(const StringC &,
-					 const Location &,
-					 Boolean &);
+					 const Location &);
   Boolean appendCurrentRank(StringC &, const RankStem *) const;
   void setCurrentRank(const RankStem *, const StringC &);
   void startMarkedSection(const Location &);
@@ -182,8 +182,9 @@ public:
   typedef NamedTableIter<Id> IdTableIter;
   IdTableIter idTableIter();
   const ParserOptions &options() const;
-  Boolean validate() const;
-  void disableValidation();
+  void enableImplydef();
+  Boolean implydefElement();
+  Boolean implydefAttlist();
   void keepMessages();
   void releaseKeptMessages();
   void discardKeptMessages();
@@ -198,8 +199,6 @@ public:
   // AFDR extensions
   void setHadAfdrDecl();
   Boolean hadAfdrDecl() const;
-
-  Boolean stupidNetTrick() const;
 
   // Implementation of AttributeContext.
   Boolean defineId(const StringC &, const Location &, Location &);
@@ -222,7 +221,6 @@ private:
   Id *lookupCreateId(const StringC &);
 
   ParserOptions options_;
-  Boolean validate_;
   EventHandler *handler_;
   Pass1EventHandler pass1Handler_;
   Boolean allowPass2_;
@@ -274,6 +272,7 @@ private:
   XcharMap<PackedBoolean> normalMap_;
   unsigned inputLevel_;
   IList<InputSource> inputStack_;
+  Vector<unsigned> inputLevelElementIndex_;
   Ptr<Dtd> currentDtd_;
   ConstPtr<Dtd> currentDtdConst_;
   Vector<Ptr<Dtd> > dtd_;
@@ -288,7 +287,8 @@ private:
   Markup markup_;
   Location markupLocation_;
   Boolean hadAfdrDecl_;
-  Boolean stupidNetTrick_;
+  Boolean implydefElement_;
+  Boolean implydefAttlist_;
   const volatile sig_atomic_t *cancelPtr_;
   static sig_atomic_t dummyCancel_;
   static const Location nullLocation_;
@@ -363,6 +363,12 @@ inline
 const Location &ParserState::currentMarkedSectionStartLocation() const
 {
   return markedSectionStartLocation_.back();
+}
+
+inline
+unsigned ParserState::currentInputElementIndex() const
+{
+  return inputLevelElementIndex_.back();
 }
 
 inline
@@ -689,15 +695,22 @@ const ParserOptions &ParserState::options() const
 }
 
 inline
-Boolean ParserState::validate() const
+Boolean ParserState::implydefElement()
 {
-  return validate_;
+  return implydefElement_;
 }
 
 inline
-void ParserState::disableValidation()
+Boolean ParserState::implydefAttlist()
 {
-  validate_ = 0;
+  return implydefAttlist_;
+}
+
+inline
+void ParserState::enableImplydef()
+{
+  implydefElement_ = 1;
+  implydefAttlist_ = 1;
 }
 
 inline
@@ -821,12 +834,6 @@ inline
 Boolean ParserState::hadAfdrDecl() const
 {
   return hadAfdrDecl_;
-}
-
-inline
-Boolean ParserState::stupidNetTrick() const
-{
-  return stupidNetTrick_;
 }
 
 #ifdef SP_NAMESPACE

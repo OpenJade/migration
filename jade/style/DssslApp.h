@@ -52,6 +52,7 @@ private:
   HashTable<StringC,NodePtr> groveTable_;
   StringC rootSystemId_;
   bool debugMode_;
+  bool dsssl2_;
 };
 
 #ifdef DSSSL_NAMESPACE

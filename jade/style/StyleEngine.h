@@ -21,7 +21,8 @@ class Interpreter;
 class STYLE_API StyleEngine {
 public:
   StyleEngine(Messenger &, GroveManager &,
-	      int unitsPerInch, bool debugMode, const FOTBuilder::Extension * = 0);
+	      int unitsPerInch, bool debugMode, bool dsssl2,
+	      const FOTBuilder::Extension * = 0);
   void defineVariable(const StringC &);
   void parseSpec(SgmlParser &specParser,
 		 const CharsetInfo &charset,

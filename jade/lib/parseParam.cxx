@@ -155,8 +155,14 @@ Boolean Parser::parseParam(const AllowedParams &allow,
       // fall through
     case tokenPeroNameStart:
       {
-	if (options().warnInstanceParamEntityRef && inInstance())
-	  message(ParserMessages::instanceParamEntityRef);
+	if (inInstance()) {
+	  if (options().warnInstanceParamEntityRef)
+	    message(ParserMessages::instanceParamEntityRef);
+	}
+	else {
+	  if (options().warnInternalSubsetPsParamEntityRef && inputLevel() == 1)
+	    message(ParserMessages::internalSubsetPsParamEntityRef);
+	}
 	ConstPtr<Entity> entity;
 	Ptr<EntityOrigin> origin;
 	if (!parseEntityReference(1, token == tokenPeroGrpo, entity, origin))
@@ -273,7 +279,7 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
 	if (inputLevel() <= declInputLevel)
 	  return 0;
       }
-      else
+      else if (!sd().www())
 	message(ParserMessages::groupEntityEnd);
       if (currentMarkup())
 	currentMarkup()->addEntityEnd();
@@ -285,6 +291,8 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       // fall through
     case tokenPeroNameStart:
       {
+	if (options().warnInternalSubsetTsParamEntityRef && inputLevel() == 1)
+	  message(ParserMessages::internalSubsetTsParamEntityRef);
 	ConstPtr<Entity> entity;
 	Ptr<EntityOrigin> origin;
 	if (!parseEntityReference(1, token == tokenPeroGrpo, entity, origin))
@@ -470,7 +478,16 @@ Boolean Parser::parseGroupConnector(const AllowedGroupConnectors &allow,
       }
       // fall through
     case tokenPeroNameStart:
-      message(ParserMessages::groupEntityReference);
+      if (!sd().www())
+	message(ParserMessages::groupEntityReference);
+      else {
+	ConstPtr<Entity> entity;
+	Ptr<EntityOrigin> origin;
+	if (!parseEntityReference(1, token == tokenPeroGrpo, entity, origin))
+	  return 0;
+	if (!entity.isNull())
+	  entity->declReference(*this, origin);
+      }
       break;
     case tokenUnrecognized:
       if (reportNonSgmlCharacter())
@@ -972,13 +989,8 @@ Boolean Parser::getIndicatedReservedName(Syntax::ReservedName *result)
   StringC &buffer = nameBuffer();
   getCurrentToken(syntax().generalSubstTable(), buffer);
   if (!syntax().lookupReservedName(buffer, result)) {
-    // Hack, hack
-    if (!options().errorAfdr && buffer == sd().execToInternal("ALL"))
-      *result = Syntax::rANY;
-    else {
-      message(ParserMessages::noSuchReservedName, StringMessageArg(buffer));
-      return 0;
-    }
+    message(ParserMessages::noSuchReservedName, StringMessageArg(buffer));
+    return 0;
   }
   if (currentMarkup())
     currentMarkup()->addReservedName(*result, currentInput());

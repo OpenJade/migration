@@ -22,32 +22,6 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 #ifdef __DECCXX
-#pragma define_template ConstPtr<ElementPattern>
-#else
-#ifdef __xlC__
-#pragma define(ConstPtr<ElementPattern>)
-#else
-#ifdef SP_ANSI_CLASS_INST
-template class ConstPtr<ElementPattern>;
-#else
-typedef ConstPtr<ElementPattern> Dummy_0;
-#endif
-#endif
-#endif
-#ifdef __DECCXX
-#pragma define_template Ptr<ElementPattern>
-#else
-#ifdef __xlC__
-#pragma define(Ptr<ElementPattern>)
-#else
-#ifdef SP_ANSI_CLASS_INST
-template class Ptr<ElementPattern>;
-#else
-typedef Ptr<ElementPattern> Dummy_1;
-#endif
-#endif
-#endif
-#ifdef __DECCXX
 #pragma define_template ConstPtr<MapNodeListObj::Context>
 #else
 #ifdef __xlC__
@@ -56,7 +30,7 @@ typedef Ptr<ElementPattern> Dummy_1;
 #ifdef SP_ANSI_CLASS_INST
 template class ConstPtr<MapNodeListObj::Context>;
 #else
-typedef ConstPtr<MapNodeListObj::Context> Dummy_2;
+typedef ConstPtr<MapNodeListObj::Context> Dummy_0;
 #endif
 #endif
 #endif
@@ -69,7 +43,33 @@ typedef ConstPtr<MapNodeListObj::Context> Dummy_2;
 #ifdef SP_ANSI_CLASS_INST
 template class Ptr<MapNodeListObj::Context>;
 #else
-typedef Ptr<MapNodeListObj::Context> Dummy_3;
+typedef Ptr<MapNodeListObj::Context> Dummy_1;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Ptr<SelectElementsNodeListObj::PatternSet>
+#else
+#ifdef __xlC__
+#pragma define(Ptr<SelectElementsNodeListObj::PatternSet>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Ptr<SelectElementsNodeListObj::PatternSet>;
+#else
+typedef Ptr<SelectElementsNodeListObj::PatternSet> Dummy_2;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template ConstPtr<SelectElementsNodeListObj::PatternSet>
+#else
+#ifdef __xlC__
+#pragma define(ConstPtr<SelectElementsNodeListObj::PatternSet>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class ConstPtr<SelectElementsNodeListObj::PatternSet>;
+#else
+typedef ConstPtr<SelectElementsNodeListObj::PatternSet> Dummy_3;
 #endif
 #endif
 #endif

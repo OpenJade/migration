@@ -16,8 +16,11 @@ public:
   class Object {
     friend struct Block;
     friend class Collector;
+  public:
+    bool readOnly() const { return readOnly_; }
+    bool permanent() const { return color_ == permanentColor; }
   protected:
-    Object() { }
+    Object() : readOnly_(0) { }
     virtual ~Object() { }
     // If we copy an object, don't copy inappropriate info.
     Object(const Object &obj) { hasSubObjects_ = obj.hasSubObjects_; }
@@ -45,6 +48,7 @@ public:
     char hasFinalizer_;
   protected:
     char hasSubObjects_;
+    char readOnly_;
   };
 
   class DynamicRoot {
@@ -83,6 +87,7 @@ public:
   void makePermanent(Object *);
   // Returns the number of live objects.
   unsigned long collect();
+  void makeReadOnly(Object *);
   bool objectMaybeLive(Object *);
 protected:
   virtual void traceStaticRoots() const { }
@@ -99,7 +104,7 @@ private:
   Object allObjectsList_;	// doubly-linked circular list of all objects
   Object permanentFinalizersList_;
   Object *lastTraced_;
-  DynamicRoot dynRootList_;	// dounly-linked circular list
+  DynamicRoot dynRootList_;	// doubly-linked circular list
   Object::Color currentColor_;
   Block *blocks_;
   unsigned long totalObjects_;
@@ -108,6 +113,7 @@ private:
   void makeSpace();
   void traceDynamicRoots();
   void check();
+  void makeReadOnly1(Object *);
   friend class DynamicRoot;
 };
 
@@ -223,6 +229,15 @@ inline
 bool Collector::objectMaybeLive(Object *obj)
 {
   return obj->color() == currentColor_ || obj->color() == Object::permanentColor;
+}
+
+inline
+void Collector::makeReadOnly(Object *obj)
+{
+  if (!obj->hasSubObjects())
+    obj->readOnly_ = 1;
+  else if (!obj->readOnly())
+    makeReadOnly1(obj);
 }
 
 #endif /* not Collector_INCLUDED */

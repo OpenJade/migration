@@ -1,10 +1,20 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
+
+// Possible improvements:
+// Don't serialize ports
+// Extension flow objects
+// Merge text chunks
+// Handle input-whitespace-treatment/tabs
+// Table processing
+// When element has an ID, output both ID anchor and numeric anchor
 
 #include "config.h"
 #include "SgmlFOTBuilder.h"
 #include "macros.h"
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -13,6 +23,7 @@ namespace DSSSL_NAMESPACE {
 class SgmlFOTBuilder : public SerialFOTBuilder {
 public:
   SgmlFOTBuilder(OutputCharStream *);
+  ~SgmlFOTBuilder();
   void setFontSize(Length);
   void setFontFamilyName(const StringC &);
   void setFontWeight(Symbol);
@@ -67,7 +78,6 @@ public:
   void setBorderAlignment(Symbol);
   void setSidelineSide(Symbol);
   void setHyphenationKeep(Symbol);
-  void setPositionPreference(Symbol);
   void setFontStructure(Symbol);
   void setFontProportionateWidth(Symbol);
   void setCellCrossed(Symbol);
@@ -144,6 +154,7 @@ public:
 
   void paragraphBreak(const ParagraphNIC &);
   void characters(const Char *, size_t);
+  void charactersFromNode(const NodePtr &nd, const Char *s, size_t n);
   void character(const CharacterNIC &);
   void externalGraphic(const ExternalGraphicNIC &);
   void rule(const RuleNIC &);
@@ -154,6 +165,7 @@ public:
   void pageNumber();
   void startSimplePageSequenceHeaderFooter(unsigned);
   void endSimplePageSequenceHeaderFooter(unsigned);
+  void endAllSimplePageSequenceHeaderFooter();
   void startScroll();
   void endScroll();
   void startLink(const Address &);
@@ -263,11 +275,21 @@ public:
   void endGrid();
   void startGridCell(const GridCellNIC &);
   void endGridCell();
-  void startNode(const NodePtr &, const StringC &, RuleType);
+  void startNode(const NodePtr &, const StringC &);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
+  struct Data {
+    Data(const StringC &str) : ptr(str.data()), size(str.size()) { }
+    Data(const Char *p, size_t n) : ptr(p), size(n) { }
+    const Char *ptr;
+    size_t size;
+  };
+  struct Units {
+    Units(long i) : n(i) { }
+    long n;
+  };
 private:
-  OutputCharStream &os() { return *os_; }
+  OutputCharStream &os() { return *curOs_; }
   void outputIcs();
   void startSimpleFlowObj(const char *name);
   void simpleFlowObj(const char *name);
@@ -285,16 +307,37 @@ private:
   void publicIdC(const char *, PublicId);
   void inlineSpaceC(const char *name, const InlineSpace &);
   void displaySpaceNIC(const char *name, const DisplaySpace &);
+  void flushPendingElements();
+  void outputElementName(unsigned long groveIndex, const Char *, size_t);
+  void outputElementName(const NodePtr &node);
+  static bool nodeIsElement(const NodePtr &node) {
+    GroveString gi;
+    return node->getGi(gi) == accessOK;
+  }
 
   Owner<OutputCharStream> os_;
   StrOutputCharStream ics_;
-  unsigned nodeDepth_;
-  unsigned elementNodeDepth_;
+  StrOutputCharStream hfs_;
+  OutputCharStream *curOs_;
   Vector<PackedBoolean> multiModeHasPrincipalMode_;
   Vector<PackedBoolean> glyphSubstTableDefined_;
+
+  Vector<NodePtr> pendingElements_;
+  Vector<unsigned> pendingElementLevels_;
+  unsigned nPendingElementsNonEmpty_;
+  unsigned nodeLevel_;
+  bool suppressAnchors_;
+  StringC hf_[nHF];
 };
 
 const char RE = '\r';
+const char quot = '"';
+const char *const trueString = "true";
+const char *const falseString = "false";
+// May change this to "null"
+const char *const nullString = "false";
+
+typedef SgmlFOTBuilder::Units Units;
 
 inline
 OutputCharStream &operator<<(OutputCharStream &os, 
@@ -316,14 +359,20 @@ OutputCharStream &operator<<(OutputCharStream &os, long n)
 }
 
 inline
+const char *boolString(bool b)
+{
+  return b ? trueString : falseString;
+}
+
+inline
 OutputCharStream &operator<<(OutputCharStream &os, FOTBuilder::Symbol sym)
 {
   switch (sym) {
   case FOTBuilder::symbolFalse:
-    os << '0';
+    os << falseString;
     break;
   case FOTBuilder::symbolTrue:
-    os << '1';
+    os << trueString;
     break;
   default:
     os << FOTBuilder::symbolName(sym);
@@ -340,24 +389,46 @@ OutputCharStream &operator<<(OutputCharStream &os, double d)
   return os << buf;
 }
 
+OutputCharStream &operator<<(OutputCharStream &os, Units u)
+{
+  char buf[32];
+  sprintf(buf, "%03d", u.n);
+  int len = strlen(buf);
+  int i = 0;
+  for (; i < 3 && buf[len - i - 1] == '0'; i++)
+    ;
+  if (i == 3) {
+    i = len - 3;
+    if (i == 0)
+      buf[i++] = '0';
+  }
+  else {
+    int j = len + 1 - i;
+    for (; i < 3; i++)
+      buf[len - i] = buf[len - i - 1];
+    buf[len - 3] = '.';
+    i = j;
+  }
+  strcpy(buf + i, "pt");
+  return os << buf;
+}
+
 inline
 OutputCharStream &operator<<(OutputCharStream &os,
 			     const FOTBuilder::LengthSpec &ls)
 {
   if (ls.displaySizeFactor != 0.0) {
     // 100+20%
-    os << '"';
     if (ls.length) {
-      os << ls.length;
+      os << Units(ls.length);
       if (ls.displaySizeFactor >= 0.0)
 	os << '+';
     }
     char buf[128];
     sprintf(buf, "%.2f%%", ls.displaySizeFactor * 100.0);
-    os << buf << '"';
   }
   else
-    os << ls.length;
+    os << Units(ls.length);
   return os;
 }
 
@@ -366,10 +437,9 @@ OutputCharStream &operator<<(OutputCharStream &os,
 {
   if (ls.displaySizeFactor != 0.0 || ls.tableUnitFactor != 0.0) {
     // 100+20%
-    os << '"';
     bool needSign = 0;
     if (ls.length) {
-      os << ls.length;
+      os << Units(ls.length);
       needSign = 1;
     }
     char buf[128];
@@ -386,10 +456,39 @@ OutputCharStream &operator<<(OutputCharStream &os,
       sprintf(buf, "%.2f*", ls.tableUnitFactor);
       os << buf;
     }
-    os << '"';
   }
   else
-    os << ls.length;
+    os << Units(ls.length);
+  return os;
+}
+
+OutputCharStream &operator<<(OutputCharStream &os,
+			     SgmlFOTBuilder::Data data)
+{
+  const Char *s = data.ptr;
+  size_t n = data.size;
+  for (; n > 0; n--, s++) {
+    switch (*s) {
+    case '&':
+      os << "&amp;";
+      break;
+    case '<':
+      os << "&lt;";
+      break;
+    case '>':
+      os << "&gt;";
+      break;
+    case '"':
+      os << "&quot;";
+      break;
+    default:
+      if (*s < 0x80)
+	os.put(*s);
+      else
+	os << "&#" << (unsigned long)*s << ';';
+      break;
+    }
+  }
   return os;
 }
 
@@ -398,13 +497,12 @@ OutputCharStream &operator<<(OutputCharStream &os,
 			     const FOTBuilder::GlyphId &gid)
 {
   if (gid.publicId) {
-    os << '"' << gid.publicId;
+    os << gid.publicId;
     if (gid.suffix)
       os << "::" << gid.suffix;
-    os << '"';
   }
   else
-    os << '0';
+    os << falseString;
   return os;
 }
 
@@ -420,77 +518,98 @@ void outputNumericCharRef(OutputCharStream &os, Char c)
 }
 
 SgmlFOTBuilder::SgmlFOTBuilder(OutputCharStream *os)
-: os_(os), nodeDepth_(0), elementNodeDepth_(0)
+: os_(os),
+  curOs_(os),
+  nodeLevel_(0),
+  nPendingElementsNonEmpty_(0),
+  suppressAnchors_(0)
 {
   os->setEscaper(outputNumericCharRef);
-  *os_ << "<!doctype fot public \"-//James Clark//DTD DSSSL Flow Object Tree//EN\">"
+  *os_ << "<?xml version=\"1.0\"?>" << RE;
+#if 0
+  *os_ << "<!DOCTYPE fot PUBLIC \"-//James Clark//DTD DSSSL Flow Object Tree//EN\">"
        << RE;
+#endif
+  *os_ << "<fot>" << RE;
+}
+
+SgmlFOTBuilder::~SgmlFOTBuilder()
+{
+  os() << "</fot>" << RE;
 }
 
 void SgmlFOTBuilder::characters(const Char *s, size_t n)
 {
-  os() << "<chars>" << RE;
-  for (; n > 0; n--, s++) {
-    switch (*s) {
-    default:
-      os().put(*s);
-      break;
-    case '&':
-    case '<':
-    case '>':
-      os() << "&#" << (unsigned long)*s << ';';
-      break;
-    }
-  }
-  os() << RE << "</chars>" << RE;
+  if (n == 0)
+    return;
+  flushPendingElements();
+  os() << "<text>" << Data(s, n) << "</text>" << RE;
+}
+
+void SgmlFOTBuilder::charactersFromNode(const NodePtr &nd, const Char *s, size_t n)
+{
+  GroveString name;
+  GroveString text;
+  NodePtr entity;
+  if (n == 1
+      && *s == 0xFFFD
+      && nd->getEntityName(name) == accessOK
+      && nd->getEntity(entity) == accessOK
+      && entity->getText(text) == accessOK)
+    os() << "<sdata name=" << quot << Data(name.data(), name.size()) << quot
+         << " text=" << quot << Data(text.data(), text.size()) << quot
+	 << "/>" << RE;
+  else
+    SgmlFOTBuilder::characters(s, n);
 }
 
 void SgmlFOTBuilder::characterNIC(const CharacterNIC &nic)
 {
   if (nic.specifiedC) {
     if (nic.specifiedC & (1 << CharacterNIC::cChar))
-      os() << " char=\"&#" << (unsigned long)nic.ch << ";\"";
+      os() << " char=" << quot << "&#" << (unsigned long)nic.ch << ";" << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cGlyphId))
-      os() << " glyph-id=" << nic.glyphId;
+      os() << " glyph-id=" << quot << nic.glyphId << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsDropAfterLineBreak))
-      os() << " drop-after-line-break=" << (nic.isDropAfterLineBreak ? '1' : '0');
+      os() << " drop-after-line-break=" << quot << boolString(nic.isDropAfterLineBreak) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsDropUnlessBeforeLineBreak))
-      os() << " drop-unless-before-line-break=" << (nic.isDropUnlessBeforeLineBreak ? '1' : '0');
+      os() << " drop-unless-before-line-break=" << quot << boolString(nic.isDropUnlessBeforeLineBreak) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsPunct))
-      os() << " punct=" << (nic.isPunct ? '1' : '0');
+      os() << " punct=" << quot << boolString(nic.isPunct) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsInputWhitespace))
-      os() << " input-whitespace=" << (nic.isInputWhitespace ? '1' : '0');
+      os() << " input-whitespace=" << quot << boolString(nic.isInputWhitespace) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsInputTab))
-      os() << " input-tab=" << (nic.isInputTab ? '1' : '0');
+      os() << " input-tab=" << quot << boolString(nic.isInputTab) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsRecordEnd))
-      os() << " record-end=" << (nic.isRecordEnd ? '1' : '0');
+      os() << " record-end=" << quot << boolString(nic.isRecordEnd) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cIsSpace))
-      os() << " space=" << (nic.isSpace ? '1' : '0');
+      os() << " space=" << quot << boolString(nic.isSpace) << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cScript)) {
       if (nic.script)
-	os() << " script=\"" << nic.script << '"';
+	os() << " script=" << quot << nic.script << quot;
       else
-	os() << " script=0";
+	os() << " script=" << quot << falseString << quot;
     }
     if (nic.specifiedC & (1 << CharacterNIC::cMathClass))
-      os() << " math-class=" << nic.mathClass;
+      os() << " math-class=" << quot << nic.mathClass << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cMathFontPosture))
-      os() << " math-font-posture=" << nic.mathFontPosture;
+      os() << " math-font-posture=" << quot << nic.mathFontPosture << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cBreakBeforePriority)) 
-      os() << " break-before-priority=" << nic.breakBeforePriority;
+      os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
     if (nic.specifiedC & (1 << CharacterNIC::cBreakAfterPriority))
-      os() << " break-after-priority=" << nic.breakAfterPriority;
+      os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
   }
   if (nic.stretchFactor != 1.0)
-    os() << " stretch-factor=" << nic.stretchFactor;
+    os() << " stretch-factor=" << quot << nic.stretchFactor << quot;
 }
 
 void SgmlFOTBuilder::character(const CharacterNIC &nic)
 {
+  flushPendingElements();
   os() << "<character";
   characterNIC(nic);
   outputIcs();
-  os() << '>' << RE;
+  os() << RE << "/>";
 }
 
 void SgmlFOTBuilder::outputIcs()
@@ -507,7 +626,7 @@ void SgmlFOTBuilder::setFontSize(Length n)
 
 void SgmlFOTBuilder::setFontFamilyName(const StringC &str)
 {
-  ics_ << " font-family-name=\"" << str << "\"";
+  ics_ << " font-family-name=" << quot << str << quot;
 }
 
 void SgmlFOTBuilder::setFontWeight(Symbol weight)
@@ -612,7 +731,7 @@ void SgmlFOTBuilder::setMarginaliaSep(const LengthSpec &ls)
 
 void SgmlFOTBuilder::lengthSpecC(const char *s, const LengthSpec &ls)
 {
-  ics_ << ' ' << s << '=' << ls;
+  ics_ << ' ' << s << '=' << quot << ls << quot;
 }
 
 void SgmlFOTBuilder::setMinPreLineSpacing(const OptLengthSpec &ols)
@@ -635,7 +754,7 @@ void SgmlFOTBuilder::optLengthSpecC(const char *s, const OptLengthSpec &ols)
   if (ols.hasLength)
     lengthSpecC(s, ols.length);
   else
-    ics_ << ' ' << s << "=\"\"";
+    ics_ << ' ' << s << quot << falseString << quot;
 }
 
 void SgmlFOTBuilder::setLines(Symbol sym)
@@ -783,11 +902,6 @@ void SgmlFOTBuilder::setHyphenationKeep(Symbol sym)
   symbolC("hyphenation-keep", sym);
 }
 
-void SgmlFOTBuilder::setPositionPreference(Symbol sym)
-{
-  symbolC("position-preference", sym);
-}
-
 void SgmlFOTBuilder::setFontStructure(Symbol sym)
 {
   symbolC("font-structure", sym);
@@ -810,26 +924,39 @@ void SgmlFOTBuilder::setMarginaliaSide(Symbol sym)
 
 void SgmlFOTBuilder::symbolC(const char *name, Symbol sym)
 {
-  ics_ << ' ' << name << '=' << sym;
+  ics_ << ' ' << name << '=' << quot << sym << quot;
+}
+
+inline
+void hex2(OutputCharStream &os, unsigned char c)
+{
+  static const char hexDigits[] = "0123456789ABCDEF";
+  os << hexDigits[c >> 4] << hexDigits[c & 0xF];
+}
+
+inline
+OutputCharStream &operator<<(OutputCharStream &os, const FOTBuilder::DeviceRGBColor &color)
+{
+  os << '#';
+  hex2(os, color.red);
+  hex2(os, color.green);
+  hex2(os, color.blue);
+  return os;
 }
 
 void SgmlFOTBuilder::setColor(const DeviceRGBColor &color)
 {
-  ics_ << " color.red=" << int(color.red)
-       << " color.green=" << int(color.green)
-       << " color.blue=" << int(color.blue);
+  ics_ << " color=" << quot << color << quot;
 }
 
 void SgmlFOTBuilder::setBackgroundColor()
 {
-  ics_ << " background-color=0";
+  ics_ << " background-color=" << quot << falseString << quot;
 }
 
 void SgmlFOTBuilder::setBackgroundColor(const DeviceRGBColor &color)
 {
-  ics_ << " background-color.red=" << int(color.red)
-       << " background-color.green=" << int(color.green)
-       << " background-color.blue=" << int(color.blue);
+  ics_ << " background-color=" << quot << color << quot;
 }
 
 void SgmlFOTBuilder::setPageWidth(Length units)
@@ -914,7 +1041,7 @@ void SgmlFOTBuilder::setBoxSizeAfter(Length units)
 
 void SgmlFOTBuilder::lengthC(const char *s, Length units)
 {
-  ics_ << ' ' << s << '=' << units;
+  ics_ << ' ' << s << '=' << quot << Units(units) << quot;
 }
 
 void SgmlFOTBuilder::setLayer(long n)
@@ -969,7 +1096,7 @@ void SgmlFOTBuilder::setOrphanCount(long n)
 
 void SgmlFOTBuilder::integerC(const char *s, long n)
 {
-  ics_ << ' ' << s << '=' << n;
+  ics_ << ' ' << s << '=' << quot << n << quot;
 }
 
 void SgmlFOTBuilder::setExpandTabs(long n)
@@ -984,20 +1111,22 @@ void SgmlFOTBuilder::setHyphenationLadderCount(long n)
 
 void SgmlFOTBuilder::setCountry(Letter2 code)
 {
-  ics_ << " country=";
+  ics_ << " country=" << quot;
   if (code)
     ics_ << char((code >> 8) & 0xff) << char(code & 0xff);
   else
-    ics_ << '0';
+    ics_ << falseString;
+  ics_ << quot;
 }
 
 void SgmlFOTBuilder::setLanguage(Letter2 code)
 {
-  ics_ << " language=";
+  ics_ << " language=" << quot;
   if (code)
     ics_ << char((code >> 8) & 0xff) << char(code & 0xff);
   else
-    ics_ << '0';
+    ics_ << falseString;
+  ics_ << quot;
 }
 
 void SgmlFOTBuilder::setBackgroundTile(PublicId pubid)
@@ -1047,11 +1176,12 @@ void SgmlFOTBuilder::setFontName(PublicId pubid)
 
 void SgmlFOTBuilder::publicIdC(const char *s, PublicId pubid)
 {
-  ics_ << ' ' << s << '=';
+  ics_ << ' ' << s << '=' << quot;
   if (pubid)
-    ics_ << '"' << pubid << '"';
+    ics_ << pubid;
   else
-    ics_ << '0';
+    ics_ << falseString;
+  ics_ << quot;
 }
 
 void SgmlFOTBuilder::setBorderPresent(bool b)
@@ -1176,7 +1306,7 @@ void SgmlFOTBuilder::setGridEquidistantColumns(bool b)
 
 void SgmlFOTBuilder::boolC(const char *s, bool b)
 {
-  ics_ << ' ' << s << (b ? "=1" : "=0");
+  ics_ << ' ' << s << '=' << quot << boolString(b) << quot;
 }
 
 void SgmlFOTBuilder::setEscapementSpaceBefore(const InlineSpace &is)
@@ -1192,11 +1322,11 @@ void SgmlFOTBuilder::setEscapementSpaceAfter(const InlineSpace &is)
 void SgmlFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
 {
   if (tables.size() == 0) {
-    ics_ << " glyph-subst-table=0";
+    ics_ << " glyph-subst-table=" << quot << quot;
     return;
   }
   static const char idPrefix[] = "gst";
-  ics_ << " glyph-subst-table=\"";
+  ics_ << " glyph-subst-table=" << quot;
   for (size_t i = 0; i < tables.size(); i++) {
     unsigned long n = tables[i]->uniqueId;
     if (n >= glyphSubstTableDefined_.size()) {
@@ -1205,71 +1335,79 @@ void SgmlFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> >
     }
     if (!glyphSubstTableDefined_[n]) {
       glyphSubstTableDefined_[n] = 1;
-      os() << "<define-glyph-subst-table id=" << idPrefix << n << '>' << RE;
+      os() << "<define-glyph-subst-table id=" << quot << idPrefix << n << quot << '>' << RE;
       const Vector<GlyphId> &pairs = tables[i]->pairs;
       for (size_t i = 0; i < pairs.size(); i += 2)
-	os() << "<glyph-subst old=" << pairs[i] << " new=" << pairs[i + 1] << '>' << RE;
+	os() << "<glyph-subst old=" << quot << pairs[i] << quot
+	     << " new=" << quot << pairs[i + 1] << quot << "/>" << RE;
       os() << "</define-glyph-subst-table>";
     }
     if (i > 0)
       ics_ << ' ';
     ics_ << idPrefix << n;
   }
-  ics_ << '"';
+  ics_ << quot;
 }
 
 void SgmlFOTBuilder::inlineSpaceC(const char *s, const InlineSpace &is)
 {
-  if (is.min)
-    ics_ << ' ' << s << ".min=" << is.min;
-  if (is.nominal)
-    ics_ << ' ' << s << ".nominal=" << is.nominal;
-  if (is.max)
-    ics_ << ' ' << s << ".max=" << is.max;
+  if (is.nominal || is.min || is.max) {
+    ics_ << ' ' << s << '=' << quot << is.nominal;
+    if (is.min.length != is.nominal.length
+        || is.min.displaySizeFactor != is.nominal.displaySizeFactor
+	|| is.max.length != is.nominal.length
+        || is.max.displaySizeFactor != is.nominal.displaySizeFactor)
+      ics_ << ',' << is.min << ',' << is.max;
+  }
 }
 
 void SgmlFOTBuilder::displayNIC(const DisplayNIC &nic)
 {
   if (nic.keepWithPrevious)
-    os() << " keep-with-previous";
+    os() << " keep-with-previous=" << quot << trueString << quot;
   if (nic.keepWithNext)
-    os() << " keep-with-next";
+    os() << " keep-with-next=" << quot << trueString << quot;
   if (nic.mayViolateKeepBefore)
-    os() << " may-violate-keep-before";
+    os() << " may-violate-keep-before=" << quot << trueString << quot;
   if (nic.mayViolateKeepAfter)
-    os() << " may-violate-keep-after";
+    os() << " may-violate-keep-after=" << quot << trueString << quot;
+  if (nic.positionPreference != symbolFalse)
+    os() << " position-preference=" << quot << nic.positionPreference << quot;
   if (nic.keep != symbolFalse)
-    os() << " keep=" << nic.keep;
+    os() << " keep=" << quot << nic.keep << quot;
   if (nic.breakBefore != symbolFalse)
-    os() << " break-before=" << nic.breakBefore;
+    os() << " break-before=" << quot << nic.breakBefore << quot;
   if (nic.breakAfter != symbolFalse)
-    os() << " break-after=" << nic.breakAfter;
+    os() << " break-after=" << quot << nic.breakAfter << quot;
   displaySpaceNIC("space-before", nic.spaceBefore);
   displaySpaceNIC("space-after", nic.spaceAfter);
 }
 
 void SgmlFOTBuilder::displaySpaceNIC(const char *s, const DisplaySpace &ds)
 {
-  if (ds.min)
-    os() << ' ' << s << ".min=" << ds.min;
-  if (ds.nominal)
-    os() << ' ' << s << ".nominal=" << ds.nominal;
-  if (ds.max)
-    os() << ' ' << s << ".max=" << ds.max;
+  if (ds.nominal || ds.min || ds.max) {
+    os() << ' ' << s << '=' << quot << ds.nominal;
+    if (ds.min.length != ds.nominal.length
+        || ds.min.displaySizeFactor != ds.nominal.displaySizeFactor
+        || ds.max.length != ds.nominal.length
+        || ds.max.displaySizeFactor != ds.nominal.displaySizeFactor)
+      os() << ',' << ds.min << ',' << ds.max;
+    os() << quot;
+  }
   if (ds.force)
-    os() << ' ' << s << ".priority=force";
+    os() << ' ' << s << "-priority=" << quot << "force" << quot;
   else if (ds.priority)
-    os() << ' ' << s << ".priority=" << ds.priority;
+    os() << ' ' << s << "-priority=" << quot << ds.priority << quot;
   if (!ds.conditional)
-    os() << ' ' << s << ".conditional=0";
+    os() << ' ' << s << "-conditional=" << quot << falseString << quot;
 }
 
 void SgmlFOTBuilder::inlineNIC(const InlineNIC &nic)
 {
   if (nic.breakBeforePriority)
-    os() << " break-before-priority=" << nic.breakBeforePriority;
+    os() << " break-before-priority=" << quot << nic.breakBeforePriority << quot;
   if (nic.breakAfterPriority)
-    os() << " break-after-priority=" << nic.breakAfterPriority;
+    os() << " break-after-priority=" << quot << nic.breakAfterPriority << quot;
 }
 
 void SgmlFOTBuilder::startParagraph(const ParagraphNIC &nic)
@@ -1290,14 +1428,14 @@ void SgmlFOTBuilder::paragraphBreak(const ParagraphNIC &nic)
   os() << "<paragraph-break";
   displayNIC(nic);
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
 }
 
 void SgmlFOTBuilder::startDisplayGroup(const DisplayGroupNIC &nic)
 {
   os() << "<display-group";
   if (nic.hasCoalesceId)
-    os() << " coalesce-id=\"" << nic.coalesceId << '"';
+    os() << " coalesce-id=" << quot << Data(nic.coalesceId) << quot;
   displayNIC(nic);
   outputIcs();
   os() << ">" << RE;
@@ -1312,7 +1450,7 @@ void SgmlFOTBuilder::simpleFlowObj(const char *name)
 {
   os() << '<' << name;
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
 }
 
 void SgmlFOTBuilder::startSimpleFlowObj(const char *name)
@@ -1344,6 +1482,7 @@ void SgmlFOTBuilder::endSequence()
 
 void SgmlFOTBuilder::startLineField(const LineFieldNIC &)
 {
+  flushPendingElements();
   startSimpleFlowObj("line-field");
 }
  
@@ -1368,29 +1507,25 @@ void SgmlFOTBuilder::startLink(const Address &addr)
   outputIcs();
   switch (addr.type) {
   case Address::sgmlDocument:
-    os() << " destination.system-id=\"" << addr.params[0] << '"';
-    os() << " destination.idref=\"" << addr.params[1] << '"';
+    // FIXME
     break;
   case Address::resolvedNode:
-    {
-      unsigned long n;
-      if (addr.node->elementIndex(n) == accessOK)
-	os() << " destination.element-index=" << n;
+    if (!nodeIsElement(addr.node))
       break;
-    }
+    os() << " destination=" << quot;
+    outputElementName(addr.node);
+    os() << quot;
+    break;
   case Address::idref:
-    os() << " destination.idref=\"" << addr.params[0] << '"';
+    os() << " destination=" << quot;
+    outputElementName(addr.node->groveIndex(), addr.params[0].data(), addr.params[0].size());
+    os() << quot;
     break;
   case Address::entity:
-    os() << " destination.entity=\"" << addr.params[0] << '"';
+    // FIXME
     break;
   default:
     break;
-  }
-  if (addr.node) {
-    unsigned long n = addr.node->groveIndex();
-    if (n)
-      os() << " destination.grove-index=" << n;
   }
   os() << '>' << RE;
 }
@@ -1416,7 +1551,7 @@ void SgmlFOTBuilder::startMultiModeSerial(const MultiMode *principalMode)
   if (principalMode) {
     os() << "<multi-mode.mode";
     if (principalMode->hasDesc)
-      os() << " desc=\"" << principalMode->desc << '"';
+      os() << " desc=" << quot << Data(principalMode->desc) << quot;
     os() << '>' << RE;
   }
   multiModeHasPrincipalMode_.push_back(principalMode != 0);
@@ -1436,9 +1571,9 @@ void SgmlFOTBuilder::startMultiModeMode(const MultiMode &mode)
     endFlow("multi-mode.mode");
     multiModeHasPrincipalMode_.back() = 0;
   }
-  os() << "<multi-mode.mode name=\"" << mode.name << '"';
+  os() << "<multi-mode.mode name=" << quot << Data(mode.name) << quot;
   if (mode.hasDesc)
-    os() << " desc=\"" << mode.desc << '"';
+    os() << " desc=" << quot << Data(mode.desc) << quot;
   os () << '>' << RE;
 }
 
@@ -1451,7 +1586,7 @@ void SgmlFOTBuilder::startScore(Symbol type)
 {
   const char *s = symbolName(type);
   if (s) {
-    os() << "<score " << s;
+    os() << "<score type=" << quot << s << quot;
     outputIcs();
     os() << '>' << RE;
   }
@@ -1459,16 +1594,16 @@ void SgmlFOTBuilder::startScore(Symbol type)
 
 void SgmlFOTBuilder::startScore(const LengthSpec &ls)
 {
-  os() << "<score type.length-spec=" << ls;
+  os() << "<score type=" << quot << ls << quot;
   outputIcs();
   os() << '>' << RE;
 }
 
 void SgmlFOTBuilder::startScore(Char c)
 {
-  os() << "<score type.char=\"";
+  os() << "<score type=\"char\" char=" << quot;
   os().put(c);
-  os() << '"';
+  os() << quot;
   outputIcs();
   os() << '>' << RE;
 }
@@ -1481,6 +1616,8 @@ void SgmlFOTBuilder::endScore()
 void SgmlFOTBuilder::startSimplePageSequence()
 {
   startSimpleFlowObj("simple-page-sequence");
+  suppressAnchors_ = 1;
+  curOs_ = &hfs_;
 }
  
 void SgmlFOTBuilder::endSimplePageSequence()
@@ -1490,41 +1627,59 @@ void SgmlFOTBuilder::endSimplePageSequence()
 
 void SgmlFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned flags)
 {
-  os() << "<simple-page-sequence.header-footer";
-  if ((flags & (headerHF|footerHF)) == headerHF)
-    os() << " header";
-  else
-    os() << " footer";
-  switch (flags & (leftHF|centerHF|rightHF)) {
-  case leftHF:
-    os() << " left";
-    break;
-  case rightHF:
-    os() << " right";
-    break;
-  case centerHF:
-    os() << " center";
-    break;
-  }
-  if ((flags & (firstHF|otherHF)) == firstHF)
-    os() << " first";
-  else
-    os() << " other";
-  if ((flags & (frontHF|backHF)) == frontHF)
-    os() << " front";
-  else
-    os() << " back";
-  os() << '>' << RE;
 }
 
-void SgmlFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
+void SgmlFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned flags)
 {
-  endFlow("simple-page-sequence.header-footer");
+  hfs_.extractString(hf_[flags]);
+}
+
+void SgmlFOTBuilder::endAllSimplePageSequenceHeaderFooter()
+{
+  curOs_ = os_.pointer();
+  suppressAnchors_ = 0;
+  for (int i = 0; i < nHF; i += nHF/6) {
+    int front;
+    if (hf_[i + (firstHF|frontHF)] != hf_[i + (firstHF|backHF)]
+        || hf_[i + (otherHF|frontHF)] != hf_[i + (otherHF|backHF)])
+      front = frontHF;
+    else
+      front = 0;
+    int first;
+    if (hf_[i + (firstHF|frontHF)] != hf_[i + (otherHF|frontHF)]
+        || hf_[i + (firstHF|backHF)] != hf_[i + (otherHF|backHF)])
+      first = firstHF;
+    else
+      first = 0;
+    for (int j = 0; j <= front; j += frontHF) {
+      for (int k = 0; k <= first; k += firstHF) {
+	const StringC &str = hf_[i + j + k];
+	if (str.size() != 0) {
+	  const char *side;
+	  if (i & centerHF)
+	    side = "center";
+	  else if (i & rightHF)
+	    side = "right";
+	  else
+	    side = "left";
+	  const char *hf = (i & headerHF) ? "header" : "footer";
+	  os() << "<simple-page-sequence." << side << '-' << hf;
+	  if (front)
+	    os() << " front=" << quot << boolString(j != 0) << quot;
+	  if (first)
+	    os() << " first=" << quot << boolString(k != 0) << quot;
+	  os() << '>' << RE;
+	  os() << str << "</simple-page-sequence." << side << '-' << hf << '>' << RE;
+	}
+      }
+    }
+  }
+
 }
 
 void SgmlFOTBuilder::pageNumber()
 {
-  os() << "<page-number>";
+  os() << "<page-number/>" << RE;
 }
 
 void SgmlFOTBuilder::startMathSequence()
@@ -1764,7 +1919,7 @@ void SgmlFOTBuilder::radicalRadical(const CharacterNIC &nic)
   os() << "<radical.radical";
   characterNIC(nic);
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
   startPortFlow("radical.principal");
 }
 
@@ -1819,9 +1974,9 @@ void SgmlFOTBuilder::startGrid(const GridNIC &nic)
 {
   os() << "<grid";
   if (nic.nColumns)
-    os() << " grid-n-columns=" << (unsigned long)nic.nColumns;
+    os() << " grid-n-columns=" << quot << (unsigned long)nic.nColumns << quot;
   if (nic.nRows)
-    os() << " grid-n-rows=" << (unsigned long)nic.nRows;
+    os() << " grid-n-rows=" << quot << (unsigned long)nic.nRows << quot;
   outputIcs();
   os() << '>' << RE;
 }
@@ -1835,9 +1990,9 @@ void SgmlFOTBuilder::startGridCell(const GridCellNIC &nic)
 {
   os() << "<grid-cell";
   if (nic.columnNumber)
-    os() << " column-number=" << (unsigned long)nic.columnNumber;
+    os() << " column-number=" << quot << (unsigned long)nic.columnNumber << quot;
   if (nic.rowNumber)
-    os() << " row-number=" << (unsigned long)nic.rowNumber;
+    os() << " row-number=" << quot << (unsigned long)nic.rowNumber << quot;
   outputIcs();
   os() << '>' << RE;
 }
@@ -1849,44 +2004,44 @@ void SgmlFOTBuilder::endGridCell()
 
 void SgmlFOTBuilder::externalGraphic(const ExternalGraphicNIC &nic)
 {
-  // FIXME quote as necessary
-  os() << "<external-graphic entity-system-id=\""
-       << nic.entitySystemId
-       << '"'
-       << " notation-system-id=\""
-       << nic.notationSystemId
-       << '"';
+  flushPendingElements();
+  os() << "<external-graphic entity-system-id="
+       << quot << Data(nic.entitySystemId) << quot
+       << " notation-system-id="
+       << quot << Data(nic.notationSystemId) << quot;
   if (nic.scaleType != symbolFalse)
-    os() << " scale=" << nic.scaleType;
+    os() << " scale=" << quot << nic.scaleType << quot;
   else
-    os() << " scale.x=" << nic.scale[0] << " scale.y=" << nic.scale[1];
+    os() << " scale-x=" << quot << nic.scale[0] << quot
+         << " scale-y=" << quot << nic.scale[1] << quot;
   if (nic.hasMaxWidth)
-    os() << " max-width=" << nic.maxWidth;
+    os() << " max-width=" << quot << nic.maxWidth << quot;
   if (nic.hasMaxHeight)
-    os() << " max-height=" << nic.maxHeight;
+    os() << " max-height=" << quot << nic.maxHeight << quot;
   if (nic.isDisplay) {
-    os() << " display";
+    os() << " display=" << quot << trueString << quot;
     displayNIC(nic);
   }
   else {
     if (nic.escapementDirection != symbolFalse)
-      os() << " escapement-direction=" << nic.escapementDirection;
+      os() << " escapement-direction=" << quot << nic.escapementDirection << quot;
     if (nic.positionPointX)
-      os() << " position-point-x=" << nic.positionPointX;
+      os() << " position-point-x=" << quot << nic.positionPointX << quot;
     if (nic.positionPointY)
-      os() << " position-point-y=" << nic.positionPointY;
+      os() << " position-point-y=" << quot << nic.positionPointY << quot;
     inlineNIC(nic);
   }
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
 }
 
 void SgmlFOTBuilder::rule(const RuleNIC &nic)
 {
+  flushPendingElements();
   const char *s = symbolName(nic.orientation);
   if (!s)
     return;
-  os() << "<rule " << s;
+  os() << "<rule orientation=" << quot << s << quot;
   switch (nic.orientation) {
   case symbolHorizontal:
   case symbolVertical:
@@ -1897,13 +2052,14 @@ void SgmlFOTBuilder::rule(const RuleNIC &nic)
     break;
   }
   if (nic.hasLength)
-    os() << " length=" << nic.length;
+    os() << " length=" << quot << nic.length << quot;
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
 }
 
 void SgmlFOTBuilder::startLeader(const LeaderNIC &nic)
 {
+  flushPendingElements();
   os() << "<leader";
   if (nic.hasLength)
     os() << " length=" << nic.length;
@@ -1929,9 +2085,10 @@ void SgmlFOTBuilder::endSideline()
 
 void SgmlFOTBuilder::startBox(const BoxNIC &nic)
 {
+  flushPendingElements();
   os() << "<box";
   if (nic.isDisplay) {
-    os() << " display";
+    os() << " display=" << quot << trueString << quot;
     displayNIC(nic);
   }
   else
@@ -1952,13 +2109,14 @@ void SgmlFOTBuilder::alignmentPoint()
 
 void SgmlFOTBuilder::startTable(const TableNIC &nic)
 {
+  flushPendingElements();
   os() << "<table";
   switch (nic.widthType) {
   case TableNIC::widthExplicit:
-    os() << " width=" << nic.width;
+    os() << " width=" << quot << nic.width << quot;
     break;
   case TableNIC::widthMinimum:
-    os() << " minimum-width";
+    os() << " minimum-width=" << quot << trueString << quot;
     break;
   default:
     break;
@@ -1996,13 +2154,13 @@ void SgmlFOTBuilder::tableAfterColumnBorder()
 void SgmlFOTBuilder::tableColumn(const TableColumnNIC &nic)
 {
   os() << "<table-column column-number="
-       << (unsigned long)nic.columnIndex + 1;
+       << quot << (unsigned long)nic.columnIndex + 1 << quot;
   if (nic.nColumnsSpanned != 1)
-    os() << " n-columns-spanned=" << (unsigned long)nic.nColumnsSpanned;
+    os() << " n-columns-spanned=" << quot << (unsigned long)nic.nColumnsSpanned << quot;
   if (nic.hasWidth)
-    os() << " width=" << nic.width;
+    os() << " width=" << quot << nic.width << quot;
   outputIcs();
-  os() << '>' << RE;
+  os() << "/>" << RE;
 }
 
 void SgmlFOTBuilder::startTablePartSerial(const TablePartNIC &nic)
@@ -2053,14 +2211,14 @@ void SgmlFOTBuilder::endTableRow()
 void SgmlFOTBuilder::startTableCell(const TableCellNIC &nic)
 {
   if (nic.missing)
-    os() << "<table-cell column-number=0";
+    os() << "<table-cell column-number=" << quot << 0 << quot;
   else {
     os() << "<table-cell column-number="
-         << (unsigned long)nic.columnIndex + 1;
+         << quot << (unsigned long)nic.columnIndex + 1 << quot;
     if (nic.nColumnsSpanned != 1)
-      os() << " n-columns-spanned=" << (unsigned long)nic.nColumnsSpanned;
+      os() << " n-columns-spanned=" << quot << (unsigned long)nic.nColumnsSpanned << quot;
     if (nic.nRowsSpanned != 1)
-      os() << " n-rows-spanned=" << (unsigned long)nic.nRowsSpanned;
+      os() << " n-rows-spanned=" << quot << (unsigned long)nic.nRowsSpanned << quot;
   }
   outputIcs();
   os() << '>' << RE;
@@ -2091,67 +2249,78 @@ void SgmlFOTBuilder::tableCellAfterColumnBorder()
   simpleFlowObj("table-cell.after-column-border");
 }
 
-void SgmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode,
-			       RuleType ruleType)
+void SgmlFOTBuilder::startNode(const NodePtr &node, const StringC &mode)
 {
-  nodeDepth_++;
-  unsigned long n;
-  if (node->elementIndex(n) == accessOK) {
-    os() << "<element index=" << n;
-    n = node->groveIndex();
-    if (n)
-      os() << " grove-index=" << n;
-    GroveString id; 
-    if (node->getId(id) == accessOK)
-      os() << " id=\"" << id << '"'; // FIXME handle possibility of quotes/non-SGML characters
-    if (mode.size())
-      os() << " mode=" << mode;
-    switch (ruleType) {
-    case ruleNone:
-      break;
-    case ruleQuery:
-      os() << " rule-query";
-      break;
-    case ruleDefault:
-      os() << " rule-default";
-      break;
-    case ruleRoot:
-      os() << " rule-root";
-      break;
-    case ruleId:
-      os() << " rule-id";
-      break;
-    default:
-      ASSERT(ruleType >= ruleElement1);
-      os() << " rule-element";
-      if (ruleType > ruleElement1)
-	os() << " n-qual-gi=" << (unsigned long)(ruleType - ruleElement1);
-    }
-    os() << '>' << RE;
-    elementNodeDepth_ = nodeDepth_;
-  }
+  nodeLevel_++;
+  if (mode.size() != 0 || !nodeIsElement(node))
+    return;
+  for (size_t i = 0; i < pendingElements_.size(); i++)
+    if (*pendingElements_[i] == *node)
+      return;
+  pendingElements_.push_back(node);
+  pendingElementLevels_.push_back(nodeLevel_);
 }
 
 void SgmlFOTBuilder::endNode()
 {
-  if (nodeDepth_ == elementNodeDepth_) {
-    endFlow("element");
-    if (--elementNodeDepth_ == 1)
-      elementNodeDepth_ = 0;
+  // The idea is not to put out a bookmark if there were
+  // no flow objects associated with the node.
+  // The flow objects might have been labeled, in which case
+  // we will get a startNode for the node later.
+  if (pendingElements_.size() > 0 && pendingElementLevels_.back() == nodeLevel_
+      && nPendingElementsNonEmpty_ < pendingElements_.size()) {
+    pendingElementLevels_.resize(pendingElements_.size() - 1);
+    pendingElements_.resize(pendingElements_.size() - 1);
   }
-  --nodeDepth_;
+  nodeLevel_--;
 }
 
 void SgmlFOTBuilder::currentNodePageNumber(const NodePtr &node)
 {
-  os() << "<node-page-number";
-  unsigned long n;
-  if (node->elementIndex(n) == accessOK)
-    os() << " element-index=" << n;
-  n = node->groveIndex();
-  if (n)
-    os() << " grove-index=" << n;
-  os() << ">";
+  if (!nodeIsElement(node))
+    return;
+  os() << "<page-number ref=" << quot;
+  outputElementName(node);
+  os() << quot << "/>" << RE;
+}
+
+void SgmlFOTBuilder::outputElementName(unsigned long groveIndex,
+				       const Char *idData,
+				       size_t idSize)
+{
+  if (groveIndex)
+    os() << groveIndex << '.';
+  os() << Data(idData, idSize);
+}
+
+void SgmlFOTBuilder::outputElementName(const NodePtr &node)
+{
+  GroveString id;
+  if (node->getId(id) == accessOK)
+    outputElementName(node->groveIndex(), id.data(), id.size());
+  else {
+    unsigned long n;
+    n = node->groveIndex();
+    if (n)
+      os() << n << '.';
+    if (node->elementIndex(n) == accessOK)
+      os() << n;
+  }
+}
+
+void SgmlFOTBuilder::flushPendingElements()
+{
+  if (suppressAnchors_)
+    return;
+  for (size_t i = 0; i < pendingElements_.size(); i++) {
+    const NodePtr &node = pendingElements_[i];
+    os() << "<a name=" << quot;
+    outputElementName(node);
+    os() << quot << "/>" << RE;
+  }
+  nPendingElementsNonEmpty_ = 0;
+  pendingElements_.resize(0);
+  pendingElementLevels_.resize(0);
 }
 
 #ifdef DSSSL_NAMESPACE

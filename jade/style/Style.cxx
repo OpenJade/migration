@@ -18,11 +18,11 @@ StyleStack::StyleStack()
 {
 }
 
-void StyleStack::push(StyleObj *style, VM &vm, FOTBuilder &fotb)
+void StyleStack::pushContinue(StyleObj *style,
+			      const ProcessingMode::Rule *rule,
+			      const NodePtr &nodePtr,
+			      Messenger *mgr)
 {
-  level_++;
-  const PopList *oldPopList = popList_.pointer();
-  popList_ = new PopList(popList_);
   StyleObjIter iter;
   style->appendIter(iter);
   for (;;) {
@@ -34,11 +34,28 @@ void StyleStack::push(StyleObj *style, VM &vm, FOTBuilder &fotb)
     if (ind >= inheritedCInfo_.size())
       inheritedCInfo_.resize(ind + 1);
     Ptr<InheritedCInfo> &info = inheritedCInfo_[ind];
-    if (info.isNull() || info->valLevel != level_) {
+    if (!info.isNull() && info->valLevel == level_) {
+      if (rule) {
+	ASSERT(info->rule != 0);
+	if (rule->compareSpecificity(*info->rule) == 0) {
+	  mgr->setNextLocation(info->rule->location());
+	  mgr->message(InterpreterMessages::ambiguousStyle,
+	               StringMessageArg(info->spec->identifier()->name()),
+		       rule->location());
+	}
+      }
+
+    }
+    else {
       popList_->list.push_back(ind);
-      info = new InheritedCInfo(spec, varStyle, level_, level_, info);
+      info = new InheritedCInfo(spec, varStyle, level_, level_, rule, info);
     }
   }
+}
+
+void StyleStack::pushEnd(VM &vm, FOTBuilder &fotb)
+{
+  const PopList *oldPopList = popList_->prev.pointer();
   if (oldPopList) {
     for (size_t i = 0; i < oldPopList->dependingList.size(); i++) {
       size_t d = oldPopList->dependingList[i];
@@ -54,6 +71,7 @@ void StyleStack::push(StyleObj *style, VM &vm, FOTBuilder &fotb)
 						    inheritedCInfo_[d]->style,
 						    level_,
 						    inheritedCInfo_[d]->specLevel,
+						    inheritedCInfo_[d]->rule,
 	                                            inheritedCInfo_[d]);
 	    popList_->list.push_back(d);
 	    changed = 1;
@@ -191,8 +209,9 @@ InheritedCInfo::InheritedCInfo(const ConstPtr<InheritedC> &sp,
 			       const VarStyleObj *so,
 			       unsigned vl,
 			       unsigned sl,
+			       const ProcessingMode::Rule *r,
 			       const Ptr<InheritedCInfo> &p)
-: spec(sp), style(so), valLevel(vl), specLevel(sl), prev(p), cachedValue(0)
+: spec(sp), style(so), valLevel(vl), specLevel(sl), rule(r), prev(p), cachedValue(0)
 {
 }
 

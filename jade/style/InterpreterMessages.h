@@ -123,116 +123,142 @@ struct InterpreterMessages {
   // 56
   static const MessageType3 notAProcedure;
   // 57
-  static const MessageType0L duplicateDefaultRule;
-  // 59
+  static const MessageType3 notAVector;
+  // 58
   static const MessageType0L duplicateRootRule;
-  // 61
-  static const MessageType1L duplicateIdRule;
-  // 63
-  static const MessageType0L duplicateElementRule;
-  // 65
+  // 60
   static const MessageType1L duplicateInitialValue;
-  // 67
+  // 62
   static const MessageType1 invalidStyleKeyword;
-  // 68
+  // 63
   static const MessageType2 invalidMakeKeyword;
-  // 69
+  // 64
   static const MessageType1 unknownFlowObjectClass;
-  // 70
+  // 65
   static const MessageType1 atomicContent;
-  // 71
+  // 66
   static const MessageType0 labelNotASymbol;
-  // 72
+  // 67
   static const MessageType1 badConnection;
-  // 73
+  // 68
   static const MessageType0 badContentMap;
-  // 74
+  // 69
   static const MessageType1 contentMapBadPort;
-  // 75
+  // 70
   static const MessageType1 invalidCharacteristicValue;
-  // 76
+  // 71
   static const MessageType0 condFail;
-  // 77
+  // 72
   static const MessageType1 caseFail;
-  // 78
+  // 73
   static const MessageType1 caseElse;
-  // 79
+  // 74
   static const MessageType0 caseUnresolvedQuantities;
-  // 80
+  // 75
   static const MessageType1 errorProc;
-  // 81
+  // 76
   static const MessageType0 divideBy0;
-  // 82
+  // 77
   static const MessageType1 invalidKeyArg;
-  // 83
+  // 78
   static const MessageType0 keyArgsNotKey;
-  // 84
+  // 79
   static const MessageType0 oneBody;
-  // 85
+  // 80
   static const MessageType0 specNotArc;
-  // 86
+  // 81
   static const MessageType0 noStyleSpec;
-  // 87
+  // 82
   static const MessageType1 unknownCharName;
-  // 88
+  // 83
   static const MessageType0 noCurrentNode;
-  // 89
+  // 84
   static const MessageType0 noCurrentProcessingMode;
-  // 90
+  // 85
   static const MessageType0 invalidRadix;
-  // 91
+  // 86
   static const MessageType0 sosofoContext;
-  // 92
+  // 87
   static const MessageType0 styleContext;
-  // 93
+  // 88
   static const MessageType0 notInCharacteristicValue;
-  // 94
+  // 89
   static const MessageType1 expressionNotImplemented;
-  // 95
+  // 90
   static const MessageType0 RGBColorArgCount;
-  // 96
+  // 91
   static const MessageType0 RGBColorArgType;
-  // 97
+  // 92
   static const MessageType0 RGBColorArgRange;
-  // 98
+  // 93
   static const MessageType1 unknownColorSpaceFamily;
-  // 99
+  // 94
   static const MessageType0 deviceRGBColorSpaceNoArgs;
-  // 100
+  // 95
   static const MessageType1 notABuiltinInheritedC;
-  // 101
+  // 96
   static const MessageType1 invalidNumberFormat;
-  // 102
+  // 97
   static const MessageType1 invalidPublicIdChar;
-  // 103
+  // 98
   static const MessageType1 debug;
-  // 104
+  // 99
   static const MessageType0 useLoop;
-  // 105
+  // 100
   static const MessageType1 missingPart;
-  // 106
+  // 101
   static const MessageType0 noParts;
-  // 107
+  // 102
   static const MessageType0 tableCellOutsideTable;
-  // 108
+  // 103
   static const MessageType0 tableRowOutsideTable;
-  // 109
+  // 104
   static const MessageType1 noNodePropertyValue;
-  // 110
+  // 105
   static const MessageType0 returnNotNodeList;
-  // 111
+  // 106
   static const MessageType0 stackTrace;
-  // 112
+  // 107
   static const MessageType1 stackTraceEllipsis;
-  // 113
+  // 108
   static const MessageType0 processNodeLoop;
-  // 114
+  // 109
   static const MessageType0 spliceNotList;
+  // 110
+  static const MessageType0 readOnly;
+  // 111
+  static const MessageType1 topLevelAssignment;
+  // 112
+  static const MessageType0 continuationDead;
+  // 113
+  static const MessageType0 patternEmptyGi;
+  // 114
+  static const MessageType0 patternNotList;
   // 115
-  static const MessageType1 actualLoop;
+  static const MessageType1 patternBadGi;
   // 116
-  static const MessageType1L duplicateCharacteristic;
+  static const MessageType1 patternBadMember;
+  // 117
+  static const MessageType0 patternMissingQualifierValue;
   // 118
+  static const MessageType1 patternUnknownQualifier;
+  // 119
+  static const MessageType2 patternBadQualifierValue;
+  // 120
+  static const MessageType0 patternChildRepeat;
+  // 121
+  static const MessageType0 patternBadAttributeQualifier;
+  // 122
+  static const MessageType1L ambiguousStyle;
+  // 124
+  static const MessageType0 ambiguousMatch;
+  // 125
+  static const MessageType1 uninitializedVariableReference;
+  // 126
+  static const MessageType1 actualLoop;
+  // 127
+  static const MessageType1L duplicateCharacteristic;
+  // 129
   static const MessageType1L duplicateFlowObjectClass;
 };
 

@@ -159,8 +159,8 @@ TokenizedDeclaredValue::makeTokenizedValue(Text &text,
 					   const StringC &name,
 					   unsigned &specLength) const
 {
-  const Syntax &syntax = context.attributeSyntax();
   Vector<size_t> spaceIndex;
+  const Syntax &syntax = context.attributeSyntax();
   Char space = syntax.space();
   text.subst(*(type_ == entityName
 	       ? syntax.entitySubstTable()
@@ -174,58 +174,60 @@ TokenizedDeclaredValue::makeTokenizedValue(Text &text,
     if (i >= length) {
       // ends with a space (which would have to have been entered
       // via a numeric character reference)
-      context.message(ParserMessages::attributeValueSyntax);
-      return 0;
-    }
-    if (!(syntax.charCategory(value[i]) & initialCategories_)) {
-      context.Messenger::setNextLocation(text.charLocation(i));
-      Char c = value[i];
-      if (!(syntax.charCategory(value[i]) & subsequentCategories_))
-	context.message(ParserMessages::attributeValueChar,
-		       StringMessageArg(StringC(&c, 1)),
-		       StringMessageArg(name));
-      else if (initialCategories_ == Syntax::digitCategory)
-	context.message(ParserMessages::attributeValueNumberToken,
-		       StringMessageArg(StringC(&c, 1)),
-		       StringMessageArg(name));
-      else
-	context.message(ParserMessages::attributeValueName,
-		       StringMessageArg(StringC(&c, 1)),
-		       StringMessageArg(name));
-      return 0;
+      if (context.validate())
+	context.message(ParserMessages::attributeValueSyntax);
+      break;
     }
     size_t startIndex = i;
-    for (++i;
-	 i < length
-	 && (syntax.charCategory(value[i]) & subsequentCategories_);
-	 i++)
-      ;
+    if (context.validate()) {
+      if (!(syntax.charCategory(value[i]) & initialCategories_)) {
+        context.Messenger::setNextLocation(text.charLocation(i));
+        Char c = value[i];
+	if (!(syntax.charCategory(value[i]) & subsequentCategories_))
+	  context.message(ParserMessages::attributeValueChar,
+	                  StringMessageArg(StringC(&c, 1)),
+	                  StringMessageArg(name));
+	else if (initialCategories_ == Syntax::digitCategory)
+	  context.message(ParserMessages::attributeValueNumberToken,
+	                  StringMessageArg(StringC(&c, 1)),
+	                  StringMessageArg(name));
+	else
+	  context.message(ParserMessages::attributeValueName,
+	                  StringMessageArg(StringC(&c, 1)),
+	                  StringMessageArg(name));
+      }
+      else {
+	for (++i;
+             i < length
+	     && (syntax.charCategory(value[i]) & subsequentCategories_);
+	     i++)
+	  ;
+	if (i < length && value[i] != space) {
+	  Char c = value[i];
+	  // character value[i] is not allowed anywhere in the value
+	  context.Messenger::setNextLocation(text.charLocation(i));
+	  context.message(ParserMessages::attributeValueChar,
+		          StringMessageArg(StringC(&c, 1)),
+		          StringMessageArg(name));
+	}
+      }
+    }
+    while (i < length && value[i] != space)
+      i++;
     if (i - startIndex > syntax.namelen()) {
       context.Messenger::setNextLocation(text.charLocation(i));
       context.message(ParserMessages::nameTokenLength,
-		     NumberMessageArg(syntax.namelen()));
+		      NumberMessageArg(syntax.namelen()));
     }
     if (i == length)
       break;
-    if (value[i] == space) {
-      if (!isList_) {
-	context.Messenger::setNextLocation(text.charLocation(i));
-	context.message(ParserMessages::attributeValueMultiple,
-		       StringMessageArg(name));
-	return 0;
-      }
-      spaceIndex.push_back(i);
-      i++;
-    }
-    else {
-      Char c = value[i];
-      // character value[i] is not allowed anywhere in the value
+    if (!isList_ && context.validate() && spaceIndex.size() == 0) {
       context.Messenger::setNextLocation(text.charLocation(i));
-      context.message(ParserMessages::attributeValueChar,
-		     StringMessageArg(StringC(&c, 1)),
-		     StringMessageArg(name));
-      return 0;
+      context.message(ParserMessages::attributeValueMultiple,
+		      StringMessageArg(name));
     }
+    spaceIndex.push_back(i);
+    i++;
   }
   size_t normsep = syntax.normsep();
   size_t litlen = syntax.litlen();
@@ -314,8 +316,8 @@ AttributeValue *GroupDeclaredValue::makeValue(Text &text,
 {
   TokenizedAttributeValue *val = makeTokenizedValue(text, context, name,
 						    specLength);
-  if (!val)
-    return 0;
+  if (!val || !context.validate())
+    return val;
   for (size_t i = 0; i < allowedValues_.size(); i++)
     if (val->string() == allowedValues_[i])
       return val;
@@ -323,8 +325,7 @@ AttributeValue *GroupDeclaredValue::makeValue(Text &text,
 		  StringMessageArg(val->string()),
 		  StringMessageArg(name),
 		  StringVectorMessageArg(allowedValues_));
-  delete val;
-  return 0;
+  return val;
 }
 
 AttributeValue *GroupDeclaredValue::makeValueFromToken(Text &text,
@@ -394,9 +395,11 @@ NotationDeclaredValue::makeSemantics(const TokenizedAttributeValue &value,
     = context.getAttributeNotation(value.string(),
 				   value.tokenLocation(0));
   if (notation.isNull()) {
-    context.setNextLocation(value.tokenLocation(0));
-    context.message(ParserMessages::invalidNotationAttribute,
-		    StringMessageArg(value.string()));
+    if (context.validate()) {
+      context.setNextLocation(value.tokenLocation(0));
+      context.message(ParserMessages::invalidNotationAttribute,
+		      StringMessageArg(value.string()));
+    }
     return 0;
   }
   return new NotationAttributeSemantics(notation);
@@ -438,15 +441,19 @@ EntityDeclaredValue::makeSemantics(const TokenizedAttributeValue &value,
     entities[i] = context.getAttributeEntity(value.token(i),
 					     value.tokenLocation(i));
     if (entities[i].isNull()) {
-      context.setNextLocation(value.tokenLocation(i));
-      context.message(ParserMessages::invalidEntityAttribute,
-		      StringMessageArg(value.token(i)));
+      if (context.validate()) {
+	context.setNextLocation(value.tokenLocation(i));
+	context.message(ParserMessages::invalidEntityAttribute,
+		        StringMessageArg(value.token(i)));
+      }
       valid = 0;
     }
     else if (!entities[i]->isDataOrSubdoc()) {
-      context.Messenger::setNextLocation(value.tokenLocation(i));
-      context.message(ParserMessages::notDataOrSubdocEntity,
-		     StringMessageArg(value.token(i)));
+      if (context.validate()) {
+        context.Messenger::setNextLocation(value.tokenLocation(i));
+        context.message(ParserMessages::notDataOrSubdocEntity,
+		        StringMessageArg(value.token(i)));
+      }
       valid = 0;
     }
   }
@@ -598,8 +605,9 @@ RequiredAttributeDefinition::RequiredAttributeDefinition(const StringC &name,
 ConstPtr<AttributeValue>
 RequiredAttributeDefinition::makeMissingValue(AttributeContext &context) const
 {
-  context.message(ParserMessages::requiredAttributeMissing,
-		  StringMessageArg(name()));
+  if (context.validate())
+    context.message(ParserMessages::requiredAttributeMissing,
+		    StringMessageArg(name()));
   return 0;
 }
 
@@ -624,16 +632,15 @@ CurrentAttributeDefinition::makeMissingValue(AttributeContext &context) const
   if (context.mayDefaultAttribute()) {
     ConstPtr<AttributeValue> currentValue
       = context.getCurrentAttribute(currentIndex_);
-    if (currentValue.isNull())
+    if (currentValue.isNull() && context.validate())
       context.message(ParserMessages::currentAttributeMissing,
 		      StringMessageArg(name()));
     return currentValue;
   }
-  else {
+  if (context.validate())
     context.message(ParserMessages::attributeMissing,
 		    StringMessageArg(name()));
-    return 0;
-  }
+  return 0;
 }
 
 Boolean CurrentAttributeDefinition::missingValueWouldMatch(const Text &text,
@@ -735,11 +742,10 @@ DefaultAttributeDefinition::makeMissingValue(AttributeContext &context) const
 {
   if (context.mayDefaultAttribute())
     return value_;
-  else {
+  if (context.validate())
     context.message(ParserMessages::attributeMissing,
 		    StringMessageArg(name()));
-    return 0;
-  }
+  return 0;
 }
 
 Boolean DefaultAttributeDefinition::missingValueWouldMatch(const Text &text,
@@ -777,7 +783,7 @@ AttributeValue *FixedAttributeDefinition::checkValue(AttributeValue *value,
 {
   const AttributeValue *fixedValue
     = DefaultAttributeDefinition::defaultValue(0);
-  if (value && fixedValue) {
+  if (value && fixedValue && context.validate()) {
     const Text *text;
     const StringC *str;
     const Text *fixedText;
@@ -851,6 +857,15 @@ Boolean AttributeDefinitionList::tokenIndex(const StringC &token, unsigned &inde
     }
   return 0;
 }
+
+Boolean AttributeDefinitionList::tokenIndexUnique(const StringC &token, unsigned i) const
+{
+  for (++i; i < defs_.size(); i++)
+    if (defs_[i]->containsToken(token))
+      return 0;
+  return 1;
+}
+
 
 Boolean AttributeDefinitionList::attributeIndex(const StringC &name,
 						unsigned &index) const
@@ -1137,7 +1152,8 @@ void AttributeList::finish(AttributeContext &context)
   if (nEntityNames_ > syntax.grpcnt())
     context.message(ParserMessages::entityNameGrpcnt,
 		   NumberMessageArg(syntax.grpcnt()));
-  if (conref_
+  if (context.validate()
+      && conref_
       && def_->notationIndex() != size_t(-1)
       && specified(def_->notationIndex()))
     context.message(ParserMessages::conrefNotation);
@@ -1296,7 +1312,7 @@ Boolean AttributeValue::handleAsUnterminated(const Text &text,
 }
 
 AttributeContext::AttributeContext()
-: mayDefaultAttribute_(0)
+: mayDefaultAttribute_(0), validate_(1)
 {
 }
 

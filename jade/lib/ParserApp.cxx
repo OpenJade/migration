@@ -37,22 +37,6 @@ ParserApp::ParserApp(const char *requiredInternalCode)
   registerOption('g');
   registerOption('i', SP_T("entity"));
   registerOption('w', SP_T("warning_type"));
-  static struct {
-    const char *name;
-    char c;
-  } entities[] = {
-    { "lt", '<' },
-    { "gt", '>' },
-    { "amp", '&' },
-    { "quot", '"' },
-    { "apos", '\'' },
-  };
-  Vector<StringC> &v = options_.recoveryEntities;
-  for (size_t i = 0; i < SIZEOF(entities); i++) {
-    v.push_back(systemCharset().execToDesc(entities[i].name));
-    Char c = systemCharset().execToDesc(entities[i].c);
-    v.push_back(StringC(&c, 1));
-  }
 }
 
 void ParserApp::initParser(const StringC &sysid)
@@ -167,9 +151,9 @@ Boolean ParserApp::enableWarning(const AppChar *s)
     { SP_T("default"), &ParserOptions::warnDefaultEntityReference, groupAll },
     { SP_T("undefined"), &ParserOptions::warnUndefinedElement, groupAll },
     { SP_T("sgmldecl"), &ParserOptions::warnSgmlDecl, groupAll },
-    { SP_T("unclosed"), &ParserOptions::warnUnclosedTag, groupAll|groupMinTag|groupXML },
-    { SP_T("empty"), &ParserOptions::warnEmptyTag, groupAll|groupMinTag|groupXML },
-    { SP_T("net"), &ParserOptions::warnNet, groupMinTag },
+    { SP_T("unclosed"), &ParserOptions::noUnclosedTag, groupAll|groupMinTag },
+    { SP_T("net"), &ParserOptions::noNet, groupMinTag },
+    { SP_T("empty"), &ParserOptions::warnEmptyTag, groupAll|groupMinTag },
     { SP_T("unused-map"), &ParserOptions::warnUnusedMap, groupAll },
     { SP_T("unused-param"), &ParserOptions::warnUnusedParam, groupAll },
     { SP_T("notation-sysid"), &ParserOptions::warnNotationSystemId, 0 },
@@ -202,7 +186,6 @@ Boolean ParserApp::enableWarning(const AppChar *s)
     { SP_T("and-group"), &ParserOptions::warnAndGroup, groupXML },
     { SP_T("rank"), &ParserOptions::warnRank, groupXML },
     { SP_T("empty-comment-decl"), &ParserOptions::warnEmptyCommentDecl, groupXML },
-    { SP_T("net-empty-element"), &ParserOptions::warnNetEmptyElement, groupXML },
     { SP_T("att-value-not-literal"), &ParserOptions::warnAttributeValueNotLiteral, groupXML },
     { SP_T("missing-att-name"), &ParserOptions::warnMissingAttributeName, groupXML },
     { SP_T("comment-decl-s"), &ParserOptions::warnCommentDeclS, groupXML },
@@ -214,14 +197,20 @@ Boolean ParserApp::enableWarning(const AppChar *s)
     { SP_T("mixed-content-xml"), &ParserOptions::warnMixedContentRepOrGroup, groupXML },
     { SP_T("name-group-not-or"), &ParserOptions::warnNameGroupNotOr, groupXML },
     { SP_T("pi-missing-name"), &ParserOptions::warnPiMissingName, groupXML },
-    { SP_T("status-keyword-s"), &ParserOptions::warnStatusKeywordSpecS, groupXML },
+    { SP_T("instance-status-keyword-s"), &ParserOptions::warnInstanceStatusKeywordSpecS, groupXML },
     { SP_T("external-data-entity-ref"), &ParserOptions::warnExternalDataEntityRef, groupXML },
     { SP_T("att-value-external-entity-ref"), &ParserOptions::warnAttributeValueExternalEntityRef, groupXML },
+    { SP_T("data-delim"), &ParserOptions::warnDataDelim, groupXML },
+    { SP_T("explicit-sgml-decl"), &ParserOptions::warnExplicitSgmlDecl, groupXML },
+    { SP_T("internal-subset-ms"), &ParserOptions::warnInternalSubsetMarkedSection, groupXML },
+    { SP_T("default-entity"), &ParserOptions::warnDefaultEntityDecl, groupXML },
+    { SP_T("non-sgml-char-ref"), &ParserOptions::warnNonSgmlCharRef, groupXML },
+    { SP_T("internal-subset-ps-param-entity"), &ParserOptions::warnInternalSubsetPsParamEntityRef, groupXML },
+    { SP_T("internal-subset-ts-param-entity"), &ParserOptions::warnInternalSubsetTsParamEntityRef, groupXML },
+    { SP_T("internal-subset-literal-param-entity"), &ParserOptions::warnInternalSubsetLiteralParamEntityRef, groupXML },
     { SP_T("idref"), &ParserOptions::errorIdref, 0 },
     { SP_T("significant"), &ParserOptions::errorSignificant, 0 },
     { SP_T("afdr"), &ParserOptions::errorAfdr, 0 },
-    { SP_T("lpd-notation"), &ParserOptions::errorLpdNotation, 0 },
-    { SP_T("valid"), &ParserOptions::errorValid, 0 },
   };
   static struct {
     const CmdLineApp::AppChar *name;
@@ -251,6 +240,10 @@ Boolean ParserApp::enableWarning(const AppChar *s)
       (options_.*(table[i].ptr)) = val;
       return 1;
     }
+  if (tcscmp(s, SP_T("valid")) == 0) {
+    options_.typeValid = val;
+    return 1;
+  }
   return 0;
 }
 

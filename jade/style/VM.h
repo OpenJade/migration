@@ -13,6 +13,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 class ELObj;
+class ContinuationObj;
 class Interpreter;
 class Insn;
 
@@ -33,6 +34,7 @@ public:
   void needStack(int);
   void pushFrame(const Insn *next, int argsPushed);
   const Insn *popFrame();
+  void setClosureArgToCC();
   void trace(Collector &) const;
   Vector<const ProcessingMode *> modeStack;
 private:
@@ -48,12 +50,14 @@ private:
     ELObj **closure;
     ELObj *protectClosure;
     Location closureLoc;
+    ContinuationObj *continuation;
     const Insn *next;
   };
 
   ControlStackEntry *csp;
   ControlStackEntry *csbase;
   ControlStackEntry *cslim;
+  friend class ContinuationObj;
 };
 
 inline

@@ -13,6 +13,8 @@ Changes in OpenSP 1.5pre5
 
 * German translation updates
 
+* Autconf fix affecting at least some gcc 2.7.x installations
+
 Changes in OpenSP 1.5pre4
 
 * More of Annex K supported: Common data attributes can now be

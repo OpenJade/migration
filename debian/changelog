@@ -1,3 +1,11 @@
+opensp (1.5pre4-5) unstable; urgency=low
+
+  * debian/rules: handle DEB_BUILD_OPTIONS
+  * debian/control: update to standard 3.5.0
+  * a few minor upstream fixes
+
+ -- Adam Di Carlo <aph@debian.org>  Wed, 31 Jan 2001 04:40:52 -0500
+
 opensp (1.5pre4-4) unstable; urgency=low
 
   * patch from Christopher C. Chimelis to enable compilation on 64-bit

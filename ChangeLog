@@ -1,3 +1,7 @@
+2003-09-03  Karl Eichwalder  <ke@suse.de>
+
+	* Add testsuite from opensp_1_5_tests_branch.
+
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 
 	* doc/Makefile.am (docdir): Set to $(datadir)/doc.

@@ -1,8 +1,18 @@
-opensp (1.5pre5-2) unstable; urgency=low
+opensp (1.5pre5-1.5pre6-1) unstable; urgency=low
 
   * ship PO files in libosp package
+  * some upstream changes from CVS, not yet released; this version will
+    call itself 1.5pre6, however
+  * nsgmls: apply a patch which should enable compilation on gcc 3.0
+    closes: #103791
+  * debian/rules: make maintainer-clean upstream is incredibly fragile,
+    so tolerate errors there until that gets fixed
+  * debian/rules: during build, run libtoolize --force to replace this
+    libtoolize stuff, which is needed for arches which diverge from the
+    libtool stuff OpenSP ships with
+    closes: #101837, #104126
 
- -- Adam Di Carlo <aph@debian.org>  Thu, 22 Feb 2001 16:23:08 -0500
+ -- Adam Di Carlo <aph@debian.org>  Tue, 10 Jul 2001 03:06:03 -0400
 
 opensp (1.5pre5-1) unstable; urgency=low
 
@@ -78,6 +88,4 @@ opensp (1.4-0.pre3-1) experimental; urgency=low
 
  -- Adam Di Carlo <aph@debian.org>  Wed, 29 Dec 1999 01:43:51 -0500
 
-Local variables:
-mode: debian-changelog
-End:
+

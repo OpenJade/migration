@@ -1,3 +1,7 @@
+* Move the implemenation of query rules from Pattern.cxx to 
+  ProcessingMode.cxx: query rules should not be treated as special
+  pattern for element rules, but rather as a separate rule type. 
+
 * Relax msggen restrictions on the relevant clauses field; put
   the relevant standard in there as well - we have at least
   ISO 8879:1986 (SGML), 

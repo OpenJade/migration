@@ -7,12 +7,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef SP_QUAL_TEMPLATE_DTOR_BROKEN
-#define DTOR(T) ~T
-#else
-#define DTOR(T) T::~T
-#endif
-
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif

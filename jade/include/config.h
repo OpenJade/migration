@@ -8,30 +8,11 @@
 #define SP_POSIX_FILENAMES
 
 #ifdef __GNUG__
+// Ideally, this should be set in configure.in, I think
 // It's not missing, but it pulls in libg++
 #define SP_NEW_H_MISSING
 // set_new_handler() has to be declared extern "C"
 #define SP_SET_NEW_HANDLER_EXTERN_C
-
-#if 1
-
-#undef SP_MANUAL_INST
-#define SP_DEFINE_TEMPLATES
-
-#else
-
-#ifndef SP_MANUAL_INST
-#define SP_MANUAL_INST
-#endif
-
-#endif
-
-#ifndef SP_ANSI_CLASS_INST
-#define SP_ANSI_CLASS_INST
-#endif
-#ifndef SP_HAVE_BOOL
-#define SP_HAVE_BOOL
-#endif
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 7)
 #define SP_ANSI_FOR_SCOPE
 #endif

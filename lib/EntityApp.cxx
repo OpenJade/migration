@@ -43,7 +43,7 @@ EntityApp::EntityApp(const char *requiredInternalCode)
 : CmdLineApp(requiredInternalCode),
   mapCatalogDocument_(0)
 {
-  registerOption('c', SP_T("catalog-sysid"), 
+  registerOption('c', SP_T("catalog"), 
                  EntityAppMessages::file, EntityAppMessages::cHelp);
   registerOption('C', SP_T("catalogs"), EntityAppMessages::CHelp);
   registerOption('D', SP_T("directory"), 

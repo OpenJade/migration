@@ -71,7 +71,8 @@ SpamApp::SpamApp()
 {
   options_.eventsWanted.addInstanceMarkup();
   options_.eventsWanted.addPrologMarkup();
-  registerOption(200, SP_T("hoist-omitted-tags"), SpamMessages::hHelp);
+  changeOptionRegistration('h', AppChar(255));
+  registerOption('h', SP_T("hoist-omitted-tags"), SpamMessages::hHelp);
   registerOption('l', SP_T("lowercase"), SpamMessages::lHelp);
   registerOption('m', SP_T("markup-option"), SpamMessages::option, 
                  SpamMessages::mHelp);
@@ -85,7 +86,10 @@ SpamApp::SpamApp()
 void SpamApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
-  case 200:
+  case AppChar(255):
+    ParserApp::processOption('h', arg);
+    break; 
+  case 'h':
     // hoist omitted tags out of entities
     normalizeFlags_ |= CopyEventHandler::normalizeOmittagHoist;
     break;

@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
 // Need option registration method that allows derived class to change
@@ -96,6 +96,22 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *name,
   registerOption(c, name, CmdLineAppMessages::noArg, doc);
 }
 
+void CmdLineApp::changeOptionRegistration(AppChar oldc, AppChar newc)
+{
+  for (size_t i = 0; i < opts_.size(); i++) {
+    if (opts_[i].value == oldc) {
+      opts_[i].value = newc;
+      char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
+      setlocale(LC_CTYPE, "C");
+      opts_[i].key = istalnum(newc) ? newc : 0;
+      setlocale(LC_CTYPE, savedLocale);
+      if (savedLocale)
+        free(savedLocale);
+      return;
+    }
+  }
+}
+
 void CmdLineApp::registerOption(AppChar c, const AppChar *name,
 				const MessageFragment &arg,
                                 const MessageType1 &doc)
@@ -113,11 +129,15 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *name,
   opt.name = name;
   opt.hasArgument = (arg.module() != CmdLineAppMessages::noArg.module()
                     || arg.number() != CmdLineAppMessages::noArg.number());
-  size_t i;
-  for (i = 0; i < opts_.size(); i++) 
-    if (opts_[i].value == c) { 
+  for (size_t i = 0; i < opts_.size(); i++) 
+    if (opts_[i].value == c) {
+      for (; i + 1 < opts_.size(); i++) {
+        opts_[i] = opts_[i + 1]; 
+        optArgs_[i] = optArgs_[i + 1];
+        optDocs_[i] = optDocs_[i + 1];
+      }
       opts_[i] = opt;
-      optArgs_[i] = arg;
+      optArgs_[i] = arg; 
       optDocs_[i] = doc;
       return;
     }
@@ -324,7 +344,7 @@ int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
       if (options.opt() == 0) {
         size_t i;
         const AppChar *t;
-        for (i = 0, t = &argv[options.ind()][2]; i < 79; i++, t++) {
+        for (i = 0, t = &argv[options.ind() - 1][2]; i < 79; i++, t++) {
           if  ((*t == '=') || (*t == '\0'))
             break;
           ostr[i] = *t;

@@ -73,7 +73,8 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
   currentMarkup_(0),
   cancelPtr_(&dummyCancel_),
   finalPhase_(finalPhase),
-  hadAfdrDecl_(0)
+  hadAfdrDecl_(0),
+  instantiatedDtds_(0)
 {
 }
 
@@ -417,8 +418,19 @@ void ParserState::startInstance()
   if (!instanceSyntax_.isNull())
     syntax_ = instanceSyntax_;
   currentMode_ = econMode;
-  currentDtd_ = dtd_[0];
-  currentDtdConst_ = dtd_[0];
+
+  currentDtd_.clear();
+  if (activeDocTypes_.size() > 0) {
+    // FIXME use mutable
+    ParserState *state = (ParserState *)this;
+    for (size_t i = 0; i < activeDocTypes_[0].size(); i++)
+      syntax().generalSubstTable()->subst(state->activeDocTypes_[0][i]);
+    currentDtd_ = lookupDtd(activeDocTypes_[0]);
+  }    
+  if (currentDtd_.isNull())
+    currentDtd_ = dtd_[0];
+  currentDtdConst_ = currentDtd_;
+
   startContent(currentDtd());
   inInstance_ = 1;
   if (sd().rank())
@@ -713,10 +725,22 @@ ParserState::allocAttributeList(const ConstPtr<AttributeDefinitionList> &def,
 
 void ParserState::activateLinkType(const StringC &name)
 {
-  if (!hadPass2Start_ && !pass2_)
+  if (activeDocTypes_.size() > 0) 
+    message(ParserMessages::activeDocLink);
+  else if (!hadPass2Start_ && !pass2_)
     activeLinkTypes_.push_back(name);
   else
     message(ParserMessages::linkActivateTooLate);
+}
+
+void ParserState::activateDocType(const StringC &name)
+{
+  if (activeLinkTypes_.size() > 0) 
+    message(ParserMessages::activeDocLink);
+  else if (activeDocTypes_.size() > 0)
+    message(ParserMessages::sorryActiveDoctypes);
+  else
+    activeDocTypes_.push_back(name);
 }
 
 Boolean ParserState::shouldActivateLink(const StringC &name) const
@@ -830,6 +854,15 @@ ConstPtr<AttributeValue> ParserState::getCurrentAttribute(size_t i) const
 const Syntax &ParserState::attributeSyntax() const
 {
   return syntax();
+}
+
+unsigned ParserState::instantiateDtd(Ptr<Dtd> &dtd)
+{
+  if (!dtd->isInstantiated()) {
+    dtd->instantiate();
+    instantiatedDtds_++;
+  }
+  return instantiatedDtds_;
 }
 
 #ifdef SP_NAMESPACE

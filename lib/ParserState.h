@@ -84,9 +84,11 @@ public:
   const Lpd &activeLpd(size_t i) const;
   ComplexLpd &defComplexLpd();
   Ptr<Dtd> lookupDtd(const StringC &name);
+  unsigned instantiateDtd(Ptr<Dtd> &dtd);
   Ptr<Dtd> baseDtd();
   void activateLinkType(const StringC &);
   void allLinkTypesActivated();
+  void activateDocType(const StringC &);
   void setResultAttributeSpecMode();
   void clearResultAttributeSpecMode();
   Boolean haveApplicableDtd() const;
@@ -242,6 +244,7 @@ private:
   Vector<ConstPtr<Lpd> > allLpd_;
   Vector<ConstPtr<Lpd> > lpd_; // active LPDs
   Vector<StringC> activeLinkTypes_;
+  Vector<StringC> activeDocTypes_;
   Boolean activeLinkTypesSubsted_;
   Boolean hadLpd_;
   Boolean resultAttributeSpecMode_;
@@ -277,6 +280,7 @@ private:
   ConstPtr<Dtd> currentDtdConst_;
   Vector<Ptr<Dtd> > dtd_;
   Ptr<Dtd> pass1Dtd_;
+  unsigned instantiatedDtds_;
   ConstPtr<Syntax> syntax_;
   Vector<StringC> currentRank_;
   NamedTable<Id> idTable_;

@@ -1,477 +1,494 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML Strict//EN">
-<HTML>
-<HEAD>
-<TITLE>NSGMLS</TITLE>
-</HEAD>
-<BODY>
-<H1>NSGMLS</H1>
-<H4>
-An SGML System Conforming to
-International Standard ISO 8879 --<BR>
-Standard Generalized Markup Language
-</H4>
-<H4>
-An SGML Extended Facilities system conforming to
-Annex A of International Standard ISO/IEC 10744 --
-Hypermedia/Time-based Structuring Language
-</H4>
-<H2>
-SYNOPSIS
-</H2>
-<P>
-<SAMP>nsgmls</SAMP>
-[
-<SAMP>-BCdeglprsuv</SAMP>
-]
-[
-<SAMP>-a<VAR>linktype</VAR></SAMP>
-]
-[
-<SAMP>-b<VAR>bctf</VAR></SAMP>
-]
-[
-<SAMP>-c<VAR>sysid</VAR></SAMP>
-]
-[
-<SAMP>-D<VAR>directory</VAR></SAMP>
-]
-[
-<SAMP>-E<VAR>max_errors</VAR></SAMP>
-]
-[
-<SAMP>-f<VAR>file</VAR></SAMP>
-]
-[
-<SAMP>-i<VAR>name</VAR></SAMP>
-]
-[
-<SAMP>-o<VAR>output_option</VAR></SAMP>
-]
-[
-<SAMP>-t<VAR>file</VAR></SAMP>
-]
-[
-<SAMP>-w<VAR>warning_type</VAR></SAMP>
-]
-[
-<SAMP><VAR>sysid</VAR>...</SAMP>
-]
-<H2>DESCRIPTION</H2>
-<P>
-Nsgmls parses and validates
-the SGML document whose document entity is specified by the
-<A HREF="sysid.htm">system identifiers</A>
-<SAMP><VAR>sysid</VAR>...</SAMP>
-and prints on the standard output a simple text representation of its
-Element Structure Information Set.
-(This is the information set which a structure-controlled
-conforming SGML application should act upon.)
-If more than one system identifier is specified,
-then the corresponding entities will be concatenated to form
-the document entity.
-Thus the document entity may be spread amongst several files;
-for example, the SGML declaration, prolog and document
-instance set could each be in a separate file.
-If no system identifiers are specified, then
-nsgmls
-will read the document entity from the standard input.
-A command line system identifier of
-<SAMP>-</SAMP>
-can be used to refer to the standard input.
-(Normally in a system identifier,
-<SAMP>&lt;osfd>0</SAMP>
-is used to refer to standard input.)
-<H2>OPTIONS</H2>
-<P>
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.6 [en] (X11; I; Linux 2.2.5-15 i586) [Netscape]">
+   <title>NSGMLS</title>
+</head>
+<body>
+
+<h1>
+NSGMLS</h1>
+
+<h4>
+An SGML System Conforming to International Standard ISO 8879 --<br>
+Standard Generalized Markup Language</h4>
+
+<h4>
+An SGML Extended Facilities system conforming to Annex A of International
+Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language</h4>
+
+<h2>
+SYNOPSIS</h2>
+<tt>nsgmls</tt> [
+<tt>-BCdeglprsuv</tt> ] [
+<tt>-a<i>linktype</i></tt>
+] [ -x<i>doctype</i> ] [
+<tt>-b<i>bctf</i></tt> ] [
+<tt>-c<i>sysid</i></tt>
+] [
+<tt>-D<i>directory</i></tt> ] [
+<tt>-E<i>max_errors</i></tt> ] [
+<tt>-f<i>file</i></tt>
+] [
+<tt>-i<i>name</i></tt> ] [
+<tt>-o<i>output_option</i></tt> ] [
+<tt>-t<i>file</i></tt>
+] [
+<tt>-w<i>warning_type</i></tt> ] [
+<tt><i>sysid</i>...</tt> ]
+<h2>
+DESCRIPTION</h2>
+Nsgmls parses and validates the SGML document whose document entity is
+specified by the
+<a href="sysid.htm">system identifiers</a><tt><i>sysid</i>...</tt>
+and prints on the standard output a simple text representation of its Element
+Structure Information Set. (This is the information set which a structure-controlled
+conforming SGML application should act upon.) If more than one system identifier
+is specified, then the corresponding entities will be concatenated to form
+the document entity. Thus the document entity may be spread amongst several
+files; for example, the SGML declaration, prolog and document instance
+set could each be in a separate file. If no system identifiers are specified,
+then nsgmls will read the document entity from the standard input. A command
+line system identifier of
+<tt>-</tt> can be used to refer to the standard
+input. (Normally in a system identifier,
+<tt>&lt;osfd>0</tt> is used to
+refer to standard input.)
+<h2>
+OPTIONS</h2>
 The following options are available:
-<DL>
-<DT>
-<SAMP>-a<VAR>linktype</VAR></SAMP>
-<DD>
+<dl>
+<dt>
+<tt>-a<i>linktype</i></tt></dt>
+
+<dd>
 Make link type
-<SAMP><VAR>linktype</VAR></SAMP>
-active.
-Not all ESIS information is output in this case:
-the active LPDs are not explicitly reported,
-although each link attribute is qualified with
-its link type name;
-there is no information about result elements;
-when there are multiple link rules applicable to the
-current element,
-nsgmls
-always chooses the first.
-<DT>
-<SAMP>-b<VAR>bctf</VAR></SAMP>
-<DT>
-<SAMP>-b<VAR>encoding</VAR></SAMP>
-<DD>
-This determines the encoding used for output.
-If in <A HREF="charset.htm#fixed">fixed character set mode</A>
-it specifies the name of an encoding;
-if not, it specifies the name of a BCTF.
-<DT>
-<SAMP>-B</SAMP>
-<DD>
-Batch mode.
-Parse each <SAMP><VAR>sysid...</VAR></SAMP> specified on the command
-line separately, rather than concatenating them.
-This is useful mainly with <SAMP>-s</SAMP>.
-<P>
-If <SAMP>-t<VAR>filename</VAR></SAMP> is also specified, then
-the specified <SAMP><VAR>filename</VAR></SAMP> will be prefixed
-to the <SAMP><VAR>sysid</VAR></SAMP> to make the filename
-for the RAST result for each <SAMP><VAR>sysid</VAR></SAMP>.
-<DT>
-<SAMP>-c<VAR>sysid</VAR></SAMP>
-<DD>
-Map public identifiers and entity names to system identifiers
-using the catalog entry file whose system identifier is
-<SAMP><VAR>sysid</VAR></SAMP>.
-Multiple
-<SAMP>-c</SAMP>
-options are allowed.
-If there is a catalog entry file called
-<SAMP>catalog</SAMP>
-in the same place as the document entity,
-it will be searched for immediately after those specified by
-<SAMP>-c</SAMP>.
-<DT>
-<A NAME="optC"><SAMP>-C</SAMP></A>
-<DD>
+<i><tt>linktype</tt></i> active. Not all ESIS information
+is output in this case: the active LPDs are not explicitly reported, although
+each link attribute is qualified with its link type name; there is no information
+about result elements; when there are multiple link rules applicable to
+the current element, nsgmls always chooses the first.</dd>
+
+<dt>
+<tt>-x<i>doctype</i></tt></dt>
+
+<dd>
+Make doctype
+<i><tt>doctype</tt></i> active.&nbsp; Currently you cannot
+make more than</dd>
+
+<dd>
+one doctype active.</dd>
+
+<dt>
+<tt>-b<i>bctf</i></tt></dt>
+
+<dt>
+<tt>-b<i>encoding</i></tt></dt>
+
+<dd>
+This determines the encoding used for output. If in <a href="charset.htm#fixed">fixed
+character set mode</a> it specifies the name of an encoding; if not, it
+specifies the name of a BCTF.</dd>
+
+<dt>
+<tt>-B</tt></dt>
+
+<dd>
+Batch mode. Parse each <i><tt>sysid...</tt></i> specified on the command
+line separately, rather than concatenating them. This is useful mainly
+with <tt>-s</tt>.</dd>
+
+<p><br>If <tt>-t<i>filename</i></tt> is also specified, then the specified
+<i><tt>filename</tt></i> will be prefixed to the <i><tt>sysid</tt></i>
+to make the filename for the RAST result for each <i><tt>sysid</tt></i>.
+<dt>
+<tt>-c<i>sysid</i></tt></dt>
+
+<dd>
+Map public identifiers and entity names to system identifiers using the
+catalog entry file whose system identifier is
+<i><tt>sysid</tt></i>. Multiple
+<tt>-c</tt>
+options are allowed. If there is a catalog entry file called
+<tt>catalog</tt>
+in the same place as the document entity, it will be searched for immediately
+after those specified by
+<tt>-c</tt>.</dd>
+
+<dt>
+<a NAME="optC"></a><tt>-C</tt></dt>
+
+<dd>
 The
-<SAMP><VAR>filename</VAR>...</SAMP>
-arguments specify catalog files rather than the document entity.
-The document entity is specified by the first
-<SAMP>DOCUMENT</SAMP>
-entry in the catalog files.
-<DT>
-<A NAME="optD"><SAMP>-D<VAR>directory</VAR></SAMP></A>
-<DD>
+<tt><i>filename</i>...</tt> arguments specify catalog files rather
+than the document entity. The document entity is specified by the first
+<tt>DOCUMENT</tt>
+entry in the catalog files.</dd>
+
+<dt>
+<a NAME="optD"></a><tt>-D<i>directory</i></tt></dt>
+
+<dd>
 Search
-<SAMP><VAR>directory</VAR></SAMP>
-for files specified in system identifiers.
+<i><tt>directory</tt></i> for files specified in system identifiers.
 Multiple
-<SAMP>-D</SAMP> options
-are allowed.
-See the description of the
-<SAMP>osfile</SAMP>
-storage manager for more information about file searching.
-<DT>
-<SAMP>-e</SAMP>
-<DD>
-Describe open entities in error messages.
-Error messages always include the position of the most recently
-opened external entity.
-<DT>
-<SAMP>-E<VAR>max_errors</VAR></SAMP>
-<DD>
-Nsgmls
-will exit after
-<SAMP><VAR>max_errors</VAR></SAMP>
-errors.
-If
-<SAMP><VAR>max_errors</VAR></SAMP>
-is 0, there is no limit on the number of errors.
-The default is 200.
-<DT>
-<SAMP>-f<VAR>file</VAR></SAMP>
-<DD>
+<tt>-D</tt> options are allowed. See the description of the
+<tt>osfile</tt>
+storage manager for more information about file searching.</dd>
+
+<dt>
+<tt>-e</tt></dt>
+
+<dd>
+Describe open entities in error messages. Error messages always include
+the position of the most recently opened external entity.</dd>
+
+<dt>
+<tt>-E<i>max_errors</i></tt></dt>
+
+<dd>
+Nsgmls will exit after
+<i><tt>max_errors</tt></i> errors. If
+<i><tt>max_errors</tt></i>
+is 0, there is no limit on the number of errors. The default is 200.</dd>
+
+<dt>
+<tt>-f<i>file</i></tt></dt>
+
+<dd>
 Redirect errors to
-<SAMP><VAR>file</VAR></SAMP>.
-This is useful mainly with shells that do not support redirection
-of stderr.
-<DT>
-<SAMP>-g</SAMP>
-<DD>
-Show the generic identifiers of open elements in error messages.
-<DT>
-<A NAME="opti"><SAMP>-i<VAR>name</VAR></SAMP></A>
-<DD>
-Pretend that
-<PRE>
-&lt;!ENTITY % <VAR>name</VAR> "INCLUDE">
-</PRE>
-<P>
-occurs at the start of the document type declaration subset
-in the SGML document entity.
-Since repeated definitions of an entity are ignored,
-this definition will take precedence over any other definitions
-of this entity in the document type declaration.
-Multiple
-<SAMP>-i</SAMP>
-options are allowed.
+<i><tt>file</tt></i>. This is useful mainly with shells
+that do not support redirection of stderr.</dd>
+
+<dt>
+<tt>-g</tt></dt>
+
+<dd>
+Show the generic identifiers of open elements in error messages.</dd>
+
+<dt>
+<a NAME="opti"></a><tt>-i<i>name</i></tt></dt>
+
+<dd>
+Pretend that</dd>
+
+<pre>&lt;!ENTITY % <i>name</i> "INCLUDE"></pre>
+occurs at the start of the document type declaration subset in the SGML
+document entity. Since repeated definitions of an entity are ignored, this
+definition will take precedence over any other definitions of this entity
+in the document type declaration. Multiple
+<tt>-i</tt> options are allowed.
 If the SGML declaration replaces the reserved name
-<SAMP>INCLUDE</SAMP>
-then the new reserved name will be the replacement text of the entity.
-Typically the document type declaration will contain
-<PRE>
-&lt;!ENTITY % <VAR>name</VAR> "IGNORE">
-</PRE>
-<P>
+<tt>INCLUDE</tt> then
+the new reserved name will be the replacement text of the entity. Typically
+the document type declaration will contain
+<pre>&lt;!ENTITY % <i>name</i> "IGNORE"></pre>
 and will use
-<SAMP>%<VAR>name</VAR>;</SAMP>
-in the status keyword specification of a marked section declaration.
-In this case the effect of the option will be to cause the marked
-section not to be ignored.
-<DT>
-<SAMP>-o<VAR>output_option</VAR></SAMP>
-<DD>
+<tt>%<i>name</i>;</tt> in the status keyword specification
+of a marked section declaration. In this case the effect of the option
+will be to cause the marked section not to be ignored.
+<dt>
+<tt>-o<i>output_option</i></tt></dt>
+
+<dd>
 Output additional information accordig to
-<SAMP><VAR>output_option</VAR></SAMP>:
-<DL>
-<DT>
-<SAMP>entity</SAMP>
-<DD>
-Output definitions of all general entities
-not just for data or subdoc entities that are referenced or named in an
-ENTITY or ENTITIES attribute.
-<DT>
-<SAMP>id</SAMP>
-<DD>
-Distinguish attributes whose declared value is ID.
-<DT>
-<SAMP>line</SAMP>
-<DD>
+<i><tt>output_option</tt></i>:</dd>
+
+<dl>
+<dt>
+<tt>entity</tt></dt>
+
+<dd>
+Output definitions of all general entities not just for data or subdoc
+entities that are referenced or named in an ENTITY or ENTITIES attribute.</dd>
+
+<dt>
+<tt>id</tt></dt>
+
+<dd>
+Distinguish attributes whose declared value is ID.</dd>
+
+<dt>
+<tt>line</tt></dt>
+
+<dd>
 Output
-<SAMP>L</SAMP>
-commands giving the current line number and filename.
-<DT>
-<SAMP>included</SAMP>
-<DD>
+<tt>L</tt> commands giving the current line number and filename.</dd>
+
+<dt>
+<tt>included</tt></dt>
+
+<dd>
 Output an
-<SAMP>i</SAMP>
-command for included subelements.
-<DT>
-<SAMP>empty</SAMP>
-<DD>
-Output an <SAMP>e</SAMP> command for elements which are not allowed to
-have an end-tag, that is those with a declared content of empty or
-with a content reference attribute.
-<DT>
-<SAMP>notation-sysid</SAMP>
-<DD>
-Output an <SAMP>f</SAMP> command before an <SAMP>N</SAMP> command,
-if a system identifier could be generated for that notation.
-<DT>
-<SAMP>nonsgml</SAMP>
-<DD>
-In <A HREF="charset.htm#fixed">fixed character set mode</A>,
-output <SAMP>\%</SAMP> escape sequences for non-SGML data characters.
-Non-SGML data characters can result from numeric character references.
-</DL>
-<P>
+<tt>i</tt> command for included subelements.</dd>
+
+<dt>
+<tt>empty</tt></dt>
+
+<dd>
+Output an <tt>e</tt> command for elements which are not allowed to have
+an end-tag, that is those with a declared content of empty or with a content
+reference attribute.</dd>
+
+<dt>
+<tt>notation-sysid</tt></dt>
+
+<dd>
+Output an <tt>f</tt> command before an <tt>N</tt> command, if a system
+identifier could be generated for that notation.</dd>
+
+<dt>
+<tt>nonsgml</tt></dt>
+
+<dd>
+In <a href="charset.htm#fixed">fixed character set mode</a>, output <tt>\%</tt>
+escape sequences for non-SGML data characters. Non-SGML data characters
+can result from numeric character references.</dd>
+</dl>
 Multiple
-<SAMP>-o</SAMP>
-options are allowed.
-<DT>
-<SAMP>-p</SAMP>
-<DD>
-Parse only the prolog.
-Nsgmls
-will exit after parsing the document type declaration.
-Implies
-<SAMP>-s</SAMP>.
-<DT>
-<SAMP>-s</SAMP>
-<DD>
-Suppress output.
-Error messages will still be printed.
-<DT>
-<SAMP>-t<VAR>file</VAR></SAMP>
-<DD>
+<tt>-o</tt> options are allowed.
+<dt>
+<tt>-p</tt></dt>
+
+<dd>
+Parse only the prolog. Nsgmls will exit after parsing the document type
+declaration. Implies
+<tt>-s</tt>.</dd>
+
+<dt>
+<tt>-s</tt></dt>
+
+<dd>
+Suppress output. Error messages will still be printed.</dd>
+
+<dt>
+<tt>-t<i>file</i></tt></dt>
+
+<dd>
 Output to
-<SAMP><VAR>file</VAR></SAMP>
-the RAST result as defined by
-ISO/IEC 13673:1995 (actually this isn't quite an IS yet;
-this implements the Intermediate Editor's Draft of 1994/08/29,
-with changes to implement ISO/IEC JTC1/SC18/WG8 N1777).
-The normal output is not produced.
-<DT>
-<SAMP>-v</SAMP>
-<DD>
-Print the version number.
-<DT>
-<A NAME="optw"><SAMP>-w<VAR>type</VAR></SAMP></A>
-<DD>
-Control warnings and errors.
-Multiple
-<SAMP>-w</SAMP>
-options are allowed.
+<i><tt>file</tt></i> the RAST result as defined by ISO/IEC 13673:1995
+(actually this isn't quite an IS yet; this implements the Intermediate
+Editor's Draft of 1994/08/29, with changes to implement ISO/IEC JTC1/SC18/WG8
+N1777). The normal output is not produced.</dd>
+
+<dt>
+<tt>-v</tt></dt>
+
+<dd>
+Print the version number.</dd>
+
+<dt>
+<a NAME="optw"></a><tt>-w<i>type</i></tt></dt>
+
+<dd>
+Control warnings and errors. Multiple
+<tt>-w</tt> options are allowed.
 The following values of
-<SAMP><VAR>type</VAR></SAMP>
-enable warnings:
-<DL>
-<DT>
-<SAMP>xml</SAMP>
-<DD>
-Warn about constructs that are not allowed by <A
-HREF="http://www.w3.org/TR/1998/REC-xml-19980210">XML</A>.
-The warnings can be enabled <A HREF="xmlwarn.htm">individually.</A>
-<DT>
-<SAMP>mixed</SAMP>
-<DD>
-Warn about mixed content models that do not allow #pcdata anywhere.
-<DT>
-<SAMP>sgmldecl</SAMP>
-<DD>
-Warn about various dubious constructions in the SGML declaration.
-<DT>
-<SAMP>should</SAMP>
-<DD>
-Warn about various recommendations made in ISO 8879 that the document
-does not comply with.
-(Recommendations are expressed with ``should'', as distinct from
-requirements which are usually expressed with ``shall''.)
-<DT>
-<SAMP>default</SAMP>
-<DD>
-Warn about defaulted references.
-<DT>
-<SAMP>duplicate</SAMP>
-<DD>
-Warn about duplicate entity declarations.
-<DT>
-<SAMP>undefined</SAMP>
-<DD>
-Warn about undefined elements: elements used in the DTD but not defined.
-<DT>
-<SAMP>unclosed</SAMP>
-<DD>
-Warn about unclosed start and end-tags.
-<DT>
-<SAMP>empty</SAMP>
-<DD>
-Warn about empty start and end-tags.
-<DT>
-<SAMP>net</SAMP>
-<DD>
-Warn about net-enabling start-tags and null end-tags.
-<DT>
-<SAMP>min-tag</SAMP>
-<DD>
-Warn about minimized start and end-tags.
-Equivalent to combination of
-<SAMP>unclosed</SAMP>,
-<SAMP>empty</SAMP>
+<i><tt>type</tt></i> enable warnings:</dd>
+
+<dl>
+<dt>
+<tt>xml</tt></dt>
+
+<dd>
+Warn about constructs that are not allowed by <a href="http://www.w3.org/TR/1998/REC-xml-19980210">XML</a>.
+The warnings can be enabled <a href="xmlwarn.htm">individually.</a></dd>
+
+<dt>
+<tt>mixed</tt></dt>
+
+<dd>
+Warn about mixed content models that do not allow #pcdata anywhere.</dd>
+
+<dt>
+<tt>sgmldecl</tt></dt>
+
+<dd>
+Warn about various dubious constructions in the SGML declaration.</dd>
+
+<dt>
+<tt>should</tt></dt>
+
+<dd>
+Warn about various recommendations made in ISO 8879 that the document does
+not comply with. (Recommendations are expressed with ``should'', as distinct
+from requirements which are usually expressed with ``shall''.)</dd>
+
+<dt>
+<tt>default</tt></dt>
+
+<dd>
+Warn about defaulted references.</dd>
+
+<dt>
+<tt>duplicate</tt></dt>
+
+<dd>
+Warn about duplicate entity declarations.</dd>
+
+<dt>
+<tt>undefined</tt></dt>
+
+<dd>
+Warn about undefined elements: elements used in the DTD but not defined.</dd>
+
+<dt>
+<tt>unclosed</tt></dt>
+
+<dd>
+Warn about unclosed start and end-tags.</dd>
+
+<dt>
+<tt>empty</tt></dt>
+
+<dd>
+Warn about empty start and end-tags.</dd>
+
+<dt>
+<tt>net</tt></dt>
+
+<dd>
+Warn about net-enabling start-tags and null end-tags.</dd>
+
+<dt>
+<tt>min-tag</tt></dt>
+
+<dd>
+Warn about minimized start and end-tags. Equivalent to combination of
+<tt>unclosed</tt>,
+<tt>empty</tt>
 and
-<SAMP>net</SAMP>
-warnings.
-<DT>
-<SAMP>unused-map</SAMP>
-<DD>
-Warn about unused short reference maps: maps that are declared with a
-short reference mapping declaration but never used in a short
-reference use declaration in the DTD.
-<DT>
-<SAMP>unused-param</SAMP>
-<DD>
-Warn about parameter entities that are defined but not used in a DTD.
-Unused internal parameter entities whose text is
-<SAMP>INCLUDE</SAMP>
-or
-<SAMP>IGNORE</SAMP>
-won't get the warning.
-<DT>
-<SAMP>notation-sysid</SAMP>
-<DD>
-Warn about notations for which no system identifier could be generated.
-<DT>
-<SAMP>all</SAMP>
-<DD>
-Warn about conditions that should usually be avoided
-(in the opinion of the author).
-Equivalent to:
-<SAMP>mixed</SAMP>,
-<SAMP>should</SAMP>,
-<SAMP>default</SAMP>,
-<SAMP>undefined</SAMP>,
-<SAMP>sgmldecl</SAMP>,
-<SAMP>unused-map</SAMP>,
-<SAMP>unused-param</SAMP>,
-<SAMP>empty</SAMP>
+<tt>net</tt> warnings.</dd>
+
+<dt>
+<tt>unused-map</tt></dt>
+
+<dd>
+Warn about unused short reference maps: maps that are declared with a short
+reference mapping declaration but never used in a short reference use declaration
+in the DTD.</dd>
+
+<dt>
+<tt>unused-param</tt></dt>
+
+<dd>
+Warn about parameter entities that are defined but not used in a DTD. Unused
+internal parameter entities whose text is
+<tt>INCLUDE</tt> or
+<tt>IGNORE</tt>
+won't get the warning.</dd>
+
+<dt>
+<tt>notation-sysid</tt></dt>
+
+<dd>
+Warn about notations for which no system identifier could be generated.</dd>
+
+<dt>
+<tt>all</tt></dt>
+
+<dd>
+Warn about conditions that should usually be avoided (in the opinion of
+the author). Equivalent to:
+<tt>mixed</tt>,
+<tt>should</tt>,
+<tt>default</tt>,
+<tt>undefined</tt>,
+<tt>sgmldecl</tt>,
+<tt>unused-map</tt>,
+<tt>unused-param</tt>,
+<tt>empty</tt>
 and
-<SAMP>unclosed</SAMP>.
-</DL>
-<P>
+<tt>unclosed</tt>.</dd>
+</dl>
 A warning can be disabled by using its name prefixed with
-<SAMP>no-</SAMP>.
+<tt>no-</tt>.
 Thus
-<SAMP>-wall -wno-duplicate</SAMP>
-will enable all warnings except those about duplicate entity
-declarations.
-<P>
-The following values for
-<SAMP><VAR>warning_type</VAR></SAMP>
-disable errors:
-<DL>
-<DT>
-<SAMP>no-idref</SAMP>
-<DD>
-Do not give an error for an ID reference value
-which no element has as its ID.
-The effect will be as if each attribute declared as
-an ID reference value had been declared as a name.
-<DT>
-<SAMP>no-significant</SAMP>
-<DD>
-Do not give an error when a character that is not a significant
-character in the reference concrete syntax occurs in a literal in the
-SGML declaration.  This may be useful in conjunction with certain
-buggy test suites.
-<DT>
-<SAMP>no-valid</SAMP>
-<DD>
-Do not require the document to be type-valid.  This has the effect of
-changing the SGML declaration to specify <SAMP>VALIDITY
-NOASSERT</SAMP> and <SAMP>IMPLYDEF ATTLIST YES ELEMENT YES</SAMP>.
-An option of <SAMP>-wvalid</SAMP> has the effect of changing
-the SGML declaration to specify <SAMP>VALIDITY
-TYPE</SAMP> and <SAMP>IMPLYDEF ATTLIST NO ELEMENT NO</SAMP>.
-If neither <SAMP>-wvalid</SAMP> nor <SAMP>-wno-valid</SAMP> are
-specified,
-then the <SAMP>VALIDITY</SAMP> and <SAMP>IMPLYDEF</SAMP> specified
-in the SGML declaration will be used.
-<DT>
-<SAMP>no-afdr</SAMP>
-<DD>
-Do not give errors when AFDR meta-DTD notation features are used
-in the DTD. These errors are normally produced when parsing the DTD, 
-but suppressed when parsing meta-DTDs.
-</DL>
-</DL>
-<P>
-The following options are also supported for backwards compatibility
-with sgmls:
-<DL>
-<DT>
-<SAMP>-d</SAMP>
-<DD>
+<tt>-wall -wno-duplicate</tt> will enable all warnings except those
+about duplicate entity declarations.
+<p>The following values for
+<i><tt>warning_type</tt></i> disable errors:
+<dl>
+<dt>
+<tt>no-idref</tt></dt>
+
+<dd>
+Do not give an error for an ID reference value which no element has as
+its ID. The effect will be as if each attribute declared as an ID reference
+value had been declared as a name.</dd>
+
+<dt>
+<tt>no-significant</tt></dt>
+
+<dd>
+Do not give an error when a character that is not a significant character
+in the reference concrete syntax occurs in a literal in the SGML declaration.
+This may be useful in conjunction with certain buggy test suites.</dd>
+
+<dt>
+<tt>no-valid</tt></dt>
+
+<dd>
+Do not require the document to be type-valid. This has the effect of changing
+the SGML declaration to specify <tt>VALIDITY NOASSERT</tt> and <tt>IMPLYDEF
+ATTLIST YES ELEMENT YES</tt>. An option of <tt>-wvalid</tt> has the effect
+of changing the SGML declaration to specify <tt>VALIDITY TYPE</tt> and
+<tt>IMPLYDEF ATTLIST NO ELEMENT NO</tt>. If neither <tt>-wvalid</tt> nor
+<tt>-wno-valid</tt> are specified, then the <tt>VALIDITY</tt> and <tt>IMPLYDEF</tt>
+specified in the SGML declaration will be used.</dd>
+
+<dt>
+<tt>no-afdr</tt></dt>
+
+<dd>
+Do not give errors when AFDR meta-DTD notation features are used in the
+DTD. These errors are normally produced when parsing the DTD, but suppressed
+when parsing meta-DTDs.</dd>
+</dl>
+</dl>
+The following options are also supported for backwards compatibility with
+sgmls:
+<dl>
+<dt>
+<tt>-d</tt></dt>
+
+<dd>
 Same as
-<SAMP>-wduplicate</SAMP>.
-<DT>
-<SAMP>-l</SAMP>
-<DD>
+<tt>-wduplicate</tt>.</dd>
+
+<dt>
+<tt>-l</tt></dt>
+
+<dd>
 Same as
-<SAMP>-oline</SAMP>.
-<DT>
-<SAMP>-m<VAR>sysid</VAR></SAMP>
-<DD>
-Same as <SAMP>-c</SAMP>.
-<DT>
-<SAMP>-r</SAMP>
-<DD>
+<tt>-oline</tt>.</dd>
+
+<dt>
+<tt>-m<i>sysid</i></tt></dt>
+
+<dd>
+Same as <tt>-c</tt>.</dd>
+
+<dt>
+<tt>-r</tt></dt>
+
+<dd>
 Same as
-<SAMP>-wdefault</SAMP>.
-<DT>
-<SAMP>-u</SAMP>
-<DD>
+<tt>-wdefault</tt>.</dd>
+
+<dt>
+<tt>-u</tt></dt>
+
+<dd>
 Same as
-<SAMP>-wundef</SAMP>.
-</DL>
-<P>
-<ADDRESS>
-James Clark<BR>
-jjc@jclark.com
-</ADDRESS>
-</BODY>
-</HTML>
+<tt>-wundef</tt>.</dd>
+</dl>
+
+<address>
+James Clark</address>
+
+<br>jjc@jclark.com
+</body>
+</html>

@@ -94,6 +94,8 @@ public:
   size_t nAttributeDefinitionList() const;
   const ElementType *documentElementType() const;
   Boolean isBase() const;
+  Boolean isInstantiated() const;
+  void instantiate();
 
   Ptr<AttributeDefinitionList> &implicitElementAttributeDef();
   void setImplicitElementAttributeDef(const Ptr<AttributeDefinitionList> &);
@@ -119,6 +121,7 @@ private:
   Vector<StringC> shortrefs_;
   HashTable<StringC,int> shortrefTable_;
   Boolean isBase_;
+  Boolean isInstantitated_;
   Ptr<AttributeDefinitionList> implicitElementAttributeDef_;
   Ptr<AttributeDefinitionList> implicitNotationAttributeDef_;
 };
@@ -458,6 +461,18 @@ inline
 void Dtd::setImplicitNotationAttributeDef(const Ptr<AttributeDefinitionList> &def)
 {
   implicitNotationAttributeDef_ = def;
+}
+
+inline 
+Boolean Dtd::isInstantiated() const
+{
+  return isInstantitated_;
+}
+
+inline 
+void Dtd::instantiate() 
+{
+  isInstantitated_ = 1;
 }
 
 #ifdef SP_NAMESPACE

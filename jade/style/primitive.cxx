@@ -81,6 +81,7 @@ public:
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodePtr first_;
   NodePtr end_;
@@ -97,21 +98,6 @@ public:
 private:
   NodeListObj *nodeList_;
   ComponentName::Id cls_;
-};
-
-class FilterNodeListObj : public NodeListObj {
-public:
-  FilterNodeListObj(FunctionObj *func, NodeListObj *nl, const Location &loc);
-  NodePtr nodeListFirst(EvalContext &, Interpreter &);
-  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
-  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
-  void traceSubObjects(Collector &) const;
-  bool contains(EvalContext &, Interpreter &, const NodePtr &);
-private:
-  bool maybeIn(EvalContext &, Interpreter &, const NodePtr &);
-  NodeListObj *nodeList_;
-  FunctionObj *func_;
-  Location loc_;
 };
 
 class MapNodeListObj : public NodeListObj {
@@ -138,10 +124,21 @@ public:
   bool suppressError();
 private:
   void mapNext(EvalContext &, Interpreter &);
+  NodeListObj *mapped_;
+protected:
   FunctionObj *func_;
   NodeListObj *nl_;
-  NodeListObj *mapped_;
   ConstPtr<Context> context_;
+};
+
+class FilterNodeListObj : public MapNodeListObj {
+public:
+  FilterNodeListObj(FunctionObj *func, NodeListObj *nl, const ConstPtr<Context> &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+private:
+  bool maybeIn(EvalContext &, Interpreter &, const NodePtr &);
 };
 
 class SelectElementsNodeListObj : public NodeListObj {
@@ -4361,7 +4358,7 @@ DEFPRIMITIVE(NodeListFilter, argc, argv, context, interp, loc)
   if (!nl)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 1, argv[1]);
-  return new (interp) FilterNodeListObj(func, nl, loc);
+  return new (interp) FilterNodeListObj(func, nl, new MapNodeListObj::Context(context, loc));
 }
 
 DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
@@ -5928,23 +5925,17 @@ bool SelectByClassNodeListObj::contains(EvalContext &context, Interpreter &inter
 }
 
 FilterNodeListObj::FilterNodeListObj(FunctionObj *func, NodeListObj *nl,
-				     const Location &loc)
-: func_(func), nodeList_(nl), loc_(loc)
+				     const ConstPtr<Context> &context)
+: MapNodeListObj(func, nl, context)
 {
-  hasSubObjects_ = 1;
-}
-
-void FilterNodeListObj::traceSubObjects(Collector &c) const
-{
-  c.trace(nodeList_);
-  c.trace(func_);
 }
 
 bool FilterNodeListObj::maybeIn(EvalContext &context, Interpreter &interp, 
 				const NodePtr &nd)
 {
   VM vm(context, interp);
-  InsnPtr insn(func_->makeCallInsn(1, interp, loc_, InsnPtr()));
+  context_->set(vm);
+  InsnPtr insn(func_->makeCallInsn(1, interp, context_->loc, InsnPtr()));
   ELObj *ret = vm.eval(insn.pointer(), 0, new (interp) NodePtrNodeListObj(nd));
   return ret->isTrue();
 }
@@ -5952,10 +5943,10 @@ bool FilterNodeListObj::maybeIn(EvalContext &context, Interpreter &interp,
 NodePtr FilterNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
 {
   for (;;) {
-    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    NodePtr nd = nl_->nodeListFirst(context, interp);
     if (!nd || maybeIn(context, interp, nd))
       return nd;
-    nodeList_ = nodeList_->nodeListRest(context, interp);
+    nl_ = nl_->nodeListRest(context, interp);
   }
   // not reached
   return NodePtr();
@@ -5964,41 +5955,25 @@ NodePtr FilterNodeListObj::nodeListFirst(EvalContext &context, Interpreter &inte
 NodeListObj *FilterNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   for (;;) {
-    NodePtr nd = nodeList_->nodeListFirst(context, interp);
+    NodePtr nd = nl_->nodeListFirst(context, interp);
     if (!nd || maybeIn(context, interp, nd))
       break;
-    nodeList_ = nodeList_->nodeListRest(context, interp);
+    nl_ = nl_->nodeListRest(context, interp);
   }
-  NodeListObj *tem = nodeList_->nodeListRest(context, interp);
+  NodeListObj *tem = nl_->nodeListRest(context, interp);
   ELObjDynamicRoot protect(interp, tem);
-  return new (interp) FilterNodeListObj(func_, tem, loc_);
-}
-
-NodeListObj *FilterNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
-{
-  for (;;) {
-    NodePtr nd = nodeList_->nodeListFirst(context, interp);
-    if (!nd)
-      return interp.makeEmptyNodeList();
-    if (maybeIn(context, interp, nd))
-      break;
-    bool tem;
-    nodeList_ = nodeList_->nodeListChunkRest(context, interp, tem);
-  }
-  NodeListObj *tem = nodeList_->nodeListChunkRest(context, interp, chunk);
-  ELObjDynamicRoot protect(interp, tem);
-  return new (interp) FilterNodeListObj(func_, tem, loc_);
+  return new (interp) FilterNodeListObj(func_, tem, context_);
 }
 
 bool FilterNodeListObj::contains(EvalContext &context, Interpreter &interp,
 					const NodePtr &nd)
 {
   VM vm(context, interp);
-  InsnPtr insn(func_->makeCallInsn(1, interp, Location(), InsnPtr()));
+  context_->set(vm);
+  InsnPtr insn(func_->makeCallInsn(1, interp, context_->loc, InsnPtr()));
   ELObj *ret = vm.eval(insn.pointer(), 0, new (interp) NodePtrNodeListObj(nd));
-  return (ret->isTrue() && nodeList_->contains(context, interp, nd));
+  return (ret->isTrue() && nl_->contains(context, interp, nd));
 }
-
 
 
 MapNodeListObj::MapNodeListObj(FunctionObj *func, NodeListObj *nl,
@@ -6209,6 +6184,16 @@ NodeListObj *SiblingNodeListObj::nodeListChunkRest(EvalContext &context, Interpr
     CANNOT_HAPPEN();
   chunk = 1;
   return new (interp) SiblingNodeListObj(nd, end_);
+}
+
+bool SiblingNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  NodePtr origin1, origin2;
+  if (first_->getOrigin(origin1) != accessOK 
+      || ptr->getOrigin(origin2) != accessOK
+      || *origin1 != *origin2) 
+    return 0;
+  return NodeListObj::contains(context, interp, ptr);
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -190,10 +190,9 @@ dnl Checks for system services.
 ACX_CHECK_PATHNAME_STYLE_DOS
 
 dnl Package options.
-AC_ARG_PROGRAM
 AC_DEFINE(SP_MULTI_BYTE,1,
           [define this to build a multi-byte version])
-AC_MSG_CHECKING(wether to include support for http)
+AC_MSG_CHECKING(whether to include support for http)
 AC_ARG_ENABLE(http,
 [  --enable-http           include support for http],
     if test $enableval
@@ -240,6 +239,17 @@ AC_ARG_ENABLE(default-search-path,
         AC_MSG_RESULT(none)
     fi,
     AC_MSG_RESULT(none))
+AC_MSG_CHECKING(whether to include support for XML Formatted Messages)
+AC_ARG_ENABLE(xml-messages,
+[  --enable-xml-messages   include support for XML Formatted Messages],
+        if test $enableval
+           then
+              AC_MSG_RESULT(yes)
+              AC_DEFINE(SP_XML,1,[set this to enable XML Formatted MEssages])
+           else
+                AC_MSG_RESULT(no)
+         fi,
+      AC_MSG_RESULT(no))
 
 dnl Output.
 AC_SUBST(LIBOBJS)

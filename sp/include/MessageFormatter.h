@@ -23,13 +23,13 @@ namespace SP_NAMESPACE {
 class SP_API MessageFormatter {
 public:
   MessageFormatter();
-  void formatMessage(const MessageFragment &,
+  virtual void formatMessage(const MessageFragment &,
 		     const Vector<CopyOwner<MessageArg> > &args,
 		     OutputCharStream &, bool noquote = 0);
-  void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
+  virtual void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
 			  OutputCharStream &os);
   virtual Boolean getMessageText(const MessageFragment &, StringC &) = 0;
-  Boolean formatFragment(const MessageFragment &, OutputCharStream &);
+  virtual Boolean formatFragment(const MessageFragment &, OutputCharStream &);
 private:
   MessageFormatter(const MessageFormatter &); // undefined
   void operator=(const MessageFormatter &);  // undefined

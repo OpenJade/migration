@@ -4,6 +4,12 @@
 #ifndef CmdLineApp_INCLUDED
 #define CmdLineApp_INCLUDED 1
 
+#ifdef SP_XML
+#define SP_REPORTER_CLASS XMLMessageReporter
+#else
+#define SP_REPORTER_CLASS MessageReporter
+#endif
+
 #ifdef __GNUG__
 #pragma interface
 #endif
@@ -27,7 +33,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API CmdLineApp  : public MessageReporter {
+class SP_API CmdLineApp  : public SP_REPORTER_CLASS {
 public:
 #ifdef SP_WIDE_SYSTEM
   typedef wchar_t AppChar;

@@ -106,8 +106,7 @@ private:
   bool doDeclareCharProperty();
   bool doAddCharProperties();
   bool skipForm();
-  bool parseDefine(Identifier *&, Owner<Expression> &, 
-                   bool &, Interpreter::Feature &);
+  bool parseDefine(Identifier *&, Owner<Expression> &);
   bool parseSpecialQuery(Owner<Expression> &expr, const char *query);
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);

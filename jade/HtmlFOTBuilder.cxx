@@ -50,7 +50,8 @@ public:
 	      && fontStyle == cp.fontStyle
 	      && fontSize == cp.fontSize
 	      && fontFamily == cp.fontFamily
-	      && color == cp.color);
+	      && color == cp.color
+	      && textTransform == cp.textTransform);
     }
     bool operator!=(const CharProps &cp) const { return !(*this == cp); }
     char fontWeight;
@@ -59,6 +60,8 @@ public:
     unsigned color;
     Length fontSize;
     StringC fontFamily;
+    enum { ttNone, ttUppercase, ttLowercase, ttCapitalize };
+    char textTransform;
   };
   struct InheritParaProps {
     InheritParaProps();
@@ -300,6 +303,7 @@ public:
   void setFontFamilyName(const StringC &);
   void setFontSize(Length);
   void setColor(const DeviceRGBColor &);
+  void setCharMap(Symbol);
   void setQuadding(Symbol);
   void setLineSpacing(const LengthSpec &);
   void setFirstLineStartIndent(const LengthSpec &);
@@ -509,6 +513,11 @@ void HtmlFOTBuilder::CharStyle::output(OutputCharStream &os) const
     for (int i = 20; i >= 0; i -= 4)
       os << "0123456789abcdef"[(color >> i) & 0xf];
     os << ';' << RE;
+    static const char *textTransformNames[4] = {
+      "none", "uppercase", "lowercase", "capitalize"
+    };
+    os << indent << "text-transform: " <<
+      textTransformNames[textTransform] << ';' << RE;
     os << '}' << RE;
   }
 }
@@ -946,6 +955,26 @@ void HtmlFOTBuilder::setColor(const DeviceRGBColor &color)
   nextFlowObject_.color = (color.red << 16) | (color.green << 8) | color.blue;
 }
 
+void HtmlFOTBuilder::setCharMap(Symbol sym)
+{
+  switch(sym) {
+  case symbolFalse:
+    nextFlowObject_.textTransform = CharProps::ttNone;
+    break;
+  case symbolUppercase:
+    nextFlowObject_.textTransform = CharProps::ttUppercase;
+    break;
+  case symbolLowercase:
+    nextFlowObject_.textTransform = CharProps::ttLowercase;
+    break;
+  case symbolCapitalize:
+    nextFlowObject_.textTransform = CharProps::ttCapitalize;
+    break;
+  default:
+    CANNOT_HAPPEN();
+  }
+}
+
 void HtmlFOTBuilder::setScrollTitle(const StringC &s)
 {
   nextFlowObject_.scrollTitle = new StringResource<Char>(s);
@@ -1178,7 +1207,8 @@ HtmlFOTBuilder::Document::~Document()
 }
 
 HtmlFOTBuilder::CharProps::CharProps()
-: fontWeight(5), color(0), fontStyle(styleNormal), fontSize(10*1000)
+: fontWeight(5), color(0), fontStyle(styleNormal), fontSize(10*1000),
+  textTransform(ttNone)
 {
   for (const char *p = "Times New Roman,serif"; *p; p++)
     fontFamily += *p;

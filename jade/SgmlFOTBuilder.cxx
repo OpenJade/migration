@@ -153,6 +153,8 @@ public:
   void setGridEquidistantColumns(bool);
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
+  void setInlineSpaceSpace(const OptInlineSpace &);
+  void setCharMap(Symbol);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables);
 
   void paragraphBreak(const ParagraphNIC &);
@@ -313,6 +315,7 @@ private:
   void integerC(const char *, long);
   void publicIdC(const char *, PublicId);
   void inlineSpaceC(const char *name, const InlineSpace &);
+  void optInlineSpaceC(const char*, const OptInlineSpace &);
   void displaySpaceNIC(const char *name, const DisplaySpace &);
   void flushPendingElements();
   void outputElementName(unsigned long groveIndex, const Char *, size_t);
@@ -1357,6 +1360,16 @@ void SgmlFOTBuilder::setEscapementSpaceAfter(const InlineSpace &is)
   inlineSpaceC("escapement-space-after", is);
 }
 
+void SgmlFOTBuilder::setInlineSpaceSpace(const OptInlineSpace &s)
+{
+  optInlineSpaceC("inline-space-space", s);
+}
+
+void SgmlFOTBuilder::setCharMap(Symbol sym)
+{
+  symbolC("char-map", sym);
+}
+
 void SgmlFOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &tables)
 {
   if (tables.size() == 0) {
@@ -1397,6 +1410,14 @@ void SgmlFOTBuilder::inlineSpaceC(const char *s, const InlineSpace &is)
         || is.max.displaySizeFactor != is.nominal.displaySizeFactor)
       ics_ << ',' << is.min << ',' << is.max;
   }
+}
+
+void SgmlFOTBuilder::optInlineSpaceC(const char *ch, const OptInlineSpace &ois)
+{
+  if (ois.hasSpace)
+    inlineSpaceC(ch, ois.space);
+  else
+    ics_ << ' ' << ch << "=" << quot << falseString << quot;
 }
 
 void SgmlFOTBuilder::displayNIC(const DisplayNIC &nic)

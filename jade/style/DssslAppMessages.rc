@@ -1,5 +1,5 @@
 STRINGTABLE
 BEGIN
-  2000, "Jade version %1"
+  2000, "OpenJade version %1"
   2001, "no DSSSL specification: use -d to specify"
 END

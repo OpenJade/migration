@@ -1,4 +1,4 @@
-// This file was automatically generated from lib\CmdLineAppMessages.msg by msggen.pl.
+// This file was automatically generated from CmdLineAppMessages.msg by msggen.pl.
 #include "Message.h"
 
 #ifdef SP_NAMESPACE
@@ -68,7 +68,7 @@ MessageFragment::appModule,
 #endif
 4003
 #ifndef SP_NO_MESSAGE_TEXT
-,"SP version %1"
+,"OpenSP version %1"
 #endif
 );
 const MessageType1 CmdLineAppMessages::unknownBctf(

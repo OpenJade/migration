@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"PO-Revision-Date: 1999-12-07 09:39+01:00\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -155,8 +155,17 @@ msgstr "flaggan %1 är tvetydig"
 msgid "option %1 doesn't allow an argument"
 msgstr "flaggan %1 tillåter inget argument"
 
-msgid "usage is %1"
-msgstr "användning: %1"
+msgid "Usage: %1"
+msgstr "Användning: %1"
+
+msgid "or: %1"
+msgstr "eller: %1"
+
+msgid "%1 [OPTION] SYSID..."
+msgstr "%1 [FLAGGA] SYSID..."
+
+msgid "Short options need the same arguments as their long forms."
+msgstr "Korta flaggor kräver samma argument som dess långa motsvarigheter."
 
 msgid "%1 version %2"
 msgstr "%1 version %2"
@@ -172,6 +181,48 @@ msgstr "kan inte öppna utdatafilen %1 (%2)"
 
 msgid "cannot close output file %1 (%2)"
 msgstr "kan inte stänga utdatafilen %1 (%2)"
+
+msgid "Use bctf %1."
+msgstr "Använd bctf %1."
+
+msgid "Use encoding %1."
+msgstr "Använd teckenkod %1."
+
+msgid "Append error messages to file %1."
+msgstr "Lägg felmeddelanden till filen %1."
+
+msgid "Display the program version."
+msgstr "Visa programmets version."
+
+msgid "Show this help text."
+msgstr "Visa denna hjälptext."
+
+msgid "NAME"
+msgstr "NAMN"
+
+msgid "FILE"
+msgstr "FIL"
+
+msgid "NOTHING"
+msgstr "INGET"
+
+msgid "Try the \"--help\" option for more information."
+msgstr "Försök med flaggan \"--help\" för mer information."
+
+msgid "Use catalog %1."
+msgstr "Använd katalog %1."
+
+msgid "Arguments are catalogs, use DOCUMENT entry."
+msgstr "Argumenten är kataloger; använd DOCUMENT-post."
+
+msgid "Search files in directory %1."
+msgstr "Sök efter filer i katalogen %1."
+
+msgid "DIRECTORY"
+msgstr "KATALOG"
+
+msgid "SYSID"
+msgstr "SYSID"
 
 # EntityManagerMessages
 msgid "bad formal system identifier syntax in %1"
@@ -304,6 +355,39 @@ msgstr "ogiltig felgräns"
 msgid "maximum number of errors (%1) reached; change with -E option"
 msgstr "felgräns (%1) uppnådd; ändra gränsen med flaggan -E"
 
+msgid "Make doctype or linktype %1 active."
+msgstr "Aktivera doctype eller linktype %1."
+
+msgid "Parse wrt. architecture %1."
+msgstr ""
+
+msgid "Give up after %1 errors."
+msgstr "Avbryt efter %1 fel."
+
+msgid "Show open entities in error messages."
+msgstr "Visa öppna entiteter i felmeddelanden."
+
+msgid "Show open elements in error messages."
+msgstr "Visa öppna element i felmeddelanden."
+
+msgid "Show error numbers in error messages."
+msgstr "Visa felnummer i felmeddelanden."
+
+msgid "Show references in error messages."
+msgstr "Visa referenser till relevant dokumentation i felmeddelanden"
+
+msgid "Define parameter entity %1 as \"INCLUDE\"."
+msgstr "Definiera parameterentitet %1 till \"INCLUDE\""
+
+msgid "Enable warning %1."
+msgstr "Slå på varning %1."
+
+msgid "TYPE"
+msgstr "TYP"
+
+msgid "NUMBER"
+msgstr "TAL"
+
 # ParserMessages
 msgid "length of name must not exceed NAMELEN (%1)"
 msgstr "längd på namn får inte överskrida NAMELEN (%1)"
@@ -407,7 +491,7 @@ msgid "%1 is not a function name"
 msgstr "%1 är inte namnet på en funktion"
 
 msgid "%1 is not a character number in the document character set"
-msgstr ""
+msgstr "%1 är inget teckenvärde i dokumentets teckenuppsättning"
 
 msgid "parameter entity %1 not defined"
 msgstr "parameterentiteten %1 ej definierad"
@@ -416,7 +500,7 @@ msgid "general entity %1 not defined and no default entity"
 msgstr "den generella entiteten %1 inte definierad och ingen standardentitet"
 
 msgid "RNI delimiter must be followed by name start character"
-msgstr ""
+msgstr "RNI-avgränsare måste följas av inledande namntecken"
 
 msgid "unterminated comment: found end of entity inside comment"
 msgstr "icke avslutad kommentar: entitetsslut i kommentar"
@@ -425,7 +509,7 @@ msgid "comment started here"
 msgstr "kommentaren började här"
 
 msgid "only one type of connector should be used in a single group"
-msgstr ""
+msgstr "endast en typ av sammanbindare får användas i en och samma grupp"
 
 msgid "%1 is not a reserved name"
 msgstr "%1 är inget reserverat namn"
@@ -462,19 +546,19 @@ msgid "%1 invalid: only %2 and token separators are allowed"
 msgstr ""
 
 msgid "unknown declaration type %1"
-msgstr ""
+msgstr "okänd deklarationstyp %1"
 
 msgid "%1 declaration not allowed in DTD subset"
-msgstr ""
+msgstr "%1-deklaration ej tillåten i DTD-delmängd"
 
 msgid "character %1 not allowed in declaration subset"
 msgstr ""
 
 msgid "end of document in DTD subset"
-msgstr ""
+msgstr "dokumentet tog slut i DTD-delmängden"
 
 msgid "character %1 not allowed in prolog"
-msgstr ""
+msgstr "tecknet %1 ej tillåtet i prologen"
 
 msgid "end of document in prolog"
 msgstr "dokumentet tog slut i prologen"
@@ -502,13 +586,13 @@ msgid ""
 msgstr ""
 
 msgid "comment declaration started here"
-msgstr ""
+msgstr "kommentardeklarationen började här"
 
 msgid "%1 declaration not allowed in instance"
-msgstr ""
+msgstr "deklarationen %1 ej tillåten i instansen"
 
 msgid "non-SGML character not allowed in content"
-msgstr ""
+msgstr "icke-SGML-tecken ej tillåtet i innehåll"
 
 msgid "no current rank for rank stem %1"
 msgstr ""
@@ -520,16 +604,16 @@ msgid "duplicate attribute definition list for element %1"
 msgstr ""
 
 msgid "entity end not allowed in end tag"
-msgstr ""
+msgstr "entitetsslut ej tillåtet i sluttag"
 
 msgid "character %1 not allowed in end tag"
-msgstr ""
+msgstr "tecknet %1 ej tillåtet i sluttag"
 
 msgid "%1 invalid: only S separators and TAGC allowed here"
 msgstr ""
 
 msgid "character data is not allowed here"
-msgstr ""
+msgstr "teckendata ej tillåtet här"
 
 msgid "document type does not allow element %1 here"
 msgstr "dokumenttypen tillåter inte elementet %1 här"
@@ -537,34 +621,36 @@ msgstr "dokumenttypen tillåter inte elementet %1 här"
 msgid ""
 "document type does not allow element %1 here; missing one of %2 start-tag"
 msgstr ""
+"dokumenttypen tillåter ej elementet %1 här; en av starttaggarna %2 saknas"
 
 msgid ""
 "document type does not allow element %1 here; assuming missing %2 start-tag"
 msgstr ""
+"dokumenttypen tillåter ej elementet %1 här; antar att starttaggen %1 saknas"
 
 msgid "no start tag specified for implied empty element %1"
-msgstr ""
+msgstr "ingen starttagg angiven för implicit tomt element %1"
 
 msgid "end tag for %1 omitted, but its declaration does not permit this"
-msgstr ""
+msgstr "sluttagg till %1 utelämnad, men detta tillåts ej av deklarationen"
 
 msgid "start tag was here"
-msgstr ""
+msgstr "starttaggen var här"
 
 msgid "end tag for %1 omitted, but OMITTAG NO was specified"
-msgstr ""
+msgstr "sluttag till %1 utelämnad, men OMITTAG NO angavs"
 
 msgid "start tag omitted for element %1 with declared content"
-msgstr ""
+msgstr "starttagg utelämnad för elementet %1 med deklarerat innehåll"
 
 msgid "end tag for %1 which is not finished"
-msgstr ""
+msgstr "sluttagg för %1, som ej är klar"
 
 msgid "start tag for %1 omitted, but its declaration does not permit this"
-msgstr ""
+msgstr "starttagg för %1 utelämnad, men deklarationen tillåter ej detta"
 
 msgid "number of open elements exceeds TAGLVL (%1)"
-msgstr ""
+msgstr "antal öppna element överskrider TAGLVL (%1)"
 
 msgid "element %1 undefined"
 msgstr "elementet %1 odefinierat"
@@ -576,10 +662,10 @@ msgid "%1 not finished but containing element ended"
 msgstr ""
 
 msgid "end tag for element %1 which is not open"
-msgstr ""
+msgstr "sluttagg för elementet %1, som ej är öppet"
 
 msgid "internal parameter entity %1 cannot be CDATA or SDATA"
-msgstr ""
+msgstr "intern parameterentitet %1 kan inte vara CDATA eller SDATA"
 
 msgid "character %1 not allowed in attribute specification list"
 msgstr ""
@@ -629,7 +715,7 @@ msgid "a reference to a PI entity is not allowed in replaceable character data"
 msgstr ""
 
 msgid "entity %1 is already open"
-msgstr ""
+msgstr "entiteten %1 är rdean öppen"
 
 msgid "short reference map %1 not defined"
 msgstr ""
@@ -683,7 +769,7 @@ msgid ""
 msgstr ""
 
 msgid "length of name token must not exceed NAMELEN (%1)"
-msgstr ""
+msgstr "längden på ett namn-token får ej överskrida NAMELEN (%1)"
 
 msgid ""
 "an attribute value literal can occur in an attribute specification list only "
@@ -727,10 +813,10 @@ msgid "syntax of attribute value does not conform to declared value"
 msgstr ""
 
 msgid "character %1 is not allowed in the value of attribute %2"
-msgstr ""
+msgstr "tecknet %1 är ej tillåtet i värdet för attributet %2"
 
 msgid "value of attribute %1 must be a single token"
-msgstr ""
+msgstr "värdet av attributet %1 måste vara ett enda token"
 
 msgid "value of attribute %2 invalid: %1 cannot start a number token"
 msgstr ""
@@ -742,16 +828,16 @@ msgid "non-impliable attribute %1 not specified but OMITTAG NO and SHORTTAG NO"
 msgstr ""
 
 msgid "required attribute %1 not specified"
-msgstr ""
+msgstr "nödvändigt attribut %1 ej angivet"
 
 msgid "first occurrence of CURRENT attribute %1 not specified"
 msgstr ""
 
 msgid "%1 is not a notation name"
-msgstr ""
+msgstr "%1 är inte namnet på någon notation"
 
 msgid "%1 is not a general entity name"
-msgstr ""
+msgstr "%1 är inte namnet på någon generell entitet"
 
 msgid "value of attribute %2 cannot be %1; must be one of %3"
 msgstr ""
@@ -787,7 +873,7 @@ msgid ""
 msgstr ""
 
 msgid "non SGML character number %1"
-msgstr ""
+msgstr "icke-SGML-teckenvärde %1"
 
 msgid "data or replaceable character data in declaration subset"
 msgstr ""
@@ -2065,9 +2151,42 @@ msgstr "fel vid läsning av URL %1 (%2)"
 msgid "unknown output option %1"
 msgstr "okänd utdataflagga %1"
 
+msgid "Enable batch mode."
+msgstr ""
+
+msgid "Produce output according to %1."
+msgstr ""
+
+msgid "Stop after the document prolog."
+msgstr "Avbryt efter dokumentets prolog."
+
+msgid "Suppress output."
+msgstr "Skriv ingen utdata."
+
+msgid "Send RAST output to file %1."
+msgstr "Skicka RAST-data till filen %1."
+
+msgid "Same as -wduplicate."
+msgstr "Samma som -wduplicate."
+
+msgid "Same as -oline."
+msgstr "Samma som -oline."
+
+msgid "Same as -c."
+msgstr "Samma som -c."
+
+msgid "Same as -wdefault."
+msgstr "Samma som -wdefault."
+
+msgid "Same as -wundef."
+msgstr "Samma som -wundef."
+
+msgid "OPTION"
+msgstr "FLAGGA"
+
 # RastEventHandlerMessages
 msgid "invalid RAST processing instruction"
-msgstr ""
+msgstr "ogiltig RAST-processinstruktion"
 
 msgid "invalid link type %1 in rast-active-lpd processing instruction"
 msgstr ""
@@ -2095,6 +2214,30 @@ msgid ""
 "normalized"
 msgstr ""
 
+msgid "Hoist omitted tags."
+msgstr ""
+
+msgid "Prefer lowercase."
+msgstr "Föredra små bokstäver."
+
+msgid "Use markup option %1."
+msgstr "Använd uppmärkningsflaggan %1."
+
+msgid "Output the entity named %1."
+msgstr "Skriv ut entiteten med namnet %1."
+
+msgid "Output the prolog."
+msgstr "Skriv ut prologen."
+
+msgid "Raw."
+msgstr "Rå."
+
+msgid "Expand references."
+msgstr ""
+
+msgid "Modify the XML output according to %1."
+msgstr ""
+
 # SxMessages
 # XmlOutputMessages
 msgid "reference to internal SDATA entity %1 not allowed in XML"
@@ -2120,3 +2263,49 @@ msgstr ""
 
 msgid "cannot convert formal system identifier %1 to URL"
 msgstr ""
+
+msgid "Output a document type declaration."
+msgstr "Mata ut en dokumenttypsdeklaration."
+
+msgid "Output marked sections."
+msgstr "Mata ut märkt avsnitt."
+
+msgid "Output comments."
+msgstr "Mata ut kommentarer."
+
+msgid "Raw output."
+msgstr "Rå utdata."
+
+msgid "Print the effective system id for the public id %1."
+msgstr "Skriv verksam systemidentifierare för den publika identifieraren %1."
+
+msgid "Print the effective system id for system id %1."
+msgstr "Skriv verksam systemidentifierare för systemidentifieraren %1."
+
+msgid "Print the effective system id for parameter entity %1."
+msgstr "Skriv verksam systemidentifierare för parameterentiteten %1."
+
+msgid "Print the effective system id for the doctype %1."
+msgstr "Skriv verksam systemidentifierare för doctype %1."
+
+msgid "Print the effective system id for the linktype %1."
+msgstr "Skriv ut verksam systemidentifierare för länktypen %1."
+
+msgid "Print the effective system id for entity %1."
+msgstr "Skriv ut verksam systemidentifierare för entiteten %1."
+
+msgid "Print the effective system id for notation %1."
+msgstr "Skriv ut verksam systemidentifierare för notationen %1."
+
+msgid "Print the effective system id for the SGML declaration for doctype %1."
+msgstr ""
+"Skriv ut verksam systemidentifierare för SGML-deklarationen för doctype %1."
+
+msgid "LITERAL"
+msgstr "LITERAL"
+
+msgid "non-SGML"
+msgstr "icke-SGML"
+
+msgid "raw"
+msgstr "rå"

@@ -66,6 +66,7 @@
 #include "NamedResourceTable.h"
 #include "NamedTable.h"
 #include "Notation.h"
+#include "NotationStorage.h"
 #include "OpenElement.h"
 #include "Options.h"
 #include "OutputByteStream.h"

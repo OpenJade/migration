@@ -15,7 +15,6 @@
 #include "Insn2.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
-#include "NotationStorage.h"
 #include "NumberCache.h"
 #include "ProcessContext.h"
 #include "ProcessingMode.h"

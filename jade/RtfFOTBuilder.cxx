@@ -293,7 +293,8 @@ private:
   void flushPendingElements();
   void doStartLink(const Address &);
   void flushFields() {
-    flushPendingElements();
+    if (!suppressBookmarks_)
+      flushPendingElements();
     if (havePendingLink_) {
       havePendingLink_ = 0;
       doStartLink(pendingLink_);
@@ -472,6 +473,7 @@ private:
   Vector<NodePtr> pendingElements_;
   Vector<unsigned> pendingElementLevels_;
   unsigned nPendingElementsNonEmpty_;
+  bool suppressBookmarks_;
   unsigned nodeLevel_;
   Vector<size_t> displayBoxLevels_;
   bool boxFirstPara_;      // not yet had a paragraph in the outermost displayed box
@@ -780,6 +782,7 @@ RtfFOTBuilder::RtfFOTBuilder(OutputByteStream *os,
   tableLevel_(0),
   nodeLevel_(0),
   nPendingElementsNonEmpty_(0),
+  suppressBookmarks_(0),
   followWhitespaceChar_(0),
   currentColumn_(0),
   boxFirstPara_(0),
@@ -1900,6 +1903,8 @@ void RtfFOTBuilder::endBox()
       // This prevents an adjacent box being merged by RTF.
       displayBoxLevels_.resize(displayBoxLevels_.size() - 1);
       os() << "\\keepn\\par\\pard\\sl-1";
+      if (tableLevel_)
+	os() << "\\intbl";
     }
     end();
     endDisplay();
@@ -2238,6 +2243,7 @@ void RtfFOTBuilder::startSimplePageSequence()
   displaySizeChanged();
   outputFormat_ = OutputFormat();
   doBreak_ = breakNone;
+  suppressBookmarks_ = 1;
 }
 
 void RtfFOTBuilder::endSimplePageSequence()
@@ -2293,6 +2299,7 @@ void RtfFOTBuilder::endAllSimplePageSequenceHeaderFooter()
     hfPart_[i].resize(0);
   inlineState_ = inlineFirst;
   continuePar_ = 0;
+  suppressBookmarks_ = 0;
 }
 
 void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)

@@ -170,8 +170,9 @@ E1+fpiExtraField++invalid formal public identifier %1: extra field
 E0+notationIdentifierTextClass++public text class of public identifier in notation identifier must be NOTATION
 W1+unknownBaseset++base character set %1 is unknown
 E2+lexicalAmbiguity+13.4.6p2+delimiter set is ambiguous: %1 and %2 can be recognized in the same mode
-E1+translateSyntaxChar++there is no unique character in the document character set corresponding to character number %1 in the syntax reference character set
 E1+missingSignificant++characters with the following numbers in the syntax reference character set are significant in the concrete syntax but are not in the document character set: %1
+E1+translateSyntaxCharDoc++there is no unique character in the document character set corresponding to character number %1 in the syntax reference character set
+E1+translateSyntaxCharInternal++there is no unique character in the internal character set corresponding to character number %1 in the syntax reference character set
 E1+missingSyntaxChar+13.4.3p2+the character with number %1 in ISO 646 is significant but has no representation in the syntax reference character set
 E1+unknownCapacitySet++capacity set %1 is unknown
 W1+duplicateCapacity++capacity %1 already specified

@@ -9,8 +9,6 @@ groveoa/GroveNode.cxx
 groveoa/GroveNode.h
 groveoa/StdAfx.cxx
 groveoa/StdAfx.h
-groveoa/WinApp.cxx
-groveoa/WinApp.h
 groveoa/groveoa.cxx
 groveoa/groveoa.def
 groveoa/groveoa.idl
@@ -36,7 +34,6 @@ style/Insn2.h
 style/Interpreter.h
 style/InterpreterMessages.h
 style/jade_version.h
-style/NotationStorage.h
 style/NumberCache.h
 style/primitive.h
 style/ProcessContext.h
@@ -58,7 +55,6 @@ style/GroveManager.cxx
 style/Insn.cxx
 style/Interpreter.cxx
 style/InterpreterMessages.cxx
-style/NotationStorage.cxx
 style/NumberCache.cxx
 style/primitive.cxx
 style/primitive_inst.cxx

@@ -28,14 +28,21 @@ namespace SP_NAMESPACE {
 #ifdef __DECCXX
 #pragma define_template NCVector<ArcProcessor>
 #else
+#ifdef __xlC__
+#pragma define(NCVector<ArcProcessor>)
+#else
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<ArcProcessor>;
 #else
 typedef NCVector<ArcProcessor> Dummy_0;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template Owner<ArcProcessor::MetaMapCache>
+#else
+#ifdef __xlC__
+#pragma define(Owner<ArcProcessor::MetaMapCache>)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class Owner<ArcProcessor::MetaMapCache>;
@@ -43,13 +50,18 @@ template class Owner<ArcProcessor::MetaMapCache>;
 typedef Owner<ArcProcessor::MetaMapCache> Dummy_1;
 #endif
 #endif
+#endif
 #ifdef __DECCXX
 #pragma define_template NCVector<Owner<ArcProcessor::MetaMapCache> >
+#else
+#ifdef __xlC__
+#pragma define(NCVector<Owner<ArcProcessor::MetaMapCache> >)
 #else
 #ifdef SP_ANSI_CLASS_INST
 template class NCVector<Owner<ArcProcessor::MetaMapCache> >;
 #else
 typedef NCVector<Owner<ArcProcessor::MetaMapCache> > Dummy_2;
+#endif
 #endif
 #endif
 

@@ -46,7 +46,7 @@ size_t maxObjSize()
     sizeof(LangObj),
 #ifdef SP_HAVE_LOCALE
     sizeof(RefLangObj),
-endif
+#endif
   };
   size_t n = sz[0];
   for (size_t i = 1; i < SIZEOF(sz); i++)

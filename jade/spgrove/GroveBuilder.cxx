@@ -1829,20 +1829,6 @@ protected:
   unsigned firstTokenIdx_;
 };
 
-// -- CLASS DEF: ModelGroupNodeList
-class ModelGroupNodeList : public BaseNodeList {
-public:
-  ModelGroupNodeList(const GroveImpl *grove,
-                     const ModelGroup &modelGroupNode,
-                     size_t firstTokenIdx);
-  AccessResult first(NodePtr &) const;
-  AccessResult chunkRest(NodeListPtr &) const;
-protected:
-  GroveImplPtr grove_;
-  ModelGroup &modelGroup_;
-  size_t firstTokenIdx_;
-};
-
 // -- CLASS DEF: AttributeDefsNodeList
 class AttributeDefsNodeList
  : public BaseNodeList, public virtual AttributeDefOrigin {

@@ -427,10 +427,12 @@ void Parser::parseStartTag()
 			       in->currentLocation());
   if (markup)
     markup->addDelim(Syntax::dSTAGO);
-  doParseStartTag();
+  Boolean netEnabling;
+  StartElementEvent *event = doParseStartTag(netEnabling);
+  acceptStartTag(event->elementType(), event, netEnabling);
 }
 
-void Parser::doParseStartTag() 
+StartElementEvent *Parser::doParseStartTag(Boolean &netEnabling) 
 {
   Markup *markup = currentMarkup();
   InputSource *in = currentInput();
@@ -449,7 +451,6 @@ void Parser::doParseStartTag()
   }
   if (!e)
     e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst(), (implydefElement() != Sd::implydefElementAnyother));
-  Boolean netEnabling;
   AttributeList *attributes = allocAttributeList(e->attributeDef(), 0);
   Token closeToken = getToken(tagMode);
   if (closeToken == tokenTagc) {
@@ -477,14 +478,11 @@ void Parser::doParseStartTag()
       e->setAttributeDef(newAttDef);
     }
   }
-  acceptStartTag(e,
-		 new (eventAllocator())
-		 StartElementEvent(e,
-				   currentDtdPointer(),
-				   attributes,
-				   markupLocation(),
-				   markup),
-		 netEnabling);
+  return new (eventAllocator()) StartElementEvent(e,
+						  currentDtdPointer(),
+						  attributes,
+						  markupLocation(),
+						  markup);
 }
 
 ElementType *Parser::completeRankStem(const StringC &name)
@@ -527,7 +525,8 @@ void Parser::parseEmptyStartTag()
 {
   if (options().warnEmptyTag)
     message(ParserMessages::emptyStartTag);
-  // FIXME error if not in base.
+  if (!currentDtd().isBase())
+    message(ParserMessages::emptyStartTagBaseDtd);
   const ElementType *e = 0;
   if (!sd().omittag()) 
     e = lastEndedElementType();
@@ -570,8 +569,13 @@ void Parser::parseGroupStartTag()
     message(ParserMessages::startTagMissingName);
     return;
   }
-  if (active)
-    doParseStartTag();
+  if (active) {
+    Boolean netEnabling;
+    StartElementEvent *event = doParseStartTag(netEnabling);
+    if (netEnabling)
+      message(ParserMessages::startTagGroupNet);
+    acceptStartTag(event->elementType(), event, netEnabling);
+  }
   else {
     in->discardInitial();
     extendNameToken(syntax().namelen(), ParserMessages::nameLength);
@@ -1076,7 +1080,8 @@ void Parser::parseEmptyEndTag()
 {
   if (options().warnEmptyTag)
     message(ParserMessages::emptyEndTag);
-  // FIXME what to do if not in base
+  if (!currentDtd().isBase())
+    message(ParserMessages::emptyEndTagBaseDtd);
   if (tagLevel() == 0)
     message(ParserMessages::emptyEndTagNoOpenElements);
   else {

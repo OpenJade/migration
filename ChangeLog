@@ -1,3 +1,9 @@
+2002-12-06  Karl Eichwalder  <ke@suse.de>
+
+	* tests/af-4: New file.
+	* tests/af-5: Likewise.
+	* tests/Makefile.am (TESTS): Add af-4 and af-5.
+
 2002-12-05  Karl Eichwalder  <ke@suse.de>
 
 	* tests/af-2: New file.

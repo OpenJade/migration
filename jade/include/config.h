@@ -39,8 +39,13 @@
 #define SP_STAT_BLKSIZE
 #endif
 
-#if (defined __MACH__) && (! defined __GNU__)
+#if (defined __MACH__) && (! defined __GNU__) && (! defined __APPLE__)
 #define SP_MUTEX_MACH
+#endif
+
+// MacOS X uses pthreads
+#if (defined __MACH__) && (defined __APPLE__)
+#define SP_USE_PTHREADS
 #endif
 
 #ifdef __EMX__

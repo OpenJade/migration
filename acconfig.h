@@ -1,3 +1,10 @@
+// Copyright (C) 1999 Matthias Clasen, Peter Nilsson
+// See the file COPYING for copying permissions.
+
+#include <OpenSP/config.h>
+
+@TOP@
+
 /* set this to the location of builtins.dsl */
 #define DEFAULT_SCHEME_BUILTINS "builtins.dsl"
 
@@ -36,12 +43,6 @@
 
 /* define this if the new handler takes size_t and returns int. */
 #undef SP_FANCY_NEW_HANDLER
-
-@TOP@
-
-#error The stuff above TOP goes to the top of config.h.in
-#error What appears below BOTTOM goes to the bottom
-#error This text should not appear anywhere!
 
 @BOTTOM@
 

@@ -223,8 +223,6 @@ void Pattern::NodeQualifier::computePriority() const
 
 bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
 {
-  computePriority();
-
   NodePtr root;
   m->getGroveRoot(root);
   EvalContext ec;
@@ -249,17 +247,7 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
       nl_);
   }
 
-  NodeListObj *nl = nl_;
-  for (;;) {
-    ELObjDynamicRoot protect(*interp_, nl);
-    NodePtr nd(nl->nodeListFirst(ec, *interp_));
-    if (!nd)
-      break;
-    if (*nd == *m)  
-      return 1;
-    nl = nl->nodeListRest(ec, *interp_); 
-  }
-  return 0;
+  return nl_->contains(m);
 }
 
 void Pattern::NodeQualifier::contributeSpecificity(long *s) const

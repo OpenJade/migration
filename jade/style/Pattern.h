@@ -49,16 +49,18 @@ public:
   };
   class NodeQualifier : public Qualifier, private Collector::DynamicRoot {
   public:
-    NodeQualifier(Owner<Expression> &, unsigned, ProcessingMode *, Interpreter *);
+    NodeQualifier(Owner<Expression> &, Owner<Expression> &, ProcessingMode *, Interpreter *);
     bool satisfies(const NodePtr &, MatchContext &) const;
     void contributeSpecificity(int *) const;
     void trace(Collector &) const;
   private:
     ProcessingMode *pm_;
     Interpreter *interp_;
-    Owner<Expression> expr_;
+    Owner<Expression> nlExpr_;
+    Owner<Expression> priorityExpr_;
     mutable NodeListObj *nl_;
-    unsigned priority_;
+    mutable unsigned int priority_;
+    mutable Boolean priorityCompiled_;
   };
   class IdQualifier : public Qualifier {
   public:

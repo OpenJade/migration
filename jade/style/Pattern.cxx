@@ -171,12 +171,20 @@ void Pattern::ChildrenQualifier::contributeSpecificity(int *s) const
     iter.cur()->contributeSpecificity(s);
 }
 
-Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &expr, unsigned priority,
+Pattern::NodeQualifier::NodeQualifier(Owner<Expression> &nlExpr, 
+				      Owner<Expression> &priorityExpr,
                                       ProcessingMode *pm, Interpreter *interp)
-: priority_(priority), interp_(interp), pm_(pm), nl_(0),
+: interp_(interp), pm_(pm), nl_(0), priority_(0),
   Collector::DynamicRoot(*interp)
 {
-  expr_.swap(expr);
+  nlExpr_.swap(nlExpr);
+  
+  if (!priorityExpr)
+    priorityCompiled_ = 1;
+  else {
+    priorityCompiled_ = 0;
+    priorityExpr_.swap(priorityExpr);
+  }
 }
 
 bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) const
@@ -186,16 +194,44 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
   EvalContext ec;
   EvalContext::CurrentNodeSetter cns(root, pm_, ec);
 
+  if (!priorityCompiled_) {
+    InsnPtr insn = 
+      priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
+    VM vm(ec, *interp_);
+    ELObj *val = vm.eval(insn.pointer());
+    double p;
+    if (!val || !val->realValue(p)) {
+      //FIXME: error
+      return 0;
+    }
+#ifndef HAVE_MUTABLE
+    ((NodeQualifier *)this)->
+#endif
+    //FIXME: we're using only 3 digits here
+    priority_ = int(1000*p);
+#ifndef HAVE_MUTABLE
+    ((NodeQualifier *)this)->
+#endif
+    priorityCompiled_ = 1;
+  }
+
   if (!nl_) {
-    InsnPtr insn = expr_->compile(*interp_, Environment(), 0, InsnPtr());
+    InsnPtr insn = nlExpr_->compile(*interp_, Environment(), 0, InsnPtr());
     VM vm(ec, *interp_);
     ELObj *val = vm.eval(insn.pointer());
     if (!val || !val->asNodeList()) {
       //FIXME: error
       return 0;
     }
+#ifndef HAVE_MUTABLE
+    ((NodeQualifier *)this)->
+#endif
     nl_ = val->asNodeList();
-    interp_->makeReadOnly(nl_);
+    interp_->makeReadOnly(
+#ifndef HAVE_MUTABLE
+      ((NodeQualifier *)this)->
+#endif
+      nl_);
   }
 
   NodeListObj *nl = nl_;
@@ -213,6 +249,27 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
 
 void Pattern::NodeQualifier::contributeSpecificity(int *s) const
 {
+  //FIXME: should current-node and current-root work in priority-expression ?
+  EvalContext ec;
+  if (!priorityCompiled_) {
+    InsnPtr insn = 
+      priorityExpr_->compile(*interp_, Environment(), 0, InsnPtr());
+    VM vm(ec, *interp_);
+    ELObj *val = vm.eval(insn.pointer());
+    double p;
+    if (!val || !val->realValue(p)) {
+      //FIXME: error
+      return;
+    }
+#ifndef HAVE_MUTABLE
+    ((NodeQualifier *)this)->
+#endif
+    priority_ = int(1000*p);
+#ifndef HAVE_MUTABLE
+    ((NodeQualifier *)this)->
+#endif
+    priorityCompiled_ = 1;
+  }
   s[nodeSpecificity] += 1 + priority_;
 }
 

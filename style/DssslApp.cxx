@@ -105,8 +105,8 @@ void DssslApp::processOption(AppChar opt, const AppChar *arg)
     break;
   case 'v':
     message(DssslAppMessages::versionInfo,
-	    StringMessageArg(convertInput(SP_T(VERSION))),
-	    StringMessageArg(convertInput(SP_T(PACKAGE))));
+	    StringMessageArg(convertInput(SP_T(OPENJADE_PACKAGE))),
+	    StringMessageArg(convertInput(SP_T(OPENJADE_VERSION))));
     // fall through
   default:
     GroveApp::processOption(opt, arg);

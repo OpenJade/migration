@@ -13,6 +13,7 @@ namespace DSSSL_NAMESPACE {
 
 FOTBuilder *makeTransformFOTBuilder(CmdLineApp *app,
 				    bool xml,
+				    const Vector<StringC> &options,
 				    const FOTBuilder::Description *&);
 
 #ifdef DSSSL_NAMESPACE

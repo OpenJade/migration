@@ -82,7 +82,7 @@ tmpfiles="$tmpfiles af-14-norm.out"
 : ${OSGMLNORM=osgmlnorm}
 ${OSGMLNORM} >af-14-norm.out -A open af-14.sgml
 tmpfiles="$tmpfiles af-14-norm.ok"
-exit
+
 cat <<EOF >af-14-norm.ok
 <OPEN>
 <NOTES>

@@ -77,7 +77,7 @@ void CharMap<T>::setRange(Char from, Char to, T val)
 	// Set a complete page.
 	CharMapPage<T> &pg = pages_[from >> (CharMapBits::level2 + CharMapBits::level3)];
 	pg.value = val;
-	delete pg.values;
+	delete [] pg.values;
 	pg.values = 0;
 	from += (1 << (CharMapBits::level2 + CharMapBits::level3)) - 1;
       }
@@ -87,7 +87,7 @@ void CharMap<T>::setRange(Char from, Char to, T val)
 	if (pg.values) {
 	  CharMapColumn<T> &column = pg.values[(from >> CharMapBits::level3) & ((1 << CharMapBits::level2) - 1)];
 	  column.value = val;
-	  delete column.values;
+	  delete [] column.values;
 	  column.values = 0;
 	}
 	else if (val != pg.value) {

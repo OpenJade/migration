@@ -296,6 +296,10 @@ InputName=InterpreterMessages
 # End Source File
 # Begin Source File
 
+SOURCE=.\LangObj.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\MacroFlowObj.cxx
 # ADD CPP /Yu"stylelib.h"
 # End Source File

@@ -239,6 +239,11 @@ private:
   ELObj *obj_;
 };
 
+struct CharPart {
+  Char c;
+  unsigned defPart;
+};
+
 class Interpreter : 
   public Collector,
   public Pattern::MatchContext,
@@ -270,6 +275,7 @@ public:
 	      bool dsssl2, const FOTBuilder::Extension *);
   void defineVariable(const StringC &);
   void endPart();
+  void dEndPart();
   FalseObj *makeFalse();
   TrueObj *makeTrue();
   NilObj *makeNil();
@@ -350,7 +356,7 @@ public:
   bool convertCharName(const StringC &str, Char &c) const;
   enum LexCategory {
     lexLetter,			// a - z A - Z
-    lexOtherNameStart,		// 
+    lexOtherNameStart,		// !$%&*/<=>?~_^:
     lexDigit,			// 0-9
     lexOtherNumberStart,	// -+.
     lexDelimiter,		// ;()"
@@ -358,6 +364,8 @@ public:
     lexOther
   };
   LexCategory lexCategory(Xchar);
+  void addStandardChars(Owner<InputSource> &);
+  void addSdataEntity(const StringC &name, const StringC &text, Owner<InputSource> &);
 private:
   Interpreter(const Interpreter &); // undefined
   void operator=(const Interpreter &); // undefined
@@ -407,6 +415,7 @@ private:
   Messenger *messenger_;
   const FOTBuilder::Extension *extensionTable_;
   unsigned partIndex_;
+  unsigned dPartIndex_;
   int unitsPerInch_;
   unsigned nInheritedC_;
   GroveManager *groveManager_;
@@ -414,7 +423,9 @@ private:
   NamedTable<ProcessingMode> processingModeTable_;
   SymbolObj *portNames_[nPortNames];
   ELObj *cValueSymbols_[FOTBuilder::nSymbols];
-  HashTable<StringC,Char> namedCharTable_;
+  HashTable<StringC, CharPart> namedCharTable_;
+  HashTable<StringC, CharPart> sdataEntityNameTable_;
+  HashTable<StringC, CharPart> sdataEntityTextTable_;
   Vector<const Identifier *> initialValueNames_;
   NCVector<Owner<Expression> > initialValueValues_;
   size_t currentPartFirstInitialValue_;
@@ -437,7 +448,6 @@ private:
     OwnerTable<String<char>, String<char>, StringSet, StringSet> table_;
   };
   StringSet publicIds_;
-  HashTable<StringC,Char> sdataEntityNameTable_;
   unsigned nextGlyphSubstTableUniqueId_;
   AddressObj *addressNoneObj_;
   NodeListObj *emptyNodeListObj_;

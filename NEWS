@@ -1,5 +1,7 @@
 Changes in OpenJade 1.3
 
+* Jade can bind variables to arbitrary values on the command line. 
+
 * The prlabs1 module of the SGML property set is supported.
 
 * Style sheet extensions.dsl lists all known

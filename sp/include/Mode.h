@@ -44,6 +44,7 @@ enum Mode {
   mlitMode,			// minimum literal starting with LIT
   mlitaMode,			// minimum literal starting with LITA
   asMode,			// data/link/result attribute specification
+  piPasMode,			// pi pseudo-attribute specification
   slitMode,			// system id literal starting with LIT
   slitaMode,			// system id literal starting with LITA
   sdslitMode,			// system id literal starting with LIT

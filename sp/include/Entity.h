@@ -99,7 +99,7 @@ protected:
   Text text_;
 };
 
-class PiEntity : public InternalEntity {
+class SP_API PiEntity : public InternalEntity {
 public:
   PiEntity(const StringC &, DeclType, const Location &, Text &);
   void litReference(Text &, ParserState &,

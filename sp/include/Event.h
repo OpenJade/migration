@@ -860,6 +860,8 @@ public:
   virtual void shortrefDecl(ShortrefDeclEvent *);
   virtual void ignoredMarkup(IgnoredMarkupEvent *);
   virtual void entityDefaulted(EntityDefaultedEvent *);
+  virtual void inputClosed(InputSource *in);
+  virtual void inputOpened(InputSource *in);
   virtual void sgmlDeclEntity(SgmlDeclEntityEvent *);
 };
 

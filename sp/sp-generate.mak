@@ -2,6 +2,8 @@
 # are automatically generated.  It's too painful to do in the IDE.
 # You'll need perl in your PATH to use this.
 
+LANG=en
+
 M4=m4
 PERL=perl
 
@@ -46,22 +48,22 @@ all: $(GENSRCS)
 
 {lib}.msg{lib}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl -l libModule $<
+	$(PERL) -w msggen.pl -l libModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {nsgmls}.msg{nsgmls}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl -l appModule $<
+	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {spam}.msg{spam}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl -l appModule $<
+	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {sx}.msg{sx}.h:
 	del /f $@ 2> nul
-	$(PERL) -w msggen.pl -l appModule $<
+	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
 include\config.h: include\config.h.old

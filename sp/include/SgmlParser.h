@@ -73,6 +73,7 @@ public:
   void allLinkTypesActivated();
   void swap(SgmlParser &);
   friend class Parser;
+  friend class PiAttspecParser;
 private:
   SgmlParser(const SgmlParser &);
   void operator=(const SgmlParser &);

@@ -310,14 +310,15 @@ If there is no input filename, then the extension is added onto
 <CODE>jade-out</CODE>.
 <DD>
 <DT>
-<CODE>-V <VAR>variable</VAR></CODE>
+<CODE>-V <VAR>variable[=value]</VAR></CODE>
 <DD>
 This is equivalent to doing
 <PRE>
-(define <VAR>variable</VAR> #t)
+(define <VAR>variable</VAR> "value")
 </PRE>
 except that this definition will take priority over any definition of
-<VAR>variable</VAR> in a style-sheet.
+<VAR>variable</VAR> in a style-sheet. If the optional part [=value]
+is omitted, the variable is set to #t.
 </DL>
 <P>
 Jade ignores the <SAMP>SP_CHARSET_FIXED</SAMP> and

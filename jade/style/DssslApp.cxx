@@ -34,7 +34,7 @@ DssslApp::DssslApp(int unitsPerInch)
   registerOption('G');
   registerOption('2');
   registerOption('d', SP_T("dsssl_spec"));
-  registerOption('V', SP_T("variable"));
+  registerOption('V', SP_T("variable[=value]"));
   registerOption('s');
 }
 

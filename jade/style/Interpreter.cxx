@@ -191,7 +191,26 @@ void Interpreter::installInitialValue(Identifier *ident, Owner<Expression> &expr
 
 void Interpreter::defineVariable(const StringC &str)
 {
-  lookup(str)->setValue(makeTrue(), 0);
+  // Dk: Interpret "name=value" as a string variable Setting.
+  int Idx;
+  for (Idx = 0; (Idx < str.size()) && (str[Idx] != '='); Idx++)
+    ;
+
+  // Dk: Not name=value?
+  if (!Idx || (Idx >= (str.size())))
+  {  lookup(str)->setValue(makeTrue(), 0);
+  }
+  else
+  {  // Dk: name=value.
+     StringC Name(str.begin(), Idx);
+     Char Empty = 0;
+     StringC Value(&Empty, 0);
+     int Vlen = str.size() - Idx - 1;
+     if (Vlen) Value = StringC(str.begin() + Idx + 1, Vlen);
+     StringObj* Vs = new (*this) StringObj(Value);
+     makePermanent(Vs);
+     lookup(Name)->setValue(Vs, 0);
+  }
 }
 
 void Interpreter::installUnits()

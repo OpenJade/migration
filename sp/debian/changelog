@@ -3,8 +3,10 @@ opensp (1.5pre5-4) unstable; urgency=low
   * libosp-dev now has proper depends on libosp2 and opensp, modified
     patch from Yann Dirson
     closes: #107239
+  * remove obsolete OJ_CHECK_SIZEOF, which was causing autoheader to puke
+  * require autoconf 2.52
 
- -- Adam Di Carlo <aph@debian.org>  Fri, 31 Aug 2001 02:24:24 -0400
+ -- Adam Di Carlo <aph@debian.org>  Fri, 31 Aug 2001 02:57:53 -0400
 
 opensp (1.5pre5-3) unstable; urgency=low
 

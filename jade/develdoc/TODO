@@ -38,11 +38,6 @@ Simple things
 Things which have to be added to the jade internals documentation
 =================================================================
 
-*  .msg file format: clauses field format, deleted messages,
-    comments, number assignments, fragments.
-
-*  tracing subobjects.
-
 *  writing backends.
 
 *  scheme primitives: special meaning of partIndex == unsigned(-1),

@@ -1,7 +1,7 @@
 <!doctype article public "-//Davenport//DTD DocBook V3.0//EN">
 <article>
   <artheader>
-    <title>Jade internals</title>
+    <title>OpenJadei and OpenSP internals</title>
     <author>
       <firstname>Matthias</firstname>
       <surname>Clasen</surname>
@@ -11,15 +11,16 @@
 	</address>
       </affiliation>
     </author>
-    <date>5.6.99</date>
+    <date>19.11.99</date>
   </artheader>
   <abstract>
-    <para>This document describes the Jade DSSSL engine
+    <para>This document describes the OpenJade DSSSL engine
+      and the OpenSP SGML system upon which it is based 
       from the programmers point of view. It was written to
-      help people who want to extend Jade.</para>
+      help people who want to extend OpenJade or OpenSP.</para>
   </abstract>
   <sect1>
-    <title>Package organization</title>
+    <title>OpenSP Package organization</title>
     <sect2>
       <title>Directory contents</title>
       <para>The follwing directories contain files needed during the
@@ -29,34 +30,17 @@
 	  <term><filename>all/</filename></term>
 	  <listitem><para>Visual C++ build process</para></listitem>
 	</varlistentry>
-	<varlistentry>
-	  <term><filename>config/</filename></term>
-	  <listitem><para>autoconf build process</para></listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>jadedist/</filename></term>
-	  <listitem><para>creating a distribution</para></listitem>
-	</varlistentry>
       </variablelist>
       <para>The following directories contain documentation:</para>
       <variablelist>
 	<varlistentry>
 	  <term><filename>doc/</filename></term>
-	  <listitem><para>SP documentation</para></listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>jadedoc/</filename></term>
-	  <listitem><para>Jade documentation</para></listitem>
+	  <listitem><para>OpenSP documentation</para></listitem>
 	</varlistentry>
       </variablelist>
       <para>The following directories contain
-      <acronym>SGML</acronym>/<acronym>DSSSL</acronym> text files:</para>
+      <acronym>SGML</acronym> text files:</para>
       <variablelist>
-	<varlistentry>
-	  <term><filename>dsssl/</filename></term>
-	  <listitem><para>DTDs for style sheets and FOT output; jadetex;
-	      examples</para></listitem>
-	</varlistentry>
 	<varlistentry>
 	  <term><filename>pubtext/</filename></term>
 	  <listitem><para>various DTDs and catalogs</para></listitem>
@@ -67,37 +51,18 @@
 	  dealing with Unicode</para></listitem>
 	</varlistentry>
       </variablelist>
-      <para>The following directories contain the sources of the various
-      libraries:</para> 
+      <para>The following directories contain the sources of the 
+      library:</para> 
       <variablelist>
 	<varlistentry>
 	  <term><filename>include/</filename></term>
-	  <term><filename>lib/</filename></term>
-	  <listitem><para>the SP library</para></listitem> 
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>style/</filename></term>
-	  <listitem><para>the <acronym>DSSSL</acronym> style
-	      engine</para></listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>grove/</filename></term>
-	  <listitem><para>an abstract interface to groves</para></listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>spgrove/</filename></term>
-	  <listitem><para>an implementation of the grove
-	      interface</para></listitem> 
-	</varlistentry>
-	<varlistentry>
-	  <term><filename>groveoa/</filename></term>
-	  <listitem><para>an <acronym>OLE</acronym>-enabled version of the
-	      grove builder, Windows-only</para></listitem>  
-	</varlistentry>
-	<varlistentry>
 	  <term><filename>generic</filename></term>
-	  <listitem><para>simple <acronym>API</acronym> for applications
-	  derived from SP</para></listitem>
+	  <listitem><para>the headers defining the API of the OpenSP
+	    library</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>lib/</filename></term>
+	  <listitem><para>the source of the OpenSP library</para></listitem> 
 	</varlistentry>
       </variablelist>
       <para>Applications:</para>
@@ -117,7 +82,7 @@
 	</varlistentry>
 	<varlistentry>
 	  <term><filename>spent/</filename></term>
-	  <listitem><para>a frontend to the SP entity manager</para>
+	  <listitem><para>a frontend to the OpenSP entity manager</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
@@ -126,17 +91,98 @@
 	      <acronym>XML</acronym> converter</para></listitem>
 	</varlistentry>
 	<varlistentry>
-	  <term><filename>jade/</filename></term>
-	  <listitem><para>the source of the Jade application and its various
-	      backends</para></listitem>
+	  <term><filename>spcat/</filename></term>
+	  <listitem><para>a frontend to the OpenSP catalog 
+	      manager</para></listitem>
 	</varlistentry>
       </variablelist>
     </sect2>
     <sect2>
       <title>The build system</title>
-      <para>TODO: What needs to be said here ? msggen.pl; What makefiles
-      are used and included where; list of defines in config.h;
-      building by hand vs. configure</para>
+      <para>OpenSP uses the GNU build system based on autoconf, automake
+	and libtool. If you are working from a <filename>.tar.gz</filename>
+        snapshot or release of OpenSP, all you need to do is
+<cmd>./configure; make</cmd>. If you are working from CVS, you have to
+  	run <cmd>autoconf --add-missing; autoheader; aclocal; autoconf</cmd>
+	initially.</para>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>OpenJade Package organization</title>
+    <sect2>
+      <title>Directory contents</title>
+      <para>The follwing directories contain files needed during the
+      build:</para> 
+      <variablelist>
+	<varlistentry>
+	  <term><filename>jadedist/</filename></term>
+	  <listitem><para>creating a distribution</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>testsuite/</filename></term>
+	  <listitem><para>a collection of DSSSL tests</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>debian/</filename></term>
+	  <listitem><para>files necessary to build a Debian package</para></listitem>
+	</varlistentry>
+      </variablelist>
+      <para>The following directories contain documentation:</para>
+      <variablelist>
+	<varlistentry>
+	  <term><filename>jadedoc/</filename></term>
+	  <listitem><para>OpenJade documentation</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>develdoc/</filename></term>
+	  <listitem><para>documentation for developers</para></listitem>
+	</varlistentry>
+      </variablelist>
+      <para>The following directories contain
+      <acronym>DSSSL</acronym> text files:</para>
+      <variablelist>
+	<varlistentry>
+	  <term><filename>dsssl/</filename></term>
+	  <listitem><para>DTDs for style sheets and FOT output; jadetex;
+	      examples</para></listitem>
+	</varlistentry>
+      </variablelist>
+      <para>The following directories contain the sources of the various
+      libraries:</para> 
+      <variablelist>
+	<varlistentry>
+	  <term><filename>style/</filename></term>
+	  <listitem><para>the <acronym>DSSSL</acronym> style
+	      engine</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>grove/</filename></term>
+	  <listitem><para>an abstract interface to groves</para></listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>spgrove/</filename></term>
+	  <listitem><para>an implementation of the grove
+	      interface on top of OpenSP</para></listitem> 
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>groveoa/</filename></term>
+	  <listitem><para>an <acronym>OLE</acronym>-enabled version of the
+	      grove builder, Windows-only</para></listitem>  
+	</varlistentry>
+      </variablelist>
+      <para>Applications:</para>
+      <variablelist>
+	<varlistentry>
+	  <term><filename>jade/</filename></term>
+	  <listitem><para>the source of the OpenJade application and its 
+              various backends</para></listitem>
+	</varlistentry>
+      </variablelist>
+    </sect2>
+    <sect2>
+      <title>The build system</title>
+	<para>OpenJade also uses the GNU build system. Look at the
+	  description of the OpenSP build system for more details.</para> 
     </sect2>
   </sect1>
   <sect1>
@@ -324,7 +370,7 @@ void foo() {
 	      <para>If a the default copy constructor and assignment operator
 		will not work for a class, you must do one of two things:
 		Either provide a copy constructor and assigment operator that
-		will work or declare but do not implement aprivate copy
+		will work or declare but do not implement a private copy
 		constructor and assignment operator.</para>
 	    </listitem>
 	    <listitem>
@@ -341,8 +387,8 @@ void foo() {
     </sect2>
     <sect2>
       <title>Headers</title>
-      <para>Every header file should be surrounded by an ifndef. Here
-	is a skeleton for a header file named 
+      <para>Every header file should be surrounded by an <code>#ifndef</code>. 
+        Here is a skeleton for a header file named 
 	<filename>filename.h</filename>:</para>
       <programlisting format="linespecific">
 /* copyright notice goes here */
@@ -354,6 +400,12 @@ void foo() {
 
 #endif /* not filename_INCLUDED */
       </programlisting>
+      <para>The first header included by a source file must be 
+	<filename>splib.h</filename> for files in
+        <filename>lib/</filename>, <filename>config.h</filename>
+        for files in <filename>grove/</filename>, <filename>spgrove/</filename>
+	or an application directory, <filename>stylelib.h</filename> 
+        for files in <filename>style/</filename>.</para>
     </sect2>
     <sect2>
       <title>Namespaces</title>
@@ -447,7 +499,7 @@ __declspec(dllimport)
 	<filename>.msg</filename> file. The lines in these files have the
 	following format:</para> 
 
-      <para><replaceable>&lt;message type></replaceable><replaceable>&lt;args></replaceable>+<replaceable>&lt;identifier></replaceable>+<replaceable>&lt;relevant clause></replaceable>+<replaceable>&lt;message text></replaceable></para>
+      <para><replaceable>&lt;message type></replaceable><replaceable>&lt;args></replaceable>+<replaceable>&lt;identifier></replaceable>+<replaceable>&lt;relevant clauses></replaceable>+<replaceable>&lt;message text></replaceable></para>
 	 
       <para><replaceable>&lt;message type></replaceable> must be one of the
 	I, W, Q, X or E. These stand for info, warning, quantity error, idref
@@ -460,15 +512,33 @@ __declspec(dllimport)
       <para><replaceable>&lt;identifier></replaceable> is the C++-identifier
 	used to refer to the message.</para> 
 
-      <para><replaceable>&lt;relevant clause></replaceable> is used in SP to
-	give an exact reference to the <acronym>SGML</acronym> standard for
-	each error message. Outside of SP, this field is usually left
-	empty.</para> 
+      <para><replaceable>&lt;relevant clauses></replaceable> may be used to
+        give an exact reference to the relevant ISO standard for
+	each error message. In OpenJade error messages, this field is 
+        usually left empty. The information in this field is currently 
+        ignored by all OpenSP and OpenJade applications. 
+        The format for this field is a space-separated
+        list of clauses, where each clause is a dot-separated list of
+        numbers. A clause may optionally contain a paragraph specification,
+        which is a suffix of the form `p&lt;number>'. </para> 
 
       <para><replaceable>&lt;message text></replaceable> is the text of the
    message. It can contain placeholders of the form %n where n is a number
    between 0 and <replaceable>&lt;args></replaceable> - 1. These placeholders
    will be replaced by suitable arguments if the message is issued.</para>
+ 
+      <para>Besides normal message lines, <filename>.msg</filename> files
+        may contain a few other lines: a line starting with `!cxx' causes
+        the generation of a <filename>.cxx</filename> file (this is necessary
+        if the generated header file is included in multiple source files,
+        a line of the form `= &lt;number>' can be used to set the number
+        for the following message, a line starting with `-' is a deleted
+        message (ie it is ignored, but still increases the message number),
+        a line with `#' or `$' as the first non-whitespace character is  
+        a comment (ie it is ignored). Finally, if a message line omits 
+        the &lt;message type> and &lt;args> fields and starts with the `+'
+        before the &lt;identifier> field, it specifies a message fragment.
+        Message fragments are used in building up messages.</para>
 
       <para>Message arguments come from classes derived from
 	<classname>MessageArg</classname>.
@@ -500,7 +570,8 @@ __declspec(dllimport)
     <sect2>
       <title>Program structure</title>
 
-      <para>Most of SP and Jade is user-interface independent: it doesn't know
+      <para>Most of OpenSP and OpenJade is user-interface independent: 
+       it doesn't know
 	whether it's being run from the command line or from a GUI. The 
 	code is organized in several layers.</para>
       <orderedlist>
@@ -548,7 +619,7 @@ __declspec(dllimport)
 	  <filename>grove/Node.h</filename>.  This doesn't depend 
 	  on any of the previous layers.</para>
 	</listitem>
-	<listitem><para>An implementation of the grove interface using SP;
+	<listitem><para>An implementation of the grove interface using OpenSP;
 	  this is in the <filename>spgrove/</filename> directory. Main class
 	  is <classname>GroveBuilder</classname>. This doesn't depend on the
 	  implementation of the entity manager interface.</para>
@@ -734,7 +805,7 @@ while (insn)
 	</para></listitem>
 	<listitem><para>It has the concept of an object being read-only: it can mark
 	  an object and all objects reachable from that object as being
-	  read-only (needed for Jade extensions which allow limited mutation
+	  read-only (needed for OpenJade extensions which allow limited mutation
 	  of objects). 
 	</para></listitem>
 	<listitem><para>It always allocates a fixed amount of space for a GC object;
@@ -840,6 +911,13 @@ return new (interp) NodePtrNodeListObj(nd);
 	</programlisting>	
       </para>
       </example>
+      <para>Another key aspect of correct use of the garbage collector is to 
+        ensure that objects with garbage-collected subobjects inform the 
+        collector of the references to the subobjects they hold. To do so, 
+        they must override 
+        <code>Collector::Object::traceSubObjects(Collector &)</code>
+        to call <code>Collector::trace(const Object *)</code> for each 
+	subobject.</para>
     </sect2>
   </sect1>
   <sect1>
@@ -850,7 +928,7 @@ return new (interp) NodePtrNodeListObj(nd);
       use <command>spcat</command> as example.</para>
   </sect1>
   <sect1>
-    <title>Extending Jade</title>
+    <title>Extending OpenJade</title>
     <sect2>
       <title>Utility classes</title>
       <para>TODO: Explain Char, String, Vector, StringC, Ptr, Owner</para>
@@ -937,7 +1015,7 @@ DEFPRIMITIVE(Sin, argc, argv, context, interp, loc)
 	      <programlisting>
 result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
 	      </programlisting>    
-       The *interp_ argument to new is important to make
+       The <code>*interp_</code> argument to new is important to make
        the newly generated object properly garbage collected.</para>
 	  </listitem>
 	</varlistentry>
@@ -954,7 +1032,7 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
 	take an existing backend as a skeleton.</para>
       <para>TODO: More detail needed.</para>
 
-      <para>To make the new backend available to Jade, you have to
+      <para>To make the new backend available to OpenJade, you have to
 	add new values for your backend to 
 	<type>JadeApp::OutputType</type> and
 	<type>JadeApp::outputTypeNames</type> and add a new 
@@ -1016,7 +1094,7 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
     </sect2>
     <sect2>
       <title>Command line switches</title>
-      <para>If you are adding a new Jade-specific option, add it to 
+      <para>If you are adding a new OpenJade-specific option, add it to 
 	<classname>JadeApp</classname>. If the option you are adding
 	influences the behaviour of the style engine, add it to
       <classname>DssslApp</classname>.</para> 
@@ -1046,7 +1124,7 @@ result = new (*interp_) <replaceable>&lt;your class></replaceable>(...)
 		<classname>ParserApp</classname></para></listitem> 
 	</varlistentry>
 	<varlistentry>
-	  <term>G, 2, d, V</term>
+	  <term>G, 2, d, V, s</term>
 	    <listitem><para>registered by
 		<classname>DssslApp</classname></para></listitem>
 	</varlistentry>
@@ -1110,62 +1188,32 @@ StyleEngine se(*this, *this, unitsPerInch_, debugMode_,
     </sect2>
     <sect2>
       <title>Supporting a larger grove plan</title>
-      <para>???</para>
+      <para>TODO: how is this done ?</para>
     </sect2>
     <sect2>
       <title>Translating messages</title>
       <para>I can explain this only for the <function>gettext()</function>
-      support. Here are the necessary steps:</para>
-      <procedure>
+        support.</para>
 	<step performance="required">
-	  <para>Make sure to define SP_HAVE_GETTEXT and undefine
-	    SP_NO_MESSAGE_TEXT. I had to change the test for
-	    <function>gettext()</function> in
-	    <filename>config/configure.in</filename> from
-	    <programlisting format="linespecific">
-AC_CHECK_LIB(intl,gettext,AC_DEFINE(SP_HAVE_GETTEXT) LIBS="$LIBS -lintl")
-	    </programlisting>
-	    to
-	    <programlisting format="linespecific">
-AC_CHECK_FUNC(gettext,AC_DEFINE(SP_HAVE_GETTEXT),
-  AC_CHECK_LIB(intl,gettext,AC_DEFINE(SP_HAVE_GETTEXT) LIBS="$LIBS -lintl"))
-	    </programlisting>
-	    and call <command>autoconf</command> to regenerate
-	    the <filename>configure</filename> script.</para>
-	</step>
+          <para>Make sure <function>gettext()</function> is supported on
+            your system.</para>
 	<step performance="required">
-	  <para>Add the following to <filename>msggen.pl</filename>
-	    in order to generate <filename>.po</filename> files:</para>
-	  <programlisting format="linespecific">
-chmod 0666, "$file_base.po";
-unlink("$file_base.po");
-open(OUT, ">$file_base.po");
-chmod 0444, "$file_base.po";
-select(OUT);
-
-printf "# %s\n\n", $file_base;
-
-foreach $i (0 .. $#message) {
-    if (defined($message[$i])) {
-	$str = $message[$i];
-	$str =~ s/"/""/g;
-	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
-    }
-    elsif (defined($message2[$i])) {
-	$str = $message2[$i];
-	$str =~ s/"/""/g;
-	printf "msgid \"%s\"\nmsgstr \"\"\n\n", $str;
-    }
-}
-
-close(OUT);
-	  </programlisting>
-	</step>
+          <para>Modify <filename>msggen.pl</filename> by changing the
+            line 
+<programlisting>
+$gen_po = 0;
+</programlisting>
+to
+<programlisting>
+$gen_po = 1; 
+</programlisting>
+</para>
 	<step performance="required">
 	  <para>Build everything.</para>
 	</step>
 	<step performance="required">
-	  <para>Collect the various .po files in one big one:</para>
+	  <para>Collect the various <filename>.po</filename> files in one big 
+            one:</para>
 	  <programlisting format="linespecific">
 for i in */*.po; do cat $i >> messages.po; done
 	  </programlisting>

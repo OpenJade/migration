@@ -1099,10 +1099,24 @@ public:
     if (className_ == ComponentName::noId)
       os_ << s;
   }
-
-  void set(const NodePtr &) { }
-  void set(const NodeListPtr &) { }
-  void set(const NamedNodeListPtr &) { }
+  // Print indication of null value, can't do it inside set,
+  // since set isn't called for null values
+  void nullValue() {
+    flush();
+    os_ << "#<null>";
+  }
+  void set(const NodePtr &) { 
+    flush();
+    os_ << "#<node>";
+  }
+  void set(const NodeListPtr &) {
+    flush();
+    os_ << "#<node-list>";
+  }
+  void set(const NamedNodeListPtr &) { 
+    flush();
+    os_ << "#<named-node-list>";
+  }
   void set(bool b) {
     flush();
     os_ << (b ? "#t" : "#f");
@@ -1125,10 +1139,20 @@ public:
     // Issue: Use RCS name or SDQL name? Compact vs. readable output.
     os_ << ComponentName::sdqlName(id);
   }
-  void set(const GroveStringListPtr &) {
+  void set(const GroveStringListPtr &gsl) {
     flush();
     // FIXME.
-    os_ << "#<string-list>";
+    os_ << '(';
+    bool first = true;
+    for(ConstGroveStringListIter iter(gsl->iter());!iter.done();iter.next()) {
+      if (!first)
+	os_ << ' ';
+      os_ << '\"';
+      os_.write(iter.cur().data(), iter.cur().size());
+      os_ << '\"';
+      first = false;
+    }
+    os_ << ')';
   }
   void set(const ComponentName::Id *idp) {
     flush();
@@ -1189,7 +1213,8 @@ void NodeListObj::print(Interpreter &interp, OutputCharStream &os)
 	continue;
       }
       outProp.setClassName(*idp);
-      nd->property(*idp, interp, outProp);
+      if (nd->property(*idp, interp, outProp) == accessNull)
+	outProp.nullValue();
       outProp.sep(" ");
       ++idp;
     }

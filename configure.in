@@ -20,6 +20,10 @@ dnl Since config.h gets included by user programs, we use special names
 dnl for PACKAGE and VERSION.
 AC_DEFINE_UNQUOTED(SP_PACKAGE, "$PACKAGE", [Package name])
 AC_DEFINE_UNQUOTED(SP_VERSION, "$VERSION", [Package version])
+dnl But intl/Makefile.in and po/Makefile.in from GNU gettext still
+dnl rely on PACKAGE and VERSION substitutions.
+AC_SUBST(PACKAGE)
+AC_SUBST(VERSION)
 
 dnl Check for programs.
 AC_PROG_CC
@@ -34,6 +38,8 @@ AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
+ALL_LINGUAS=
+AM_GNU_GETTEXT
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -239,4 +245,6 @@ dnl Output.
 AC_SUBST(LIBOBJS)
 AC_OUTPUT([Makefile lib/Makefile nsgmls/Makefile spent/Makefile 
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
-	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile])
+	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile
+	intl/Makefile po/Makefile.in],
+	[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

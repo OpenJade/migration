@@ -106,21 +106,23 @@ extern char *bindtextdomain(const char *, const char *);
 namespace SP_NAMESPACE {
 #endif
 
-// FIXME should use mutable class member
-static char *messageDomain[MessageFragment::nModules]; 
-
 class GettextMessageTable : public MessageTable {
 public:
   GettextMessageTable();
   Boolean getText(const MessageFragment &, String<SP_TCHAR> &) const;
-  void registerMessageDomain(unsigned char module, char *domain, char *dir) const;  
+  void registerMessageDomain(unsigned char module, char *domain, char *dir) const;
+private:
+  mutable char *messageDomain[MessageFragment::nModules]; 
 };
 
 void GettextMessageTable::registerMessageDomain(unsigned char module, 
                                                 char *domain, char *dir) const  
 {
   if (module < MessageFragment::nModules) {
-    messageDomain[module] = domain; 
+#ifndef HAVE_MUTABLE
+    ((GettextMessageTable *)this)->
+#endif 
+      messageDomain[module] = domain; 
     if (dir) 
       bindtextdomain(domain, dir);
   }

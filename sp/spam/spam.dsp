@@ -119,7 +119,7 @@ InputName=spam_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -139,7 +139,7 @@ InputPath=.\SpamMessages.msg
 InputName=SpamMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 
@@ -151,7 +151,7 @@ InputPath=.\SpamMessages.msg
 InputName=SpamMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl $(InputPath)
+	perl -w ..\msggen.pl -l appModule $(InputPath)
 
 # End Custom Build
 

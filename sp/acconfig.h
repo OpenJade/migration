@@ -1,3 +1,7 @@
+// Copyright (C) 1999 Matthias Clasen, Peter Nilsson
+// See the file COPYING for copying permissions.
+
+
 /* these are needed for GNU gettext */
 #undef ENABLE_NLS
 #undef HAVE_CATGETS

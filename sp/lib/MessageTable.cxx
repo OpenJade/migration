@@ -121,7 +121,7 @@ void GettextMessageTable::registerMessageDomain(unsigned char module,
 {
   if (module < MessageFragment::nModules) {
     messageDomain[module] = domain; 
-    if (dir)
+    if (dir) 
       bindtextdomain(domain, dir);
   }
 }

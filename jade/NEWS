@@ -1,5 +1,12 @@
 Changes in OpenJade 1.4
 
+* --help option.
+
+* Separate cmdline options for the two SGML parsers used for the document and
+  the style-sheet.
+
+* Long cmdline options.
+
 * The standard flow objects check that their content is valid.
 
 * Internal defines (ie defines at the begin of a body) are supported. 

@@ -1,9 +1,31 @@
-Changes in OpenSP 1.4
+Changes in OpenSP 1.5pre5
 
+* Fix 32-bit assumptions so we build on 64-bit platforms such
+  as Alpha.
+
+* Enable internationalized builds on Win32
+
+* Other Win32 fixes
+
+* Reinstate the '-widref' option which was accidentally removed.
+
+* Build hygene
+
+* German translation updates
+
+* Autconf fix affecting at least some gcc 2.7.x installations
+
+Changes in OpenSP 1.5pre4
+
+* More of Annex K supported: Common data attributes can now be
+  specified in external entity declarations.
+  
 * The architecture engine supports #MAPTOKEN.
 
 * The multibyte version of OpenSP now uses 32bit chars and supports
   the full UTF-16 range 0x0000-0x10ffff.
+
+Changes in OpenSP 1.4
 
 * Support for the koi8-r (RFC 1489) encoding.
  

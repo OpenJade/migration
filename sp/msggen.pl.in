@@ -1,5 +1,6 @@
 #! /usr/bin/perl
 # Copyright (c) 1994 James Clark
+# Copyright (c) 2000 Peter Nilsson
 # See the file COPYING for copying permission.
 
 use POSIX;
@@ -16,10 +17,16 @@ $gen_c = 0;
 
 undef $opt_l;
 undef $opt_p;
+undef $opt_t;
 do 'getopts.pl';
-&Getopts('l:p:');
+&Getopts('l:p:t:');
 $module = $opt_l;
 $pot_file = $opt_p;
+
+if (defined($opt_t)) {
+  # don't try to read translations for English
+  $opt_t =~ /.*en.*/ || &read_po_translations($opt_t);
+}
 
 $num = 0; 
 
@@ -255,6 +262,9 @@ print "STRINGTABLE\nBEGIN\n";
 foreach $i (0 .. $#message) {
     if (defined($message[$i])) {
 	$str = $message[$i];
+	if ($translation{$str}) {
+	    $str = $translation{$str};
+	}
 	$str =~ s/"/""/g;
 	printf "  %d, \"%s\"\n", $i, $str;
     }
@@ -323,3 +333,86 @@ close(OUT);
 sub error {
     die "$def_file:$.: $_[0]\n";
 }
+
+# Read a PO file with message translations.
+# This doesn't accept every valid PO file, but it seems to work reasonably.
+sub read_po_translations {
+    my $po_in = $_[0];
+    open(PO_IN, "<$po_in") || die "Can't open file $po_in.";
+    my $id = "";
+    my $str = "";
+    my $catching_string = 0;
+
+    while(<PO_IN>) {
+	if (/^\s*msgid/) {
+	    if ($catching_string) {
+		&po_flush($id, $str);
+		$id = "";
+		$str = "";
+	    }
+	    $_ = $';
+	    $catching_string = 1;
+	}
+	elsif (/^\s*msgstr/) {
+	    die "No msgid." if !$catching_string or $id;
+	    $id = $str;
+	    $str = "";
+	    $_ = $';
+	}
+	
+	if ($catching_string) {
+	    my $in_string = 0;
+	    s/\s*//;
+	    while ($_) {
+		if (s/^\"//) {
+		    $in_string = !$in_string;
+		}
+		if ($in_string) {
+		    if (s/^[^\"\\]+//) {
+			$str .= $&;
+		    }
+		    elsif (s/^\\([ntbrf\\\"])//) {
+			$str .= "\n" if $1 eq "n";
+			$str .= "\t" if $1 eq "t";
+			$str .= "\b" if $1 eq "b";
+			$str .= "\r" if $1 eq "r";
+			$str .= "\f" if $1 eq "f";
+			$str .= "\\" if $1 eq "\\";
+			$str .= "\"" if $1 eq "\"";
+		    }
+		    elsif (s/\\([0-9]+)//) {
+			$str .= chr(oct($1));
+		    }
+		    elsif (s/\\[xX]([0-9a-fA-F]+)//) {
+			$str .= chr(hex($1));
+		    }
+		    else {
+			die "Invalid control sequence." if /^\\/;
+		    }
+		}
+		else {
+		    s/\s*//;
+		    last if /^[^"]/;
+	        }
+            }
+        }
+    }
+    if ($catching_string) {
+        &po_flush($id, $str);
+
+    }
+}
+
+sub po_flush {
+    my $id = $_[0];
+    my $str = $_[1];
+    # We use a translation only if $id is non-empty (we don't include the
+    # PO file header) and if $str is non-empty (the message is translated).
+    if ($id && $str) {
+	$translation{$id} = $str;
+    }
+    $id = "";
+    $str = "";
+}
+
+

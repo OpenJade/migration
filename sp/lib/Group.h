@@ -31,7 +31,9 @@ public:
     elementToken,
     modelGroup,
     pcdata,
-    dataTagTemplateGroup
+    dataTagTemplateGroup,
+    all,
+    implicit
     };
   Type type;
   StringC token;		// name nameToken; with substitution
@@ -47,6 +49,8 @@ private:
 class AllowedGroupTokens {
 public:
   AllowedGroupTokens(GroupToken::Type,
+		     GroupToken::Type = GroupToken::invalid,
+		     GroupToken::Type = GroupToken::invalid,
 		     GroupToken::Type = GroupToken::invalid,
 		     GroupToken::Type = GroupToken::invalid,
 		     GroupToken::Type = GroupToken::invalid);

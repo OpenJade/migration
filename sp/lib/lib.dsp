@@ -113,7 +113,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -127,7 +127,7 @@ InputName=app_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -153,7 +153,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -167,7 +167,7 @@ InputName=arc_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -401,7 +401,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -415,7 +415,7 @@ InputName=entmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -482,10 +482,6 @@ SOURCE=.\IListBase.cxx
 # Begin Source File
 
 SOURCE=.\InputSource.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\instmac.m4
 # End Source File
 # Begin Source File
 
@@ -687,7 +683,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -701,7 +697,7 @@ InputName=parser_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1089,7 +1085,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build
@@ -1103,7 +1099,7 @@ InputName=xentmgr_inst
 
 "$(InputDir)\$(InputName).cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	del /f $(InputDir)\$(InputName).cxx 
-	perl ..\lib\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
+	perl ..\instmac.pl $(InputPath) >$(InputDir)\$(InputName).cxx 
 	attrib +r $(InputDir)\$(InputName).cxx 
 	
 # End Custom Build

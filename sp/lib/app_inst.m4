@@ -26,8 +26,8 @@ __instantiate(Options<CmdLineApp::AppChar>)
 __instantiate(Owner<EventHandler>)
 __instantiate(Vector<MessageFragment>)
 __instantiate(Vector<MessageType1>)
-__instantiate(LongOption<AppChar>)
-__instantiate(Vector<LongOption<AppChar> >)
+__instantiate(LongOption<CmdLineApp::AppChar>)
+__instantiate(Vector<LongOption<CmdLineApp::AppChar> >)
 
 #ifdef SP_NAMESPACE
 }

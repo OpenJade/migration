@@ -237,4 +237,4 @@ line-dash
 allowed-ligatures
 line-number
 line-spacing-priority
-char-map
+char-map			* 

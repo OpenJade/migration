@@ -35,8 +35,6 @@ __instantiate(ConstPtr<MapNodeListObj::Context>)
 __instantiate(Ptr<MapNodeListObj::Context>)
 __instantiate(Ptr<SelectElementsNodeListObj::PatternSet>)
 __instantiate(ConstPtr<SelectElementsNodeListObj::PatternSet>)
-__instantiate(Vector<ELObj*>)
-__instantiate(Vector<InsnPtr>)
 
 #ifdef SP_NAMESPACE
 }

@@ -36,8 +36,6 @@ SchemeParser::SchemeParser(Interpreter &interp,
 void SchemeParser::parseStandardChars() 
 {
   for (;;) {
-    // FIXME we do not check that we have valid character names
-    // and numbers (in decimal)
     Token tok;
     if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
          || tok == tokenEndOfEntity)
@@ -48,6 +46,29 @@ void SchemeParser::parseStandardChars()
     if (!getToken(allowOtherExpr, tok) || tok != tokenNumber) {
       message(InterpreterMessages::badDeclaration);
       break;
+    }
+
+    int i; 
+    for (i = 0; i < name.size(); i++) 
+      if (interp_->lexCategory(name[i]) != Interpreter::lexLetter
+          && ((i == 0) || 
+              (interp_->lexCategory(name[i]) != Interpreter::lexDigit
+               && name[i] != '-' && name[i] != '.'))) 
+        break;
+    if (i < name.size() || name.size() == 1) {
+      message(InterpreterMessages::invalidCharName,
+              StringMessageArg(name));
+      continue;
+    } 
+
+    for (i = 0; i < currentToken_.size(); i++)
+      if (interp_->lexCategory(currentToken_[i]) != Interpreter::lexDigit)
+        break;       
+ 
+    if (i < currentToken_.size()) {
+      message(InterpreterMessages::invalidCharNumber,
+              StringMessageArg(currentToken_));
+      continue;
     }
 
     interp_->addStandardChar(name, currentToken_);
@@ -643,6 +664,16 @@ bool SchemeParser::doDefineUnit()
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
+  int i;
+  for (i = 0; i < currentToken_.size(); i++)
+    if (interp_->lexCategory(currentToken_[i]) != Interpreter::lexLetter)
+      break;
+  if (i < currentToken_.size()) {
+    message(InterpreterMessages::invalidUnitName,
+            StringMessageArg(currentToken_));
+    return 0;
+  } 
+
   Unit *unit = interp_->lookupUnit(currentToken_);
   Owner<Expression> expr;
   Identifier::SyntacticKey key;
@@ -1990,28 +2021,25 @@ void SchemeParser::initMessage(Message &msg)
 
 bool SchemeParser::doDeclareDefaultLanguage()
 {
+  Location loc(in_->currentLocation());
   Owner<Expression> expr;
   Token tok;
   Identifier::SyntacticKey key;
   if (!parseExpression(0, expr, key, tok))
     return 0;
-  InsnPtr insn = Expression::optimizeCompile(expr, *interp_,
-                                             Environment(), 0, InsnPtr());
-  VM vm(*interp_);
-  ELObj *obj = vm.eval(insn.pointer());
-  if (!obj)
-    return 0;
-  if (!obj->asLanguage()) {
-    interp_->message(InterpreterMessages::notALanguage,
-                     StringMessageArg(interp_->makeStringC
-                                      ("declare-default-language")),
-                     OrdinalMessageArg(1),
-                     ELObjMessageArg(obj, *interp_));
-    return 0;
-  }
   if (!getToken(allowCloseParen, tok))
     return 0;
-  interp_->setDefaultLanguage(obj);
+  Location defLoc;
+  unsigned defPart;
+  if(interp_->defaultLanguageSet(defPart, defLoc)
+     && defPart <= interp_->currentPartIndex()) {
+    if(defPart == interp_->currentPartIndex()) {
+      interp_->setNextLocation(loc);
+      message(InterpreterMessages::duplicateDefLangDecl, defLoc);
+    }
+  }
+  else
+    interp_->setDefaultLanguage(expr, interp_->currentPartIndex(), loc);
   return 1;
 }
 

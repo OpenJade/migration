@@ -367,8 +367,10 @@ public:
   bool dsssl2() const;
   bool strictMode() const;
   void setNodeLocation(const NodePtr &);
-  void setDefaultLanguage(ELObj *);
+  void setDefaultLanguage(Owner<Expression> &,unsigned part,const Location &);
   ELObj *defaultLanguage() const;
+  bool defaultLanguageSet(unsigned &,Location &) const;
+  void compileDefaultLanguage();
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
@@ -488,6 +490,9 @@ private:
   bool dsssl2_;
   bool strictMode_;
   ELObj *defaultLanguage_;
+  Owner<Expression> defaultLanguageDef_;
+  unsigned defaultLanguageDefPart_;
+  Location defaultLanguageDefLoc_;
   friend class Identifier;
 };
 

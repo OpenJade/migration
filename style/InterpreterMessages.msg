@@ -126,7 +126,6 @@ E1+actualLoop++circular use of actual value of characteristic %1
 E1+duplicateCharacteristic++characteristic %1 already defined in same part+first definition was here
 E1+duplicateFlowObjectClass++flow object class %1 already defined in same part+first definition was here
 E1+undefinedMode++mode %1 not defined
-E1+badCharNumber++bad character number %1
 E1+duplicateCharName++duplicate character name %1
 E1+duplicateSdataEntityName++duplicate SDATA entity name %1
 E1+duplicateSdataEntityText++duplicate SDATA entity text %1
@@ -145,3 +144,8 @@ E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist
 E3+notACharList++%2 argument for primitive %1 of wrong type: %3 not a list of characters
 E3+lengthError++%2 argument for primitive %1 has wrong length
 W1+noExactRepresentation++quantity %1 can't be represented exactly
+E0+duplicateDefLangDecl++default language already declared in this part+first declaration was here
+E1+defLangDeclRequiresLanguage++%1 not a language as required in a default-language-declaration
+E1+invalidUnitName++%1 is not a valid unit name
+E1+invalidCharName++%1 is not a valid character name
+E1+invalidCharNumber++%1 is not a valid character number

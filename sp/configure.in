@@ -12,7 +12,7 @@ dnl
 
 dnl Initialization.
 AC_INIT(pubtext)
-AM_INIT_AUTOMAKE(OpenSP, 1.5pre6, no-define)
+AM_INIT_AUTOMAKE(opensp, 1.5pre7, no-define)
 AC_PREREQ(2.52)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK

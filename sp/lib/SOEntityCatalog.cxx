@@ -775,8 +775,7 @@ SOEntityCatalog::Table::lookup(const StringC &name,
     StringC buffer;
     while (iter.next(key, value)) {
       buffer = *key;
-      for (size_t j = 0; j < buffer.size(); j++)
-	substTable.subst(buffer[j]);
+      substTable.subst(buffer);
       if (buffer == name) {
 	if (!entry || value->serial < entry->serial)
 	  entry = value;
@@ -1185,8 +1184,7 @@ void CatalogParser::parseName()
 
 void CatalogParser::upcase(StringC &str)
 {
-  for (size_t i = 0; i < str.size(); i++)
-    substTable_.subst(str[i]);
+  substTable_.subst(str);
 }
 
 void CatalogParser::dispatchMessage(const Message &msg)

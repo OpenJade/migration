@@ -1915,9 +1915,7 @@ Boolean Parser::parseShortrefDecl()
   Vector<StringC> vec;
   do {
     StringC delim(parm.literalText.string());
-    const SubstTable *table = instanceSyntax().generalSubstTable();
-    for (size_t i = 0; i < delim.size(); i++)
-      table->subst(delim[i]);
+    instanceSyntax().generalSubstTable()->subst(delim);
     size_t srIndex;
     if (!defDtd().shortrefIndex(delim, instanceSyntax(), srIndex)) {
       message(ParserMessages::unknownShortrefDelim,

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<fot>
+<simple-page-sequence>
+<paragraph>
+<a name="0"/>
+<text>query (priority 1) matching A</text>
+</paragraph>
+<paragraph>
+<text>query (priority 0) matching B</text>
+</paragraph>
+<paragraph>
+<text>query (priority -1) matching C</text>
+</paragraph>
+<paragraph>
+<text>id matching D</text>
+</paragraph>
+<paragraph>
+<text>element matching E</text>
+</paragraph>
+<paragraph>
+<text>initial mode query (priority 1) matching F</text>
+</paragraph>
+<paragraph>
+<text>initial mode query (priority 0) matching G</text>
+</paragraph>
+<paragraph>
+<text>initial mode query (priority -1) matching H</text>
+</paragraph>
+<paragraph>
+<text>initial mode id matching I</text>
+</paragraph>
+<paragraph>
+<text>initial mode element matching J</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode query (priority 1) matching K</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode query (priority 0) matching L</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode query (priority -1) matching M</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode id matching N</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode element matching O</text>
+</paragraph>
+<paragraph>
+<text>part 2 initial mode default matching P</text>
+</paragraph>
+</simple-page-sequence>
+</fot>

@@ -40,6 +40,12 @@ public:
 			       const CharsetInfo &,
 			       Messenger &,
 			       StringC &) const;
+  // This is for a character described by a minimum literal
+  // in the SGML declaration.
+  virtual Boolean lookupChar(const StringC &,
+                             const CharsetInfo &,
+			     Messenger &,
+			     UnivChar &) const;
 };
 
 #ifdef SP_NAMESPACE

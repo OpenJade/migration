@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-03-07 09:17+0000\n"
+"POT-Creation-Date: 2000-03-09 17:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2240,6 +2240,13 @@ msgstr "Notation %1 für Parameterentität %2 undefiniert"
 
 msgid "notation %1 for external subset undefined"
 msgstr "Notation %1 für externe Teilmenge undefiniert"
+
+msgid "attribute %1 can't be redeclared"
+msgstr ""
+
+#, fuzzy
+msgid "#IMPLICIT attributes have already been specified for notation %1"
+msgstr "Keine Atttribute für Notation %1 definiert"
 
 msgid "delimiter "
 msgstr "Begrenzer "

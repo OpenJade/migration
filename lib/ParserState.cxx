@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -53,6 +53,8 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
 : entityManager_(em),
   options_(opt),
   inInstance_(0),
+  inStartTag_(0),
+  inEndTag_(0),
   keepingMessages_(0),
   eventAllocator_(maxSize(eventSizes, SIZEOF(eventSizes)), 50),
   internalAllocator_(maxSize(internalSizes, SIZEOF(internalSizes), EntityOrigin::allocSize), 50),
@@ -167,6 +169,8 @@ Boolean ParserState::maybeStartPass2()
   currentMarkup_ = 0;
   inputLevel_ = 1;
   inInstance_ = 0;
+  inStartTag_ = 0;
+  inEndTag_ = 0;
   defDtd_.clear();
   defLpd_.clear();
   dtd_[0].swap(pass1Dtd_);
@@ -223,6 +227,23 @@ void ParserState::startDtd(const StringC &name)
   currentDtd_ = defDtd_;
   currentDtdConst_ = defDtd_;
   currentMode_ = dsMode;
+}
+
+void ParserState::enterTag(Boolean start)
+{
+  (start ? inStartTag_ : inEndTag_) = 1;
+}
+
+void ParserState::leaveTag()
+{
+  inStartTag_ = 0;
+  inEndTag_ = 0;
+}
+
+Boolean ParserState::inTag(Boolean &start) const
+{
+  start = inStartTag_;
+  return inStartTag_ || inEndTag_;
 }
 
 void ParserState::endDtd()

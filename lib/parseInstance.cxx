@@ -547,7 +547,7 @@ void Parser::parseGroupStartTag()
     currentMarkup()->addDelim(Syntax::dGRPO);
   }
   Boolean active;
-  if (!parseTagNameGroup(active))
+  if (!parseTagNameGroup(active, 1))
     return;
   in->startToken();
   // Location startLocation = in->currentLocation();
@@ -565,6 +565,7 @@ void Parser::parseGroupStartTag()
   }
   else {
     in->discardInitial();
+
     extendNameToken(syntax().namelen(), ParserMessages::nameLength);
     if (currentMarkup())
       currentMarkup()->addName(currentInput());
@@ -585,7 +586,7 @@ void Parser::parseGroupEndTag()
     currentMarkup()->addDelim(Syntax::dGRPO);
   }
   Boolean active;
-  if (!parseTagNameGroup(active))
+  if (!parseTagNameGroup(active, 0))
     return;
   in->startToken();
   // Location startLocation = in->currentLocation();

@@ -287,9 +287,16 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       popInputStack();
       break;
     case tokenPeroGrpo:
-      if (!inInstance())
-	message(ParserMessages::peroGrpoProlog);
-      // fall through
+      {
+	if (!inInstance())
+	  message(ParserMessages::peroGrpoProlog);
+	Boolean start;
+	if (inTag(start))
+	    message(start 
+		    ? ParserMessages::peroGrpoStartTag 
+		    : ParserMessages::peroGrpoEndTag);
+	// fall through
+      }
     case tokenPeroNameStart:
       {
 	if (options().warnInternalSubsetTsParamEntityRef && inputLevel() == 1)
@@ -587,16 +594,27 @@ Boolean Parser::parseEntityReferenceNameGroup(Boolean &ignore)
 	ignore = 0;
 	return 1;
       }
+      Ptr<Dtd> dtd = lookupDtd(parm.nameTokenVector[i].name).pointer();
+      if (!dtd.isNull()) {
+	instantiateDtd(dtd);
+	if (currentDtdPointer() == dtd) {
+	  ignore = 0;
+	  return 1;
+	}
+      }
     }
   }
-  ignore = 1;
+  ignore = 1;x
   return 1;
 }
 
-Boolean Parser::parseTagNameGroup(Boolean &active)
+Boolean Parser::parseTagNameGroup(Boolean &active, Boolean start)
 {
   Param parm;
-  if (!parseNameGroup(inputLevel(), parm))
+  enterTag(start);
+  Boolean ret = parseNameGroup(inputLevel(), parm);
+  leaveTag();
+  if (!ret)
     return 0;
   active = 0;
   for (size_t i = 0; i < parm.nameTokenVector.size(); i++) {

@@ -179,8 +179,6 @@ __instantiate(CharMapColumn<ELObjPart>)
 __instantiate(CharMapResource<ELObjPart>)
 __instantiate(Ptr<CharMapResource<ELObjPart> >)
 __instantiate(ConstPtr<CharMapResource<ELObjPart> >)
-__instantiate(`HashTable<StringC,CharProp>')
-__instantiate(`HashTableItem<StringC,CharProp>')
 #ifndef _MSC_VER
 __instantiate(`OneRefArgCall<FOTBuilder::Address>')
 __instantiate(`OneArgCall<char const *>')

@@ -31,7 +31,7 @@ OBJS=DocumentGenerator.o\
 INCLUDE=-I$(srcdir)/../grove -I$(srcdir)/../spgrove
 
 GENSRCS=jade_version.h style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
-  InterpreterMessages.h DssslAppMessages.h
+  InterpreterMessages.h DssslAppMessages.h DssslAppMessages.rc InterpreterMessages.rc
 
 $(srcdir)/jade_version.h: $(srcdir)/../VERSION $(srcdir)/mkversion.pl
 	rm -f $@

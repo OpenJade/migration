@@ -7,13 +7,17 @@ Changes in OpenSP 1.5pre5
 
 * Other Win32 fixes
 
-* Reinstate the '-widref' option which was accidentally removed.
+* Re-instate the '-widref' option which was accidentally removed.
 
-* Build hygene
+* New -output options: comment, omitted, tagomit and attromit; this
+  shows comments and implied elements and/or attributes.  
+  Patch from Robert Braddock.
 
 * German translation updates
 
-* Autconf fix affecting at least some gcc 2.7.x installations
+* Build hygene
+
+* Autoconf fix affecting at least some gcc 2.7.x installations
 
 Changes in OpenSP 1.5pre4
 

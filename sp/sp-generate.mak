@@ -30,9 +30,10 @@ spam\spam_inst.cxx \
 sx\SxMessages.h \
 sx\XmlOutputMessages.h \
 sx\sx_inst.cxx \
-include\config.h 
+include\config.h \
+msggen.pl
 
-.SUFFIXES: .m4 .msg
+.SUFFIXES: .m4 .msg .pl .in
 
 all: $(GENSRCS)
 
@@ -64,3 +65,6 @@ all: $(GENSRCS)
 
 include\config.h: include\config.h.old
 	copy include\config.h.old include\config.h 
+
+msggen.pl: msggen.pl.in
+	copy msggen.pl.in msggen.pl

@@ -15,14 +15,11 @@
                 32      95      32
                 127     1       UNUSED
                 128     32      UNUSED
-             -- use this instead of the official declaration because SP only
-                supports 16-bit characters --
-                160     65374   160
-                65534   2       UNUSED 
-             -- 55296   2048    UNUSED
+                160     55136   160
+                55296   2048    UNUSED  -- surrogates --
                 57344   8190    57344
-                65534   2       UNUSED
-                65536   1048576 65536 --
+                65534   2       UNUSED  -- FFFE and FFFF --
+                65536   1048576 65536 
      CAPACITY NONE
 
      SCOPE DOCUMENT

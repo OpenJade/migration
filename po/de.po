@@ -2224,9 +2224,8 @@ msgstr ""
 "#IMPLICIT kann als Dokumenttyp nur bei CONCUR NO und LINK EXPLICIT NO "
 "verwendet werden"
 
-#, fuzzy
 msgid "Sorry, #IMPLIED doctypes not implemented"
-msgstr "Sorry, #IMPLICIT als Dokumenttyp nicht implementiert"
+msgstr "Sorry, #IMPLIED als Dokumenttyp nicht implementiert"
 
 msgid "reference to DTD data entity ignored"
 msgstr "Referenz auf DTD-Datenentität ignoriert"
@@ -2243,30 +2242,26 @@ msgstr "Attribut %1 kann nicht redeklariert werden"
 msgid "#IMPLICIT attributes have already been specified for notation %1"
 msgstr "#IMPLICIT Attribut für Notationo %1 bereits spezifiziert"
 
-#, fuzzy
 msgid ""
 "a name group is not allowed in a parameter entity reference in a start tag"
 msgstr ""
-"Eine Namensgruppe ist in einer Referenz auf eine allgemeine Entität in einem "
+"Eine Namensgruppe ist in einer Referenz auf eine Parameterentität in einem "
 "Starttag nicht erlaubt"
 
-#, fuzzy
 msgid ""
 "name group in a parameter entity reference in an end tag (SGML forbids them "
 "in start tags)"
 msgstr ""
-"Eine Namensgruppe ist in einer Referenz auf eine allgemeine Entität in einem "
-"Starttag nicht erlaubt"
+"Namensgruppe ist in einer Referenz auf eine Parameterentität in einem Endtag "
+"(SGML verbietet diese in Starttags)"
 
-#, fuzzy
 msgid "if the declared value is NOTATION a default value of CONREF is useless"
 msgstr ""
-"Wenn der deklarierte Wert ID ist, muß der Standardwert IMPLIED oder REQUIRED "
-"sein"
+"Wenn der deklarierte Wert NOTATION ist, ist ein Defaultwert von CONREF "
+"sinnlos"
 
-#, fuzzy
 msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
-msgstr "Sorry, #IMPLICIT als Dokumenttyp nicht implementiert"
+msgstr "Sorry, #ALL und #IMPLICIT Inhaltstoken nicht implementiert"
 
 msgid "delimiter "
 msgstr "Begrenzer "

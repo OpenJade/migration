@@ -85,6 +85,7 @@ AC_CHECK_FUNC(strerror,,LIBOBJS="$LIBOBJS strerror.o")
 AC_CHECK_FUNC(strtoul,,LIBOBJS="$LIBOBJS strtoul.o")
 
 AC_CHECK_FUNC(setlocale,[AC_DEFINE(SP_HAVE_LOCALE)])
+AC_CHECK_FUNC(towupper,[AC_DEFINE(SP_HAVE_WCHAR)])
 AC_CHECK_FUNC(gettext,[AC_DEFINE(SP_HAVE_GETTEXT)],
   [AC_CHECK_LIB(intl,gettext,[AC_DEFINE(SP_HAVE_GETTEXT) LIBS="$LIBS -lintl"])])
 
@@ -154,8 +155,8 @@ AC_ARG_ENABLE(http,
 dnl
 dnl  optional backends
 dnl
-smr_SWITCH(mif, support for FrameMaker MIF output, on, JADE_MIF)
-smr_SWITCH(html, support for HTML+CSS output, on, JADE_HTML)
+smr_SWITCH(mif, support for FrameMaker MIF output, on, JADE_MIF, DUMMY)
+smr_SWITCH(html, support for HTML+CSS output, on, JADE_HTML, DUMMY)
 
 
 dnl 
@@ -190,7 +191,8 @@ AC_ARG_ENABLE(default-search-path,
 
 AC_SUBST(LIBOBJS)
 
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 AC_OUTPUT(Makefile Makefile.lib Makefile.prog Makefile.comm)
 

@@ -7,6 +7,7 @@
 #
 CLEANFILES=-r $(PROG) $(OBJS) core .libs Makefile.lt
 
+top_builddir=@TOP@
 ALL_LIBS = $(XLIBS) $(LIBS)
 Makefile.lt:
 	echo 'LT_LIBS='`echo $(ALL_LIBS)|sed 's/\.a/.la/g'` >Makefile.lt

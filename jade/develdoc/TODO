@@ -1,9 +1,4 @@
-* Move parsing the spec before constructing the grove in DssslApp. 
-
-* If the -T option is given, collect the titles of all PIs which would
-  be applicable but for the title. Then, if no applicable PI is found
-  issue a different message listing the available titles. This requires
-  StringVectorMessageArg to be made part of the SP_API.
+* FIX links to NEWS and ChangeLog in docs and www.
 
 * Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message

@@ -1,5 +1,11 @@
 2002-12-07  Karl Eichwalder  <ke@suse.de>
 
+	* tests/af-12: New file.
+	* tests/af-13: Likewise.
+	* tests/af-14: Likewise.
+	* tests/af-15: Likewise.
+	* tests/Makefile.am (TESTS): Add af-12, af-13, af-14, and af-15.
+
 	* tests/af-10: New file.
 	* tests/af-11: Likewise.
 	* tests/Makefile.am (SHOWSTOPPERS): Add af-10 and af-11.

@@ -1,4 +1,4 @@
 PROG=spcat
 OBJS=spcat.o
 INCLUDE=
-LIBS=../lib/libsp.a
+LIBS=../lib/libosp.a

@@ -425,7 +425,6 @@ E0+entityRefInternal++reference to external entity
 E0+implydefEntityDefault++declaration of default entity conflicts with IMPLYDEF ENTITY YES
 E0+sorryActiveDoctypes++Parsing with respect to more than one active doctype not supported
 E0+activeDocLink+7.1+Cannot have active doctypes and link types at the same time
-# message fragments
 # This isn't formally a quantity error, but we'll treat it as one.
 Q1+concurrentInstances+7.2.1+number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)
 E0+datatagBaseDtd+11.2.4.4+datatag group can only be specified in base document type
@@ -444,6 +443,7 @@ E0+sorryImpliedDoctype++Sorry, #IMPLICIT doctypes not implemented
 W0+dtdDataEntityReference++reference to DTD data entity ignored
 E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefined
 E1+dsEntityNotationUndefined++notation %1 for external subset undefined
+# message fragments
 =1000
 +delimStart++delimiter 
 +delimEnd++

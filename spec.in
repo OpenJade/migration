@@ -40,8 +40,8 @@ and other functions useful for SGML/XML/DSSSL development.
 
 %prep
 # check that rpm is new enough to know internal macros like %{_prefix}
-rpmversion=`rpm -q --queryformat '%{RPMVERSION}' rpm`
-[ ${rpmversion//.*} -lt 3 ] && { echo "please update rpm" exit 1 ; }
+rpmversion=`rpm -q --queryformat '%{RPMVERSION}' rpm | cut -d. -f1`
+[ ${rpmversion} -lt 3 ] && { echo "please update rpm" exit 1 ; }
 # unpack source .tar.gz package
 %setup
 
@@ -67,6 +67,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %files lib
 %defattr(-, root, root)
 %{_libdir}/*.so.*
+%{_datadir}/locale/*/LC_MESSAGES/@PACKAGE@.mo
 
 %files devel
 %defattr(-, root, root)

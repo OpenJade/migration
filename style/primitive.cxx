@@ -4858,6 +4858,18 @@ DEFPRIMITIVE(ListToString, argc, argv, context, interp, loc)
   }
   return obj;
 }
+          
+template <class T>
+class ArrayDeleter
+{ 
+public:
+  ArrayDeleter(T* array) : array_(array) {}
+  ~ArrayDeleter() { delete[] array_; }
+private:
+  ArrayDeleter(const ArrayDeleter&);   // no implementation
+  void operator=(const ArrayDeleter&); // no implementation
+  T* array_;
+};
 
 /* What we're effectively doing here is the C++ equivalent of 
    (modulo error checking)
@@ -4889,8 +4901,10 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
    }
    // Split off the cars of the arguments and
    // check that they are proper lists of the same length
-   ELObj *cars[argc];
-   ELObj *cdrs[argc];
+   ELObj** cars = new ELObj*[argc];
+   ArrayDeleter<ELObj*> cars_del(cars);
+   ELObj** cdrs = new ELObj*[argc];
+   ArrayDeleter<ELObj*> cdrs_del(cdrs);
    bool hasSeenNil = 0;
    bool hasSeenNonNil = 0;
    for (unsigned i = 1; i < argc; i++) {
@@ -4901,7 +4915,7 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
        cdrs[i] = pair->cdr();
      } else if (argv[i]->isNil()) 
        hasSeenNil = 1;
-     else
+     else 
        return argError(interp, loc,
                   InterpreterMessages::notAList, i, argv[i]);
    }
@@ -4918,7 +4932,8 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
    cars[0] = MapPrimitiveObj::primitiveCall(argc, rargv, context, interp, loc); 
  
    // Prepend the result of applying func to the cars
-   InsnPtr insns[argc + 2];
+   InsnPtr* insns = new InsnPtr[argc + 2];
+   ArrayDeleter<InsnPtr> insns_del = insns;
    insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
    insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
    for (unsigned i = 1; i <= argc; i++) 

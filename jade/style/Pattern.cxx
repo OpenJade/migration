@@ -48,13 +48,21 @@ Pattern::Element::Element(const StringC &gi, bool forceGi)
 
 bool Pattern::Element::matches(const NodePtr &nd, MatchContext &context) const
 {
+  printf("Pattern::Element::matches\n");
   if (gi_.size()) {
-    if (!nd->hasGi(GroveString(gi_.data(), gi_.size())))
+    if (!nd->hasGi(GroveString(gi_.data(), gi_.size()))) {
+      printf("exit matches 0\n");
       return 0;
+    }
   }
-  for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next())
-    if (!iter.cur()->satisfies(nd, context))
+  for (IListIter<Qualifier> iter(qualifiers_); !iter.done(); iter.next()) {
+    printf("qualifier loop\n");
+    if (!iter.cur()->satisfies(nd, context)) {
+      printf("exit matches 0\n");
       return 0;
+    }
+  }
+  printf("exit matches 1\n");
   return 1;
 }
 
@@ -195,20 +203,56 @@ bool Pattern::NodeQualifier::satisfies(const NodePtr &m, MatchContext &context) 
       return 0;
     }
     nl_ = val->asNodeList();
-    printf("nodelist length %d\n", nl_->nodeListLength(ec, *interp_));
     interp_->makePermanent(nl_);
     printf("made perm\n");
+    printf("nodelist length %d\n", nl_->nodeListLength(ec, *interp_));
+    {
+      NodePtr p(nl_->nodeListFirst(ec, *interp_));
+      GroveString gi;
+      if (p->getGi(gi)) {
+        printf("gi of first node: ");
+        for (int i = 0; i < gi.size(); i++) 
+          printf("%c", char(gi[i]));
+        printf("\n");
+      }
+      else 
+        printf("first node not element\n");
+    } 
+    {
+      NodePtr p(nl_->nodeListFirst(ec, *interp_));
+      GroveString gi;
+      if (p->getGi(gi)) {
+        printf("gi of first node: ");
+        for (int i = 0; i < gi.size(); i++) 
+          printf("%c", char(gi[i]));
+        printf("\n");
+      }
+      else 
+        printf("first node not element\n");
+    } 
   }
 
   NodeListObj *nl = nl_;
+  {
+    NodePtr p(nl->nodeListFirst(ec, *interp_));
+    GroveString gi;
+    if (p->getGi(gi)) {
+      printf("gi of first node: ");
+      for (int i = 0; i < gi.size(); i++) 
+        printf("%c", char(gi[i]));
+      printf("\n");
+    }
+    else 
+      printf("first node not element\n");
+  } 
   for (;;) {
     printf("going loop\n");
     ELObjDynamicRoot protect(*interp_, nl);
-    NodePtr nd = nl->nodeListFirst(ec, *interp_);
+    NodePtr nd(nl->nodeListFirst(ec, *interp_));
     if (!nd)
       break;
     printf("checking node\n");
-    if (nd == m) {
+    if (*nd == *m) {
       printf("found\n");
       return 1;
     }

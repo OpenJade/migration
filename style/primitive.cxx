@@ -5638,6 +5638,9 @@ NodePtr TreeNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 NodeListObj *TreeNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   TreeNodeListObj *obj = copy(interp);
+  // SubgroveNodeListObj::advance uses ELObjPropertyValue, so we must
+  // protect obj.
+  ELObjDynamicRoot protect(interp, obj);
   obj->advance(context, interp);
   return obj;
 }

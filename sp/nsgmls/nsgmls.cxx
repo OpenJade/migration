@@ -92,7 +92,8 @@ NsgmlsApp::NsgmlsApp()
   // FIXME treat these as aliases
   registerOption('d', 0, NsgmlsMessages::dHelp);
   registerOption('l', 0, NsgmlsMessages::lHelp);
-  registerOption('m', 0, NsgmlsMessages::mHelp);
+  // registerOption('m', SP_T("catalog"), NsgmlsMessages::sysid, NsgmlsMessages::mHelp);
+  registerOption('m', 0, NsgmlsMessages::sysid, NsgmlsMessages::mHelp);
   registerOption('r', 0, NsgmlsMessages::rHelp);
   registerOption('u', 0, NsgmlsMessages::uHelp);
   registerInfo(NsgmlsMessages::info1);

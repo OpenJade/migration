@@ -140,8 +140,17 @@ msgstr "Option %1 ist nicht eindeutig"
 msgid "option %1 doesn't allow an argument"
 msgstr "Option %1 akzeptiert kein Argument"
 
-msgid "usage is %1"
-msgstr "Aufruf %1"
+msgid "Usage: %1"
+msgstr "Aufruf: %1"
+
+msgid "or: %1"
+msgstr "oder: %1"
+
+msgid "%1 [OPTION] SYSID..."
+msgstr "%1 [OPTION] SYSID..."
+
+msgid "Short options need the same arguments as their long forms."
+msgstr "Kurzoptionen benötigen dieselben Argumente wie ihre Langformen."
 
 msgid "%1 version %2"
 msgstr "%1 Version %2"
@@ -157,6 +166,45 @@ msgstr "Ausgabedatei %1 kann nicht geöffnet werden (%2)"
 
 msgid "cannot close output file %1 (%2)"
 msgstr "Ausgabedatei %1 kann nicht geschlossen werden (%2)"
+
+msgid "Use bctf %1."
+msgstr "Benutze BCTF %1."
+
+msgid "Use encoding %1."
+msgstr "Benutze Kodierung %1."
+
+msgid "Append error messages to file %1."
+msgstr "Hänge Fehlermeldungen an die Datei %1 an."
+
+msgid "Display the program version."
+msgstr "Zeige die Programmversion an."
+
+msgid "Show this help text."
+msgstr "Zeige diesen Text an."
+
+msgid "NAME"
+msgstr "NAME"
+
+msgid "FILE"
+msgstr "DATEI"
+
+msgid "NOTHING"
+msgstr ""
+
+msgid "Use catalog %1."
+msgstr "Benutze Katalog %1."
+
+msgid "Arguments are catalogs, use DOCUMENT entry."
+msgstr "Argumente sind Kataloge, benutze DOCUMENT Eintrag."
+
+msgid "Search files in directory %1."
+msgstr "Suche Dateien im Verzeichnis %1."
+
+msgid "DIRECTORY"
+msgstr "VERZEICHNIS"
+
+msgid "SYSID"
+msgstr "SYSID"
 
 msgid "bad formal system identifier syntax in %1"
 msgstr "Syntax für formale Systembezeichner verletzt in %1"
@@ -287,6 +335,39 @@ msgstr "Ungültige Fehlerschranke"
 msgid "maximum number of errors (%1) reached; change with -E option"
 msgstr ""
 "Maximale Anzahl von Fehlern (%1) erreicht; das Limit läßt sich mit -E ändern"
+
+msgid "Make doctype or linktype %1 active."
+msgstr "Aktiviere Dokumenttyp oder Linktyp %1."
+
+msgid "Parse wrt. architecture %1."
+msgstr "Parse bezgl. Architektur %1."
+
+msgid "Give up after %1 errors."
+msgstr "Gib nach %1 Fehlern auf."
+
+msgid "Show open entities in error messages."
+msgstr "Zeige offene Entitäten in Fehlermeldungen."
+
+msgid "Show open elements in error messages."
+msgstr "Zeige offene Elemente in Fehlermeldungen."
+
+msgid "Show error numbers in error messages."
+msgstr "Zeige Fehlernummern in Fehlermeldungen."
+
+msgid "Show references in error messages."
+msgstr "Zeige Verweise in Fehlermeldungen."
+
+msgid "Define parameter entity %1 as \"INCLUDE\"."
+msgstr "Definiere Parameterentität %1 als \"INCLUDE\"."
+
+msgid "Enable warning %1."
+msgstr "Aktiviere Warnung %1."
+
+msgid "TYPE"
+msgstr "TYP"
+
+msgid "NUMBER"
+msgstr "ZAHL"
 
 msgid "length of name must not exceed NAMELEN (%1)"
 msgstr "Die Länge eines Namens darf NAMELEN (%1) nicht überschreiten"
@@ -880,7 +961,10 @@ msgstr ""
 msgid ""
 "minimum data of first minimum literal in SGML declaration must be \"ISO "
 "8879:1986\" or \"ISO 8879:1986 (ENR)\" or \"ISO 8879:1986 (WWW)\" not %1"
-msgstr "Die minimalen Daten des ersten minimalen Literals in der SGML Deklaration muß \"ISO 8879:1986\" oder \"ISO 8879:1986 (ENR)\" oder \"ISO 8879:1986 (WWW)\" sein, nicht %1"
+msgstr ""
+"Die minimalen Daten des ersten minimalen Literals in der SGML Deklaration "
+"muß \"ISO 8879:1986\" oder \"ISO 8879:1986 (ENR)\" oder \"ISO 8879:1986 "
+"(WWW)\" sein, nicht %1"
 
 msgid "parameter before LCNMSTRT must be NAMING not %1"
 msgstr "Der Parameter vor LCNMSTRT muß NAMING sein, nicht %1"
@@ -1766,7 +1850,9 @@ msgid "no document type declaration; implying %1"
 msgstr "Keine Dokumenttypdeklaration: impliziere %1"
 
 msgid "minimum data of AFDR declaration must be \"ISO/IEC 10744:1997\" not %1"
-msgstr "Minimale Daten der AFDR Deklaration müssen \"ISO/IEC 10744:1997\" und nicht %1 sein"
+msgstr ""
+"Minimale Daten der AFDR Deklaration müssen \"ISO/IEC 10744:1997\" und nicht "
+"%1 sein"
 
 msgid "AFDR declaration required before use of AFDR extensions"
 msgstr ""
@@ -1775,7 +1861,9 @@ msgstr ""
 msgid ""
 "ENR extensions were used but minimum literal was not \"ISO 8879:1986 (ENR)\" "
 "or \"ISO 8879:1986 (WWW)\""
-msgstr "Die ENR Erweiterungen wurden benutzt, aber das minimale Literal war nicht \"ISO 8879:1986 (ENR)\" oder \"ISO 8879:1986 (WWW)\""
+msgstr ""
+"Die ENR Erweiterungen wurden benutzt, aber das minimale Literal war nicht "
+"\"ISO 8879:1986 (ENR)\" oder \"ISO 8879:1986 (WWW)\""
 
 msgid "illegal numeric character reference to non-SGML character %1 in literal"
 msgstr ""
@@ -1813,7 +1901,9 @@ msgstr ""
 msgid ""
 "Web SGML adaptations were used but minimum literal was not \"ISO 8879:1986 "
 "(WWW)\""
-msgstr "Die Web SGML Anpassungen wurden benutzt, aber das minimale Literal war nicht \"ISO 8879:1986 (WWW)\""
+msgstr ""
+"Die Web SGML Anpassungen wurden benutzt, aber das minimale Literal war nicht "
+"\"ISO 8879:1986 (WWW)\""
 
 msgid ""
 "token %1 can be value for multiple attributes so attribute name required"
@@ -2018,7 +2108,9 @@ msgstr ""
 msgid ""
 "SGML declaration reference was used but minimum literal was not \"ISO "
 "8879:1986 (WWW)\""
-msgstr "Eine Referenz auf die SGML Deklaration wurde benutzt, obwohl das minimale Literal nicht \"ISO 8879:1986 (WWW)\" ist"
+msgstr ""
+"Eine Referenz auf die SGML Deklaration wurde benutzt, obwohl das minimale "
+"Literal nicht \"ISO 8879:1986 (WWW)\" ist"
 
 msgid "member of model group containing #PCDATA has occurrence indicator"
 msgstr ""
@@ -2323,6 +2415,39 @@ msgstr "Fehler beim Lesen von URL %1 (%2)"
 msgid "unknown output option %1"
 msgstr "Ungültige Ausgabeoption %1"
 
+msgid "Enable batch mode."
+msgstr "Aktiviere Batch-Modus."
+
+msgid "Produce output according to %1."
+msgstr "Erzeuge Ausgabe gemäß %1."
+
+msgid "Stop after the document prolog."
+msgstr "Stoppe nach dem Dokumentprolog."
+
+msgid "Suppress output."
+msgstr "Unterdrücke Ausgabe."
+
+msgid "Send RAST output to file %1."
+msgstr "Sende RAST Ausgabe in Datei %1."
+
+msgid "Same as -wduplicate."
+msgstr "Dasselbe wie -wduplicate."
+
+msgid "Same as -oline."
+msgstr "Dasselbe wie -oline."
+
+msgid "Same as -c."
+msgstr "Dasselbe wie -c."
+
+msgid "Same as -wdefault."
+msgstr "Dasselbe wie -wdefault."
+
+msgid "Same as -wundef."
+msgstr "Dasselbe wie -wundef."
+
+msgid "OPTION"
+msgstr "OPTION"
+
 # RastEventHandlerMessages
 # RastEventHandlerMessages
 msgid "invalid RAST processing instruction"
@@ -2359,6 +2484,30 @@ msgstr ""
 "Weggelassener Start- oder Endtag in einem CDATA oder RCDATA markierten "
 "Bereich impliziert; nicht normalisiert"
 
+msgid "Hoist omitted tags."
+msgstr ""
+
+msgid "Prefer lowercase."
+msgstr "Ziehe Kleinschreibung vor."
+
+msgid "Use markup option %1."
+msgstr "Benutze Markup-Option %1."
+
+msgid "Output the entity named %1."
+msgstr "Gib Entität %1 aus."
+
+msgid "Output the prolog."
+msgstr "Gib den Prolog aus."
+
+msgid "Raw."
+msgstr "Roh."
+
+msgid "Expand references."
+msgstr "Expandiere Referenzen."
+
+msgid "Modify the XML output according to %1."
+msgstr "Modifiziere die XML Ausgabe gemäß %1."
+
 msgid "reference to internal SDATA entity %1 not allowed in XML"
 msgstr "Referenz auf interne SDATA Entität %1 in XML nicht erlaubt"
 
@@ -2383,3 +2532,48 @@ msgstr "Attribute für Notation %1 definiert: in XML nicht erlaubt"
 
 msgid "cannot convert formal system identifier %1 to URL"
 msgstr "Kann formalen Systembezeichner %1 nicht in URL konvertieren"
+
+msgid "Output a document type declaration."
+msgstr "Gib eine Dokumenttypdeklaration aus."
+
+msgid "Output marked sections."
+msgstr "Gib markierte Bereiche aus."
+
+msgid "Output comments."
+msgstr "Gib Kommentare aus."
+
+msgid "Raw output."
+msgstr "Rohe Ausgabe."
+
+msgid "Print the effective system id for the public id %1."
+msgstr "Gib den effektiven Systembezeichner für den öffentlichen Bezeichner %1 aus."
+
+msgid "Print the effective system id for system id %1."
+msgstr "Gib den effektiven Systembezeichner für Systembezeichner %1 aus."
+
+msgid "Print the effective system id for parameter entity %1."
+msgstr "Gib den effektiven Systembezeichner für die Parameterentität %1 aus."
+
+msgid "Print the effective system id for the doctype %1."
+msgstr "Gib den effektiven Systembezeichner für Dokumenttyp %1 aus."
+
+msgid "Print the effective system id for the linktype %1."
+msgstr "Gib den effektiven Systembezeichner für Linktyp %1 aus."
+
+msgid "Print the effective system id for entity %1."
+msgstr "Gib den Systembezeichner für die allgemeine Entität %1 aus."
+
+msgid "Print the effective system id for notation %1."
+msgstr "Gib den effektiven Systembezeichner für Notation %1 aus."
+
+msgid "Print the effective system id for the SGML declaration for doctype %1."
+msgstr "Gib den effektiven Systembezeichner für die SGML Deklaration für Dokumenttyp %1 aus."
+
+msgid "LITERAL"
+msgstr "LITERAL"
+
+msgid "non-SGML"
+msgstr "nicht-SGML"
+
+msgid "raw"
+msgstr "roh"

@@ -23,17 +23,6 @@ if test "$CXXFLAGS" = ""; then
   CXXFLAGS="-O2"
 fi
 
-
-dnl
-dnl  Backup original Makefiles, people may want to revert to it if
-dnl  configure doesn't work.
-dnl
-echo 'saving distribution makefiles...'
-test ! -f Makefile.dist && cp Makefile Makefile.dist
-test ! -f Makefile.lib.dist && cp Makefile.lib Makefile.lib.dist
-test ! -f Makefile.prog.dist && cp Makefile.prog Makefile.prog.dist
-test ! -f Makefile.comm.dist && cp Makefile.comm Makefile.comm.dist
-
 dnl
 dnl  Check for programs
 dnl
@@ -44,14 +33,6 @@ AC_PROG_CXX
 AC_PROG_CXXCPP
 AC_PATH_PROGS(PERL, perl, perl)
 AC_PROG_INSTALL
-
-dnl
-dnl  Stuff special to GNU C++
-dnl
-if test "$GXX"
-then
-  CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
-fi
 
 dnl
 dnl  Checks for header files.
@@ -129,6 +110,24 @@ template class test<foo>;
 if test "$ac_cv_c_template_ansi" = "yes"
  then
   AC_DEFINE(SP_ANSI_CLASS_INST)
+fi
+
+dnl
+dnl  Whether GNU C++ supported automatic template instantiation
+dnl
+if test "$GXX"
+then
+  AC_CACHE_CHECK(whether GNU C++ supports automatic template instantiation,
+	         ac_cv_c_gnu_automatic_templates,
+                 AC_EGREP_CPP(yes,[
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 8)
+  yes
+#endif
+	],AC_MSG_RESULT(yes)
+            AC_DEFINE(SP_DEFINE_TEMPLATES),
+          AC_MSG_RESULT(no)
+            AC_DEFINE(SP_MANUAL_INST)
+            CXXFLAGS="$CXXFLAGS -fno-implicit-templates"))
 fi
 
 

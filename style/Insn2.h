@@ -66,11 +66,12 @@ private:
 
 class CopyFlowObjInsn : public Insn {
 public:
-  CopyFlowObjInsn(FlowObj *, InsnPtr);
+  CopyFlowObjInsn(FlowObj *, const Location &, InsnPtr);
   const Insn *execute(VM &) const;
 private:
   FlowObj *flowObj_;
   InsnPtr next_;
+  Location loc_;
 };
 
 // Value for characteristic is on top of the stack
@@ -106,11 +107,12 @@ private:
 
 class SetContentInsn : public Insn {
 public:
-  SetContentInsn(const CompoundFlowObj *, InsnPtr next);
+  SetContentInsn(const CompoundFlowObj *, const Location &, InsnPtr next);
   const Insn *execute(VM &vm) const;
 private:
   InsnPtr next_;
   const CompoundFlowObj *flowObj_;
+  Location loc_;
 };
 
 class SetDefaultContentInsn : public Insn {

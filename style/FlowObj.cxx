@@ -13,6 +13,69 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class InlineValidator : public ProcessContext::Validator {
+public:
+  bool isValid(const FlowObj &fo, ProcessContext &);
+  bool charsValie(size_t, const Location &, ProcessContext &)
+    { return true; }
+};
+
+bool InlineValidator::isValid(const FlowObj &fo, ProcessContext &context)
+{
+  FlowObj::AcceptFlags af(fo.acceptFlags(context));
+  if ((af & (FlowObj::afAlways | FlowObj::afInline)) != 0)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notInlineFlowObj);
+  return false;
+}
+
+class DisplayValidator : public ProcessContext::Validator {
+public:
+  bool isValid(const FlowObj &fo, ProcessContext &);
+  bool charsValid(size_t, const Location &, ProcessContext &);
+};
+
+bool DisplayValidator::isValid(const FlowObj &fo, ProcessContext &context)
+{
+  FlowObj::AcceptFlags af(fo.acceptFlags(context));
+  if ((af & (FlowObj::afAlways | FlowObj::afDisplay)) != 0)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notDisplayFlowObj);
+  return false;
+}
+
+bool DisplayValidator::charsValid(size_t, const Location &loc,
+				  ProcessContext &context)
+{
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::notDisplayFlowObj);
+  return false;
+}
+
+class InlineOrDisplayValidator : public ProcessContext::Validator {
+public:
+  bool isValid(const FlowObj &fo, ProcessContext &);
+  bool charsValie(size_t, const Location &, ProcessContext &)
+    { return true; }
+};
+
+bool InlineOrDisplayValidator::isValid(const FlowObj &fo,
+				       ProcessContext &context)
+{
+  FlowObj::AcceptFlags af(fo.acceptFlags(context));
+  if ((af & (FlowObj::afAlways | FlowObj::afInline | FlowObj::afDisplay)) != 0)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notInlineOrDisplayFlowObj);
+  return false;
+}
+
 FlowObj::FlowObj()
 : style_(0)
 {
@@ -24,7 +87,9 @@ void FlowObj::process(ProcessContext &context)
   context.startFlowObj();
   unsigned flags = 0;
   pushStyle(context, flags);
+  context.validate(*this);
   processInner(context);
+  context.endValidate();
   popStyle(context, flags);
   context.endFlowObj();
 }
@@ -174,7 +239,8 @@ void CompoundFlowObj::processInner(ProcessContext &context)
   if (content_)
     content_->process(context);
   else
-    context.processChildren(context.vm().interp->initialProcessingMode());
+    context.processChildren(context.vm().interp->initialProcessingMode(),
+			    location());
 }
 
 void CompoundFlowObj::traceSubObjects(Collector &c) const
@@ -200,6 +266,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afDisplay; }
 protected:
   Owner<FOTBuilder::DisplayGroupNIC> nic_;
 };
@@ -218,7 +286,9 @@ void DisplayGroupFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startDisplayGroup(*nic_);
+  context.pushPrincipalPort(new DisplayValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endDisplayGroup();
 }
 
@@ -263,8 +333,16 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afDisplay; }
 private:
   Owner<FOTBuilder::ParagraphNIC> nic_;
+  class Validator_ : public ProcessContext::Validator {
+  public:
+    bool isValid(const FlowObj &, ProcessContext &context);
+    bool charsValid(size_t, const Location &, ProcessContext &)
+      { return true; }
+  };
 };
 
 
@@ -281,9 +359,13 @@ ParagraphFlowObj::ParagraphFlowObj(const ParagraphFlowObj &fo)
 void ParagraphFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
+  context.startParagraph();
   fotb.startParagraph(*nic_);
+  context.pushPrincipalPort(new Validator_);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endParagraph();
+  context.endParagraph();
 }
 
 void ParagraphFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
@@ -302,6 +384,19 @@ FlowObj *ParagraphFlowObj::copy(Collector &c) const
   return new (c) ParagraphFlowObj(*this);
 }
 
+bool ParagraphFlowObj::Validator_::isValid(const FlowObj &fo,
+					   ProcessContext &context)
+{
+  FlowObj::AcceptFlags af(fo.acceptFlags(context));
+  if ((af & (FlowObj::afAlways | FlowObj::afInline | FlowObj::afDisplay
+	     | FlowObj::afParagraphBreak)) != 0)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notValidInParagraph);
+  return false;
+}
+
 class ParagraphBreakFlowObj : public FlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -314,6 +409,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afParagraphBreak; }
 private:
   Owner<FOTBuilder::ParagraphNIC> nic_;
 };
@@ -362,6 +459,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return nic_->isDisplay ? afDisplay : afInline; }
 private:
   Owner<FOTBuilder::ExternalGraphicNIC> nic_;
 };
@@ -511,6 +610,7 @@ public:
     return 1;
   }
   bool isRule() { return 1; }
+  AcceptFlags acceptFlags(ProcessContext &) const;
 private:
   Owner<FOTBuilder::RuleNIC> nic_;
 };
@@ -588,11 +688,26 @@ FlowObj *RuleFlowObj::copy(Collector &c) const
   return new (c) RuleFlowObj(*this);
 }
 
+FlowObj::AcceptFlags RuleFlowObj::acceptFlags(ProcessContext &) const
+{
+  switch(nic_->orientation) {
+  case FOTBuilder::symbolHorizontal:
+  case FOTBuilder::symbolVertical:
+    return afDisplay;
+  case FOTBuilder::symbolEscapement:
+  case FOTBuilder::symbolLineProgression:
+    return afInline;
+  }
+  CANNOT_HAPPEN();
+}
+
 class AlignmentPointFlowObj : public FlowObj {
 public:
   AlignmentPointFlowObj() { }
   FlowObj *copy(Collector &) const;
   void processInner(ProcessContext &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afInline | afMathSequence; }
 };
 
 FlowObj *AlignmentPointFlowObj::copy(Collector &c) const
@@ -610,6 +725,9 @@ public:
   SidelineFlowObj() { }
   FlowObj *copy(Collector &) const;
   void processInner(ProcessContext &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    // FIXME. Correct? Standard isn't clear about this.
+    { return afDisplay | afInline; }
 };
 
 FlowObj *SidelineFlowObj::copy(Collector &c) const
@@ -621,7 +739,9 @@ void SidelineFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSideline();
+  context.pushPrincipalPort(new InlineOrDisplayValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endSideline();
 }
 
@@ -629,6 +749,8 @@ void SequenceFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSequence();
+  // We *don't* push the principal port, so that the validator of the parent's
+  // port will be used.
   CompoundFlowObj::processInner(context);
   fotb.endSequence();
 }
@@ -651,6 +773,8 @@ public:
   bool hasNonInheritedC(const Identifier *ident) const;
   void setNonInheritedC(const Identifier *ident, ELObj *obj,
 			const Location &loc, Interpreter &interp);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afInline; }
 private:
   Owner<FOTBuilder::LineFieldNIC> nic_;
 };
@@ -664,7 +788,9 @@ void LineFieldFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startLineField(*nic_);
+  context.pushPrincipalPort(new InlineValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endLineField();
 }
 
@@ -720,6 +846,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   void traceSubObjects(Collector &) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afPaging; }
 private:
   enum { nPageTypeBits = 2 };
   Owner<HeaderFooter> hf_;
@@ -753,14 +881,18 @@ void SimplePageSequenceFlowObj::processInner(ProcessContext &context)
     context.setPageType(i);
     for (int j = 0; j < HeaderFooter::nParts; j++) {
       if (hf_->part[j]) {
-        context.pushPrincipalPort(hf_fotb[i | (j << nPageTypeBits)]);
+	// FIXME. Invalid FOs result in FOUR error messages.
+        context.pushPseudoPort(hf_fotb[i | (j << nPageTypeBits)],
+			       new InlineValidator);
 	hf_->part[j]->process(context);
-        context.popPrincipalPort();
+        context.popPseudoPort();
+      }
     }
   }
-  }
   fotb.endSimplePageSequenceHeaderFooter();
+  context.pushPrincipalPort(new DisplayValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endSimplePageSequence();
 }
 
@@ -843,6 +975,9 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    // FIXME. Should we treat this as a sequence?
+    { return afAlways; }
 private:
   AddressObj *addressObj_;
 };
@@ -862,6 +997,7 @@ void LinkFlowObj::processInner(ProcessContext &context)
   }
   else
     fotb.startLink(addressObj_->address());
+  // We treat a link as a sequence, i.d. flow parent validates its children
   CompoundFlowObj::processInner(context);
   fotb.endLink();
 }
@@ -904,13 +1040,17 @@ public:
   ScrollFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afScroll; }
 };
 
 void ScrollFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startScroll();
+  context.pushPrincipalPort(new DisplayValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endScroll();
 }
 
@@ -924,14 +1064,29 @@ public:
   MarginaliaFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    // Para ancestor checked in processInner.
+    { return afAlways; }
 };
 
 void MarginaliaFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
+  bool bad(!context.paragraphAncestor());
+  if (bad) {
+    Interpreter &interp = *context.vm().interp;
+    interp.setNextLocation(location());
+    interp.message(InterpreterMessages::noParagraphAncestor);
+    FOTBuilder ignore;
+    context.pushPseudoPort(&fotb, new ProcessContext::Validator);
+  }
   fotb.startMarginalia();
+  context.pushPrincipalPort(new InlineValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endMarginalia();
+  if (bad)
+    context.popPseudoPort();
 }
 
 FlowObj *MarginaliaFlowObj::copy(Collector &c) const
@@ -957,6 +1112,9 @@ public:
     FOTBuilder::MultiMode principalMode;
     Vector<FOTBuilder::MultiMode> namedModes;
   };
+  AcceptFlags acceptFlags(ProcessContext &) const
+    // FIXME.
+    { return afAlways; }
 private:
   bool handleMultiModesMember(const Identifier *, ELObj *obj,
 			      const Location &, Interpreter &);
@@ -981,9 +1139,14 @@ void MultiModeFlowObj::processInner(ProcessContext &context)
 		      nic_->namedModes,
 		      fotbs);
   Vector<SymbolObj *> portSyms(nic_->namedModes.size());
-  for (size_t i = 0; i < portSyms.size(); i++)
+  Vector<ProcessContext::Validator *> validators(nic_->namedModes.size());
+  for (size_t i = 0; i < portSyms.size(); i++) {
     portSyms[i] = context.vm().interp->makeSymbol(nic_->namedModes[i].name);
-  context.pushPorts(nic_->hasPrincipalMode, portSyms, fotbs);
+    validators[i] = new ProcessContext::Validator;
+  }
+  context.pushPorts(nic_->hasPrincipalMode, portSyms, fotbs, validators,
+		    nic_->hasPrincipalMode ?
+		    new ProcessContext::Validator : 0);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMultiMode();
@@ -1067,6 +1230,8 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afInline; }
   class Type {
   public:
     virtual ~Type();
@@ -1117,7 +1282,9 @@ void ScoreFlowObj::processInner(ProcessContext &context)
     type_->start(fotb);
   else
     fotb.startSequence();
+  context.pushPrincipalPort(new InlineValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   if (type_)
     fotb.endScore();
   else
@@ -1213,6 +1380,8 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return nic_->isDisplay ? afDisplay : afInline; }
 private:
   Owner<FOTBuilder::BoxNIC> nic_;
 };
@@ -1231,7 +1400,11 @@ void BoxFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startBox(*nic_);
+  context.pushPrincipalPort(nic_->isDisplay
+			    ? new DisplayValidator
+			    : new InlineValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endBox();
 }
 
@@ -1292,8 +1465,16 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afDisplay; }
 protected:
   Owner<FOTBuilder::DisplayNIC> nic_;
+private:
+  class Validator_ : public ProcessContext::Validator {
+  public:
+    bool isValid(const FlowObj &, ProcessContext &);
+    bool charsValid(size_t, const Location &, ProcessContext &);
+  };
 };
 
 SideBySideFlowObj::SideBySideFlowObj()
@@ -1310,7 +1491,9 @@ void SideBySideFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSideBySide(*nic_);
+  context.pushPrincipalPort(new Validator_);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endSideBySide();
 }
 
@@ -1331,6 +1514,26 @@ FlowObj *SideBySideFlowObj::copy(Collector &c) const
   return new (c) SideBySideFlowObj(*this);
 }
 
+bool SideBySideFlowObj::Validator_::isValid(const FlowObj &fo,
+					    ProcessContext &context)
+{
+  if (fo.acceptFlags(context) & afSideBySideItem)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notSideBySideItem);
+  return false;
+}
+
+bool SideBySideFlowObj::Validator_::charsValid(size_t, const Location &loc,
+					       ProcessContext &context)
+{
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(loc);
+  interp.message(InterpreterMessages::notSideBySideItem);
+  return false;
+}
+  
 class SideBySideItemFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -1338,13 +1541,17 @@ public:
   }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afSideBySideItem; }
 };
 
 void SideBySideItemFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startSideBySideItem();
+  context.pushPrincipalPort(new DisplayValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endSideBySideItem();
 }
 
@@ -1365,6 +1572,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afInline; }
 private:
   Owner<FOTBuilder::LeaderNIC> nic_;
 };
@@ -1383,7 +1592,9 @@ void LeaderFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startLeader(*nic_);
+  context.pushPrincipalPort(new InlineValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endLeader();
 }
 
@@ -1452,6 +1663,8 @@ public:
     return 1;
   }
   bool isCharacter() { return 1; }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afInline | afChar | afMathSequence; }
 private:
   Owner<FOTBuilder::CharacterNIC> nic_;
   bool needFixNICs_;
@@ -1506,9 +1719,9 @@ void FlowObj::fixCharNICs(const Char *ch, size_t n,
   Vector<size_t> dep;
   FunctionObj *func = context.currentStyleStack().
     actual(interp.charMapC(), interp, dep)->asFunction();
-  if (func && (func->nRequiredArgs()>1
-      || (func->nRequiredArgs() + func->nOptionalArgs())
-	  + func->restArg() ? 1 : 0) == 0)
+  if (func && (func->nRequiredArgs() > 1
+	       || (func->nRequiredArgs() + func->nOptionalArgs()
+		   + func->restArg() ? 1 : 0) == 0))
     func = 0;
   InsnPtr insn(func != 0 ? func->makeCallInsn(1, interp, loc, InsnPtr()) : InsnPtr());
   VM vm(interp);
@@ -1792,17 +2005,41 @@ FlowObj *CharacterFlowObj::copy(Collector &c) const
   return new (c) CharacterFlowObj(*this);
 }
 
+class MathSequenceValidator : public ProcessContext::Validator {
+public:
+  bool isValid(const FlowObj &, ProcessContext &);
+  bool charsValid(size_t, const Location &loc, ProcessContext &context)
+    { return true; }
+};
+
+bool MathSequenceValidator::isValid(const FlowObj &fo, ProcessContext &context)
+{
+  if (fo.acceptFlags(context) & FlowObj::afMathSequence)
+    return true;
+  Interpreter &interp = *context.vm().interp;
+  interp.setNextLocation(fo.location());
+  interp.message(InterpreterMessages::notMathSequence);
+  return false;
+}
+
+
 class MathSequenceFlowObj : public CompoundFlowObj {
 public:
   MathSequenceFlowObj() { }
   void processInner(ProcessContext &context) {
     FOTBuilder &fotb = context.currentFOTBuilder();
     fotb.startMathSequence();
+    context.pushPrincipalPort(new MathSequenceValidator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     fotb.endMathSequence();
   }
   FlowObj *copy(Collector &c) const {
     return new (c) MathSequenceFlowObj(*this);
+  }
+  AcceptFlags acceptFlags(ProcessContext &) const {
+    // FIXME. Should the value depend on math-display-mode:?
+    return afDisplay | afInline | afMathSequence;
   }
 };
 
@@ -1811,6 +2048,8 @@ public:
   FractionFlowObj() { }
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 void FractionFlowObj::processInner(ProcessContext &context)
@@ -1833,7 +2072,10 @@ void FractionFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portNumerator);
   labels[1] = context.vm().interp->portName(Interpreter::portDenominator);
-  context.pushPorts(0, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] = new MathSequenceValidator;
+  validators[1] = new MathSequenceValidator;
+  context.pushPorts(0, labels, fotbs, validators);
   // Fraction flow object doesn't have principal port,
   // so clear the current connection.
   CompoundFlowObj::processInner(context);
@@ -1852,12 +2094,16 @@ public:
   void processInner(ProcessContext &context) {
     FOTBuilder &fotb = context.currentFOTBuilder();
     fotb.startUnmath();
+    context.pushPrincipalPort(new InlineValidator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     fotb.endUnmath();
   }
   FlowObj *copy(Collector &c) const {
     return new (c) UnmathFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 class SuperscriptFlowObj : public CompoundFlowObj {
@@ -1866,12 +2112,16 @@ public:
   void processInner(ProcessContext &context) {
     FOTBuilder &fotb = context.currentFOTBuilder();
     fotb.startSuperscript();
+    context.pushPrincipalPort(new MathSequenceValidator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     fotb.endSuperscript();
   }
   FlowObj *copy(Collector &c) const {
     return new (c) SuperscriptFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 class SubscriptFlowObj : public CompoundFlowObj {
@@ -1880,12 +2130,16 @@ public:
   void processInner(ProcessContext &context) {
     FOTBuilder &fotb = context.currentFOTBuilder();
     fotb.startSubscript();
+    context.pushPrincipalPort(new MathSequenceValidator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     fotb.endSubscript();
   }
   FlowObj *copy(Collector &c) const {
     return new (c) SubscriptFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 class ScriptFlowObj : public CompoundFlowObj {
@@ -1895,6 +2149,8 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) ScriptFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 void ScriptFlowObj::processInner(ProcessContext &context)
@@ -1910,7 +2166,11 @@ void ScriptFlowObj::processInner(ProcessContext &context)
   labels[3] = context.vm().interp->portName(Interpreter::portPostSub);
   labels[4] = context.vm().interp->portName(Interpreter::portMidSup);
   labels[5] = context.vm().interp->portName(Interpreter::portMidSub);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(6);
+  for (size_t i = 0; i < 6; ++i)
+    validators[6] = new MathSequenceValidator;
+  context.pushPorts(true, labels, fotbs, validators,
+		    new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endScript();
@@ -1923,6 +2183,8 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) MarkFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 void MarkFlowObj::processInner(ProcessContext &context)
@@ -1933,7 +2195,11 @@ void MarkFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portOverMark);
   labels[1] = context.vm().interp->portName(Interpreter::portUnderMark);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] = new MathSequenceValidator;
+  validators[1] = new MathSequenceValidator;
+  context.pushPorts(true, labels, fotbs, validators,
+		    new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMark();
@@ -1946,6 +2212,19 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) FenceFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
+private:
+  class Validator_ : public ProcessContext::Validator {
+  public:
+    Validator_()
+      : hadChar_(false), hadError_(false) { }
+    bool isValid(const FlowObj &, ProcessContext &);
+    bool charsValid(size_t, const Location &, ProcessContext &);
+  private:
+    bool hadChar_;
+    bool hadError_;
+  };
 };
 
 void FenceFlowObj::processInner(ProcessContext &context)
@@ -1956,12 +2235,56 @@ void FenceFlowObj::processInner(ProcessContext &context)
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portOpen);
   labels[1] = context.vm().interp->portName(Interpreter::portClose);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(2);
+  validators[0] = new Validator_;
+  validators[1] = new Validator_;
+  context.pushPorts(true, labels, fotbs, validators,
+		    new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endFence();
 }
 
+bool FenceFlowObj::Validator_::isValid(const FlowObj &fo,
+				       ProcessContext &context)
+{
+  if (!hadChar_ && (fo.acceptFlags(context) & FlowObj::afChar) != 0) {
+    hadChar_ = true;
+    return true;
+  }
+  if (!hadError_) {
+    Interpreter &interp = *context.vm().interp;
+    interp.setNextLocation(fo.location());
+    interp.message(InterpreterMessages::notSingleChar);
+    hadError_ = true;
+  }
+  return false;
+}
+
+bool FenceFlowObj::Validator_::charsValid(size_t n,
+					  const Location &loc,
+					  ProcessContext &context)
+{
+  if (n < 1)
+    return true;
+  if (n == 1) {
+    hadChar_ = true;
+    return true;
+  }
+  if (!hadError_) {
+    Interpreter &interp = *context.vm().interp;
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::notSingleChar);
+    hadError_ = true;
+  }
+  if (!hadChar_) {
+    hadChar_ = true;
+    n = 1;
+    return true;
+  }
+  return false;
+}
+  
 class RadicalFlowObj : public CompoundFlowObj {
 public:
   RadicalFlowObj() : radical_(0) { }
@@ -1976,6 +2299,8 @@ public:
     c.trace(radical_);
     CompoundFlowObj::traceSubObjects(c);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 private:
   SosofoObj *radical_;
 };
@@ -1998,7 +2323,10 @@ void RadicalFlowObj::processInner(ProcessContext &context)
     fotb.radicalRadicalDefaulted();
   Vector<SymbolObj *> labels(1);
   labels[0] = context.vm().interp->portName(Interpreter::portDegree);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(1);
+  validators[0] = new MathSequenceValidator;
+  context.pushPorts(true, labels, fotbs, validators,
+		    new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endRadical();
@@ -2028,6 +2356,8 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) MathOperatorFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afMathSequence; }
 };
 
 void MathOperatorFlowObj::processInner(ProcessContext &context)
@@ -2039,7 +2369,11 @@ void MathOperatorFlowObj::processInner(ProcessContext &context)
   labels[0] = context.vm().interp->portName(Interpreter::portOperator);
   labels[1] = context.vm().interp->portName(Interpreter::portLowerLimit);
   labels[2] = context.vm().interp->portName(Interpreter::portUpperLimit);
-  context.pushPorts(1, labels, fotbs);
+  Vector<ProcessContext::Validator *> validators(3);
+  for (size_t i = 0; i < 3; ++i)
+    validators[i] = new MathSequenceValidator;
+  context.pushPorts(true, labels, fotbs, validators,
+		    new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
   context.popPorts();
   fotb.endMathOperator();
@@ -2059,8 +2393,26 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    // FIXME. Accepted anywhere else?
+    { return afMathSequence; }
 private:
   Owner<FOTBuilder::GridNIC> nic_;
+  class Validator_ : public ProcessContext::Validator {
+  public:
+    bool isValid(const FlowObj &fo, ProcessContext &context) {
+      AcceptFlags af(fo.acceptFlags(context));
+      if (af & (afAlways | afGridCell))
+	return true;
+      return charsValid(1, fo.location(), context);
+    }
+    bool charsValid(size_t, const Location &loc, ProcessContext &context) {
+      Interpreter &interp = *context.vm().interp;
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::notGridCell);
+      return false;
+    }
+  };
 };
 
 GridFlowObj::GridFlowObj()
@@ -2077,7 +2429,9 @@ void GridFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startGrid(*nic_);
+  context.pushPrincipalPort(new Validator_);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endGrid();
 }
 
@@ -2138,6 +2492,8 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afGridCell; }
 private:
   Owner<FOTBuilder::GridCellNIC> nic_;
 };
@@ -2156,7 +2512,9 @@ void GridCellFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   fotb.startGridCell(*nic_);
+  context.pushPrincipalPort(new MathSequenceValidator);
   CompoundFlowObj::processInner(context);
+  context.popPrincipalPort();
   fotb.endGridCell();
 }
 
@@ -2203,6 +2561,82 @@ bool GridCellFlowObj::hasNonInheritedC(const Identifier *ident) const
   return 0;
 }
 
+class TableValidator : public ProcessContext::Validator {
+public:
+  TableValidator(): s_(sNone) { }
+  virtual void badFO(const Location &loc, ProcessContext &context) const {
+    Interpreter &interp = *context.vm().interp;
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::badTableContent);
+  }
+  bool isValid(const FlowObj &fo, ProcessContext &context) {
+    FlowObj::AcceptFlags af(fo.acceptFlags(context));
+    if (af & FlowObj::afAlways)
+      return true;
+    switch (s_) {
+    case sNone:
+      if (af & FlowObj::afTablePart) {
+	s_ = sPart;
+	return true;
+      }
+      if (af & FlowObj::afTableColumn) {
+	s_ = sColumn;
+	return true;
+      }
+      if (af & (FlowObj::afTableRow | FlowObj::afTableCell)) {
+	s_ = sContent;
+	return true;
+      }
+      break;
+    case sBadPart:
+      if (!(af & FlowObj::afTablePart))
+	return false;
+      // Fall through.
+    case sPart:
+      if (af & FlowObj::afTablePart)
+	return true;
+      s_ = sBadPart;
+      break;
+    case sBadColumn:
+      if (!(af & FlowObj::afTableColumn))
+	return false;
+      // Fall through.
+    case sColumn:
+      if (af & FlowObj::afTableColumn)
+	return true;
+      s_ = sBadColumn;
+      break;
+    case sBadContent:
+      if (!(af & (FlowObj::afTableCell | FlowObj::afTableRow)))
+	return false;
+      // Fall through.
+    case sContent:
+      if (af & (FlowObj::afTableRow | FlowObj::afTableCell))
+	return true;
+      s_ =sBadContent;
+      break;
+    default:
+      CANNOT_HAPPEN();
+    }
+    badFO(fo.location(), context);
+    return false;
+  }
+  bool charsValid(size_t, const Location &loc, ProcessContext &context) {
+    badFO(loc, context);
+    return false;
+  }
+protected:
+  enum State {
+    sNone,
+    sPart,
+    sBadPart,
+    sColumn,
+    sBadColumn,
+    sContent,
+    sBadContent
+  } s_;
+  TableValidator(State s) : s_(s) { }
+};
 class TableFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -2239,9 +2673,11 @@ public:
     border(nic_->afterRowBorder, borderStyle, &FOTBuilder::tableAfterRowBorder, context);
     border(nic_->beforeColumnBorder, borderStyle, &FOTBuilder::tableBeforeColumnBorder, context);
     border(nic_->afterColumnBorder, borderStyle, &FOTBuilder::tableAfterColumnBorder, context);
+    context.pushPrincipalPort(new TableValidator);
     CompoundFlowObj::processInner(context);
     if (context.inTableRow())
       context.endTableRow();
+    context.popPrincipalPort();
     context.endTable();
     fotb.endTable();
   }
@@ -2303,6 +2739,8 @@ public:
       CANNOT_HAPPEN();
     }
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afDisplay; }
 private:
   void border(StyleObj *style, StyleObj *style2,
               void (FOTBuilder::*setter)(), ProcessContext &context) {
@@ -2334,7 +2772,12 @@ public:
     Vector<SymbolObj *> labels(2);
     labels[0] = context.vm().interp->portName(Interpreter::portHeader);
     labels[1] = context.vm().interp->portName(Interpreter::portFooter);
-    context.pushPorts(1, labels, fotbs);
+    Vector<ProcessContext::Validator *> validators(2);
+    validators[0] =
+      new HFValidator_;
+    validators[1] =
+      new HFValidator_;
+    context.pushPorts(true, labels, fotbs, validators, new BodyValidator_);
     CompoundFlowObj::processInner(context);
     context.popPorts();
     if (context.inTableRow())
@@ -2358,8 +2801,29 @@ public:
       return 0;
     return 1;
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afTablePart; }
 private:
   Owner<FOTBuilder::TablePartNIC> nic_;
+  class HFValidator_ : public TableValidator {
+  public:
+    HFValidator_() : TableValidator(sContent) { }
+    void badFO(const Location &loc, ProcessContext &context) const {
+      Interpreter &interp = *context.vm().interp;
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::badTablePartHF);
+    }
+  };
+  
+  class BodyValidator_ : public TableValidator {
+  public:
+    BodyValidator_() : TableValidator(sColumn) { }
+    void badFO(const Location &loc, ProcessContext &context) const {
+      Interpreter &interp = *context.vm().interp;
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::badTablePartBody);
+    }
+  };
 };
 
 class TableColumnFlowObj : public FlowObj {
@@ -2447,6 +2911,8 @@ public:
     }
     CANNOT_HAPPEN();
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afTableColumn; }
 private:
   Owner<NIC> nic_;
 };
@@ -2462,11 +2928,14 @@ public:
       context.vm().interp->message(InterpreterMessages::tableRowOutsideTable);
       CompoundFlowObj::processInner(context);
       return;
+      // FIXME: Remove when validation is working.
     }
     if (context.inTableRow())
       context.endTableRow();
     context.startTableRow(style_);
+    context.pushPrincipalPort(new Validator_);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     if (context.inTableRow())
       context.endTableRow();
     // else FIXME give an error
@@ -2475,6 +2944,23 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) TableRowFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afTableRow; }
+private:
+  class Validator_ : public ProcessContext::Validator {
+  public:
+    bool isValid(const FlowObj &fo, ProcessContext &context) {
+      AcceptFlags af(fo.acceptFlags(context));
+      if (af & afTableCell)
+	return true;
+    }
+    bool charsValid(size_t, const Location &loc, ProcessContext &context) {
+      Interpreter &interp = *context.vm().interp;
+      interp.setNextLocation(loc);
+      interp.message(InterpreterMessages::badTableRow);
+      return false;
+    }
+  };
 };
 
 class TableCellFlowObj : public CompoundFlowObj {
@@ -2532,6 +3018,7 @@ public:
       // FIXME location
       context.vm().interp->message(InterpreterMessages::tableCellOutsideTable);
       CompoundFlowObj::processInner(context);
+      // FIXME. Remove this when validation is ok.
       return;
     }
     FOTBuilder &fotb = context.currentFOTBuilder();
@@ -2552,7 +3039,9 @@ public:
     border(interp.cellAfterRowBorderC(), &FOTBuilder::tableCellAfterRowBorder, context);
     border(interp.cellBeforeColumnBorderC(), &FOTBuilder::tableCellBeforeColumnBorder, context);
     border(interp.cellAfterColumnBorderC(), &FOTBuilder::tableCellAfterColumnBorder, context);
+    context.pushPrincipalPort(new DisplayValidator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
     fotb.endTableCell();
   }
   FlowObj *copy(Collector &c) const {
@@ -2625,6 +3114,8 @@ public:
     }
     CANNOT_HAPPEN();
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afTableCell; }
 private:
   void border(const ConstPtr<InheritedC> &ic, void (FOTBuilder::*setter)(),
 	      ProcessContext &context) {
@@ -2663,6 +3154,8 @@ public:
   FlowObj *copy(Collector &c) const {
     return new (c) TableBorderFlowObj(*this);
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afNever; }
 };
 
 
@@ -2847,6 +3340,8 @@ public:
       return 0;
     return 1;
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afAlways; }
 };
 
 class FormattingInstructionFlowObj : public FlowObj {
@@ -2854,23 +3349,28 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  FormattingInstructionFlowObj() { }
+  FormattingInstructionFlowObj()
+    : datap_(new StringC()) { }
+  FormattingInstructionFlowObj(const FormattingInstructionFlowObj &fo)
+    : FlowObj(fo), datap_(new StringC(*fo.datap_)) { }
   void processInner(ProcessContext &context) {
-    context.currentFOTBuilder().formattingInstruction(data_);
+    context.currentFOTBuilder().formattingInstruction(*datap_);
   }
   FlowObj *copy(Collector &c) const {
     return new (c) FormattingInstructionFlowObj(*this);
   }
   void setNonInheritedC(const Identifier *ident, ELObj *obj,
 			const Location &loc, Interpreter &interp) {
-    interp.convertStringC(obj, ident, loc, data_);
+    interp.convertStringC(obj, ident, loc, *datap_);
   }
   bool hasNonInheritedC(const Identifier *ident) const {
     Identifier::SyntacticKey key;
     return ident->syntacticKey(key) && key == Identifier::keyData;
   }
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afAlways; }
 private:
-  StringC data_;
+  Owner<StringC> datap_;
 };
 
 class ELObjExtensionFlowObjValue : public FOTBuilder::ExtensionFlowObj::Value {
@@ -2955,6 +3455,8 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afAlways; }
 private:
   Owner<FOTBuilder::ExtensionFlowObj> fo_;
 };
@@ -3004,6 +3506,8 @@ public:
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
+  AcceptFlags acceptFlags(ProcessContext &) const
+    { return afAlways; }
 private:
   Owner<FOTBuilder::CompoundExtensionFlowObj> fo_;
 };
@@ -3027,14 +3531,25 @@ void CompoundExtensionFlowObj::processInner(ProcessContext &context)
   fotb.startExtension(*fo_, context.vm().currentNode, fotbs);
   if (portNames.size()) {
     Vector<SymbolObj *> portSyms(portNames.size());
-    for (size_t i = 0; i < portSyms.size(); i++)
+    Vector<ProcessContext::Validator *> validators(portNames.size());
+    for (size_t i = 0; i < portSyms.size(); i++) {
       portSyms[i] = context.vm().interp->makeSymbol(portNames[i]);
-    context.pushPorts(fo_->hasPrincipalPort(), portSyms, fotbs);
+      // FIXME. A way for extensions to specify accepted contents.
+      validators[i] =
+	new ProcessContext::Validator;
+    }
+    context.pushPorts(fo_->hasPrincipalPort(), portSyms, fotbs, validators,
+		      fo_->hasPrincipalPort()
+		      ? new ProcessContext::Validator
+		      : 0);
     CompoundFlowObj::processInner(context);
     context.popPorts();
   }
-  else
+  else {
+    context.pushPrincipalPort(new ProcessContext::Validator);
     CompoundFlowObj::processInner(context);
+    context.popPrincipalPort();
+  }
   fotb.endExtension(*fo_);
 }
 
@@ -3058,6 +3573,8 @@ FlowObj *CompoundExtensionFlowObj::copy(Collector &c) const
 
 #define FLOW_OBJ(name, string, feature) \
 { FlowObj *tem = new (*this) name; \
+  /* Temporary debugging check.*/ \
+  ASSERT(sizeof(name) <= 32); \
   makePermanent(tem); \
   Identifier *ident = lookup(makeStringC(string)); \
   ident->setFlowObj(tem); \

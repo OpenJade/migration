@@ -1076,9 +1076,13 @@ bool NodeListObj::contains(EvalContext &context, Interpreter &interp, const Node
       return 0;
     if (*nd == *ptr)  
       return 1;
-    // FIXME: Since all nodes in a chunk have the same class, skip the
-    // chunk if class of *nd != class of *ptr.
-    nl = nl->nodeListRest(context, interp); 
+    ComponentName::Id cls1, cls2;
+    nd->getClassName(cls1);
+    ptr->getClassName(cls2);
+    bool chunk;
+    nl = (cls1 == cls2) 
+      ? nl->nodeListRest(context, interp)
+      : nl->nodeListChunkRest(context, interp, chunk);
   }
   return 0;
 }

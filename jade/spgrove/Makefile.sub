@@ -1,3 +1,4 @@
+LTVERSION=0:0:0
 LIB=ospgrove
 INCLUDE=-I$(srcdir)/../grove
 DEPLIBS=-lm -L$(TOP)/grove/.libs -logrove -L$(TOP)/lib/.libs -losp \

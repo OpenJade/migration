@@ -6,7 +6,7 @@
 
 TESTS = onsgmls-1 \
 osnorm-1 \
-af-1 af-2 af-3
+af-1 af-2 af-3 af-4 af-5 af-6
 
 EXTRA_DIST = $(TESTS)
 

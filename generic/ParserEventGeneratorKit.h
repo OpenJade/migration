@@ -22,7 +22,8 @@ public:
     outputCommentDecls,
     outputMarkedSections,
     outputGeneralEntities,
-    mapCatalogDocument
+    mapCatalogDocument,
+    restrictFileReading
   };
   enum OptionWithArg {
     addCatalog,

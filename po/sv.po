@@ -3,8 +3,8 @@
 # Peter Nilsson <pnidv96@student.vxu.se>, 1999.
 msgid ""
 msgstr ""
-"Project-Id-Version: OpenSP 1.4\n"
-"POT-Creation-Date: 1999-12-21 22:25+0000\n"
+"Project-Id-Version: OpenSP 1.5\n"
+"POT-Creation-Date: 2002-11-15 23:13+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -85,9 +85,6 @@ msgstr "meta-DTD tillåter inte data här"
 msgid "invalid value %1 for ArcIgnD attribute"
 msgstr "ogiltigt värde %1 för attributet ArcIgnD"
 
-msgid "invalid value %1 for ArcIndr architectural support attribute"
-msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"
-
 msgid "unrecognized quantity name %1"
 msgstr "okänt kvantitetsnamn %1"
 
@@ -102,6 +99,49 @@ msgstr "ogiltig siffra %1"
 
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "för attributet ArcIndr stöds endast värdet nArcIndr"
+
+#, fuzzy
+msgid "#ARCCONT attribute already specified"
+msgstr "kapaciteten %1 är redan angiven"
+
+#, fuzzy
+msgid "invalid value %1 for #ARCCONT"
+msgstr "ogiltigt värde %1 för ArcSurp-attribut"
+
+#, fuzzy
+msgid "%1 already used as a substitute name"
+msgstr "%1 är redan ett funktionsnamn"
+
+#, fuzzy
+msgid "substitute name #CONTENT already specified"
+msgstr "ersättningsnamn för %1 är redan definierat"
+
+msgid "IS10744 PI keyword missing"
+msgstr ""
+
+msgid "invalid IS10744 PI keyword %1"
+msgstr ""
+
+#, fuzzy
+msgid "architecture %1 already defined"
+msgstr "länktypen %1 redan definierad"
+
+msgid "the first definition"
+msgstr ""
+
+#, fuzzy
+msgid "ignoring PI declaration of architecture %1"
+msgstr "ingen notationsdeklaration för arkitekturen %1"
+
+msgid "the ArcBase definition"
+msgstr ""
+
+#, fuzzy
+msgid "ignoring ArcBase declaration of architecture %1"
+msgstr "ingen notationsdeklaration för arkitekturen %1"
+
+msgid "the PI definition"
+msgstr ""
 
 # CatalogMessages
 msgid "name expected"
@@ -223,6 +263,9 @@ msgstr "Argumenten är kataloger; använd DOCUMENT-post."
 
 msgid "Search files in directory %1."
 msgstr "Sök efter filer i katalogen %1."
+
+msgid "Restrict file reading (for use in Web apps)."
+msgstr ""
 
 msgid "DIRECTORY"
 msgstr "KATALOG"
@@ -537,8 +580,8 @@ msgstr ""
 msgid ""
 "length of tokenized attribute value must not exceed LITLEN less NORMSEP (%1)"
 msgstr ""
-"längden av värde för token-attribut får ej överskrida LITLEN minus NORMSEP "
-"(%1)"
+"längden av värde för token-attribut får ej överskrida LITLEN minus NORMSEP (%"
+"1)"
 
 msgid "length of system identifier must not exceed LITLEN (%1)"
 msgstr "längden av en systemidentifierare får ej överskrida LITLEN (%1)"
@@ -901,24 +944,24 @@ msgstr ""
 "förekomsten %1 som %2 av %3 möjlig"
 
 msgid ""
-"content model is ambiguous: when the current token is the %2 occurrence of "
-"%1, both the %4 and %5 occurrences of %3 are possible"
+"content model is ambiguous: when the current token is the %2 occurrence of %"
+"1, both the %4 and %5 occurrences of %3 are possible"
 msgstr ""
-"innehållsmodellen är tvetydig: när aktuellt token är den %2 förekomsten av "
-"%1, är såväl den %4 som %5 förekomsten av %3 möjlig"
+"innehållsmodellen är tvetydig: när aktuellt token är den %2 förekomsten av %"
+"1, är såväl den %4 som %5 förekomsten av %3 möjlig"
 
 msgid ""
-"content model is ambiguous: when the current token is the %2 occurrence of "
-"%1 and the innermost containing AND group has been matched, both the %4 and "
-"%5 occurrences of %3 are possible"
+"content model is ambiguous: when the current token is the %2 occurrence of %"
+"1 and the innermost containing AND group has been matched, both the %4 and %"
+"5 occurrences of %3 are possible"
 msgstr ""
-"innehållsmodellen är tvetydig: när aktuellt token är den %2 förekomsten av "
-"%1 och den innersta innehållande AND-gruppen har matchats, är såväl den %4 "
+"innehållsmodellen är tvetydig: när aktuellt token är den %2 förekomsten av %"
+"1 och den innersta innehållande AND-gruppen har matchats, är såväl den %4 "
 "som %5 förekomsten av %3 möjlig"
 
 msgid ""
-"content model is ambiguous: when the current token is the %2 occurrence of "
-"%1 and the innermost %3 containing AND groups have been matched, both the %5 "
+"content model is ambiguous: when the current token is the %2 occurrence of %"
+"1 and the innermost %3 containing AND groups have been matched, both the %5 "
 "and %6 occurrences of %4 are possible"
 msgstr ""
 "innehållsmodellen är tvetydig: när aktuellt token är den %2 förekomten av %1 "
@@ -959,8 +1002,8 @@ msgid ""
 "8879:1986\" or \"ISO 8879:1986 (ENR)\" or \"ISO 8879:1986 (WWW)\" not %1"
 msgstr ""
 "minimumdata i SGML-deklarationens första minimumliteral måste vara \"ISO "
-"8879:1986\", \"ISO 8879:1986 (ENR)\" eller \"ISO 8879:1986 (WWW)\" och inte "
-"%1"
+"8879:1986\", \"ISO 8879:1986 (ENR)\" eller \"ISO 8879:1986 (WWW)\" och inte %"
+"1"
 
 msgid "parameter before LCNMSTRT must be NAMING not %1"
 msgstr "parametern före LCNMSTRT måste vara NAMING och inte %1"
@@ -1124,8 +1167,8 @@ msgstr ""
 
 msgid "entity %1 declared SUBDOC, but SUBDOC NO specified in SGML declaration"
 msgstr ""
-"entiteten %1 deklarerad som SUBDOC, men SUBDOC NO är angivet i "
-"SGML-deklarationen"
+"entiteten %1 deklarerad som SUBDOC, men SUBDOC NO är angivet i SGML-"
+"deklarationen"
 
 msgid ""
 "a parameter entity referenced in a parameter separator must end in the same "
@@ -1340,8 +1383,8 @@ msgid ""
 "end-tag minimization should be O for element %1 because it has CONREF "
 "attribute"
 msgstr ""
-"sluttaggminimering för elementet %1 bör vara O, då det har ett "
-"CONREF-attribut"
+"sluttaggminimering för elementet %1 bör vara O, då det har ett CONREF-"
+"attribut"
 
 msgid "element %1 has a declared content of EMPTY and a CONREF attribute"
 msgstr ""
@@ -1488,8 +1531,8 @@ msgid ""
 msgstr ""
 
 msgid ""
-"normalized length of attribute specification list must not exceed ATTSPLEN "
-"(%1); length was %2"
+"normalized length of attribute specification list must not exceed ATTSPLEN (%"
+"1); length was %2"
 msgstr ""
 
 msgid "short reference delimiter %1 already specified"
@@ -2056,7 +2099,8 @@ msgstr ""
 "kan ej använda implicit (#IMPLICIT) dokumenttyp om inte CONCUR NO LINK "
 "EXPLICIT NO är angivna"
 
-msgid "Sorry, #IMPLICIT doctypes not implemented"
+#, fuzzy
+msgid "Sorry, #IMPLIED doctypes not implemented"
 msgstr "Tyvärr är #IMPLICIT dokumenttyper ej implementerat."
 
 msgid "reference to DTD data entity ignored"
@@ -2067,6 +2111,36 @@ msgstr "notationen %1 för parameterentiteten %2 odefinierad"
 
 msgid "notation %1 for external subset undefined"
 msgstr "notationen %1 för extern delmängd odefinierad"
+
+msgid "attribute %1 can't be redeclared"
+msgstr ""
+
+#, fuzzy
+msgid "#IMPLICIT attributes have already been specified for notation %1"
+msgstr "inga attribut definierade för notationen %1"
+
+#, fuzzy
+msgid ""
+"a name group is not allowed in a parameter entity reference in a start tag"
+msgstr ""
+"en namngrupp är ej tillåten i en generell entitetsreferens in en starttagg"
+
+#, fuzzy
+msgid ""
+"name group in a parameter entity reference in an end tag (SGML forbids them "
+"in start tags)"
+msgstr ""
+"en namngrupp är ej tillåten i en generell entitetsreferens in en starttagg"
+
+#, fuzzy
+msgid "if the declared value is NOTATION a default value of CONREF is useless"
+msgstr ""
+"om det deklarerade värdet är ID, måste ingångsvärdet vara IMPLIED eller "
+"REQUIRED"
+
+#, fuzzy
+msgid "Sorry, #ALL and #IMPLICIT content tokens not implemented"
+msgstr "Tyvärr är #IMPLICIT dokumenttyper ej implementerat."
 
 msgid "delimiter "
 msgstr "avgränsaren "
@@ -2444,6 +2518,18 @@ msgstr ""
 msgid "cannot convert formal system identifier %1 to URL"
 msgstr "kan inte omvandla den formella systemidentifieraren %1 till en URL"
 
+#, fuzzy
+msgid "cannot open output file %1"
+msgstr "kan inte öppna utdatafilen %1 (%2)"
+
+#, fuzzy
+msgid "missing system ID for entity %1"
+msgstr "Skriv ut verksam systemidentifierare för entiteten %1."
+
+#, fuzzy
+msgid "unexpected entity type for entity named %1"
+msgstr "Skriv ut entiteten med namnet %1."
+
 msgid "Output a document type declaration."
 msgstr "Mata ut en dokumenttypsdeklaration."
 
@@ -2518,3 +2604,6 @@ msgstr "%1 slår samman och skriver ut entiteterna med systemidentifierarna "
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... på standard ut."
+
+#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
+#~ msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"

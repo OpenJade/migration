@@ -117,7 +117,7 @@ E0+attributeValueExpected+ISO 8879:1986 7.9.3p1+an attribute value specification
 Q1+nameTokenLength+ISO 8879:1986 9.3.1+length of name token must not exceed NAMELEN (%1)
 E0+attributeSpecLiteral+ISO 8879:1986 7.9.3p1 7.9.1.2p1+an attribute value literal can occur in an attribute specification list only after a VI delimiter
 E1+duplicateAttributeSpec+ISO 8879:1986 7.9p5+duplicate specification of attribute %1
-E1+duplicateAttributeDef+ISO 8879:1986 11.3.2p2+duplicate definition of attribute %1
+W1+duplicateAttributeDef+ISO 8879:1986 11.3.2p2+duplicate definition of attribute %1
 E0+emptyDataAttributeSpec+ISO 8879:1986 11.4.1.2p3+data attribute specification must be omitted if attribute specification list is empty
 E0+markedSectionEnd+ISO 8879:1986 10.4p6+marked section end not in marked section declaration
 E1+markedSectionLevel+ISO 8879:1986 10.4.1p1+number of open marked sections must not exceed TAGLVL (%1)
@@ -438,11 +438,17 @@ E1+urnExtraField++invalid URN %1: extra field
 E0+omittedProlog++prolog can't be omitted unless CONCUR NO and LINK EXPLICIT NO and either IMPLYDEF ELEMENT YES or IMPLYDEF DOCTYPE YES
 E0+impliedDocumentElement++can't determine name of #IMPLIED document element
 E0+impliedDoctypeConcurLink++can't use #IMPLICIT doctype unless CONCUR NO and LINK EXPLICIT NO
-E0+sorryImpliedDoctype++Sorry, #IMPLICIT doctypes not implemented
+E0+sorryImpliedDoctype++Sorry, #IMPLIED doctypes not implemented
 W0+dtdDataEntityReference++reference to DTD data entity ignored
 E2+parameterEntityNotationUndefined++notation %1 for parameter entity %2 undefined
 E1+dsEntityNotationUndefined++notation %1 for external subset undefined
+E1+specifiedAttributeRedeclared+ISO 8879:1986 K4.4+attribute %1 can't be redeclared
+E1+notationMustNotBeDeclared++#IMPLICIT attributes have already been specified for notation %1
+E0+peroGrpoStartTag+ISO 8879:1986 9.4.4p3+a name group is not allowed in a parameter entity reference in a start tag
+W0+peroGrpoEndTag+ISO 8879:1986 9.4.4p3+name group in a parameter entity reference in an end tag (SGML forbids them in start tags)
 # message fragments
+W0+notationConref++if the declared value is NOTATION a default value of CONREF is useless
+E0+sorryAllImplicit++Sorry, #ALL and #IMPLICIT content tokens not implemented
 =1000
 +delimStart++delimiter 
 -+delimEnd++

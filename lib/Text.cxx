@@ -17,6 +17,10 @@ Text::Text()
 {
 }
 
+Text::~Text()
+{
+}
+
 void Text::addChar(Char c, const Location &loc)
 {
   if (items_.size() == 0

@@ -82,6 +82,27 @@ if test "$ac_cv_cxx_bool" = yes; then
 fi
 ])
 
+dnl @synopsis AC_CXX_TYPENAME
+dnl
+dnl If the compiler recognizes the typename keyword, define HAVE_TYPENAME.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_TYPENAME,
+[AC_CACHE_CHECK(whether the compiler recognizes typename,
+ac_cv_cxx_typename,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([template<typename T>class X {public:X(){}};],
+[X<float> z; return 0;],
+ ac_cv_cxx_typename=yes, ac_cv_cxx_typename=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_typename" = yes; then
+  AC_DEFINE(HAVE_TYPENAME,,[define if the compiler recognizes typename])
+fi
+])
 
 dnl @synopsis AC_CXX_NEW_FOR_SCOPING
 dnl
@@ -228,3 +249,31 @@ AC_DEFUN(AC_DEFINE_DIR, [
     AC_DEFINE_UNQUOTED($1, "$ac_expanded"), 
     AC_DEFINE_UNQUOTED($1, "$ac_expanded", $3)) 
 ]) 
+
+dnl @synopsis AC_CXX_MUTABLE
+dnl
+dnl If the compiler allows modifying class data members flagged with
+dnl the mutable keyword even in const objects (for example in the
+dnl body of a const member function), define HAVE_MUTABLE.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_MUTABLE,
+[AC_CACHE_CHECK(whether the compiler supports the mutable keyword,
+ac_cv_cxx_mutable,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([
+class A { mutable int i;
+          public:
+          int f (int n) const { i = n; return i; }
+        };
+],[A a; return a.f (1);],
+ ac_cv_cxx_mutable=yes, ac_cv_cxx_mutable=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_mutable" = yes; then
+  AC_DEFINE(HAVE_MUTABLE,,[define if the compiler supports the mutable keyword])
+fi
+])

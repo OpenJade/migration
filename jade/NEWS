@@ -1,5 +1,7 @@
 Changes in OpenJade 1.4
 
+* The standard flow objects check that their content is valid.
+
 * Internal defines (ie defines at the begin of a body) are supported. 
   
 * The char-map inherited characteristic is supported. 

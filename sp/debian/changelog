@@ -1,3 +1,13 @@
+opensp (1.5pre4-4) unstable; urgency=low
+
+  * patch from Christopher C. Chimelis to enable compilation on 64-bit
+    platforms (closes: Bug#71952)
+  * configure.in is more careful about po/Makefile.in, although we still
+    seem to get some circular situations
+  * debian/rules: put doc/*.htm in opensp doc dir (closes: Bug#68002)
+
+ -- Adam Di Carlo <aph@debian.org>  Sun, 15 Oct 2000 02:49:09 -0400
+
 opensp (1.5pre4-3) unstable; urgency=low
 
   * they changed the major shared library version for libosp from 1 to 2,

@@ -51,6 +51,9 @@
 /* set this to the path separator */
 #undef PATH_SEPARATOR
 
+/* Define if you have the gettext() function */
+#undef HAVE_GETTEXT
+
 /*** I think everything below this line can safely be ignored ***/
 
 /* if this is not set it defaults to 200 */
@@ -244,5 +247,5 @@
 #endif /* HAVE_NAMESPACE_STD */
 
 #if defined(HAVE_NEW) && defined(HAVE_CASSERT)
-#define SP_ANSI_LIB
+#define SP_ANSI_LIB 1
 #endif /* HAVE_NEW && HAVE_CASSERT */

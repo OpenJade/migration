@@ -928,8 +928,19 @@ MultipassTextFOTBuilder::process()
 #endif
 
 FOTBuilder *makeTextFOTBuilder(OutputByteStream* os, Messenger *,
-			      const FOTBuilder::Extension *&)
+			      const FOTBuilder::Description *&descr)
 {
+  static const FOTBuilder::Feature features[] = {
+    { "simple-page", 0},
+    { 0, 0}
+  };
+  static const FOTBuilder::Description description = {
+    0, // Extensions
+    features,
+    false
+  };
+  descr = &description;
+
   return new TEXTBACKEND_SCOPE MultipassTextFOTBuilder(os);
 }
 

@@ -1,5 +1,7 @@
 Changes in OpenSP 1.4
 
+* New options -n and -x to see message numbers/relevant clauses with messages.
+
 * More of Annex K supported: SGML declarations on subdocs,
   DATA declared value for attributes, DTD data entities and 
   DTD notations for doctypes, complete IMPLYDEF support, 

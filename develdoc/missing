@@ -21,8 +21,8 @@ missing DSSSL architectural element forms
 missing expression language primitives
 ======================================
 
-8.5.8.1		declare-char-property
-		add-char-properties
+8.5.8.1		declare-char-property *
+		add-char-properties   *
 8.5.8.2		language?	 *
 		current-language *
 		with-language	 *
@@ -37,7 +37,7 @@ missing expression language primitives
 		char-ci>=?	 *
 8.5.8.6		char-upcase	 *
 		char-downcase	 *
-8.5.8.7		char-property 
+8.5.8.7		char-property	 * 
 8.5.9.5		string-ci=?	 *
 		string-equiv?	 *
 8.5.9.6		string<?	 *
@@ -56,7 +56,7 @@ missing property set modules
 basesds1
 sdclabs
 sdclsds
-prlgabs1                  + (contained in mif patches)
+prlgabs1                  * 
 prlgsds
 instsds1
 dtgabs
@@ -166,7 +166,7 @@ Style language
 
 12.4.1   query
 12.4.6	 char-script-case
-	 declare-char-characteristic+property
+	 declare-char-characteristic+property *
 12.4.7	 sync
 	 side-sync
 12.5.1	 generated-object?
@@ -222,6 +222,7 @@ emphasizing-mark
 Ignored inherited characteristics
 =================================
 
+force!c                         *
 inline-space-space              *
 line-miter-limit
 alignment-point-offset

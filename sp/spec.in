@@ -61,7 +61,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %defattr(-, root, root)
 %{_bindir}/*
 %{_datadir}/@PACKAGE@/*
-%doc /usr/doc/@PACKAGE@/*
+%doc %{_datadir}/doc/@PACKAGE@/*
 
 %files lib
 %defattr(-, root, root)
@@ -76,6 +76,9 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %{_includedir}/@PACKAGE@/*
 
 %changelog
+* Fri Apr 09 2004 Terje Bless <link@pobox.com>
+- Use _datadir macro for doc files (Karl Eichwalder and Ville Skytta).
+
 * Fri Apr 09 2004 Terje Bless <link@pobox.com>
 - Tweak name of l10n files; they get the lib's major rev appended.
 

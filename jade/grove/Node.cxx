@@ -1628,9 +1628,13 @@ const ClassDef ClassDef::entity = {
   ComponentName::noId,
   ComponentName::noId
 };
+static const ComponentName::Id allProps_sgmlConstants[] = {
+  INTRINSIC_PROPS,
+  ComponentName::noId
+};
 const ClassDef ClassDef::sgmlConstants = {
   ComponentName::idSgmlConstants,
-  noProps,
+  allProps_sgmlConstants,
   noProps,
   ComponentName::noId,
   ComponentName::noId,
@@ -1745,13 +1749,10 @@ static const ComponentName::Id allProps_pcdataToken[] = {
   INTRINSIC_PROPS,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_pcdataToken[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::pcdataToken = {
   ComponentName::idPcdataToken,
   allProps_pcdataToken,
-  subnodeProps_pcdataToken,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId
@@ -1787,13 +1788,10 @@ static const ComponentName::Id allProps_rankStem[] = {
   ComponentName::idElementType,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_rankStem[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::rankStem = {
   ComponentName::idRankStem,
   allProps_rankStem,
-  subnodeProps_rankStem,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId
@@ -1810,13 +1808,10 @@ static const ComponentName::Id allProps_formalPublicId[] = {
   ComponentName::idTextLanguage,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_formalPublicId[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::formalPublicId = {
   ComponentName::idFormalPublicId,
   allProps_formalPublicId,
-  subnodeProps_formalPublicId,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId

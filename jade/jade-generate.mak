@@ -5,6 +5,7 @@
 PERL=perl
 
 GENSRCS=\
+style\jade_version.h \
 style\style_inst.cxx \
 style\FlowObj_inst.cxx \
 style\primitive_inst.cxx \
@@ -36,4 +37,9 @@ all: $(GENSRCS)
 .msg.h:
 	del /f $@ 2> nul
 	$(PERL) -w msggen.pl $<
+	attrib +r $@
+
+style\jade_version.h: style\mkversion.pl VERSION
+	del /f $@ 2> nul
+	$(PERL) -w style\mkversion.pl VERSION >$@
 	attrib +r $@

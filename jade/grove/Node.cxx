@@ -120,6 +120,11 @@ AccessResult Node::getPublicId(GroveString &) const
   return accessNotInClass;
 }
 
+AccessResult Node::getFormalPublicId(NodePtr &) const
+{
+  return accessNotInClass;
+}
+
 AccessResult Node::getSystemId(GroveString &) const
 {
   return accessNotInClass;
@@ -245,6 +250,31 @@ AccessResult Node::getOmitStartTag(bool &) const
   return accessNotInClass;
 }
 
+AccessResult Node::getRankGroup(GroveStringListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getRankStem(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getRankSuffix(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getElementTypes(NodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getStem(GroveString &) const
+{
+  return accessNotInClass;
+}
+
 AccessResult Node::getConnector(Connector::Enum &) const
 {
   return accessNotInClass;
@@ -356,6 +386,46 @@ AccessResult Node::getDoctypesAndLinktypes(NamedNodeListPtr &) const
 }
 
 AccessResult Node::getNonSgml(unsigned long &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getOwnerType(OwnerType::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getOwnerId(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTextClass(TextClass::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getUnavailable(bool &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTextDescription(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTextLanguage(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTextDesignatingSequence(GroveString &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTextDisplayVersion(GroveString &) const
 {
   return accessNotInClass;
 }
@@ -577,6 +647,50 @@ AccessResult Node::property(ComponentName::Id id,
       }
       break;
     }
+  case ComponentName::idOwnerType:
+    {
+      OwnerType::Enum type;
+      ret = getOwnerType(type);
+      if (ret == accessOK) {
+        switch (type) {
+#define ENUM(e, E) case OwnerType::##e: value.set(ComponentName::id##E); break;
+        ENUM(iso, Iso)
+        ENUM(registered, Registered)
+        ENUM(unregistered, Unregistered)
+#undef ENUM
+        default:
+          ret = accessNotInClass;
+        }
+      }
+      break;
+    }
+  case ComponentName::idTextClass:
+    {
+      TextClass::Enum tclass;
+      ret = getTextClass(tclass);
+      if (ret == accessOK) {
+        switch (tclass) {
+#define ENUM(e, E) case TextClass::##e: value.set(ComponentName::id##E); break;
+        ENUM(capacity, Capacity)
+        ENUM(charset, Charset)
+        ENUM(document, Document)
+        ENUM(dtd, Dtd)
+        ENUM(elements, Elements)
+        ENUM(entities, Entities)
+        ENUM(lpd, Lpd)
+        ENUM(nonsgml, Nonsgml)
+        ENUM(notation, Notation)
+        ENUM(shortref, Shortref)
+        ENUM(subdoc, Subdoc)
+        ENUM(syntax, Syntax)
+        ENUM(text, Text)
+#undef ENUM
+        default:
+          ret = accessNotInClass;
+        }
+      }
+      break;
+    }
   case ComponentName::idChar:
     {
       GroveChar tem;
@@ -584,6 +698,26 @@ AccessResult Node::property(ComponentName::Id id,
       if (ret == accessOK)
 	value.set(tem);
       break;
+    }
+  case ComponentName::idElementTypes: 
+    { 
+      // ElementTypes is special since it occurs as
+      // named-node-list and as node-list.
+      if (&classDef() == &ClassDef::documentType) {
+        NamedNodeListPtr tem; 
+        ret = getElementTypes(tem); 
+        if (ret == accessOK)
+	  value.set(tem); 
+      }
+      else if (&classDef() == &ClassDef::rankStem) { 
+        NodeListPtr tem;
+        ret = getElementTypes(tem); 
+        if (ret == accessOK)
+	  value.set(tem); 
+      } 
+      else 
+        ret = accessNotInClass; 
+      break; 
     }
 #define PROP(Name, Type) \
   case ComponentName::id##Name: \
@@ -618,6 +752,16 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_BOOLEAN(MustOmitEndTag)
   PROP_BOOLEAN(OmitEndTag)
   PROP_BOOLEAN(OmitStartTag)
+  PROP_BOOLEAN(Unavailable)
+  PROP_STRINGLIST(RankGroup)
+  PROP_STRING(RankStem)
+  PROP_STRING(RankSuffix)
+  PROP_STRING(Stem)
+  PROP_STRING(OwnerId)
+  PROP_STRING(TextDescription)
+  PROP_STRING(TextLanguage)
+  PROP_STRING(TextDesignatingSequence)
+  PROP_STRING(TextDisplayVersion)
   PROP_CHAR(TokenSep)
   PROP_NMNDLIST(Attributes)
   PROP_NMNDLIST(DefaultedEntities)
@@ -627,7 +771,6 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_NMNDLIST(GeneralEntities)
   PROP_NMNDLIST(Notations)
   PROP_NMNDLIST(AttributeDefs)
-  PROP_NMNDLIST(ElementTypes)
   PROP_NMNDLIST(ParameterEntities)
   PROP_NODE(DocumentElement)
   PROP_NODE(Entity)
@@ -643,6 +786,7 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_NODE(ModelGroup)
   PROP_NODE(DefaultEntity)
   PROP_NODE(ElementType)
+  PROP_NODE(FormalPublicId)
   PROP_NODELIST(Content)
   PROP_NODELIST(Epilog)
   PROP_NODELIST(Prolog)
@@ -813,6 +957,10 @@ void NodeVisitor::elementType(Node &)
 {
 }
 
+void NodeVisitor::rankStem(Node &)
+{
+}
+
 void NodeVisitor::modelGroup(Node &)
 {
 }
@@ -826,6 +974,10 @@ void NodeVisitor::pcdataToken(Node &)
 }
 
 void NodeVisitor::defaultEntity(Node &)
+{
+}
+
+void NodeVisitor::formalPublicId(Node &)
 {
 }
 
@@ -935,8 +1087,10 @@ const char *ComponentName::rcsName(Id id)
     "attdefs",
     "atts",
     "attvaltk",
+    "capacity",
     "cdata",
     "char",
+    "charset",
     "childpn",
     "classnm",
     "connect",
@@ -957,8 +1111,10 @@ const char *ComponentName::rcsName(Id id)
     "dfltval",
     "dflttype",
     "dtlts",
+    "document",
     "docelem",
     "doctype",
+    "dtd",
     "element",
     "elements",
     "elemtk",
@@ -974,6 +1130,7 @@ const char *ComponentName::rcsName(Id id)
     "extdata",
     "extid",
     "fixed",
+    "fpi",
     "genents",
     "gensysid",
     "gi",
@@ -986,6 +1143,8 @@ const char *ComponentName::rcsName(Id id)
     "implied",
     "included",
     "incls",
+    "iso",
+    "lpd",
     "modelgrp",
     "momitend",
     "name",
@@ -994,6 +1153,7 @@ const char *ComponentName::rcsName(Id id)
     "nmtkgrp",
     "nmtoken",
     "nmtokens",
+    "nonsgml",
     "notation",
     "notname",
     "nots",
@@ -1008,6 +1168,8 @@ const char *ComponentName::rcsName(Id id)
     "or",
     "origin",
     "otsrelpn",
+    "ownerid",
+    "ownertp",
     "parments",
     "parent",
     "pcdatatk",
@@ -1015,23 +1177,38 @@ const char *ComponentName::rcsName(Id id)
     "plus",
     "prolog",
     "pubid",
+    "rankgrp",
+    "rankstem",
+    "ranksuff",
     "rcdata",
     "referent",
+    "regist",
     "rep",
     "required",
     "sdata",
     "seq",
     "sgmlcsts",
     "sgmldoc",
+    "shortref",
+    "stem",
+    "subdoc",
     "subdoc",
     "subpns",
+    "syntax",
     "sysdata",
     "sysid",
     "text",
+    "textclas",
+    "textdesc",
+    "textdseq",
+    "textdver",
+    "textlang",
     "token",
     "tokens",
     "tokensep",
     "treeroot",
+    "unavail",
+    "unregist",
     "value"
   };
   if (id < 0 || id >= SIZEOF(names))
@@ -1051,8 +1228,10 @@ const char *ComponentName::sdqlName(Id id)
     "attribute-defs",
     "attributes",
     "attribute-value-token",
+    "capacity",
     "cdata",
     "char",
+    "charset",
     "children-property-name",
     "class-name",
     "connector",
@@ -1073,8 +1252,10 @@ const char *ComponentName::sdqlName(Id id)
     "default-value",
     "default-value-type",
     "doctypes-and-linktypes",
+    "document",
     "document-element",
     "document-type",
+    "dtd",
     "element",
     "elements",
     "element-token",
@@ -1090,6 +1271,7 @@ const char *ComponentName::sdqlName(Id id)
     "external-data",
     "external-id",
     "fixed",
+    "formal-public-id",
     "general-entities",
     "generated-system-id",
     "gi",
@@ -1102,6 +1284,8 @@ const char *ComponentName::sdqlName(Id id)
     "implied?",
     "included?",
     "inclusions",
+    "iso",
+    "lpd",
     "model-group",
     "must-omit-end-tag?",
     "name",
@@ -1110,6 +1294,7 @@ const char *ComponentName::sdqlName(Id id)
     "name-token-group",
     "nmtoken",
     "nmtokens",
+    "nonsgml",
     "notation",
     "notation-name",
     "notations",
@@ -1124,6 +1309,8 @@ const char *ComponentName::sdqlName(Id id)
     "or",
     "origin",
     "origin-to-subnode-rel-property-name",
+    "owner-id",
+    "owner-type",
     "parameter-entities",
     "parent",
     "pcdata-token",
@@ -1131,23 +1318,38 @@ const char *ComponentName::sdqlName(Id id)
     "plus",
     "prolog",
     "public-id",
+    "rank-group",
+    "rank-stem",
+    "rank-suffix",
     "rcdata",
     "referent",
+    "registered",
     "rep",
     "required",
     "sdata",
     "seq",
     "sgml-constants",
     "sgml-document",
+    "shortref",
+    "stem",
+    "subdoc",
     "subdocument",
     "subnode-property-names",
+    "syntax",
     "system-data",
     "system-id",
     "text",
+    "text-class",
+    "text-description",
+    "text-designating-sequence",
+    "text-display-version",
+    "text-language",
     "token",
     "tokens",
     "token-sep",
     "tree-root",
+    "unavailable",
+    "unregistered",
     "value"
   };
   if (id < 0 || id >= SIZEOF(names))
@@ -1175,12 +1377,17 @@ static const ComponentName::Id allProps_externalId[] = {
   ComponentName::idPublicId,
   ComponentName::idSystemId,
   ComponentName::idGeneratedSystemId,
+  ComponentName::idFormalPublicId,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_externalId[] = {
+  ComponentName::idFormalPublicId,
   ComponentName::noId
 };
 const ClassDef ClassDef::externalId = {
   ComponentName::idExternalId,
   allProps_externalId,
-  noProps,
+  subnodeProps_externalId,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId
@@ -1480,6 +1687,9 @@ static const ComponentName::Id allProps_elementType[] = {
   ComponentName::idModelGroup,
   ComponentName::idOmitEndTag,
   ComponentName::idOmitStartTag,
+  ComponentName::idRankGroup,
+  ComponentName::idRankStem,
+  ComponentName::idRankSuffix,
   ComponentName::noId
 };
 static const ComponentName::Id subnodeProps_elementType[] = {
@@ -1566,6 +1776,47 @@ const ClassDef ClassDef::defaultEntity = {
   ComponentName::idDefaultEntity,
   allProps_defaultEntity,
   subnodeProps_defaultEntity,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+
+static const ComponentName::Id allProps_rankStem[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idStem,
+  ComponentName::idElementType,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_rankStem[] = {
+  ComponentName::noId
+};
+const ClassDef ClassDef::rankStem = {
+  ComponentName::idRankStem,
+  allProps_rankStem,
+  subnodeProps_rankStem,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+
+static const ComponentName::Id allProps_formalPublicId[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idOwnerType,
+  ComponentName::idOwnerId,
+  ComponentName::idTextClass,
+  ComponentName::idTextDescription,
+  ComponentName::idTextDesignatingSequence,
+  ComponentName::idTextDisplayVersion,
+  ComponentName::idTextLanguage,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_formalPublicId[] = {
+  ComponentName::noId
+};
+const ClassDef ClassDef::formalPublicId = {
+  ComponentName::idFormalPublicId,
+  allProps_formalPublicId,
+  subnodeProps_formalPublicId,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId

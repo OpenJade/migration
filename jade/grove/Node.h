@@ -28,6 +28,7 @@
 
 // Supports the following modules:
 // baseabs prlgabs0 prlgabs1 instabs basesds0 instsds0 subdcabs
+// rankabs fpiabs
 
 #ifdef GROVE_NAMESPACE
 namespace GROVE_NAMESPACE {
@@ -72,8 +73,10 @@ struct GROVE_API ComponentName {
     idAttributeDefs,
     idAttributes,
     idAttributeValueToken,
+    idCapacity,
     idCdata,
     idChar,
+    idCharset,
     idChildrenPropertyName,
     idClassName,
     idConnector,
@@ -94,8 +97,10 @@ struct GROVE_API ComponentName {
     idDefaultValue,
     idDefaultValueType,
     idDoctypesAndLinktypes,
+    idDocument,
     idDocumentElement,
     idDocumentType,
+    idDtd,
     idElement,
     idElements,
     idElementToken,
@@ -111,6 +116,7 @@ struct GROVE_API ComponentName {
     idExternalData,
     idExternalId,
     idFixed,
+    idFormalPublicId,
     idGeneralEntities,
     idGeneratedSystemId,
     idGi,
@@ -123,6 +129,8 @@ struct GROVE_API ComponentName {
     idImplied,
     idIncluded,
     idInclusions,
+    idIso,
+    idLpd,
     idModelGroup,
     idMustOmitEndTag,
     idName,
@@ -131,6 +139,7 @@ struct GROVE_API ComponentName {
     idNmtkgrp,
     idNmtoken,
     idNmtokens,
+    idNonsgml,
     idNotation,
     idNotationName,
     idNotations,
@@ -145,6 +154,8 @@ struct GROVE_API ComponentName {
     idOr,
     idOrigin,
     idOriginToSubnodeRelPropertyName,
+    idOwnerId,
+    idOwnerType,
     idParameterEntities,
     idParent,
     idPcdataToken,
@@ -152,23 +163,38 @@ struct GROVE_API ComponentName {
     idPlus,
     idProlog,
     idPublicId,
+    idRankGroup,
+    idRankStem,
+    idRankSuffix,
     idRcdata,
     idReferent,
+    idRegistered,
     idRep,
     idRequired,
     idSdata,
     idSeq,
     idSgmlConstants,
     idSgmlDocument,
+    idShortref,
+    idStem,
+    idSubdoc,
     idSubdocument,
     idSubnodePropertyNames,
+    idSyntax,
     idSystemData,
     idSystemId,
     idText,
+    idTextClass,
+    idTextDescription,
+    idTextDesignatingSequence,
+    idTextDisplayVersion,
+    idTextLanguage,
     idToken,
     idTokens,
     idTokenSep,
     idTreeRoot,
+    idUnavailable,
+    idUnregistered,
     idValue
   };
   enum { nIds = idValue + 1 };
@@ -206,6 +232,8 @@ struct GROVE_API ClassDef {
   static const ClassDef elementToken;
   static const ClassDef pcdataToken;
   static const ClassDef defaultEntity;
+  static const ClassDef rankStem;
+  static const ClassDef formalPublicId;
 };
 
 class PropertyValue;
@@ -327,6 +355,7 @@ public:
   virtual AccessResult getPublicId(GroveString &) const;
   virtual AccessResult getSystemId(GroveString &) const;
   virtual AccessResult getGeneratedSystemId(GroveString &) const;
+  virtual AccessResult getFormalPublicId(NodePtr &) const;
   // Properties only on attributeAssignment
   virtual AccessResult getValue(NodeListPtr &) const;
   virtual AccessResult getTokenSep(GroveChar &) const;
@@ -363,6 +392,12 @@ public:
   virtual AccessResult getModelGroup(NodePtr &) const;
   virtual AccessResult getOmitEndTag(bool &) const;
   virtual AccessResult getOmitStartTag(bool &) const;
+  virtual AccessResult getRankGroup(GroveStringListPtr &) const;
+  virtual AccessResult getRankStem(GroveString &) const;
+  virtual AccessResult getRankSuffix(GroveString &) const;
+  // Properties only on rankStem
+  virtual AccessResult getElementTypes(NodeListPtr &) const;
+  virtual AccessResult getStem(GroveString &) const;
   // Properties only on modelGroup.
   struct Connector {
     enum Enum { and_, or_, seq }; // "and", "or" can be keywords
@@ -394,6 +429,35 @@ public:
   // For a non-SGML data character (resulting from a numeric character reference).
   // Something like this is being added in the HyTime TC.
   virtual AccessResult getNonSgml(unsigned long &) const;
+  // Properties only on formalPublicId
+  struct OwnerType {
+    enum Enum { iso, registered, unregistered };
+  };
+  virtual AccessResult getOwnerType(OwnerType::Enum &) const;
+  virtual AccessResult getOwnerId(GroveString &) const;
+  struct TextClass {
+    enum Enum { 
+      capacity, 
+      charset, 
+      document,
+      dtd,
+      elements,
+      entities,
+      lpd,
+      nonsgml,
+      notation,
+      shortref,
+      subdoc,
+      syntax,
+      text,
+    };
+  };
+  virtual AccessResult getTextClass(TextClass::Enum &) const;
+  virtual AccessResult getUnavailable(bool &) const;
+  virtual AccessResult getTextDescription(GroveString &) const;
+  virtual AccessResult getTextLanguage(GroveString &) const;
+  virtual AccessResult getTextDesignatingSequence(GroveString &) const;
+  virtual AccessResult getTextDisplayVersion(GroveString &) const;
 };
 
 class GROVE_API NodeList {
@@ -671,10 +735,12 @@ public:
   virtual void nonSgml(Node &);
   virtual void message(Node &);
   virtual void elementType(Node &);
+  virtual void rankStem(Node &);
   virtual void modelGroup(Node &);
   virtual void elementToken(Node &);
   virtual void pcdataToken(Node &);
   virtual void defaultEntity(Node &);
+  virtual void formalPublicId(Node &);
 };
 
 class GROVE_API PropertyValue {

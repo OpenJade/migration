@@ -1,10 +1,6 @@
 // Copyright (c) 1999 Matthias Clasen
 // See the file COPYING for copying permission.
 
-#ifdef __GNUG__
-#pragma implementation
-#endif
-
 #include "splib.h"
 #include "DtdDeclEventHandler.h"
 #include "macros.h"

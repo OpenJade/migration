@@ -4,7 +4,7 @@ bin_PROGRAMS = onsgmls
 
 onsgmls_SOURCES = nsgmls.cxx SgmlsEventHandler.cxx SgmlsEventHandler.h \
 	RastEventHandler.cxx RastEventHandler.h StringSet.cxx StringSet.h \
-	nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h
+	nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h nsgmls.h
 
 EXTRA_DIST = nsgmls_inst.m4 NsgmlsMessages.msg NsgmlsMessages.rc \
 	RastEventHandlerMessages.msg RastEventHandlerMessages.rc \

@@ -6,7 +6,7 @@ ospam_SOURCES = spam.cxx CopyEventHandler.cxx CopyEventHandler.h \
 
 EXTRA_DIST = spam_inst.m4 SpamMessages.msg
 
-ospam_LDADD = $(top_builddir)/lib/libosp.a
+ospam_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = $(top_srcdir)/include
 

@@ -82,8 +82,8 @@
 
 /* define this if _setmode is supported */
 #undef SP_HAVE_SETMODE
-#define _O_BINARY O_BINARY
-#define S_IFMT (S_IFDIR|S_IFCHR|S_IFREG)
+#undef _O_BINARY 
+#undef S_IFMT 
 
 /* set this to the path separator */
 #undef PATH_SEPARATOR

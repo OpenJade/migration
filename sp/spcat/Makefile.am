@@ -4,7 +4,7 @@ ospcat_SOURCES = spcat.cxx spcat_inst.cxx
 
 EXTRA_DIST = spcat_inst.m4
 
-ospcat_LDADD = $(top_builddir)/lib/libosp.a
+ospcat_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = $(top_srcdir)/include
 

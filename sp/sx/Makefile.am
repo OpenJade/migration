@@ -5,7 +5,7 @@ osx_SOURCES = sx.cxx XmlOutputEventHandler.cxx XmlOutputEventHandler.h \
 
 EXTRA_DIST = XmlOutputMessages.msg SxMessages.msg sx_inst.m4
 
-osx_LDADD = $(top_builddir)/lib/libosp.a
+osx_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = $(top_srcdir)/include
 

@@ -1,3 +1,8 @@
+2002-12-01  Karl Eichwalder  <ke@suse.de>
+
+	* include/Makefile.am (EXTRA_DIST): Add NCVector.sed.
+	* include/NCVector.sed: Add it; required by sunfix.sh.
+
 2002-11-24 17:04  icastle
 
 	* docsrc/ospam.xml: file ospam.xml was initially added on branch

@@ -8,8 +8,16 @@ openjade (1.4devel1-5) unstable; urgency=low
     documentation
     closes: #71093
   * Japanese translation added upstream
+  * debian/rules: make maintainer-clean upstream is incredibly fragile,
+    so tolerate errors there until that gets fixed
+  * debian/rules: during build, run libtoolize --force to replace this
+    libtoolize stuff, which is needed for arches which diverge from the
+    libtool stuff OpenSP ships with
+  * debian/rules, control: use dh_shlibdeps, remove some hand-rolled stuff
+    here which was unnecessary and in fact adding two libosp deps on the
+    opensp package, not to mention that it stopped working
 
- -- Adam Di Carlo <aph@debian.org>  Fri, 20 Jul 2001 02:19:45 -0400
+ -- Adam Di Carlo <aph@debian.org>  Fri, 20 Jul 2001 11:08:45 -0400
 
 openjade (1.4devel1-4) unstable; urgency=low
 

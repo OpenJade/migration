@@ -92,6 +92,7 @@ ChangeLog:
 config.status:	ChangeLog
 	aclocal
 	autoheader
+	libtoolize --force
 	automake --add-missing
 	autoreconf
 	./configure --prefix=/usr --sysconfdir=/etc			\
@@ -108,7 +109,7 @@ build:	config.status
 
 clean:
 	$(checkdir)
-	[ ! -f Makefile ] || $(MAKE) maintainer-clean
+	[ ! -f Makefile ] || $(MAKE) maintainer-clean || true
 	find . -type l | xargs rm -f
 	dh_clean build binary-arch debian/substvars debian/copyright	\
 	    debian/$(pkg-libostyle).shlibs
@@ -214,15 +215,8 @@ binary-arch:	build debian/copyright debian/substvars 		\
 	dh_compress -a
 	dh_fixperms -a
 
-#	 we don't use dh_shlibsdeps because it wants to use it's
-#	 own wierd substvars file
-	cd $(prefix-libostyle)/usr/lib && LD_LIBRARY_PATH=.		\
-	  dpkg-shlibdeps -pshlibs-$(pkg-libostyle) -O lib*.so.*.*	\
-	  >> $(SRCDIR)/debian/substvars
-	LD_LIBRARY_PATH=$(prefix-libostyle)/usr/lib			\
-	  dpkg-shlibdeps -pshlibs-$(pkg-openjade) $(bindir-openjade)/*
-
-	dh_gencontrol -a -- -Tdebian/substvars
+	dh_shlibdeps -l $(pkg-libostyle) -a
+	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a
 

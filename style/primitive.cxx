@@ -1584,19 +1584,15 @@ DEFPRIMITIVE(TimeToString, argc, argv, context, interp, loc)
 
 DEFPRIMITIVE(CharProperty, argc, argv, context, interp, loc)
 {
-  SymbolObj *sym = argv[0]->asSymbol();
-  if (!sym)
+  if (!argv[0]->asSymbol())
     return argError(interp, loc,
 		    InterpreterMessages::notASymbol, 0, argv[0]);
+  StringObj *prop = argv[0]->asSymbol()->convertToString();
   Char c;
   if (!argv[1]->charValue(c))
     return argError(interp, loc,
 		    InterpreterMessages::notAChar, 1, argv[1]);
-  // FIXME
-  if (argc > 2)
-    return argv[2];
-  else
-    return interp.makeFalse();
+  return interp.charProperty(*prop, c, loc, argv[2] ? argv[2] : 0);
 }
 
 DEFPRIMITIVE(Literal, argc, argv, context, interp, loc)
@@ -4933,7 +4929,7 @@ DEFPRIMITIVE(Map, argc, argv, context, interp, loc)
  
    // Prepend the result of applying func to the cars
    InsnPtr* insns = new InsnPtr[argc + 2];
-   ArrayDeleter<InsnPtr> insns_del = insns;
+   ArrayDeleter<InsnPtr> insns_del(insns);
    insns[argc + 1] = InsnPtr(new ConsInsn(InsnPtr()));
    insns[argc] = func->makeCallInsn(argc - 1, interp, loc, insns[argc + 1]);
    for (unsigned i = 1; i <= argc; i++) 

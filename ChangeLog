@@ -1,5 +1,9 @@
 2002-12-05  Karl Eichwalder  <ke@suse.de>
 
+	* tests/af-2: New file.
+	* tests/af-3: Likewise.
+	* tests/Makefile.am (TESTS): Add af-2 and af-3.
+
 	* configure.in: Add tests/Makefile.
 
 	* tests: New directory; start testsuite.

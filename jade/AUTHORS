@@ -13,7 +13,8 @@ Didier PH Martin:
 OpenJade documentation and PR.
 
 Peter Nilsson:
-FOT validation, character properties.
+FOT validation, character properties, part of query rule, char-map:
+characteristic, uri-ref-address extension procedure.
 
 David Megginson:
 TeX backend.

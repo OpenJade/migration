@@ -12,6 +12,7 @@ exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
 libdir=@libdir@
+datadir=@datadir@
 
 CXX=@CXX@
 CC=@CC@
@@ -22,7 +23,7 @@ INSTALL=@INSTALL@
 
 LIBOBJS=@LIBOBJS@
 LIBS=@LIBS@
-DEFS=@DEFS@
+DEFS=@DEFS@ -DDEFAULT_SCHEME_BUILTINS=\"${datadir}/builtins.dsl\"
 INCS=-I$(srcdir) -I$(srcdir)/../include $(INCLUDE)
 CXXFLAGS=@CXXFLAGS@ $(INCS) $(DEBUG) $(DEFS)
 CFLAGS=@CFLAGS@ $(DEBUG) $(DEFS)

@@ -61,7 +61,7 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %defattr(-, root, root)
 %{_bindir}/*
 %{_datadir}/@PACKAGE@/*
-%doc /usr/doc/@PACKAGE@/*
+%doc %{_datadir}/doc/@PACKAGE@/*
 
 %files lib
 %defattr(-, root, root)

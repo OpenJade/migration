@@ -14,6 +14,7 @@
 
 #include <string.h>
 
+
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -23,6 +24,15 @@ const OutputCharStream::Newline nl = OutputCharStream::newline;
 MessageReporter::MessageReporter(OutputCharStream *os)
 : os_(os), options_(0)
 {
+}
+XMLMessageReporter::XMLMessageReporter(OutputCharStream* os) :
+	MessageReporter(os) , id(0) , msgmode(SP_MESSAGES_TRADITIONAL) {
+  char* fmt = getenv("SP_MESSAGE_FORMAT") ;
+  if ( fmt )
+    if ( !strcmp(fmt, "XML") )
+      msgmode = SP_MESSAGES_XML ;
+    else if ( !strcmp(fmt, "NONE") )
+      msgmode = SP_MESSAGES_NONE ;
 }
 
 MessageReporter::~MessageReporter()
@@ -43,7 +53,14 @@ void MessageReporter::addOption(Option option)
   options_ |= option;
 }
 void XMLMessageReporter::dispatchMessage(const Message& message) {
-  static long unsigned int id = 0 ;
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+      MessageReporter::dispatchMessage(message) ;
+    case SP_MESSAGES_NONE:
+      return ;
+    case SP_MESSAGES_XML:
+      break ;
+  }
   Offset off ;
 
   const ExternalInfo *externalInfo = locationHeader(message.loc, off);
@@ -177,6 +194,14 @@ const ExternalInfo *MessageReporter::locationHeader(const Location &loc,
 
 const ExternalInfo* XMLMessageReporter::locationHeader(
 	const Origin *origin, Index index, Offset &off) {
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+      return MessageReporter::locationHeader(origin, index, off) ;
+    case SP_MESSAGES_NONE:
+      return 0 ;
+    case SP_MESSAGES_XML:
+      break ;
+  }
 // take out the context printing 'cos we'll do that later
     while (origin) {
       const ExternalInfo *externalInfo = origin->externalInfo();
@@ -203,6 +228,7 @@ const ExternalInfo* XMLMessageReporter::locationHeader(
 }
 void XMLMessageReporter::showOpenEntities(
 	const Origin *origin, Index index, Offset &off) {
+/* this function is XMLMessageReporter-only */
   while (origin) {
    if (origin->entityName() || origin->parent().origin().isNull()) {
       Offset parentOff;
@@ -320,6 +346,14 @@ const ExternalInfo *MessageReporter::locationHeader(const Origin *origin,
 void XMLMessageReporter::printLocation(const ExternalInfo *externalInfo,
 				    Offset off)
 {
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+	MessageReporter::printLocation(externalInfo, off) ;
+    case SP_MESSAGES_NONE:
+	return ;
+    case SP_MESSAGES_XML:
+	break ;
+  }
   if (!externalInfo) {
     return;
   }
@@ -399,6 +433,15 @@ Boolean MessageReporter::getMessageText(const MessageFragment &frag,
 }
 Boolean XMLMessageReporter::XMLformatFragment(const MessageFragment &frag,
 	OutputCharStream &os) {
+/* This function is XMLMessageReporter only */
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+	return MessageReporter::formatFragment(frag, os) ;
+    case SP_MESSAGES_NONE:
+	return 1 ;
+    case SP_MESSAGES_XML:
+	break ;
+  }
   StringC text;
   if (!getMessageText(frag, text))
 	return 0 ;
@@ -408,6 +451,14 @@ Boolean XMLMessageReporter::XMLformatFragment(const MessageFragment &frag,
 void XMLMessageReporter::formatMessage(const MessageFragment &frag,
 	const Vector<CopyOwner<MessageArg> > &args,
 	OutputCharStream &os, bool noquote) {
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+	MessageReporter::formatMessage(frag, args, os, noquote) ;
+    case SP_MESSAGES_NONE:
+	return ;
+    case SP_MESSAGES_XML:
+	break ;
+  }
   StringC text;
   if (!getMessageText(frag, text)) {
 //    XMLformatFragment(MessageFormatterMessages::invalidMessage, os);
@@ -439,6 +490,14 @@ void XMLMessageReporter::formatMessage(const MessageFragment &frag,
 void XMLMessageReporter::formatOpenElements(
 	const Vector<OpenElementInfo> &openElementInfo ,
 	OutputCharStream &os) {
+  switch ( msgmode ) {
+    case SP_MESSAGES_TRADITIONAL:
+	MessageReporter::formatOpenElements(openElementInfo, os) ;
+    case SP_MESSAGES_NONE:
+	return ;
+    case SP_MESSAGES_XML:
+	break ;
+  }
   unsigned nOpenElements = openElementInfo.size();
   for (unsigned i = 0;; i++) {
     if (i > 0

@@ -1,3 +1,5 @@
+* Fix doctypes-and-linktypes to return a list of all dtds.
+
 * Wrap lines in help message. (Add wrapping OutputCharStream.)
   Then fold the info<n> messages into a single message
 
@@ -10,6 +12,9 @@
 
 Things which are missing and need a lot of work
 ===============================================
+
+* Redesign the App class hierarchy to prepare for breaking OpenJade in
+  exchangeable components.
 
 * Check the win32 port of OpenJade (OpenSP works).
 

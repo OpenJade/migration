@@ -56,17 +56,17 @@ missing property set modules
 basesds1
 sdclabs
 sdclsds
-prlgabs1                  * 
+prlgabs1			* 
 prlgsds
 instsds1
 dtgabs
-rankabs
+rankabs				*
 srabs
 srsds
 linkabs
 linksds
 subdcsds
-fpiabs
+fpiabs				*
 
 
 missing SDQL primitives

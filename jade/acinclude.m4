@@ -1,180 +1,180 @@
-dnl Convenience macros, taken from acinclude.m4 in fvwm2.
-
-dnl Configure-time switch with default
-dnl
-dnl Each switch defines an --enable-FOO and --disable-FOO option in
-dnl the resulting configure script.
-dnl
-dnl Usage:
-dnl smr_SWITCH(name, description, default, pos-def, neg-def)
-dnl
-dnl where:
-dnl
-dnl name        name of switch; generates --enable-name & --disable-name
-dnl             options
-dnl description help string is set to this prefixed by "enable" or
-dnl             "disable", whichever is the non-default value
-dnl default     either "on" or "off"; specifies default if neither
-dnl             --enable-name nor --disable-name is specified
-dnl pos-def     a symbol to AC_DEFINE if switch is on (optional)
-dnl neg-def     a symbol to AC_DEFINE if switch is off (optional)
-dnl
-AC_DEFUN(smr_SWITCH, [
-    AC_MSG_CHECKING(whether to enable $2)
-    AC_ARG_ENABLE(
-        $1,
-        ifelse($3, on,
-            [  --disable-[$1]    disable [$2]],
-            [  --enable-[$1]     enable [$2]]),
-        [ if test "$enableval" = yes; then
-            AC_MSG_RESULT(yes)
-            ifelse($4, , , AC_DEFINE($4))
-        else
-            AC_MSG_RESULT(no)
-            ifelse($5, , , AC_DEFINE($5))
-        fi ],
-        ifelse($3, on,
-           [ AC_MSG_RESULT(yes)
-             ifelse($4, , , AC_DEFINE($4)) ],
-           [ AC_MSG_RESULT(no)
-            ifelse($5, , , AC_DEFINE($5))]))])
 
 
-dnl Allow argument for optional libraries; wraps AC_ARG_WITH, to
-dnl provide a "--with-foo-library" option in the configure script, where foo
-dnl is presumed to be a library name.  The argument given by the user
-dnl (i.e. "bar" in ./configure --with-foo-library=bar) may be one of three
-dnl things:
-dnl     * boolean (no, yes or blank): whether to use library or not
-dnl     * file: assumed to be the name of the library
-dnl     * directory: assumed to *contain* the library
+dnl @synopsis AC_CXX_TYPENAME
 dnl
-dnl The argument is sanity-checked.  If all is well, two variables are
-dnl set: "with_foo" (value is yes, no, or maybe), and "foo_LIBS" (value
-dnl is either blank, a file, -lfoo, or '-L/some/dir -lfoo').  The idea
-dnl is: the first tells you whether the library is to be used or not
-dnl (or the user didn't specify one way or the other) and the second
-dnl to put on the command line for linking with the library.
+dnl If the compiler recognizes the typename keyword, define HAVE_TYPENAME.
 dnl
-dnl Usage:
-dnl smr_ARG_WITHLIB(name, libname, description)
+dnl @version $Id$
+dnl @author Luc Maisonobe
 dnl
-dnl name                name for --with argument ("foo" for libfoo)
-dnl libname             (optional) actual name of library,
-dnl                     if different from name
-dnl description         (optional) used to construct help string
+AC_DEFUN(AC_CXX_TYPENAME,
+[AC_CACHE_CHECK(whether the compiler recognizes typename,
+ac_cv_cxx_typename,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([template<typename T>class X {public:X(){}};],
+[X<float> z; return 0;],
+ ac_cv_cxx_typename=yes, ac_cv_cxx_typename=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_typename" = yes; then
+  AC_DEFINE(HAVE_TYPENAME,,[define if the compiler recognizes typename])
+fi
+])
+dnl @synopsis AC_CXX_RTTI
 dnl
-AC_DEFUN(smr_ARG_WITHLIB, [
-
-ifelse($2, , smr_lib=[$1], smr_lib=[$2])
-
-AC_ARG_WITH([$1]-library,
-ifelse($3, ,
-[  --with-$1-library[=PATH]   use $1 library],
-[  --with-$1-library[=PATH]   use $1 library ($3)]),
-[
-    if test "$withval" = yes; then
-        with_[$1]=yes
-        [$1]_LIBS="-l${smr_lib}"
-    elif test "$withval" = no; then
-        with_[$1]=no
-        [$1]_LIBS=
-    else
-        with_[$1]=yes
-        if test -f "$withval"; then
-            [$1]_LIBS=$withval
-        elif test -d "$withval"; then
-            [$1]_LIBS="-L$withval -l${smr_lib}"
-        else
-            AC_MSG_ERROR(argument must be boolean, file, or directory)
-        fi
-    fi
-], [
-    with_[$1]=maybe
-    [$1]_LIBS="-l${smr_lib}"
-])])
-
-
-dnl Check if the include files for a library are accessible, and
-dnl define the variable "name_CFLAGS" with the proper "-I" flag for
-dnl the compiler.  The user has a chance to specify the includes
-dnl location, using "--with-foo-includes".
+dnl If the compiler supports Run-Time Type Identification (typeinfo
+dnl header and typeid keyword), define HAVE_RTTI.
 dnl
-dnl This should be used *after* smr_ARG_WITHLIB *and* AC_CHECK_LIB are
-dnl successful.
+dnl @version $Id$
+dnl @author Luc Maisonobe
 dnl
-dnl Usage:
-dnl smr_ARG_WITHINCLUDES(name, header, extra-flags)
+AC_DEFUN(AC_CXX_RTTI,
+[AC_CACHE_CHECK(whether the compiler supports Run-Time Type Identification,
+ac_cv_cxx_rtti,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <typeinfo>
+class Base { public :
+             Base () {}
+             virtual int f () { return 0; }
+           };
+class Derived : public Base { public :
+                              Derived () {}
+                              virtual int f () { return 1; }
+                            };
+],[Derived d;
+Base *ptr = &d;
+return typeid (*ptr) == typeid (Derived);
+],
+ ac_cv_cxx_rtti=yes, ac_cv_cxx_rtti=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_rtti" = yes; then
+  AC_DEFINE(HAVE_RTTI,,
+            [define if the compiler supports Run-Time Type Identification])
+fi
+])
+dnl @synopsis AC_CXX_NEW_FOR_SCOPING
 dnl
-dnl name                library name, MUST same as used with smr_ARG_WITHLIB
-dnl header              a header file required for using the lib
-dnl extra-flags         (optional) flags required when compiling the
-dnl                     header, typically more includes; for ex. X_CFLAGS
+dnl If the compiler accepts the new for scoping rules (the scope of a
+dnl variable declared inside the parentheses is restricted to the
+dnl for-body), define HAVE_NEW_FOR_SCOPING.
 dnl
-AC_DEFUN(smr_ARG_WITHINCLUDES, [
-
-AC_ARG_WITH([$1]-includes,
-[  --with-$1-includes=DIR  set directory for $1 headers],
-[
-    if test -d "$withval"; then
-        [$1]_CFLAGS="-I${withval}"
-    else
-        AC_MSG_ERROR(argument must be a directory)
-    fi])
-
-    dnl We need to put the given include directory into CPPFLAGS temporarily, but
-    dnl then restore CPPFLAGS to its old value.
-    dnl
-    smr_save_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS ${[$1]_CFLAGS}"
-    ifelse($3, , , CPPFLAGS="$CPPFLAGS [$3]")
-
-    AC_CHECK_HEADERS($2)
-
-    CPPFLAGS=$smr_save_CPPFLAGS
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_NEW_FOR_SCOPING,
+[AC_CACHE_CHECK(whether the compiler accepts the new for scoping rules,
+ac_cv_cxx_new_for_scoping,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE(,[
+  int z = 0;
+  for (int i = 0; i < 10; ++i)
+    z = z + i;
+  for (int i = 0; i < 10; ++i)
+    z = z - i;
+  return z;],
+ ac_cv_cxx_new_for_scoping=yes, ac_cv_cxx_new_for_scoping=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_new_for_scoping" = yes; then
+  AC_DEFINE(HAVE_NEW_FOR_SCOPING,,[define if the compiler accepts the new for scoping rules])
+fi
+])
+dnl @synopsis AC_CXX_EXPLICIT_INSTANTIATIONS
+dnl
+dnl If the C++ compiler supports explicit instanciations syntax,
+dnl define HAVE_INSTANTIATIONS.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_EXPLICIT_INSTANTIATIONS,
+[AC_CACHE_CHECK(whether the compiler supports explicit instantiations,
+ac_cv_cxx_explinst,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([template <class T> class A { T t; }; template class A<int>;],
+ [], ac_cv_cxx_explinst=yes, ac_cv_cxx_explinst=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_explinst" = yes; then
+  AC_DEFINE(HAVE_INSTANTIATIONS,,
+            [define if the compiler supports explicit instantiations])
+fi
+])
+dnl @synopsis AC_CXX_DYNAMIC_CAST
+dnl
+dnl If the compiler supports dynamic_cast<>, define HAVE_DYNAMIC_CAST.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_DYNAMIC_CAST,
+[AC_CACHE_CHECK(whether the compiler supports dynamic_cast<>,
+ac_cv_cxx_dynamic_cast,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <typeinfo>
+class Base { public : Base () {} virtual void f () = 0;};
+class Derived : public Base { public : Derived () {} virtual void f () {} };],[
+Derived d; Base& b=d; return dynamic_cast<Derived*>(&b) ? 0 : 1;],
+ ac_cv_cxx_dynamic_cast=yes, ac_cv_cxx_dynamic_cast=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_dynamic_cast" = yes; then
+  AC_DEFINE(HAVE_DYNAMIC_CAST,,[define if the compiler supports dynamic_cast<>])
+fi
 ])
 
-
-dnl Probe for an optional library.  This macro creates both
-dnl --with-foo-library and --with-foo-includes options for the configure
-dnl script.  If --with-foo-library is *not* specified, the default is to
-dnl probe for the library, and use it if found.
+dnl @synopsis AC_CXX_NAMESPACES
 dnl
-dnl Usage:
-dnl smr_CHECK_LIB(name, libname, desc, func, header, x-libs, x-flags)
+dnl If the compiler can prevent names clashes using namespaces, define
+dnl HAVE_NAMESPACES.
 dnl
-dnl name        name for --with options
-dnl libname     (optional) real name of library, if different from
-dnl             above
-dnl desc        (optional) short descr. of library, for help string
-dnl func        function of library, to probe for
-dnl header      (optional) header required for using library
-dnl x-libs      (optional) extra libraries, if needed to link with lib
-dnl x-flags     (optional) extra flags, if needed to include header files
+dnl @version $Id$
+dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(smr_CHECK_LIB,
-[
-ifelse($2, , smr_lib=[$1], smr_lib=[$2])
-ifelse($5, , , smr_header=[$5])
-smr_ARG_WITHLIB($1,$2,$3)
-if test "$with_$1" != no; then
-    AC_CHECK_LIB($smr_lib, $4,
-        smr_havelib=yes, smr_havelib=no,
-        ifelse($6, , ${$1_LIBS}, [${$1_LIBS} $6]))
-    if test "$smr_havelib" = yes -a "$smr_header" != ""; then
-        smr_ARG_WITHINCLUDES($1, $smr_header, $7)
-        smr_safe=`echo "$smr_header" | sed 'y%./+-%__p_%'`
-        if eval "test \"`echo '$ac_cv_header_'$smr_safe`\" != yes"; then
-            smr_havelib=no
-        fi
-    fi
-    if test "$smr_havelib" = yes; then
-        with_$1=yes
-    else
-        $1_LIBS=
-        $1_CFLAGS=
-        with_$1=no
-    fi
-fi])
-
-
+AC_DEFUN(AC_CXX_NAMESPACES,
+[AC_CACHE_CHECK(whether the compiler implements namespaces,
+ac_cv_cxx_namespaces,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([namespace Outer { namespace Inner { int i = 0; }}],
+                [using namespace Outer::Inner; return i;],
+ ac_cv_cxx_namespaces=yes, ac_cv_cxx_namespaces=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_namespaces" = yes; then
+  AC_DEFINE(HAVE_NAMESPACES,,[define if the compiler implements namespaces])
+fi
+])
+dnl @synopsis AC_CXX_BOOL
+dnl
+dnl If the compiler recognizes bool as a separate built-in type,
+dnl define HAVE_BOOL. Note that a typedef is not a separate
+dnl type since you cannot overload a function such that it accepts either
+dnl the basic type or the typedef.
+dnl
+dnl @version $Id$
+dnl @author Luc Maisonobe
+dnl
+AC_DEFUN(AC_CXX_BOOL,
+[AC_CACHE_CHECK(whether the compiler recognizes bool as a built-in type,
+ac_cv_cxx_bool,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([
+int f(int  x){return 1;}
+int f(char x){return 1;}
+int f(bool x){return 1;}
+],[bool b = true; return f(b);],
+ ac_cv_cxx_bool=yes, ac_cv_cxx_bool=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_bool" = yes; then
+  AC_DEFINE(HAVE_BOOL,,[define if bool is a built-in type])
+fi
+])

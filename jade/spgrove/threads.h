@@ -141,8 +141,9 @@ private:
 
 #endif /* _MSC_VER && _MT */
 
-#if (defined __MACH__) || (defined __GNU__)
+#if defined (USE_THREADS) && !defined(SP_THREAD)
 
+#ifdef SP_MUTEX_MACH
 // For Mach, using C Threads. May or may not work as-is on your Mach-based OS.
 // Written by Raf Schietekat <RfSchtkt@maze.ruca.ua.ac.be> on 1996-11-10.
 // Platform used: NEXTSTEP_(Dev_)3.2 with sp-1.1.1 and jade-0.1.
@@ -302,9 +303,9 @@ private:
 
 #endif /* SP_NO_BLOCK */
 
-#endif /* __MACH__ || __GNU__ */
+#endif /* SP_MUTEX_MACH */
 
-#ifdef SP_USE_PTHREADS
+#ifdef SP_MUTEX_PTHREADS
 
 // Support for pthreads on Linux.
 // Written by Matthias Clasen <clasen@mathematik.uni-freiburg.de>
@@ -430,7 +431,9 @@ private:
 
 #endif /* SP_NO_BLOCK */
 
-#endif /* SP_USE_PTHREADS */
+#endif /* SP_MUTEX_PTHREADS */
+
+#endif /* USE_THREADS */
 
 #ifndef SP_THREAD
 

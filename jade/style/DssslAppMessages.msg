@@ -3,5 +3,5 @@
 
 =2000
 
-I1+versionInfo++OpenJade version %1
+I2+versionInfo++%1 version %2
 E0+noSpec++no DSSSL specification: use -d to specify

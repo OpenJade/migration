@@ -525,6 +525,7 @@ FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *os,
     { "table", 0},
     { "math", 0},
     { "simple-page", 0},
+    { "online", 0},
     { 0, 0}
   };
   static FOTBuilder::Description description = {

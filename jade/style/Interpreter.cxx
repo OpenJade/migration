@@ -10,6 +10,8 @@
 #include "MacroFlowObj.h"
 #include "ELObjMessageArg.h"
 #include "VM.h"
+#include "Owner.h" 
+#include "SchemeParser.h"
 #include "macros.h"
 #include <stdlib.h>
 
@@ -58,6 +60,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
   extensionTable_(extensionTable),
   Collector(maxObjSize()),
   partIndex_(1),  // 0 is for command-line definitions
+  dPartIndex_(1),
   lexCategory_(lexOther),
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -83,9 +86,9 @@ Interpreter::Interpreter(GroveManager *groveManager,
   installPrimitives();
   installUnits();
   installCharNames();
+  installSdata();
   installFlowObjs();
   installInheritedCs();
-  installSdata();
   installNodeProperties();
 
   static const char *lexCategories[] = {
@@ -96,7 +99,7 @@ Interpreter::Interpreter(GroveManager *groveManager,
     "();\"",
     " \t\r\n\f",
   };
-      //
+  lexCategory_.setChar(InputSource::eE, lexDelimiter);
   for (size_t i = 0; i < SIZEOF(lexCategories); i++)
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
@@ -385,8 +388,12 @@ void Interpreter::installCharNames()
   } chars[] = {
 #include "charNames.h"
   };
-  for (size_t i = 0; i < SIZEOF(chars); i++)
-    namedCharTable_.insert(makeStringC(chars[i].name), chars[i].c);
+  for (size_t i = 0; i < SIZEOF(chars); i++) {
+    CharPart ch;
+    ch.c = chars[i].c;
+    ch.defPart = unsigned(-1);
+    namedCharTable_.insert(makeStringC(chars[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installSdata()
@@ -400,8 +407,12 @@ void Interpreter::installSdata()
   } entities[] = {
 #include "sdata.h"
   };
-  for (size_t i = 0; i < SIZEOF(entities); i++)
-    sdataEntityNameTable_.insert(makeStringC(entities[i].name), entities[i].c);
+  for (size_t i = 0; i < SIZEOF(entities); i++) { 
+    CharPart ch;
+    ch.c = entities[i].c;
+    ch.defPart = unsigned(-1);
+    sdataEntityNameTable_.insert(makeStringC(entities[i].name), ch, 1);
+  }
 }
 
 void Interpreter::installNodeProperties()
@@ -413,17 +424,165 @@ void Interpreter::installNodeProperties()
   }
 }
 
-bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
+static
+bool isWhitespace(Xchar c)
+{
+   switch (c) {
+     case InputSource::eE:
+     case '\t':
+     case '\f':
+     case '\r':
+     case '\n':
+     case ' ':
+	return 1;
+     default:
+        return 0;
+   }
+}
+
+static
+bool getToken(InputSource *in, Interpreter &inp)
+{
+  // Get the next sequence of nonblank chars from 
+  // in. Ignore inital blanks. Return 1 if at least
+  // one nonblank was found, else 0.
+   for (;;) {
+     in->startToken();
+     int length = 0;
+     Xchar c = in->tokenChar(inp); 
+     if (c == InputSource::eE)
+       return 0;
+     if (!isWhitespace(c)) { 
+       length = in->currentTokenLength();
+       while (!isWhitespace(c)) { 
+	 c = in->tokenChar(inp); 
+	 length++;
+       }
+       in->endToken(length - 1);
+       return 1;        
+     } 
+   }
+}
+
+void Interpreter::addStandardChars(Owner<InputSource> &ins) 
+{
+  InputSource *in = ins.pointer();
+  if (!in)
+    return;
+  for (;;) {
+    // FIXME we do not check that we have valid character names
+    // and numbers (in decimal)
+    if (!getToken(in, *this)) 
+      break;
+    StringC name(in->currentTokenStart(), in->currentTokenLength());
+ 
+   if (!getToken(in, *this)) {
+      setNextLocation(in->currentLocation());
+      message(InterpreterMessages::badDeclaration);
+      break;
+    }
+    StringC digits(in->currentTokenStart(), in->currentTokenLength());
+
+    int n;
+    unsigned int i=0;  
+    if (!scanSignDigits(digits, i, n)) {
+      setNextLocation(in->currentLocation());
+      message(InterpreterMessages::badCharNumber, StringMessageArg(digits));
+      continue;
+    }
+
+    const CharPart *def = namedCharTable_.lookup(name);
+    CharPart ch;
+    ch.c = n;
+    ch.defPart = dPartIndex_;
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+        namedCharTable_.insert(name, ch, 1);
+      else if (def->defPart == dPartIndex_ && def->c != ch.c) {
+	setNextLocation(in->currentLocation());
+       	message(InterpreterMessages::duplicateCharName, 
+		StringMessageArg(name));
+      }
+    }
+    else 
+      namedCharTable_.insert(name, ch, 1);
+  }
+}
+
+void Interpreter::addSdataEntity(const StringC &name, const StringC &text, Owner<InputSource> &ins)
+{
+  InputSource *in = ins.pointer();
+  if (!in)
+    return;
+
+  if (!getToken(in, *this)) {
+    setNextLocation(in->currentLocation());
+    message(InterpreterMessages::badDeclaration);
+    return;
+  }
+
+  StringC chnum(in->currentTokenStart(), in->currentTokenLength());
+  // FIXME we do not check that there is only one token
+
+  const CharPart *cp = namedCharTable_.lookup(chnum);
+  if (!cp) 
+    return;  // FIXME
+
+  CharPart ch;
+  ch.c = cp->c;
+  ch.defPart = dPartIndex_;
+
+  if (name.size() > 0) {
+    const CharPart *def = sdataEntityNameTable_.lookup(name);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityNameTable_.insert(name, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) {
+	setNextLocation(in->currentLocation());
+       	message(InterpreterMessages::duplicateSdataEntityName, 
+		StringMessageArg(name));
+      }
+    }
+    else
+      sdataEntityNameTable_.insert(name, ch);
+  }
+
+  if (text.size() > 0) {
+    const CharPart *def = sdataEntityTextTable_.lookup(text);
+    if (def) {
+      if (dPartIndex_ < def->defPart)
+	sdataEntityTextTable_.insert(text, ch);
+      else if (def->defPart == dPartIndex_ && def->c != cp->c) {
+	setNextLocation(in->currentLocation());
+       	message(InterpreterMessages::duplicateSdataEntityText, 
+		StringMessageArg(text));
+      }
+    }
+    else
+      sdataEntityTextTable_.insert(text, ch);
+  }
+}
+
+bool Interpreter::sdataMap(GroveString name, GroveString text, GroveChar &c) const
 {
   StringC tem(name.data(), name.size());
-  const Char *cp = sdataEntityNameTable_.lookup(tem);
+  StringC tem2(text.data(), text.size());
+
+  const CharPart *cp = sdataEntityNameTable_.lookup(tem);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
+  
+  cp = sdataEntityTextTable_.lookup(tem2);
+  if (cp) {
+    c = cp->c;
+    return 1;
+  }
+  
   if (convertUnicodeCharName(tem, c))
     return 1;
-  // I think this is the most thing to do.
+  // I think this is the best thing to do.
   // At least it makes preserve-sdata work with unknown SDATA entities.
   c = defaultChar;
   return 1;
@@ -450,9 +609,9 @@ ELObj *Interpreter::convertGlyphId(const Char *str, size_t len, const Location &
 
 bool Interpreter::convertCharName(const StringC &str, Char &c) const
 {
-  const Char *cp = namedCharTable_.lookup(str);
+  const CharPart *cp = namedCharTable_.lookup(str);
   if (cp) {
-    c = *cp;
+    c = cp->c;
     return 1;
   }
   return convertUnicodeCharName(str, c);
@@ -567,6 +726,11 @@ void Interpreter::endPart()
 {
   currentPartFirstInitialValue_ = initialValueNames_.size();
   partIndex_++;
+}
+
+void Interpreter::dEndPart()
+{
+  dPartIndex_++;
 }
 
 void Interpreter::normalizeGeneralName(const NodePtr &nd, StringC &str)

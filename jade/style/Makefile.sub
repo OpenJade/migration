@@ -1,4 +1,6 @@
 LIB=style
+DEPLIBS=-lm -L$(TOP)/grove/.libs -lgrove -L$(TOP)/lib/.libs -lsp 	\
+  -L$(TOP)/spgrove/.libs -lspgrove
 OBJS=Collector.o \
   DssslApp.o \
   DssslSpecEventHandler.o \

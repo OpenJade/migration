@@ -1,4 +1,4 @@
-// This file was automatically generated from style/InterpreterMessages.msg by msggen.pl.
+// This file was automatically generated from InterpreterMessages.msg by msggen.pl.
 #ifndef InterpreterMessages_INCLUDED
 #define InterpreterMessages_INCLUDED 1
 
@@ -43,7 +43,7 @@ struct InterpreterMessages {
   // 14
   static const MessageType1 undefinedVariableReference;
   // 15
-  static const MessageType0 badCharName;
+  static const MessageType1 badCharName;
   // 16
   static const MessageType1 keywordNotAllowedCall;
   // 17
@@ -262,6 +262,32 @@ struct InterpreterMessages {
   static const MessageType1L duplicateFlowObjectClass;
   // 131
   static const MessageType1 undefinedMode;
+  // 132
+  static const MessageType1 badCharNumber;
+  // 133
+  static const MessageType1 duplicateCharName;
+  // 134
+  static const MessageType1 duplicateSdataEntityName;
+  // 135
+  static const MessageType1 duplicateSdataEntityText;
+  // 136
+  static const MessageType0 unsupportedDeclaration;
+  // 137
+  static const MessageType1 unsupportedCharRepertoire;
+  // 138
+  static const MessageType0 badDeclaration;
+  // 139
+  static const MessageType3 notAnInteger;
+  // 140
+  static const MessageType3 notAKeyword;
+  // 141
+  static const MessageType3 notAnAlist;
+  // 142
+  static const MessageType3 notACharList;
+  // 143
+  static const MessageType3 lengthError;
+  // 144
+  static const MessageType1 noExactRepresentation;
 };
 
 #ifdef SP_NAMESPACE

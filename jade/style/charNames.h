@@ -1,4 +1,6 @@
 // Unicode code, character name
+{ 0x000a, "line-feed" },
+{ 0x000d, "carriage-return" },
 { 0x0020, "space" },
 { 0x0021, "exclamation-mark" },
 { 0x0022, "quotation-mark" },

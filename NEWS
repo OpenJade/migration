@@ -11,6 +11,8 @@ Changes in OpenSP 1.5pre6
 
 * A few minor documentation improvements, thanks to Terje Bless
 
+* require autoconf 2.52
+
 Changes in OpenSP 1.5pre5
 
 * Fix 32-bit assumptions so we build on 64-bit platforms such

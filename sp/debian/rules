@@ -164,7 +164,8 @@ install-opensp:	$(install-common) debian/README.Debian
 	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg)
 
 #	 install man pages
-	dh_undocumented -p$(pkg) onsgmls osgmlnorm ospam ospcat ospent osx
+	dh_undocumented -p$(pkg) onsgmls.1 osgmlnorm.1 ospam.1 ospcat.1	\
+	    ospent.1 osx.1
 
 #	 make sure maintainer scripts are good
 	sh -n debian/$(pkg).postinst

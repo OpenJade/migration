@@ -1,3 +1,7 @@
+2004-06-30  Karl Eichwalder  <ke@suse.de>
+
+	* acinclude.m4: Add missing quotations.
+
 2004-06-09  Karl Eichwalder  <ke@gnu.franken.de>
 
 	* tests/onsgmls-2: Make sure path to the binary will not come

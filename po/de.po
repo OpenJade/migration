@@ -1,5 +1,6 @@
 # ArcEngineMessages
 
+# ArcEngineMessages
 msgid "no system identifier could be generated for meta-DTD for architecture %1"
 msgstr "Für die Meta-DTD für Architektur %1 konnte kein Systembezeichner erzeugt werden"
 
@@ -89,6 +90,7 @@ msgstr "Nur der Wert nArcIndr für das ArcIndr Attribut wird unterstützt"
 
 # CatalogMessages
 
+# CatalogMessages
 msgid "name expected"
 msgstr "Name erwartet"
 
@@ -127,11 +129,18 @@ msgstr "Kein Eintrag für den öffentlichen Bezeichner %1 in Katalog %2"
 
 # CmdLineAppMessages
 
+# CmdLineAppMessages
 msgid "invalid option %1"
 msgstr "Ungültige Option %1"
 
 msgid "missing argument for option %1"
 msgstr "Fehlendes Argument für Option %1"
+
+msgid "option %1 is ambiguous"
+msgstr "Option %1 ist nicht eindeutig"
+
+msgid "option %1 doesn't allow an argument"
+msgstr "Option %1 akzeptiert kein Argument"
 
 msgid "usage is %1"
 msgstr "Aufruf %1"
@@ -139,9 +148,11 @@ msgstr "Aufruf %1"
 msgid "%1 version %2"
 msgstr "%1 Version %2"
 
+# duplicate, must be left empty or msgfmt will complain
 msgid "unknown BCTF %1"
 msgstr "Unbekannte BCTF %1"
 
+# duplicate, must be left empty or msgfmt will complain
 msgid "unknown encoding %1"
 msgstr "Unbekannte Kodierung %1"
 
@@ -153,6 +164,7 @@ msgstr "Ausgabedatei %1 kann nicht geschlossen werden (%2)"
 
 # EntityManagerMessages
 
+# EntityManagerMessages
 msgid "bad formal system identifier syntax in %1"
 msgstr "Syntax für formale Systembezeichner verletzt in %1"
 
@@ -165,11 +177,9 @@ msgstr "%1 ist Wert, nicht Name eines Attributes für formale Systembezeichner"
 msgid "value of smcrd attribute must be a single character not %1"
 msgstr "Der Wert des smcrd Attributes muß ein einzelnes Zeichen ungleich %1 sein"
 
-# duplicate, must be left empty or msgfmt will complain
 msgid "unknown BCTF %1"
 msgstr ""
 
-# duplicate, must be left empty or msgfmt will complain
 msgid "unknown encoding %1"
 msgstr ""
 
@@ -220,6 +230,7 @@ msgstr "Zeichen (Nummer %1) im Wert des lookup Attributes für formale Systembeze
 
 # MessageFormatterMessages
 
+# MessageFormatterMessages
 msgid "st"
 msgstr "."
 
@@ -240,6 +251,7 @@ msgstr "(ungültige Meldung)"
 
 # MessageReporterMessages
 
+# MessageReporterMessages
 msgid "I"
 msgstr "I"
 
@@ -275,6 +287,7 @@ msgstr "Relevante Klauseln: "
 
 # ParserAppMessages
 
+# ParserAppMessages
 msgid "unknown warning type %1"
 msgstr "Unbekannter Warnungstyp %1"
 
@@ -286,6 +299,7 @@ msgstr "Maximale Anzahl von Fehlern (%1) erreicht; das Limit läßt sich mit -E än
 
 # ParserMessages
 
+# ParserMessages
 msgid "length of name must not exceed NAMELEN (%1)"
 msgstr "Die Länge eines Namens darf NAMELEN (%1) nicht überschreiten"
 
@@ -398,12 +412,11 @@ msgid "literal is missing closing delimiter"
 msgstr "Abschließender Begrenzer fehlt in Literal"
 
 msgid "%1 invalid: only %2 and parameter separators are allowed"
-msgstr "%1 ungültig: nur %2 und Parametertrenner erlaubt"
+msgstr "%1 ungültig: nur %2 und Parametertrenner sind erlaubt"
 
 msgid "%1 invalid: only %2 and token separators are allowed"
 msgstr "%1 ungültig: nur %2 und Tokentrenner erlaubt"
 
-#duplicate, must be left empty or msgfmt will complain
 msgid "%1 invalid: only %2 and token separators are allowed"
 msgstr ""
 
@@ -444,7 +457,7 @@ msgid "invalid comment declaration: found %1 outside comment but inside comment 
 msgstr "Ungültige Kommentardeklaration: %1 außerhalb des Kommentars, aber innerhalb der Deklaration"
 
 msgid "comment declaration started here"
-msgstr "Kommentardeklaration begann hier"
+msgstr "Die Kommentardeklaration begann hier"
 
 msgid "%1 declaration not allowed in instance"
 msgstr "%1 Deklaration in der Dokumentinstanz nicht erlaubt"
@@ -494,7 +507,6 @@ msgstr "Starttag war hier"
 msgid "end tag for %1 omitted, but OMITTAG NO was specified"
 msgstr "Endtag für %1 ausgelassen, obwohl OMITTAG NO spezifiziert war"
 
-#duplicate
 msgid "start tag was here"
 msgstr ""
 
@@ -665,8 +677,8 @@ msgstr "Das nicht-implizierbare Attribut %1 ist nicht spezifiziert, aber OMMITAG
 msgid "required attribute %1 not specified"
 msgstr "Notwendiges Attribut %1 nicht spezifiziert"
 
-msgid "first occurrence of current attribute %1 not specified"
-msgstr "Erstes Vorkommen des current Attributs %1 nicht spezifiziert"
+msgid "first occurrence of CURRENT attribute %1 not specified"
+msgstr "Erstes Vorkommen des CURRENT Attributes %1 nicht spezifiziert"
 
 msgid "%1 is not a notation name"
 msgstr "%1 ist nicht der Name einer Notation"
@@ -696,7 +708,7 @@ msgid "invalid comment declaration: found character %1 outside comment but insid
 msgstr "Ungültige Kommentardeklaration: Zeichen %1 außerhalb des Kommentars, aber innerhalb der Kommentardeklaration"
 
 msgid "comment declaration started here"
-msgstr "Die Kommentardeklaration begann hier"
+msgstr "Kommentardeklaration begann hier"
 
 msgid "non SGML character number %1"
 msgstr "Nicht-SGML-Zeichen Nummer %1"
@@ -741,7 +753,7 @@ msgid "a parameter entity reference cannot occur in an SGML declaration"
 msgstr "Eine Referenz auf eine Parameterentität kann in der SGML Deklaration nicht vorkommen"
 
 msgid "%1 invalid: only %2 and parameter separators are allowed"
-msgstr "%1 ungültig: nur %2 und Parametertrenner sind erlaubt"
+msgstr "%1 ungültig: nur %2 und Parametertrenner erlaubt"
 
 msgid "cannot continue because of previous errors"
 msgstr "Fortsetzung wegen der aufgetretenen Fehler unmöglich"
@@ -801,7 +813,7 @@ msgid "there is no unique character in the internal character set corresponding 
 msgstr "Es gibt kein eindeutiges Zeichen im internen Zeichensatz, das der Zeichennummer %1 im Syntaxreferenzzeichensatz entspricht"
 
 msgid "the character with number %1 in ISO 646 is significant but has no representation in the syntax reference character set"
-msgstr ""
+msgstr "Das Zeichen mit Nummer %1 in ISO 646 ist signifikant, hat aber keine Repräsentation im Syntaxreferenzzeichensatz"
 
 msgid "capacity set %1 is unknown"
 msgstr "Kapazitätsmenge %1 ist unbekannt"
@@ -913,7 +925,7 @@ msgstr "Ziffern zu LCNMCHAR, UCNMCHAR, LCNMSTRT oder UCNMSTRT zugewiesen: %1"
 
 msgid "character number %1 cannot be assigned to LCNMCHAR, UCNMCHAR, LCNMSTRT or UCNMSTRT because it is RE"
 msgstr "Zeichennummer %1 kann nicht zu LCNMCHAR, UCNMCHAR, LCNMSTRT oder UCNMSTRT zugewiesen werden, da es RE ist"
- 
+
 msgid "character number %1 cannot be assigned to LCNMCHAR, UCNMCHAR, LCNMSTRT or UCNMSTRT because it is RS"
 msgstr "Zeichennummer %1 kann nicht zu LCNMCHAR, UCNMCHAR, LCNMSTRT oder UCNMSTRT zugewiesen werden, da es RS ist"
 
@@ -959,7 +971,7 @@ msgstr "Folgende Zeichennummern wurden sowohl zu LCNMCHAR oder UCNMCHAR und LCNM
 msgid "when the concrete syntax scope is INSTANCE the syntax reference character set of the declared syntax must be the same as that of the reference concrete syntax"
 msgstr "Wenn der Gültigkeitsbereich der konkreten Syntax INSTANCE ist, muß der Syntaxreferenzzeichensatz der deklarierten Syntax derselbe wie der der konkreten Referenzsyntax sein"
 
-msgid "end-tag minimization should be O for element with declared content of EMPTY" 
+msgid "end-tag minimization should be O for element with declared content of EMPTY"
 msgstr "Enttag-Minimierung sollte für ein Element mit deklariertem Inhalt EMPTY O sein"
 
 msgid "end-tag minimization should be O for element %1 because it has CONREF attribute"
@@ -1022,7 +1034,7 @@ msgstr "Gesamtsumme der Inhaltstoken überschreitet GRPGTCNT (%1)"
 msgid "unclosed start-tag requires SHORTTAG YES"
 msgstr "Ungeschlossener Starttag benötigt SHORTTAG YES"
 
-msgid "net-enabling start-tag requires SHORTTAG YES"
+msgid "NET-enabling start-tag requires SHORTTAG YES"
 msgstr "NET-ermöglichender Starttag benötigt SHORTTAG YES"
 
 msgid "unclosed end-tag requires SHORTTAG YES"
@@ -1049,7 +1061,7 @@ msgstr "Markierter Bereich illegal nach dem Dokumentelement"
 msgid "the %1 occurrence of %2 in the content model for %3 cannot be excluded at this point because it is contextually required"
 msgstr "Das %1 Vorkommen von %2 im Inhaltsmodell für %3 kann hier nicht ausgeschlossen werden, da es kontextuell benötigt wird" 
 
-msgid "the %1 occurrence of %2 in the content model for %3 cannot be excluded because it is neither inherently optional nor a member of an or group"
+msgid "the %1 occurrence of %2 in the content model for %3 cannot be excluded because it is neither inherently optional nor a member of an OR group"
 msgstr "Das %1 Vorkommen von %2 im Inhaltsmodell für %2 kann nicht ausgeschlossen werden, weil es weder inhärent optional noch ein Mitglied einer OR Gruppe ist"
 
 msgid "an attribute value specification must be an attribute value literal unless SHORTTAG YES is specified"
@@ -1070,8 +1082,8 @@ msgstr "erste Definition war hier"
 msgid "general delimiter role %1 already defined"
 msgstr "Allgemeine Begrenzerrolle %1 bereits definiert"
 
-msgid "number of id references in start-tag must not exceed GRPCNT (%1)"
-msgstr "Die Anzahl der ID referenzen in einem Starttag darf GRPCNT (%1) nicht pberschreiten"
+msgid "number of ID references in start-tag must not exceed GRPCNT (%1)"
+msgstr "Die Anzahl der ID referenzen in einem Starttag darf GRPCNT (%1) nicht überschreiten"
 
 msgid "number of entity names in attribute specification list must not exceed GRPCNT (%1)"
 msgstr "Die Anzahl der Entitätsnamen in einer Attributspezifikationsliste darf GRPCNT (%1) nicht überschreiten"
@@ -1088,7 +1100,7 @@ msgstr "Kurzreferenzen aus einzelnen Zeichen wurden für folgende Zeichennummern 
 msgid "default entity used in entity attribute %1"
 msgstr "Standardentität in Entitätsattribut %1 benutzt"
 
-msgid "reference to entity %1 uses default entity "
+msgid "reference to entity %1 uses default entity"
 msgstr "Referenz auf Entität %1 benutzt die Standardentität"
 
 msgid "entity %1 in short reference map %2 uses default entity"
@@ -1215,8 +1227,7 @@ msgid "only one chain of explicit link processes can be active"
 msgstr "Nur eine Kette expliziter Linkprozesse kann aktiv sein"
 
 msgid "source document type name for link type %1 must be base document type since EXPLICIT YES 1"
-msgstr "Quelldokumenttypname für Linktyp %1 muß der Grunddokumenttyp sein, da
-EXPLICIT YES 1"
+msgstr "Quelldokumenttypname für Linktyp %1 muß der Grunddokumenttyp sein, da EXPLICIT YES 1"
 
 msgid "only one implicit link process can be active"
 msgstr "Nur ein impliziter Linkprozeß kann aktiv sein"
@@ -1248,7 +1259,7 @@ msgstr "Generischer Bezeichner fehlt nach der Dokumenttypspezifikation"
 msgid "generic identifier specification missing after document type specification in end-tag"
 msgstr "Generischer Bezeichner fehlt nach der Dokumenttypspezifikation in einem Endtag"
 
-msgid "a net-enabling start-tag cannot include a document type specification"
+msgid "a NET-enabling start-tag cannot include a document type specification"
 msgstr "Ein NET-ermöglichender Starttag kann keine Dokumenttypspezikation enthalten"
 
 msgid "DTD did not contain element declaration for document type name"
@@ -1572,16 +1583,16 @@ msgstr "Ein Element, das nicht zum Dokumentgrundtyp gehört, kann keinen leeren E
 msgid "immediately recursive element"
 msgstr "Unmittelbar rekursives Element"
 
-msgid "invalid URN %1: missing "":"" "
+msgid "invalid URN %1: missing "":"""
 msgstr "Ungültige URN %1: fehlendes "":"""
 
-msgid "invalid URN %1: missing ""urn:"" prefix "
+msgid "invalid URN %1: missing ""urn:"" prefix"
 msgstr "Ungültige URN %1: fehlendes ""urn:"" Präfix"
 
-msgid "invalid URN %1: invalid namespace identifier  "
+msgid "invalid URN %1: invalid namespace identifier"
 msgstr "Ungültige URN %1: ungültiger Namensraumbezeichner"
 
-msgid "invalid URN %1: invalid namespace specific string "
+msgid "invalid URN %1: invalid namespace specific string"
 msgstr "Ungültige URN %1: ungültiger Namensraum-spezifischer String"
 
 msgid "invalid URN %1: extra field"
@@ -1715,9 +1726,11 @@ msgstr "Kurzreferenzbegrenzer"
 
 # PosixStorageMessages
 
+# PosixStorageMessages
 msgid "error reading %1 (%2)"
 msgstr "Fehler beim Lesen von %1 (%2)"
 
+# StdioStorageMessages
 msgid "cannot open %1 (%2)"
 msgstr "Kann %1 nicht öffnen (%2)"
 
@@ -1745,16 +1758,17 @@ msgstr "Kann %1 nicht finden; versuchte %2"
 # StdioStorageMessages
 
 msgid "cannot open %1 (%2)"
-msgstr "Kann %1 nicht öffnen (%2)"
+msgstr ""
 
 msgid "error reading %1 (%2)"
-msgstr "Fehler beim Lesen von %1 (%2)"
+msgstr ""
 
 msgid "error seeking %1 (%2)"
 msgstr "Fehler beim Suchen in %1 (%2)"
 
 # URLStorageMessages
 
+# URLStorageMessages
 msgid "empty host in HTTP URL %1"
 msgstr "Leerer Rechnername in HTTP URL %1"
 
@@ -1823,6 +1837,7 @@ msgstr "Fehlernummer "
 
 # WinInetStorageMessages
 
+# WinInetStorageMessages
 msgid "cannot open URL %1 (%2)"
 msgstr "Kann URL %1 nicht öffnen (%2)"
 
@@ -1831,11 +1846,13 @@ msgstr "Fehler beim Lesen von URL %1 (%2)"
 
 # NsgmlsMessages
 
+# SxMessages
 msgid "unknown output option %1"
 msgstr "Ungültige Ausgabeoption %1"
 
 # RastEventHandlerMessages
 
+# RastEventHandlerMessages
 msgid "invalid RAST processing instruction"
 msgstr "Ungültige RAST Steueranweisung"
 
@@ -1848,7 +1865,7 @@ msgstr "Doppelter Linktyp %1 in rast-active-lpd Steueranweisung"
 msgid "rast-link-rule: processing instruction matches more than one link rule"
 msgstr "rast-link-rule: Steueranweisung passt zu mehreren Linkregeln"
 
-msgid "rast-link-rule: processing instruction matches does not match any link rules"
+msgid "rast-link-rule: processing instruction does not match any link rules"
 msgstr "rast-link-rule: Steueranweisung passt zu keiner Linkregel"
 
 msgid "multiple applicable link rules without disambiguating rast-link-rule: processing instruction"
@@ -1856,6 +1873,7 @@ msgstr "Mehrere anwendbare Linkregeln ohne eindeutig machende rast-link-rule: St
 
 # SpamMessages
 
+# SpamMessages
 msgid "invalid argument for -m option"
 msgstr "Ungültiges Argument für -m Option"
 
@@ -1864,12 +1882,12 @@ msgstr "Weggelassener Start- oder Endtag in einem CDATA oder RCDATA markierten B
 
 # SxMessages
 
-#duplicate
 msgid "unknown output option %1"
 msgstr ""
 
 # XmlOutputMessages
 
+# XmlOutputMessages
 msgid "reference to internal SDATA entity %1 not allowed in XML"
 msgstr "Referenz auf interne SDATA Entität %1 in XML nicht erlaubt"
 

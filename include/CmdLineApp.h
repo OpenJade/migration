@@ -57,7 +57,7 @@ protected:
                               const MessageType1 &doc);
   virtual void changeOptionRegistration(AppChar oldc, AppChar newc);
   virtual void registerUsage(const MessageType1 &u);
-  virtual void registerInfo(const MessageType0 &i);
+  virtual void registerInfo(const MessageType0 &i, bool pre = 0);
   virtual int init(int argc, AppChar **argv);
   void resetCodingSystemKit();
   static Boolean stringMatches(const AppChar *s, const char *key);
@@ -67,6 +67,7 @@ protected:
   Vector<MessageType1> optDocs_;
   Vector<MessageFragment> optArgs_;
   Vector<MessageType1> usages_;
+  Vector<MessageType0> preInfos_;
   Vector<MessageType0> infos_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;

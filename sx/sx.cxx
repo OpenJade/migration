@@ -51,6 +51,7 @@ SxApp::SxApp()
 : ParserApp("unicode")
 {
   outputCodingSystem_ = codingSystemKit_->makeCodingSystem("UTF-8", 0);
+  changeOptionRegistration('x', AppChar(255));
   registerOption('x', SP_T("xml-output-option"), SxMessages::option,  
                  SxMessages::xHelp);
   outputOptions_.nlInTag = 1;
@@ -70,6 +71,9 @@ int SxApp::processSysid(const StringC &sysid)
 void SxApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
+  case AppChar(255):
+    ParserApp::processOption('x', arg);
+    break;
   case 'x':
     {
       PackedBoolean value;

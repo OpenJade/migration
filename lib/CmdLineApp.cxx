@@ -83,6 +83,7 @@ CmdLineApp::CmdLineApp(const char *requiredInternalCode)
                  CmdLineAppMessages::file, CmdLineAppMessages::fHelp);
   registerOption('v', SP_T("version"), CmdLineAppMessages::vHelp);
   registerOption('h', SP_T("help"), CmdLineAppMessages::hHelp);
+  registerInfo(CmdLineAppMessages::usageStart, 1);
 }
 
 void CmdLineApp::resetCodingSystemKit()
@@ -151,9 +152,12 @@ void CmdLineApp::registerUsage(const MessageType1 &u)
   usages_.push_back(u);
 }
 
-void CmdLineApp::registerInfo(const MessageType0 &i)
+void CmdLineApp::registerInfo(const MessageType0 &i, bool pre)
 {
-  infos_.push_back(i);
+  if (pre)
+    preInfos_.push_back(i);
+  else
+    infos_.push_back(i);
 }
 
 void CmdLineApp::usage()
@@ -174,7 +178,8 @@ void CmdLineApp::usage()
                 : CmdLineAppMessages::usage, StringMessageArg(tem));
     } 
   }
-  message(CmdLineAppMessages::usageStart);
+  for (size_t i = 0; i < preInfos_.size(); i++)
+    message(preInfos_[i]);
   Vector<StringC> leftSide;
   size_t leftSize = 0;
   for (size_t i = 0; i < opts_.size(); i++) {

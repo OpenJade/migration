@@ -5,7 +5,7 @@
 
 =4100
 I1+cHelp++Use catalog %1.
-I1+CHelp++Treat arguments as catalogs, use DOCUMENT entry.
+I1+CHelp++Arguments are catalogs, use DOCUMENT entry.
 I1+DHelp++Search files in directory %1.
-+file++FILE
-+path++PATH
++directory++DIRECTORY
++sysid++SYSID

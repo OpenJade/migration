@@ -1475,6 +1475,10 @@ class MifFOTBuilder : public SerialFOTBuilder {
 //  void setEscapementSpaceBefore(const InlineSpace &);
 //  void setEscapementSpaceAfter(const InlineSpace &);
 //  void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
+	
+
+
+
 
     struct DisplayInfo : public Link {
 
@@ -1793,7 +1797,7 @@ class MifFOTBuilder : public SerialFOTBuilder {
     void beginHeaderFooter( bool header );
     void beginHeader() { beginHeaderFooter( true ); }
     void beginFooter() { beginHeaderFooter( false ); };
-    void endHeaderFooter();
+    void endHeaderFooter( unsigned hfPart );
     void makeEmptyTextFlow( MifDoc::TextRect & );
     void checkForParagraphReopening();
     void outPendingInlineStatements();
@@ -2278,12 +2282,12 @@ void MifFOTBuilder::outString
 
 void MifFOTBuilder::characters( const Char *s, size_t n ) {
 
-    checkForParagraphReopening();
+	 checkForParagraphReopening();
     if( MifDoc::Para::currentlyOpened ) {
-        if( inLeader ) {
+        if( inLeader) {
             outString( s, n, &curLeaderStream(), false );
         } else {
-            synchronizeFontFormat();
+	        synchronizeFontFormat();
             outString( s, n, NULL, true );
         }
     }
@@ -2457,27 +2461,32 @@ void MifFOTBuilder::doEndParagraph
 //    mifDoc.endParaLine();
 //    MifDoc::Para::outEpilog( mifDoc.os() );
 
+
     DisplayInfo *curDs = displayStack.head();
     assert( curDs != NULL );
 
+// Desc: Content of document missing in the debug version
+// Author: Seshadri
+// Date: 24th feb 2000
+
+    if( !curDs->paragraphClosedInMif ) {
+      MifDoc::Para *p = mifDoc.curPara();
+      mifDoc.exitPara();
+      if( !discardThisPara ) {
+	p->out( mifDoc.os() );
+	mifDoc.curFormat().updateFrom( p->format() );
+      }
+      delete p;
+    } 
+
     if( !sustainFormatStack )
-        end();
+      end();
     if( !sustainDisplayStack )
         endDisplay();
 
     if( paragraphBreakTest && paragraphBreakInEffect ) {
         paragraphBreakInEffect = false;
         end();
-    }
-
-    if( !curDs->paragraphClosedInMif ) {
-        MifDoc::Para *p = mifDoc.curPara();
-        mifDoc.exitPara();
-        if( !discardThisPara ) {
-            p->out( mifDoc.os() );
-            mifDoc.curFormat().updateFrom( p->format() );
-        }
-        delete p;
     }
 }
 
@@ -2560,8 +2569,13 @@ void MifFOTBuilder::startSimplePageSequenceSerial() {
         bookComponentOpened = true;
         bookComponentAvailable = false;
     }
+//	Desc: Pagesize was being initialized but not set after 
+//	the attribute was read .
 
-    nextFormat.FotCurDisplaySize
+	mifDoc.document().setDPageSize
+    ( MifDoc::T_WH( MifDoc::T_dimension( nextFormat.FotPageWidth ),
+                    MifDoc::T_dimension( nextFormat.FotPageHeight ) ) );   
+	nextFormat.FotCurDisplaySize
      = ( nextFormat.FotPageWidth - nextFormat.FotLeftMargin - nextFormat.FotRightMargin
           - nextFormat.FotPageColumnSep * ( nextFormat.FotPageNColumns - 1 ) )  
         / nextFormat.FotPageNColumns;
@@ -2616,12 +2630,17 @@ void MifFOTBuilder::beginHeaderFooter( bool header ) {
     mifDoc.beginParaLine();
 }
 
-void MifFOTBuilder::endHeaderFooter() {
+void MifFOTBuilder::endHeaderFooter( unsigned hfPart ) {
 
     mifDoc.endParaLine();
     MifDoc::Para::outEpilog( mifDoc.os() );
+//  Right header missing beacuse the prev stmt has set
+//  currentlyopened flag to false for a right footer. So reset it.
+	if ( hfPart & rightHF ) {
+		MifDoc::Para::currentlyOpened= true ;
+	}
 
-    end();
+	end();
 }
 
 void MifFOTBuilder::setupSimplePageSequence() {
@@ -2769,8 +2788,9 @@ void MifFOTBuilder::startSimplePageSequenceHeaderFooter( unsigned hfPart ) {
 
 void MifFOTBuilder::endSimplePageSequenceHeaderFooter( unsigned hfPart ) {
 
+
     if( hfPart & rightHF && (hfPart & frontHF || !(hfPart & firstHF)) ) {
-        endHeaderFooter();
+        endHeaderFooter(hfPart);
     }
 
     if( !(hfPart & firstHF) || hfPart & frontHF )

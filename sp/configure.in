@@ -247,4 +247,5 @@ AC_OUTPUT([Makefile lib/Makefile nsgmls/Makefile spent/Makefile
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
 	include/Makefile generic/Makefile doc/Makefile pubtext/Makefile
 	intl/Makefile po/Makefile.in],
-	[sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])
+	[echo creating po/Makefile
+         sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])

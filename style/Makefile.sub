@@ -31,3 +31,6 @@ GENSRCS=style_inst.cxx FlowObj_inst.cxx primitive_inst.cxx \
 FlowObj.o: FlowObj_inst.cxx
 primitive.o: primitive_inst.cxx
 DssslApp.o: DssslAppMessages.h
+FlowObj.lo: FlowObj_inst.cxx
+primitive.lo: primitive_inst.cxx
+DssslApp.lo: DssslAppMessages.h

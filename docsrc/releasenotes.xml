@@ -1,47 +1,20 @@
 <?xml version='1.0'?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "/usr/share/sgml/docbook/xml-dtd-4.1.2/docbookx.dtd" [
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" [
 ]>
 <book>
 <bookinfo>
-	<title>OpenJade 1.3.1</title>
+	<title>OpenJade 1.3.2</title>
 	<subtitle>Release Notes</subtitle>
 	<corpauthor>OpenJade Project</corpauthor>
-        <edition>Release 1.3.1</edition>
-        <pubdate>January 2002</pubdate>
+        <edition>Release 1.3.2</edition>
+        <pubdate>October 2002</pubdate>
         <copyright>
                 <year>2002</year>
                 <holder>OpenJade Project</holder>
         </copyright>
 </bookinfo>
 
-<preface><title>Acknowledgements</title>
-<para>It goes without saying that the release of OpenJade 1.3.1 is the work of many people and it would be impossible to name everyone who has made some contribution. However, I would particularly like to thank for their patches, testing
-and feedback:
-Karl Eichwalder (SuSE),
-Clive George (LOOK Systems),
-Markus Hoenika,
-Francis J. Lacoste,
-Kogul&eacute Ryo,
-Leigh Smith (Fink Project), 
-Tim Waugh (Red Hat),
-and
-Didier PH Martin.
-</para>
-<para>I would also like to thank sourceforge.net for their great gift of providing CVS, email and the compile farm which have made the task of getting this
-release ready much easier.</para>
-<para>Finally, I must thank my employers, LOOK Systems, for their generosity in
-allowing me to work on this release, even though I spent much more time
-on it than I said I would.</para>
-<para>
-<address>
-<firstname>Ian</firstname> <surname>Castle</surname> <email>ian.castle@looksystems.co.uk</email>
-<state>Yorkshire</state>
-<country>England</country>
-<otheraddr>January 2002</otheraddr>
-</address>
-</para>
-</preface>
-<chapter><title>OpenJade 1.3.1 Release Notes</title>
+<chapter><title>OpenJade 1.3.2 Release Notes</title>
 
 <para>OpenJade is a suite of tools for validating, processing and applying DSSSL (Document Style Semantics and Specification Language) style sheets to SGML and XML documents.</para>
 <para>OpenJade is a project undertaken by the DSSSL community to maintain
@@ -49,7 +22,7 @@ and extend James Clark's Jade, as well as the related SP suite of SGML/XML proce
 
 <sect1><title>Applications of OpenJade</title>
 <para>Many different projects, organizations and companies make use of OpenJade to publish documentation. The SGML/XML backend enables the generation of "world wide web ready" documents while the TeX backend allows high quality "ready for press" output to be obtained. The FreeBSD Handbook (second edition) ISBN: 1571763031 is one such example of a book created using OpenJade.</para>
-<para>The OpenSP (and SP) library has been used for the basis of a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the SP library.</para>
+<para>The OpenSP (and SP) library has been used for the basis of a number of projects. The World Wide Web consortium on-line HTML and XHTML validator is based on the OpenSP library.</para>
 </sect1>
 
 <sect1><title>Obtaining OpenJade</title>
@@ -66,9 +39,8 @@ addition OpenJade will also build on Microsoft's Win32 based operating systems.
 </para>
 <para>OpenJade is known to compile with both the GNU gcc c++ compiler and
 Microsoft Visual C++. Other compilers have not been extensively tested.</para>
-<para>OpenJade has been successfully built with the following GNU compilers: egcs++ 1.1.2 (g++ 2.91.66),
-g++ 2.95.3, g++ 3.0.3 and should also compile with g++ 3.1 when it becomes
-available</para>
+<para>OpenJade has been successfully built with the following GNU compilers: 
+Red Hat g++ 2.96</para>
 <para>OpenJade has been built on a number of architectures including Intel i386 and ia64, Alpha AXP, Sparc, PPC and S/390, S/390x.</para>
 <para>The following table details known successful builds</para>
 <table id="platforms" frame="topbot"><title>Platforms on which OpenJade is known to build</title>
@@ -88,98 +60,8 @@ available</para>
 <tbody>
 <row>
    <entry align="left" morerows="7">i386</entry>
-   <entry>Red Hat Linux 6.2</entry>
-   <entry>egcs++, gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Red Hat Linux 7.2</entry>
+   <entry>Red Hat Linux 7.3</entry>
    <entry>Red Hat gcc 2.96</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>SuSE Linux 7.x</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Mandrake Linux 8.0, 8.1</entry>
-   <entry>Red Hat gcc 2.96</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Debian GNU/Linux 2.2</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>FreeBSD 4.4</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
-the default <command>make</command> program.</emphasis></entry>
-</row>
-<row>
-   <entry>Microsoft Win32</entry>
-   <entry>Visual C++ 6.0</entry>
-   <entry><emphasis>It is likely that VC++ 4.2 and 5.0 will also work, see
-build.htm for further details.</emphasis></entry>
-</row>
-<row>
-   <entry>Cygwin 1.3.6 Win32</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry><emphasis>Executables and Libraries must be built statically. Later versions of Cygwin should also work.</emphasis></entry>
-</row>
-<row>
-   <entry morerows="2">Alpha AXP</entry>
-   <entry>SuSE Linux 7.1</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Debian GNU/Linux 2.2</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Digital UNIX 4.0D</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
-the default <command>make</command> program.</emphasis></entry>
-</row>
-<row>
-   <entry>ia64</entry>
-   <entry>SuSE Linux 7.2</entry>
-   <entry></entry>
-   <entry></entry>
-</row>
-<row>
-   <entry morerows="1">PPC</entry>
-   <entry>SuSE Linux 7.3</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Mac OS X 10.1 (Darwin 1.4)</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
-the default <command>make</command> program.</emphasis></entry>
-</row>
-<row>
-   <entry morerows="1">Sparc</entry>
-   <entry>SuSE Linux 7.3</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry></entry>
-</row>
-<row>
-   <entry>Solaris (SunOS 5.8)</entry>
-   <entry>gcc 2.95.3</entry>
-   <entry><emphasis>Use <command>gmake</command> (GNU Make) rather than
-the default <command>make</command> program. Use configure options <command>--enable-static=yes --enable-shared=no</command> to prevent core dump on startup.</emphasis></entry>
-</row>
-<row>
-   <entry>S/390</entry>
-   <entry>SuSE Linux 7.2</entry>
-   <entry>gcc 2.95.3</entry>
    <entry></entry>
 </row>
 </tbody>
@@ -193,8 +75,8 @@ will require around 15Mb to 20Mb depending on architecture.</para>
 <para>OpenJade makes use of the GNU software configuration tools (autoconf, libtool, automake etc).
 The GNU C++ compiler and make utility should also be used.
 The steps required to build the OpenJade tools (<command>onsgmls</command>, <command>openjade</command>, <command>osgmlnorm</command>, <command>ospam</command>, <command>ospent</command>, <command>osx</command>) and libraries are as follows:
-<screen>gzip -d openjade-1.3.1.tar.gz | tar xvf -
-cd openjade-1.3.1
+<screen>gzip -d openjade-1.3.2.tar.gz | tar xvf -
+cd openjade-1.3.2
 ./configure <optional><option><replaceable>options&hellip;</replaceable></option></optional>
 make
 </screen>
@@ -223,6 +105,16 @@ In addition to the standard options, the following table describes options speci
 </row>
 </thead>
 <tbody>
+<row>
+  <entry><option>--enable-spincludedir=path</option></entry>
+  <entry>/usr/include/OpenSP</entry>
+  <entry>Define the path where the OpenSP include files may be found.</entry>
+</row>
+<row>
+  <entry><option>--enable-splibdir=path</option></entry>
+  <entry>/usr/lib</entry>
+  <entry>Define the path where the OpenSP library (libosp) may be found.</entry>
+</row>
 <row>
   <entry><option>--enable-http</option></entry>
   <entry>No http support</entry>
@@ -302,6 +194,11 @@ See http://www.oasis-open.org/docbook/mailinglist/ for details.</para>
 The various mailing lists are archived and searchable.
 It is always worth searching for your problem first, as it is often the case that someone has had the same problem before.</para>
 
+</sect1>
+<sect1><title>Version 1.3.2</title>
+<formalpara><title>Released October 2002.</title>
+<para>This release allows openjade to be built against the most recent OpenSP release - version 1.5. It also contains some fixes for the MIF backend which were omitted from the 1.3.1 release. OpenSP is now distributed in a separate package and made available on its own release cycle</para>
+</formalpara>
 </sect1>
 <sect1><title>Version 1.3.1</title>
 <formalpara><title>Released January 2002.</title>

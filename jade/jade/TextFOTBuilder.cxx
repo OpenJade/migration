@@ -187,7 +187,7 @@ public:
     class FlowPort : Abstract {
     public:
       virtual Ordinate currentWidth() const = 0;
-      virtual void emitLine(Ordinate x, const Char* chars, unsigned n) = 0;
+      virtual void chars(Ordinate x, const Char* chars, unsigned n) = 0;
       virtual void verticalSpace(Ordinate height) = 0;
     };
     class ParaBuilder : Abstract {
@@ -218,13 +218,14 @@ public:
       FlowPort& flow_;
       TextFOTBuilder& fotb_;
       Ordinate x_;
-      Char* line_;
+      Ordinate limit_;
+      Ordinate offset_;
     };
     class AreaFlowPort : public FlowPort {
     public:
       AreaFlowPort(TextArea::Area& area);
       virtual Ordinate currentWidth() const;
-      virtual void emitLine(Ordinate x, const Char* chars, unsigned n);
+      virtual void chars(Ordinate x, const Char* chars, unsigned n);
       virtual void verticalSpace(Ordinate height);
     private:
       TextArea::Area& area_;
@@ -235,7 +236,7 @@ public:
       PageSeqFlowPort(TextFOTBuilder& fotb, Model::PageSequence model);
       ~PageSeqFlowPort();
       virtual Ordinate currentWidth() const;
-      virtual void emitLine(Ordinate x, const Char* chars, unsigned n);
+      virtual void chars(Ordinate x, const Char* chars, unsigned n);
       virtual void verticalSpace(Ordinate height);
     private:
       const TextArea::Area* getArea() const;
@@ -513,7 +514,7 @@ TextFOTBuilder::Output::FlowParaBuilder::FlowParaBuilder(FlowPort& flow, TextFOT
 : flow_(flow)
 , fotb_(fotb)
 , x_(0)
-, line_(0)
+, limit_(0)
 {
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::FlowParaBuilder()"));
 }
@@ -528,27 +529,24 @@ void
 TextFOTBuilder::Output::FlowParaBuilder::allocLine()
 {
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::allocLine()"));
-  fotb_.lineWidthProvider_.nextLine();
-  line_ = new Char[flow_.currentWidth()];
-  for (Ordinate x = 0; x < flow_.currentWidth(); ++x) 
-    line_[x] = ' ';
   x_ = 0;
+  flow_.currentWidth(); // Ensure there is an area allocated. FIXME.
+  fotb_.lineWidthProvider_.nextLine();
+  limit_ = flow_.currentWidth() - fotb_.lineWidthProvider_.freeLineWidth();
+  offset_ = fotb_.quaddingOffset(fotb_.style().quadding, flow_.currentWidth() - limit_);
+  DBG(dbg << "limit = " << limit_ << "; setting quadding offset at " << offset_ << endl);
 }
 
 void
 TextFOTBuilder::Output::FlowParaBuilder::flushLine()
 {
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::flushLine()"));
-  if (line_) {
-    if (x_ > 0) {
-      Ordinate& freeLineWidth = fotb_.lineWidthProvider_.freeLineWidth();
-      Ordinate offset = fotb_.quaddingOffset(fotb_.style().quadding, freeLineWidth);
-      flow_.emitLine(offset, line_, x_);
-      freeLineWidth = flow_.currentWidth() - x_;
-    }
-    delete[] line_;
-    line_ = 0;
+  if (x_ > 0) {
+    DBG(Debugger dbg("flushLine active"));
+    flow_.verticalSpace(1);
+    fotb_.lineWidthProvider_.freeLineWidth() = limit_ - x_;
   }
+  x_ = limit_ = 0;
 }
 
 void
@@ -557,16 +555,17 @@ TextFOTBuilder::Output::FlowParaBuilder::chars(const Char* chars, unsigned n)
   DBG(Debugger dbg("TextFOTBuilder::Output::FlowParaBuilder::chars()"));
   // break lines rather tastelessly.
   while (n > 0) {
-    if (!line_)
+    if (x_ >= limit_)
       allocLine();
-    if (x_ + n > flow_.currentWidth() - fotb_.lineWidthProvider_.freeLineWidth()) {
-      while (n > 0, x_ < flow_.currentWidth() - fotb_.lineWidthProvider_.freeLineWidth())
-        --n, line_[x_++] = *chars++;
+    size_t done = limit_ - x_;
+    if (done > n)
+      done = n;
+    flow_.chars(offset_ + x_, chars, done);
+    x_ += done;
+    n -= done;
+    chars += done;
+    if (x_ == limit_)
       flushLine();
-    } else {
-      while (n > 0)
-        --n, line_[x_++] = *chars++;
-    }
   }
 }
 
@@ -625,15 +624,16 @@ TextFOTBuilder::Output::AreaFlowPort::currentWidth() const
 }
 
 void 
-TextFOTBuilder::Output::AreaFlowPort::emitLine(Ordinate x, const Char* chars, unsigned n)
+TextFOTBuilder::Output::AreaFlowPort::chars(Ordinate x, const Char* chars, unsigned n)
 {
-  DBG(Debugger dbg("TextFOTBuilder::Output::AreaFlowPort::emitLine"));
-  area_.chars(x, y_++, chars, n);
+  DBG(Debugger dbg("TextFOTBuilder::Output::AreaFlowPort::chars()"));
+  area_.chars(x, y_, chars, n);
 }
 
 void 
 TextFOTBuilder::Output::AreaFlowPort::verticalSpace(Ordinate height)
 {   
+  y_ += height;
 }
 
 TextFOTBuilder::Output::PageSeqFlowPort::PageSeqFlowPort
@@ -736,17 +736,16 @@ TextFOTBuilder::Output::PageSeqFlowPort::currentWidth() const
 }
 
 void 
-TextFOTBuilder::Output::PageSeqFlowPort::emitLine(Ordinate x, const Char* chars, unsigned n)
+TextFOTBuilder::Output::PageSeqFlowPort::chars(Ordinate x, const Char* chars, unsigned n)
 {
-  DBG(Debugger dbg("TextFOTBuilder::Output::PageSeqFlowPort::emitLine()"));
+  DBG(Debugger dbg("TextFOTBuilder::Output::PageSeqFlowPort::chars()"));
   getArea()->chars(x, y_, chars, n);
-  ++y_;
 }
 
 void  
 TextFOTBuilder::Output::PageSeqFlowPort::verticalSpace(Ordinate height)
 {
-  ++y_; 
+  y_ += height;
 }
 
 void 
@@ -843,10 +842,13 @@ MultipassTextFOTBuilder::~MultipassTextFOTBuilder()
 void 
 MultipassTextFOTBuilder::process()
 {
+  DBG(Debugger dbg("MultipassTextFOTBuilder::process()"));
+  DBG(dbg << "Measurement pass" << endl);
   LineWidthCache lwc;
   TextArea::DummyPageFactory nooutput;
   TextFOTBuilder pass1(nooutput, lwc.fill());
   emit(pass1);
+  DBG(dbg << "Output pass" << endl);
   TextArea::RealPageFactory output(os_);
   TextFOTBuilder pass2(output, lwc.use());
   emit(pass2);

@@ -78,6 +78,13 @@ SpamApp::SpamApp()
   registerOption('p');
   registerOption('r');
   registerOption('x');
+  registerLongOption(SP_T("hoist-omitted-tags"), 'h');
+  registerLongOption(SP_T("lowercase"), 'l');
+  registerLongOption(SP_T("markup-option"), 'm', SP_T("omittag|shortref|net|emptytag|unclosed|attname|attvalue|attspec|current|shorttag|rank|reserved"));
+  registerLongOption(SP_T("output-entity"), 'o', SP_T("name"));
+  registerLongOption(SP_T("output-prolog"), 'p');
+  registerLongOption(SP_T("raw"), 'r');
+  registerLongOption(SP_T("expand-references"), 'x');
 }
 
 void SpamApp::processOption(AppChar opt, const AppChar *arg)

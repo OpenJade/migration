@@ -28,6 +28,8 @@ SpentApp::SpentApp()
 {
   registerOption('n');
   registerOption('r');
+  registerLongOption(SP_T("non-sgml"), 'n');
+  registerLongOption(SP_T("raw"), 'r');
 }
 
 void SpentApp::processOption(AppChar opt, const AppChar *arg)

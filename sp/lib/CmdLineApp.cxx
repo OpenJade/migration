@@ -174,7 +174,12 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *argName)
 void CmdLineApp::usage()
 {
   const OutputCharStream::Newline nl = OutputCharStream::newline;
-  Owner<OutputCharStream> stdOut(makeStdOut());
+  // We use the default encoding for the help message, since this is consistent
+  // with error messages and probably is what users want.
+  Owner<OutputCharStream> stdOut(ConsoleOutput::makeOutputCharStream(1));
+  if (!stdOut)
+    stdOut = new EncodeOutputCharStream(&standardOutput, codingSystem());
+
   Vector<CopyOwner<MessageArg> > args(1);
   StringMessageArg arg(convertInput(progName ? progName : SP_T("program")));
   args[0] = arg.copy();
@@ -193,6 +198,7 @@ void CmdLineApp::usage()
 		  args2, *stdOut, 1);
     *stdOut << nl;
   } 
+
   for (size_t i = 0; i < preInfos_.size(); i++) {
     formatMessage(preInfos_[i], args, *stdOut, 1);
     *stdOut << nl;

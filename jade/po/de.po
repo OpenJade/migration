@@ -1,0 +1,654 @@
+msgid "cannot open output file %1 (%2)"
+msgstr "Ausgabedatei %1 kann nicht geöffnet werden (%2)"
+
+msgid "unknown output type %1"
+msgstr "Unbekannter Ausgabetyp %1"
+
+msgid "empty output filename"
+msgstr "Leerer Ausgabedateiname"
+
+msgid "MIF: cannot open output file %1 (%2)"
+msgstr "Ausgabedatei %1 kann nicht geöffnet werden (%2)"
+
+msgid "MIF: could not convert system identifier %1 to a single filename"
+msgstr "Konnte Systembezeichner %1 nicht in einzelnen Dateinamen konvertieren"
+
+msgid "MIF: missing table column flow object (table-auto-width feature not fully supported)"
+msgstr "Fehlendes Tabellenspalten-Flußobjekt (table-auto-width Feature nicht vollständig unterstützt)"
+
+msgid "nested tables are not allowed in RTF"
+msgstr "Verschachtelte Tabellen sind in RTF nicht erlaubt"
+
+msgid "could not convert system identifier %1 to a single filename"
+msgstr "Konnte Systembezeichner %1 nicht in einzelnen Dateinamen konvertieren"
+
+msgid "could not embed %1 with clsid %2"
+msgstr "Konnte %1 nicht mit clsid %2 einbetten"
+
+msgid "TeX backend does not currently support references to page numbers of nodes other than elements"
+msgstr "TeX Ausgabe unterstützt Querverweise auf Seitenzahlen nur für Elementknoten"
+
+msgid "TeX backend does not currently support links to nodes other than elements"
+msgstr "TeX Ausgabe unterstützt Verknüpfungen nur für Elementknoten"
+
+msgid "TeX backend does not currently support links to entities"
+msgstr "TeX Ausgabe unterstützt keine Verknüpfungen auf Entitäten"
+
+msgid "TeX backend does not currently support links to other SGML documents"
+msgstr "TeX Ausgabe unterstützt keine Verknüpfungen auf andere SGML Dokumente"
+
+msgid "TeX backend does not currently support HyTime linkends"
+msgstr "TeX Ausgabe unterstützt keine HyTime Verknüpfungsenden"
+
+msgid "TeX backend does not currently support TEI links"
+msgstr "TeX Ausgabe unterstützt keine TEI Verknüpfungen"
+
+msgid "TeX backend does not currently support HTML links"
+msgstr "TeX Ausgabe unterstützt keine HTML Verknüpfungen"
+
+msgid "TeX backend does not currently support glyph substitution tables"
+msgstr "TeX Ausgabe unterstützt keine Glyphersetzungstabellen"
+
+msgid "%1 version %2"
+msgstr "%1 Version %2"
+
+msgid "no DSSSL specification: use -d to specify"
+msgstr "Keine DSSSL Spezifikation: verwende -d, um sie zu spezifizieren"
+
+msgid "unexpected end of file"
+msgstr "Unerwartetes Ende der Datei"
+
+msgid "invalid character"
+msgstr "Ungültiges Zeichen"
+
+msgid "invalid character after '#'"
+msgstr "Ungültiges Zeichen nach '#'"
+
+msgid "unknown #! named constant %1"
+msgstr "Unbekannte #! benannte Konstante %1"
+
+msgid "unexpected token %1"
+msgstr "Unerwartetes Token %1"
+
+msgid "string with no closing quote"
+msgstr "Zeichenkette ohne abschließendes Anführungszeichen"
+
+msgid "missing closing parenthesis"
+msgstr "Fehlende schließende Klammer"
+
+msgid "invalid number %1"
+msgstr "Ungültige Zahl %1"
+
+msgid "invalid AFII glyph identifier %1"
+msgstr "Ungültiger AFII Glyphbezeichner %1"
+
+msgid "call of non-function object %1"
+msgstr "Aufruf des nicht-Funktionsobjektes %1"
+
+msgid "too many arguments for function"
+msgstr "Zu viele Argumente für Funktion"
+
+msgid "odd number of keyword/value arguments"
+msgstr "Ungerade Anzahl von Schlüsselwort/Wert Argumenten"
+
+msgid "missing argument for function call"
+msgstr "Fehlendes Argument für Funktionsaufruf"
+
+msgid "syntactic keyword %1 used as variable"
+msgstr "Syntaktisches Schlüsselwort %1 als Variable benutzt"
+
+msgid "reference to undefined variable %1"
+msgstr "Referenz auf undefinierte Variable %1"
+
+msgid "no character with name %1"
+msgstr "Kein Zeichen mit Namen %1"
+
+msgid "syntactic keyword %1 not valid in call position"
+msgstr "Syntaktisches Schlüsselwort %1 in Aufrufposition nicht gültig"
+
+msgid "symbol required (got %1)"
+msgstr "Symbol benötigt (fand %1)"
+
+msgid "unknown top level form %1"
+msgstr "Unbekannte Top-Level Form %1"
+
+msgid "bad form %1 in mode group"
+msgstr "Schlechte Form %1 in Modusgruppe"
+
+msgid "identifier %1 already defined in same part"
+msgstr "Bezeichner %1 bereits im selben Teil definiert"
+
+msgid "first definition was here"
+msgstr "erste Definition war hier"
+
+msgid "loop in specification of value of %1"
+msgstr "Schleife in der Spezifikation des Wertes von %1"
+
+msgid "argument out of range"
+msgstr "Argument außerhalb des zulässigen Bereichs"
+
+msgid "loop in specification of value of unit %1"
+msgstr "Schleife in der Spezifikation des Wertes der Einheit %1"
+
+msgid "bad value specified for unit %1"
+msgstr "Schlechter Wert für Einheit %1 spezifiziert"
+
+msgid "unit %1 already defined in same part"
+msgstr "Einheit %1 bereits im selben Teil definiert"
+
+msgid "quantity %1 undefined"
+msgstr "Quantität %1 undefiniert"
+
+msgid "incompatible dimensions"
+msgstr "Inkompatible Dimensionen"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a boolean"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein boolescher Wert"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a pair"
+msgstr "%2 Argument für Funktion %1 vom falschen Type: %3 ist kein Paar"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Liste"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a symbol"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Symbol"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a string"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Zeichenkette"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a string or symbol"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist weder Zeichenkette noch Symbol"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist weder Zeichenkette noch Symbol"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a char"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Zeichen"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a style"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Stil"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an exact integer"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine exakte ganze Zahl"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a quantity"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Größe"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a color-space"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Farbraum"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a number"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Zahl"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a sosofo"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Sosofo"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an optional singleton node list"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine optionale Einzelknotenliste"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a singleton node list"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Einzelknotenliste"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a node list"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Knotenliste"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a named node list"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine benannte Knotenliste"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a length or length-spec"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist weder eine Länge noch eine Längen-Spezifikation"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a quantity or length-spec"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist weder eine Größe noch eine Längen-Spezifikation"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an integer or the symbol \"force\""
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist weder eine ganze Zahl noch das Symbol \"force\""
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a valid element matching pattern"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein gültiges Elementsuchmuster" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an address"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Adresse" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a glyph-id"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Glyphbezeichner" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a glyph-subst-table"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Glyphersetzungstabelle" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list of pairs of glyph-ids"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Liste von Paaren von Glyphbezeichnern" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a procedure"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Prozedur" 
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a vector"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Vektor" 
+
+msgid "root rule already defined in same part with same importance"
+msgstr "Root-Regel bereits im selben Teil mit derselben Wichtigkeit definiert"
+
+msgid "initial value already declared for characteristic %1 in same part"
+msgstr "Initialer Wert für Charakteristik %1 bereits im selben Teil deklariert"
+
+msgid "first declaration was here"
+msgstr "erste Deklaration war hier"
+
+msgid "%1 is not a valid keyword in a style expression"
+msgstr "%1 ist kein gültiges Schlüsselwort in einem Stilausdruck"
+
+msgid "%1 is not a valid keyword in a make expression for flow object class %2"
+msgstr "%1 ist kein gültiges Schlüsselwort in einem make-Ausdruck für Flußobjektklasse %2"
+
+msgid "%1 is not the name of any flow object class"
+msgstr "%1 ist nicht der Name einer Flußobjektklasse"
+
+msgid "content expression cannot be specified in make expression for atomic flow object class %1"
+msgstr "Inhaltsausdruck kann in einem make-Ausdruck für die atomare Flußobjektklasse %1 nicht spezifiziert werden"
+
+msgid "value for \"label:\" not a symbol"
+msgstr "Wert für \"label:\" ist kein Symbol"
+
+msgid "no port for label %1"
+msgstr "Kein Port für Label %1"
+
+msgid "invalid content map"
+msgstr "Ungültige Inhaltsabbildung"
+
+msgid "content map references non-existent port %1"
+msgstr "Inhaltsabbildung referenziert nicht existierenden Port %1"
+
+msgid "invalid value for %1 characteristic"
+msgstr "Ungültiger Wert für Charakteristik %1"
+
+msgid "no clause in cond expression matched"
+msgstr "Keine Klausel im cond-Ausdruck traf zu"
+
+msgid "no clause in case expression matched %1"
+msgstr "Keine Klausel im case-Ausdruck passte zu %1"
+
+msgid "expected \"else\" not %1"
+msgstr "Erwartete \"else\", nicht %1"
+
+msgid "sorry, cannot handle unresolvable quantities in datums in case expression"
+msgstr "Sorry, kann unauflösbare Quantitäten in Datums in case-Ausdrücken nicht verarbeiten"
+
+msgid "%1"
+msgstr "%1"
+
+msgid "division by zero"
+msgstr "Teilung durch Null"
+
+msgid "procedure does not have %1 keyword argument"
+msgstr "Prozedur hat kein %1 Schlüsselwortargument"
+
+msgid "argument not a keyword"
+msgstr "Argument ist kein Schlüsselwort"
+
+msgid "support for more than one style-specification-body not yet implemented"
+msgstr ""
+
+msgid "specification document does not have the DSSSL architecture as a base architecture"
+msgstr "Die Spezifikation basiert nicht auf der DSSSL Architektur"
+
+msgid "specification document did not contain a style-specification-body element"
+msgstr "Die Spezifikation enthielt kein style-specification-body Element"
+
+msgid "unknown character name %1"
+msgstr "Unbekannter Zeichenname %1"
+
+msgid "attempt to use current node when there is none"
+msgstr "Versuch, den gegenwärtigen Knoten zu benutzen, obwohl es keinen gibt"
+
+msgid "attempt to process node in illegal context"
+msgstr "Versuch, einen Knoten in illegalem Kontext zu verarbeiten"
+
+msgid "radix must be 2, 8, 10 or 16"
+msgstr "Wurzel muß 2, 8, 10 oder 16 sein"
+
+msgid "this context requires a sosofo"
+msgstr "Dieser Kontext benötigt ein Sosofo"
+
+msgid "this context requires a style object"
+msgstr "Dieser Kontext benötigt ein Stilobjekt"
+
+msgid "procedure can only be used in evaluation of characteristic value"
+msgstr "Diese Prozedur kann nur in der Auswertung des Wertes einer Charakteristik verwendet werden"
+
+msgid "sorry, %1 expression not implemented"
+msgstr ""
+
+msgid "%1 color requires three arguments"
+msgstr "Eine %1 Farbe benötigt drei Argumente"
+
+msgid "arguments for %1 color must be numbers"
+msgstr "Argumente für eine %1 Farbe müssen Zahlen sein"
+
+msgid "arguments for %1 color must be in the range 0 to 1"
+msgstr "Argumente für eine %1 Farbe müssen zwischen 0 und 1 liegen"
+
+msgid "result of procedure in %1 color must be a number"
+msgstr "Ergebnis der Prozedur in einer %1 Farbe muß eine Zahl sein"
+
+msgid "unknown color-space family %1"
+msgstr "Unbekannte Farbraumfamilie %1"
+
+msgid "%1 color-space family does not take any arguments"
+msgstr "Die %1 Farbraumfamilie akzeptiert keine Argumente"
+
+msgid "invalid parameters for %1 color-space family"
+msgstr "Ungültige Parameter für die %1 Farbraumfamilie"
+
+msgid "%1 is not a pre-defined inherited characteristic"
+msgstr "%1 ist keine vordefinierte vererbte Charakteristik"
+
+msgid "invalid number format %1"
+msgstr "Ungültiges Zahlformat %1"
+
+msgid "invalid character %1 in public identifier"
+msgstr "Ungültiges Zeichen in öffentlichem Bezeichner"
+
+msgid "debug %1"
+msgstr ""
+
+msgid "circular use of specification parts"
+msgstr "Zirkuläre Benutzung von Spezifikationsteilen"
+
+msgid "no style-specification or external-specification with ID %1"
+msgstr "Keine style-specification oder external-specificaton mit ID %1"
+
+msgid "document did not contain any style-specifications or external-specifications"
+msgstr "Das Dokument enthielt weder style-specification noch external-specificaton Elemente"
+
+msgid "table-cell flow object not inside a table"
+msgstr "table-cell Flußobjekt nicht innerhalb einer Tabelle"
+
+msgid "table-row flow object not inside a table"
+msgstr "table-row Flußobjekt nicht innerhalb einer Tabelle"
+
+msgid "no value for node property %1"
+msgstr "Kein Wert für Knoteneigenschaft %1"
+
+msgid "value returned by procedure was not a node-list"
+msgstr "Der Rückgabewert der Prozedur war keine Knotenliste"
+
+msgid "called from here"
+msgstr "von hier aufgerufen"
+
+msgid "called from here...(%1 calls omitted)"
+msgstr "von hier aufgerufen...(%1 Aufrufe weggelassen)"
+
+msgid "node processing loop detected"
+msgstr "Knotenverarbeitungsschleife"
+
+msgid "unquote-splicing expression does not evaluate to a list"
+msgstr "unqote-splicing Ausdruck hat keine Liste als Wert"
+
+msgid "object is read-only"
+msgstr "Objekt ist nur lesbar"
+
+msgid "assignment to top-level variable %1"
+msgstr "Zuweisung an Top-Level Variable %1"
+
+msgid "invalid call to continuation"
+msgstr "Ungültiger Aufruf einer Fortsetzung"
+
+msgid "empty generic identifier in pattern"
+msgstr "Leerer generischer Bezeichner in Muster"
+
+msgid "pattern is not a list"
+msgstr "Muster ist keine Liste"
+
+msgid "%1 cannot be used as a generic identifier in a pattern"
+msgstr "%1 kann nicht als generischer Bezeichner in einem Muster verwendet werden"
+
+msgid "%1 cannot occur in a pattern"
+msgstr "%1 kann in einem Muster nicht vorkommen"
+
+msgid "value missing for qualifier in pattern"
+msgstr "Im Muster fehlt ein Wert für einen Qualifikator"
+
+msgid "unknown pattern qualifier %1"
+msgstr "Unbekannter Musterqualifikator %1"
+
+msgid "bad value %1 for %2 qualifier in pattern"
+msgstr "Schlechter Wert %1 für Qualifikator %2 im Muster"
+
+msgid "repeat qualifier not allowed inside children qualifier"
+msgstr "repeat Qualifikator nicht innerhalb des children Qualifikators erlaubt"
+
+msgid "bad value for attributes qualifier in pattern"
+msgstr "Schlechter Wert für den attributes Qualifikator im Muster"
+
+msgid "characteristic %1 applied in style rule with same specificity"
+msgstr "Charakteristik %1 in Stilregel mit derselben Spezifizität"
+
+msgid "other style rule is here"
+msgstr "die andere Regel ist hier"
+
+msgid "node matches more than one pattern with the same specificity"
+msgstr "Knoten passt zu meheren Mustern mit derselben Spezifizität"
+
+msgid "reference to uninitialized variable %1"
+msgstr "Referenz auf uninitialisierte Variable %1"
+
+msgid "circular use of actual value of characteristic %1"
+msgstr "Zirkuläre Benutzung des aktuellen Wertes der Charakteristik %1"
+
+msgid "characteristic %1 already defined in same part"
+msgstr "Charakteristik %1 bereits im selben Teil definiert"
+
+msgid "flow object class %1 already defined in same part"
+msgstr "Flußobjektklasse %1 bereits im selben Teil definiert"
+
+msgid "mode %1 not defined"
+msgstr "Modus %1 nicht definiert"
+
+msgid "duplicate character name %1"
+msgstr "Doppelter Zeichenname %1"
+
+msgid "duplicate SDATA entity name %1"
+msgstr "Doppelter SDATA-Entitätsname %1"
+
+msgid "duplicate SDATA entity text %1"
+msgstr "Doppelter SDATA-Entitätstext %1"
+
+msgid "unsupported declaration will be ignored"
+msgstr "Nicht unterstützte Deklaration wird ignoriert"
+
+msgid "unsupported character repertoire %1 will be ignored"
+msgstr "Nicht unterstütztes Zeichenrepertoir %1 wird ignoriert"
+
+msgid "error in declaration element"
+msgstr "Fehler in Deklarationselement"
+
+msgid "duplicate declaration element (%1)"
+msgstr "Doppeltes Deklarationselement (%1)"
+
+msgid "%1 is not a valid identifier"
+msgstr "%1 ist kein gültiger Bezeichner"
+
+msgid "error in language definition"
+msgstr "Fehler in Sprachdefinition"
+
+msgid "no current language"
+msgstr "Keine gegenwärtige Sprache"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a language"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine Sprache"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a positive integer"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine positive ganze Zahl"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an integer"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine ganze Zahl"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a keyword"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist kein Schlüsselwort"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not an alist"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist keine alist"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %3 ist Zeichenliste"
+
+msgid "%2 argument for primitive %1 has wrong length"
+msgstr "%2 Argument für Funktion %1 hat die falsche Länge"
+
+msgid "quantity %1 can't be represented exactly"
+msgstr "Die Größe %1 kann nicht exakt repräsentiert werden"
+
+msgid "default language already declared in this part"
+msgstr "Standardsprache bereits im selben Teil deklariert"
+
+msgid "%1 not a language as required in a default-language-declaration"
+msgstr "%1 ist keine Sprache wie sie in einer default-language-declaration benötigt wird"
+
+msgid "%1 not a valid unit name"
+msgstr "%1 ist kein gültiger Einheitsname"
+
+msgid "%1 not a valid character name"
+msgstr "%1 ist kein gültiger Zeichenname"
+
+msgid "%1 not a valid character number"
+msgstr "%1 ist keine gültige Zeichennummer"
+
+msgid "unknown character property %1"
+msgstr "Unbekannte Zeicheneigenschaft %1"
+
+msgid "error in character property declaration"
+msgstr "Fehler in Zeicheneigenschaftsdeklaration"
+
+msgid "character property %1 already declared in same part"
+msgstr "Zeicheneigenschaft %1 bereits im selben Teil deklariert"
+
+msgid "added value for character property %1 already declared in same part"
+msgstr "Neuer Wert für Zeicheneigenschaft %1, die bereits im selben Teil deklariert war"
+
+msgid "previous declaration was here"
+msgstr "vorige Deklaration war hier"
+
+msgid "value returned by procedure was not a sosofo"
+msgstr "Rückgabewert der Prozedur war kein Sosofo"
+
+msgid "loop in specification of value of character property %1"
+msgstr "Schleife in der Spezifikation des Wertes von Zeicheneigenschaft %1"
+
+msgid "value for character property %1 of wrong type: %2 not an integer"
+msgstr "Wert der Zeicheneigenschaft %1 vom falschen Type: %2 ist keine ganze Zahl"
+
+msgid "value for character property %1 of wrong type: %2 not an integer or the value \"#f\""
+msgstr "Wert der Zeicheneigenschaft %1 vom falschen Type: %2 ist weder eine ganze Zahl noch \"#f\""
+
+msgid "%1 not a style or transformation language feature"
+msgstr "%1 ist kein Feature der Stil- oder Transformationssprache"
+
+msgid "undeclared use of feature %1"
+msgstr "Undeklarierte Benutzung von Feature %1"
+
+msgid "feature %1 not supported"
+msgstr "Feature %1 nicht unterstützt"
+
+msgid "feature %1 only partially supported"
+msgstr "Feature %1 nur teilweise unterstützt"
+
+msgid "only allowed in style language"
+msgstr "Nur in der Stilsprache erlaubt"
+
+msgid "only allowed in transformation language"
+msgstr "Nur in der Transformationssprache erlaubt"
+
+msgid "style and transformation language parts mixed"
+msgstr "Vermischung von Stil- und Transformationssprache"
+
+msgid "specification is marked as partial"
+msgstr "Spezifikation ist als partiell gekennzeichnet"
+
+msgid "grove plan excluding module %1 not supported"
+msgstr "Groveplan ohne Modul %1 nicht unterstützt"
+
+msgid "grove plan including module %1 not supported"
+msgstr "Groveplan mit Modul %1 nicht unterstützt"
+
+msgid "%1 not an SGML property set module"
+msgstr "%1 ist kein Modul der SGML-Eigenschaftsmenge"
+
+msgid "Function for char-map characteristic returned non-char object %2 for character %1"
+msgstr "Die Funktion für die char-map Charakteristik lieferte für das Zeichen %1 das nicht-Zeichen %2"
+
+msgid "value for character property %1 of wrong type: %2 not a public identifier or the value \"#f\""
+msgstr "Wert für Zeicheneigenschaft %1 vom falschen Typ: %2 ist weder ein öffentlicher Bezeichner noch \"#f\""
+
+msgid "variable %1 occurs more than once in bindings======="
+msgstr "Variable %1 kommt mehrfach in den Bindungen vor"
+
+msgid "exactly one of node:, subgrove: and class: needed"
+msgstr "Genau eines von node:, subgrove: und class: benötigt"
+
+msgid "add:, null:, remove:, children:, sub: make no sense with subgrove:"
+msgstr "add:, null:, remove:, children: oder sub: machen zusammen mit subgrove: keinen Sinn"
+
+msgid "remove: makes no sense with class:"
+msgstr "remove: macht keinen Sinn mit class:"
+
+msgid "%2 argument for primitive %1 of wrong type: %3 not a subgrove-spec"
+msgstr "%2 Argument für Funktion %1 vom falschen Typ: %2 ist kein subgrove-spec"
+
+msgid "wrong type: %1 not a list of create-specs"
+msgstr "Falscher Typ: %1 ist keine Liste von create-specs"
+
+msgid "wrong type: %1 not a create-spec or list of create-specs"
+msgstr "Falscher Typ: %1 ist kein create-spec und keine Liste von create-specs"
+
+msgid "query expression: %1 not a node list"
+msgstr "query-Ausdruck: %1 ist keine Knotenliste"
+
+msgid "priority expression: %1 not an exact integer"
+msgstr "Prioritätsausdruck: %1 ist keine exakte ganze Zahl"
+
+msgid "flow objects at the root must be all of class scroll or all of class page-sequence or simple-page-sequence"
+msgstr "Flußobjekte an der Wurzel müssen all der Klasse scroll oder alle den Klassen page-sequence oder simple-page-sequence angehören"
+
+msgid "current flow parent has no principal port"
+msgstr "Gegenwärtiger Flußvater hat keinen Hauptport"
+
+msgid "this flow object requires a paragraph as an ancestor flow object"
+msgstr "Dieses Flußobjekt benötigt ein paragraph Flußobjekt als Flußvorgänger"
+
+msgid "flow object not accepted by port; only inline flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur inline Flußobjekte akzeptiert"
+
+msgid "flow object not accepted by port; only display flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur display Flußobjekte akzeptiert"
+
+msgid "flow object not accepted by port; only display or inline flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur display oder inline Flußobjekte akzeptiert"
+
+msgid "flow object not accepted in a paragraph; only inline, display or paragraph-break flow objects accepted"
+msgstr "Flußobjekt nicht innerhalb eines paragraph Flußobjekts akzeptiert: nur inline, display oder paragraph-break Flußobjekte akzeptiert"
+
+msgid "a side-by-side flow object only accepts side-by-side-item flow objects as children"
+msgstr "Ein side-by-side Flußobjekt akzeptiert nur side-by-side-item Flußobjekte als Kinder"
+
+msgid "flow object not accepted by port; only math-sequence, unmath, subscript, superscript, script, mark, fence, fraction, radical, math-operator, grid, character and alignment-point flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur math-sequence, unmath, subscript, superscript, script, mark, fence, fraction, radical, math-operator, grid, character und alignment-point Flußobjekte akzeptiert"
+
+msgid "flow object not accepted by port; must be grid-cell"
+msgstr "Flußobjekt nicht vom Port akzeptiert: muß ein grid-cell Flußobjekt sein"
+
+msgid "flow object not accepted by port; only a single character flow object accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur ein einzelnes character Flußobjekt akzeptiert"
+
+msgid "flow object not accepted by port; in a table, only either table-part flow objects or table-column flow objects followed by table-row or table-cell flow objects are allowed"
+msgstr "Flußobjekt nicht vom Port akzeptiert: in einer Tabelle werden entweder nur table-part Flußobjekte oder table-column Flußobjekte, gefolgt von table-row oder table-column Flußobjekten, akzeptiert"
+
+msgid "flow object not accepted by port; only table-row or table-cell flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur table-row oder table-cell Flußobjekte akzeptiert"
+
+msgid "flow object not accepted by port; only table-column flow objects followed by table-row or table-cell flow objects allowd"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur table-column Flußobjekte, gefolgt von table-row oder table-cell Flußobjekten, akzeptiert"
+
+msgid "flow object not accepted by port; only table-cell flow objects accepted"
+msgstr "Flußobjekt nicht vom Port akzeptiert: nur table-cell Flußobjekte akzeptiert"
+

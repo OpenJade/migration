@@ -1,7 +1,7 @@
 opensp (1.5pre4-5) unstable; urgency=low
 
   * debian/rules: handle DEB_BUILD_OPTIONS
-  * debian/control: update to standard 3.5.0
+  * debian/control: update to policy 3.5.0
   * a few minor upstream fixes
 
  -- Adam Di Carlo <aph@debian.org>  Fri,  2 Feb 2001 21:39:04 -0500

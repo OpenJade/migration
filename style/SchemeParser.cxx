@@ -261,7 +261,11 @@ bool SchemeParser::parseExpression(Owner<Expression> &expr)
 bool SchemeParser::doMode()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -317,7 +321,11 @@ bool SchemeParser::doMode()
 bool SchemeParser::doElement()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   ELObj *obj;
   if (!parseDatum(0, obj, loc, tok))
@@ -338,7 +346,11 @@ bool SchemeParser::doElement()
 bool SchemeParser::doOrElement()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowOpenParen, tok))
     return 0;
@@ -370,7 +382,11 @@ bool SchemeParser::doOrElement()
 bool SchemeParser::doId()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowString|allowIdentifier, tok))
     return 0;
@@ -393,7 +409,11 @@ bool SchemeParser::doId()
 bool SchemeParser::doDefault()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -410,7 +430,11 @@ bool SchemeParser::doDefault()
 bool SchemeParser::doRoot()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -456,7 +480,11 @@ bool SchemeParser::parseRuleBody(Owner<Expression> &expr, ProcessingMode::RuleTy
 bool SchemeParser::doDeclareInitialValue()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -479,7 +507,11 @@ bool SchemeParser::doDeclareInitialValue()
 bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -522,7 +554,11 @@ bool SchemeParser::doDeclareCharCharacteristicAndProperty()
 bool SchemeParser::doDeclareCharacteristic()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -565,7 +601,11 @@ bool SchemeParser::doDeclareCharacteristic()
 bool SchemeParser::doDeclareFlowObjectClass()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -593,7 +633,11 @@ bool SchemeParser::doDeclareFlowObjectClass()
 bool SchemeParser::doDeclareFlowObjectMacro()
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -693,13 +737,21 @@ bool SchemeParser::doDefine()
   Location loc(in_->currentLocation());
   Token tok;
   bool internal = 0;
+  Interpreter::Feature feature = Interpreter::noFeature;
   if (!getToken(allowOpenParen|allowIdentifier|
          ((interp_->currentPartIndex() == unsigned(-1)) ? allowKeyword : 0), tok))
     return 0;
   if (tok == tokenKeyword) {
-    internal = 1;
-    if ((currentToken_ != interp_->makeStringC("internal"))  
-        || !getToken(allowOpenParen|allowIdentifier, tok))
+    if (currentToken_ == interp_->makeStringC("internal")) 
+      internal = 1; 
+    else if (currentToken_ == interp_->makeStringC("feature")) {
+      if (!getToken(allowIdentifier, tok) 
+          || !interp_->convertFeature(currentToken_, feature))
+        return 0;
+    }
+    else
+      return 0;
+    if (!getToken(allowOpenParen|allowIdentifier, tok))
       return 0;
   }
 
@@ -749,8 +801,9 @@ bool SchemeParser::doDefine()
   }
   else if (internal)
     ident->setBuiltinDefinition(expr, interp_->currentPartIndex(), loc);
-  else 
+  else  
     ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  ident->setFeature(feature);
   return 1;
 }
 
@@ -1369,7 +1422,11 @@ bool SchemeParser::parseSet(Owner<Expression> &expr)
 bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier|allowFalse, tok))
     return 0;
@@ -1391,7 +1448,11 @@ bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 bool SchemeParser::parseMake(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -1430,7 +1491,11 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
 bool SchemeParser::parseStyle(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
-  interp_->requireFeature(Interpreter::style, loc);
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   NCVector<Owner<Expression> > exprs;
   Vector<const Identifier *> keys;
   for (;;) {
@@ -1754,7 +1819,11 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
     }
     break;
   case tokenGlyphId:
-    interp_->requireFeature(Interpreter::style, loc);
+    if (!interp_->style()) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::styleLanguage);
+      return 0;
+    }
     result = convertAfiiGlyphId(currentToken_);
     break;
   default:
@@ -1928,7 +1997,10 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	tok = tokenGlyphId;
 	currentToken_.assign(in->currentTokenStart() + 2,
                              in->currentTokenLength() - 2);
-        interp_->requireFeature(Interpreter::style, loc);
+        if (!interp_->style()) {
+          interp_->setNextLocation(loc);
+          interp_->message(InterpreterMessages::styleLanguage);
+        }
 	return 1;
       case InputSource::eE:
 	message(InterpreterMessages::unexpectedEof);

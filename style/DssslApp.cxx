@@ -389,20 +389,12 @@ bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
   return 1;
 }
 
-void DssslApp::mapSysid(StringC &sysid)
+void DssslApp::mapSysid(StringC &id)
 {
- // map a sysid according to SYSTEM catalog entries. 
+ // find the sysid for id by looking through the catalogs. 
   ConstPtr<EntityCatalog> 
-     catalog(entityManager()->makeCatalog(sysid, systemCharset(), *this));
-  Text txt;
-  Location loc;
-  txt.addChars(sysid, loc);
-  ExternalId extid;
-  extid.setSystem(txt);
-  StringC name;
-  ExternalTextEntity ent(name, EntityDecl::generalEntity, loc, extid);
-  catalog->lookup(ent, *(parser().instanceSyntax()), systemCharset(), 
-                  *this, sysid); 
+     catalog(entityManager()->makeCatalog(id, systemCharset(), *this));
+  catalog->lookupPublic(id, systemCharset(), *this, id); 
 }
 
 bool DssslApp::readEntity(const StringC &sysid, StringC &contents) 

@@ -158,4 +158,5 @@ E1+unknownFeature++%1 is not a style or transformation language feature
 E1+missingFeature++undeclared use of feature %1
 W1+unsupportedFeature++feature %1 is not supported
 W1+partiallySupportedFeature++feature %1 only partially supported 
+E0+styleLanguage++only allowed in style language
 

@@ -26,7 +26,7 @@ StyleEngine::StyleEngine(Messenger &mgr,
 			 const FOTBuilder::Extension *extensionTable,
 			 const FOTBuilder::Feature *features)
 : interpreter_(new Interpreter(&groveManager, &mgr, unitsPerInch, 
-                               debugMode, dsssl2, strictMode, 
+                               debugMode, dsssl2, 1, strictMode, 
 			       extensionTable, features))
 {
 }
@@ -40,8 +40,6 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
   Vector<DssslSpecEventHandler::Part *> parts;
   specHandler.load(specParser, charset, id, parts);
   
-  interpreter_->declareFeature(Interpreter::style);
-
   for (int phase = 0; phase < 3; phase++) {
     for (size_t i = 0; i < parts.size(); i++) {
       DssslSpecEventHandler::Part::DIter diter(parts[i]->doc()->diter());

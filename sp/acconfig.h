@@ -40,12 +40,6 @@
 /* define this to compile explicit template instantiations */
 #undef SP_MANUAL_INST
 
-/* define this to use Mach mutex mechanisms (mach only) */
-#undef SP_MUTEX_MACH
-
-/* define this to use pthreads based mutex mechanisms */
-#undef SP_MUTEX_PTHREADS
-
 /* define this if qualified templated destructors like T::~T are broken */
 #undef SP_QUAL_TEMPLATE_DTOR_BROKEN
 
@@ -230,4 +224,14 @@
 #ifdef WORDS_BIGENDIAN
 #define SP_BIG_ENDIAN
 #endif /* WORDS_BIGENDIAN */
+
+#ifdef HAVE_LIBTHREADS
+#define SP_MUTEX_MACH
+#endif /* HAVE_LIBTHREADS */
+
+#ifdef HAVE_LIBPTHREAD
+#define SP_MUTEX_PTHREADS
+#endif /* HAVE_LIBPTHREAD */
+
+
 

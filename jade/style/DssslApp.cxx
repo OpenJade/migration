@@ -36,6 +36,10 @@ DssslApp::DssslApp(int unitsPerInch)
   registerOption('d', SP_T("dsssl_spec"));
   registerOption('V', SP_T("variable[=value]"));
   registerOption('s');
+  registerLongOption(SP_T("debug"), 'G');
+  registerLongOption(SP_T("dsssl-specification"), 'd', SP_T("file"));
+  registerLongOption(SP_T("define-variable"), 'V', SP_T("variable[=value]"));
+  registerLongOption(SP_T("strict"), 's');
 }
 
 int DssslApp::init(int argc, AppChar **argv)

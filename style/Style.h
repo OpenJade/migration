@@ -15,6 +15,7 @@
 #include "Owner.h"
 #include "Insn.h"
 #include "FOTBuilder.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "Location.h"
 #include "ProcessingMode.h"

@@ -136,7 +136,7 @@ public:
   unsigned markedSectionSpecialLevel() const;
   unsigned currentInputElementIndex() const;
   const Location &currentMarkedSectionStartLocation() const;
-  Boolean entityIsOpen(const Entity *) const;
+  Boolean entityIsOpen(const EntityDecl *) const;
   void popInputStack();
   void pushInput(InputSource *);
   Boolean referenceDsEntity(const Location &);

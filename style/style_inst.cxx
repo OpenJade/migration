@@ -40,17 +40,41 @@ namespace SP_NAMESPACE {
 #include "ProcessContext.h"
 #include "SosofoObj.h"
 #include "DssslSpecEventHandler.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "DssslApp.h"
 #include "Pattern.h"
 #include "MacroFlowObj.h"
 
 #ifdef DSSSL_NAMESPACE
+class DSSSL_NAMESPACE::ProcessingMode;
+class DSSSL_NAMESPACE::SosofoObj;
+#else
+class ProcessingMode;
+class SosofoObj;
+#endif
+
+#if _MSC_VER >= 1100
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
+
+#ifdef DSSSL_NAMESPACE
+using namespace DSSSL_NAMESPACE;
+#endif
+
+#ifdef GROVE_NAMESPACE
+using namespace GROVE_NAMESPACE;
+#endif
+
+#else
+
+#ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
 #endif
 
-class ProcessingMode;
-class SosofoObj;
+#endif
 
 #ifdef __DECCXX
 #pragma define_template Ptr<Insn>
@@ -1315,7 +1339,8 @@ typedef ConstPtr<SharedXcharMap<char> > Dummy_96;
 #endif
 #endif
 #endif
-#ifdef DSSSL_NAMESPACE
+
+#ifdef SP_NAMESPACE
 }
 #endif
 

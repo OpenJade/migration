@@ -47,6 +47,9 @@ public:
   void operator delete(void *p) {
     Allocator::free(p);
   }
+#ifdef SP_HAVE_PLACEMENT_OPERATOR_DELETE
+  void operator delete(void *p, Allocator &) { Allocator::free(p); }
+#endif
   EntityOriginImpl(const ConstPtr<Entity> &);
   EntityOriginImpl(const ConstPtr<Entity> &,
 		   const Location &refLocation);

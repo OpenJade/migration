@@ -18,8 +18,26 @@ namespace SP_NAMESPACE {
 #include "CopyOwner.h"
 #undef SP_DEFINE_TEMPLATES
 
+#if _MSC_VER >= 1100
+
+#ifdef SP_NAMESPACE
+namespace SP_NAMESPACE {
+#endif
+
+#ifdef DSSSL_NAMESPACE
+using namespace DSSSL_NAMESPACE;
+#endif
+
+#ifdef GROVE_NAMESPACE
+using namespace GROVE_NAMESPACE;
+#endif
+
+#else
+
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
+#endif
+
 #endif
 
 #ifdef __DECCXX
@@ -231,7 +249,7 @@ typedef Owner<FOTBuilder::GridCellNIC> Dummy_15;
 #endif
 #endif
 
-#ifdef DSSSL_NAMESPACE
+#ifdef SP_NAMESPACE
 }
 #endif
 

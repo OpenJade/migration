@@ -6,7 +6,6 @@
 #endif
 #include "splib.h"
 #include "Text.h"
-#include "Entity.h"
 // for memcmp()
 #include <string.h>
 
@@ -48,18 +47,18 @@ void Text::addChars(const Char *p, size_t length, const Location &loc)
   chars_.append(p, length);
 }
 
-void Text::addCdata(const InternalEntity *entity,
+void Text::addCdata(const StringC &str,
 		    const ConstPtr<Origin> &origin)
 {
   addSimple(TextItem::cdata, Location(origin, 0));
-  chars_.append(entity->string().data(), entity->string().size());
+  chars_.append(str.data(), str.size());
 }
 
-void Text::addSdata(const InternalEntity *entity,
+void Text::addSdata(const StringC &str,
 		    const ConstPtr<Origin> &origin)
 {
   addSimple(TextItem::sdata, Location(origin, 0));
-  chars_.append(entity->string().data(), entity->string().size());
+  chars_.append(str.data(), str.size());
 }
 
 void Text::addNonSgmlChar(Char c, const Location &loc)
@@ -339,8 +338,8 @@ Boolean Text::fixedEqual(const Text &text) const
 	j++;
       }
       if (text.items_[j].index != items_[i].index
-	  || (text.items_[j].loc.origin()->asEntityOrigin()->entity()
-	      != items_[i].loc.origin()->asEntityOrigin()->entity()))
+	  || (text.items_[j].loc.origin()->entityDecl()
+	      != items_[i].loc.origin()->entityDecl()))
 	return 0;
       break;
     case TextItem::nonSgml:

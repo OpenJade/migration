@@ -78,9 +78,18 @@ public:
     Object *obj_;
   };
 
+  struct Block {
+    Block(Block *, size_t, size_t, Object *);
+    ~Block();
+    Block *next;
+    Object *firstObj;
+  };
+
   Collector(size_t maxSize);
   virtual ~Collector();
   void *allocateObject(bool hasFinalizer);
+  // This is called only when the constructor throws an exception.
+  void unallocateObject(void *);
   void trace(const Object *obj);
   // Permanent objects must not be altered in such a way that
   // they contain pointers to non-permanent objects.
@@ -94,12 +103,6 @@ protected:
 private:
   Collector(const Collector &);	// undefined
   void operator=(const Collector &); // undefined
-  struct Block {
-    Block(Block *, size_t, size_t, Object *);
-    ~Block();
-    Block *next;
-    Object *firstObj;
-  };
   Object *freePtr_;
   Object allObjectsList_;	// doubly-linked circular list of all objects
   Object permanentFinalizersList_;
@@ -115,6 +118,7 @@ private:
   void check();
   void makeReadOnly1(Object *);
   friend class DynamicRoot;
+  friend class Object;
 };
 
 

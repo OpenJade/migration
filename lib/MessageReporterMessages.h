@@ -1,4 +1,4 @@
-// This file was automatically generated from lib\MessageReporterMessages.msg by msggen.pl.
+// This file was automatically generated from .\MessageReporterMessages.msg by ..\msggen.pl.
 #include "Message.h"
 
 #ifdef SP_NAMESPACE

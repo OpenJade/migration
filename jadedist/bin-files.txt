@@ -28,7 +28,7 @@ dsssl\jadetex.ini
 dsssl\jadetex.ins
 dsssl\pdfjadetex.ini
 dsssl\Makefile.jadetex
-bin\sp132.dll
+bin\sp133.dll
 bin\style.dll
 bin\spgrove.dll
 bin\grove.dll

@@ -534,7 +534,7 @@ bool SchemeParser::doDefine()
     isProcedure = 0;
   Identifier *ident = lookup(currentToken_);
   Identifier::SyntacticKey key;
-  if (ident->syntacticKey(key) && key <= Identifier::lastSyntacticKey)
+  if (ident->syntacticKey(key) && key <= int(Identifier::lastSyntacticKey))
     message(InterpreterMessages::syntacticKeywordAsVariable,
 	    StringMessageArg(currentToken_));
   NCVector<Owner<Expression> > inits;
@@ -713,7 +713,7 @@ bool SchemeParser::parseExpression(unsigned allowed,
   case tokenIdentifier:
     {
       const Identifier *ident = lookup(currentToken_);
-      if (ident->syntacticKey(key) && key <= Identifier::lastSyntacticKey) {
+      if (ident->syntacticKey(key) && key <= int(Identifier::lastSyntacticKey)) {
 	switch (key) {
 	case Identifier::keyDefine:
 	  if (allowed & allowKeyDefine)

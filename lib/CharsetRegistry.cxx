@@ -6,7 +6,6 @@
 #endif
 #include "splib.h"
 #include "CharsetRegistry.h"
-#include "ExternalId.h"
 #include "CharsetInfo.h"
 #include "StringC.h"
 #include "types.h"

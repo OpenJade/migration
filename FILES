@@ -8,6 +8,7 @@ Makefile.lib.sun
 Makefile.prog
 Makefile.wat
 README
+SP.dsw
 SP.mak
 VERSION
 all/README
@@ -377,6 +378,7 @@ lib/jis0201.h
 lib/jis0208.h
 lib/jis0212.h
 lib/ksc5601.h
+lib/lib.dsp
 lib/lib.rc
 lib/memmove.c
 lib/mkversion.pl
@@ -412,6 +414,7 @@ nsgmls/SgmlsEventHandler.h
 nsgmls/StringSet.cxx
 nsgmls/StringSet.h
 nsgmls/nsgmls.cxx
+nsgmls/nsgmls.dsp
 nsgmls/nsgmls.rc
 nsgmls/nsgmls_inst.cxx
 nsgmls/nsgmls_inst.m4
@@ -419,6 +422,7 @@ sgmlnorm/Makefile.sub
 sgmlnorm/SGMLGenerator.cxx
 sgmlnorm/SGMLGenerator.h
 sgmlnorm/sgmlnorm.cxx
+sgmlnorm/sgmlnorm.dsp
 spam/CopyEventHandler.cxx
 spam/CopyEventHandler.h
 spam/MarkupEventHandler.cxx
@@ -428,11 +432,13 @@ spam/SpamMessages.msg
 spam/SpamMessages.rc
 spam/Makefile.sub
 spam/spam.cxx
+spam/spam.dsp
 spam/spam.rc
 spam/spam_inst.cxx
 spam/spam_inst.m4
 spent/Makefile.sub
 spent/spent.cxx
+spent/spent.dsp
 sp-generate.mak
 sunfix.sh
 sx/Makefile.sub
@@ -445,6 +451,7 @@ sx/XmlOutputMessages.h
 sx/XmlOutputMessages.msg
 sx/XmlOutputMessages.rc
 sx/sx.cxx
+sx/sx.dsp
 sx/sx.rc
 sx/sx_inst.cxx
 sx/sx_inst.m4

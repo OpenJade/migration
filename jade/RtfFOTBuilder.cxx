@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "RtfFOTBuilder.h"
+#include "TmpOutputByteStream.h"
 #include "RtfMessages.h"
 #include "MessageArg.h"
 #include "Vector.h"
@@ -29,45 +30,6 @@ public:
   NullOutputByteStream() { ptr_ = end_ = 0; }
   void flush() { }
   void flushBuf(char) { }
-};
-
-class TmpOutputByteStream : public OutputByteStream {
-public:
-  struct Block;
-  class Iter {
-  public:
-    Iter(const TmpOutputByteStream &sb) : block_(sb.head_), lastBlockUsed_(sb.lastBlockUsed()) { }
-    bool next(const char *&p, size_t &n) {
-      if (block_) {
-	p = block_->buf;
-	n = block_->next ? TmpOutputByteStream::bufSize : lastBlockUsed_;
-	block_ = block_->next;
-	return 1;
-      }
-      else
-	return 0;
-    }
-  private:
-    Block *block_;
-    size_t lastBlockUsed_;
-  };
-  TmpOutputByteStream();
-  ~TmpOutputByteStream();
-  void flush();
-  void flushBuf(char ch);
-  enum { bufSize = 1024 };
-private:
-  friend class Iter;
-  struct Block {
-    Block *next;
-    char buf[bufSize];
-  };
-  size_t lastBlockUsed() const {
-    return last_ ? (ptr_ - last_->buf) : 0;
-  }
-  unsigned nFullBlocks_;
-  Block *head_;
-  Block *last_;
 };
 
 class ElementSet {

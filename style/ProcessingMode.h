@@ -13,6 +13,7 @@
 #include "NamedTable.h"
 #include "Expression.h"
 #include "Insn.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "FOTBuilder.h"
 #include "IList.h"

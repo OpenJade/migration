@@ -4,6 +4,7 @@
 #ifndef EvalContext_INCLUDED
 #define EvalContext_INCLUDED 1
 
+#include "Boolean.h"
 #include "Node.h"
 #include "Vector.h"
 #include <stddef.h>

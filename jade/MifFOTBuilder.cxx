@@ -63,8 +63,8 @@ namespace DSSSL_NAMESPACE {
 
 #define PROPERTY( propertyType, propertyName ) \
     propertyType propertyName; \
-    void set ## propertyName ## ( propertyType p ) \
-     { propertyName = p; setProperties |= f ## propertyName ## ;} 
+    void set ## propertyName ( propertyType p ) \
+     { propertyName = p; setProperties |= f ## propertyName ;} 
 
 #define PROPERTY_OUT( propertyName ) \
     if( properties & f ## propertyName ) \
@@ -72,14 +72,14 @@ namespace DSSSL_NAMESPACE {
            << "<" #propertyName " " << propertyName << ">"; 
 
 #define VECTOR_OF_PROPERTIES( propertyType, propertyName ) \
-    Vector< ## propertyType ## > propertyName ## s; \
+    Vector< propertyType > propertyName ## s; \
     void propertyName ## sAreSet() \
-     { setProperties |= f ## propertyName ## s ##;}
+     { setProperties |= f ## propertyName ## s ;}
 
 #define STATIC_PROPERTY( propertyType, propertyName ) \
     static propertyType propertyName; \
-    static void set ## propertyName ## ( propertyType p ) \
-     { propertyName = p; setProperties |= f ## propertyName ## ;}
+    static void set ## propertyName ( propertyType p ) \
+     { propertyName = p; setProperties |= f ## propertyName ;}
 
 class StringHash {
 public:
@@ -918,7 +918,7 @@ class MifDoc {
         PROPERTY( T_ID, TblID );
         PROPERTY( T_tagstring, TblTag );
         bool TblIDUsed;
-        TblFormat TblFormat;
+        TblFormat tblFormat;
 
         // table columns
         PROPERTY( T_integer, TblNumColumns );
@@ -1018,15 +1018,15 @@ class MifDoc {
         
         String<CmdLineApp::AppChar> FileName;
         Vector<XRefFormat> XRefFormats;
-        Document Document;
-        ColorCatalog ColorCatalog;
-        PgfCatalog PgfCatalog;
-        TblCatalog TblCatalog;
+        Document document;
+        ColorCatalog colorCatalog;
+        PgfCatalog pgfCatalog;
+        TblCatalog tblCatalog;
         Vector<Frame> AFrames;
         Vector<Tbl> Tbls;
         Vector<Page> Pages;
         Vector<TextFlow> TextFlows;
-        RulingCatalog RulingCatalog;
+        RulingCatalog rulingCatalog;
 
         bool pageNumXRefFormatGenerated;
 
@@ -1125,11 +1125,11 @@ class MifDoc {
     void exitTagStream();
     T_ID nextID() { return ++NextID; }
 
-    Document &document() { return bookComponent().Document; }
-    PgfCatalog &pgfCatalog() { return bookComponent().PgfCatalog; }
-    TblCatalog &tblCatalog() { return bookComponent().TblCatalog; }
-    RulingCatalog &rulingCatalog() { return bookComponent().RulingCatalog; }
-    ColorCatalog &colorCatalog() { return bookComponent().ColorCatalog; }
+    Document &document() { return bookComponent().document; }
+    PgfCatalog &pgfCatalog() { return bookComponent().pgfCatalog; }
+    TblCatalog &tblCatalog() { return bookComponent().tblCatalog; }
+    RulingCatalog &rulingCatalog() { return bookComponent().rulingCatalog; }
+    ColorCatalog &colorCatalog() { return bookComponent().colorCatalog; }
     Vector<Tbl> &tbls() { return bookComponent().Tbls; }
     Vector<Page> &pages() { return bookComponent().Pages; }
     Vector<TextFlow> &textFlows() { return bookComponent().TextFlows; }
@@ -1230,13 +1230,13 @@ class MifOutputByteStream {
        for( ; cnt; cnt-- ) stream() << ' '; return *this; }
 };
 
-class MifTmpOutputByteStream : public TmpOutputByteStream2 {
+class MifTmpOutputByteStream : public TmpOutputByteStream {
 
     MifOutputByteStream os;    
 
   public:
     MifTmpOutputByteStream( MifDoc::T_indent osIndent = 0 )
-     : TmpOutputByteStream2(), os( osIndent ) { os.setStream( *this ); }
+     : TmpOutputByteStream(), os( osIndent ) { os.setStream( *this ); }
     void commit( OutputByteStream &os, bool resolveCrossReferences = false );
     void commit( String<char> &str );
     MifOutputByteStream  &stream() { return os; }
@@ -1752,6 +1752,13 @@ class MifFOTBuilder : public SerialFOTBuilder {
         static unsigned pendingMifClosings;
     };
 
+    struct SymbolFont {
+        const char *name;
+        Char mapping[256];
+    };
+
+    enum { nSymbolFonts = 3 };
+
     void synchronizeFontFormat();
     long computeLengthSpec( const LengthSpec &spec ) const;
     Format &format() const
@@ -1778,8 +1785,8 @@ class MifFOTBuilder : public SerialFOTBuilder {
     TFotSimplePageSequence FotSimplePageSequence;
     Table CurTable;
 
-    MifDoc::T_pathname MifFOTBuilder::systemIdToMifPathname( const StringC &systemId );
-    bool MifFOTBuilder::systemIdToMifPathname( const StringC &systemId, MifDoc::T_pathname & );
+    MifDoc::T_pathname systemIdToMifPathname( const StringC &systemId );
+    bool systemIdToMifPathname( const StringC &systemId, MifDoc::T_pathname & );
     int  systemIdFilename( const StringC &systemId, StringC &filename );
     void initMifBookComponent();
     void setupSimplePageSequence();
@@ -1826,12 +1833,6 @@ class MifFOTBuilder : public SerialFOTBuilder {
     enum { CHAR_TABLE_SYMBOL_FLAG = 1U << 31 };
     CharMap<Unsigned32> CharTable;
 
-    struct SymbolFont {
-        const char *name;
-        Char mapping[256];
-    };
-
-    enum { nSymbolFonts = 3 };
     static const SymbolFont SymbolFonts[nSymbolFonts];
     static const Char FrameCharsetMap[128];
 };
@@ -2917,7 +2918,7 @@ void MifFOTBuilder::TablePart::translate( MifDoc &mifDoc ) {
 
     MifDoc::Tbl &mifTbl = mifTable( mifDoc );
     if( parentTable().startIndent != 0 ) { // DSSSL default
-        mifTbl.TblFormat.setTblLIndent( parentTable().startIndent );
+        mifTbl.tblFormat.setTblLIndent( parentTable().startIndent );
         mifTbl.setProperties |= MifDoc::Tbl::fTblFormat;
     }
 
@@ -2932,7 +2933,7 @@ void MifFOTBuilder::TablePart::translate( MifDoc &mifDoc ) {
             case symbolOutside: mifAlignment = MifDoc::sOutside; break;
             default: assert( false );
         }
-        mifTbl.TblFormat.setTblAlignment( mifAlignment );
+        mifTbl.tblFormat.setTblAlignment( mifAlignment );
     }
 
     bool putHeaderInBody = Body.size() == 0 && Header.size() > 0;
@@ -4463,7 +4464,7 @@ MifFOTBuilder::SymbolFonts[MifFOTBuilder::nSymbolFonts] = {
 // --------- static -----------------------------------------------------------
 
 #define CONST_STRING( symbolName ) \
-const String<char> MifDoc::s ## symbolName ## ( #symbolName, sizeof( #symbolName ) - 1 )
+const String<char> MifDoc::s ## symbolName ( #symbolName, sizeof( #symbolName ) - 1 )
 
 const String<char> MifDoc::sNONE;
 const String<char> MifDoc::sSPACE( " ", sizeof( " " ) - 1 );
@@ -4591,7 +4592,7 @@ int operator!=( const MifDoc::T_LTRB &o1, const MifDoc::T_LTRB &o2 ) {
 void MifTmpOutputByteStream::commit( OutputByteStream &os, bool resolveCrossReferences ) {
 
     MifOutputByteStream outS( os );
-    TmpOutputByteStream2::Iter iter( *this );
+    TmpOutputByteStream::Iter iter( *this );
     const char *s;
     size_t n;
 
@@ -4640,7 +4641,7 @@ void MifTmpOutputByteStream::commit( OutputByteStream &os, bool resolveCrossRefe
 
 void MifTmpOutputByteStream::commit( String<char> &str ) {
 
-    TmpOutputByteStream2::Iter iter( *this );
+    TmpOutputByteStream::Iter iter( *this );
     const char *s;
     size_t n;
 
@@ -4999,7 +5000,7 @@ void MifDoc::Tbl::out( MifOutputByteStream &os, bool resolveCrossReferences ) {
     CHECK_PROPERTY( TblTag );
 
     if( setProperties & fTblFormat )
-        TblFormat.out( os );
+        tblFormat.out( os );
 
     CHECK_PROPERTY( TblNumColumns );
     CHECK_VECTOR_OF_PROPERTIES( TblColumnWidth );
@@ -5357,13 +5358,13 @@ void MifDoc::TblCatalog::out( MifOutputByteStream &os ) {
 
 #define COMPARE_PROPERTY( propertyName ) \
 \
-    if( propertyName != f. ## propertyName ) \
+    if( propertyName != f.propertyName ) \
         differingProperties |= f ## propertyName;        
 
 #define COND_SET_PROPERTY( propertyName ) \
 \
     if( properties & f ## propertyName ) \
-        propertyName =  f. ## propertyName;        
+        propertyName =  f.propertyName;        
 
 #define PROPERTY_OUT( propertyName ) \
 \
@@ -5550,7 +5551,7 @@ void MifDoc::ParagraphFormat::out( MifOutputByteStream &os,
         }
     }
 
-    if( properties != 0 | fontProperties != 0 | outPgfTag ) {
+    if( properties != 0 || fontProperties != 0 || outPgfTag ) {
 
         os << '\n' << MifOutputByteStream::INDENT << "<Pgf ";
         os.indent();
@@ -5634,9 +5635,9 @@ void MifDoc::BookComponent::commit
 
         os << "<MIFFile 5.0>";
 
-        ColorCatalog.out( os );
-        PgfCatalog.out( os );
-        RulingCatalog.out( os );
+        colorCatalog.out( os );
+        pgfCatalog.out( os );
+        rulingCatalog.out( os );
 
         size_t i;
         if( AFrames.size() ) {
@@ -5655,8 +5656,8 @@ void MifDoc::BookComponent::commit
             os << '\n' << ">";
         }
 
-        TblCatalog.out( os );
-        Document.out( os );
+        tblCatalog.out( os );
+        document.out( os );
     
         if( Tbls.size() ) {
             os << "\n<Tbls ";

@@ -11,7 +11,7 @@
 
 pkg			:= openjade
 pkg-openjade		:= $(pkg)
-pkg-libostyle		:= libostyle1
+pkg-libostyle		:= libostyle0
 pkg-libostyle-dev	:= libostyle-dev
 
 # default SGML pathing
@@ -22,7 +22,7 @@ default-sgml-path	:= /usr/local/share/sgml:/usr/local/lib/sgml:/usr/lib/sgml
 prefix-openjade		:= debian/tmp
 bindir-openjade		:= $(prefix-openjade)/usr/bin
 confdir-openjade	:= $(prefix-openjade)/etc
-libdir-openjade		:= $(prefix-openjade)/usr/lib/$(pkg-openjade)
+libdir-openjade		:= $(prefix-openjade)/usr/share/OpenJade
 sgmldir-openjade	:= $(prefix-openjade)/usr/lib/sgml
 docdir-openjade		:= $(prefix-openjade)/usr/share/doc/$(pkg-openjade)
 infodir-openjade	:= $(prefix-openjade)/usr/share/info
@@ -49,7 +49,7 @@ compress	:= gzip -9f
 am_inst_flags	:= INSTALL='install -o root -g root -p' INSTALL_PROGRAM='$(install_program)' INSTALL_SCRIPT='$(install_script)' INSTALL_DATA='$(install_file)'
 
 # first version of package providing the right shlibs
-OSP_SHLIBS_PKGVER	:= 1.5pre4-1
+SHLIBS_PKGVER	:= 1.5pre4-1
 
 # extra docs we don't want
 DOCS_TOO_MUCH	:= ABOUT-NLS COPYING ChangeLog
@@ -126,114 +126,77 @@ debian/$(pkg-libostyle).shlibs:
 #	 std shlibs file, with the first version that supplied the version
 #	  that applications should build with
 	echo "libostyle      0 $(pkg-libostyle) (>= $(SHLIBS_PKGVER))" > $@
+	echo "libogrove      0 $(pkg-libostyle) (>= $(SHLIBS_PKGVER))" > $@
+	echo "libospgrove    0 $(pkg-libostyle) (>= $(SHLIBS_PKGVER))" > $@
 
-install-common	:= build debian/copyright debian/substvars 		\
-		   debian/$(pkg-libostyle).shlibs
 
-install-openjade:	$(install-common) debian/README.Debian
+binary-arch:	build debian/copyright debian/substvars 		\
+		debian/$(pkg-libostyle).shlibs debian/README.Debian
 	$(checkdir)
 	$(checkroot)
+
+##
+##	 openjade
+##
 	rm -rf $(prefix-openjade)
-
-	$(make_directory) $(bindir-openjade) $(sgmldir-openjade) $(libdir-openjade)	\
+	$(make_directory) $(bindir-openjade) $(sgmldir-openjade)	\
 	    $(mandir-openjade)
-	exit 1
 
-	$(MAKE) install SUBDIRS="doc nsgmls sgmlnorm spam spcat spent sx" \
-	    prefix=$(SRCDIR)/$(prefix-openjade)/usr $(am_inst_flags)		\
+#	 we can't use SUBDIRS here since that trickles down; 
+#	 install it all into openjade dir
+	$(MAKE) install							\
+	    prefix=$(SRCDIR)/$(prefix-openjade)/usr $(am_inst_flags)	\
 	    pkgdocdir=$(docdir-openjade)
-#	 it insists on installing config.h
-	rm -rf $(prefix-openjade)/usr/include
+
 #	 remove the extra docs installed from top-level Makefile
 	cd $(docdir-openjade) && rm -f $(DOCS_TOO_MUCH)
 
-#	 install declarations
-	$(make_directory) $(sgmldir-openjade)/declaration
-	$(install_file) pubtext/opensp-implied.dcl $(sgmldir-openjade)/declaration/
-
-#	 install unicode stuff
+#	 install unicode stuff -- this should probably be handled in
+#	 upstream Makefiles
 	$(make_directory) $(libdir-openjade)/unicode
 	$(install_file) unicode/catalog unicode/demo.sgm unicode/unicode.syn \
 	    $(libdir-openjade)/unicode
 	$(install_file) unicode/unicode.sd $(libdir-openjade)/unicode/unicode.decl
 	$(install_script) unicode/gensyntax.pl $(libdir-openjade)/unicode
 
-#	 doc-base etc
-	dh_installdocs -p$(pkg)
-#	 optionally, install upstream ChangeLog
-	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg) ChangeLog
-	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg)
-
 #	 install man pages
-	dh_undocumented -p$(pkg) onsgmls.1 osgmlnorm.1 ospam.1 ospcat.1	\
-	    ospent.1 osx.1
-
-#	 install control files
-	dh_installdeb -p$(pkg)
+	dh_undocumented -p$(pkg) openjade.1
 
 
-install-libostyle:	$(install-common) debian/$(pkg-libostyle).README.Debian
-	$(checkdir)
-	$(checkroot)
+##
+##	 libostyle
+##
 	rm -rf $(prefix-libostyle)
-
 	$(make_directory) $(libdir-libostyle)
 
-	$(MAKE) install SUBDIRS="lib"					\
-	    prefix=$(SRCDIR)/$(prefix-libostyle)/usr $(am_inst_flags)	\
-	    pkgdocdir=$(docdir-libostyle)
-#	 it insists on installing config.h
-	rm -rf $(prefix-libostyle)/usr/include
-#	 remove the extra docs installed from top-level Makefile
-	cd $(docdir-libostyle) && rm -f $(DOCS_TOO_MUCH)
-
-	rm -f $(libdir-libostyle)/*.so					\
-	    $(libdir-libostyle)/*.a $(libdir-libostyle)/*.la
-
-#	 install Debian-std docs
-	dh_installdocs -p$(pkg-libostyle)
-#	 optionally, install upstream ChangeLog
-	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg-libostyle) ChangeLog
-	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg-libostyle)
+	mv $(prefix-openjade)/usr/lib/lib*.so.*.* $(libdir-libostyle)/
+	mv $(prefix-openjade)/usr/lib/lib*.so.* $(libdir-libostyle)/
 
 #	 make sure maintainer scripts are good
 	sh -n debian/$(pkg-libostyle).postinst
 
-#	 install control files
-	dh_installdeb -p$(pkg-libostyle)
 
-
-install-libostyle-dev:	$(install-common) debian/$(pkg-libostyle).README.Debian
-	$(checkdir)
-	$(checkroot)
+##
+##	 libostyle-dev
+##
 	rm -rf $(prefix-libostyle-dev)
-
-	$(make_directory) $(incdir-libostyle-dev) $(libdir-libostyle-dev)	\
+	$(make_directory) $(incdir-libostyle-dev) $(libdir-libostyle-dev)\
 	    $(docdir-libostyle-dev)
 
-	$(MAKE) install SUBDIRS="lib generic include"			\
-	    prefix=$(SRCDIR)/$(prefix-libostyle-dev)/usr $(am_inst_flags)	\
-	    pkgdocdir=$(docdir-libostyle-dev)
-#	 remove the extra docs installed from top-level Makefile
-	cd $(docdir-libostyle-dev) && rm -f $(DOCS_TOO_MUCH)
+	mv $(prefix-openjade)/usr/lib/lib*.* $(libdir-libostyle-dev)/
 
-	rm -f $(libdir-libostyle-dev)/*.so.*
+
+##
+##	 common to all
+##
 
 #	 install Debian-std docs
-	dh_installdocs -p$(pkg-libostyle-dev)
+	dh_installdocs -a
 #	 optionally, install upstream ChangeLog
-	[ ! -f ChangeLog ] || dh_installchangelogs -p$(pkg-libostyle-dev) ChangeLog
-	[ -f ChangeLog ] || dh_installchangelogs -p$(pkg-libostyle-dev)
+	[ ! -f ChangeLog ] || dh_installchangelogs -a ChangeLog
+	[ -f ChangeLog ] || dh_installchangelogs -a
 
-#	 install control files
-	dh_installdeb -p$(pkg-libostyle-dev)
-
-
-binary-arch:	$(install-common) install-openjade install-libostyle		\
-		install-libostyle-dev
-	$(checkdir)
-	$(checkroot)
-
+	dh_installdeb -a
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
@@ -241,7 +204,7 @@ binary-arch:	$(install-common) install-openjade install-libostyle		\
 #	 we don't use dh_shlibsdeps because it wants to use it's
 #	 own wierd substvars file
 	cd $(prefix-libostyle)/usr/lib && LD_LIBRARY_PATH=.		\
-	  dpkg-shlibdeps -pshlibs-$(pkg-libostyle) -O lib*.so.*.*	 	\
+	  dpkg-shlibdeps -pshlibs-$(pkg-libostyle) -O lib*.so.*.*	\
 	  >> $(SRCDIR)/debian/substvars
 	LD_LIBRARY_PATH=$(prefix-libostyle)/usr/lib			\
 	  dpkg-shlibdeps -pshlibs-$(pkg-openjade) $(bindir-openjade)/*

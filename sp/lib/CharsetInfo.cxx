@@ -87,7 +87,7 @@ void CharsetInfo::init()
   for (size_t i = 0; execChars[i] != '\0'; i++) {
     WideChar c;
     ISet<WideChar> set;
-    if (univToDesc(univCodes[i], c, set) > 0 && c <= Char(-1))
+    if (univToDesc(univCodes[i], c, set) > 0 && c <= charMax)
       execToDesc_[(unsigned char)execChars[i]] = Char(c);
   }
 }

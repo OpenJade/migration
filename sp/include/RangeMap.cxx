@@ -47,7 +47,7 @@ unsigned RangeMap<From, To>::inverseMap(To to, From &from,
 {
   // FIXME use binary search
   unsigned ret = 0;
-  count = WideChar(-1);
+  count = wideCharMax;
   for (size_t i = 0; i < ranges_.size(); i++) {
     const RangeMapRange<From,To> &r = ranges_[i];
     if (r.toMin <= to && to <= r.toMin + (r.fromMax - r.fromMin)) {

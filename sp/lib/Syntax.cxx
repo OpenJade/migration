@@ -85,7 +85,7 @@ Syntax::Syntax(const Sd &sd)
       const CharsetInfo &charset = sd.internalCharset();
       WideChar c;
       ISet<WideChar> set;
-      if (charset.univToDesc(wwwSpecial[i], c, set) > 0 && c <= Char(-1)) {
+      if (charset.univToDesc(wwwSpecial[i], c, set) > 0 && c <= charMax) {
 	set_[minimumData] += Char(c);
 	set_[significant] += c;
       }

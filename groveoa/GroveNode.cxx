@@ -712,7 +712,7 @@ public:
       CAttributeDefNode() { }
 BEGIN_COM_MAP(CElementTypeNode)
   COM_INTERFACE_ENTRY(IDispatch)
-  COM_INTERFACE_ENTRY(AttributeDefNode)
+  COM_INTERFACE_ENTRY(ElementTypeNode)
   COM_INTERFACE_ENTRY(Node)
 END_COM_MAP()
   STRING_PROP(Name)

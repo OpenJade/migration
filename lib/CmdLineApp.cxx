@@ -284,8 +284,8 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
   case 'v':
     // print the version number
     message(CmdLineAppMessages::versionInfo,
-	    StringMessageArg(convertInput(SP_T(PACKAGE))),
-	    StringMessageArg(convertInput(SP_T(VERSION))));
+	    StringMessageArg(convertInput(SP_T(SP_PACKAGE))),
+	    StringMessageArg(convertInput(SP_T(SP_VERSION))));
     break;
   default:
     CANNOT_HAPPEN();

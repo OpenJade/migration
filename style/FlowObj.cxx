@@ -1278,6 +1278,79 @@ FlowObj *BoxFlowObj::copy(Collector &c) const
   return new (c) BoxFlowObj(*this);
 }
 
+class SideBySideFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  SideBySideFlowObj();
+  SideBySideFlowObj(const SideBySideFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+protected:
+  Owner<FOTBuilder::DisplayNIC> nic_;
+};
+
+SideBySideFlowObj::SideBySideFlowObj()
+: nic_(new FOTBuilder::DisplayNIC)
+{
+}
+
+SideBySideFlowObj::SideBySideFlowObj(const SideBySideFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::DisplayNIC(*fo.nic_))
+{
+}
+
+void SideBySideFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySide(*nic_);
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySide();
+}
+
+bool SideBySideFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  return isDisplayNIC(ident);
+}
+
+void SideBySideFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+					   const Location &loc, Interpreter &interp)
+{
+  if (!setDisplayNIC(*nic_, ident, obj, loc, interp)) 
+    CANNOT_HAPPEN();
+}
+
+FlowObj *SideBySideFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideFlowObj(*this);
+}
+
+class SideBySideItemFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+};
+
+void SideBySideItemFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startSideBySideItem();
+  CompoundFlowObj::processInner(context);
+  fotb.endSideBySideItem();
+}
+
+FlowObj *SideBySideItemFlowObj::copy(Collector &c) const
+{
+  return new (c) SideBySideItemFlowObj(*this);
+}
+
 class LeaderFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -2976,6 +3049,8 @@ void Interpreter::installFlowObjs()
   FLOW_OBJ(LeaderFlowObj, "leader");
   FLOW_OBJ(CharacterFlowObj, "character");
   FLOW_OBJ(BoxFlowObj, "box");
+  FLOW_OBJ(SideBySideFlowObj, "side-by-side");
+  FLOW_OBJ(SideBySideItemFlowObj, "side-by-side-item");
   FLOW_OBJ(AlignmentPointFlowObj, "alignment-point");
   FLOW_OBJ(SidelineFlowObj, "sideline");
   // simple-page

@@ -7,7 +7,7 @@
 E1+invalidOptionError++invalid option %1
 E1+missingOptionArgError++missing argument for option %1
 I1+usage++usage is %1
-I1+versionInfo++OpenSP version %1
+I2+versionInfo++%1 version %2
 E1+unknownBctf++unknown BCTF %1
 E1+unknownEncoding++unknown encoding %1
 E2+openFileError++cannot open output file %1 (%2)

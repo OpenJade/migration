@@ -18,10 +18,8 @@ spam.o: SpamMessages.h
 SUFFIXES = .msg .m4
 
 .m4.cxx:
-	$(PERL) $(top_srcdir)/lib/instmac.pl $< >$@
+	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<
-
-
 

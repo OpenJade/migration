@@ -13,7 +13,7 @@ BUILT_SOURCES = spcat_inst.cxx
 SUFFIXES = .msg .m4
 
 .m4.cxx:
-	$(PERL) $(top_srcdir)/lib/instmac.pl $< >$@
+	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
 %.h %.cxx %.rc: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

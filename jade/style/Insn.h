@@ -5,10 +5,10 @@
 #define Insn_INCLUDED 1
 
 #include "ELObj.h"
-#include "Resource.h"
-#include "Ptr.h"
-#include "Location.h"
-#include "Message.h"
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Location.h>
+#include <OpenSP/Message.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

@@ -6,8 +6,8 @@
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
 #include "SosofoObj.h"
-#include "macros.h"
-#include "IListIter.h"
+#include <OpenSP/macros.h>
+#include <OpenSP/IListIter.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

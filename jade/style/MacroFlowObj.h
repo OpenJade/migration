@@ -6,11 +6,11 @@
 
 #include "SosofoObj.h"
 #include "Insn.h"
-#include "Resource.h"
-#include "Ptr.h"
-#include "Vector.h"
-#include "NCVector.h"
-#include "Owner.h"
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/Owner.h>
 #include "Expression.h"
 
 #ifdef DSSSL_NAMESPACE

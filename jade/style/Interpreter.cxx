@@ -10,10 +10,10 @@
 #include "MacroFlowObj.h"
 #include "ELObjMessageArg.h"
 #include "VM.h"
-#include "Owner.h" 
+#include <OpenSP/Owner.h> 
 #include "SchemeParser.h"
-#include "macros.h"
-#include "InternalInputSource.h"
+#include <OpenSP/macros.h>
+#include <OpenSP/InternalInputSource.h>
 #include <stdlib.h>
 #include "LangObj.h"
 

@@ -7,7 +7,7 @@
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
 #include "SosofoObj.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

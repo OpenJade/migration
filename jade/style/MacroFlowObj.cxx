@@ -9,7 +9,7 @@
 #include "Expression.h"
 #include "Interpreter.h"
 #include "ProcessContext.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

@@ -4,15 +4,15 @@
 #ifndef Pattern_INCLUDED
 #define Pattern_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Link.h"
-#include "IList.h"
-#include "IListIter.h"
-#include "StringC.h"
-#include "Vector.h"
-#include "Ptr.h"
-#include "Resource.h"
+#include <OpenSP/Link.h>
+#include <OpenSP/IList.h>
+#include <OpenSP/IListIter.h>
+#include <OpenSP/StringC.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/Resource.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

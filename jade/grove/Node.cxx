@@ -6,9 +6,9 @@
 #endif
 
 #include "config.h"
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include <string.h>
 #include <assert.h>
 

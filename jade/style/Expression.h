@@ -5,14 +5,14 @@
 #define Expression_INCLUDED 1
 
 #include "ELObj.h"
-#include "Owner.h"
-#include "Vector.h"
-#include "NCVector.h"
-#include "Resource.h"
-#include "Ptr.h"
+#include <OpenSP/Owner.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/Resource.h>
+#include <OpenSP/Ptr.h>
 #include "Insn.h"
-#include "Named.h"
-#include "Location.h"
+#include <OpenSP/Named.h>
+#include <OpenSP/Location.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

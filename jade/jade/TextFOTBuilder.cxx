@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include "config.h"
 #include "TextFOTBuilder.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "dsssl_ns.h"
 
 #undef   DBG_TEXT_BACKEND

@@ -4,7 +4,7 @@
 #include "stylelib.h"
 #include "ELObjMessageArg.h"
 #include "Interpreter.h"
-#include "OutputCharStream.h"
+#include <OpenSP/OutputCharStream.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

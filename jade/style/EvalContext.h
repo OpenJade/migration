@@ -4,9 +4,9 @@
 #ifndef EvalContext_INCLUDED
 #define EvalContext_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "Vector.h"
+#include <OpenSP/Vector.h>
 #include <stddef.h>
 
 #ifdef DSSSL_NAMESPACE

@@ -6,7 +6,7 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "Ptr.h"
+#include <OpenSP/Ptr.h>
 #undef SP_DEFINE_TEMPLATES
 
 #if _MSC_VER >= 1100

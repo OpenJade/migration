@@ -4,7 +4,7 @@
 #ifndef LocNode_INCLUDED
 #define LocNode_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
 
 #ifdef SP_NAMESPACE

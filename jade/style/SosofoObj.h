@@ -5,10 +5,10 @@
 #define SosofoObj_INCLUDED 1
 
 #include "ELObj.h"
-#include "Location.h"
+#include <OpenSP/Location.h>
 #include "FOTBuilder.h"
-#include "Owner.h"
-#include "CopyOwner.h"
+#include <OpenSP/Owner.h>
+#include <OpenSP/CopyOwner.h>
 #include "Insn.h"
 
 #ifdef DSSSL_NAMESPACE

@@ -6,7 +6,7 @@
 #include "InterpreterMessages.h"
 #include "Pattern.h"
 #include "MacroFlowObj.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include <stdlib.h>
 #include "LangObj.h"
 #include "VM.h"

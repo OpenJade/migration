@@ -5,7 +5,7 @@
 #define Collector_INCLUDED 1
 
 #include <stddef.h>
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 
 // A garbage collector.
 

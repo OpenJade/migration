@@ -5,7 +5,7 @@
 #include "ELObj.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include <string.h>
 #include <math.h>
 #include <stdio.h>

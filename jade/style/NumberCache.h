@@ -4,11 +4,11 @@
 #ifndef NumberCache_INCLUDED
 #define NumberCache_INCLUDED 1
 
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
-#include "NamedTable.h"
-#include "StringC.h"
-#include "NCVector.h"
+#include <OpenSP/NamedTable.h>
+#include <OpenSP/StringC.h>
+#include <OpenSP/NCVector.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

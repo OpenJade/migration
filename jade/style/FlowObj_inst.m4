@@ -6,8 +6,8 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "Owner.h"
-#include "CopyOwner.h"
+#include <OpenSP/Owner.h>
+#include <OpenSP/CopyOwner.h>
 #undef SP_DEFINE_TEMPLATES
 
 #if _MSC_VER >= 1100

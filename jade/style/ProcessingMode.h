@@ -4,19 +4,19 @@
 #ifndef ProcessingMode_INCLUDED
 #define ProcessingMode_INCLUDED 1
 
-#include "Named.h"
-#include "StringC.h"
-#include "Location.h"
-#include "Owner.h"
-#include "Vector.h"
-#include "NCVector.h"
-#include "NamedTable.h"
+#include <OpenSP/Named.h>
+#include <OpenSP/StringC.h>
+#include <OpenSP/Location.h>
+#include <OpenSP/Owner.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/NCVector.h>
+#include <OpenSP/NamedTable.h>
 #include "Expression.h"
 #include "Insn.h"
-#include "Boolean.h"
+#include <OpenSP/Boolean.h>
 #include "Node.h"
 #include "FOTBuilder.h"
-#include "IList.h"
+#include <OpenSP/IList.h>
 #include "Pattern.h"
 
 #ifdef DSSSL_NAMESPACE

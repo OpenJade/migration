@@ -6,7 +6,7 @@
 
 #include "config.h"
 #include "Node.h"
-#include "OutputCharStream.h"
+#include <OpenSP/OutputCharStream.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

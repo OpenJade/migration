@@ -3,8 +3,8 @@
 
 #include "stylelib.h"
 #include "Pattern.h"
-#include "macros.h"
-#include "Vector.h"
+#include <OpenSP/macros.h>
+#include <OpenSP/Vector.h>
 #include "Interpreter.h"
 
 #ifdef DSSSL_NAMESPACE

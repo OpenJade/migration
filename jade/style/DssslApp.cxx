@@ -3,16 +3,16 @@
 
 #include "stylelib.h"
 #include "DssslApp.h"
-#include "StorageManager.h"
+#include <OpenSP/StorageManager.h>
 #include "DssslAppMessages.h"
 #include "StyleEngine.h"
-#include "sptchar.h"
-#include "macros.h"
+#include <OpenSP/sptchar.h>
+#include <OpenSP/macros.h>
 #include "LocNode.h"
 #include "SdNode.h"
-#include "InputSource.h"
-#include "ArcEngine.h"
-#include "Entity.h"
+#include <OpenSP/InputSource.h>
+#include <OpenSP/ArcEngine.h>
+#include <OpenSP/Entity.h>
 
 #include <ctype.h>
 #include <string.h>

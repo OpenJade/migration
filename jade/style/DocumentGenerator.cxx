@@ -2,7 +2,7 @@
 // See the file copying.txt for copying permission.
 
 #include "stylelib.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include "DocumentGenerator.h"
 #include <stdio.h>
 

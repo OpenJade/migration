@@ -9,26 +9,26 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "StringOf.h"
-#include "Vector.h"
-#include "XcharMap.h"
-#include "CharMap.h"
-#include "Ptr.h"
-#include "PointerTable.h"
-#include "OwnerTable.h"
-#include "HashTable.h"
-#include "HashTableItemBase.h"
-#include "SubstTable.h"
-#include "ISet.h"
-#include "Owner.h"
+#include <OpenSP/StringOf.h>
+#include <OpenSP/Vector.h>
+#include <OpenSP/XcharMap.h>
+#include <OpenSP/CharMap.h>
+#include <OpenSP/Ptr.h>
+#include <OpenSP/PointerTable.h>
+#include <OpenSP/OwnerTable.h>
+#include <OpenSP/HashTable.h>
+#include <OpenSP/HashTableItemBase.h>
+#include <OpenSP/SubstTable.h>
+#include <OpenSP/ISet.h>
+#include <OpenSP/Owner.h>
 #undef SP_DEFINE_TEMPLATES
 
-#include "types.h"
-#include "Entity.h"
-#include "Syntax.h"
-#include "ExtendEntityManager.h"
-#include "Event.h"
-#include "CmdLineApp.h"
+#include <OpenSP/types.h>
+#include <OpenSP/Entity.h>
+#include <OpenSP/Syntax.h>
+#include <OpenSP/ExtendEntityManager.h>
+#include <OpenSP/Event.h>
+#include <OpenSP/CmdLineApp.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {

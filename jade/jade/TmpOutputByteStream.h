@@ -1,8 +1,8 @@
 #ifndef TmpOutputByteStream_INCLUDED
 #define TmpOutputByteStream_INCLUDED 1
 
-#include "OutputByteStream.h"
-#include "Boolean.h"
+#include <OpenSP/OutputByteStream.h>
+#include <OpenSP/Boolean.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {

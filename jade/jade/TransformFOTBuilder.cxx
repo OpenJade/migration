@@ -4,9 +4,9 @@
 #include "config.h"
 #include "TransformFOTBuilder.h"
 #include "FOTBuilder.h"
-#include "OutputCharStream.h"
-#include "MessageArg.h"
-#include "ErrnoMessageArg.h"
+#include <OpenSP/OutputCharStream.h>
+#include <OpenSP/MessageArg.h>
+#include <OpenSP/ErrnoMessageArg.h>
 #include "dsssl_ns.h"
 
 #include <errno.h>

@@ -14,12 +14,12 @@
 #include "MifFOTBuilder.h"
 #endif
 #include "TextFOTBuilder.h"
-#include "OutputCharStream.h"
-#include "macros.h"
-#include "sptchar.h"
+#include <OpenSP/OutputCharStream.h>
+#include <OpenSP/macros.h>
+#include <OpenSP/sptchar.h>
 #include "JadeMessages.h"
-#include "ErrnoMessageArg.h"
-#include "OutputByteStream.h"
+#include <OpenSP/ErrnoMessageArg.h>
+#include <OpenSP/OutputByteStream.h>
 #include "dsssl_ns.h"
 
 #include <errno.h>

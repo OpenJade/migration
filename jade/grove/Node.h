@@ -8,7 +8,7 @@
 #endif
 
 #include <stddef.h>
-#include "IList.h"
+#include <OpenSP/IList.h>
 
 #ifdef SP_USE_DLL
 #ifdef BUILD_LIBGROVE

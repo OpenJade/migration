@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "Collector.h"
-#include "macros.h"
+#include <OpenSP/macros.h>
 #include <stdlib.h>
 
 #if 0

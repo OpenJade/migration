@@ -17,6 +17,8 @@ AC_CONFIG_AUX_DIR(config)
 TOP=`pwd`
 AC_SUBST(TOP)
 
+AC_ARG_PROGRAM
+
 if test "$CXXFLAGS" = ""; then 
   CXXFLAGS="-O2"
 fi

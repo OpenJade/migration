@@ -1198,6 +1198,26 @@ ConstPtr<InheritedC> BorderC::make(ELObj *obj, const Location &loc, Interpreter 
   return ConstPtr<InheritedC>();
 }
 
+class RuleC : public IgnoredC {
+public:
+  RuleC(const Identifier *, unsigned index, ELObj *, Interpreter &);
+  ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+};
+
+RuleC::RuleC(const Identifier *ident, unsigned index, ELObj *value, Interpreter &interp)
+: IgnoredC(ident, index, value, interp)
+{
+}
+
+ConstPtr<InheritedC> RuleC::make(ELObj *obj, const Location &loc, Interpreter &interp) const
+{
+  SosofoObj *sosofo = obj->asSosofo();
+    if (sosofo && sosofo->isRule())
+    return new RuleC(identifier(), index(), obj, interp);
+  invalidValue(loc, interp);
+  return ConstPtr<InheritedC>();
+}
+
 class InheritedCPrimitiveObj : public PrimitiveObj {
 public:
   void *operator new(size_t, Collector &c) {
@@ -1206,8 +1226,7 @@ public:
   static const Signature signature_;
   InheritedCPrimitiveObj(const ConstPtr<InheritedC> &ic)
     : PrimitiveObj(&signature_), inheritedC_(ic) { }
-  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &)
-    const;
+  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &);
 private:
   ConstPtr<InheritedC> inheritedC_;
 };
@@ -1216,7 +1235,7 @@ const Signature InheritedCPrimitiveObj::signature_ = { 0, 0, 0 };
 
 ELObj *InheritedCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec,
 					     Interpreter &interp,
-					     const Location &loc) const
+					     const Location &loc)
 {
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
@@ -1235,8 +1254,7 @@ public:
   static const Signature signature_;
   ActualCPrimitiveObj(const ConstPtr<InheritedC> &ic)
     : PrimitiveObj(&signature_), inheritedC_(ic) { }
-  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &)
-    const;
+  ELObj *primitiveCall(int, ELObj **, EvalContext &, Interpreter &, const Location &);
 private:
   ConstPtr<InheritedC> inheritedC_;
 };
@@ -1244,7 +1262,7 @@ private:
 const Signature ActualCPrimitiveObj::signature_ = { 0, 0, 0 };
 
 ELObj *ActualCPrimitiveObj::primitiveCall(int, ELObj **, EvalContext &ec, Interpreter &interp,
-					  const Location &loc) const
+					  const Location &loc)
 {
   if (!ec.styleStack) {
     interp.setNextLocation(loc);
@@ -1344,6 +1362,8 @@ void Interpreter::installInheritedCs()
 		     BorderC, makeFalse(), *this);
   STORE_INHERITED_C2(cellAfterColumnBorderC_, "cell-after-column-border",
 		     BorderC, makeFalse(), *this);
+  STORE_INHERITED_C2(fractionBarC_, "fraction-bar",
+		     RuleC, lookup(makeStringC("rule"))->flowObj(), *this);
   INHERITED_C2("line-thickness", GenericLengthInheritedC, &FOTBuilder::setLineThickness,
                unitsPerInch()/72);
   INHERITED_C2("cell-before-row-margin", GenericLengthInheritedC,
@@ -1405,6 +1425,8 @@ void Interpreter::installInheritedCs()
 	       &FOTBuilder::setPrincipalModeSimultaneous, 0);
   INHERITED_C2("marginalia-keep-with-previous?", GenericBoolInheritedC,
 	       &FOTBuilder::setMarginaliaKeepWithPrevious, 0);
+  INHERITED_C2("grid-equidistant-rows?", GenericBoolInheritedC, &FOTBuilder::setGridEquidistantRows, 0);
+  INHERITED_C2("grid-equidistant-columns?", GenericBoolInheritedC, &FOTBuilder::setGridEquidistantColumns, 0);
   INHERITED_C2("line-join", GenericSymbolInheritedC, &FOTBuilder::setLineJoin,
 	       FOTBuilder::symbolMiter);
   INHERITED_C2("line-cap", GenericSymbolInheritedC, &FOTBuilder::setLineCap,
@@ -1423,6 +1445,24 @@ void Interpreter::installInheritedCs()
 	       FOTBuilder::symbolRelative);
   INHERITED_C2("math-display-mode", GenericSymbolInheritedC, &FOTBuilder::setMathDisplayMode,
 	       FOTBuilder::symbolDisplay);
+  INHERITED_C2("script-pre-align", GenericSymbolInheritedC, &FOTBuilder::setScriptPreAlign,
+               FOTBuilder::symbolIndependent);
+  INHERITED_C2("script-post-align", GenericSymbolInheritedC, &FOTBuilder::setScriptPostAlign,
+               FOTBuilder::symbolIndependent);
+  INHERITED_C2("script-mid-sup-align", GenericSymbolInheritedC, &FOTBuilder::setScriptMidSupAlign,
+               FOTBuilder::symbolCenter);
+  INHERITED_C2("script-mid-sub-align", GenericSymbolInheritedC, &FOTBuilder::setScriptMidSubAlign,
+               FOTBuilder::symbolCenter);
+  INHERITED_C2("numerator-align", GenericSymbolInheritedC, &FOTBuilder::setNumeratorAlign,
+               FOTBuilder::symbolCenter);
+  INHERITED_C2("denominator-align", GenericSymbolInheritedC, &FOTBuilder::setDenominatorAlign,
+               FOTBuilder::symbolCenter);
+  INHERITED_C2("grid-position-cell-type", GenericSymbolInheritedC, &FOTBuilder::setGridPositionCellType,
+               FOTBuilder::symbolRowMajor);
+  INHERITED_C2("grid-column-alignment", GenericSymbolInheritedC, &FOTBuilder::setGridColumnAlignment,
+               FOTBuilder::symbolCenter);
+  INHERITED_C2("grid-row-alignment", GenericSymbolInheritedC, &FOTBuilder::setGridRowAlignment,
+               FOTBuilder::symbolCenter);
   INHERITED_C2("box-type", GenericSymbolInheritedC, &FOTBuilder::setBoxType,
 	       FOTBuilder::symbolBorder);
   INHERITED_C2("glyph-alignment-mode", GenericSymbolInheritedC, &FOTBuilder::setGlyphAlignmentMode,

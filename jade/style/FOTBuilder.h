@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
 
 #ifndef FOTBuilder_INCLUDED
@@ -12,6 +12,7 @@
 #include "Vector.h"
 #include "Resource.h"
 #include "Ptr.h"
+#include "Owner.h"
 #include <stddef.h>
 #include <string.h>
 #include "dsssl_ns.h"
@@ -140,9 +141,18 @@ public:
     symbolOutline,
     symbolWith,
     symbolAgainst,
-    symbolForce
+    symbolForce,
+    symbolIndependent,
+    symbolPile,
+    symbolSupOut,
+    symbolSubOut,
+    symbolLeadEdge,
+    symbolTrailEdge,
+    symbolExplicit,
+    symbolRowMajor,
+    symbolColumnMajor
   };
-  enum { nSymbols = symbolForce + 1 };
+  enum { nSymbols = symbolColumnMajor + 1 };
   typedef const char *PublicId;
   struct GlyphId {
     GlyphId() : publicId(0), suffix(0) { }
@@ -171,13 +181,6 @@ public:
   struct TableLengthSpec : LengthSpec {
     TableLengthSpec() : tableUnitFactor(0.0) { }
     double tableUnitFactor;
-  };
-  struct Extension {
-    const char *pubid;
-    void (FOTBuilder::*boolSetter)(bool);
-    void (FOTBuilder::*stringSetter)(const StringC &);
-    void (FOTBuilder::*integerSetter)(long);
-    void (FOTBuilder::*lengthSetter)(Length);
   };
   struct OptLengthSpec {
     OptLengthSpec() : hasLength(0) { }
@@ -424,8 +427,57 @@ public:
   virtual void tableCellAfterColumnBorder();
   // Implementation must set numerator and denominator
   // must be set to non-null values.
+  virtual void startMathSequence();
+  virtual void endMathSequence();
   virtual void startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator);
+  // startFraction is followed by call to fractionBar with set...() calls
+  // intervening
+  virtual void fractionBar();
   virtual void endFraction();
+  virtual void startUnmath();
+  virtual void endUnmath();
+  virtual void startSuperscript();
+  virtual void endSuperscript();
+  virtual void startSubscript();
+  virtual void endSubscript();
+  virtual void startScript(FOTBuilder *&preSup,
+                           FOTBuilder *&preSub,
+                           FOTBuilder *&postSup,
+                           FOTBuilder *&postSub,
+                           FOTBuilder *&midSup,
+                           FOTBuilder *&midSub);
+  virtual void endScript();
+  virtual void startMark(FOTBuilder *&overMark, FOTBuilder *&underMark);
+  virtual void endMark();
+  virtual void startFence(FOTBuilder *&open, FOTBuilder *&close);
+  virtual void endFence();
+  virtual void startRadical(FOTBuilder *&degree);
+  // startRadical is followed by one of the following
+  virtual void radicalRadical(const CharacterNIC &);
+  virtual void radicalRadicalDefaulted();
+  virtual void endRadical();
+  virtual void startMathOperator(FOTBuilder *&oper,
+                                 FOTBuilder *&lowerLimit,
+                                 FOTBuilder *&upperLimit);
+  virtual void endMathOperator();
+  
+  struct GridNIC {
+    GridNIC();
+    unsigned nColumns;
+    unsigned nRows;
+  };
+  virtual void startGrid(const GridNIC &);
+  virtual void endGrid();
+
+  struct GridCellNIC {
+    GridCellNIC();
+    unsigned columnNumber;
+    unsigned rowNumber;
+  };
+  virtual void startGridCell(const GridCellNIC &);
+  virtual void endGridCell();
+
+  // Simple page
   virtual void startSimplePageSequence();
   virtual void endSimplePageSequence();
   // Headers and footers are treated like a separate port.
@@ -452,22 +504,6 @@ public:
   virtual void startSimplePageSequenceHeaderFooter(unsigned);
   virtual void endSimplePageSequenceHeaderFooter(unsigned);
   virtual void endAllSimplePageSequenceHeaderFooter();
-  // SGML Transformations
-  struct DocumentTypeNIC {
-    DocumentTypeNIC();
-    StringC name;
-    StringC publicId;
-    StringC systemId;
-  };
-  virtual void documentType(const DocumentTypeNIC &);
-  struct ElementNIC {
-    StringC gi;
-    Vector<StringC> attributes;
-  };
-  virtual void startElement(const ElementNIC &);
-  virtual void endElement();
-  virtual void emptyElement(const ElementNIC &);
-  virtual void processingInstruction(const StringC &);
   // page-number sosofo
   virtual void pageNumber();
   // Inherited characteristics
@@ -536,6 +572,8 @@ public:
   virtual void setBorderOmitAtBreak(bool);
   virtual void setPrincipalModeSimultaneous(bool);
   virtual void setMarginaliaKeepWithPrevious(bool);
+  virtual void setGridEquidistantRows(bool);
+  virtual void setGridEquidistantColumns(bool);
   virtual void setLineJoin(Symbol);
   virtual void setLineCap(Symbol);
   virtual void setLineNumberSide(Symbol);
@@ -545,6 +583,15 @@ public:
   virtual void setWritingMode(Symbol);
   virtual void setLastLineQuadding(Symbol);
   virtual void setMathDisplayMode(Symbol);
+  virtual void setScriptPreAlign(Symbol);
+  virtual void setScriptPostAlign(Symbol);
+  virtual void setScriptMidSupAlign(Symbol);
+  virtual void setScriptMidSubAlign(Symbol);
+  virtual void setNumeratorAlign(Symbol);
+  virtual void setDenominatorAlign(Symbol);
+  virtual void setGridPositionCellType(Symbol);
+  virtual void setGridColumnAlignment(Symbol);
+  virtual void setGridRowAlignment(Symbol);
   virtual void setBoxType(Symbol);
   virtual void setGlyphAlignmentMode(Symbol);
   virtual void setBoxBorderAlignment(Symbol);
@@ -614,10 +661,51 @@ public:
   virtual void endNode();
   virtual void currentNodePageNumber(const NodePtr &);
 
+  class CompoundExtensionFlowObj;
+  class STYLE_API ExtensionFlowObj {
+  public:
+    virtual ~ExtensionFlowObj();
+    class Value {
+    public:
+      virtual bool convertString(StringC &) const = 0;
+      virtual bool convertStringPairList(Vector<StringC> &) const = 0;
+    };
+    virtual CompoundExtensionFlowObj *asCompoundExtensionFlowObj();
+    virtual const CompoundExtensionFlowObj *asCompoundExtensionFlowObj() const;
+    virtual bool hasNIC(const StringC &) const;
+    virtual void setNIC(const StringC &, const Value &);
+    virtual ExtensionFlowObj *copy() const = 0;
+  };
+  class STYLE_API CompoundExtensionFlowObj : public ExtensionFlowObj {
+  public:
+    CompoundExtensionFlowObj *asCompoundExtensionFlowObj();
+    const CompoundExtensionFlowObj *asCompoundExtensionFlowObj() const;
+    virtual bool hasPrincipalPort() const;
+    virtual void portNames(Vector<StringC> &) const;
+  };
+
+  // extension inherited characteristics
+
   virtual void extensionSet(void (FOTBuilder::*)(bool), bool);
   virtual void extensionSet(void (FOTBuilder::*)(const StringC &), const StringC &);
   virtual void extensionSet(void (FOTBuilder::*)(long), long);
   
+  // extension flow objects
+  virtual void extension(const ExtensionFlowObj &, const NodePtr &);
+  virtual void startExtension(const CompoundExtensionFlowObj &,
+			      const NodePtr &,
+			      Vector<FOTBuilder *> &ports);
+  virtual void endExtension(const CompoundExtensionFlowObj &);
+
+  struct Extension {
+    const char *pubid;
+    void (FOTBuilder::*boolSetter)(bool);
+    void (FOTBuilder::*stringSetter)(const StringC &);
+    void (FOTBuilder::*integerSetter)(long);
+    void (FOTBuilder::*lengthSetter)(Length);
+    const ExtensionFlowObj *flowObj;
+  };
+
   static const char *symbolName(Symbol);
 };
 
@@ -673,8 +761,43 @@ public:
   void endAllSimplePageSequenceHeaderFooter();
   // page-number sosofo
   void pageNumber();
+  // math
+  void startMathSequence();
+  void endMathSequence();
   void startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator);
+  void fractionBar();
   void endFraction();
+  void startUnmath();
+  void endUnmath();
+  void startSuperscript();
+  void endSuperscript();
+  void startSubscript();
+  void endSubscript();
+  void startScript(FOTBuilder *&preSup,
+                   FOTBuilder *&preSub,
+                   FOTBuilder *&postSup,
+                   FOTBuilder *&postSub,
+                   FOTBuilder *&midSup,
+                   FOTBuilder *&midSub);
+  void endScript();
+  void startMark(FOTBuilder *&overMark, FOTBuilder *&underMark);
+  void endMark();
+  void startFence(FOTBuilder *&open, FOTBuilder *&close);
+  void endFence();
+  void startRadical(FOTBuilder *&degree);
+  void endRadical();
+  void radicalRadical(const CharacterNIC &);
+  void radicalRadicalDefaulted();
+  void startMathOperator(FOTBuilder *&oper,
+                         FOTBuilder *&lowerLimit,
+                         FOTBuilder *&upperLimit);
+  void endMathOperator();
+  void startGrid(const GridNIC &);
+  void endGrid();
+  void startGridCell(const GridCellNIC &);
+  void endGridCell();
+
+  // Tables
   void startTable(const TableNIC &);
   void endTable();
   void tableBeforeRowBorder();
@@ -692,11 +815,6 @@ public:
   void tableCellAfterRowBorder();
   void tableCellBeforeColumnBorder();
   void tableCellAfterColumnBorder();
-  void startElement(const ElementNIC &);
-  void endElement();
-  void emptyElement(const ElementNIC &);
-  void documentType(const DocumentTypeNIC &);
-  void processingInstruction(const StringC &);
   // Inherited characteristics
   void setFontSize(Length);
   void setFontFamilyName(const StringC &);
@@ -768,6 +886,8 @@ public:
   void setBorderOmitAtBreak(bool);
   void setPrincipalModeSimultaneous(bool);
   void setMarginaliaKeepWithPrevious(bool);
+  void setGridEquidistantRows(bool);
+  void setGridEquidistantColumns(bool);
   void setLineJoin(Symbol);
   void setLineCap(Symbol);
   void setLineNumberSide(Symbol);
@@ -777,6 +897,15 @@ public:
   void setWritingMode(Symbol);
   void setLastLineQuadding(Symbol);
   void setMathDisplayMode(Symbol);
+  void setScriptPreAlign(Symbol);
+  void setScriptPostAlign(Symbol);
+  void setScriptMidSupAlign(Symbol);
+  void setScriptMidSubAlign(Symbol);
+  void setNumeratorAlign(Symbol);
+  void setDenominatorAlign(Symbol);
+  void setGridPositionCellType(Symbol);
+  void setGridColumnAlignment(Symbol);
+  void setGridRowAlignment(Symbol);
   void setBoxType(Symbol);
   void setGlyphAlignmentMode(Symbol);
   void setBoxBorderAlignment(Symbol);
@@ -821,6 +950,11 @@ public:
   void extensionSet(void (FOTBuilder::*)(bool), bool);
   void extensionSet(void (FOTBuilder::*)(const StringC &), const StringC &);
   void extensionSet(void (FOTBuilder::*)(long), long);
+  void extension(const ExtensionFlowObj &, const NodePtr &);
+  void startExtension(const CompoundExtensionFlowObj &,
+		      const NodePtr &,
+		      Vector<FOTBuilder *> &ports);
+  void endExtension(const CompoundExtensionFlowObj &);
 
   struct Call {
     virtual ~Call();
@@ -1030,20 +1164,33 @@ private:
     void emit(FOTBuilder &);
     Vector<ConstPtr<GlyphSubstTable> > arg;
   };
-  struct StartElementCall : Call {
-    StartElementCall(const ElementNIC &nic) : arg(nic) { }
+  struct StartGridCall : Call {
+    StartGridCall(const GridNIC &nic) : arg(nic) { }
     void emit(FOTBuilder &);
-    ElementNIC arg;
+    GridNIC arg;
   };
-  struct EmptyElementCall : Call {
-    EmptyElementCall(const ElementNIC &nic) : arg(nic) { }
+  struct StartGridCellCall : Call {
+    StartGridCellCall(const GridCellNIC &nic) : arg(nic) { }
     void emit(FOTBuilder &);
-    ElementNIC arg;
+    GridCellNIC arg;
   };
-  struct DocumentTypeCall : Call {
-    DocumentTypeCall(const DocumentTypeNIC &nic) : arg(nic) { }
+  struct RadicalRadicalCall : Call {
+    RadicalRadicalCall(const CharacterNIC &nic) : arg(nic) { }
     void emit(FOTBuilder &);
-    DocumentTypeNIC arg;
+    CharacterNIC arg;
+  };
+  struct ExtensionCall : Call {
+    ExtensionCall(const ExtensionFlowObj &fo, const NodePtr &nd)
+      : arg(fo.copy()), node(nd) { }
+    void emit(FOTBuilder &);
+    Owner<ExtensionFlowObj> arg;
+    NodePtr node;
+  };
+  struct EndExtensionCall : Call {
+    EndExtensionCall(const CompoundExtensionFlowObj &fo)
+      : arg(fo.copy()->asCompoundExtensionFlowObj()) { }
+    void emit(FOTBuilder &);
+    Owner<CompoundExtensionFlowObj> arg;
   };
   Call *calls_;
   Call **tail_;
@@ -1060,6 +1207,52 @@ struct StartFractionCall : SaveFOTBuilder::Call {
   void emit(FOTBuilder &);
   SaveFOTBuilder numerator;
   SaveFOTBuilder denominator;
+};
+
+struct StartScriptCall : SaveFOTBuilder::Call {
+  StartScriptCall(FOTBuilder *&preSup,
+                  FOTBuilder *&preSub,
+                  FOTBuilder *&postSup,
+                  FOTBuilder *&postSub,
+                  FOTBuilder *&midSup,
+                  FOTBuilder *&midSub);
+  void emit(FOTBuilder &);
+  SaveFOTBuilder preSup;
+  SaveFOTBuilder preSub;
+  SaveFOTBuilder postSup;
+  SaveFOTBuilder postSub;
+  SaveFOTBuilder midSup;
+  SaveFOTBuilder midSub;
+};
+
+struct StartMarkCall : public SaveFOTBuilder::Call {
+  StartMarkCall(FOTBuilder *&overMark, FOTBuilder *&underMark);
+  void emit(FOTBuilder &);
+  SaveFOTBuilder overMark;
+  SaveFOTBuilder underMark;
+};
+
+struct StartFenceCall : public SaveFOTBuilder::Call {
+  StartFenceCall(FOTBuilder *&open, FOTBuilder *&close);
+  void emit(FOTBuilder &);
+  SaveFOTBuilder open;
+  SaveFOTBuilder close;
+};
+
+struct StartRadicalCall : public SaveFOTBuilder::Call {
+  StartRadicalCall(FOTBuilder *&degree);
+  void emit(FOTBuilder &);
+  SaveFOTBuilder degree;
+};
+
+struct StartMathOperatorCall : public SaveFOTBuilder::Call {
+  StartMathOperatorCall(FOTBuilder *&oper,
+                        FOTBuilder *&lowerLimit,
+                        FOTBuilder *&upperLimit);
+  void emit(FOTBuilder &);
+  SaveFOTBuilder oper;
+  SaveFOTBuilder lowerLimit;
+  SaveFOTBuilder upperLimit;
 };
 
 struct StartTablePartCall : SaveFOTBuilder::Call {
@@ -1081,20 +1274,52 @@ struct StartMultiModeCall : SaveFOTBuilder::Call {
   IList<SaveFOTBuilder> ports;
 };
 
+struct StartExtensionCall : SaveFOTBuilder::Call {
+  StartExtensionCall(const FOTBuilder::CompoundExtensionFlowObj &,
+		     const NodePtr &,
+		     Vector<FOTBuilder *> &);
+  void emit(FOTBuilder &);
+  IList<SaveFOTBuilder> ports;
+  NodePtr node;
+  Owner<FOTBuilder::CompoundExtensionFlowObj> flowObj;
+};
+
 // This uses SaveFOTBuilder to provide a serial view of multi-port objects.
 
 class STYLE_API SerialFOTBuilder : public FOTBuilder {
 public:
   SerialFOTBuilder();
   // Instead of overriding these
+  void startTablePart(const TablePartNIC &,
+                      FOTBuilder *&header, FOTBuilder *&footer);
+  void endTablePart();
   void startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator);
   void endFraction();
-  void startTablePart(const TablePartNIC &, FOTBuilder *&header, FOTBuilder *&footer);
-  void endTablePart();
+  void startScript(FOTBuilder *&preSup,
+                   FOTBuilder *&preSub,
+                   FOTBuilder *&postSup,
+                   FOTBuilder *&postSub,
+                   FOTBuilder *&midSup,
+                   FOTBuilder *&midSub);
+  void endScript();
+  void startMark(FOTBuilder *&overMark, FOTBuilder *&underMark);
+  void endMark();
+  void startFence(FOTBuilder *&open, FOTBuilder *&close);
+  void endFence();
+  void startRadical(FOTBuilder *&degree);
+  void endRadical();
+  void startMathOperator(FOTBuilder *&oper,
+                         FOTBuilder *&lowerLimit,
+                         FOTBuilder *&upperLimit);
+  void endMathOperator();
   void startMultiMode(const MultiMode *,
                       const Vector<MultiMode> &,
 		      Vector<FOTBuilder *> &);
   void endMultiMode();
+  void startExtension(const CompoundExtensionFlowObj &,
+		      const NodePtr &,
+		      Vector<FOTBuilder *> &ports);
+  void endExtension(const CompoundExtensionFlowObj &);
   // Override these
   virtual void startFractionSerial();
   virtual void endFractionSerial();
@@ -1102,6 +1327,44 @@ public:
   virtual void endFractionNumerator();
   virtual void startFractionDenominator();
   virtual void endFractionDenominator();
+  virtual void startScriptSerial();
+  virtual void endScriptSerial();
+  virtual void startScriptPreSup();
+  virtual void endScriptPreSup();
+  virtual void startScriptPreSub();
+  virtual void endScriptPreSub();
+  virtual void startScriptPostSup();
+  virtual void endScriptPostSup();
+  virtual void startScriptPostSub();
+  virtual void endScriptPostSub();
+  virtual void startScriptMidSup();
+  virtual void endScriptMidSup();
+  virtual void startScriptMidSub();
+  virtual void endScriptMidSub();
+  virtual void startMarkSerial();
+  virtual void endMarkSerial();
+  virtual void startMarkOver();
+  virtual void endMarkOver();
+  virtual void startMarkUnder();
+  virtual void endMarkUnder();
+  virtual void startFenceSerial();
+  virtual void endFenceSerial();
+  virtual void startFenceOpen();
+  virtual void endFenceOpen();
+  virtual void startFenceClose();
+  virtual void endFenceClose();
+  virtual void startRadicalSerial();
+  virtual void endRadicalSerial();
+  virtual void startRadicalDegree();
+  virtual void endRadicalDegree();
+  virtual void startMathOperatorSerial();
+  virtual void endMathOperatorSerial();
+  virtual void startMathOperatorOperator();
+  virtual void endMathOperatorOperator();
+  virtual void startMathOperatorLowerLimit();
+  virtual void endMathOperatorLowerLimit();
+  virtual void startMathOperatorUpperLimit();
+  virtual void endMathOperatorUpperLimit();
   virtual void startTablePartSerial(const TablePartNIC &);
   virtual void endTablePartSerial();
   virtual void startTablePartHeader();
@@ -1112,6 +1375,10 @@ public:
   virtual void endMultiModeSerial();
   virtual void startMultiModeMode(const MultiMode &);
   virtual void endMultiModeMode();
+  virtual void startExtensionSerial(const CompoundExtensionFlowObj &, const NodePtr &);
+  virtual void endExtensionSerial(const CompoundExtensionFlowObj &);
+  virtual void startExtensionStream(const StringC &);
+  virtual void endExtensionStream(const StringC &);
 private:
   IList<SaveFOTBuilder> save_;
   Vector<Vector<MultiMode> > multiModeStack_;
@@ -1122,6 +1389,8 @@ bool operator==(const FOTBuilder::GlyphId &g1, const FOTBuilder::GlyphId &g2)
 {
   return g1.publicId == g2.publicId && g1.suffix == g2.suffix;
 }
+
+bool STYLE_API operator==(const StringC &, const char *);
 
 #ifdef DSSSL_NAMESPACE
 }

@@ -13,6 +13,7 @@
 #include "StringOf.h"
 #include "Boolean.h"
 #include "CodingSystem.h"
+#include "OutputByteStream.h"
 #include "OutputCharStream.h"
 #include "CodingSystemKit.h"
 
@@ -20,8 +21,6 @@
 // for wchar_t
 #include <stddef.h>
 #endif
-
-class filebuf;
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -39,7 +38,8 @@ public:
   virtual int processOptions(int argc, AppChar **argv, int &nextArg);
   virtual void processOption(AppChar opt, const AppChar *arg);
   virtual int processArguments(int argc, AppChar **files) = 0;
-  Boolean openFilebufWrite(filebuf &file, const AppChar *filename);
+  static const MessageType2 &openFileErrorMessage();
+  static const MessageType2 &closeFileErrorMessage();
   StringC usageString();
   const CodingSystem *codingSystem();
   const CodingSystem *outputCodingSystem();

@@ -9,9 +9,6 @@ namespace SP_NAMESPACE {
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
 
-// Copyright (c) 1996 James Clark
-// See the file COPYING for copying permission.
-
 #include "config.h"
 
 #ifdef SP_MANUAL_INST
@@ -19,6 +16,7 @@ namespace SP_NAMESPACE {
 #define SP_DEFINE_TEMPLATES
 #include "Vector.h"
 #include "HashTable.h"
+#include "IList.h"
 #undef SP_DEFINE_TEMPLATES
 
 #ifdef DSSSL_NAMESPACE
@@ -165,6 +163,45 @@ typedef Vector<RtfFOTBuilder::FontFamilyCharsets> Dummy_9;
 template class HashTableIter<StringC,int>;
 #else
 typedef HashTableIter<StringC,int> Dummy_10;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template IList<RtfFOTBuilder::ReorderFlowObject>
+#else
+#ifdef __xlC__
+#pragma define(IList<RtfFOTBuilder::ReorderFlowObject>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class IList<RtfFOTBuilder::ReorderFlowObject>;
+#else
+typedef IList<RtfFOTBuilder::ReorderFlowObject> Dummy_11;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template IList<RtfFOTBuilder::Grid>
+#else
+#ifdef __xlC__
+#pragma define(IList<RtfFOTBuilder::Grid>)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class IList<RtfFOTBuilder::Grid>;
+#else
+typedef IList<RtfFOTBuilder::Grid> Dummy_12;
+#endif
+#endif
+#endif
+#ifdef __DECCXX
+#pragma define_template Vector<Vector<String<char> > >
+#else
+#ifdef __xlC__
+#pragma define(Vector<Vector<String<char> > >)
+#else
+#ifdef SP_ANSI_CLASS_INST
+template class Vector<Vector<String<char> > >;
+#else
+typedef Vector<Vector<String<char> > > Dummy_13;
 #endif
 #endif
 #endif

@@ -1,9 +1,6 @@
 // Copyright (c) 1996 James Clark
 // See the file copying.txt for copying permission.
 
-// Copyright (c) 1996 James Clark
-// See the file COPYING for copying permission.
-
 #include "stylelib.h"
 
 #ifdef SP_MANUAL_INST
@@ -99,8 +96,6 @@ __instantiate(Vector<FOTBuilder::MultiMode>)
 __instantiate(Vector<Vector<FOTBuilder::MultiMode> >)
 __instantiate(`HashTable<StringC,FunctionObj *>')
 __instantiate(`HashTableItem<StringC,FunctionObj *>')
-__instantiate(ConstPtr<ElementPattern>)
-__instantiate(Ptr<ElementPattern>)
 __instantiate(Vector<DssslSpecEventHandler::Part *>)
 __instantiate(Vector<DssslSpecEventHandler::PartHeader *>)
 __instantiate(IListIter<DssslSpecEventHandler::BodyElement>)
@@ -121,6 +116,8 @@ __instantiate(Vector<FOTBuilder::GlyphId>)
 __instantiate(Ptr<FOTBuilder::GlyphSubstTable>)
 __instantiate(ConstPtr<FOTBuilder::GlyphSubstTable>)
 __instantiate(Vector<ConstPtr<FOTBuilder::GlyphSubstTable> >)
+__instantiate(Owner<FOTBuilder::ExtensionFlowObj>)
+__instantiate(Owner<FOTBuilder::CompoundExtensionFlowObj>)
 
 #ifdef DSSSL_NAMESPACE
 }

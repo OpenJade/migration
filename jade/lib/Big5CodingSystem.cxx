@@ -6,7 +6,6 @@
 #ifdef SP_MULTI_BYTE
 
 #include "Big5CodingSystem.h"
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -22,7 +21,7 @@ private:
 class Big5Encoder : public Encoder {
 public:
   Big5Encoder() { }
-  void output(const Char *, size_t, streambuf *);
+  void output(const Char *, size_t, OutputByteStream *);
 };
 
 Decoder *Big5CodingSystem::makeDecoder() const
@@ -58,9 +57,7 @@ size_t Big5Decoder::decode(Char *to, const char *s,
   return to - start;
 }
 
-// FIXME handle errors from streambuf::sputc
-
-void Big5Encoder::output(const Char *s, size_t n, streambuf *sb)
+void Big5Encoder::output(const Char *s, size_t n, OutputByteStream *sb)
 {
   for (; n > 0; s++, n--) {
     Char c = *s;

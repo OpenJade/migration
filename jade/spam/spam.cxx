@@ -17,7 +17,6 @@
 #include "sptchar.h"
 
 #include <stdlib.h>
-#include <iostream.h>
 
 #ifdef SP_NAMESPACE
 using namespace SP_NAMESPACE;

@@ -18,7 +18,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 class Interpreter;
-class QueryContext;
+class EvalContext;
 
 class Unit;
 class PairObj;
@@ -82,7 +82,7 @@ public:
   virtual QuantityType quantityValue(long &, double &, int &);
   virtual ELObj *resolveQuantities(bool force, Interpreter &,
 				   const Location &);
-  virtual bool optSingletonNodeList(QueryContext &, NodePtr &);
+  virtual bool optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &);
   // Implements equal? semantics
   bool operator==(ELObj &);
   bool operator!=(ELObj &);
@@ -373,22 +373,24 @@ private:
   Owner<FOTBuilder::Address> address_;
 };
 
-class QueryContext : public Collector, public SdataMapper {
-public:
-  QueryContext(size_t maxSize) : Collector(maxSize) { }
-};
-
 class NodeListObj : public ELObj {
 public:
   NodeListObj *asNodeList();
-  bool optSingletonNodeList(QueryContext &, NodePtr &);
-  virtual NodePtr nodeListFirst(QueryContext &) = 0;
-  virtual NodeListObj *nodeListRest(QueryContext &) = 0;
-  virtual NodeListObj *nodeListNoOrder(QueryContext &);
-  virtual NodeListObj *nodeListChunkRest(QueryContext &);
-  // If it contains a node, must it also contain all nodes in the following chunk?
-  // Default is true!
-  virtual bool chunkComplete();
+  bool optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &);
+  virtual NodePtr nodeListFirst(EvalContext &, Interpreter &) = 0;
+  virtual NodeListObj *nodeListRest(EvalContext &, Interpreter &) = 0;
+  virtual NodeListObj *nodeListNoOrder(Collector &);
+  // If this node contains all the node in the chunk of the first node, then
+  // this *may* return the node list containing the nodes following the chunk;
+  // If so chunk, will be set to 1.  Otherwise return nodeListRest() and set
+  // chunk to 0.  If charChunk() returns a string of length n, then
+  // the chunk of the node is the node together with the n - 1 following siblings;
+  // otherwise the chunk of the node is the node itself.
+  virtual NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &chunk);
+  virtual NodePtr nodeListRef(long, EvalContext &, Interpreter &);
+  virtual NodeListObj *nodeListReverse(EvalContext &, Interpreter &);
+  virtual long nodeListLength(EvalContext &, Interpreter &);
+  virtual bool suppressError();
 };
 
 class NamedNodeListObj : public NodeListObj {
@@ -396,6 +398,7 @@ public:
   NamedNodeListObj *asNamedNodeList();
   virtual NodePtr namedNode(const Char *, size_t) = 0;
   virtual bool nodeName(const NodePtr &, GroveString &) = 0;
+  virtual size_t normalize(Char *, size_t) = 0;
 };
 
 class NodePtrNodeListObj : public NodeListObj {
@@ -405,9 +408,9 @@ public:
   }
   NodePtrNodeListObj();
   NodePtrNodeListObj(const NodePtr &);
-  NodePtr nodeListFirst(QueryContext &);
-  NodeListObj *nodeListRest(QueryContext &);
-  bool optSingletonNodeList(QueryContext &, NodePtr &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  bool optSingletonNodeList(EvalContext &, Interpreter &, NodePtr &);
   bool chunkComplete();
 private:
   // Null for no node.
@@ -420,9 +423,10 @@ public:
     return c.allocateObject(1);
   }
   NodeListPtrNodeListObj(const NodeListPtr &);
-  NodePtr nodeListFirst(QueryContext &);
-  NodeListObj *nodeListRest(QueryContext &);
-  NodeListObj *nodeListChunkRest(QueryContext &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+  NodePtr nodeListRef(long, EvalContext &, Interpreter &);
 private:
   // never null
   NodeListPtr nodeList_;
@@ -434,35 +438,28 @@ public:
     return c.allocateObject(1);
   }
   NamedNodeListPtrNodeListObj(const NamedNodeListPtr &);
-  NodePtr nodeListFirst(QueryContext &);
-  NodeListObj *nodeListRest(QueryContext &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodePtr namedNode(const Char *, size_t);
   bool nodeName(const NodePtr &, GroveString &);
-  NodeListObj *nodeListNoOrder(QueryContext &);
+  size_t normalize(Char *, size_t);
+  NodeListObj *nodeListNoOrder(Collector &);
 private:
   NamedNodeListPtr namedNodeList_;
   // cached node list, null if not yet computed
   NodeListPtr nodeList_;
 };
 
-class ElementPattern : public Resource {
+class PairNodeListObj : public NodeListObj {
 public:
-  virtual ~ElementPattern();
-  virtual bool matches(const NodePtr &, QueryContext &) const = 0;
-};
-
-class SelectElementsNodeListObj : public NodeListObj {
-public:
-  void *operator new(size_t, Collector &c) {
-    return c.allocateObject(1);
-  }
-  SelectElementsNodeListObj(NodeListObj *, const ConstPtr<ElementPattern> &);
+  PairNodeListObj(NodeListObj *, NodeListObj *);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
   void traceSubObjects(Collector &) const;
-  NodePtr nodeListFirst(QueryContext &);
-  NodeListObj *nodeListRest(QueryContext &);
 private:
-  NodeListObj *nodeList_;
-  ConstPtr<ElementPattern> pattern_;
+  NodeListObj *head_; // may be null
+  NodeListObj *tail_;
 };
 
 inline

@@ -6,10 +6,72 @@
 #endif
 #include "splib.h"
 #include "Location.h"
+#include "Entity.h"
+#include "Mutex.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
+
+class InputSourceOriginImpl : public EntityOrigin {
+public:
+  InputSourceOriginImpl();
+  InputSourceOriginImpl(const Location &refLocation);
+  const Location &parent() const;
+  const ExternalInfo *externalInfo() const;
+  Offset startOffset(Index ind) const;
+  void noteCharRef(Index replacementIndex, const NamedCharRef &);
+  Boolean isNamedCharRef(Index ind, NamedCharRef &ref) const;
+  void setExternalInfo(ExternalInfo *);
+  virtual InputSourceOrigin *copy() const;
+  const InputSourceOrigin *asInputSourceOrigin() const;
+private:
+  InputSourceOriginImpl(const InputSourceOriginImpl &); // undefined
+  void operator=(const InputSourceOriginImpl &);	// undefined
+  size_t nPrecedingCharRefs(Index ind) const;
+  Vector<InputSourceOriginNamedCharRef> charRefs_;
+  StringC charRefOrigNames_;
+  Owner<ExternalInfo> externalInfo_; // 0 for internal entities
+  Location refLocation_;	// where referenced from
+  Mutex mutex_;
+};
+
+class EntityOriginImpl : public InputSourceOriginImpl {
+public:
+  void *operator new(size_t sz, Allocator &alloc) {
+    return alloc.alloc(sz);
+  }
+  void *operator new(size_t sz) {
+    return Allocator::allocSimple(sz);
+  }
+  void operator delete(void *p) {
+    Allocator::free(p);
+  }
+  EntityOriginImpl(const ConstPtr<Entity> &);
+  EntityOriginImpl(const ConstPtr<Entity> &,
+		   const Location &refLocation);
+  EntityOriginImpl(const ConstPtr<Entity> &,
+		   const Location &refLocation, Index refLength,
+		   Owner<Markup> &markup);
+  ~EntityOriginImpl();
+  InputSourceOrigin *copy() const;
+  const Entity *entity() const { return entity_.pointer(); }
+  const EntityDecl *entityDecl() const;
+  const EntityOrigin *asEntityOrigin() const;
+  Boolean defLocation(Offset off, const Origin *&, Index &) const;
+  Index refLength() const;
+  const Markup *markup() const;
+private:
+  EntityOriginImpl(const EntityOriginImpl &); // undefined
+  void operator=(const EntityOriginImpl &);	// undefined
+  ConstPtr<Entity> entity_;	// 0 for document entity
+  // total length of reference
+  // (characters that were replaced by the entity)
+  Index refLength_;
+  Owner<Markup> markup_;
+};
+
+const size_t EntityOrigin::allocSize = sizeof(EntityOriginImpl);
 
 Location::Location()
 {
@@ -74,6 +136,40 @@ const EntityDecl *Origin::entityDecl() const
   return 0;
 }
 
+const Markup *Origin::markup() const
+{
+  return 0;
+}
+  
+const Entity *Origin::entity() const
+{
+  return 0;
+}
+
+Boolean Origin::defLocation(Offset, const Origin *&, Index &) const
+{
+  return 0;
+}
+
+const ExternalInfo *Origin::externalInfo() const
+{
+  return 0;
+}
+
+Offset Origin::startOffset(Index ind) const
+{
+  return ind;
+}
+
+const StringC *Origin::entityName() const
+{
+  const EntityDecl *ent = entityDecl();
+  if (ent)
+    return &ent->name();
+  else
+    return 0;
+}
+
 BracketOrigin::BracketOrigin(const Location &loc, Position pos)
 : loc_(loc), pos_(pos)
 {
@@ -94,48 +190,54 @@ Boolean BracketOrigin::inBracketedTextCloseDelim() const
   return pos_ == close;
 }
 
-InputSourceOrigin::InputSourceOrigin()
+InputSourceOrigin *InputSourceOrigin::make()
+{
+  return new InputSourceOriginImpl;
+}
+
+InputSourceOrigin *InputSourceOrigin::make(const Location &refLocation)
+{
+  return new InputSourceOriginImpl(refLocation);
+}
+
+InputSourceOriginImpl::InputSourceOriginImpl()
 {
 }
 
-InputSourceOrigin::InputSourceOrigin(const Location &refLocation)
+InputSourceOriginImpl::InputSourceOriginImpl(const Location &refLocation)
 : refLocation_(refLocation)
 {
 }
 
-const InputSourceOrigin *InputSourceOrigin::asInputSourceOrigin() const
+const InputSourceOrigin *InputSourceOriginImpl::asInputSourceOrigin() const
 {
   return this;
 }
 
-Boolean InputSourceOrigin::defLocation(Offset, Location &) const
+const ExternalInfo *InputSourceOriginImpl::externalInfo() const
 {
-  return 0;
+  return externalInfo_.pointer();
 }
 
-const StringC *InputSourceOrigin::entityName() const
+InputSourceOrigin *InputSourceOriginImpl::copy() const
 {
-  return 0;
+  return new InputSourceOriginImpl(refLocation_);
 }
 
-InputSourceOrigin *InputSourceOrigin::copy() const
-{
-  return new InputSourceOrigin(refLocation_);
-}
-
-const Location &InputSourceOrigin::parent() const
+const Location &InputSourceOriginImpl::parent() const
 {
   return refLocation_;
 }
 
-void InputSourceOrigin::setExternalInfo(ExternalInfo *info)
+void InputSourceOriginImpl::setExternalInfo(ExternalInfo *info)
 {
   externalInfo_ = info;
 }
 
-void InputSourceOrigin::noteCharRef(Index replacementIndex,
-			       const NamedCharRef &ref)
+void InputSourceOriginImpl::noteCharRef(Index replacementIndex,
+					const NamedCharRef &ref)
 {
+  Mutex::Lock lock(&mutex_);
   charRefs_.resize(charRefs_.size() + 1);
   charRefs_.back().replacementIndex = replacementIndex;
   charRefs_.back().refStartIndex = ref.refStartIndex();
@@ -146,7 +248,7 @@ void InputSourceOrigin::noteCharRef(Index replacementIndex,
 
 // Number of character references whose replacement index < ind.
 
-size_t InputSourceOrigin::nPrecedingCharRefs(Index ind) const
+size_t InputSourceOriginImpl::nPrecedingCharRefs(Index ind) const
 {
   size_t i;
   // Find i such that
@@ -174,8 +276,9 @@ size_t InputSourceOrigin::nPrecedingCharRefs(Index ind) const
   return i;
 }
 
-Offset InputSourceOrigin::startOffset(Index ind) const
+Offset InputSourceOriginImpl::startOffset(Index ind) const
 {
+  Mutex::Lock lock(&((InputSourceOriginImpl *)this)->mutex_);
   size_t n = nPrecedingCharRefs(ind);
   if (n < charRefs_.size()
       && ind == charRefs_[n].replacementIndex) {
@@ -190,8 +293,9 @@ Offset InputSourceOrigin::startOffset(Index ind) const
   return Offset(ind - n);
 }
 
-Boolean InputSourceOrigin::isNamedCharRef(Index ind, NamedCharRef &ref) const
+Boolean InputSourceOriginImpl::isNamedCharRef(Index ind, NamedCharRef &ref) const
 {
+  Mutex::Lock lock(&((InputSourceOriginImpl *)this)->mutex_);
   size_t n = nPrecedingCharRefs(ind);
   if (n < charRefs_.size() && ind == charRefs_[n].replacementIndex) {
     ref.set(charRefs_[n].refStartIndex,
@@ -205,6 +309,105 @@ Boolean InputSourceOrigin::isNamedCharRef(Index ind, NamedCharRef &ref) const
   }
   return 0;
 }
+
+EntityOrigin *EntityOrigin::make(Allocator &alloc,
+				 const ConstPtr<Entity> &entity)
+{
+  return new (alloc) EntityOriginImpl(entity);
+}
+
+EntityOrigin *EntityOrigin::make(Allocator &alloc,
+				 const ConstPtr<Entity> &entity,
+				 const Location &refLocation)
+{
+  return new (alloc) EntityOriginImpl(entity, refLocation);
+}
+
+EntityOrigin *EntityOrigin::make(Allocator &alloc,
+				 const ConstPtr<Entity> &entity,
+				 const Location &refLocation,
+				 Index refLength,
+				 Owner<Markup> &markup)
+{
+  return new (alloc) EntityOriginImpl(entity, refLocation, refLength, markup);
+}
+
+EntityOrigin *EntityOrigin::make(const ConstPtr<Entity> &entity,
+				 const Location &refLocation,
+				 Index refLength,
+				 Owner<Markup> &markup)
+{
+  return new EntityOriginImpl(entity, refLocation, refLength, markup);
+}
+
+EntityOrigin *EntityOrigin::make(const ConstPtr<Entity> &entity,
+				 const Location &refLocation)
+{
+  return new EntityOriginImpl(entity, refLocation);
+}
+
+EntityOriginImpl::EntityOriginImpl(const ConstPtr<Entity> &entity)
+: refLength_(0), entity_(entity)
+{
+}
+
+EntityOriginImpl::EntityOriginImpl(const ConstPtr<Entity> &entity,
+				   const Location &refLocation)
+: InputSourceOriginImpl(refLocation), refLength_(0), entity_(entity)
+{
+}
+
+EntityOriginImpl::EntityOriginImpl(const ConstPtr<Entity> &entity,
+				   const Location &refLocation,
+				   Index refLength,
+				   Owner<Markup> &markup)
+: InputSourceOriginImpl(refLocation), refLength_(refLength), entity_(entity)
+{
+  markup.swap(markup_);
+}
+
+EntityOriginImpl::~EntityOriginImpl()
+{
+}
+
+InputSourceOrigin *EntityOriginImpl::copy() const
+{
+  Owner<Markup> m;
+  if (markup_)
+    m = new Markup(*markup_);
+  return new EntityOriginImpl(entity_, parent(), refLength_, m);
+}
+
+Index EntityOriginImpl::refLength() const
+{
+  return refLength_;
+}
+
+const EntityOrigin *EntityOriginImpl::asEntityOrigin() const
+{
+  return this;
+}
+
+Boolean EntityOriginImpl::defLocation(Offset off, const Origin *&origin, Index &index) const
+{
+  if (entity_.isNull())
+    return 0;
+  const InternalEntity *internal = entity_->asInternalEntity();
+  if (!internal)
+    return 0;
+  return internal->text().charLocation(off, origin, index);
+}
+
+const EntityDecl *EntityOriginImpl::entityDecl() const
+{
+  return entity_.pointer();
+}
+
+const Markup *EntityOriginImpl::markup() const
+{
+  return markup_.pointer();
+}
+
 
 ReplacementOrigin::ReplacementOrigin(const Location &loc, Char origChar)
 : loc_(loc), origChar_(origChar)
@@ -240,6 +443,86 @@ Boolean MultiReplacementOrigin::origChars(const Char *&s) const
   if (loc_.origin().isNull() || !loc_.origin()->origChars(s))
     s = origChars_.data();
   return 1;
+}
+
+ProxyOrigin::ProxyOrigin(const Origin *origin)
+: origin_(origin)
+{
+}
+ 
+const EntityOrigin *ProxyOrigin::asEntityOrigin() const
+{
+  return origin_->asEntityOrigin();
+}
+
+const InputSourceOrigin *ProxyOrigin::asInputSourceOrigin() const
+{
+  return origin_->asInputSourceOrigin();
+}
+
+const Location &ProxyOrigin::parent() const
+{
+  return origin_->parent();
+}
+
+Index ProxyOrigin::refLength() const
+{
+  return origin_->refLength();
+}
+
+Boolean ProxyOrigin::origChars(const Char *&p) const
+{
+  return origin_->origChars(p);
+}
+
+Boolean ProxyOrigin::inBracketedTextOpenDelim() const
+{
+  return origin_->inBracketedTextOpenDelim();
+}
+
+Boolean ProxyOrigin::inBracketedTextCloseDelim() const
+{
+  return origin_->inBracketedTextCloseDelim();
+}
+
+Boolean ProxyOrigin::isNumericCharRef(const Markup *&markup) const
+{
+  return origin_->isNumericCharRef(markup);
+}
+
+Boolean ProxyOrigin::isNamedCharRef(Index ind, NamedCharRef &ref) const
+{
+  return origin_->isNamedCharRef(ind, ref);
+}
+
+const EntityDecl *ProxyOrigin::entityDecl() const
+{
+  return origin_->entityDecl();
+}
+
+Boolean ProxyOrigin::defLocation(Offset off, const Origin *&origin, Index &index) const
+{
+  return origin_->defLocation(off, origin, index);
+}
+
+const Markup *ProxyOrigin::markup() const
+{
+  return origin_->markup();
+}
+
+const Entity *ProxyOrigin::entity() const
+{
+  return origin_->entity();
+}
+
+const ExternalInfo *ProxyOrigin::externalInfo() const
+{
+  return origin_->externalInfo();
+}
+
+Offset ProxyOrigin::startOffset(Index ind) const
+{
+  return origin_->startOffset(ind);
 }
 
 ExternalInfo::~ExternalInfo()

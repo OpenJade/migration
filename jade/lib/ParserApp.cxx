@@ -37,6 +37,22 @@ ParserApp::ParserApp(const char *requiredInternalCode)
   registerOption('g');
   registerOption('i', SP_T("entity"));
   registerOption('w', SP_T("warning_type"));
+  static struct {
+    const char *name;
+    char c;
+  } entities[] = {
+    { "lt", '<' },
+    { "gt", '>' },
+    { "amp", '&' },
+    { "quot", '"' },
+    { "apos", '\'' },
+  };
+  Vector<StringC> &v = options_.recoveryEntities;
+  for (size_t i = 0; i < SIZEOF(entities); i++) {
+    v.push_back(systemCharset().execToDesc(entities[i].name));
+    Char c = systemCharset().execToDesc(entities[i].c);
+    v.push_back(StringC(&c, 1));
+  }
 }
 
 void ParserApp::initParser(const StringC &sysid)
@@ -138,54 +154,103 @@ void ParserApp::processOption(AppChar opt, const AppChar *arg)
 
 Boolean ParserApp::enableWarning(const AppChar *s)
 {
+  enum { groupAll = 01, groupMinTag = 02, groupXML = 04 };
   static struct {
     // Explicit qualifier works around CodeWarrior bug
     const CmdLineApp::AppChar *name;
     PackedBoolean ParserOptions::*ptr;
-    PackedBoolean partOfAll;
+    unsigned char groups;
   } table[] = {
-    { SP_T("mixed"), &ParserOptions::warnMixedContent, 1 },
-    { SP_T("should"), &ParserOptions::warnShould, 1 },
+    { SP_T("mixed"), &ParserOptions::warnMixedContent, groupAll },
+    { SP_T("should"), &ParserOptions::warnShould, groupAll },
     { SP_T("duplicate"), &ParserOptions::warnDuplicateEntity, 0 },
-    { SP_T("default"), &ParserOptions::warnDefaultEntityReference, 1 },
-    { SP_T("undefined"), &ParserOptions::warnUndefinedElement, 1 },
-    { SP_T("sgmldecl"), &ParserOptions::warnSgmlDecl, 1 },
-    { SP_T("unclosed"), &ParserOptions::warnUnclosedTag, 1 },
-    { SP_T("empty"), &ParserOptions::warnEmptyTag, 1 },
-    { SP_T("net"), &ParserOptions::warnNet, 0 },
-    { SP_T("unused-map"), &ParserOptions::warnUnusedMap, 1 },
-    { SP_T("unused-param"), &ParserOptions::warnUnusedParam, 1 },
+    { SP_T("default"), &ParserOptions::warnDefaultEntityReference, groupAll },
+    { SP_T("undefined"), &ParserOptions::warnUndefinedElement, groupAll },
+    { SP_T("sgmldecl"), &ParserOptions::warnSgmlDecl, groupAll },
+    { SP_T("unclosed"), &ParserOptions::warnUnclosedTag, groupAll|groupMinTag|groupXML },
+    { SP_T("empty"), &ParserOptions::warnEmptyTag, groupAll|groupMinTag|groupXML },
+    { SP_T("net"), &ParserOptions::warnNet, groupMinTag },
+    { SP_T("unused-map"), &ParserOptions::warnUnusedMap, groupAll },
+    { SP_T("unused-param"), &ParserOptions::warnUnusedParam, groupAll },
     { SP_T("notation-sysid"), &ParserOptions::warnNotationSystemId, 0 },
+    { SP_T("inclusion"), &ParserOptions::warnInclusion, groupXML },
+    { SP_T("exclusion"), &ParserOptions::warnExclusion, groupXML },
+    { SP_T("rcdata-content"), &ParserOptions::warnRcdataContent, groupXML },
+    { SP_T("cdata-content"), &ParserOptions::warnCdataContent, groupXML },
+    { SP_T("ps-comment"), &ParserOptions::warnPsComment, groupXML },
+    { SP_T("attlist-group-decl"), &ParserOptions::warnAttlistGroupDecl, groupXML },
+    { SP_T("element-group-decl"), &ParserOptions::warnElementGroupDecl, groupXML },
+    { SP_T("pi-entity"), &ParserOptions::warnPiEntity, groupXML },
+    { SP_T("internal-sdata-entity"), &ParserOptions::warnInternalSdataEntity, groupXML },
+    { SP_T("internal-cdata-entity"), &ParserOptions::warnInternalCdataEntity, groupXML },
+    { SP_T("external-sdata-entity"), &ParserOptions::warnExternalSdataEntity, groupXML },
+    { SP_T("external-cdata-entity"), &ParserOptions::warnExternalCdataEntity, groupXML },
+    { SP_T("bracket-entity"), &ParserOptions::warnBracketEntity, groupXML },
+    { SP_T("data-atts"), &ParserOptions::warnDataAttributes, groupXML },
+    { SP_T("missing-system-id"), &ParserOptions::warnMissingSystemId, groupXML },
+    { SP_T("conref"), &ParserOptions::warnConref, groupXML },
+    { SP_T("current"), &ParserOptions::warnCurrent, groupXML },
+    { SP_T("nutoken-decl-value"), &ParserOptions::warnNutokenDeclaredValue, groupXML },
+    { SP_T("number-decl-value"), &ParserOptions::warnNumberDeclaredValue, groupXML },
+    { SP_T("name-decl-value"), &ParserOptions::warnNameDeclaredValue, groupXML },
+    { SP_T("named-char-ref"), &ParserOptions::warnNamedCharRef, groupXML },
+    { SP_T("refc"), &ParserOptions::warnRefc, groupXML },
+    { SP_T("temp-ms"), &ParserOptions::warnTempMarkedSection, groupXML },
+    { SP_T("rcdata-ms"), &ParserOptions::warnRcdataMarkedSection, groupXML },
+    { SP_T("instance-include-ms"), &ParserOptions::warnInstanceIncludeMarkedSection, groupXML },
+    { SP_T("instance-ignore-ms"), &ParserOptions::warnInstanceIgnoreMarkedSection, groupXML },
+    { SP_T("and-group"), &ParserOptions::warnAndGroup, groupXML },
+    { SP_T("rank"), &ParserOptions::warnRank, groupXML },
+    { SP_T("empty-comment-decl"), &ParserOptions::warnEmptyCommentDecl, groupXML },
+    { SP_T("net-empty-element"), &ParserOptions::warnNetEmptyElement, groupXML },
+    { SP_T("att-value-not-literal"), &ParserOptions::warnAttributeValueNotLiteral, groupXML },
+    { SP_T("missing-att-name"), &ParserOptions::warnMissingAttributeName, groupXML },
+    { SP_T("comment-decl-s"), &ParserOptions::warnCommentDeclS, groupXML },
+    { SP_T("comment-decl-multiple"), &ParserOptions::warnCommentDeclMultiple, groupXML },
+    { SP_T("missing-status-keyword"), &ParserOptions::warnMissingStatusKeyword, groupXML },
+    { SP_T("multiple-status-keyword"), &ParserOptions::warnMultipleStatusKeyword, groupXML },
+    { SP_T("instance-param-entity"), &ParserOptions::warnInstanceParamEntityRef, groupXML },
+    { SP_T("min-param"), &ParserOptions::warnMinimizationParam, groupXML },
+    { SP_T("mixed-content-xml"), &ParserOptions::warnMixedContentRepOrGroup, groupXML },
+    { SP_T("name-group-not-or"), &ParserOptions::warnNameGroupNotOr, groupXML },
+    { SP_T("pi-missing-name"), &ParserOptions::warnPiMissingName, groupXML },
+    { SP_T("status-keyword-s"), &ParserOptions::warnStatusKeywordSpecS, groupXML },
+    { SP_T("external-data-entity-ref"), &ParserOptions::warnExternalDataEntityRef, groupXML },
+    { SP_T("att-value-external-entity-ref"), &ParserOptions::warnAttributeValueExternalEntityRef, groupXML },
     { SP_T("idref"), &ParserOptions::errorIdref, 0 },
     { SP_T("significant"), &ParserOptions::errorSignificant, 0 },
     { SP_T("afdr"), &ParserOptions::errorAfdr, 0 },
     { SP_T("lpd-notation"), &ParserOptions::errorLpdNotation, 0 },
+    { SP_T("valid"), &ParserOptions::errorValid, 0 },
+  };
+  static struct {
+    const CmdLineApp::AppChar *name;
+    unsigned char flag;
+  } groupTable[] = {
+    { SP_T("all"), groupAll },
+    { SP_T("min-tag"), groupMinTag },
+    { SP_T("xml"), groupXML },
   };
   PackedBoolean val = 1;
   if (tcsncmp(s, SP_T("no-"), 3) == 0) {
     s += 3;
     val = 0;
   }
-  if (tcscmp(s, SP_T("all")) == 0) {
-    for (size_t i = 0; i < SIZEOF(table); i++)
-      if (table[i].partOfAll) {
-	// Use parentheses to work around Watcom 10.0a bug.
-	(options_.*(table[i].ptr)) = val;
-      }
-    return 1;
-  }
+  for (size_t i = 0; i < SIZEOF(groupTable); i++)
+    if (tcscmp(s, groupTable[i].name) == 0) {
+      for (size_t j = 0; j < SIZEOF(table); j++)
+	if (table[j].groups & groupTable[i].flag) {
+	  // Use parentheses to work around Watcom 10.0a bug.
+	  (options_.*(table[j].ptr)) = val;
+	}
+      return 1;
+    }
   for (size_t i = 0; i < SIZEOF(table); i++)
     if (tcscmp(s, table[i].name) == 0) {
       // Use parentheses to work around Watcom 10.0a bug.
       (options_.*(table[i].ptr)) = val;
       return 1;
     }
-  if (tcscmp(s, SP_T("min-tag")) == 0) {
-    options_.warnUnclosedTag = val;
-    options_.warnEmptyTag = val;
-    options_.warnNet = val;
-    return 1;
-  }
   return 0;
 }
 

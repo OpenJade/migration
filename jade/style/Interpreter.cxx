@@ -46,7 +46,7 @@ Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unit
 : rootNode_(rootNode),
   messenger_(messenger),
   extensionTable_(extensionTable),
-  QueryContext(maxObjSize()),
+  Collector(maxObjSize()),
   partIndex_(1),  // 0 is for command-line definitions
   unitsPerInch_(unitsPerInch),
   nInheritedC_(0),
@@ -62,6 +62,10 @@ Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unit
   makePermanent(theTrueObj_ = new (*this) TrueObj);
   makePermanent(theErrorObj_ = new (*this) ErrorObj);
   makePermanent(theUnspecifiedObj_ = new (*this) UnspecifiedObj);
+  makePermanent(addressNoneObj_
+                = new (*this) AddressObj(FOTBuilder::Address::none));
+  makePermanent(emptyNodeListObj_
+		= new (*this) NodePtrNodeListObj);
   {
     StringC tem(makeStringC("ISO/IEC 10036/RA//Glyphs"));
     afiiPublicId_ = storePublicId(tem.data(), tem.size(), Location());
@@ -72,9 +76,10 @@ Interpreter::Interpreter(const NodePtr &rootNode, Messenger *messenger, int unit
   installPrimitives();
   installUnits();
   installCharNames();
-  installInheritedCs();
   installFlowObjs();
+  installInheritedCs();
   installSdata();
+  installNodeProperties();
   defMode_ = &initialProcessingMode_;
   static const char *lexCategories[] = {
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -775,6 +780,7 @@ void Interpreter::installSyntacticKeys()
     { "before-column-border", Identifier::keyBeforeColumnBorder },
     { "after-column-border", Identifier::keyAfterColumnBorder },
     { "column-number", Identifier::keyColumnNumber },
+    { "row-number", Identifier::keyRowNumber },
     { "n-columns-spanned", Identifier::keyNColumnsSpanned },
     { "n-rows-spanned", Identifier::keyNRowsSpanned },
     { "width", Identifier::keyWidth },
@@ -787,11 +793,11 @@ void Interpreter::installSyntacticKeys()
     { "max", Identifier::keyMax },
     { "conditional?", Identifier::keyIsConditional },
     { "priority", Identifier::keyPriority },
-    { "name", Identifier::keyName },
-    { "gi", Identifier::keyGi },
-    { "attributes", Identifier::keyAttributes },
-    { "system-id", Identifier::keySystemId },
-    { "public-id", Identifier::keyPublicId },
+    { "grid-n-rows", Identifier::keyGridNRows },
+    { "grid-n-columns", Identifier::keyGridNColumns },
+    { "radical", Identifier::keyRadical },
+    { "null", Identifier::keyNull },
+    { "rcs?", Identifier::keyIsRcs },
   };
   for (size_t i = 0; i < SIZEOF(keys); i++)
     lookup(makeStringC(keys[i].name))->setSyntacticKey(keys[i].key);
@@ -814,6 +820,20 @@ void Interpreter::installPortNames()
   static const char *names[] = {
     "numerator",
     "denominator",
+    "pre-sup",
+    "pre-sub",
+    "post-sup",
+    "post-sub",
+    "mid-sup",
+    "mid-sub",
+    "over-mark",
+    "under-mark",
+    "open",
+    "close",
+    "degree",
+    "operator",
+    "lower-limit",
+    "upper-limit",
     "header",
     "footer"
   };
@@ -1019,46 +1039,100 @@ void Interpreter::installCharNames()
     { 0x00fd, "latin-small-letter-y-with-acute" },
     { 0x00fe, "latin-small-letter-thorn" },
     { 0x00ff, "latin-small-letter-y-with-diaeresis" },
+    { 0x0100, "latin-capital-letter-a-with-macron" },
+    { 0x0101, "latin-small-letter-a-with-macron" },
     { 0x0102, "latin-capital-letter-a-with-breve" },
     { 0x0103, "latin-small-letter-a-with-breve" },
     { 0x0104, "latin-capital-letter-a-with-ogonek" },
     { 0x0105, "latin-small-letter-a-with-ogonek" },
     { 0x0106, "latin-capital-letter-c-with-acute" },
     { 0x0107, "latin-small-letter-c-with-acute" },
+    { 0x0108, "latin-capital-letter-c-with-circumflex" },
+    { 0x0109, "latin-small-letter-c-with-circumflex" },
+    { 0x010a, "latin-capital-letter-c-with-dot-above" },
+    { 0x010b, "latin-small-letter-c-with-dot-above" },
     { 0x010c, "latin-capital-letter-c-with-caron" },
     { 0x010d, "latin-small-letter-c-with-caron" },
     { 0x010e, "latin-capital-letter-d-with-caron" },
     { 0x010f, "latin-small-letter-d-with-caron" },
     { 0x0110, "latin-capital-letter-d-with-stroke" },
     { 0x0111, "latin-small-letter-d-with-stroke" },
+    { 0x0112, "latin-capital-letter-e-with-macron" },
+    { 0x0113, "latin-small-letter-e-with-macron" },
+    { 0x0114, "latin-capital-letter-e-with-breve" },
+    { 0x0115, "latin-small-letter-e-with-breve" },
+    { 0x0116, "latin-capital-letter-e-with-dot-above" },
+    { 0x0117, "latin-small-letter-e-with-dot-above" },
     { 0x0118, "latin-capital-letter-e-with-ogonek" },
     { 0x0119, "latin-small-letter-e-with-ogonek" },
     { 0x011a, "latin-capital-letter-e-with-caron" },
     { 0x011b, "latin-small-letter-e-with-caron" },
+    { 0x011c, "latin-capital-letter-g-with-circumflex" },
+    { 0x011d, "latin-small-letter-g-with-circumflex" },
     { 0x011e, "latin-capital-letter-g-with-breve" },
     { 0x011f, "latin-small-letter-g-with-breve" },
+    { 0x0120, "latin-capital-letter-g-with-dot-above" },
+    { 0x0121, "latin-small-letter-g-with-dot-above" },
+    { 0x0122, "latin-capital-letter-g-with-cedilla" },
+    { 0x0123, "latin-small-letter-g-with-cedilla" },
+    { 0x0124, "latin-capital-letter-h-with-circumflex" },
+    { 0x0125, "latin-small-letter-h-with-circumflex" },
+    { 0x0126, "latin-capital-letter-h-with-stroke" },
+    { 0x0127, "latin-small-letter-h-with-stroke" },
+    { 0x0128, "latin-capital-letter-i-with-tilde" },
+    { 0x0129, "latin-small-letter-i-with-tilde" },
+    { 0x012a, "latin-capital-letter-i-with-macron" },
+    { 0x012b, "latin-small-letter-i-with-macron" },
+    { 0x012c, "latin-capital-letter-i-with-breve" },
+    { 0x012d, "latin-small-letter-i-with-breve" },
+    { 0x012e, "latin-capital-letter-i-with-ogonek" },
+    { 0x012f, "latin-small-letter-i-with-ogonek" },
     { 0x0130, "latin-capital-letter-i-with-dot-above" },
     { 0x0131, "latin-small-letter-dotless-i" },
+    { 0x0132, "latin-capital-ligature-ij" },
+    { 0x0133, "latin-small-ligature-ij" },
+    { 0x0134, "latin-capital-letter-j-with-circumflex" },
+    { 0x0135, "latin-small-letter-j-with-circumflex" },
+    { 0x0136, "latin-capital-letter-k-with-cedilla" },
+    { 0x0137, "latin-small-letter-k-with-cedilla" },
+    { 0x0138, "latin-small-letter-kra" },
     { 0x0139, "latin-capital-letter-l-with-acute" },
     { 0x013a, "latin-small-letter-l-with-acute" },
+    { 0x013b, "latin-capital-letter-l-with-cedilla" },
+    { 0x013c, "latin-small-letter-l-with-cedilla" },
     { 0x013d, "latin-capital-letter-l-with-caron" },
     { 0x013e, "latin-small-letter-l-with-caron" },
+    { 0x013f, "latin-capital-letter-l-with-middle-dot" },
+    { 0x0140, "latin-small-letter-l-with-middle-dot" },
     { 0x0141, "latin-capital-letter-l-with-stroke" },
     { 0x0142, "latin-small-letter-l-with-stroke" },
     { 0x0143, "latin-capital-letter-n-with-acute" },
     { 0x0144, "latin-small-letter-n-with-acute" },
+    { 0x0145, "latin-capital-letter-n-with-cedilla" },
+    { 0x0146, "latin-small-letter-n-with-cedilla" },
     { 0x0147, "latin-capital-letter-n-with-caron" },
     { 0x0148, "latin-small-letter-n-with-caron" },
+    { 0x0149, "latin-small-letter-n-preceded-by-apostrophe" },
+    { 0x014a, "latin-capital-letter-eng" },
+    { 0x014b, "latin-small-letter-eng" },
+    { 0x014c, "latin-capital-letter-o-with-macron" },
+    { 0x014d, "latin-small-letter-o-with-macron" },
+    { 0x014e, "latin-capital-letter-o-with-breve" },
+    { 0x014f, "latin-small-letter-o-with-breve" },
     { 0x0150, "latin-capital-letter-o-with-double-acute" },
     { 0x0151, "latin-small-letter-o-with-double-acute" },
     { 0x0152, "latin-capital-ligature-oe" },
     { 0x0153, "latin-small-ligature-oe" },
     { 0x0154, "latin-capital-letter-r-with-acute" },
     { 0x0155, "latin-small-letter-r-with-acute" },
+    { 0x0156, "latin-capital-letter-r-with-cedilla" },
+    { 0x0157, "latin-small-letter-r-with-cedilla" },
     { 0x0158, "latin-capital-letter-r-with-caron" },
     { 0x0159, "latin-small-letter-r-with-caron" },
     { 0x015a, "latin-capital-letter-s-with-acute" },
     { 0x015b, "latin-small-letter-s-with-acute" },
+    { 0x015c, "latin-capital-letter-s-with-circumflex" },
+    { 0x015d, "latin-small-letter-s-with-circumflex" },
     { 0x015e, "latin-capital-letter-s-with-cedilla" },
     { 0x015f, "latin-small-letter-s-with-cedilla" },
     { 0x0160, "latin-capital-letter-s-with-caron" },
@@ -1067,10 +1141,24 @@ void Interpreter::installCharNames()
     { 0x0163, "latin-small-letter-t-with-cedilla" },
     { 0x0164, "latin-capital-letter-t-with-caron" },
     { 0x0165, "latin-small-letter-t-with-caron" },
+    { 0x0166, "latin-capital-letter-t-with-stroke" },
+    { 0x0167, "latin-small-letter-t-with-stroke" },
+    { 0x0168, "latin-capital-letter-u-with-tilde" },
+    { 0x0169, "latin-small-letter-u-with-tilde" },
+    { 0x016a, "latin-capital-letter-u-with-macron" },
+    { 0x016b, "latin-small-letter-u-with-macron" },
+    { 0x016c, "latin-capital-letter-u-with-breve" },
+    { 0x016d, "latin-small-letter-u-with-breve" },
     { 0x016e, "latin-capital-letter-u-with-ring-above" },
     { 0x016f, "latin-small-letter-u-with-ring-above" },
     { 0x0170, "latin-capital-letter-u-with-double-acute" },
     { 0x0171, "latin-small-letter-u-with-double-acute" },
+    { 0x0172, "latin-capital-letter-u-with-ogonek" },
+    { 0x0173, "latin-small-letter-u-with-ogonek" },
+    { 0x0174, "latin-capital-letter-w-with-circumflex" },
+    { 0x0175, "latin-small-letter-w-with-circumflex" },
+    { 0x0176, "latin-capital-letter-y-with-circumflex" },
+    { 0x0177, "latin-small-letter-y-with-circumflex" },
     { 0x0178, "latin-capital-letter-y-with-diaeresis" },
     { 0x0179, "latin-capital-letter-z-with-acute" },
     { 0x017a, "latin-small-letter-z-with-acute" },
@@ -1078,17 +1166,27 @@ void Interpreter::installCharNames()
     { 0x017c, "latin-small-letter-z-with-dot-above" },
     { 0x017d, "latin-capital-letter-z-with-caron" },
     { 0x017e, "latin-small-letter-z-with-caron" },
+    { 0x017f, "latin-small-letter-long-s" },
     { 0x0192, "latin-small-letter-f-with-hook" },
+    { 0x01fa, "latin-capital-letter-a-with-ring-above-and-acute" },
+    { 0x01fb, "latin-small-letter-a-with-ring-above-and-acute" },
+    { 0x01fc, "latin-capital-letter-ae-with-acute" },
+    { 0x01fd, "latin-small-letter-ae-with-acute" },
+    { 0x01fe, "latin-capital-letter-o-with-stroke-and-acute" },
+    { 0x01ff, "latin-small-letter-o-with-stroke-and-acute" },
     { 0x02c6, "modifier-letter-circumflex-accent" },
     { 0x02c7, "caron" },
+    { 0x02c9, "modifier-letter-macron" },
     { 0x02d8, "breve" },
     { 0x02d9, "dot-above" },
+    { 0x02da, "ring-above" },
     { 0x02db, "ogonek" },
     { 0x02dc, "small-tilde" },
     { 0x02dd, "double-acute-accent" },
     { 0x0384, "greek-tonos" },
     { 0x0385, "greek-dialytika-tonos" },
     { 0x0386, "greek-capital-letter-alpha-with-tonos" },
+    { 0x0387, "greek-ano-teleia" },
     { 0x0388, "greek-capital-letter-epsilon-with-tonos" },
     { 0x0389, "greek-capital-letter-eta-with-tonos" },
     { 0x038a, "greek-capital-letter-iota-with-tonos" },
@@ -1256,12 +1354,22 @@ void Interpreter::installCharNames()
     { 0x0490, "cyrillic-capital-letter-ghe-with-upturn" },
     { 0x0491, "cyrillic-small-letter-ghe-with-upturn" },
     { 0x0950, "devanagari-om" },
+    { 0x1e80, "latin-capital-letter-w-with-grave" },
+    { 0x1e81, "latin-small-letter-w-with-grave" },
+    { 0x1e82, "latin-capital-letter-w-with-acute" },
+    { 0x1e83, "latin-small-letter-w-with-acute" },
+    { 0x1e84, "latin-capital-letter-w-with-diaeresis" },
+    { 0x1e85, "latin-small-letter-w-with-diaeresis" },
+    { 0x1ef2, "latin-capital-letter-y-with-grave" },
+    { 0x1ef3, "latin-small-letter-y-with-grave" },
     { 0x2013, "en-dash" },
     { 0x2014, "em-dash" },
     { 0x2015, "horizontal-bar" },
+    { 0x2017, "double-low-line" },
     { 0x2018, "left-single-quotation-mark" },
     { 0x2019, "right-single-quotation-mark" },
     { 0x201a, "single-low-9-quotation-mark" },
+    { 0x201b, "single-high-reversed-9-quotation-mark" },
     { 0x201c, "left-double-quotation-mark" },
     { 0x201d, "right-double-quotation-mark" },
     { 0x201e, "double-low-9-quotation-mark" },
@@ -1274,20 +1382,34 @@ void Interpreter::installCharNames()
     { 0x2033, "double-prime" },
     { 0x2039, "single-left-pointing-angle-quotation-mark" },
     { 0x203a, "single-right-pointing-angle-quotation-mark" },
+    { 0x203c, "double-exclamation-mark" },
     { 0x203e, "overline" },
+    { 0x2044, "fraction-slash" },
+    { 0x207f, "superscript-latin-small-letter-n" },
+    { 0x20a3, "french-franc-sign" },
+    { 0x20a4, "lira-sign" },
+    { 0x20a7, "peseta-sign" },
+    { 0x2105, "care-of" },
     { 0x2111, "black-letter-capital-i" },
+    { 0x2113, "script-small-l" },
     { 0x2116, "numero-sign" },
     { 0x2118, "script-capital-p" },
     { 0x211c, "black-letter-capital-r" },
     { 0x2122, "trade-mark-sign" },
     { 0x2126, "ohm-sign" },
+    { 0x212e, "estimated-symbol" },
     { 0x2135, "alef-symbol" },
+    { 0x215b, "vulgar-fraction-one-eighth" },
+    { 0x215c, "vulgar-fraction-three-eighths" },
+    { 0x215d, "vulgar-fraction-five-eighths" },
+    { 0x215e, "vulgar-fraction-seven-eighths" },
     { 0x2190, "leftwards-arrow" },
     { 0x2191, "upwards-arrow" },
     { 0x2192, "rightwards-arrow" },
     { 0x2193, "downwards-arrow" },
     { 0x2194, "left-right-arrow" },
     { 0x2195, "up-down-arrow" },
+    { 0x21a8, "up-down-arrow-with-base" },
     { 0x21b5, "downwards-arrow-with-corner-leftwards" },
     { 0x21d0, "leftwards-double-arrow" },
     { 0x21d1, "upwards-double-arrow" },
@@ -1308,9 +1430,11 @@ void Interpreter::installCharNames()
     { 0x2212, "minus-sign" },
     { 0x2215, "division-slash" },
     { 0x2217, "asterisk-operator" },
+    { 0x2219, "bullet-operator" },
     { 0x221a, "square-root" },
     { 0x221d, "proportional-to" },
     { 0x221e, "infinity" },
+    { 0x221f, "right-angle" },
     { 0x2220, "angle" },
     { 0x2227, "logical-and" },
     { 0x2228, "logical-or" },
@@ -1334,6 +1458,8 @@ void Interpreter::installCharNames()
     { 0x2297, "circled-times" },
     { 0x22a5, "up-tack" },
     { 0x22c5, "dot-operator" },
+    { 0x2302, "house" },
+    { 0x2310, "reversed-not-sign" },
     { 0x2320, "top-half-integral" },
     { 0x2321, "bottom-half-integral" },
     { 0x2326, "erase-to-the-right" },
@@ -1351,16 +1477,70 @@ void Interpreter::installCharNames()
     { 0x2467, "circled-digit-eight" },
     { 0x2468, "circled-digit-nine" },
     { 0x2469, "circled-number-ten" },
+    { 0x2500, "box-drawings-light-horizontal" },
+    { 0x2502, "box-drawings-light-vertical" },
+    { 0x250c, "box-drawings-light-down-and-right" },
+    { 0x2510, "box-drawings-light-down-and-left" },
+    { 0x2514, "box-drawings-light-up-and-right" },
+    { 0x2518, "box-drawings-light-up-and-left" },
+    { 0x251c, "box-drawings-light-vertical-and-right" },
+    { 0x2524, "box-drawings-light-vertical-and-left" },
+    { 0x252c, "box-drawings-light-down-and-horizontal" },
+    { 0x2534, "box-drawings-light-up-and-horizontal" },
+    { 0x253c, "box-drawings-light-vertical-and-horizontal" },
+    { 0x2550, "box-drawings-double-horizontal" },
+    { 0x2551, "box-drawings-double-vertical" },
+    { 0x2552, "box-drawings-down-single-and-right-double" },
+    { 0x2553, "box-drawings-down-double-and-right-single" },
+    { 0x2554, "box-drawings-double-down-and-right" },
+    { 0x2555, "box-drawings-down-single-and-left-double" },
+    { 0x2556, "box-drawings-down-double-and-left-single" },
+    { 0x2557, "box-drawings-double-down-and-left" },
+    { 0x2558, "box-drawings-up-single-and-right-double" },
+    { 0x2559, "box-drawings-up-double-and-right-single" },
+    { 0x255a, "box-drawings-double-up-and-right" },
+    { 0x255b, "box-drawings-up-single-and-left-double" },
+    { 0x255c, "box-drawings-up-double-and-left-single" },
+    { 0x255d, "box-drawings-double-up-and-left" },
+    { 0x255e, "box-drawings-vertical-single-and-right-double" },
+    { 0x255f, "box-drawings-vertical-double-and-right-single" },
+    { 0x2560, "box-drawings-double-vertical-and-right" },
+    { 0x2561, "box-drawings-vertical-single-and-left-double" },
+    { 0x2562, "box-drawings-vertical-double-and-left-single" },
+    { 0x2563, "box-drawings-double-vertical-and-left" },
+    { 0x2564, "box-drawings-down-single-and-horizontal-double" },
+    { 0x2565, "box-drawings-down-double-and-horizontal-single" },
+    { 0x2566, "box-drawings-double-down-and-horizontal" },
+    { 0x2567, "box-drawings-up-single-and-horizontal-double" },
+    { 0x2568, "box-drawings-up-double-and-horizontal-single" },
+    { 0x2569, "box-drawings-double-up-and-horizontal" },
+    { 0x256a, "box-drawings-vertical-single-and-horizontal-double" },
+    { 0x256b, "box-drawings-vertical-double-and-horizontal-single" },
+    { 0x256c, "box-drawings-double-vertical-and-horizontal" },
+    { 0x2580, "upper-half-block" },
+    { 0x2584, "lower-half-block" },
+    { 0x2588, "full-block" },
+    { 0x258c, "left-half-block" },
+    { 0x2590, "right-half-block" },
+    { 0x2591, "light-shade" },
+    { 0x2592, "medium-shade" },
+    { 0x2593, "dark-shade" },
     { 0x25a0, "black-square" },
     { 0x25a1, "white-square" },
     { 0x25aa, "black-small-square" },
     { 0x25ab, "white-small-square" },
+    { 0x25ac, "black-rectangle" },
     { 0x25b2, "black-up-pointing-triangle" },
+    { 0x25ba, "black-right-pointing-pointer" },
     { 0x25bc, "black-down-pointing-triangle" },
+    { 0x25c4, "black-left-pointing-pointer" },
     { 0x25c6, "black-diamond" },
     { 0x25ca, "lozenge" },
     { 0x25cb, "white-circle" },
     { 0x25cf, "black-circle" },
+    { 0x25d8, "inverse-bullet" },
+    { 0x25d9, "inverse-white-circle" },
+    { 0x25e6, "white-bullet" },
     { 0x2605, "black-star" },
     { 0x260e, "black-telephone" },
     { 0x2611, "ballot-box-with-check" },
@@ -1376,7 +1556,10 @@ void Interpreter::installCharNames()
     { 0x2638, "wheel-of-dharma" },
     { 0x2639, "white-frowning-face" },
     { 0x263a, "white-smiling-face" },
+    { 0x263b, "black-smiling-face" },
     { 0x263c, "white-sun-with-rays" },
+    { 0x2640, "female-sign" },
+    { 0x2642, "male-sign" },
     { 0x2648, "aries" },
     { 0x2649, "taurus" },
     { 0x264a, "gemini" },
@@ -1393,6 +1576,8 @@ void Interpreter::installCharNames()
     { 0x2663, "black-club-suit" },
     { 0x2665, "black-heart-suit" },
     { 0x2666, "black-diamond-suit" },
+    { 0x266a, "eighth-note" },
+    { 0x266b, "beamed-eighth-notes" },
     { 0x2701, "upper-blade-scissors" },
     { 0x2702, "black-scissors" },
     { 0x2703, "lower-blade-scissors" },
@@ -1553,6 +1738,8 @@ void Interpreter::installCharNames()
     { 0x27bc, "wedge-tailed-rightwards-arrow" },
     { 0x27bd, "heavy-wedge-tailed-rightwards-arrow" },
     { 0x27be, "open-outlined-rightwards-arrow" },
+    { 0xfb01, "latin-small-ligature-fi" },
+    { 0xfb02, "latin-small-ligature-fl" },
   };
   for (size_t i = 0; i < SIZEOF(chars); i++)
     namedCharTable_.insert(makeStringC(chars[i].name), chars[i].c);
@@ -2455,6 +2642,15 @@ void Interpreter::installSdata()
     sdataEntityNameTable_.insert(makeStringC(entities[i].name), entities[i].c);
 }
 
+void Interpreter::installNodeProperties()
+{
+  for (int i = 0; i < ComponentName::nIds; i++) {
+    ComponentName::Id id = ComponentName::Id(i);
+    nodePropertyTable_.insert(makeStringC(ComponentName::rcsName(id)), i);
+    nodePropertyTable_.insert(makeStringC(ComponentName::sdqlName(id)), i);
+  }
+}
+
 bool Interpreter::sdataMap(GroveString name, GroveString, GroveChar &c) const
 {
   StringC tem(name.data(), name.size());
@@ -2627,7 +2823,7 @@ bool Interpreter::parseAnd(Owner<Expression> &expr, bool opt)
     testExpr.swap(expr);
   else {
     // This relies on the fact that #f is the only false value.
-    Owner<Expression> falseExpr = new ConstantExpression(makeFalse(), loc);
+    Owner<Expression> falseExpr(new ConstantExpression(makeFalse(), loc));
     expr = new IfExpression(testExpr, restExpr, falseExpr, loc);
   }
   return 1;
@@ -3697,6 +3893,23 @@ Identifier *Interpreter::lookup(const StringC &str)
     identTable_.insert(ident);
   }
   return ident;
+}
+
+bool Interpreter::lookupNodeProperty(const StringC &str, ComponentName::Id &id)
+{
+  const int *val = nodePropertyTable_.lookup(str);
+  if (!val) {
+    StringC tem(str);
+    for (size_t i = 0; i < tem.size(); i++) {
+      if (tem[i] >= 'A' && tem[i] <= 'Z')
+        tem[i] = 'a' + (tem[i] - 'A');
+    }
+    val = nodePropertyTable_.lookup(tem);
+    if (!val)
+      return 0;
+  }
+  id = ComponentName::Id(*val);
+  return 1;
 }
 
 Unit *Interpreter::lookupUnit(const StringC &str)

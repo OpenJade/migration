@@ -14,47 +14,48 @@
 #include "jade_version.h"
 #include "JadeMessages.h"
 #include "ErrnoMessageArg.h"
-#include <iostream.h>
-#include <fstream.h>
+#include "OutputByteStream.h"
+
 #include <errno.h>
 
 #ifdef DSSSL_NAMESPACE
 using namespace DSSSL_NAMESPACE;
 #endif
 
-class DfrontApp : public DssslApp {
+class JadeApp : public DssslApp {
 public:
   enum { u = 72000 };
-  DfrontApp();
+  JadeApp();
   void processOption(AppChar opt, const AppChar *arg);
   FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&);
 private:
-  enum OutputType { fotType, rtfType, htmlType, texType, sgmlType };
+  enum OutputType { fotType, rtfType, htmlType, texType, sgmlType, xmlType };
   static const AppChar *const outputTypeNames[];
   OutputType outputType_;
   String<AppChar> outputFilename_;
   Vector<StringC> outputOptions_;
-  filebuf outputFile_;
+  FileOutputByteStream outputFile_;
 };
 
-SP_DEFINE_APP(DfrontApp)
+SP_DEFINE_APP(JadeApp)
 
-const DfrontApp::AppChar *const DfrontApp::outputTypeNames[] = {
+const JadeApp::AppChar *const JadeApp::outputTypeNames[] = {
   SP_T("fot"),
   SP_T("rtf"),
   SP_T("html"),
   SP_T("tex"),
-  SP_T("sgml")
+  SP_T("sgml"),
+  SP_T("xml")
 };
 
-DfrontApp::DfrontApp()
+JadeApp::JadeApp()
 : DssslApp(u), outputType_(fotType)
 {
-  registerOption('t', SP_T("(fot|rtf|html|tex|sgml)"));
+  registerOption('t', SP_T("(fot|rtf|html|tex|sgml|xml)"));
   registerOption('o', SP_T("output_file"));
 }
 
-void DfrontApp::processOption(AppChar opt, const AppChar *arg)
+void JadeApp::processOption(AppChar opt, const AppChar *arg)
 {
   switch (opt) {
   case 't':
@@ -104,7 +105,7 @@ void DfrontApp::processOption(AppChar opt, const AppChar *arg)
   }
 }
 
-FOTBuilder *DfrontApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
+FOTBuilder *JadeApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
 {
   if (outputFilename_.size() == 0) {
     if (defaultOutputBasename_.size() != 0) {
@@ -122,28 +123,35 @@ FOTBuilder *DfrontApp::makeFOTBuilder(const FOTBuilder::Extension *&exts)
     const AppChar *ext = outputTypeNames[outputType_];
     outputFilename_.append(ext, tcslen(ext));
   }
-  if (outputType_ != htmlType && outputType_ != sgmlType) {
+  switch (outputType_) {
+  case htmlType:
+  case sgmlType:
+  case xmlType:
+    break;
+  default:
     outputFilename_ += 0;
-    if (!CmdLineApp::openFilebufWrite(outputFile_, outputFilename_.data())) {
+    if (!outputFile_.open(outputFilename_.data())) {
       message(JadeMessages::cannotOpenOutputError,
 	      StringMessageArg(CmdLineApp::convertInput(outputFilename_.data())),
 	      ErrnoMessageArg(errno));
       return 0;
     }
+    break;
   }
   switch (outputType_) {
   case rtfType:
     unitsPerInch_ = 20*72; // twips
     return makeRtfFOTBuilder(&outputFile_, outputOptions_, entityManager(), systemCharset(), this, exts);
   case texType:
-    return makeTeXFOTBuilder(&outputFile_);
+    return makeTeXFOTBuilder(&outputFile_, this);
   case htmlType:
     return makeHtmlFOTBuilder(outputFilename_, this, exts);
   case fotType:
-    return makeSgmlFOTBuilder(new RecordOutputCharStream(new IosOutputCharStream(&outputFile_,
-                                                                                 outputCodingSystem_)));
+    return makeSgmlFOTBuilder(new RecordOutputCharStream(new EncodeOutputCharStream(&outputFile_,
+						         outputCodingSystem_)));
   case sgmlType:
-    return makeTransformFOTBuilder(this, exts);
+  case xmlType:
+    return makeTransformFOTBuilder(this, outputType_ == xmlType, exts);
   default:
     break;
   }

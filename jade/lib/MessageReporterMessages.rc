@@ -10,10 +10,4 @@ BEGIN
   5007, "In entity included from %2"
   5008, "(invalid location)"
   5009, "offset "
-  5010, "st"
-  5011, "nd"
-  5012, "rd"
-  5013, "th"
-  5014, "(invalid argument type)"
-  5015, "(invalid message)"
 END

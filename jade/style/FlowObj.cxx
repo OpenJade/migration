@@ -478,6 +478,11 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  bool ruleStyle(ProcessContext &, StyleObj *&style) {
+    style = style_;
+    return 1;
+  }
+  bool isRule() { return 1; }
 private:
   Owner<FOTBuilder::RuleNIC> nic_;
 };
@@ -860,7 +865,7 @@ void LinkFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
                      StringMessageArg(ident->name()));
     }
     else
-      address = new (interp) AddressObj(FOTBuilder::Address::none);
+      address = interp.makeAddressNone();
   }
   addressObj_ = address;
 }
@@ -1344,6 +1349,12 @@ public:
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
   bool hasNonInheritedC(const Identifier *) const;
+  bool characterStyle(ProcessContext &, StyleObj *&style, FOTBuilder::CharacterNIC &nic) {
+    style = style_;
+    nic = *nic_;
+    return 1;
+  }
+  bool isCharacter() { return 1; }
 private:
   Owner<FOTBuilder::CharacterNIC> nic_;
 };
@@ -1515,6 +1526,20 @@ FlowObj *CharacterFlowObj::copy(Collector &c) const
   return new (c) CharacterFlowObj(*this);
 }
 
+class MathSequenceFlowObj : public CompoundFlowObj {
+public:
+  MathSequenceFlowObj() { }
+  void processInner(ProcessContext &context) {
+    FOTBuilder &fotb = context.currentFOTBuilder();
+    fotb.startMathSequence();
+    CompoundFlowObj::processInner(context);
+    fotb.endMathSequence();
+  }
+  FlowObj *copy(Collector &c) const {
+    return new (c) MathSequenceFlowObj(*this);
+  }
+};
+
 class FractionFlowObj : public CompoundFlowObj {
 public:
   FractionFlowObj() { }
@@ -1522,12 +1547,23 @@ public:
   FlowObj *copy(Collector &) const;
 };
 
-
 void FractionFlowObj::processInner(ProcessContext &context)
 {
   FOTBuilder &fotb = context.currentFOTBuilder();
   Vector<FOTBuilder *> fotbs(2);
   fotb.startFraction(fotbs[0], fotbs[1]);
+  Vector<size_t> dep;
+  StyleObj *fractionBarStyle = 0;
+  SosofoObj *sosofo
+    = context.currentStyleStack().actual(context.vm().interp->fractionBarC(),
+					 *context.vm().interp, dep)->asSosofo();
+  if (sosofo)
+    sosofo->ruleStyle(context, fractionBarStyle);
+  if (fractionBarStyle)
+    context.currentStyleStack().push(fractionBarStyle, context.vm(), fotb);
+  fotb.fractionBar();
+  if (fractionBarStyle)
+    context.currentStyleStack().pop();
   Vector<SymbolObj *> labels(2);
   labels[0] = context.vm().interp->portName(Interpreter::portNumerator);
   labels[1] = context.vm().interp->portName(Interpreter::portDenominator);
@@ -1542,6 +1578,364 @@ void FractionFlowObj::processInner(ProcessContext &context)
 FlowObj *FractionFlowObj::copy(Collector &c) const
 {
   return new (c) FractionFlowObj(*this);
+}
+
+class UnmathFlowObj : public CompoundFlowObj {
+public:
+  UnmathFlowObj() { }
+  void processInner(ProcessContext &context) {
+    FOTBuilder &fotb = context.currentFOTBuilder();
+    fotb.startUnmath();
+    CompoundFlowObj::processInner(context);
+    fotb.endUnmath();
+  }
+  FlowObj *copy(Collector &c) const {
+    return new (c) UnmathFlowObj(*this);
+  }
+};
+
+class SuperscriptFlowObj : public CompoundFlowObj {
+public:
+  SuperscriptFlowObj() { }
+  void processInner(ProcessContext &context) {
+    FOTBuilder &fotb = context.currentFOTBuilder();
+    fotb.startSuperscript();
+    CompoundFlowObj::processInner(context);
+    fotb.endSuperscript();
+  }
+  FlowObj *copy(Collector &c) const {
+    return new (c) SuperscriptFlowObj(*this);
+  }
+};
+
+class SubscriptFlowObj : public CompoundFlowObj {
+public:
+  SubscriptFlowObj() { }
+  void processInner(ProcessContext &context) {
+    FOTBuilder &fotb = context.currentFOTBuilder();
+    fotb.startSubscript();
+    CompoundFlowObj::processInner(context);
+    fotb.endSubscript();
+  }
+  FlowObj *copy(Collector &c) const {
+    return new (c) SubscriptFlowObj(*this);
+  }
+};
+
+class ScriptFlowObj : public CompoundFlowObj {
+public:
+  ScriptFlowObj() { }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) ScriptFlowObj(*this);
+  }
+
+};
+
+void ScriptFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<FOTBuilder *> fotbs(6);
+  fotb.startScript(fotbs[0], fotbs[1], fotbs[2], fotbs[3],
+                   fotbs[4], fotbs[5]);
+  Vector<SymbolObj *> labels(6);
+  labels[0] = context.vm().interp->portName(Interpreter::portPreSup);
+  labels[1] = context.vm().interp->portName(Interpreter::portPreSub);
+  labels[2] = context.vm().interp->portName(Interpreter::portPostSup);
+  labels[3] = context.vm().interp->portName(Interpreter::portPostSub);
+  labels[4] = context.vm().interp->portName(Interpreter::portMidSup);
+  labels[5] = context.vm().interp->portName(Interpreter::portMidSub);
+  context.pushPorts(1, labels, fotbs);
+  CompoundFlowObj::processInner(context);
+  context.popPorts();
+  fotb.endScript();
+}
+
+class MarkFlowObj : public CompoundFlowObj {
+public:
+  MarkFlowObj() { }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) MarkFlowObj(*this);
+  }
+};
+
+void MarkFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<FOTBuilder *> fotbs(2);
+  fotb.startMark(fotbs[0], fotbs[1]);
+  Vector<SymbolObj *> labels(2);
+  labels[0] = context.vm().interp->portName(Interpreter::portOverMark);
+  labels[1] = context.vm().interp->portName(Interpreter::portUnderMark);
+  context.pushPorts(1, labels, fotbs);
+  CompoundFlowObj::processInner(context);
+  context.popPorts();
+  fotb.endMark();
+}
+
+class FenceFlowObj : public CompoundFlowObj {
+public:
+  FenceFlowObj() { }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) FenceFlowObj(*this);
+  }
+};
+
+void FenceFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<FOTBuilder *> fotbs(2);
+  fotb.startFence(fotbs[0], fotbs[1]);
+  Vector<SymbolObj *> labels(2);
+  labels[0] = context.vm().interp->portName(Interpreter::portOpen);
+  labels[1] = context.vm().interp->portName(Interpreter::portClose);
+  context.pushPorts(1, labels, fotbs);
+  CompoundFlowObj::processInner(context);
+  context.popPorts();
+  fotb.endFence();
+}
+
+class RadicalFlowObj : public CompoundFlowObj {
+public:
+  RadicalFlowObj() : radical_(0) { }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) RadicalFlowObj(*this);
+  }
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+  void traceSubObjects(Collector &c) const {
+    c.trace(radical_);
+    CompoundFlowObj::traceSubObjects(c);
+  }
+private:
+  SosofoObj *radical_;
+};
+
+void RadicalFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<FOTBuilder *> fotbs(1);
+  fotb.startRadical(fotbs[0]);
+  StyleObj *style;
+  FOTBuilder::CharacterNIC nic;
+  if (radical_ && radical_->characterStyle(context, style, nic)) {
+    if (style)
+      context.currentStyleStack().push(style, context.vm(), fotb);
+    fotb.radicalRadical(nic);
+    if (style)
+      context.currentStyleStack().pop();
+  }
+  else 
+    fotb.radicalRadicalDefaulted();
+  Vector<SymbolObj *> labels(1);
+  labels[0] = context.vm().interp->portName(Interpreter::portDegree);
+  context.pushPorts(1, labels, fotbs);
+  CompoundFlowObj::processInner(context);
+  context.popPorts();
+  fotb.endRadical();
+}
+
+bool RadicalFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  Identifier::SyntacticKey key;
+  return ident->syntacticKey(key) && key == Identifier::keyRadical;
+}
+
+void RadicalFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+				      const Location &loc, Interpreter &interp)
+{
+  radical_ = obj->asSosofo();
+  if (!radical_ || !radical_->isCharacter()) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::invalidCharacteristicValue,
+		   StringMessageArg(ident->name()));
+  }
+}
+
+class MathOperatorFlowObj : public CompoundFlowObj {
+public:
+  MathOperatorFlowObj() { }
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) MathOperatorFlowObj(*this);
+  }
+};
+
+void MathOperatorFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<FOTBuilder *> fotbs(3);
+  fotb.startMathOperator(fotbs[0], fotbs[1], fotbs[2]);
+  Vector<SymbolObj *> labels(3);
+  labels[0] = context.vm().interp->portName(Interpreter::portOperator);
+  labels[1] = context.vm().interp->portName(Interpreter::portLowerLimit);
+  labels[2] = context.vm().interp->portName(Interpreter::portUpperLimit);
+  context.pushPorts(1, labels, fotbs);
+  CompoundFlowObj::processInner(context);
+  context.popPorts();
+  fotb.endMathOperator();
+}
+
+class GridFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  GridFlowObj();
+  GridFlowObj(const GridFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) GridFlowObj(*this);
+  }
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+private:
+  Owner<FOTBuilder::GridNIC> nic_;
+};
+
+GridFlowObj::GridFlowObj()
+: nic_(new FOTBuilder::GridNIC)
+{
+}
+
+GridFlowObj::GridFlowObj(const GridFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::GridNIC(*fo.nic_))
+{
+}
+
+void GridFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startGrid(*nic_);
+  CompoundFlowObj::processInner(context);
+  fotb.endGrid();
+}
+
+void GridFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+					const Location &loc, Interpreter &interp)
+{
+  long tem;
+  if (!interp.convertIntegerC(obj, ident, loc, tem))
+    return;
+  if (tem <= 0) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::invalidCharacteristicValue,
+		   StringMessageArg(ident->name()));
+    return;
+  }
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyGridNColumns:
+      nic_->nColumns = tem;
+      return;
+    case Identifier::keyGridNRows:
+      nic_->nRows = tem;
+      return;
+    default:
+      break;
+    }
+  }
+  CANNOT_HAPPEN();
+}
+
+bool GridFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyGridNColumns:
+    case Identifier::keyGridNRows:
+      return 1;
+    default:
+      break;
+    }
+  }
+  return 0;
+}
+
+class GridCellFlowObj : public CompoundFlowObj {
+public:
+  void *operator new(size_t, Collector &c) {
+    return c.allocateObject(1);
+  }
+  GridCellFlowObj();
+  GridCellFlowObj(const GridCellFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &c) const {
+    return new (c) GridCellFlowObj(*this);
+  }
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
+  bool hasNonInheritedC(const Identifier *) const;
+private:
+  Owner<FOTBuilder::GridCellNIC> nic_;
+};
+
+GridCellFlowObj::GridCellFlowObj()
+: nic_(new FOTBuilder::GridCellNIC)
+{
+}
+
+GridCellFlowObj::GridCellFlowObj(const GridCellFlowObj &fo)
+: CompoundFlowObj(fo), nic_(new FOTBuilder::GridCellNIC(*fo.nic_))
+{
+}
+
+void GridCellFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  fotb.startGridCell(*nic_);
+  CompoundFlowObj::processInner(context);
+  fotb.endGridCell();
+}
+
+void GridCellFlowObj::setNonInheritedC(const Identifier *ident, ELObj *obj,
+				       const Location &loc, Interpreter &interp)
+{
+  long tem;
+  if (!interp.convertIntegerC(obj, ident, loc, tem))
+    return;
+  if (tem <= 0) {
+    interp.setNextLocation(loc);
+    interp.message(InterpreterMessages::invalidCharacteristicValue,
+		   StringMessageArg(ident->name()));
+    return;
+  }
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyColumnNumber:
+      nic_->columnNumber = tem;
+      return;
+    case Identifier::keyRowNumber:
+      nic_->rowNumber = tem;
+      return;
+    default:
+      break;
+    }
+  }
+  CANNOT_HAPPEN();
+}
+
+bool GridCellFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key)) {
+    switch (key) {
+    case Identifier::keyColumnNumber:
+    case Identifier::keyRowNumber:
+      return 1;
+    default:
+      break;
+    }
+  }
+  return 0;
 }
 
 class TableFlowObj : public CompoundFlowObj {
@@ -1683,6 +2077,7 @@ public:
     labels[1] = context.vm().interp->portName(Interpreter::portFooter);
     context.pushPorts(1, labels, fotbs);
     CompoundFlowObj::processInner(context);
+    context.popPorts();
     if (context.inTableRow())
       context.endTableRow();
     context.endTablePart();
@@ -2206,253 +2601,164 @@ private:
   StringC data_;
 };
 
-class ElementFlowObj : public CompoundFlowObj {
+class ELObjExtensionFlowObjValue : public FOTBuilder::ExtensionFlowObj::Value {
 public:
-  void *operator new(size_t, Collector &c) {
-    return c.allocateObject(1);
+  ELObjExtensionFlowObjValue(const Identifier *ident, ELObj *obj,
+			     const Location &loc, Interpreter &interp)
+  : ident_(ident), obj_(obj), loc_(&loc), interp_(&interp) { }
+  bool convertString(StringC &result) const {
+    return interp_->convertStringC(obj_, ident_, *loc_, result);
   }
-  ElementFlowObj();
-  ElementFlowObj(const ElementFlowObj &);
-  void processInner(ProcessContext &);
-  FlowObj *copy(Collector &) const;
-  bool hasNonInheritedC(const Identifier *) const;
-  void setNonInheritedC(const Identifier *, ELObj *,
-			const Location &, Interpreter &);
-protected:
-  Owner<FOTBuilder::ElementNIC> nic_;
-};
-
-ElementFlowObj::ElementFlowObj()
-: nic_(new FOTBuilder::ElementNIC)
-{
-}
-
-ElementFlowObj::ElementFlowObj(const ElementFlowObj &fo)
-: CompoundFlowObj(fo), nic_(new FOTBuilder::ElementNIC(*fo.nic_))
-{
-}
-
-void ElementFlowObj::processInner(ProcessContext &context)
-{
-  FOTBuilder &fotb = context.currentFOTBuilder();
-  if (nic_->gi.size())
-    fotb.startElement(*nic_);
-  else {
-    const NodePtr &nd = context.vm().currentNode;
-    GroveString str;
-    if (nd && nd->getGi(str) == accessOK) {
-      FOTBuilder::ElementNIC tem(*nic_);
-      tem.gi.assign(str.data(), str.size());
-      fotb.startElement(tem);
-    }
-    else
-      fotb.startElement(*nic_);
-  }
-  CompoundFlowObj::processInner(context);
-  fotb.endElement();
-}
-
-void ElementFlowObj::setNonInheritedC(const Identifier *ident,
-				      ELObj *obj,
-				      const Location &loc,
-				      Interpreter &interp)
-{
-  Identifier::SyntacticKey key;
-  if (ident->syntacticKey(key)) {
-    switch (key) {
-    case Identifier::keyGi:
-      interp.convertStringC(obj, ident, loc, nic_->gi);
-      return;
-    case Identifier::keyAttributes:
-      {
-	Vector<StringC> &atts = nic_->attributes;
-	for (;;) {
-	  if (obj->isNil())
-	    return;
-	  PairObj *pair = obj->asPair();
-	  if (!pair)
-	    break;
-	  obj = pair->cdr();
-	  PairObj *att = pair->car()->asPair();
-	  if (!att)
-	    break;
-	  const Char *s;
-	  size_t n;
-	  if (!att->car()->stringData(s, n))
-	    break;
-	  atts.resize(atts.size() + 1);
-	  atts.back().assign(s, n);
-	  att = att->cdr()->asPair();
-	  if (!att || !att->car()->stringData(s, n) || !att->cdr()->isNil())
-	    break;
-	  atts.resize(atts.size() + 1);
-	  atts.back().assign(s, n);
-	}
-	interp.setNextLocation(loc);
-	interp.message(InterpreterMessages::invalidCharacteristicValue,
-		       StringMessageArg(ident->name()));
+  bool convertStringPairList(Vector<StringC> &v) const {
+    ELObj *obj = obj_;
+    for (;;) {
+      if (obj->isNil())
+	return 1;	
+      PairObj *pair = obj->asPair();
+      if (!pair)
+	break;
+      obj = pair->cdr();
+      PairObj *att = pair->car()->asPair();
+      if (!att)
+	break;
+      const Char *s;
+      size_t n;
+      if (!att->car()->stringData(s, n))
+	break;
+      v.resize(v.size() + 1);
+      v.back().assign(s, n);
+      att = att->cdr()->asPair();
+      if (!att || !att->car()->stringData(s, n) || !att->cdr()->isNil()) {
+	v.resize(v.size() - 1);
+	break;
       }
-      return;
-    default:
-      break;
+      v.resize(v.size() + 1);
+      v.back().assign(s, n);
     }
+    interp_->setNextLocation(*loc_);
+    interp_->message(InterpreterMessages::invalidCharacteristicValue,
+		     StringMessageArg(ident_->name()));
+    return 0;
   }
-  CANNOT_HAPPEN();
-}
-
-bool ElementFlowObj::hasNonInheritedC(const Identifier *ident) const
-{
-  Identifier::SyntacticKey key;
-  if (ident->syntacticKey(key)) {
-    switch (key) {
-    case Identifier::keyGi:
-    case Identifier::keyAttributes:
-      return 1;
-    default:
-      break;
-    }
-  }
-  return 0;
-}
-
-FlowObj *ElementFlowObj::copy(Collector &c) const
-{
-  return new (c) ElementFlowObj(*this);
-}
-
-class EmptyElementFlowObj : public ElementFlowObj {
-public:
-  void *operator new(size_t, Collector &c) {
-    return c.allocateObject(1);
-  }
-  EmptyElementFlowObj() { }
-  FlowObj *copy(Collector &c) const {
-    return new (c) EmptyElementFlowObj(*this);
-  }
-  CompoundFlowObj *asCompoundFlowObj() { return 0; }
-  void processInner(ProcessContext &);
+private:
+  ELObj *obj_;
+  const Identifier *ident_;
+  const Location *loc_;
+  Interpreter *interp_;
 };
 
-void EmptyElementFlowObj::processInner(ProcessContext &context)
-{
-  FOTBuilder &fotb = context.currentFOTBuilder();
-  if (nic_->gi.size())
-    fotb.emptyElement(*nic_);
-  else {
-    const NodePtr &nd = context.vm().currentNode;
-    GroveString str;
-    if (nd && nd->getGi(str) == accessOK) {
-      FOTBuilder::ElementNIC tem(*nic_);
-      tem.gi.assign(str.data(), str.size());
-      fotb.emptyElement(tem);
-    }
-    else
-      fotb.emptyElement(*nic_);
-  }
-}
-
-class DocumentTypeFlowObj : public FlowObj {
+class ExtensionFlowObj : public FlowObj {
 public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  DocumentTypeFlowObj();
-  DocumentTypeFlowObj(const DocumentTypeFlowObj &);
+  ExtensionFlowObj(const FOTBuilder::ExtensionFlowObj &);
+  ExtensionFlowObj(const ExtensionFlowObj &);
   void processInner(ProcessContext &);
   FlowObj *copy(Collector &) const;
   bool hasNonInheritedC(const Identifier *) const;
   void setNonInheritedC(const Identifier *, ELObj *,
 			const Location &, Interpreter &);
 private:
-  Owner<FOTBuilder::DocumentTypeNIC> nic_;
+  Owner<FOTBuilder::ExtensionFlowObj> fo_;
 };
 
-DocumentTypeFlowObj::DocumentTypeFlowObj()
-: nic_(new FOTBuilder::DocumentTypeNIC)
+ExtensionFlowObj::ExtensionFlowObj(const FOTBuilder::ExtensionFlowObj &fo)
+: fo_(fo.copy())
 {
 }
 
-DocumentTypeFlowObj::DocumentTypeFlowObj(const DocumentTypeFlowObj &fo)
-: FlowObj(fo), nic_(new FOTBuilder::DocumentTypeNIC(*fo.nic_))
+ExtensionFlowObj::ExtensionFlowObj(const ExtensionFlowObj &fo)
+: FlowObj(fo), fo_(fo.fo_->copy())
 {
 }
 
-void DocumentTypeFlowObj::processInner(ProcessContext &context)
+void ExtensionFlowObj::processInner(ProcessContext &context)
 {
-  context.currentFOTBuilder().documentType(*nic_);
+  context.currentFOTBuilder().extension(*fo_, context.vm().currentNode);
 }
 
-void DocumentTypeFlowObj::setNonInheritedC(const Identifier *ident,
-				      ELObj *obj,
-				      const Location &loc,
-				      Interpreter &interp)
+void ExtensionFlowObj::setNonInheritedC(const Identifier *ident,
+					ELObj *obj,
+					const Location &loc,
+					Interpreter &interp)
 {
-  Identifier::SyntacticKey key;
-  if (ident->syntacticKey(key)) {
-    switch (key) {
-    case Identifier::keyPublicId:
-      interp.convertStringC(obj, ident, loc, nic_->publicId);
-      return;
-    case Identifier::keySystemId:
-      interp.convertStringC(obj, ident, loc, nic_->systemId);
-      return;
-    case Identifier::keyName:
-      interp.convertStringC(obj, ident, loc, nic_->name);
-      return;
-    default:
-      break;
-    }
-  }
-  CANNOT_HAPPEN();
+  fo_->setNIC(ident->name(), ELObjExtensionFlowObjValue(ident, obj, loc, interp));
 }
 
-bool DocumentTypeFlowObj::hasNonInheritedC(const Identifier *ident) const
+bool ExtensionFlowObj::hasNonInheritedC(const Identifier *ident) const
 {
-  Identifier::SyntacticKey key;
-  if (ident->syntacticKey(key)) {
-    switch (key) {
-    case Identifier::keyPublicId:
-    case Identifier::keySystemId:
-    case Identifier::keyName:
-      return 1;
-    default:
-      break;
-    }
-  }
-  return 0;
+  return fo_->hasNIC(ident->name());
 }
 
-FlowObj *DocumentTypeFlowObj::copy(Collector &c) const
+FlowObj *ExtensionFlowObj::copy(Collector &c) const
 {
-  return new (c) DocumentTypeFlowObj(*this);
+  return new (c) ExtensionFlowObj(*this);
 }
 
-class ProcessingInstructionFlowObj : public FlowObj {
+class CompoundExtensionFlowObj : public CompoundFlowObj {
 public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  ProcessingInstructionFlowObj() {
-    ASSERT(sizeof(ProcessingInstructionFlowObj)
-           <= sizeof(UnresolvedQuantityObj));
-  }
-  void processInner(ProcessContext &context) {
-    context.currentFOTBuilder().processingInstruction(data_);
-  }
-  FlowObj *copy(Collector &c) const {
-    return new (c) ProcessingInstructionFlowObj(*this);
-  }
-  void setNonInheritedC(const Identifier *ident, ELObj *obj,
-			const Location &loc, Interpreter &interp) {
-    interp.convertStringC(obj, ident, loc, data_);
-  }
-  bool hasNonInheritedC(const Identifier *ident) const {
-    Identifier::SyntacticKey key;
-    return ident->syntacticKey(key) && key == Identifier::keyData;
-  }
+  CompoundExtensionFlowObj(const FOTBuilder::CompoundExtensionFlowObj &);
+  CompoundExtensionFlowObj(const CompoundExtensionFlowObj &);
+  void processInner(ProcessContext &);
+  FlowObj *copy(Collector &) const;
+  bool hasNonInheritedC(const Identifier *) const;
+  void setNonInheritedC(const Identifier *, ELObj *,
+			const Location &, Interpreter &);
 private:
-  StringC data_;
+  Owner<FOTBuilder::CompoundExtensionFlowObj> fo_;
 };
+
+CompoundExtensionFlowObj::CompoundExtensionFlowObj(const FOTBuilder::CompoundExtensionFlowObj &fo)
+: fo_(fo.copy()->asCompoundExtensionFlowObj())
+{
+}
+
+CompoundExtensionFlowObj::CompoundExtensionFlowObj(const CompoundExtensionFlowObj &fo)
+: CompoundFlowObj(fo), fo_(fo.fo_->copy()->asCompoundExtensionFlowObj())
+{
+}
+
+void CompoundExtensionFlowObj::processInner(ProcessContext &context)
+{
+  FOTBuilder &fotb = context.currentFOTBuilder();
+  Vector<StringC> portNames;
+  fo_->portNames(portNames);
+  Vector<FOTBuilder *> fotbs(portNames.size());
+  fotb.startExtension(*fo_, context.vm().currentNode, fotbs);
+  if (portNames.size()) {
+    Vector<SymbolObj *> portSyms(portNames.size());
+    for (size_t i = 0; i < portSyms.size(); i++)
+      portSyms[i] = context.vm().interp->makeSymbol(portNames[i]);
+    context.pushPorts(fo_->hasPrincipalPort(), portSyms, fotbs);
+    CompoundFlowObj::processInner(context);
+    context.popPorts();
+  }
+  else
+    CompoundFlowObj::processInner(context);
+  fotb.endExtension(*fo_);
+}
+
+void CompoundExtensionFlowObj::setNonInheritedC(const Identifier *ident,
+					        ELObj *obj,
+						const Location &loc,
+						Interpreter &interp)
+{
+  fo_->setNIC(ident->name(), ELObjExtensionFlowObjValue(ident, obj, loc, interp));
+}
+
+bool CompoundExtensionFlowObj::hasNonInheritedC(const Identifier *ident) const
+{
+  return fo_->hasNIC(ident->name());
+}
+
+FlowObj *CompoundExtensionFlowObj::copy(Collector &c) const
+{
+  return new (c) CompoundExtensionFlowObj(*this);
+}
 
 #define FLOW_OBJ(name, string) \
 { FlowObj *tem = new (*this) name; \
@@ -2489,35 +2795,47 @@ void Interpreter::installFlowObjs()
   FLOW_OBJ(MarginaliaFlowObj, "marginalia");
   FLOW_OBJ(MultiModeFlowObj, "multi-mode");
   // math
+  FLOW_OBJ(MathSequenceFlowObj, "math-sequence");
   FLOW_OBJ(FractionFlowObj, "fraction");
+  FLOW_OBJ(UnmathFlowObj, "unmath");
+  FLOW_OBJ(SuperscriptFlowObj, "superscript");
+  FLOW_OBJ(SubscriptFlowObj, "subscript");
+  FLOW_OBJ(ScriptFlowObj, "script");
+  FLOW_OBJ(MarkFlowObj, "mark");
+  FLOW_OBJ(FenceFlowObj, "fence");
+  FLOW_OBJ(RadicalFlowObj, "radical");
+  FLOW_OBJ(MathOperatorFlowObj, "math-operator");
+  FLOW_OBJ(GridFlowObj, "grid");
+  FLOW_OBJ(GridCellFlowObj, "grid-cell");
 }
 
 void Interpreter::installExtensionFlowObjectClass(Identifier *ident,
 						  const StringC &pubid)
 {
-  FlowObj *tem;
-  if (pubid
-      == "UNREGISTERED::James Clark//Flow Object Class::"
-         "formatting-instruction")
-    tem = new (*this) FormattingInstructionFlowObj;
-  else if (pubid
-      == "UNREGISTERED::James Clark//Flow Object Class::"
-         "element")
-    tem = new (*this) ElementFlowObj;
-  else if (pubid
-      == "UNREGISTERED::James Clark//Flow Object Class::"
-         "empty-element")
-    tem = new (*this) EmptyElementFlowObj;
-  else if (pubid
-      == "UNREGISTERED::James Clark//Flow Object Class::"
-         "document-type")
-    tem = new (*this) DocumentTypeFlowObj;
-  else if (pubid
-      == "UNREGISTERED::James Clark//Flow Object Class::"
-         "processing-instruction")
-    tem = new (*this) ProcessingInstructionFlowObj;
-  else
-    tem = new (*this) UnknownFlowObj;
+  FlowObj *tem = 0;
+  if (extensionTable_) {
+    for (const FOTBuilder::Extension *ep = extensionTable_; ep->pubid; ep++) {
+      if (pubid == ep->pubid) {
+	if (ep->flowObj) {
+	  const FOTBuilder::CompoundExtensionFlowObj *cFlowObj
+	    = ep->flowObj->asCompoundExtensionFlowObj();
+	  if (cFlowObj)
+	    tem = new (*this) CompoundExtensionFlowObj(*cFlowObj);
+	  else
+	    tem = new (*this) ExtensionFlowObj(*ep->flowObj);
+	}
+	break;
+      }
+    }
+  }
+  if (!tem) {
+    if (pubid
+        == "UNREGISTERED::James Clark//Flow Object Class::"
+           "formatting-instruction")
+      tem = new (*this) FormattingInstructionFlowObj;
+    else
+      tem = new (*this) UnknownFlowObj;
+  }
   makePermanent(tem);
   ident->setFlowObj(tem);
 }

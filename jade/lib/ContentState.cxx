@@ -59,7 +59,6 @@ void ContentState::startContent(const Dtd &dtd)
   netEnablingCount_ = 0;
   totalExcludeCount_ = 0;
   lastEndedElementType_ = 0;
-  undefinedElementTypeTable_.clear();
 }
 
 void ContentState::pushElement(OpenElement *e)
@@ -141,22 +140,21 @@ void ContentState::getOpenElementInfo(Vector<OpenElementInfo> &v,
   }
 }
 
-const ElementType *
+ElementType *
 ContentState::lookupCreateUndefinedElement(const StringC &name,
-					   const Location &loc)
+					   const Location &loc,
+					   Dtd &dtd)
 {
-  const ElementType *e = undefinedElementTypeTable_.lookup(name);
-  if (e)
-    return e;
   ElementType *p = new ElementType(name,
-				   openElementCount_.size());
+				   dtd.nElementTypeIndex());
+  dtd.insertUndefinedElementType(p);
   p->setElementDefinition(new ElementDefinition(loc,
 						ElementDefinition::undefinedIndex,
 						(ElementDefinition::omitStart
 						 |ElementDefinition::omitEnd),
 						ElementDefinition::any),
 			  0);
-  undefinedElementTypeTable_.insert(p);
+
   includeCount_.push_back(0);
   excludeCount_.push_back(0);
   openElementCount_.push_back(0);

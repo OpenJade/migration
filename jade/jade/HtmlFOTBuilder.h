@@ -5,7 +5,6 @@
 #define HtmlFOTBuilder_INCLUDED 1
 
 #include "FOTBuilder.h"
-#include "OutputCharStream.h"
 #include "CmdLineApp.h"
 #include "Message.h"
 

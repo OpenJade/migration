@@ -331,11 +331,11 @@ void Parser::handleShortref(int index)
       markupPtr->addShortref(currentInput());
     }
     Ptr<EntityOrigin> origin
-      = new (internalAllocator())
-          EntityOrigin(entity,
-		       currentLocation(),
-		       currentInput()->currentTokenLength(),
-		       markupPtr);
+      = EntityOrigin::make(internalAllocator(),
+			   entity,
+			   currentLocation(),
+			   currentInput()->currentTokenLength(),
+			   markupPtr);
     entity->contentReference(*this, origin);
     return;
   }
@@ -403,15 +403,20 @@ void Parser::parseStartTag()
   }
   StringC &name = nameBuffer();
   getCurrentToken(syntax().generalSubstTable(), name);
-  const ElementType *e = currentDtd().lookupElementType(name);
+  ElementType *e = currentDtdNonConst().lookupElementType(name);
   if (sd().rank()) {
     if (!e)
       e = completeRankStem(name);
     else if (e->isRankedElement())
       handleRankedElement(e);
   }
-  if (!e) 
-    e = lookupCreateUndefinedElement(name, currentLocation());
+  ElementType *undefElementType;
+  if (!e)
+    e = undefElementType = lookupCreateUndefinedElement(name,
+							currentLocation(),
+							currentDtdNonConst());
+  else
+    undefElementType = 0;
   Boolean netEnabling;
   AttributeList *attributes = allocAttributeList(e->attributeDef(), 0);
   Token closeToken = getToken(tagMode);
@@ -425,7 +430,8 @@ void Parser::parseStartTag()
   }
   else {
     in->ungetToken();
-    if (parseAttributeSpec(0, *attributes, netEnabling)) {
+    Ptr<AttributeDefinitionList> newAttDef;
+    if (parseAttributeSpec(0, *attributes, netEnabling, newAttDef)) {
       // The difference between the indices will be the difference
       // in offsets plus 1 for each named character reference.
       if (in->currentLocation().index() - markupLocation().index()
@@ -434,6 +440,10 @@ void Parser::parseStartTag()
     }
     else
       netEnabling = 0;
+    if (!newAttDef.isNull()) {
+      newAttDef->setIndex(currentDtdNonConst().allocAttributeDefinitionListIndex());
+      e->setAttributeDef(newAttDef);
+    }
   }
   acceptStartTag(e,
 		 new (eventAllocator())
@@ -445,7 +455,7 @@ void Parser::parseStartTag()
 		 netEnabling);
 }
 
-const ElementType *Parser::completeRankStem(const StringC &name)
+ElementType *Parser::completeRankStem(const StringC &name)
 {
   const RankStem *rankStem = currentDtd().lookupRankStem(name);
   if (rankStem) {
@@ -453,7 +463,7 @@ const ElementType *Parser::completeRankStem(const StringC &name)
     if (!appendCurrentRank(name, rankStem))
       message(ParserMessages::noCurrentRank, StringMessageArg(name));
     else
-      return currentDtd().lookupElementType(name);
+      return currentDtdNonConst().lookupElementType(name);
   }
   return 0;
 }
@@ -598,7 +608,8 @@ void Parser::acceptStartTag(const ElementType *e,
 			    Boolean netEnabling)
 {
   if (e->definition()->undefined()) {
-    message(ParserMessages::undefinedElement, StringMessageArg(e->name()));
+    if (validate())
+      message(ParserMessages::undefinedElement, StringMessageArg(e->name()));
     pushElementCheck(e, event, netEnabling);
     return;
   }
@@ -781,7 +792,8 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
   if (tagLevel() == syntax().taglvl())
     message(ParserMessages::taglvlOpenElements, NumberMessageArg(syntax().taglvl()));
   noteStartElement(event->included());
-  if (event->mustOmitEnd()) {
+  if (event->mustOmitEnd()
+      || (stupidNetTrick() && netEnabling && e->definition()->undefined())) {
     EndElementEvent *end
       = new (eventAllocator()) EndElementEvent(e,
 					       currentDtdPointer(),
@@ -858,7 +870,7 @@ void Parser::parseEndTag()
       e = completeRankStem(name);
   }
   if (!e) 
-    e = lookupCreateUndefinedElement(name, currentLocation());
+    e = lookupCreateUndefinedElement(name, currentLocation(), currentDtdNonConst());
   parseEndTagClose();
   acceptEndTag(e,
 	       new (eventAllocator())
@@ -928,7 +940,7 @@ void Parser::parseEmptyEndTag()
 
 void Parser::parseNullEndTag()
 {
-  if (options().warnNet)
+  if (options().warnNet || options().warnNetEmptyElement)
     message(ParserMessages::nullEndTag);
   // If a null end tag was recognized, then there must be a net enabling
   // element on the stack.
@@ -963,7 +975,7 @@ void Parser::endAllElements()
 	      StringMessageArg(currentElement().type()->name()));
     implyCurrentElementEnd(currentLocation());
   }
-  if (!currentElement().isFinished())
+  if (!currentElement().isFinished() && validate())
     message(ParserMessages::noDocumentElement);
 }
 
@@ -988,6 +1000,8 @@ void Parser::acceptEndTag(const ElementType *e,
 	    StringMessageArg(currentElement().type()->name()));
   if (currentElement().included())
     event->setIncluded();
+  if (options().warnNetEmptyElement && currentElement().netEnabling())
+    message(ParserMessages::netStartTagEndTag);
   noteEndElement(event->included());
   eventHandler().endElement(event);
   popElement();

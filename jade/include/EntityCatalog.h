@@ -40,10 +40,6 @@ public:
 			       const CharsetInfo &,
 			       Messenger &,
 			       StringC &) const;
-  virtual Boolean defaultDoctype(const CharsetInfo &,
-				 Messenger &,
-				 StringC &,
-				 StringC &) const;
 };
 
 #ifdef SP_NAMESPACE

@@ -23,8 +23,6 @@
 
 #include "ConsoleOutput.h"
 
-#include <iostream.h>
-#include <fstream.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -37,19 +35,6 @@
 #include <fcntl.h>
 #include <io.h>
 #endif
-#ifdef SP_HAVE_IOS_BINARY
-#define IOS_BINARY ios::binary
-#else
-#define IOS_BINARY 0
-#endif
-#ifdef SP_WIDE_SYSTEM
-#include <sys/stat.h>
-#endif
-#ifdef SP_WIDE_SYSTEM
-
-#include <stdio.h>
-
-#else /* not SP_WIDE_SYSTEM */
 
 #include <sys/types.h>
 #ifdef SP_INCLUDE_UNISTD_H
@@ -59,8 +44,6 @@
 #include <io.h>
 #endif
 
-#endif /* not SP_WIDE_SYSTEM */
-
 #ifndef SP_DEFAULT_ENCODING
 #ifdef WIN32
 #define SP_DEFAULT_ENCODING SP_T("WINDOWS")
@@ -69,10 +52,6 @@
 #endif
 #endif /* not SP_DEFAULT_ENCODING */
 
-#ifdef SP_WIDE_SYSTEM
-#include <windows.h>
-#endif
-
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
@@ -80,6 +59,9 @@ namespace SP_NAMESPACE {
 static const SP_TCHAR *progName = 0;
 
 static const SP_TCHAR versionString[] = SP_VERSION;
+
+static FileOutputByteStream standardOutput(1, 0);
+static FileOutputByteStream standardError(2, 0);
 
 CmdLineApp::CmdLineApp(const char *requiredInternalCode)
 : errorFile_(0),
@@ -160,11 +142,8 @@ StringC CmdLineApp::usageString()
 }
 
 static
-void ewrite(const CmdLineApp::AppChar *s)
+void ewrite(const char *s)
 {
-#ifdef SP_WIDE_SYSTEM
-  fputts(s, stderr);
-#else
   int n = (int)strlen(s);
   while (n > 0) {
     int nw = write(2, s, n);
@@ -173,7 +152,6 @@ void ewrite(const CmdLineApp::AppChar *s)
     n -= nw;
     s += nw;
   }
-#endif
 }
 
 static
@@ -183,11 +161,7 @@ int outOfMemory(size_t)
 void outOfMemory()
 #endif
 {
-  if (progName) {
-    ewrite(progName);
-    ewrite(SP_T(": "));
-  }
-  ewrite(SP_T(": out of memory\n"));
+  ewrite("SP library: out of memory\n");
   exit(1);
 #ifdef SP_FANCY_NEW_HANDLER
   return 0;
@@ -196,7 +170,9 @@ void outOfMemory()
 
 int CmdLineApp::init(int, AppChar **argv)
 {
+#ifndef SP_ANSI_LIB
   set_new_handler(outOfMemory);
+#endif
 #ifdef SP_HAVE_LOCALE
   setlocale(LC_ALL, "");
 #endif
@@ -207,15 +183,14 @@ int CmdLineApp::init(int, AppChar **argv)
   progName = argv[0];
   if (progName)
     setProgramName(convertInput(progName));
-#ifdef __GNUG__
-  // cout is a performance disaster in libg++ unless we do this.
-  ios::sync_with_stdio(0);
-#endif
   return 0;
 }
 
 int CmdLineApp::run(int argc, AppChar **argv)
 {
+#ifdef SP_ANSI_LIB
+  try {
+#endif
   int ret = init(argc, argv);
   if (ret)
     return ret;
@@ -226,28 +201,18 @@ int CmdLineApp::run(int argc, AppChar **argv)
   ret = processArguments(argc - firstArg, argv + firstArg);
   progName = 0;
   return ret;
-}    
-
-Boolean CmdLineApp::openFilebufWrite(filebuf &file,
-				     const AppChar *filename)
-{
-#ifdef SP_WIDE_SYSTEM
-  int fd = _wopen(filename, _O_CREAT|_O_WRONLY|_O_TRUNC|_O_BINARY,
-                  _S_IREAD | _S_IWRITE);
-  if (fd < 0) {
-    // _wopen will always fail on Windows 95
-    String<char> buf;
-    int len = WideCharToMultiByte(CP_ACP, 0, filename, -1, 0, 0, 0, 0);
-    buf.resize(len + 1);
-    WideCharToMultiByte(CP_ACP, 0, filename, -1, buf.begin(), len, 0, 0);
-    buf[len] = '\0';
-    return file.open(buf.data(), ios::out|ios::trunc|IOS_BINARY) != 0;
+#ifdef SP_ANSI_LIB
   }
-  return file.attach(fd) != 0;
+  catch (bad_alloc) {
+#ifdef SP_FANCY_NEW_HANDLER
+    outOfMemory(0);
 #else
-  return file.open(filename, ios::out|ios::trunc|IOS_BINARY) != 0;
+    outOfMemory();
 #endif
-}
+  }
+  return 1;
+#endif /* SP_ANSI_LIB */
+}    
 
 int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
 {
@@ -280,14 +245,14 @@ int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
   }
   nextArg = options.ind();
   if (errorFile_) {
-    static filebuf file;
-    if (!openFilebufWrite(file, errorFile_)) {
-      message(CmdLineAppMessages::cannotOpenOutputError,
+    static FileOutputByteStream file;
+    if (!file.open(errorFile_)) {
+      message(CmdLineAppMessages::openFileError,
 	      StringMessageArg(convertInput(errorFile_)),
 	      ErrnoMessageArg(errno));
       return 1;
     }
-    setMessageStream(new IosOutputCharStream(&file, codingSystem()));
+    setMessageStream(new EncodeOutputCharStream(&file, codingSystem()));
   }
   if (!outputCodingSystem_)
     outputCodingSystem_ = codingSystem();
@@ -426,7 +391,7 @@ OutputCharStream *CmdLineApp::makeStdErr()
   OutputCharStream *os = ConsoleOutput::makeOutputCharStream(2);
   if (os)
     return os;
-  return new IosOutputCharStream(cerr.rdbuf(), codingSystem());
+  return new EncodeOutputCharStream(&standardError, codingSystem());
 }
 
 OutputCharStream *CmdLineApp::makeStdOut()
@@ -434,7 +399,17 @@ OutputCharStream *CmdLineApp::makeStdOut()
   OutputCharStream *os = ConsoleOutput::makeOutputCharStream(1);
   if (os)
     return os;
-  return new IosOutputCharStream(cout.rdbuf(), outputCodingSystem_);
+  return new EncodeOutputCharStream(&standardOutput, outputCodingSystem_);
+}
+
+const MessageType2 &CmdLineApp::openFileErrorMessage()
+{
+  return CmdLineAppMessages::openFileError;
+}
+
+const MessageType2 &CmdLineApp::closeFileErrorMessage()
+{
+  return CmdLineAppMessages::closeFileError;
 }
 
 #ifdef SP_NAMESPACE

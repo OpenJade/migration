@@ -57,6 +57,7 @@ public:
   ElementType *lookupElementType(const StringC &);
   ElementType *removeElementType(const StringC &);
   ElementType *insertElementType(ElementType *);
+  ElementType *insertUndefinedElementType(ElementType *);
   size_t nElementTypeIndex() const;
   ConstElementTypeIter elementTypeIter() const;
   ElementTypeIter elementTypeIter();
@@ -100,6 +101,7 @@ private:
   ConstPtr<Entity> defaultEntity_;
   ConstPtr<StringResource<Char> > name_;
   NamedTable<ElementType> elementTypeTable_;
+  NamedTable<ElementType> undefinedElementTypeTable_;
   NamedTable<RankStem> rankStemTable_;
   NamedTable<ShortReferenceMap> shortReferenceMapTable_;
   NamedResourceTable<Notation> notationTable_;
@@ -246,19 +248,33 @@ size_t Dtd::nAttributeDefinitionList() const
 inline
 const ElementType *Dtd::lookupElementType(const StringC &name) const
 {
-  return elementTypeTable_.lookup(name);
+  const ElementType *e = elementTypeTable_.lookup(name);
+  if (e)
+    return e;
+  else
+    return undefinedElementTypeTable_.lookup(name);
 }
 
 inline
 ElementType *Dtd::lookupElementType(const StringC &name)
 {
-  return elementTypeTable_.lookup(name);
+  ElementType *e = elementTypeTable_.lookup(name);
+  if (e)
+    return e;
+  else
+    return undefinedElementTypeTable_.lookup(name);
 }
 
 inline
 ElementType *Dtd::insertElementType(ElementType *e)
 {
   return elementTypeTable_.insert(e);
+}
+
+inline
+ElementType *Dtd::insertUndefinedElementType(ElementType *e)
+{
+  return undefinedElementTypeTable_.insert(e);
 }
 
 inline
@@ -285,7 +301,7 @@ inline
 size_t Dtd::nElementTypeIndex() const
 {
   // index 0 is reserved for #pcdata
-  return 1 + elementTypeTable_.count();
+  return 1 + elementTypeTable_.count() + undefinedElementTypeTable_.count();
 }
 
 inline

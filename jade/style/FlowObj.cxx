@@ -1397,7 +1397,6 @@ void CharacterFlowObj::processInner(ProcessContext &context)
 bool FlowObj::setImplicitChar(ELObj *obj, const Location &loc, 
                                        Interpreter &interp)
 {
-  printf("FlowObj::setImplicitChar\n");
   CANNOT_HAPPEN();
 }
 

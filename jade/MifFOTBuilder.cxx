@@ -663,7 +663,7 @@ class MifDoc {
 
     struct TagStream {
 
-        enum TagStreamClass { tsTagStream, tsTextFlow, tsCell, tsPara } TagStreamClass;
+        enum TagStreamClass2 { tsTagStream, tsTextFlow, tsCell, tsPara } TagStreamClass;
 
         TagStream( T_indent osIndent = 2 );
         ~TagStream();

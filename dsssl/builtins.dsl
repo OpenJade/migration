@@ -239,11 +239,6 @@
 (define (source nl)
   (node-list-property 'source nl))
 
-(define (subtree nl)
-  (node-list-map (lambda (snl)
-		   (node-list snl (subtree (children snl))))
-		 nl))
-
 (define (subgrove nl)
   (node-list-map
    (lambda (snl)

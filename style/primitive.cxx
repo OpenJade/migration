@@ -25,26 +25,34 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-class DescendantsNodeListObj : public NodeListObj {
+class SubtreeNodeListObj : public NodeListObj {
 public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  DescendantsNodeListObj(const NodePtr &);
+  SubtreeNodeListObj(const NodePtr &);
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
   bool contains(EvalContext &, Interpreter &, const NodePtr &);
-private:
+protected:
   void advance();
   void chunkAdvance();
-  // nodes in node list are strictly after this node
   NodePtr root_;
+  virtual SubtreeNodeListObj *copy(Interpreter &);
+private:
+  // nodes in node list are strictly after this node
   NodePtr start_;
   unsigned depth_;
 };
 
-
+class DescendantsNodeListObj : public SubtreeNodeListObj {
+public:
+  DescendantsNodeListObj(const NodePtr &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+protected:
+  SubtreeNodeListObj *copy(Interpreter &);
+};
 
 class SiblingNodeListObj : public NodeListObj {
 public:
@@ -4023,6 +4031,19 @@ DEFPRIMITIVE(Follow, argc, argv, context, interp, loc)
   return new (interp) NodeListPtrNodeListObj(nl);
 }
 
+DEFPRIMITIVE(Subtree, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
+  return new (interp) SubtreeNodeListObj(node);
+}
+
 DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
 {
   NodePtr node;
@@ -5532,33 +5553,37 @@ void Interpreter::installXPrimitive(const char *prefix, const char *s,
   externalProcTable_.insert(pubid, value);
 }
 
-DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start)
+SubtreeNodeListObj::SubtreeNodeListObj(const NodePtr &start)
 : start_(start), root_(start), depth_(0)
 {
-  advance();
 }
 
-NodePtr DescendantsNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
+SubtreeNodeListObj *SubtreeNodeListObj::copy(Interpreter &interp)
+{
+  return new (interp) SubtreeNodeListObj(*this);
+}
+
+NodePtr SubtreeNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   return start_;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+NodeListObj *SubtreeNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
+  SubtreeNodeListObj *obj = copy(interp);
   obj->advance();
   return obj;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
+NodeListObj *SubtreeNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
-  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
+  SubtreeNodeListObj *obj = copy(interp);
   obj->chunkAdvance();
   chunk = 1;
   return obj;
 }
 
-void DescendantsNodeListObj::advance()
+void SubtreeNodeListObj::advance()
 {
   if (!start_)
     return;
@@ -5579,7 +5604,7 @@ void DescendantsNodeListObj::advance()
   }
 }
 
-void DescendantsNodeListObj::chunkAdvance()
+void SubtreeNodeListObj::chunkAdvance()
 {
   if (!start_)
     return;
@@ -5600,13 +5625,35 @@ void DescendantsNodeListObj::chunkAdvance()
   }
 }
 
-bool DescendantsNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+bool SubtreeNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
 {
-  for (NodePtr parent = ptr; parent->getParent(parent) == accessOK;) 
-    if (*parent == *root_)
+  NodePtr nd(ptr);
+  for (;;) {
+    if (*nd == *root_)
       return 1;
-  return 0;
+    if (nd->getParent(nd) != accessOK)
+      return 0;
+  }
 }
+
+DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start)
+  : SubtreeNodeListObj(start)
+{
+  advance();
+}
+
+SubtreeNodeListObj *DescendantsNodeListObj::copy(Interpreter &interp)
+{
+  return new (interp) DescendantsNodeListObj(*this);
+}
+
+bool DescendantsNodeListObj::contains(EvalContext &context, 
+				      Interpreter &interp, const NodePtr &ptr)
+{
+  return (*ptr != *root_ 
+	  && SubtreeNodeListObj::contains(context, interp, ptr));
+}
+
 
 SelectByClassNodeListObj::SelectByClassNodeListObj(NodeListObj *nl, ComponentName::Id cls)
 : nodeList_(nl), cls_(cls)

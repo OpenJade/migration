@@ -40,6 +40,7 @@ public:
   void startTokenNoMulticode();
   void endToken(size_t length);
   Xchar tokenChar(Messenger &);
+  Xchar tokenCharInBuffer(Messenger &);
   void ungetToken();
   void setMarkupScanTable(const XcharMap<unsigned char> &);
   Boolean scanSuppress() const;
@@ -126,6 +127,12 @@ inline
 Xchar InputSource::tokenChar(Messenger &mgr)
 {
   return cur_ < end_ ? *cur_++ : fill(mgr);
+}
+
+inline
+Xchar InputSource::tokenCharInBuffer(Messenger &mgr)
+{
+  return cur_ < end_ ? (Xchar)*cur_++ : eE;
 }
 
 inline

@@ -922,20 +922,18 @@ void SchemeParser::createQuasiquoteAbbreviation(const char *sym, Owner<Expressio
 bool SchemeParser::parseIf(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
-  Owner<Expression> exprs[3];
+  Owner<Expression> expr0, expr1, expr2;
   Token tok;
   Identifier::SyntacticKey key;
-  for (int i = 0; i < 2; i++) {
-    if (!parseExpression(0, exprs[i], key, tok))
-      return 0;
-  }
-  if (!parseExpression(dsssl2() ? allowCloseParen : 0, exprs[2], key, tok))
+  if (!parseExpression(0, expr0, key, tok)
+      || !parseExpression(0, expr1, key, tok)      
+      || !parseExpression(dsssl2() ? allowCloseParen : 0, expr2, key, tok))
     return 0;
-  if (!exprs[2])
-    exprs[2] = new ConstantExpression(interp_->makeUnspecified(), in_->currentLocation());
+  if (!expr2)
+    expr2 = new ConstantExpression(interp_->makeUnspecified(), in_->currentLocation());
   else if (!getToken(allowCloseParen, tok))
     return 0;
-  expr = new IfExpression(exprs[0], exprs[1], exprs[2], loc);
+  expr = new IfExpression(expr0, expr1, expr2, loc);
   return 1;
 }
 

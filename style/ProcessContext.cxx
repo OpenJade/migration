@@ -288,6 +288,8 @@ void ProcessContext::startConnection(SymbolObj *label, const Location &loc)
 
 void ProcessContext::endConnection()
 {
+  if (inTableRow() && tableStack_.head()->rowConnectableLevel == connectableStackLevel_)
+    endTableRow();
   if (connectionStack_.head()->nBadFollow > 0)
     connectionStack_.head()->nBadFollow--;
   else {
@@ -302,18 +304,6 @@ void ProcessContext::endConnection()
     }
     delete connectionStack_.get();
   }
-}
-
-void ProcessContext::saveCurrentConnection(SavedConnection &save)
-{
-  const Connection &c = *connectionStack_.head();
-  save.connectableLevel = c.connectableLevel;
-  save.portIndex = c.portIndex;
-}
-
-void ProcessContext::restoreConnection(const SavedConnection &save)
-{
-  restoreConnection(save.connectableLevel, save.portIndex);
 }
 
 void ProcessContext::restoreConnection(unsigned connectableLevel, size_t portIndex)

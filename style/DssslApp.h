@@ -19,7 +19,8 @@ public:
   virtual FOTBuilder *makeFOTBuilder(const FOTBuilder::Extension *&) = 0;
   int processSysid(const StringC &);
   bool load(const StringC &sysid, const Vector<StringC> &active,
-	    const NodePtr &parent, NodePtr &rootNode);
+	    const NodePtr &parent, NodePtr &rootNode,
+	    const Vector<StringC> &architecture);
   bool readEntity(const StringC &, StringC &);
 protected:
   void processOption(AppChar opt, const AppChar *arg);

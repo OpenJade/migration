@@ -14,7 +14,7 @@ INSTALL=cp
 # and -O (or any optimization level >= 1).
 # c++ is a front-end for gcc which takes care of linking with -lstdc++
 CXX=c++ -fno-implicit-templates -O2
-WARN=-Wall -Wno-reorder -Wwrite-strings -Wpointer-arith -Wnested-externs -Woverloaded-virtual -Wbad-function-cast
+WARN=#-Wall -Wno-reorder -Wwrite-strings -Wpointer-arith -Wnested-externs -Woverloaded-virtual -Wbad-function-cast
 # Executables will be *very* large if you use -g.
 DEBUG=
 # Add -DSP_HAVE_BOOL if you have the bool type.
@@ -23,6 +23,7 @@ DEBUG=
 # Add -DSP_HAVE_LOCALE if you have setlocale().
 # Add -DSP_HAVE_GETTEXT if you gettext() and friends (eg Solaris 2.3).
 # Add -DSP_HAVE_SOCKET if you have sockets and you want support for HTTP
+# Add -DSP_MUTEX_PTHREADS if you want to use pthreads for mutexes
 # Add -DSP_DECLARE_H_ERRNO if you have sockets, but netdb.h doesn't declare h_errno
 #   (reportedly HPUX, Ultrix and Solaris 5.4)
 # Add -DSGML_CATALOG_FILES_DEFAULT=\"/usr/local/lib/sgml/catalog\"

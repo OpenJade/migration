@@ -23,6 +23,7 @@
 <LI><A HREF="#backend-rtf">RTF</A>
 <LI><A HREF="#backend-fot">XML Flow Object Tree</A>
 <LI><A HREF="TeX.htm">TeX</A>
+<LI><A HREF="mif.htm">MIF</A>
 <LI><A HREF="transform.htm">SGML Transformation</A>
 </UL>
 <LI><A HREF="#source">Reading the Jade Sources</A>
@@ -33,7 +34,7 @@
 <h2><A NAME=whatis>What is Jade?</A></h2>
 <p>
 Jade is an implementation of the DSSSL style language.
-The current version is 1.1.1.
+The current version is 1.2.
 <p>
 For general information about DSSSL, see my <a
 href="http://www.jclark.com/dsssl/">DSSSL page</A>.
@@ -90,10 +91,9 @@ Microsoft Word 97 and Microsoft's free
 <A HREF="http://www.microsoft.com/word/internet/viewer/">Word Viewer 97</A>.
 Previous versions were tested with Word 95 and Word Viewer 7.1.
 <LI>
-A backend that generates TeX.  Although the C++ part of this is almost
-complete, much work remains to be done on writing the TeX macros on which the
-generated TeX code depends. (This backend was contributed by
-<a href="mailto:dmeggins@uottawa.ca">David Megginson</a>.)
+A backend that generates TeX.
+<LI>
+A backend that generates MIF.
 <LI>
 A backend that generates SGML.
 This is used in conjunction with non-standard flow object classes
@@ -115,10 +115,10 @@ courtesy, to let me know about it and acknowledge the use of Jade.
 <h2><A NAME=getting>Getting Jade</A></h2>
 <p>
 If you're using Windows 95 or Windows NT, then you all you need is in the <A
-HREF="ftp://ftp.jclark.com/pub/jade/jadew1_1_1.zip">binary distribution</A>.
+HREF="ftp://ftp.jclark.com/pub/jade/jadew1_2.zip">binary distribution</A>.
 <P>
 Otherwise you will need to build it yourself from source. You need
-the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_1_1.zip">Jade</A>.
+the sources for <A HREF="ftp://ftp.jclark.com/pub/jade/jade1_2.zip">Jade</A>.
 This package includes the sources for a compatible version of SP
 (which may be different from the latest released version of SP).
 <p>

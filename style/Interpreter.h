@@ -155,7 +155,8 @@ public:
     keyDeclareIdAttribute,
     keyDeclareFlowObjectMacro,
     keyOrElement,
-    keyPositionPreference
+    keyPositionPreference,
+    keyArchitecture
   };
   enum { lastSyntacticKey = keyWithMode };
   Identifier(const StringC &name);

@@ -339,6 +339,7 @@ void InternalCdataEntity::normalReference(ParserState &parser,
 					  const Ptr<EntityOrigin> &origin,
 					  Boolean) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   if (string().size() > 0) {
     parser.noteData();
@@ -357,6 +358,7 @@ void InternalCdataEntity::litReference(Text &text,
 				       const Ptr<EntityOrigin> &origin,
 				       Boolean squeeze) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   if (squeeze) {
     Location loc(origin.pointer(), 0);
@@ -374,6 +376,7 @@ void InternalSdataEntity::normalReference(ParserState &parser,
 					  const Ptr<EntityOrigin> &origin,
 					  Boolean) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   parser.noteData();
   parser.eventHandler().sdataEntity(new (parser.eventAllocator())
@@ -391,6 +394,7 @@ void InternalSdataEntity::litReference(Text &text,
 				       const Ptr<EntityOrigin> &origin,
 				       Boolean squeeze) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   if (squeeze) {
     Location loc(origin.pointer(), 0);
@@ -407,6 +411,7 @@ void InternalTextEntity::normalReference(ParserState &parser,
 					 const Ptr<EntityOrigin> &origin,
 					 Boolean generateEvent) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   if (checkNotOpen(parser)) {
     if (generateEvent && parser.wantMarkup())
@@ -430,6 +435,7 @@ void ExternalTextEntity::normalReference(ParserState &parser,
 					 const Ptr<EntityOrigin> &origin,
 					 Boolean generateEvent) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   if (checkNotOpen(parser)) {
     if (generateEvent && parser.wantMarkup())
@@ -471,6 +477,7 @@ void ExternalDataEntity::contentReference(ParserState &parser,
 {
   if (parser.options().warnExternalDataEntityRef)
     parser.message(ParserMessages::externalDataEntityRef);
+  checkRef(parser);
   checkEntlvl(parser);
   parser.noteData();
   parser.eventHandler().externalDataEntity(new (parser.eventAllocator())
@@ -512,6 +519,7 @@ void ExternalNonTextEntity::rcdataReference(ParserState &parser,
 void SubdocEntity::contentReference(ParserState &parser,
 				    const Ptr<EntityOrigin> &origin) const
 {
+  checkRef(parser);
   checkEntlvl(parser);
   parser.noteData();
   parser.eventHandler().subdocEntity(new (parser.eventAllocator())
@@ -580,6 +588,26 @@ Boolean Entity::checkNotOpen(ParserState &parser) const
     return 0;
   }
   return 1;
+}
+
+void InternalEntity::checkRef(ParserState &parser) const
+{
+  if (parser.sd().entityRef() == Sd::entityRefNone)
+    parser.message(ParserMessages::entityRefNone);
+}
+
+void ExternalEntity::checkRef(ParserState &parser) const
+{
+  if (parser.sd().entityRef() != Sd::entityRefAny)
+    parser.message(ParserMessages::entityRefInternal);
+}
+
+void PredefinedEntity::checkRef(ParserState &parser) const
+{
+}
+
+void Entity::checkRef(ParserState &parser) const
+{
 }
 
 

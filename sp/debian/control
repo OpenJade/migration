@@ -19,6 +19,7 @@ Description: OpenJade group's SGML parsing tools
 
 Package: libosp2
 Architecture: any
+Section: libs
 Depends: ${shlibs-libosp2:Depends}
 Conflicts: libosp1
 Description: Runtime library for OpenJade group's SP suite
@@ -30,6 +31,7 @@ Description: Runtime library for OpenJade group's SP suite
 
 Package: libosp-dev
 Architecture: any
+Section: devel
 Depends: ${opensp:Version}, ${libosp:Version}, libc6-dev, libstdc++-dev
 Recommends: c++-compiler
 Description: OpenJade group's SP suite, developer support

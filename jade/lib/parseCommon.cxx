@@ -529,18 +529,6 @@ Boolean Parser::parseEntityReference(Boolean isParameter,
 				markupPtr);
   else
     origin = (EntityOrigin *)0;
-  switch (sd().entityRef()) {
-  case Sd::entityRefNone:
-    if (!entity->isPredefined())
-      message(ParserMessages::entityRefNone);
-    break;
-  case Sd::entityRefInternal:
-    if (entity->asExternalEntity()) 
-      message(ParserMessages::entityRefInternal);
-    break;
-  default:
-    break;
-  }
   return 1;
 }
 

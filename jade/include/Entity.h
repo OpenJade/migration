@@ -64,7 +64,6 @@ public:
   virtual Boolean isDataOrSubdoc() const;
   // for determining whether we need to validate as character data
   virtual Boolean isCharacterData() const;
-  virtual Boolean isPredefined() const { return 0; }
   virtual const ExternalDataEntity *asExternalDataEntity() const;
   virtual const SubdocEntity *asSubdocEntity() const;
   virtual const InternalEntity *asInternalEntity() const;
@@ -77,6 +76,7 @@ public:
   void setDefaulted();
   Boolean defaulted() const;
 protected:
+  virtual void checkRef(ParserState &) const;
   static void checkEntlvl(ParserState &);
   Boolean checkNotOpen(ParserState &) const;
 private:
@@ -95,6 +95,7 @@ public:
   const Text &text() const;
   const InternalEntity *asInternalEntity() const;
 protected:
+  void checkRef(ParserState &) const;
   Text text_;
 };
 
@@ -139,7 +140,8 @@ class SP_API PredefinedEntity : public InternalCdataEntity {
 public:
   PredefinedEntity(const StringC &s, const Location &l, Text &t)
    : InternalCdataEntity(s,l,t) { }
-  Boolean isPredefined() const { return 1; }
+protected:
+  void checkRef(ParserState &) const;
 };
 
 class SP_API InternalSdataEntity : public InternalDataEntity {
@@ -187,6 +189,8 @@ public:
   const StringC *systemIdPointer() const;
   const StringC *effectiveSystemIdPointer() const;
   const StringC *publicIdPointer() const;
+protected:
+  void checkRef(ParserState &) const;
 private:
   ExternalId externalId_;
 };
@@ -336,6 +340,7 @@ const Notation *ExternalDataEntity::notation() const
 {
   return notation_.pointer();
 }
+
 
 #ifdef SP_NAMESPACE
 }

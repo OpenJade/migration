@@ -88,6 +88,37 @@ void DocumentGenerator::emit(const NodePtr &ptr)
     os() << tok;
     break;
   }
+  case ComponentName::idPi: {
+    GroveString str;
+    if (ptr->getEntityName(str) == accessOK) 
+      os() << "&" << str << ";";
+    else {
+      ptr->getSystemData(str);
+      os() << "<?" << str << ">";
+    }
+    break;
+  }
+  case ComponentName::idSdata: {
+    GroveString str;
+    if (ptr->getEntityName(str) == accessOK) 
+      os() << "&" << str << ";";
+    else {
+      printf("can't emit sdata entity reference without name\n");
+      GroveChar ch;
+      ptr->getChar(*smap_, ch);
+      os() << ch;
+    }
+    break;
+  }
+  case ComponentName::idSubdocument:
+  case ComponentName::idExternalData: {
+    GroveString str;
+    if (ptr->getEntityName(str) == accessOK) 
+      os() << "&" << str << ";";
+    else 
+      printf("can't emit entity reference without name\n");
+    break;
+  }
   default: {
     printf("unsupported node class skipped\n");
   }

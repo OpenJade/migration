@@ -34,4 +34,7 @@ pkginclude_HEADERS = Allocator.h ArcEngine.h Attribute.h Attributed.h \
 
 ## We don't install the windows-only headers on unix systems, but
 ## we still include it in the distribution
-EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old
+EXTRA_DIST = Win32CodingSystem.h WinApp.h WinInetStorage.h config.h.old \
+	.cvsignore
+
+MAINTAINERCLEANFILES = Makefile.in

@@ -183,9 +183,12 @@ void WinApp::setRegistry(const char *name, const StringC &value)
   if (RegCreateKeyA(HKEY_CURRENT_USER, SP_REGISTRY_KEY, &hk) != ERROR_SUCCESS)
     return;
   String<char> buf;
-  int len = WideCharToMultiByte(CP_ACP, 0, value.data(), value.size(), 0, 0, 0, 0);
+  String<wchar_t> valuew;
+  for (size_t i = 0; i < value.size(); i++)
+    valuew += wchar_t(value[i]);
+  int len = WideCharToMultiByte(CP_ACP, 0, valuew.data(), valuew.size(), 0, 0, 0, 0);
   buf.resize(len + 1);
-  WideCharToMultiByte(CP_ACP, 0, value.data(), value.size(), buf.begin(), len, 0, 0);
+  WideCharToMultiByte(CP_ACP, 0, valuew.data(), valuew.size(), buf.begin(), len, 0, 0);
   buf[len] = '\0';
   RegSetValueA(hk, name, REG_SZ, buf.data(), len);
   RegCloseKey(hk);
@@ -205,7 +208,10 @@ Boolean WinApp::getRegistry(const char *name, StringC &value)
       int nChars = MultiByteToWideChar(CP_ACP, 0, buf.data(), size - 1, 0, 0);
       if (nChars || GetLastError() == ERROR_SUCCESS) {
 	value.resize(nChars);
-	if (MultiByteToWideChar(CP_ACP, 0, buf.data(), size - 1, &value[0], nChars) == nChars)
+	String<wchar_t> valuew;
+	for (size_t i = 0; i < value.size(); i++)
+	  valuew += wchar_t(value[i]);
+	if (MultiByteToWideChar(CP_ACP, 0, buf.data(), size - 1, (wchar_t *)valuew.data(), nChars) == nChars)
 	  retval = 1;
 	else
 	  value.resize(0);

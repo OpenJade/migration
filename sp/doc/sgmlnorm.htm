@@ -16,33 +16,14 @@ Hypermedia/Time-based Structuring Language
 </H4>
 <H2>SYNOPSIS</H2>
 <P>
-<SAMP>osgmlnorm</SAMP>
-[
-<SAMP>-Cdemnv</SAMP>
-]
-[
-<SAMP>-b<VAR>bctf</VAR></SAMP>
-]
-[
-<SAMP>-c<VAR>catalog</VAR></SAMP>
-]
-[
-<SAMP>-D<VAR>dir</VAR></SAMP>
-]
-[
-<SAMP>-i<VAR>name</VAR></SAMP>
-]
-[
-<SAMP>-w<VAR>warning</VAR></SAMP>
-]
-<SAMP><VAR>sysid...</VAR></SAMP>
-
+<CODE>osgmlnorm</CODE> [ <CODE>option...</CODE> ] <CODE><VAR>sysid...</VAR></CODE>
+ 
 <H2>DESCRIPTION</H2>
 <P>
 Osgmlnorm prints on the standard output a <I>normalized</I> document instance
 for the SGML document contained in the concatenation of the entities
 with <A HREF="sysid.htm">system identifiers</A>
-<SAMP><VAR>sysid...</VAR></SAMP>.
+<CODE><VAR>sysid...</VAR></CODE>.
 <P>
 When the normalized instance is prefixed with the original SGML declaration
 and prolog, it will have the same ESIS as the original SGML document,
@@ -57,7 +38,7 @@ The normalized instance will use the reference delimiters, even if the
 original instance did not.
 <LI>
 If marked sections are included in the output using the
-<SAMP>-m</SAMP> option, the reference reserved names will be used for
+<CODE>-m</CODE> option, the reference reserved names will be used for
 the status keywords even if the original instance did not.
 <LI>
 Any ESIS information relating to the SGML LINK feature will be lost.
@@ -78,26 +59,30 @@ omitted.
 For example, with HTML osgmlnorm would output <CODE>&lt;DL COMPACT&gt;</CODE>
 rather than <CODE>&lt;DL COMPACT="COMPACT"&gt;</CODE>
 </UL>
+<H2>OPTIONS</H2>
 <P>
 The following options are available:
 <DL>
 <DT>
-<SAMP>-b<VAR>bctf</VAR></SAMP>
+<CODE>-b<VAR>name</VAR></CODE>,
+<CODE>--bctf=<VAR>name</VAR></CODE>
 <DD>
-Use the <A HREF="sysid.htm#bctf">BCTF</A> with name
-<SAMP><VAR>bctf</VAR></SAMP>
-for output.
+Use the <A HREF="sysid.htm#bctf">BCTF</A> <VAR>name</VAR> for output.
 <DT>
-<SAMP>-c<VAR>file</VAR></SAMP>
+<CODE>-c<VAR>sysid</VAR></CODE>,
+<CODE>--catalog=<VAR>sysid</VAR></CODE>
 <DD>
-Use the catalog entry file
-<SAMP><VAR>file</VAR></SAMP>.
+Map public identifiers and entity names to system identifiers
+using the catalog entry file whose system identifier is <VAR>sysid</VAR>.
+This has the same effect as in <A HREF="nsgmls.htm#optc">onsgmls</A>.
 <DT>
-<SAMP>-C</SAMP>
+<CODE>-C</CODE>,
+<CODE>--catalogs</CODE>
 <DD>
-This has the same effect as in <A HREF="nsgmls#optC">onsgmls</A>.
+This has the same effect as in <A HREF="nsgmls.htm#optC">onsgmls</A>.
 <DT>
-<SAMP>-d</SAMP>
+<CODE>-d</CODE>,
+<CODE>--dtd</CODE>
 <DD>
 Output a document type declaration with the same external
 identifier as the input document, and with no
@@ -105,50 +90,53 @@ internal declaration subset.
 No check is performed that the document instance is valid
 with respect to this DTD.
 <DT>
-<SAMP>-D<VAR>directory</VAR></SAMP>
+<CODE>-D<VAR>directory</VAR></CODE>,
+<CODE>--directory=<VAR>directory</VAR></CODE>
 <DD>
 Search
-<SAMP><VAR>directory</VAR></SAMP>
+<CODE><VAR>directory</VAR></CODE>
 for files specified in system identifiers.
 This has the same effect as in <A HREF="nsgmls.htm#optD">onsgmls</A>.
 <DT>
-<SAMP>-e</SAMP>
+<CODE>-e</CODE>,
+<CODE>--open-entities</CODE>
 <DD>
 Describe open entities in error messages.
 <DT>
-<SAMP>-i<VAR>name</VAR></SAMP>
+<CODE>-i<VAR>name</VAR></CODE>,
+<CODE>--include=<VAR>name</VAR></CODE>
 <DD>
 This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 <DT>
-<SAMP>-m</SAMP>
+<CODE>-m</CODE>,
+<CODE>--marked-sections</CODE>
 <DD>
 Output any marked sections that were in the input document instance.
 <DT>
-<SAMP>-n</SAMP>
+<CODE>-n</CODE>,
+<CODE>--comments</CODE>
 <DD>
 Output any comments that were in the input document instance.
 <DT>
-<SAMP>-r</SAMP>
+<CODE>-r</CODE>,
+<CODE>--raw</CODE>
 <DD>
 Raw output.
 Don't perform any conversion on RSs and REs when printing the entity.
 The entity would typically have the storage manager attribute
 <SAMP>records=asis</SAMP>.
 <DT>
-<SAMP>-v</SAMP>
+<CODE>-v</CODE>,
+<CODE>--version</CODE>
 <DD>
 Print the version number.
 <DT>
-<SAMP>-w<VAR>type</VAR></SAMP>
+<CODE>-w<VAR>type</VAR></CODE>,
+<CODE>--warning=<VAR>type</VAR></CODE>
 <DD>
 Control warnings and errors according to
-<SAMP><VAR>type</VAR></SAMP>.
+<CODE><VAR>type</VAR></CODE>.
 This has the same effect as in <A HREF="nsgmls.htm#optw">onsgmls</A>.
 </DL>
-<P>
-<ADDRESS>
-James Clark<BR>
-jjc@jclark.com
-</ADDRESS>
 </BODY>
 </HTML>

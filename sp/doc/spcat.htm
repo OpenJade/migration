@@ -7,116 +7,95 @@
 <H1>OSPCAT</H1>
 <H2>SYNOPSIS</H2>
 <P>
-<CODE>ospcat</CODE>
-[
-<CODE>-vC</CODE>
-]
-[
-<CODE>-b<VAR>bctf</VAR></CODE>
-]
-[
-<CODE>-f<VAR>error_file</VAR></CODE>
-]
-[
-<CODE>-c<VAR>catalog_sysid</VAR></CODE>
-]
-[
-<CODE>-D<VAR>directory</VAR></CODE>
-]
-[
-<CODE>-P<VAR>public_id</VAR></CODE>
-]
-[
-<CODE>-S<VAR>system_id</VAR></CODE>
-]
-[
-<CODE>-p<VAR>parameter_entity</VAR></CODE>
-]
-[
-<CODE>-d<VAR>doctype</VAR></CODE>
-]
-[
-<CODE>-l<VAR>linktype</VAR></CODE>
-]
-[
-<CODE>-e<VAR>entity</VAR></CODE>
-]
-[
-<CODE>-n<VAR>notation</VAR></CODE>
-]
-[
-<CODE>-s<VAR>doctype</VAR></CODE>
-]
-
+<CODE>ospcat</CODE> [ <CODE>option...</CODE> ] 
 <H2>DESCRIPTION</H2>
 <P>
 Ospcat (SGML print catalog)
-prints effective system identifiers found by sp in the catalogs 
+prints effective system identifiers found in the catalogs 
 on the standard output. It doesn't check that the system identifiers 
 correspond to actual files. The return value is 0 if the last system 
 identifier was successfully created and 1 otherwise. 
+<H2>OPTIONS</H2>
 <P>
 The following options are available:
 <DL>
 <DT>
-<CODE>-C</CODE>
+<CODE>-C</CODE>,
+<CODE>--catalogs</CODE>
 <DT>
-<CODE>-b<VAR>bctf</VAR></CODE>
+<CODE>-b<VAR>name</VAR></CODE>,
+<CODE>--bctf=<VAR>name</VAR></CODE>
 <DT>
-<CODE>-f<VAR>error_file</VAR></CODE>
+<CODE>-f<VAR>file</VAR></CODE>,
+<CODE>--error-file=<VAR>file</VAR></CODE><BR>
 <DT>
-<CODE>-c<VAR>catalog_sysid</VAR></CODE>
+<CODE>-c<VAR>sysid</VAR></CODE>,
+<CODE>--catalog=<VAR>sysid</VAR></CODE>,
 <DT>
-<CODE>-D<VAR>directory</VAR></CODE>
+<CODE>-D<VAR>directory</VAR></CODE>,
+<CODE>--directory=<VAR>directory</VAR></CODE>
 <DD>
 These options have the same effect as in <A HREF="nsgmls.htm">onsgmls</A>.
 <DT>
-<CODE>-v</CODE>
+<CODE>-v</CODE>,
+<CODE>--version</CODE>
 <DD>
 Print the version number.
 <DT>
-<CODE>-P<VAR>public_id</VAR></CODE>
+<CODE>-h</CODE>,
+<CODE>--help</CODE>
 <DD>
-Print the effective system identifier for the public identifier
-<VAR>public_id</VAR>.
+Print a help message and exit.
 <DT>
-<CODE>-S<VAR>system_id</VAR></CODE>
+<CODE>-P<VAR>literal</VAR></CODE>,
+<CODE>--public-id=<VAR>literal</VAR></CODE>
+<DD>
+Print the effective system identifier for the public identifier 
+<CODE><VAR>literal</VAR></CODE>.
+<DT>
+<CODE>-S<VAR>literal</VAR></CODE>,
+<CODE>-system_id=<VAR>literal</VAR></CODE>
 <DD>
 Print the effective system identifier for the system identifier
-<VAR>system_id</VAR>.
+<CODE><VAR>literal</VAR></CODE>.
 <DT>
-<CODE>-p<VAR>parameter_entity</VAR></CODE>
+<CODE>-p<VAR>name</VAR></CODE>,
+<CODE>--parameter-entity=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the parameter entity
-with the name <VAR>parameter_entity</VAR>.
+<CODE><VAR>name</VAR></CODE>.
 <DT>
-<CODE>-d<VAR>doctype</VAR></CODE>
+<CODE>-d<VAR>name</VAR></CODE>,
+<CODE>--doctype=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the declaration of the 
-document type with the name <VAR>doctype</VAR>.
+document type <CODE><VAR>name</VAR></CODE>.
 <DT>
-<CODE>-l<VAR>linktype</VAR></CODE>
+<CODE>-l<VAR>name</VAR></CODE>,
+<CODE>--linktype=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the declaration of the 
-link type with the name <VAR>linktype</VAR>.
+link type <CODE><VAR>name</VAR></CODE>.
 <DT>
-<CODE>-e<VAR>entity</VAR></CODE>
+<CODE>-e<VAR>name</VAR></CODE>,
+<CODE>--entity=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the general entity 
-with the name <VAR>entity</VAR>.
+<CODE><VAR>name</VAR></CODE>.
 <DT>
-<CODE>-n<VAR>notation</VAR></CODE>
+<CODE>-n<VAR>name</VAR></CODE>,
+<CODE>--notation=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the notation
-with the name <VAR>notation</VAR>.
+<CODE><VAR>name</VAR></CODE>.
 <DT>
-<CODE>-s<VAR>doctype</VAR></CODE>
+<CODE>-s<VAR>name</VAR></CODE>,
+<CODE>--declaration=<VAR>name</VAR></CODE>
 <DD>
 Print the effective system identifier for the SGML declaration
-associated with the document type <VAR>doctype</VAR>. Until sp
-implements the <CODE>DTDDECL</CODE> catalog entry, this will
-just return the value of the <CODE>SGMLDECL</CODE> entry.
+associated with the document type <CODE><VAR>name</VAR></CODE>. 
+This currently ignores <CODE>DTDDECL</CODE> catalog entries and
+just returns the value of the <CODE>SGMLDECL</CODE> entry.
 </DL>
-<P>
 </BODY>
 </HTML>

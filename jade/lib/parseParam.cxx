@@ -258,10 +258,11 @@ Boolean Parser::parseParam(const AllowedParams &allow,
 
 void Parser::paramInvalidToken(Token token, const AllowedParams &allow)
 {
-  message(ParserMessages::paramInvalidToken,
-	  TokenMessageArg(token, allow.mainMode(),
-			  syntaxPointer(), sdPointer()),
-	  AllowedParamsMessageArg(allow, syntaxPointer()));
+  if (!allow.silent())
+    message(ParserMessages::paramInvalidToken,
+	    TokenMessageArg(token, allow.mainMode(),
+			    syntaxPointer(), sdPointer()),
+	    AllowedParamsMessageArg(allow, syntaxPointer()));
 }
 
 Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,

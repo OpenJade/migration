@@ -113,6 +113,7 @@ public:
   DeclaredValue *copy() const;
 };
 
+
 class TokenizedDeclaredValue : public DeclaredValue {
 public:
   // must be in same order as AttributeDefinitionDesc
@@ -407,9 +408,11 @@ public:
   const Text *text() const;
   Boolean recoverUnquoted(const StringC &, const Location &,
 			  AttributeContext &, const StringC &);
+  virtual const Notation *notation() const;
 private:
   Text text_;
 };
+
 
 class TokenizedAttributeValue : public AttributeValue {
 public:
@@ -505,6 +508,27 @@ private:
   size_t nSpec_;
   Vector<Attribute> vec_;
   ConstPtr<AttributeDefinitionList> def_;
+};
+
+class DataDeclaredValue : public CdataDeclaredValue {
+public:
+  DataDeclaredValue(const ConstPtr<Notation> &, AttributeList &);
+  AttributeValue *makeValue(Text &, AttributeContext &, const StringC &,
+                            unsigned &) const;
+  DeclaredValue *copy() const;
+private:
+  ConstPtr<Notation> notation_;
+  AttributeList attributes_;
+};
+
+class DataAttributeValue : public CdataAttributeValue {
+public:
+  DataAttributeValue(Text &, const ConstPtr<Notation> &, const AttributeList &);
+  const AttributeList &attributes() const;
+  const Notation *notation() const;
+private:
+  const ConstPtr<Notation> notation_;
+  const AttributeList *attributes_;
 };
 
 class SP_API AttributeContext : public Messenger {

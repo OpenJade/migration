@@ -1218,11 +1218,15 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
     Param::reservedName + Syntax::rNUTOKEN,
     Param::reservedName + Syntax::rNUTOKENS,
     Param::reservedName + Syntax::rNOTATION,
-    Param::nameTokenGroup
+    Param::nameTokenGroup,
+    Param::reservedName + Syntax::rDATA
     };
   static AllowedParams allowDeclaredValue(declaredValues,
-					  SIZEOF(declaredValues));
-  if (!parseParam(allowDeclaredValue, declInputLevel, parm))
+					  SIZEOF(declaredValues) - 1);
+  static AllowedParams allowDeclaredValueData(declaredValues,
+					      SIZEOF(declaredValues));
+  if (!parseParam(sd().www() ? allowDeclaredValueData : allowDeclaredValue, 
+                  declInputLevel, parm))
     return 0;
   enum { asDataAttribute = 01, asLinkAttribute = 02 };
   unsigned allowedFlags = asDataAttribute|asLinkAttribute;
@@ -1312,6 +1316,38 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
       for (size_t i = 0; i < group.size(); i++)
 	parm.nameTokenVector[i].name.swap(group[i]);
       declaredValue = new NameTokenGroupDeclaredValue(group);
+    }
+    break;
+  case Param::reservedName + Syntax::rDATA:
+    {
+      if (!parseParam(allowName, declInputLevel, parm))
+        return 0;
+      Ptr<Notation> notation(lookupCreateNotation(parm.token));
+      static AllowedParams allowDsoSilentValue(Param::dso, Param::silent);
+      AttributeList attributes(notation->attributeDef());
+      if (parseParam(allowDsoSilentValue, declInputLevel, parm)
+          && parm.type == Param::dso) {
+        if (attributes.size() == 0)
+          message(ParserMessages::notationNoAttributes,
+                  StringMessageArg(notation->name()));
+        Boolean netEnabling;
+        Ptr<AttributeDefinitionList> newAttDef;
+        if (!parseAttributeSpec(1, attributes, netEnabling, newAttDef))
+          return 0;
+        if (!newAttDef.isNull()) {
+          newAttDef->setIndex(defDtd().allocAttributeDefinitionListIndex());
+          notation->setAttributeDef(newAttDef);
+        }
+        if (attributes.nSpec() == 0)
+          message(ParserMessages::emptyDataAttributeSpec);
+      }
+      else {
+        attributes.finish(*this);
+        // unget the first token of the default value
+        currentInput()->ungetToken();
+      }
+      ConstPtr<Notation> nt(notation.pointer());
+      declaredValue = new DataDeclaredValue(nt, attributes);
     }
     break;
   default:

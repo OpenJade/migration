@@ -4,6 +4,7 @@
 #ifndef OutputByteStream_INCLUDED
 #define OutputByteStream_INCLUDED 1
 
+#include "Link.h"
 #include "StringOf.h"
 #include "Boolean.h"
 
@@ -11,7 +12,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API OutputByteStream {
+class SP_API OutputByteStream : public Link {
 public:
   OutputByteStream();
   virtual ~OutputByteStream();
@@ -98,6 +99,7 @@ OutputByteStream &OutputByteStream::operator<<(const String<char> &s)
 class SP_API StrOutputByteStream : public OutputByteStream {
 public:
   StrOutputByteStream();
+  virtual ~StrOutputByteStream() { /* no-op */ };
   void extractString(String<char> &);
 protected:
   StrOutputByteStream(const StrOutputByteStream &); // undefined
@@ -111,7 +113,7 @@ class SP_API FileOutputByteStream : public OutputByteStream {
 public:
   FileOutputByteStream();
   FileOutputByteStream(int fd, Boolean closeFd = 1);
-  ~FileOutputByteStream();
+  virtual ~FileOutputByteStream();
 #ifdef SP_WIDE_SYSTEM
   Boolean open(const wchar_t *);
 #else

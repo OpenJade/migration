@@ -11,6 +11,8 @@
 #include "ExtendEntityManager.h"
 #include "StorageManager.h"
 #include "macros.h"
+#include "sptchar.h"
+#include "nsgmls.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -39,11 +41,26 @@ const char fileCode = 'f';
 const char locationCode = 'L';
 const char includedElementCode = 'i';
 const char emptyElementCode = 'e';
+const char commentCode = '_';
+const char omissionCode = 'o';
+const char featuresCode = 'V';
+const char featuresSubCodeOptions = 'o';
+const char featuresSubCodeVersion = 'v';
+const char featuresSubCodePackage = 'p';
+const char featuresSubCodePossibleCodes = 'c';
 
 const OutputCharStream::Newline nl = OutputCharStream::newline;
 
 const char space = ' ';
-const Char re = '\r';
+const char re = '\r';
+const Char reChar = re;
+const char escapePrefix = '\\';
+const Char escapePrefixChar = escapePrefix;
+const char sdataDelim = '|';
+const char nonSgmlEscape = '%';
+const char newlineEscape = 'n';
+const char numEscape = '#';
+const char escapeEnd = ';';
 
 inline
 void SgmlsEventHandler::startData()
@@ -83,9 +100,16 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
   outputNonSgml_((outputFlags & outputNonSgml) != 0),
   outputEmpty_((outputFlags & outputEmpty) != 0),
   outputDataAtt_((outputFlags & outputDataAtt) != 0),
-  haveData_(0), lastSos_(0)
+  outputComment_((outputFlags & outputComment) != 0),
+  outputTagOmission_((outputFlags & outputTagOmission) != 0),
+  outputAttributeOmission_((outputFlags & outputAttributeOmission) != 0),
+  outputParserInformation_((outputFlags & outputParserInformation) != 0),
+
+  haveData_(0), lastSos_(0), inDocument_(0)
 {
-  os_->setEscaper(escape);
+  os_->setEscaper(escaper);
+  if (outputParserInformation_)
+    features(outputFlags);
 }
 
 SgmlsEventHandler::~SgmlsEventHandler()
@@ -100,6 +124,58 @@ void SgmlsEventHandler::message(MessageEvent *event)
 {
   messenger_->dispatchMessage(event->message());
   ErrorCountEventHandler::message(event);
+}
+
+void SgmlsEventHandler::features(unsigned outputFlags)
+{
+    os() << featuresCode << featuresSubCodePackage << space
+         << SP_PACKAGE
+         << nl;
+    
+    os() << featuresCode << featuresSubCodeVersion << space
+         << SP_VERSION
+         << nl;
+    
+    os() << featuresCode << featuresSubCodePossibleCodes << space;
+    os() << dataCode;
+    os() << piCode;
+    os() << conformingCode;
+    os() << appinfoCode;
+    os() << startElementCode;
+    os() << endElementCode;
+    os() << referenceEntityCode;
+    os() << attributeCode;
+    os() << dataAttributeCode;
+    os() << linkAttributeCode;
+    os() << defineNotationCode;
+    os() << defineExternalEntityCode;
+    os() << defineInternalEntityCode;
+    os() << defineSubdocEntityCode;
+    os() << defineExternalTextEntityCode;
+    os() << pubidCode;
+    os() << sysidCode;
+    os() << startSubdocCode;
+    os() << endSubdocCode;
+    os() << fileCode;
+    os() << locationCode;
+    os() << includedElementCode;
+    os() << emptyElementCode;
+    os() << commentCode;
+    os() << omissionCode;
+    os() << featuresCode;
+    
+    os() << nl;
+
+    os() << featuresCode << featuresSubCodeOptions
+         << space << SP_T("esis");
+    for (size_t i = 1; NsgmlsApp::outputOptions[i].flag != 0; i++) {
+      if (NsgmlsApp::outputOptions[i].flag == 0)
+        break;
+      if (0 != (outputFlags & NsgmlsApp::outputOptions[i].flag)) {
+        os() << space << NsgmlsApp::outputOptions[i].name;
+      }
+    }
+    os() << nl;
 }
 
 void SgmlsEventHandler::appinfo(AppinfoEvent *event)
@@ -128,6 +204,8 @@ void SgmlsEventHandler::endProlog(EndPrologEvent *event)
       defineEntity(entity);
     }
   }
+  if (outputComment_)
+    inDocument_ = true;
   if (!event->lpdPointer().isNull()) {
     linkProcess_.init(event->lpdPointer());
     haveLinkProcess_ = 1;
@@ -178,9 +256,9 @@ void SgmlsEventHandler::sdataEntity(SdataEntityEvent *event)
 {
   outputLocation(event->location());
   startData();
-  os() << "\\|";
+  os() << escapePrefix << sdataDelim;
   outputString(event->data(), event->dataLength());
-  os() << "\\|";
+  os() << escapePrefix << sdataDelim;
   delete event;
 }
 
@@ -194,12 +272,29 @@ void SgmlsEventHandler::pi(PiEvent *event)
   delete event;
 }
 
+void SgmlsEventHandler::commentDecl(CommentDeclEvent *event)
+{
+  if (inDocument_) {  //only receive this event if outputComment_ true
+    outputLocation(event->location());
+    flushData();
+    MarkupIter iter(event->markup());
+    for (; iter.valid(); iter.advance()) {
+      if (iter.type() == Markup::comment) {
+        os() << commentCode;
+        outputString(iter.charsPointer(), iter.charsLength());
+        os() << nl;
+      }
+    }
+  }
+  delete event;
+}
+
 void SgmlsEventHandler::nonSgmlChar(NonSgmlCharEvent *event)
 {
   if (outputNonSgml_) {
     outputLocation(event->location());
     startData();
-    os() << "\\%" << (unsigned long)event->character() << ';';
+    os() << escapePrefix << nonSgmlEscape << (unsigned long)event->character() << escapeEnd;
   }
   delete event;
 }
@@ -222,6 +317,8 @@ void SgmlsEventHandler::startElement(StartElementEvent *event)
   }
   attributes(event->attributes(), attributeCode, 0);
   currentLocation_.clear();
+  if (outputTagOmission_ && !event->markupPtr())
+    os() << omissionCode << nl;
   if (outputIncluded_ && event->included())
     os() << includedElementCode << nl;
   if (outputEmpty_ && event->mustOmitEnd())
@@ -241,6 +338,11 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
     const StringC *string;
     const AttributeValue *value = attributes.value(i);
     if (value) {
+      if (outputAttributeOmission_) {
+        if (! attributes.specified(i)) {
+          os() << omissionCode << nl;
+        }
+      }
       switch (value->info(text, string)) {
       case AttributeValue::implied:
 	startAttribute(attributes.name(i), code, ownerName);
@@ -296,13 +398,13 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
 	      outputString(p, length);
 	      break;
 	    case TextItem::sdata:
-	      os() << "\\|";
+	      os() << escapePrefix << sdataDelim;
 	      outputString(p, length);
-	      os() << "\\|";
+	      os() << escapePrefix << sdataDelim;
 	      break;
 	    case TextItem::nonSgml:
 	      if (outputNonSgml_)
-		os() << "\\%" << (unsigned long)*p << ';';
+		os() << escapePrefix << nonSgmlEscape << (unsigned long)*p << escapeEnd;
 	      break;
 	    default:
 	      break;
@@ -338,6 +440,8 @@ void SgmlsEventHandler::endElement(EndElementEvent *event)
   if (haveLinkProcess_)
     linkProcess_.endElement();
   outputLocation(event->location());
+  if (outputTagOmission_ && !event->markupPtr())
+    os() << omissionCode << nl;
   os() << endElementCode << event->name() << nl;
   delete event;
 }
@@ -511,19 +615,20 @@ void SgmlsEventHandler::outputString(const Char *p, size_t n)
 {
   for (; n > 0; p++, n--) {
     switch (*p) {
-    case '\\':			// FIXME we're punning Chars and chars
-      os() << "\\\\";
+    case escapePrefixChar:
+      os() << escapePrefix << escapePrefix;
       break;
-    case re:
-      os() << "\\n";
+    case reChar:
+      os() << escapePrefix << newlineEscape;
       if (outputLine_ && haveData_)
 	lastLineno_++;
       break;
     default:
       // FIXME not clear what to do here given possibility of wide characters
-      if (*p < 040) {
+      unsigned long c = *p;
+      if (c < 040) {
 	static const char digits[] = "0123456789";
-	os() << "\\0" << digits[*p / 8] << digits[*p % 8];
+	os() << escapePrefix << '0' << digits[(c / 8) % 8] << digits[c % 8];
       }
       else
 	os().put(*p);
@@ -532,9 +637,9 @@ void SgmlsEventHandler::outputString(const Char *p, size_t n)
   }
 }
 
-void SgmlsEventHandler::escape(OutputCharStream &s, Char c)
+void SgmlsEventHandler::escaper(OutputCharStream &s, Char c)
 {
-  s << "\\#" << (unsigned long)c << ";";
+  s << escapePrefix << numEscape << (unsigned long)c << escapeEnd;
 }
 
 void SgmlsEventHandler::outputLocation1(const Location &loc)

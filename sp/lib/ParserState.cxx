@@ -1,4 +1,4 @@
-// Copyright (c) 1994 James Clark
+// Copyright (c) 1994 James Clark, 2000 Matthias Clasen
 // See the file COPYING for copying permission.
 
 #ifdef __GNUG__
@@ -53,6 +53,8 @@ ParserState::ParserState(const Ptr<EntityManager> &em,
 : entityManager_(em),
   options_(opt),
   inInstance_(0),
+  inStartTag_(0),
+  inEndTag_(0),
   keepingMessages_(0),
   eventAllocator_(maxSize(eventSizes, SIZEOF(eventSizes)), 50),
   internalAllocator_(maxSize(internalSizes, SIZEOF(internalSizes), EntityOrigin::allocSize), 50),
@@ -167,6 +169,8 @@ Boolean ParserState::maybeStartPass2()
   currentMarkup_ = 0;
   inputLevel_ = 1;
   inInstance_ = 0;
+  inStartTag_ = 0;
+  inEndTag_ = 0;
   defDtd_.clear();
   defLpd_.clear();
   dtd_[0].swap(pass1Dtd_);
@@ -225,6 +229,23 @@ void ParserState::startDtd(const StringC &name)
   currentMode_ = dsMode;
 }
 
+void ParserState::enterTag(Boolean start)
+{
+  (start ? inStartTag_ : inEndTag_) = 1;
+}
+
+void ParserState::leaveTag()
+{
+  inStartTag_ = 0;
+  inEndTag_ = 0;
+}
+
+Boolean ParserState::inTag(Boolean &start) const
+{
+  start = inStartTag_;
+  return inStartTag_ || inEndTag_;
+}
+
 void ParserState::endDtd()
 {
   dtd_.push_back(defDtd_);
@@ -259,6 +280,11 @@ void ParserState::popInputStack()
 {
   ASSERT(inputLevel_ > 0);
   InputSource *p = inputStack_.get();
+
+  if (handler_ != 0 && inputLevel_ > 1) {
+    handler_->inputClosed(p);
+  }
+
   inputLevel_--;
   delete p;
   if (specialParseInputLevel_ > 0 && inputLevel_ == specialParseInputLevel_)
@@ -299,6 +325,11 @@ void ParserState::pushInput(InputSource *in)
 {
   if (!in)
     return;
+
+  if (handler_ != 0 && inputLevel_ > 0) {
+    handler_->inputOpened(in);
+  }
+
   if (!syntax_.isNull() && syntax_->multicode())
     in->setMarkupScanTable(syntax_->markupScanTable());
   inputStack_.insert(in);
@@ -490,6 +521,9 @@ ParserState::lookupEntity(Boolean isParameter,
     }
     else if (!entity.isNull()) {
       entity->setUsed();
+      eventHandler().entityDefaulted
+	(new (eventAllocator())EntityDefaultedEvent
+	 (entity, useLocation));
       return entity;
     }
     if (!isParameter) {
@@ -786,6 +820,7 @@ ConstPtr<Notation> ParserState::getAttributeNotation(const StringC &name,
       ExternalId id;
       nt->setExternalId(id, Location());
       nt->generateSystemId(*this);				       
+      nt->setAttributeDef(currentDtdNonConst().implicitNotationAttributeDef());
       currentDtdNonConst().insertNotation(nt);
       notation = currentDtd().lookupNotation(name);      
     }

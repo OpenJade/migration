@@ -31,6 +31,7 @@ private:
   Vector<const AppChar *> searchDirs_;
   Vector<const AppChar *> catalogSysids_;
   Boolean mapCatalogDocument_;
+  Boolean restrictFileReading_;
   Ptr<ExtendEntityManager> entityManager_;
 };
 

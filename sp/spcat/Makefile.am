@@ -4,13 +4,16 @@ bin_PROGRAMS = ospcat
 
 ospcat_SOURCES = spcat.cxx spcat_inst.cxx SpcatMessages.h
 
-EXTRA_DIST = spcat_inst.m4 spcat.dsp SpcatMessages.msg SpcatMessages.rc
+EXTRA_DIST = spcat_inst.m4 spcat.dsp SpcatMessages.msg SpcatMessages.rc \
+	.cvsignore
 
 ospcat_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = spcat_inst.cxx SpcatMessages.h SpcatMessages.rc
+
+MAINTAINERCLEANFILES = Makefile.in
 
 MSGGENFLAGS = -l appModule
 

@@ -78,7 +78,7 @@ NULL=nul
 !ENDIF 
 ################################################################################
 # Begin Project
-# PROP Target_Last_Scanned "all - Win32 UnicodeRelease"
+# PROP Target_Last_Scanned "lib - Win32 UnicodeDebug"
 
 !IF  "$(CFG)" == "lib - Win32 Release"
 
@@ -95,7 +95,7 @@ NULL=nul
 OUTDIR=.\lib\Release
 INTDIR=.\lib\Release
 
-ALL : ".\bin\sp114.dll"
+ALL : ".\bin\sp115.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -206,9 +206,9 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp114.exp"
-	-@erase "$(OUTDIR)\sp114.lib"
-	-@erase ".\bin\sp114.dll"
+	-@erase "$(OUTDIR)\sp115.exp"
+	-@erase "$(OUTDIR)\sp115.lib"
+	-@erase ".\bin\sp115.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -256,13 +256,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp114.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp115.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp114.pdb" /machine:I386 /out:"bin/sp114.dll"\
- /implib:"$(OUTDIR)/sp114.lib" 
+ /pdb:"$(OUTDIR)/sp115.pdb" /machine:I386 /out:"bin/sp115.dll"\
+ /implib:"$(OUTDIR)/sp115.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -372,7 +372,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-".\bin\sp114.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp115.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -392,7 +392,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\Debug
 INTDIR=.\lib\Debug
 
-ALL : "$(OUTDIR)\sp114d.dll"
+ALL : "$(OUTDIR)\sp115d.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -504,11 +504,11 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp114d.dll"
-	-@erase "$(OUTDIR)\sp114d.exp"
-	-@erase "$(OUTDIR)\sp114d.ilk"
-	-@erase "$(OUTDIR)\sp114d.lib"
-	-@erase "$(OUTDIR)\sp114d.pdb"
+	-@erase "$(OUTDIR)\sp115d.dll"
+	-@erase "$(OUTDIR)\sp115d.exp"
+	-@erase "$(OUTDIR)\sp115d.ilk"
+	-@erase "$(OUTDIR)\sp115d.lib"
+	-@erase "$(OUTDIR)\sp115d.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -556,12 +556,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp114d.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp115d.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/sp114d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp114d.dll"\
- /implib:"$(OUTDIR)/sp114d.lib" 
+ /pdb:"$(OUTDIR)/sp115d.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp115d.dll"\
+ /implib:"$(OUTDIR)/sp115d.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -671,7 +671,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-"$(OUTDIR)\sp114d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\sp115d.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -757,7 +757,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Release\sp114.lib"
+	".\lib\Release\sp115.lib"
 
 ".\bin\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -848,7 +848,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\Debug\sp114d.lib"
+	".\lib\Debug\sp115d.lib"
 
 ".\lib\Debug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -934,7 +934,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Release\sp114.lib"
+	".\lib\Release\sp115.lib"
 
 ".\bin\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1023,7 +1023,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\Debug\sp114d.lib"
+	".\lib\Debug\sp115d.lib"
 
 ".\lib\Debug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1100,7 +1100,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Release\sp114.lib"
+	".\lib\Release\sp115.lib"
 
 ".\bin\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1180,7 +1180,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /machine:I386 /out:"lib\Debug/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\Debug\sp114d.lib"
+	".\lib\Debug\sp115d.lib"
 
 ".\lib\Debug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1259,7 +1259,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Release\sp114.lib"
+	".\lib\Release\sp115.lib"
 
 ".\bin\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1341,7 +1341,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\Debug\sp114d.lib"
+	".\lib\Debug\sp115d.lib"
 
 ".\lib\Debug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1427,7 +1427,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeRelease\sp114u.lib"
+	".\lib\UnicodeRelease\sp115u.lib"
 
 ".\bin\spamu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1506,7 +1506,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeRelease\sp114u.lib"
+	".\lib\UnicodeRelease\sp115u.lib"
 
 ".\bin\sgmlnrmu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1583,7 +1583,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /out:"bin/spentu.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeRelease\sp114u.lib"
+	".\lib\UnicodeRelease\sp115u.lib"
 
 ".\bin\spentu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1671,7 +1671,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeRelease\sp114u.lib"
+	".\lib\UnicodeRelease\sp115u.lib"
 
 ".\bin\nsgmlsu.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -1693,7 +1693,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\UnicodeRelease
 INTDIR=.\lib\UnicodeRelease
 
-ALL : ".\bin\sp114u.dll"
+ALL : ".\bin\sp115u.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -1804,9 +1804,9 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp114u.exp"
-	-@erase "$(OUTDIR)\sp114u.lib"
-	-@erase ".\bin\sp114u.dll"
+	-@erase "$(OUTDIR)\sp115u.exp"
+	-@erase "$(OUTDIR)\sp115u.lib"
+	-@erase ".\bin\sp115u.dll"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -1855,13 +1855,13 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"lib\Release/sp108.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp114u.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"bin/sp115u.dll"
 # SUBTRACT LINK32 /profile
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
  uuid.lib /nologo /subsystem:windows /dll /incremental:no\
- /pdb:"$(OUTDIR)/sp114u.pdb" /machine:I386 /out:"bin/sp114u.dll"\
- /implib:"$(OUTDIR)/sp114u.lib" 
+ /pdb:"$(OUTDIR)/sp115u.pdb" /machine:I386 /out:"bin/sp115u.dll"\
+ /implib:"$(OUTDIR)/sp115u.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -1971,7 +1971,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-".\bin\sp114u.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+".\bin\sp115u.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -2058,7 +2058,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\spam.obj" \
 	"$(INTDIR)\spam.res" \
 	"$(INTDIR)\spam_inst.obj" \
-	".\lib\UnicodeDebug\sp114ud.lib"
+	".\lib\UnicodeDebug\sp115ud.lib"
 
 ".\lib\UnicodeDebug\spam.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2140,7 +2140,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
 LINK32_OBJS= \
 	"$(INTDIR)\SGMLGenerator.obj" \
 	"$(INTDIR)\sgmlnorm.obj" \
-	".\lib\UnicodeDebug\sp114ud.lib"
+	".\lib\UnicodeDebug\sp115ud.lib"
 
 ".\lib\UnicodeDebug\sgmlnorm.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2220,7 +2220,7 @@ LINK32_FLAGS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib\
  /machine:I386 /out:"lib\UnicodeDebug/spent.exe" 
 LINK32_OBJS= \
 	"$(INTDIR)\spent.obj" \
-	".\lib\UnicodeDebug\sp114ud.lib"
+	".\lib\UnicodeDebug\sp115ud.lib"
 
 ".\lib\UnicodeDebug\spent.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2311,7 +2311,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\RastEventHandler.obj" \
 	"$(INTDIR)\SgmlsEventHandler.obj" \
 	"$(INTDIR)\StringSet.obj" \
-	".\lib\UnicodeDebug\sp114ud.lib"
+	".\lib\UnicodeDebug\sp115ud.lib"
 
 ".\lib\UnicodeDebug\nsgmls.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -2333,7 +2333,7 @@ LINK32_OBJS= \
 OUTDIR=.\lib\UnicodeDebug
 INTDIR=.\lib\UnicodeDebug
 
-ALL : "$(OUTDIR)\sp114ud.dll"
+ALL : "$(OUTDIR)\sp115ud.dll"
 
 CLEAN : 
 	-@erase "$(INTDIR)\Allocator.obj"
@@ -2445,11 +2445,10 @@ CLEAN :
 	-@erase "$(INTDIR)\Win32CodingSystem.obj"
 	-@erase "$(INTDIR)\WinInetStorage.obj"
 	-@erase "$(INTDIR)\xentmgr_inst.obj"
-	-@erase "$(OUTDIR)\sp114ud.dll"
-	-@erase "$(OUTDIR)\sp114ud.exp"
-	-@erase "$(OUTDIR)\sp114ud.ilk"
-	-@erase "$(OUTDIR)\sp114ud.lib"
-	-@erase "$(OUTDIR)\sp114ud.pdb"
+	-@erase "$(OUTDIR)\sp115ud.dll"
+	-@erase "$(OUTDIR)\sp115ud.exp"
+	-@erase "$(OUTDIR)\sp115ud.lib"
+	-@erase "$(OUTDIR)\sp115ud.pdb"
 
 "$(OUTDIR)" :
     if not exist "$(OUTDIR)/$(NULL)" mkdir "$(OUTDIR)"
@@ -2498,12 +2497,12 @@ BSC32_SBRS= \
 	
 LINK32=link.exe
 # ADD BASE LINK32 wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\Debug/sp108d.dll"
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"lib\UnicodeDebug/sp114ud.dll"
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /incremental:no /debug /machine:I386 /out:"lib\UnicodeDebug/sp115ud.dll"
 LINK32_FLAGS=wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib\
  winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib\
- uuid.lib /nologo /subsystem:windows /dll /incremental:yes\
- /pdb:"$(OUTDIR)/sp114ud.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp114ud.dll"\
- /implib:"$(OUTDIR)/sp114ud.lib" 
+ uuid.lib /nologo /subsystem:windows /dll /incremental:no\
+ /pdb:"$(OUTDIR)/sp115ud.pdb" /debug /machine:I386 /out:"$(OUTDIR)/sp115ud.dll"\
+ /implib:"$(OUTDIR)/sp115ud.lib" 
 LINK32_OBJS= \
 	"$(INTDIR)\Allocator.obj" \
 	"$(INTDIR)\app_inst.obj" \
@@ -2613,7 +2612,7 @@ LINK32_OBJS= \
 	"$(INTDIR)\WinInetStorage.obj" \
 	"$(INTDIR)\xentmgr_inst.obj"
 
-"$(OUTDIR)\sp114ud.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
+"$(OUTDIR)\sp115ud.dll" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
   $(LINK32_FLAGS) $(LINK32_OBJS)
 <<
@@ -3147,7 +3146,7 @@ DEP_CPP_URLST=\
 	".\lib\TrieBuilder.h"\
 	".\lib\Undo.h"\
 	".\lib\URLStorageMessages.h"\
-	{$(INCLUDE)}"\sys\Types.h"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -7239,8 +7238,8 @@ DEP_CPP_POSIX=\
 	".\lib\Trie.h"\
 	".\lib\TrieBuilder.h"\
 	".\lib\Undo.h"\
-	{$(INCLUDE)}"\sys\Stat.h"\
-	{$(INCLUDE)}"\sys\Types.h"\
+	{$(INCLUDE)}"\sys\STAT.H"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -20926,7 +20925,7 @@ DEP_CPP_CMDLI=\
 	".\lib\TrieBuilder.h"\
 	".\lib\Undo.h"\
 	".\lib\version.h"\
-	{$(INCLUDE)}"\sys\Types.h"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -24426,8 +24425,8 @@ DEP_CPP_OUTPUTB=\
 	".\lib\Trie.h"\
 	".\lib\TrieBuilder.h"\
 	".\lib\Undo.h"\
-	{$(INCLUDE)}"\sys\Stat.h"\
-	{$(INCLUDE)}"\sys\Types.h"\
+	{$(INCLUDE)}"\sys\STAT.H"\
+	{$(INCLUDE)}"\sys\TYPES.H"\
 	
 
 !IF  "$(CFG)" == "lib - Win32 Release"
@@ -25938,6 +25937,9 @@ DEP_RSC_SPAM_R=\
 # Begin Source File
 
 SOURCE=.\spent\spent.cxx
+
+!IF  "$(CFG)" == "spent - Win32 Release"
+
 DEP_CPP_SPENT=\
 	".\include\Boolean.h"\
 	".\include\CharMap.cxx"\
@@ -25988,15 +25990,61 @@ DEP_CPP_SPENT=\
 	".\include\xnew.h"\
 	
 
-!IF  "$(CFG)" == "spent - Win32 Release"
-
-
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "spent - Win32 Debug"
 
+DEP_CPP_SPENT=\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityManager.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\InputSource.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26004,6 +26052,55 @@ DEP_CPP_SPENT=\
 
 !ELSEIF  "$(CFG)" == "spent - Win32 UnicodeRelease"
 
+DEP_CPP_SPENT=\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityManager.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\InputSource.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26011,6 +26108,55 @@ DEP_CPP_SPENT=\
 
 !ELSEIF  "$(CFG)" == "spent - Win32 UnicodeDebug"
 
+DEP_CPP_SPENT=\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityManager.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\InputSource.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	
 
 "$(INTDIR)\spent.obj" : $(SOURCE) $(DEP_CPP_SPENT) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26086,6 +26232,39 @@ SOURCE=.\spent\SpentMessages.msg
 # Begin Source File
 
 SOURCE=.\sgmlnorm\sgmlnorm.cxx
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
+DEP_CPP_SGMLN=\
+	".\generic\SGMLApplication.h"\
+	".\include\Boolean.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Location.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\ParserApp.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\Resource.h"\
+	".\include\SgmlParser.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\Vector.h"\
+	".\include\xnew.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
+
+"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
+   $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
+
 DEP_CPP_SGMLN=\
 	".\generic\SGMLApplication.h"\
 	".\include\Allocator.h"\
@@ -26178,22 +26357,82 @@ DEP_CPP_SGMLN=\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
 
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
-
-"$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
-   $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
-
-
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
 
+DEP_CPP_SGMLN=\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExternalId.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SgmlParser.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\xnew.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26201,6 +26440,97 @@ DEP_CPP_SGMLN=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
 
+DEP_CPP_SGMLN=\
+	".\generic\SGMLApplication.h"\
+	".\include\Allocator.h"\
+	".\include\Attribute.h"\
+	".\include\Attributed.h"\
+	".\include\Boolean.h"\
+	".\include\CharMap.cxx"\
+	".\include\CharMap.h"\
+	".\include\CharsetDecl.h"\
+	".\include\CharsetInfo.h"\
+	".\include\CmdLineApp.h"\
+	".\include\CodingSystem.h"\
+	".\include\CodingSystemKit.h"\
+	".\include\config.h"\
+	".\include\constant.h"\
+	".\include\ContentToken.h"\
+	".\include\CopyOwner.cxx"\
+	".\include\CopyOwner.h"\
+	".\include\Dtd.h"\
+	".\include\ElementType.h"\
+	".\include\Entity.h"\
+	".\include\EntityApp.h"\
+	".\include\EntityCatalog.h"\
+	".\include\EntityDecl.h"\
+	".\include\EntityManager.h"\
+	".\include\ErrorCountEventHandler.h"\
+	".\include\Event.h"\
+	".\include\EventsWanted.h"\
+	".\include\ExtendEntityManager.h"\
+	".\include\ExternalId.h"\
+	".\include\GenericEventHandler.h"\
+	".\include\Hash.h"\
+	".\include\HashTable.cxx"\
+	".\include\HashTable.h"\
+	".\include\HashTableItemBase.cxx"\
+	".\include\HashTableItemBase.h"\
+	".\include\ISet.cxx"\
+	".\include\ISet.h"\
+	".\include\Link.h"\
+	".\include\Location.h"\
+	".\include\Lpd.h"\
+	".\include\Markup.h"\
+	".\include\Message.h"\
+	".\include\MessageArg.h"\
+	".\include\MessageBuilder.h"\
+	".\include\MessageFormatter.h"\
+	".\include\MessageReporter.h"\
+	".\include\Mode.h"\
+	".\include\Named.h"\
+	".\include\NamedResource.h"\
+	".\include\NamedResourceTable.h"\
+	".\include\NamedTable.h"\
+	".\include\NCVector.h"\
+	".\include\Notation.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\OwnerTable.cxx"\
+	".\include\OwnerTable.h"\
+	".\include\ParserApp.h"\
+	".\include\ParserOptions.h"\
+	".\include\PointerTable.cxx"\
+	".\include\PointerTable.h"\
+	".\include\Ptr.cxx"\
+	".\include\Ptr.h"\
+	".\include\RangeMap.cxx"\
+	".\include\RangeMap.h"\
+	".\include\Resource.h"\
+	".\include\rtti.h"\
+	".\include\Sd.h"\
+	".\include\SdText.h"\
+	".\include\SgmlParser.h"\
+	".\include\ShortReferenceMap.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\include\StringResource.h"\
+	".\include\SubstTable.cxx"\
+	".\include\SubstTable.h"\
+	".\include\Syntax.h"\
+	".\include\Text.h"\
+	".\include\TypeId.h"\
+	".\include\UnivCharsetDesc.h"\
+	".\include\Vector.cxx"\
+	".\include\Vector.h"\
+	".\include\XcharMap.cxx"\
+	".\include\XcharMap.h"\
+	".\include\xnew.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
 
 "$(INTDIR)\sgmlnorm.obj" : $(SOURCE) $(DEP_CPP_SGMLN) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26213,6 +26543,9 @@ DEP_CPP_SGMLN=\
 # Begin Source File
 
 SOURCE=.\sgmlnorm\SGMLGenerator.cxx
+
+!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
+
 DEP_CPP_SGMLG=\
 	".\generic\SGMLApplication.h"\
 	".\include\Boolean.h"\
@@ -26228,15 +26561,26 @@ DEP_CPP_SGMLG=\
 	".\sgmlnorm\SGMLGenerator.h"\
 	
 
-!IF  "$(CFG)" == "sgmlnorm - Win32 Release"
-
-
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
 
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 Debug"
 
+DEP_CPP_SGMLG=\
+	".\generic\SGMLApplication.h"\
+	".\include\Boolean.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26244,6 +26588,10 @@ DEP_CPP_SGMLG=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeRelease"
 
+DEP_CPP_SGMLG=\
+	".\include\config.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)
@@ -26251,6 +26599,20 @@ DEP_CPP_SGMLG=\
 
 !ELSEIF  "$(CFG)" == "sgmlnorm - Win32 UnicodeDebug"
 
+DEP_CPP_SGMLG=\
+	".\generic\SGMLApplication.h"\
+	".\include\Boolean.h"\
+	".\include\CodingSystem.h"\
+	".\include\config.h"\
+	".\include\OutputByteStream.h"\
+	".\include\OutputCharStream.h"\
+	".\include\Owner.cxx"\
+	".\include\Owner.h"\
+	".\include\StringC.h"\
+	".\include\StringOf.cxx"\
+	".\include\StringOf.h"\
+	".\sgmlnorm\SGMLGenerator.h"\
+	
 
 "$(INTDIR)\SGMLGenerator.obj" : $(SOURCE) $(DEP_CPP_SGMLG) "$(INTDIR)"
    $(CPP) $(CPP_PROJ) $(SOURCE)

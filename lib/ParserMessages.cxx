@@ -4649,7 +4649,7 @@ MessageFragment::appModule,
 #endif
 394
 #ifndef SP_NO_MESSAGE_TEXT
-,"#PCDATA in model group that does not have rep occurrence indicator"
+,"#PCDATA in model group that is not repeatable"
 #endif
 );
 const MessageType0 ParserMessages::nameGroupNotOr(

@@ -27,11 +27,17 @@
 #include "Syntax.h"
 #include "ExtendEntityManager.h"
 #include "Event.h"
+#include "CmdLineApp.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
+__instantiate(Vector<const CmdLineApp::AppChar *>)
+__instantiate(Ptr<CodingSystemKit>)
+__instantiate(Ptr<Sd>)
+__instantiate(Ptr<InputSourceOrigin>)
+__instantiate(Vector<ParsedSystemId::Map>)
 __instantiate(Vector<size_t>)
 __instantiate(String<Char>)
 __instantiate(Vector<String<Char> >)

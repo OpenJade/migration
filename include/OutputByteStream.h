@@ -26,11 +26,32 @@ public:
   OutputByteStream &operator<<(long);
   OutputByteStream &operator<<(unsigned long);
   OutputByteStream &operator<<(const String<char> &);
-protected:
+  char *getBufferPtr() const;
+  size_t getBufferSize() const;
+  void usedBuffer(size_t);
   virtual void flushBuf(char) = 0;
+protected:
   char *ptr_;
   char *end_;
 };
+
+inline
+char *OutputByteStream::getBufferPtr() const
+{
+  return ptr_;
+}
+
+inline
+size_t OutputByteStream::getBufferSize() const
+{
+  return end_ - ptr_;
+}
+
+inline
+void OutputByteStream::usedBuffer(size_t n)
+{
+  ptr_ += n;
+}
 
 inline
 void OutputByteStream::sputc(char c)

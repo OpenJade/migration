@@ -17,6 +17,9 @@
 #include "IListIter.h"
 #include "IQueue.h"
 #include "HashTable.h"
+#ifdef SP_SIZEOF_BOOL_1
+#include "XcharMap.h"
+#endif
 #undef SP_DEFINE_TEMPLATES
 
 #include "Insn.h"
@@ -124,7 +127,12 @@ __instantiate(Owner<FOTBuilder::CompoundExtensionFlowObj>)
 __instantiate(`HashTable<StringC,NodePtr>')
 __instantiate(`HashTableItem<StringC,NodePtr>')
 __instantiate(Vector<ProcessContext::NodeStackEntry>)
-
+#ifdef SP_SIZEOF_BOOL_1
+__instantiate(XcharMap<char>)
+__instantiate(SharedXcharMap<char>)
+__instantiate(Ptr<SharedXcharMap<char> >)
+__instantiate(ConstPtr<SharedXcharMap<char> >)
+#endif
 #ifdef DSSSL_NAMESPACE
 }
 #endif

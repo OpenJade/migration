@@ -1386,6 +1386,8 @@ void GroveImpl::appendSibling(Chunk *chunk)
 {
   if (pendingData_) {
     if (tailPtr_) {
+      // Must set completeLimit_ before setting tailPtr_.
+      completeLimit_ = pendingData_->after();
       *tailPtr_ = pendingData_;
       tailPtr_ = 0;
     }
@@ -1407,14 +1409,15 @@ inline
 void GroveImpl::appendSibling(DataChunk *chunk)
 {
   // Since we might extend this DataChunk, it's
-  // not safe to set completeLimit_ to this chunk yet.
+  // not safe to set completeLimit_ to after this chunk yet.
   // This means we can't yet set tailPtr_.
   if (pendingData_) {
+    // Must set completeLimit_ before setting tailPtr_.
+    completeLimit_ = pendingData_->after();
     if (tailPtr_) {
       *tailPtr_ = pendingData_;
       tailPtr_ = 0;
     }
-    completeLimit_ = pendingData_;
   }
   chunk->origin = origin_;
   pendingData_ = chunk;
@@ -1426,6 +1429,8 @@ void GroveImpl::push(ElementChunk *chunk, Boolean hasId)
 {
   if (pendingData_) {
     if (tailPtr_) {
+      // Must set completeLimit_ before setting tailPtr_.
+      completeLimit_ = pendingData_->after();
       *tailPtr_ = pendingData_;
       tailPtr_ = 0;
     }
@@ -1459,11 +1464,12 @@ inline
 void GroveImpl::pop()
 {
   if (pendingData_) {
+    // Must set completeLimit_ before setting tailPtr_.
+    completeLimit_ = pendingData_->after();
     if (tailPtr_) {
       *tailPtr_ = pendingData_;
       tailPtr_ = 0;
     }
-    completeLimit_ = pendingData_;
     pendingData_ = 0;
   }
   tailPtr_ = &origin_->nextSibling;
@@ -1505,8 +1511,9 @@ GroveImpl::ElementIter GroveImpl::elementIter() const
 inline
 Boolean GroveImpl::maybeMoreSiblings(const ParentChunk *chunk) const
 {
-  return (!complete_
-  	  && (origin_ == chunk 
+  return (complete_
+          ? chunk->nextSibling != 0
+	  : (origin_ == chunk 
 	      || &chunk->nextSibling == tailPtr_
 	      || maybeMoreSiblings1(chunk)));
 } 
@@ -1931,7 +1938,7 @@ Boolean GroveImpl::maybeMoreSiblings1(const ParentChunk *chunk) const
     if (open == chunk)
       return 1;
   // for multi-thread case
-  return chunk->nextSibling != 0;
+  return tailPtr_ == &chunk->nextSibling || chunk->nextSibling != 0;
 }
 
 void *GroveImpl::allocFinish(size_t n)

@@ -1086,12 +1086,12 @@ ReverseNodeListObj::ReverseNodeListObj(NodeListObj *nl)
 
 NodePtr ReverseNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
 {
-  return reversed_->nodeListFirst(context, interp);
+  return reversed(context, interp)->nodeListFirst(context, interp);
 }
 
 NodeListObj *ReverseNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  return reversed_->nodeListRest(context, interp);
+  return reversed(context, interp)->nodeListRest(context, interp);
 }
 
 NodePtr ReverseNodeListObj::nodeListRef(long n, EvalContext &context, Interpreter &interp)

@@ -19,8 +19,16 @@ void SubstTable<T>::addSubst(T from, T to)
 {
   if (table_.size() == 0) {
     table_.resize(T(-1) + 1);
+#if _MSC_VER == 1100
+    // Workaround for Visual C++ 5.0 bug.
+    T n = 0;
+    int i = 0;
+    while (i < T(-1) + 1)
+      table_[i++] = n++;
+#else
     for (int i = 0; i < T(-1) + 1; i++)
       table_[i] = i;
+#endif
   }
   if (table_[from] != to)
     pairsValid_ = 0;

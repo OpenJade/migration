@@ -67,6 +67,14 @@
 // Function passed to set_new_handler() returns int and takes size_t argument.
 #define SP_FANCY_NEW_HANDLER
 
+#if _MSC_VER >= 1100
+// Visual C++ 5.0
+#define SP_HAVE_BOOL
+#define SP_SIZEOF_BOOL_1
+#pragma warning ( disable : 4800 ) // forcing value to bool 'true' or
+                                   // 'false' (performance warning)
+#endif
+
 #define SP_HAVE_SETMODE
 #define SP_DLLEXPORT __declspec(dllexport)
 #define SP_DLLIMPORT __declspec(dllimport)
@@ -107,6 +115,10 @@
 #define SP_MUTEX_WIN32
 // Use the new Standard C++ library
 #define SP_ANSI_LIB
+#if _MSC_VER < 1100
+// Versions prior to 5.0 don't use the std namespace
+#define SP_NO_STD_NAMESPACE
+#endif
 #endif /* _MT */
 #endif /* _MSC_VER */
 
@@ -127,6 +139,10 @@
 #define _O_BINARY O_BINARY
 #endif
 #define SP_WCHAR_T_USHORT
+#if __WATCOMC__ >= 1100
+#define SP_HAVE_BOOL
+// #define SP_SIZEOF_BOOL_1
+#endif
 #endif /* __WATCOMC__ */
 
 #ifdef __BORLANDC__

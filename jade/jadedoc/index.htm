@@ -24,32 +24,32 @@ content="text/html; charset=iso-8859-1">
         <ul>
             <li><a
                 href="#whatis"><font
-                face="Arial">What is OpenJade?</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">What is OpenJade?</font></a></li>
             <li><a
                 href="#copyright"><font
-                face="Arial">Copyright</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Copyright</font></a></li>
             <li><a
                 href="http://jade-cvs.avionitek.com/download.html"><font
-                face="Arial">Getting OpenJade</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Getting OpenJade</font></a></li>
+            <li><a
+                href="#build"><font
+                face="Arial">Building OpenJade</font></a></li>
+            <li><a
+                href="#install"><font
+                face="Arial">Installing OpenJade</font></a></li>
             <li><a
                 href="#using"><font
-                face="Arial">Using OpenJade</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Using OpenJade</font></a></li>
             <li><a
                 href="#extensions"><font
-                face="Arial">OpenJade Extensions</font></a> </li>
+                face="Arial">OpenJade Extensions</font></a></li>
             <li><a
                 href="#limitations"><font
-                face="Arial">Current OpenJade Limitations</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Current OpenJade Limitations</font></a></li>
             <li><a href="../NEWS"><font
-                face="Arial">New additions to previous versions</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">New additions to previous versions</font></a></li>
             <li><a href="dsssl2.htm"><font face="Arial">Experimental
-                DSSSL extensions</font></a><font face="Arial"> </font></li>
+                DSSSL extensions</font></a></li>
             <li><font face="Arial">Backends</font>
                 <ul>
                     <li><a href="rtf.htm"><font face="Arial">RTF</font></a></li>
@@ -63,17 +63,11 @@ content="text/html; charset=iso-8859-1">
             </li>
             <li><a
                 href="#source"><font
-                face="Arial">About OpenJade sources</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">About OpenJade sources</font></a></li>
             <li><a href="http://jade-cvs.avionitek.com/bugs.html"><font
-                face="Arial">Reporting bugs in OpenJade</font></a><font
-                face="Arial"> </font></li>
-            <li><a
-                href="#contribute"><font
-                face="Arial">Contributing to OpenJade</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Reporting bugs in OpenJade</font></a></li>
             <li><a href="contributors.htm"><font face="Arial">OpenJade
-                contributors</font></a> </li>
+                contributors</font></a></li>
         </ul>
         <h2><a name="whatis"><font face="Arial">What is OpenJade?</font></a></h2>
         <p><font face="Arial">OpenJade is an implementation of
@@ -106,14 +100,12 @@ content="text/html; charset=iso-8859-1">
             <li><font face="Arial">RTF format that can be
                 rendered and printed with Microsoft's free </font><a
                 href="http://www.microsoft.com/word/internet/viewer/"><font
-                face="Arial">Word Viewer 97</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Word Viewer 97</font></a></li>
             <li><font face="Arial">TeX format </font></li>
             <li><font face="Arial">MIF format that can be
                 rendered and printed with </font><a
                 href="http://www.adobe.com/prodindex/framemaker/main.html/"><font
-                face="Arial">Framemaker</font></a><font
-                face="Arial"> </font></li>
+                face="Arial">Framemaker</font></a></li>
             <li><font face="Arial">SGML or XML format. This is
                 used in conjunction with non-standard flow object
                 classes to generate SGML, thus allowing OpenJade
@@ -135,12 +127,90 @@ content="text/html; charset=iso-8859-1">
         <p><font face="Arial">If you do use OpenJade in a
         commercial product, we ask you, as a courtesy, to
         acknowledge the use of OpenJade. </font></p>
-        <p><a href="#top"><font
-        face="Arial"><img src="images/top-of-page.gif"
+        <p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
         alt="Up" border="0" width="11" height="15"></font></a><a
-        href="#top"><font
-        size="2" face="Arial">Back to top</font></a><font
-        size="2" face="Arial">&nbsp;</font></p>
+        href="#top"><font size="2" face="Arial">Back to top</font></a></p>
+
+        <h2><a name="build"><font face="Arial">Building OpenJade</font></a></h2>
+
+<basefont face="Arial">
+<h3><A NAME=building-win32>Win32</A></h3>
+<p>
+Only Microsoft Visual C++ 6.0 is supported. Also, Perl 5 is required; the
+executable must be on your PATH.
+</p>
+<p>
+To build on the command line, ensure that the directories
+containing <code>msdev</code> and <code>nmake</code> are in your path,
+typically by executing
+the command:
+<pre>
+path C:/Program Files/Microsoft Visual Studio/Common/MSDev98/Bin;
+    C:/Program Files/Microsoft Visual Studio/VC98/Bin;%path%
+</pre>
+<p>
+(all in one long line) then run the command:
+<pre>
+build-win32.bat
+</pre>
+<p>
+To build using the Visual
+Studio GUI, open the workspace <code>jade.dsw</code> and build the
+<code>Win32&nbsp;Release</code> configuration of the <code>all</code>
+project.  You must first do a command-line build, however, to get
+the perl-generated files.
+</p>
+<h3><A NAME=building-unix>Unix</A></h3>
+<p>
+The following compilers should work:
+<ul>
+<li>gcc 2.95
+<li>egcs 1.1.2
+<li>egcs 1.0.2
+<li>gcc 2.8.1
+<li>gcc 2.7.2
+</ul>
+<p>Only the first has been tested by me.
+<p>
+If you use gcc 2.7.2 with -O on an x86 processor you must use
+-fno-strength-reduce. gcc 2.7.2.1 fixes this problem.
+<p>
+Edit <code>Makefile</code>, then build with <code>make</code>.  Note
+that you must use -DSP_MULTI_BYTE. If you plan to do any development,
+also do <code>make depend</code>.
+Alternatively you can build using the <a
+HREF="autoconf.htm">experimental autoconf support</a>. This
+will soon be the recommended method.
+
+		<p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
+        alt="Up" border="0" width="11" height="15"></font></a><a
+        href="#top"><font size="2" face="Arial">Back to top</font></a></p>
+
+        <h2><a name="install"><font face="Arial">Installing OpenJade</font></a></h2>
+
+<h3><A NAME=install-win32>Win32</A></h3>
+<p>
+OpenJade requires the file <code>dsssl/builtins.dsl</code> to operate.
+You can tell OpenJade where this file is in one of two ways:
+<ul>
+<li>By including a SYSTEM catalog entry for "builtins.dsl" pointing to this
+file. See <code>dsssl/catalog</code> for an example.</li>
+<li>By including the <code>dsssl/catalog</code> catalog with the
+<code>-c</code> command line option or the <code>SGML_CATALOG_FILES</code>
+environment variable.</li>
+</ul>
+<h3><A NAME=install-unix>Unix</A></h3>
+<p>
+Run
+<pre>
+make install
+</pre>
+as <code>root</code>.
+
+        <p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
+        alt="Up" border="0" width="11" height="15"></font></a><a
+        href="#top"><font size="2" face="Arial">Back to top</font></a></p>
+
         <h2><a name="using"><font face="Arial">Using OpenJade</font></a></h2>
         <p><font face="Arial">Add the directory containing the
         OpenJade binary to your path, change directory to the
@@ -167,7 +237,7 @@ OpenJade demo.sgm
                 recognized: </font><dl>
                     <dt><font face="Arial"><code>&lt;?stylesheet
                         href=&quot;</code><code><var>sysid</var></code><code>&quot;
-                        type=&quot;text/dsssl&quot;&gt;</code> </font></dt>
+                        type=&quot;text/dsssl&quot;&gt;</code></font></dt>
                     <dd><font face="Arial">The system data of the
                         processing instruction is parsed like an
                         SGML start-tag. It will be parsed using
@@ -222,58 +292,54 @@ OpenJade demo.sgm
             <dd><font face="Arial">This specifies that <i>dsssl_spec</i>
                 is the system identifier of the DSSSL
                 specification to be used.</font> </dd>
-            <dt><font face="Arial"><code>-G</code></font> </dt>
+            <dt><font face="Arial"><code>-G</code></font></dt>
             <dd><font face="Arial">Debug mode. When an error
                 occurs in the evaluation of an expression,
                 OpenJade will display a stack trace. Note that
-                this disables tail-call optimization.</font> </dd>
-            <dt><font face="Arial"><code>-c</code> <i>filename</i></font>
-            </dt>
+                this disables tail-call optimization.</font></dd>
+            <dt><font face="Arial"><code>-c</code> <i>filename</i></font></dt>
             <dd><font face="Arial">The <i>filename</i> arguments
                 specify catalog files rather than the document
                 entity. The document entity is specified by the
                 first <samp>DOCUMENT</samp> entry in the catalog
-                files.</font> </dd>
-            <dt><font face="Arial"><code>-s</code></font> </dt>
+                files.</font></dd>
+            <dt><font face="Arial"><code>-s</code></font></dt>
             <dd><font face="Arial">Strict compliance mode.
                 Currently the only effect is that jade doesn't
                 use any predefined character names, sdata-entity
                 mappings or name-characters. This is useful for
                 checking that your stylesheet is portable to
                 other DSSSL implementations and that it is
-                strictly compliant to the DSSSL specifications.</font>
-            </dd>
-            <dt><font face="Arial"><code>-t</code> <i>output_type</i></font>
-            </dt>
+                strictly compliant to the DSSSL specifications.</font></dd>
+            <dt><font face="Arial"><code>-t</code> <i>output_type</i></font></dt>
             <dd><font face="Arial"><i>output_type</i> specifies
                 the type of output as follows:</font> <dl compact>
-                    <dt><font face="Arial"><code>fot</code> </font></dt>
+                    <dt><font face="Arial"><code>fot</code></font></dt>
                     <dd><font face="Arial">An XML representation
                         of the flow object tree </font></dd>
                     <dt><font face="Arial"><code>rtf</code> <code>rtf-95</code>
                         </font></dt>
                     <dd><font face="Arial">RTF (used for SGML/XML
-                        to RTF transformations) </font></dd>
+                        to RTF transformations)</font></dd>
                     <dd><font face="Arial">Microsoft's Rich Text
                         Format. <code>rtf-95</code> produces
                         output optimized for Word 95 rather than
-                        Word 97. </font></dd>
-                    <dt><font face="Arial"><code>tex</code> </font></dt>
+                        Word 97.</font></dd>
+                    <dt><font face="Arial"><code>tex</code></font></dt>
                     <dd><font face="Arial">TeX (used for SGML/XML
-                        to TeX transformations) </font></dd>
-                    <dt><font face="Arial"><code>sgml</code> </font></dt>
+                        to TeX transformations)</font></dd>
+                    <dt><font face="Arial"><code>sgml</code></font></dt>
                     <dd><font face="Arial">SGML (used for SGML/XML
-                        to SGML transformations) </font></dd>
-                    <dt><font face="Arial"><code>xml</code> </font></dt>
+                        to SGML transformations)</font></dd>
+                    <dt><font face="Arial"><code>xml</code></font></dt>
                     <dd><font face="Arial">XML (used for SGML/XML
-                        to XML transformations) </font></dd>
+                        to XML transformations)</font></dd>
                     <dt><font face="Arial">html</font> </dt>
                     <dd><font face="Arial">HTML (used for SGML/XML
-                        to HTML transformations)</font> </dd>
-                    <dt><font face="Arial"><code>mif</code></font>
-                    </dt>
+                        to HTML transformations)</font></dd>
+                    <dt><font face="Arial"><code>mif</code></font></dt>
                     <dd><font face="Arial">MIF (used for SGML/XML
-                        to MIF transformations) </font></dd>
+                        to MIF transformations)</font></dd>
                 </dl>
             </dd>
             <dt><font face="Arial"><code>-o</code> <i>output_file</i>
@@ -283,7 +349,7 @@ OpenJade demo.sgm
                 the name of the last input file with its
                 extension replaced by the name of the type of
                 output. If there is no input filename, then the
-                extension is added onto OpenJade-out. </font></dd>
+                extension is added onto <i>jade-out</i>. </font></dd>
             <dt><font face="Arial"><code>-V</code> <i>variable</i>
                 </font></dt>
             <dd><font face="Arial">This is equivalent to doing <code>(define
@@ -297,11 +363,13 @@ OpenJade demo.sgm
                 this definition will take priority over any
                 definition of variable in a style-sheet. </font></dd>
             <dt><font face="Arial"><code>-V</code> <i>(define
-                variable value)</i> </font></dt>
+                variable value)</i></font></dt>
             <dd><font face="Arial">This is equivalent to doing <code>(define
                 variable value)</code> except that this
                 definition will take priority over any definition
-                of variable in a style-sheet. </font></dd>
+                of variable in a style-sheet. Note that you will probably
+                have to use some escaping mechanism for the spaces to get 
+                the entire scheme expression parsed as one cmdline argument.</font></dd>
             <dt><a name="optw"><font face="Arial"><code>-wtype</code></font></a><font
                 face="Arial"> (examples: wxml, wmixed, wsgmldecl,
                 etc.) </font></dt>
@@ -309,73 +377,70 @@ OpenJade demo.sgm
                 Multiple <samp>-w</samp> options are allowed. The
                 following values of <samp><var>type</var></samp>
                 enable warnings: </font><dl>
-                    <dt><font face="Arial"><samp>xml</samp> </font></dt>
+                    <dt><font face="Arial"><samp>xml</samp></font></dt>
                     <dd><font face="Arial">Warn about constructs
                         that are not allowed by </font><a
                         href="http://www.w3.org/TR/1998/REC-xml-19980210"><font
                         face="Arial">XML</font></a><font
-                        face="Arial">. </font></dd>
-                    <dt><font face="Arial"><samp>mixed</samp> </font></dt>
+                        face="Arial">.</font></dd>
+                    <dt><font face="Arial"><samp>mixed</samp></font></dt>
                     <dd><font face="Arial">Warn about mixed
                         content models that do not allow #pcdata
-                        anywhere. </font></dd>
-                    <dt><font face="Arial"><samp>sgmldecl</samp> </font></dt>
+                        anywhere.</font></dd>
+                    <dt><font face="Arial"><samp>sgmldecl</samp></font></dt>
                     <dd><font face="Arial">Warn about various
                         dubious constructions in the SGML
-                        declaration. </font></dd>
-                    <dt><font face="Arial"><samp>should</samp> </font></dt>
+                        declaration.</font></dd>
+                    <dt><font face="Arial"><samp>should</samp></font></dt>
                     <dd><font face="Arial">Warn about various
                         recommendations made in ISO 8879 that the
                         document does not comply with. (Recommendations
                         are expressed with ``should'', as
                         distinct from requirements which are
-                        usually expressed with ``shall''.) </font></dd>
-                    <dt><font face="Arial"><samp>default</samp> </font></dt>
+                        usually expressed with ``shall''.)</font></dd>
+                    <dt><font face="Arial"><samp>default</samp></font></dt>
                     <dd><font face="Arial">Warn about defaulted
-                        references. </font></dd>
+                        references.</font></dd>
                     <dt><font face="Arial"><samp>duplicate</samp>
                         </font></dt>
                     <dd><font face="Arial">Warn about duplicate
-                        entity declarations. </font></dd>
+                        entity declarations.</font></dd>
                     <dt><font face="Arial"><samp>undefined</samp>
                         </font></dt>
                     <dd><font face="Arial">Warn about undefined
                         elements: elements used in the DTD but
-                        not defined. </font></dd>
-                    <dt><font face="Arial"><samp>unclosed</samp> </font></dt>
+                        not defined.</font></dd>
+                    <dt><font face="Arial"><samp>unclosed</samp></font></dt>
                     <dd><font face="Arial">Warn about unclosed
-                        start and end-tags. </font></dd>
-                    <dt><font face="Arial"><samp>empty</samp> </font></dt>
+                        start and end-tags.</font></dd>
+                    <dt><font face="Arial"><samp>empty</samp></font></dt>
                     <dd><font face="Arial">Warn about empty start
-                        and end-tags. </font></dd>
-                    <dt><font face="Arial"><samp>net</samp> </font></dt>
+                        and end-tags.</font></dd>
+                    <dt><font face="Arial"><samp>net</samp></font></dt>
                     <dd><font face="Arial">Warn about net-enabling
-                        start-tags and null end-tags. </font></dd>
-                    <dt><font face="Arial"><samp>min-tag</samp> </font></dt>
+                        start-tags and null end-tags.</font></dd>
+                    <dt><font face="Arial"><samp>min-tag</samp></font></dt>
                     <dd><font face="Arial">Warn about minimized
                         start and end-tags. Equivalent to
                         combination of <samp>unclosed</samp>, <samp>empty</samp>
-                        and <samp>net</samp> warnings. </font></dd>
-                    <dt><font face="Arial"><samp>unused-map</samp>
-                        </font></dt>
+                        and <samp>net</samp> warnings.</font></dd>
+                    <dt><font face="Arial"><samp>unused-map</samp></font></dt>
                     <dd><font face="Arial">Warn about unused
                         short reference maps: maps that are
                         declared with a short reference mapping
                         declaration but never used in a short
-                        reference use declaration in the DTD. </font></dd>
-                    <dt><font face="Arial"><samp>unused-param</samp>
-                        </font></dt>
+                        reference use declaration in the DTD.</font></dd>
+                    <dt><font face="Arial"><samp>unused-param</samp></font></dt>
                     <dd><font face="Arial">Warn about parameter
                         entities that are defined but not used in
                         a DTD. Unused internal parameter entities
                         whose text is <samp>INCLUDE</samp> or <samp>IGNORE</samp>
-                        won't get the warning. </font></dd>
-                    <dt><font face="Arial"><samp>notation-sysid</samp>
-                        </font></dt>
+                        won't get the warning.</font></dd>
+                    <dt><font face="Arial"><samp>notation-sysid</samp></font></dt>
                     <dd><font face="Arial">Warn about notations
                         for which no system identifier could be
-                        generated. </font></dd>
-                    <dt><font face="Arial"><samp>all</samp> </font></dt>
+                        generated.</font></dd>
+                    <dt><font face="Arial"><samp>all</samp></font></dt>
                     <dd><font face="Arial">Warn about conditions
                         that should usually be avoided (in the
                         opinion of the author). Equivalent to: <samp>mixed</samp>,
@@ -389,17 +454,17 @@ OpenJade demo.sgm
                 by using its name prefixed with <samp>no-</samp>.
                 Thus <samp>-wall -wno-duplicate</samp> will
                 enable all warnings except those about duplicate
-                entity declarations. </font></p>
+                entity declarations.</font></p>
                 <p><font face="Arial">The following values for <samp><var>warning_type</var></samp>
-                disable errors: </font></p>
+                disable errors:</font></p>
                 <dl>
-                    <dt><font face="Arial"><samp>no-idref</samp> </font></dt>
+                    <dt><font face="Arial"><samp>no-idref</samp></font></dt>
                     <dd><font face="Arial">Do not give an error
                         for an ID reference value which no
                         element has as its ID. The effect will be
                         as if each attribute declared as an ID
                         reference value had been declared as a
-                        name. </font></dd>
+                        name.</font></dd>
                     <dt><font face="Arial"><samp>no-significant</samp>
                         </font></dt>
                     <dd><font face="Arial">Do not give an error
@@ -408,8 +473,8 @@ OpenJade demo.sgm
                         concrete syntax occurs in a literal in
                         the SGML declaration. This may be useful
                         in conjunction with certain buggy test
-                        suites. </font></dd>
-                    <dt><font face="Arial"><samp>no-valid</samp> </font></dt>
+                        suites.</font></dd>
+                    <dt><font face="Arial"><samp>no-valid</samp></font></dt>
                     <dd><font face="Arial">Do not require the
                         document to be type-valid. This has the
                         effect of changing the SGML declaration
@@ -423,7 +488,7 @@ OpenJade demo.sgm
                         nor <samp>-wno-valid</samp> are specified,
                         then the <samp>VALIDITY</samp> and <samp>IMPLYDEF</samp>
                         specified in the SGML declaration will be
-                        used. </font></dd>
+                        used.</font></dd>
                 </dl>
             </dd>
         </dl>
@@ -433,13 +498,13 @@ OpenJade demo.sgm
         if <samp>SP_CHARSET_FIXED</samp> was 1 and <samp>SP_SYSTEM_CHARSET</samp>
         was unset. Thus only the <samp>SP_ENCODING</samp>
         environment variable is relevant to OpenJade's handling
-        of character sets. </font></p>
+        of character sets.</font></p>
         <p><a href="#top"><font
         face="Arial"><img src="images/top-of-page.gif"
         alt="Up" border="0" width="11" height="15"></font></a><a
         href="#top"><font
         size="2" face="Arial">Back to top</font></a><font
-        size="2" face="Arial">&nbsp;</font><font face="Arial"> </font></p>
+        size="2" face="Arial">&nbsp;</font></p>
         <h2><a name="extensions"><font face="Arial">OpenJade
         Extensions</font></a></h2>
         <p><font face="Arial">The following external procedures
@@ -451,7 +516,7 @@ OpenJade demo.sgm
         Clark//Procedure::</code><code><var>name</var></code><code>&quot;</code>
         where <code><var>name</var></code> is the name given here,
         typically by including the following in the DSSSL
-        specification: </font></p>
+        specification:</font></p>
         <pre><font face="Arial">
 (define <var>name</var>
   (external-procedure &quot;UNREGISTERED::James Clark//Procedure::<var>name</var>&quot;))
@@ -462,11 +527,11 @@ OpenJade demo.sgm
         your DSSSL specifications to work gracefully with other
         implementations which do not support these extensions. </font></p>
         <p><font face="Arial">For external procedures added by
-        the OpenJade team, use a public identifier of the form <code>&quot;UNREGISTERED::OpenJade//Procedure::</code><code><var>name</var></code><code>&quot;</code>
+        the OpenJade team, use a public identifier of the form <code>&quot;UNREGISTERED::OpenJade//Procedure::</code><code><var>name</var></code><code>&quot;</code>.
         </font></p>
         <p><font face="Arial">An easy way to get access to all
         external procedures is to use the style specification
-        with id <code>procedures</code> from <code>dsssl/extensions.dsl</code>
+        <code>dsssl/extensions.dsl#procedures</code>.
         </font></p>
         <h3><font face="Arial">Debugging</font></h3>
         <pre><font face="Arial">
@@ -485,8 +550,9 @@ OpenJade demo.sgm
         characteristics of simple-page-sequence. It returns a
         sosofo that will display as <code><var>sosofo1</var></code>
         if the page is the first page of the simple-page-sequence
-        and as <code><var>sosofo2</var></code> otherwise. </font></p>
+        and as <code><var>sosofo2</var></code> otherwise.</font></p>
         <pre><font face="Arial">
+
 (if-front-page <var>sosofo1</var> <var>sosofo2</var>)
 </font></pre>
         <p><font face="Arial">This can be used only in the
@@ -495,7 +561,7 @@ OpenJade demo.sgm
         sosofo that will display as <code><var>sosofo1</var></code>
         if the page is a front (ie recto, odd-numbered) page and
         as <code><var>sosofo2</var></code> if it is a back (ie
-        verso, even-numbered) page </font></p>
+        verso, even-numbered) page.</font></p>
         <h3><font face="Arial">Numbering</font></h3>
         <pre><font face="Arial">
 (all-element-number)
@@ -507,7 +573,7 @@ OpenJade demo.sgm
         otherwise returns 1 plus the number of elements that
         started before <code><var>osnl</var></code>. This
         provides an efficient way of creating a unique identifier
-        for any element in a document. </font></p>
+        for any element in a document.</font></p>
         <h3><font face="Arial">External entity access</font></h3>
         <pre><font face="Arial">
 (read-entity <var>string</var>)
@@ -516,19 +582,18 @@ OpenJade demo.sgm
         the contents of the external entity with system
         identifier <code><var>string</var></code>. This should be
         used only for textual entities (CDATA and SDATA), and not
-        for binary entities (NDATA). </font></p>
+        for binary entities (NDATA).</font></p>
         <h3><font face="Arial">POSIX locale access</font></h3>
         <pre><font face="Arial">
 (language <var>lang</var> <var>country</var>)
 </font></pre>
-        <p><font size="3" face="Arial">This procedure returns an
+        <p><font face="Arial">This procedure returns an
         object of type <code>language</code>, if the system
         supports the specified language. <code><var>lang</var></code>
         is a string or symbol giving the two letter language code.
         <code><var>country</var></code> is a string or symbol
-        giving the tro letter country code.</font><font
-        face="Arial"> </font></p>
-        <p><font size="3" face="Arial">This procedure uses POSIX
+        giving the two letter country code.</font></p>
+        <p><font face="Arial">This procedure uses POSIX
         locales. It is an OpenJade addition.</font></p>
         <h3><font face="Arial">Extended standard procedures</font></h3>
         <pre><font face="Arial">
@@ -548,24 +613,24 @@ OpenJade demo.sgm
         alt="Up" border="0" width="11" height="15"></font></a><a
         href="#top"><font
         size="2" face="Arial">Back to top</font></a><font
-        size="2" face="Arial">&nbsp;</font><font face="Arial"> </font></p>
+        size="2" face="Arial">&nbsp;</font></p>
         <h2><a name="limitations"><font face="Arial">Current
         OpenJade Limitations</font></a></h2>
         <p><font face="Arial">This section describes the
         limitations of the front-end (the general-purpose DSSSL
-        engine): each backend also has its own limitations. </font></p>
+        engine); each backend also has its own limitations. </font></p>
         <p><font face="Arial">OpenJade doesn't allow the <code>(test
-        =&gt; recipient)</code> variant of cond clause.</font></p>
+        =&gt; recipient)</code> variant of cond clauses.</font></p>
         <p><font face="Arial">OpenJade supports only a single,
-        fixed grove plan which comprises the following modules: </font></p>
+        fixed grove plan which comprises the following modules:</font></p>
         <ul>
-            <li><font face="Arial">baseabs </font></li>
-            <li><font face="Arial">prlgabs0 </font></li>
-            <li><font face="Arial">prlgabs1 </font></li>
-            <li><font face="Arial">instabs </font></li>
-            <li><font face="Arial">basesds0 </font></li>
-            <li><font face="Arial">instsds0 </font></li>
-            <li><font face="Arial">subdcabs </font></li>
+            <li><font face="Arial">baseabs</font></li>
+            <li><font face="Arial">prlgabs0</font></li>
+            <li><font face="Arial">prlgabs1</font></li>
+            <li><font face="Arial">instabs</font></li>
+            <li><font face="Arial">basesds0</font></li>
+            <li><font face="Arial">instsds0</font></li>
+            <li><font face="Arial">subdcabs</font></li>
         </ul>
         <p><font face="Arial">It doesn't implement the following
         parts of SDQL: HyTime support, auxiliary parsing, node
@@ -575,7 +640,7 @@ OpenJade demo.sgm
         font properties are not supported.</font></p>
         <p><font face="Arial">Note that only inherited
         characteristics that are applicable to some supported
-        flow object can be specified. </font></p>
+        flow object can be specified.</font></p>
         <h3><font face="Arial">Character/glyph handling</font></h3>
         <p><font face="Arial">It only supports a single pre-defined
         character repertoire. A character name of the form <code>U-</code><code><var>XXXX</var></code>
@@ -583,13 +648,13 @@ OpenJade demo.sgm
         hexadecimal digits, is recognized as referring to the
         Unicode character with that code. For many characters, it
         is also possible to use the ISO/IEC 10646 name in lower-case
-        with words separated by hyphens. </font></p>
+        with words separated by hyphens.</font></p>
         <p><font face="Arial">Some common SDATA entity names from
         the ISO entity sets are recognized and mapped to
         characters. In addition an SDATA entity name of the form <code>U-</code><code><var>XXXX</var></code>,
         where <code><var>XXXX</var></code> are four upper-case
         hexadecimal digits, is mapped to the Unicode character
-        with that code. </font></p>
+        with that code.</font></p>
         <p><font face="Arial">OpenJade now supports the standard-chars,
         map-sdata-entity, add-name-chars, add-separator-chars and
         char-repertoire declaration element forms, allowing a
@@ -597,8 +662,8 @@ OpenJade demo.sgm
         entity mappings, name characters (i.e. characters allowed
         in identifiers) and separator characters. Currently the
         only recognized character repertoire is the built-in
-        repertoire. It has the public identifier <code>&quot;UNREGISTERED::OpenJade//Character
-        Repertoire::OpenJade&quot;</code>.</font></p>
+        repertoire. It has the public identifier 
+        <code>&quot;UNREGISTERED::OpenJade//Character Repertoire::OpenJade&quot;</code>.</font></p>
         <h3><font face="Arial">Validation</font></h3>
         <p><font face="Arial">Several things that it would be
         desirable to have checked aren't checked: </font></p>
@@ -608,38 +673,35 @@ OpenJade demo.sgm
                 checks only that the value is a symbol that is
                 allowed as the value of some characteristic; #t
                 and #f are treated as a special kind of symbol in
-                this case. </font></li>
+                this case.</font></li>
             <li><font face="Arial">OpenJade doesn't check whether
                 a flow object is occurring in a context where it
-                is allowed. </font></li>
+                is allowed.</font></li>
             <li><font face="Arial">OpenJade does not prevent flow
                 objects being attached to the principal port of a
                 flow object when the flow object shouldn't have a
-                principal port. </font></li>
+                principal port.</font></li>
             <li><font face="Arial">Most type-checking is done at
-                run-time not compile-time. </font></li>
+                run-time not compile-time.</font></li>
             <li><font face="Arial">OpenJade does not check for
                 non-inherited characteristics that are required
-                to be specified. </font></li>
+                to be specified.</font></li>
             <li><font face="Arial">It doesn't check that optional
                 features that have been used were declared in the
-                features form. </font></li>
+                features form.</font></li>
         </ul>
         <h3><font face="Arial">Other limitations</font></h3>
         <p><font face="Arial">The following primitives are just
-        stubs: </font></p>
+        stubs:</font></p>
         <dl>
-            <dt><font face="Arial"><code>char-script-case</code> </font></dt>
-            <dd><font face="Arial">Always returns last argument. </font></dd>
-            <dt><font face="Arial"><code>address-visited?</code> </font></dt>
-            <dd><font face="Arial">Always returns #f. </font></dd>
+            <dt><font face="Arial"><code>char-script-case</code></font></dt>
+            <dd><font face="Arial">Always returns last argument.</font></dd>
+            <dt><font face="Arial"><code>address-visited?</code></font></dt>
+            <dd><font face="Arial">Always returns #f.</font></dd>
         </dl>
-        <p><a href="#top"><font
-        face="Arial"><img src="images/top-of-page.gif"
-        alt="Up" border="0" width="11" height="15"></font></a><a
-        href="#top"><font
-        size="2" face="Arial">Back to top</font></a><font
-        size="2" face="Arial">&nbsp;</font></p>
+        <p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
+        alt="Up" border="0" width="11" height="15"></font></a><a 
+        href="#top"><font size="2" face="Arial">Back to top</font></a></p>
         <h2><a name="source"><font face="Arial">About OpenJade
         sources</font></a></h2>
         <p><font face="Arial">The source of OpenJade is available
@@ -647,12 +709,15 @@ OpenJade demo.sgm
         </font><a href="http://www.netfolder.com/DSSSL/"><font
         face="Arial">OpenJade home page</font></a><font
         face="Arial"> for more details.</font></p>
+        <p><a href="#top"><font face="Arial"><img src="images/top-of-page.gif"
+        alt="Up" border="0" width="11" height="15"></font></a><a 
+        href="#top"><font size="2" face="Arial">Back to top</font></a></p>
         <hr size="1" noshade>
         <p><font size="1" face="Arial">All trademarks herein are
         the property of their respective owners.&nbsp; <br>
         Copyright ©&nbsp; 1999 OpenJade project, All rights
-        reserved. Created by Didier PH Martin, modified: August
-        31, 1999</font><font face="Arial"> </font></p>
+        reserved. Created by Didier PH Martin, modified: September
+        7, 1999</font></p>
         </td>
     </tr>
     <tr>

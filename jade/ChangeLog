@@ -1,3 +1,12 @@
+2002-12-08  Karl Eichwalder  <ke@suse.de>
+
+	* unicode/unicode.syn: Remove it; now part of opensp.
+	* unicode/unicode.sd: Likewise.
+	* unicode/gensyntax.pl: Likewise.
+	* unicode/demo.sgm: Likewise.
+	* unicode/catalog: Likewise.
+	* unicode: Likewise.
+
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 
 	* sunfix.sh: Remove it; it's required for OpenSP only.

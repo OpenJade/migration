@@ -317,6 +317,8 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       }
       if (sd().datatag())
 	message(ParserMessages::datatagNotImplemented);
+      if (!defDtd().isBase())
+	message(ParserMessages::datatagBaseDtd);
       if (currentMarkup())
 	currentMarkup()->addDelim(Syntax::dDTGO);
       return parseDataTagGroup(nestingLevel + 1, declInputLevel, gt);

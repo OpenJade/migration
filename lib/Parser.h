@@ -396,7 +396,7 @@ private:
   Boolean parseTagNameGroup(Boolean &active);
   void parseGroupStartTag();
   void parseGroupEndTag();
-  void doParseStartTag();
+  StartElementEvent *doParseStartTag(Boolean &netEnabling);
   EndElementEvent *doParseEndTag();
   Boolean skipAttributeSpec();
   Boolean lookingAtStartTag(StringC &gi);

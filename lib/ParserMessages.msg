@@ -428,6 +428,9 @@ E0+activeDocLink++Cannot have active doctypes and link types at the same time
 # message fragments
 # This isn't formally a quantity error, but we'll treat it as one.
 Q1+concurrentInstances+7.2.1+number of concurrent document instances exceeds quantity specified for CONCUR parameter in SGML declaration (%1)
+E0+datatagBaseDtd++datatag group can only be specified in base document type
+E0+emptyStartTagBaseDtd++element not in the base document type can't have an empty start-tag
+E0+emptyEndTagBaseDtd++element not in base document type can't have an empty end-tag
 =1000
 +delimStart++delimiter 
 +delimEnd++

@@ -1140,12 +1140,14 @@ void AttributeList::finish(AttributeContext &context)
     if (!vec_[i].specified()) {
       ConstPtr<AttributeValue> value
 	= def(i)->makeMissingValue(context);
-      vec_[i].setValue(value);
-      if (!value.isNull())
-	vec_[i].setSemantics(def(i)->makeSemantics(value.pointer(),
-						   context,
-						   nIdrefs_,
-						   nEntityNames_));
+      if (!conref_ || def_->notationIndex() != i) {
+        vec_[i].setValue(value);
+        if (!value.isNull())
+	  vec_[i].setSemantics(def(i)->makeSemantics(value.pointer(),
+	  					     context,
+						     nIdrefs_,
+						     nEntityNames_));
+      }
     }
   const Syntax &syntax = context.attributeSyntax();
   if (nIdrefs_ > syntax.grpcnt())

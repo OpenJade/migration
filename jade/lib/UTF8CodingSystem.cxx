@@ -46,10 +46,13 @@ class UTF8Decoder : public Decoder {
 public:
   UTF8Decoder();
   size_t decode(Char *, const char *, size_t, const char **);
+  Boolean convertOffset(unsigned long &offset) const;
 private:
   // value for encoding error
   enum { invalid = 0xfffd };
   Boolean recovering_;
+  PackedBoolean hadFirstChar_;
+  PackedBoolean hadByteOrderMark_;
 };
 
 class UTF8Encoder : public Encoder {
@@ -70,13 +73,27 @@ Encoder *UTF8CodingSystem::makeEncoder() const
 
 
 UTF8Decoder::UTF8Decoder()
-: recovering_(0)
+: recovering_(0), hadFirstChar_(0), hadByteOrderMark_(0)
 {
 }
 
 size_t UTF8Decoder::decode(Char *to, const char *s,
 			  size_t slen, const char **result)
 {
+  // Check for byte-order mark
+  if (!hadFirstChar_ && slen >= 3) {
+    hadFirstChar_ = 1;
+
+    if ((unsigned char)s[0] == 0xEF &&
+        (unsigned char)s[1] == 0xBB &&
+       (unsigned char)s[2] == 0xBF)
+    {
+      s += 3;
+      slen -= 3;
+      hadByteOrderMark_ = 1;
+    }
+  }
+
   Char *start = to;
   const unsigned char *us = (const unsigned char *)s;
   if (recovering_) {
@@ -202,6 +219,14 @@ size_t UTF8Decoder::decode(Char *to, const char *s,
  done:
   *result = (char *)us;
   return to - start;
+}
+
+Boolean UTF8Decoder::convertOffset(unsigned long &n) const
+{
+  if (hadByteOrderMark_)
+    n += 3;
+
+  return true;
 }
 
 UTF8Encoder::UTF8Encoder()

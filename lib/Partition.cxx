@@ -17,7 +17,6 @@
 #include "EquivClass.h"
 #include "constant.h"
 #include "StringC.h"
-#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -86,7 +85,6 @@ Partition::Partition(const ISet<Char> &chars,
       } while (min++ != max);
     }
   }
-fprintf(stderr, "Partition: maxCode %d\n", maxCode_);
 }
 
 static

@@ -57,11 +57,11 @@
 )
 (define (string>?    s1 s2) (string<?  s2 s1))
 (define (string>=?   s1 s2) (string<=? s2 s1))
-(define string-ci=?  (__ci-string-equic string=?))
-(define string-ci<?  (__ci-string-equic string<?))
-(define string-ci>?  (__ci-string-equic string>?))
-(define string-ci<=? (__ci-string-equic string<=?))
-(define string-ci>=? (__ci-string-equic string>=?))
+(define string-ci=?  (__ci-string-equiv string=?))
+(define string-ci<?  (__ci-string-equiv string<?))
+(define string-ci>?  (__ci-string-equiv string>?))
+(define string-ci<=? (__ci-string-equiv string<=?))
+(define string-ci>=? (__ci-string-equiv string>=?))
 
 ;; clause 8.5.10.3
  (define (map f #!rest xs)
@@ -279,7 +279,7 @@
 			      (result (empty-node-list)))
 		     (if (node-list-empty? cur)
 			 result
-			 (loop (origin nl)
+			 (loop (origin cur)
 			       (node-list cur result)))))
 		 nl))
 

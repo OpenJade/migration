@@ -24,23 +24,23 @@ via one of the many standard CVS client, or via a web browser.</p>
 may enjoy <a href="http://www.wincvs.org">WinCVS/MacCVS</a>. A Java client also
 exists.</p>
 
-<p><a href="/cgi-bin/jade-cvs-web.pl">Browse the Jade CVS 
+<p><a href="http://cvs.sourceforge.net/cgi-bin/cvsweb.cgi?cvsroot=openjade">Browse the Jade CVS 
 repository</a></p>
 
 <p>To access the repository using the command-line cvs client,
 use</p>
 
-<pre>    CVSROOT = :pserver:cvs@peano.mathematik.uni-freiburg.de:/jadecvs</pre>
+<pre>    CVSROOT = :pserver:anonymous@cvs.openjade.sourceforge.net:/cvsroot/openjade</pre>
 
-<p>And login with password "cvs".</p>
+<p>Log in and just press the Enter key, if you are asked for a password.</p>
 
 <p>Then check-out the OpenJade sources using</p>
 
-<pre>    cvs -z6 checkout jade</pre>
+<pre>    cvs -z3 checkout jade</pre>
 
 <p>or (for example)</p>
 
-<pre>    cvs -z6 checkout -r jade_1_1 jade</pre>
+<pre>    cvs -z3 checkout -r jade_1_1 jade</pre>
 
 <p>(You can also use the module name <code>OpenJade</code> instead of the 
 directory name <code>jade</code>.)</p>
@@ -53,7 +53,7 @@ repository using WinCVS, go to Admin/Preferences, and set</p>
 
 <ul>
   <li>General/CVSROOT =
-      <code>cvs@peano.mathematik.uni-freiburg.de:/jadecvs</code>
+      <code>anonymous@cvs.openjade.sourceforge.net:/cvsroot/openjade</code>
   </li>
   <li>General/Authentication = 
       <code>&quot;passwd&quot; file on the cvs server</code>

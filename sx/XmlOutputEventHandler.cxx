@@ -137,15 +137,6 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
     intEnts_ =
       new EncodeOutputCharStream(intEntFile_, app_->outputCodingSystem());
 
-    /* If we are expanding internal entities, we are definitely not
-       generating a reference in the internal subset to an internal
-       entities driver file. Likewise for external entities. */
-    if (options_.expInt)
-      options_.intDecl= false;
-
-    if (options_.expExt)
-      options_.extDecl= false;
-
     /* Make a NullOutputByteStream to write to when we want to throw
        things away. This is only used when we are not expanding internal
        entities. */
@@ -155,6 +146,14 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
       new EncodeOutputCharStream(nobs, outputCodingSystem);
   }
 
+    /* If we are expanding internal entities, we are definitely not
+       generating a reference in the internal subset to an internal
+       entities driver file. Likewise for external entities. */
+    if (options_.expInt)
+      options_.intDecl= false;
+
+    if (options_.expExt)
+      options_.extDecl= false;
 }
 
 XmlOutputEventHandler::~XmlOutputEventHandler()
@@ -594,7 +593,7 @@ void XmlOutputEventHandler::endProlog(EndPrologEvent *event)
   const Dtd &dtd = event->dtd();
   Boolean doctypeStarted = 0;
 
-  if (options_.expInt || options_.expExt) {
+  if (options_.extDecl || options_.intDecl) {
     maybeStartDoctype(doctypeStarted, dtd);
   }
 

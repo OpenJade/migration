@@ -12,6 +12,17 @@ OBJS=LangObj.o \
   ELObjMessageArg.o \
   Expression.o \
   FOTBuilder.o \
+  ColumnSetSequence.o \
+  PageSequence.o \
+  Anchor.o \
+  EmbeddedText.o \
+  IncludedContainerArea.o \
+  GlyphAnnotation.o \
+  SideBySide.o \
+  SideBySideItem.o \
+  AlignedColumn.o \
+  MultiLineInlineNote.o \
+  EmphasizingMark.o \
   FlowObj.o \
   InheritedC.o \
   Insn.o \
@@ -38,7 +49,7 @@ FlowObj.o: FlowObj_inst.cxx
 primitive.o: primitive_inst.cxx
 DssslApp.o: DssslAppMessages.h
 FlowObj.lo: FlowObj_inst.cxx
+FlowObj.lo: FlowObj_inst.cxx
 primitive.lo: primitive_inst.cxx
 DssslApp.lo: DssslAppMessages.h
-InterpreterMessages.o: InterpreterMessages.h
 InterpreterMessages.lo: InterpreterMessages.h

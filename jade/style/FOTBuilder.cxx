@@ -119,6 +119,21 @@ const char *FOTBuilder::symbolName(Symbol sym)
     "explicit",
     "row-major",
     "column-major",
+    "front",
+    "back",
+    "parent",
+    "right",
+    "left",
+    "centered",
+    "shouldered",
+    "glyph",
+    "even",
+    "indent",
+    "final",
+    "truncate",
+    "error",
+    "repeat",
+    "initial",
   };
   ASSERT(SIZEOF(names) == nSymbols - 2);
   return names[sym - 2];
@@ -332,6 +347,136 @@ void FOTBuilder::endSimplePageSequenceHeaderFooter()
 }
 
 void FOTBuilder::endSimplePageSequence()
+{
+  end();
+}
+
+//column-set-sequence
+void FOTBuilder::startColumnSetSequence(const DisplayNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endColumnSetSequence()
+{
+  end();
+}
+
+//page-sequence
+void FOTBuilder::startPageSequence()
+{
+  start();
+}
+
+void FOTBuilder::endPageSequence()
+{
+  end();
+}
+
+//anchor
+void FOTBuilder::anchor(const AnchorNIC &)
+{
+  atomic();
+}
+
+//embedded-text
+void FOTBuilder::startEmbeddedText(const EmbeddedTextNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endEmbeddedText()
+{
+  end();
+}
+
+//included-container-area
+void FOTBuilder::startIncludedContainerArea(const IncludedContainerAreaNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endIncludedContainerArea()
+{
+  end();
+}
+
+//aligned-column
+void FOTBuilder::startAlignedColumn(const DisplayNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endAlignedColumn()
+{
+  end();
+}
+
+//multi-line-inline-note
+void FOTBuilder::startMultiLineInlineNote(const MultiLineInlineNoteNIC &, FOTBuilder* openclosenic[2])
+{
+//para multi-line-inline-note.open y multi-line-inline-note.close
+  openclosenic[0] = this;
+  openclosenic[1] = this;
+  start();
+}
+
+void FOTBuilder::endMultiLineInlineNote()
+{
+  end();
+}
+
+//no se acaba
+void FOTBuilder::endMultiLineInlineNoteOpenClose()
+{
+}
+
+//emphasizing-mark
+void FOTBuilder::startEmphasizingMark(const EmphasizingMarkNIC &, FOTBuilder* marknic[1])
+{
+  marknic[0] = this;
+  start();
+}
+
+void FOTBuilder::endEmphasizingMark()
+{
+  end();
+}
+
+void FOTBuilder::endEmphasizingMarkEM()
+{
+}
+
+//glyph-annotation
+void FOTBuilder::startGlyphAnnotation(const GlyphAnnotationNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endGlyphAnnotation()
+{
+  end();
+}
+
+
+//side-by-side
+void FOTBuilder::startSideBySide(const DisplayNIC &)
+{
+  start();
+}
+
+void FOTBuilder::endSideBySide()
+{
+  end();
+}
+
+//side-by-side-item
+void FOTBuilder::startSideBySideItem()
+{
+  start();
+}
+
+void FOTBuilder::endSideBySideItem()
 {
   end();
 }
@@ -690,6 +835,86 @@ void FOTBuilder::setHeaderMargin(Length)
 }
 
 void FOTBuilder::setFooterMargin(Length)
+{
+}
+
+//For page-sequence
+void FOTBuilder::setPageCategory(Symbol)
+{
+}
+
+void FOTBuilder::setForceLastPage(Symbol)
+{
+}
+
+void FOTBuilder::setForceFirstPage(Symbol)
+{
+}
+
+void FOTBuilder::setFirstPageType(Symbol)
+{
+}
+
+void FOTBuilder::setJustifySpread(bool)
+{
+}
+
+void FOTBuilder::setBindingEdge(Symbol)
+{
+}
+
+//For anchor
+void FOTBuilder::setAnchorKeepWithPrevious(bool)
+{
+}
+
+//For included-container-area
+void FOTBuilder::setContentsAlignment(Symbol)
+{
+}
+
+void FOTBuilder::setOverflowAction(Symbol)
+{
+}
+
+//For glyph-annotation
+void FOTBuilder::setAnnotationGlyphPlacement(Symbol)
+{
+}
+
+void FOTBuilder::setAnnotationGlyphStyle(PublicId)
+{
+}
+
+//For multi-line-inline-note
+void FOTBuilder::setInlineNoteLineCount(long)
+{
+}
+
+void FOTBuilder::setInlineNoteStyle(PublicId)
+{
+}
+
+//For emphasizing-mark
+void FOTBuilder::setMarkDistribution(Symbol)
+{
+}
+
+void FOTBuilder::setMarkStyle(PublicId)
+{
+}
+
+//For side-by-side
+void FOTBuilder::setSideBySideOverlapControl(Symbol)
+{
+}
+
+//For side-by-side-item
+void FOTBuilder::setSideBySidePreAlign(Symbol)
+{
+}
+
+void FOTBuilder::setSideBySidePostAlign(Symbol)
 {
 }
 
@@ -1216,6 +1441,42 @@ FOTBuilder::MultiMode::MultiMode()
 {
 }
 
+//embedded-text
+FOTBuilder::EmbeddedTextNIC::EmbeddedTextNIC()
+: Direction(symbolFalse)
+{
+}
+
+//anchor
+FOTBuilder::AnchorNIC::AnchorNIC()
+: IsDisplay(0)
+{
+}
+
+//included-container-area
+FOTBuilder::IncludedContainerAreaNIC::IncludedContainerAreaNIC()
+: EscapementDirection(symbolFalse), IsDisplay(0), scaleType(symbolMaxUniform), widthType(widthFull), heightType(heightFull), contentsRotation(0), positionPointX(0), positionPointY(0) 
+{
+}
+
+//multi-line-inline-note
+FOTBuilder::MultiLineInlineNoteNIC::MultiLineInlineNoteNIC()
+: breakBeforePriority(0), breakAfterPriority(0) 
+{
+}
+
+//emphasizing-mark
+FOTBuilder::EmphasizingMarkNIC::EmphasizingMarkNIC()
+: breakBeforePriority(0), breakAfterPriority(0) 
+{
+}
+
+//glyph-annotation
+FOTBuilder::GlyphAnnotationNIC::GlyphAnnotationNIC()
+: breakBeforePriority(0), breakAfterPriority(0) 
+{
+}
+
 FOTBuilder::GlyphId FOTBuilder::GlyphSubstTable::subst(const FOTBuilder::GlyphId &gid) const
 {
   for (size_t i = 0; i < pairs.size(); i += 2)
@@ -1304,6 +1565,30 @@ NO_ARG_CALL(endSideline)
 NO_ARG_CALL(endNode)
 NO_ARG_CALL(endSimplePageSequenceHeaderFooter)
 NO_ARG_CALL(endSimplePageSequence)
+//column-set-sequence
+NO_ARG_CALL(endColumnSetSequence)
+//page-sequence
+NO_ARG_CALL(startPageSequence)
+NO_ARG_CALL(endPageSequence)
+//embedded-text
+NO_ARG_CALL(endEmbeddedText)
+//included-container-area
+NO_ARG_CALL(endIncludedContainerArea)
+//aligned-column
+NO_ARG_CALL(endAlignedColumn)
+//multi-line-inline-note
+NO_ARG_CALL(endMultiLineInlineNote)
+NO_ARG_CALL(endMultiLineInlineNoteOpenClose)
+//emphasizing-mark
+NO_ARG_CALL(endEmphasizingMark)
+NO_ARG_CALL(endEmphasizingMarkEM)
+//glyph-annotation
+NO_ARG_CALL(endGlyphAnnotation)
+//side-by-side
+NO_ARG_CALL(endSideBySide)
+//side-by-side-item
+NO_ARG_CALL(startSideBySideItem)
+NO_ARG_CALL(endSideBySideItem)
 NO_ARG_CALL(pageNumber)
 NO_ARG_CALL(endTable)
 NO_ARG_CALL(tableBeforeRowBorder)
@@ -1405,6 +1690,7 @@ LONG_ARG_CALL(setWidowCount)
 LONG_ARG_CALL(setOrphanCount)
 LONG_ARG_CALL(setExpandTabs)
 LONG_ARG_CALL(setHyphenationLadderCount)
+LONG_ARG_CALL(setInlineNoteLineCount)
 
 #define BOOL_ARG_CALL(F) \
   void SaveFOTBuilder::F(bool b) { \
@@ -1435,6 +1721,8 @@ BOOL_ARG_CALL(setPrincipalModeSimultaneous)
 BOOL_ARG_CALL(setMarginaliaKeepWithPrevious)
 BOOL_ARG_CALL(setGridEquidistantRows)
 BOOL_ARG_CALL(setGridEquidistantColumns)
+BOOL_ARG_CALL(setJustifySpread)
+BOOL_ARG_CALL(setAnchorKeepWithPrevious)
 
 #define SYMBOL_ARG_CALL(F) \
   void SaveFOTBuilder::F(Symbol sym) { \
@@ -1476,6 +1764,18 @@ SYMBOL_ARG_CALL(setFontStructure)
 SYMBOL_ARG_CALL(setFontProportionateWidth)
 SYMBOL_ARG_CALL(setCellCrossed)
 SYMBOL_ARG_CALL(setMarginaliaSide)
+SYMBOL_ARG_CALL(setPageCategory)
+SYMBOL_ARG_CALL(setForceLastPage)
+SYMBOL_ARG_CALL(setForceFirstPage)
+SYMBOL_ARG_CALL(setFirstPageType)
+SYMBOL_ARG_CALL(setBindingEdge)
+SYMBOL_ARG_CALL(setContentsAlignment)
+SYMBOL_ARG_CALL(setOverflowAction)
+SYMBOL_ARG_CALL(setAnnotationGlyphPlacement)
+SYMBOL_ARG_CALL(setMarkDistribution)
+SYMBOL_ARG_CALL(setSideBySideOverlapControl)
+SYMBOL_ARG_CALL(setSideBySidePreAlign)
+SYMBOL_ARG_CALL(setSideBySidePostAlign)
 
 #define PUBLIC_ID_ARG_CALL(F) \
   void SaveFOTBuilder::F(PublicId pubid) { \
@@ -1491,6 +1791,9 @@ PUBLIC_ID_ARG_CALL(setGlyphReorderMethod)
 PUBLIC_ID_ARG_CALL(setHyphenationMethod)
 PUBLIC_ID_ARG_CALL(setTableAutoWidthMethod)
 PUBLIC_ID_ARG_CALL(setFontName)
+PUBLIC_ID_ARG_CALL(setMarkStyle)
+PUBLIC_ID_ARG_CALL(setInlineNoteStyle)
+PUBLIC_ID_ARG_CALL(setAnnotationGlyphStyle)
 
 #define UNSIGNED_ARG_CALL(F) \
   void SaveFOTBuilder::F(unsigned n) { \
@@ -1761,6 +2064,69 @@ void SaveFOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[nHF])
   tail_ = &(*tail_)->next;
 }
 
+//column-set-sequence
+void SaveFOTBuilder::startColumnSetSequence(const DisplayNIC &nic)
+{
+  *tail_ = new StartColumnSetSequenceCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//embedded-text
+void SaveFOTBuilder::startEmbeddedText(const EmbeddedTextNIC &nic)
+{
+  *tail_ = new StartEmbeddedTextCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//anchor
+void SaveFOTBuilder::anchor(const AnchorNIC &nic)
+{
+  *tail_ = new AnchorCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//included-container-area
+void SaveFOTBuilder::startIncludedContainerArea(const IncludedContainerAreaNIC &nic)
+{
+  *tail_ = new StartIncludedContainerAreaCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//aligned-column
+void SaveFOTBuilder::startAlignedColumn(const DisplayNIC &nic)
+{
+  *tail_ = new StartAlignedColumnCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//multi-line-inline-note
+void SaveFOTBuilder::startMultiLineInlineNote(const MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2])
+{
+  *tail_ = new StartMultiLineInlineNoteCall(nic, openclosenic);
+  tail_ = &(*tail_)->next;
+}
+
+//emphasizing-mark
+void SaveFOTBuilder::startEmphasizingMark(const EmphasizingMarkNIC &nic, FOTBuilder* marknic[1])
+{
+  *tail_ = new StartEmphasizingMarkCall(nic, marknic);
+  tail_ = &(*tail_)->next;
+}
+
+//glyph-annotation
+void SaveFOTBuilder::startGlyphAnnotation(const GlyphAnnotationNIC &nic)
+{
+  *tail_ = new StartGlyphAnnotationCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
+//side-by-side
+void SaveFOTBuilder::startSideBySide(const DisplayNIC &nic)
+{
+  *tail_ = new StartSideBySideCall(nic);
+  tail_ = &(*tail_)->next;
+}
+
 void SaveFOTBuilder::startTable(const TableNIC &nic)
 {
   *tail_ = new StartTableCall(nic);
@@ -1922,6 +2288,107 @@ void StartSimplePageSequenceCall::emit(FOTBuilder& fotb)
   fotb.startSimplePageSequence(hf);
   for ( unsigned i = 0; i < FOTBuilder::nHF; ++i )
     headerFooter[i].emit(*hf[i]);
+}
+
+//column-set-sequence
+StartColumnSetSequenceCall::StartColumnSetSequenceCall(const SaveFOTBuilder::DisplayNIC &nic)
+: arg(nic)
+{
+}
+
+void StartColumnSetSequenceCall::emit(FOTBuilder& fotb)
+{
+  fotb.startColumnSetSequence(arg);
+}
+
+//embedded-text
+StartEmbeddedTextCall::StartEmbeddedTextCall(const SaveFOTBuilder::EmbeddedTextNIC &nic)
+: arg(nic)
+{
+}
+
+void StartEmbeddedTextCall::emit(FOTBuilder& fotb)
+{
+  fotb.startEmbeddedText(arg);
+}
+
+//included-container-area
+StartIncludedContainerAreaCall::StartIncludedContainerAreaCall(const SaveFOTBuilder::IncludedContainerAreaNIC &nic)
+: arg(nic)
+{
+}
+
+void StartIncludedContainerAreaCall::emit(FOTBuilder& fotb)
+{
+  fotb.startIncludedContainerArea(arg);
+}
+
+//aligned-column
+StartAlignedColumnCall::StartAlignedColumnCall(const SaveFOTBuilder::DisplayNIC &nic)
+: arg(nic)
+{
+}
+
+void StartAlignedColumnCall::emit(FOTBuilder& fotb)
+{
+  fotb.startAlignedColumn(arg);
+}
+
+
+//multi-line-inline-note
+StartMultiLineInlineNoteCall::StartMultiLineInlineNoteCall(const SaveFOTBuilder::MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2])
+: arg(nic)
+{
+  //multi-line-inline-note.open
+  openclosenic[0] = &argopenclose[0]; 
+  //multi-line-inline-note.close
+  openclosenic[1] = &argopenclose[1]; 
+
+}
+
+void StartMultiLineInlineNoteCall::emit(FOTBuilder& fotb)
+{
+  FOTBuilder* oc_nic[2];
+  fotb.startMultiLineInlineNote(arg, oc_nic);
+  for (int i=0; i < 2; i++){
+  argopenclose[i].emit(*oc_nic[i]);
+  }
+}
+
+//emphasizing-mark
+StartEmphasizingMarkCall::StartEmphasizingMarkCall(const SaveFOTBuilder::EmphasizingMarkNIC &nic, FOTBuilder* marknic[1])
+: arg(nic)
+{
+  marknic[0] = &argmark;
+}
+
+void StartEmphasizingMarkCall::emit(FOTBuilder& fotb)
+{
+  FOTBuilder* mark_nic[1];
+  fotb.startEmphasizingMark(arg, mark_nic);
+  argmark.emit(*mark_nic[0]);
+}
+
+//glyph-annotation
+StartGlyphAnnotationCall::StartGlyphAnnotationCall(const SaveFOTBuilder::GlyphAnnotationNIC &nic)
+: arg(nic)
+{
+}
+
+void StartGlyphAnnotationCall::emit(FOTBuilder& fotb)
+{
+  fotb.startGlyphAnnotation(arg);
+}
+
+//side-by-side
+StartSideBySideCall::StartSideBySideCall(const SaveFOTBuilder::DisplayNIC &nic)
+: arg(nic)
+{
+}
+
+void StartSideBySideCall::emit(FOTBuilder& fotb)
+{
+  fotb.startSideBySide(arg);
 }
 
 StartFractionCall::StartFractionCall(FOTBuilder *&n, FOTBuilder *&d)
@@ -2117,6 +2584,12 @@ void SaveFOTBuilder::ExternalGraphicCall::emit(FOTBuilder &fotb)
   fotb.externalGraphic(arg);
 }
 
+//anchor
+void SaveFOTBuilder::AnchorCall::emit(FOTBuilder& fotb)
+{
+  fotb.anchor(arg);
+}
+
 void SaveFOTBuilder::RuleCall::emit(FOTBuilder &fotb)
 {
   fotb.rule(arg);
@@ -2232,6 +2705,95 @@ void SerialFOTBuilder::endSimplePageSequence()
   endSimplePageSequenceSerial();
 }
 
+//column-set-sequence
+void SerialFOTBuilder::startColumnSetSequence(const DisplayNIC &nic)
+{
+  startColumnSetSequenceSerial(nic);
+}
+
+void SerialFOTBuilder::endColumnSetSequence()
+{
+  endColumnSetSequenceSerial();
+}
+
+//page-sequence
+void SerialFOTBuilder::startPageSequence()
+{
+  startPageSequenceSerial();
+}
+
+void SerialFOTBuilder::endPageSequence()
+{
+  endPageSequenceSerial();
+}
+
+//multi-line-inline-note
+//serial para solucionar el FOT* de openclosenic
+void SerialFOTBuilder::startMultiLineInlineNote(const MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2])
+{
+  for (int i = 0; i < 2; i++) {
+    save_.insert(new SaveFOTBuilder);
+    openclosenic[i] = save_.head();
+  }
+  startMultiLineInlineNoteSerial(nic);
+}
+
+void SerialFOTBuilder::endMultiLineInlineNote()
+{
+  endMultiLineInlineNoteSerial();
+}
+
+//resolviendo entre open y close
+void SerialFOTBuilder::endMultiLineInlineNoteOpenClose()
+{
+  //oco :)
+  Owner<SaveFOTBuilder> oc[2];
+  for (int o=0; o < 2; o++){
+   oc[o] = save_.get();
+   //indica que start (close o open) es mediante la o
+   startMultiLineInlineNoteOpenClose(o);
+   oc[o]->emit(*this);
+   //indica que end (close o open) es mediante la o
+   endMultiLineInlineNoteOpenClose(o);
+  }
+  //cierra el open y el close, pero sin cerrar del la FO 
+  endAllMultiLineInlineNoteOpenClose(); 
+}
+
+//emphasizing-mark
+void SerialFOTBuilder::startEmphasizingMark(const EmphasizingMarkNIC &nic, FOTBuilder* marknic[1])
+{
+  save_.insert(new SaveFOTBuilder);
+  marknic[0] = save_.head();
+  startEmphasizingMarkSerial(nic);
+}
+
+void SerialFOTBuilder::endEmphasizingMarkEM()
+{
+   Owner<SaveFOTBuilder> emark(save_.get());
+   startEmphasizingMarkMark();
+   emark->emit(*this);
+   endEmphasizingMarkMark();
+
+  endAllEmphasizingMarkMark();
+}
+
+void SerialFOTBuilder::endEmphasizingMark()
+{
+  endEmphasizingMarkSerial();
+}
+
+//glyph-annotation
+/*void SerialFOTBuilder::startGlyphAnnotation(const GlyphAnnotationNIC &nic)
+{
+  startGlyphAnnotationSerial(nic);
+}
+
+void SerialFOTBuilder::endGlyphAnnotation()
+{
+  endGlyphAnnotationSerial();
+}
+*/
 
 void SerialFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
@@ -2450,6 +3012,89 @@ void SerialFOTBuilder::endAllSimplePageSequenceHeaderFooter()
 {
 }
 
+//column-set-sequence
+void SerialFOTBuilder::startColumnSetSequenceSerial(const DisplayNIC &)
+{
+  start();
+}
+
+void SerialFOTBuilder::endColumnSetSequenceSerial()
+{
+  end();
+}
+
+//page-sequence
+void SerialFOTBuilder::startPageSequenceSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endPageSequenceSerial()
+{
+  end();
+}
+
+//multi-line-inline-note
+void SerialFOTBuilder::startMultiLineInlineNoteSerial(const MultiLineInlineNoteNIC &nic)
+{
+ start();
+}
+
+void SerialFOTBuilder::endMultiLineInlineNoteSerial()
+{
+ end();
+}
+
+void SerialFOTBuilder::startMultiLineInlineNoteOpenClose(int)
+{
+ start();
+}
+
+void SerialFOTBuilder::endMultiLineInlineNoteOpenClose(int)
+{
+ end();
+}
+
+void SerialFOTBuilder::endAllMultiLineInlineNoteOpenClose()
+{
+}
+
+//emphasizing-mark
+void SerialFOTBuilder::startEmphasizingMarkSerial(const EmphasizingMarkNIC &)
+{
+  start();
+}
+
+void SerialFOTBuilder::endEmphasizingMarkSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startEmphasizingMarkMark()
+{
+ start();
+}
+
+void SerialFOTBuilder::endEmphasizingMarkMark()
+{
+ end();
+}
+
+void SerialFOTBuilder::endAllEmphasizingMarkMark()
+{
+}
+
+//glyph-annotation
+/*void SerialFOTBuilder::startGlyphAnnotationSerial(const GlyphAnnotationNIC &)
+{
+  start();
+}
+
+void SerialFOTBuilder::endGlyphAnnotationSerial()
+{
+  end();
+}
+*/
 void SerialFOTBuilder::startFractionSerial()
 {
   start();

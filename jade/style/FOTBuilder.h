@@ -1,5 +1,6 @@
 // Copyright (c) 1996, 1997 James Clark
 // See the file copying.txt for copying permission.
+//modif: Cristian Tornador (Barcelona) PFC-UPC 22-10-2002
 
 #ifndef FOTBuilder_INCLUDED
 #define FOTBuilder_INCLUDED 1
@@ -151,9 +152,24 @@ public:
     symbolTrailEdge,
     symbolExplicit,
     symbolRowMajor,
-    symbolColumnMajor
+    symbolColumnMajor,
+    symbolFront,
+    symbolBack,
+    symbolParent,
+    symbolRight,
+    symbolLeft,
+    symbolCentered,
+    symbolShouldered,
+    symbolGlyph,
+    symbolEven,
+    symbolIndent,
+    symbolFinal,
+    symbolTruncate,
+    symbolError,
+    symbolRepeat,
+    symbolInitial,
   };
-  enum { nSymbols = symbolColumnMajor + 1 };
+  enum { nSymbols = symbolInitial + 1 };
   typedef const char *PublicId;
   struct GlyphId {
     GlyphId() : publicId(0), suffix(0) { }
@@ -171,8 +187,15 @@ public:
   };
   // SP_LETTER2('U', 'K')
 #define SP_LETTER2(c1, c2) (((c1) << 8) | (c2))
+
+
+  /**
+   * tipos basicos
+   */
   typedef unsigned Letter2;
   typedef long Length;
+
+
   struct LengthSpec {
     LengthSpec(long len = 0) : length(len), displaySizeFactor(0.0) { }
     long length;
@@ -263,9 +286,17 @@ public:
     bool hasLength;
     LengthSpec length;
   };
+
+  /**
+   * tipos de NICs 
+   */
   // A paragraph has the same non-inherited characteristics
   // as a display-group.
   typedef DisplayNIC ParagraphNIC;
+  typedef InlineNIC LineFieldNIC;
+  typedef DisplayNIC TablePartNIC;
+
+
   struct CharacterNIC {
     CharacterNIC();
     enum {
@@ -304,7 +335,7 @@ public:
     // because it has a fixed default.
     double stretchFactor;
   };
-  typedef InlineNIC LineFieldNIC;
+
   struct TableNIC : public DisplayNIC {
     TableNIC();
     enum WidthType {
@@ -315,7 +346,7 @@ public:
     WidthType widthType;
     LengthSpec width;
   };
-  typedef DisplayNIC TablePartNIC;
+
   struct TableColumnNIC {
     TableColumnNIC();
     unsigned columnIndex;  // zero-based
@@ -332,6 +363,61 @@ public:
     unsigned nColumnsSpanned;
     unsigned nRowsSpanned;
   };
+   //embedded-text
+   struct EmbeddedTextNIC {
+    EmbeddedTextNIC();
+    Symbol Direction;
+  };
+   //anchor
+   struct AnchorNIC : InlineNIC {
+    AnchorNIC();
+    bool IsDisplay;
+  };
+   //included-container-area
+   struct IncludedContainerAreaNIC : DisplayNIC, InlineNIC{
+    IncludedContainerAreaNIC();
+    Symbol EscapementDirection;
+    bool IsDisplay;
+    enum WidthType {
+      widthFull,
+      widthMinimum,
+      widthExplicit
+    };
+    WidthType widthType;
+    LengthSpec width;
+    enum HeightType {
+      heightFull,
+      heightMinimum,
+      heightExplicit
+    };
+    HeightType heightType;
+    LengthSpec height;
+    LengthSpec positionPointX;
+    LengthSpec positionPointY;
+    long contentsRotation;
+    Symbol scaleType; // symbolFalse if not a symbol
+    double scale[2]; // if scaleType == symbolFalse
+  };
+   //multi-line-inline-note
+   struct MultiLineInlineNoteNIC {
+    MultiLineInlineNoteNIC();
+    long breakBeforePriority;
+    long breakAfterPriority;
+  };
+   //emphasizing-mark
+   struct EmphasizingMarkNIC {
+    EmphasizingMarkNIC();
+    long breakBeforePriority;
+    long breakAfterPriority;
+  };
+   
+   //glyph-annotation
+   struct GlyphAnnotationNIC {
+    GlyphAnnotationNIC();
+    long breakBeforePriority;
+    long breakAfterPriority;
+  };
+
   struct DeviceRGBColor {
     unsigned char red;
     unsigned char green;
@@ -511,6 +597,41 @@ public:
   virtual void endSimplePageSequenceHeaderFooter();
   virtual void endSimplePageSequence();
 
+  //column-set-sequence
+  virtual void startColumnSetSequence(const DisplayNIC &nic);
+  virtual void endColumnSetSequence();
+  //page-sequence
+  virtual void startPageSequence();
+  virtual void endPageSequence();
+  //anchor
+  virtual void anchor(const AnchorNIC &nic);
+  //embedded-text
+  virtual void startEmbeddedText(const EmbeddedTextNIC &nic);
+  virtual void endEmbeddedText();
+  //included-container-area
+  virtual void startIncludedContainerArea(const IncludedContainerAreaNIC &nic);
+  virtual void endIncludedContainerArea();
+  //aligned-column
+  virtual void startAlignedColumn(const DisplayNIC &nic);
+  virtual void endAlignedColumn();
+  //multi-line-inline-note
+  virtual void startMultiLineInlineNote(const MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2]);
+  virtual void endMultiLineInlineNote();
+  virtual void endMultiLineInlineNoteOpenClose();
+  //emphasizing-mark
+  virtual void startEmphasizingMark(const EmphasizingMarkNIC &nic, FOTBuilder* marknic[1]);
+  virtual void endEmphasizingMark();
+  virtual void endEmphasizingMarkEM();
+  //glyph-annotation
+  virtual void startGlyphAnnotation(const GlyphAnnotationNIC &nic);
+  virtual void endGlyphAnnotation();
+  //side-by-side
+  virtual void startSideBySide(const DisplayNIC &nic);
+  virtual void endSideBySide();
+  //side-by-side-item
+  virtual void startSideBySideItem();
+  virtual void endSideBySideItem();
+
   // page-number sosofo
   virtual void pageNumber();
   // Inherited characteristics
@@ -648,6 +769,32 @@ public:
   virtual void setBottomMargin(Length);
   virtual void setHeaderMargin(Length);
   virtual void setFooterMargin(Length);
+  //For page-sequence
+  virtual void setPageCategory(Symbol);
+  virtual void setForceLastPage(Symbol);
+  virtual void setForceFirstPage(Symbol);
+  virtual void setFirstPageType(Symbol);
+  virtual void setJustifySpread(bool);
+  virtual void setBindingEdge(Symbol);
+  //For anchor
+  virtual void setAnchorKeepWithPrevious(bool);
+  //For included-container-area 
+  virtual void setContentsAlignment(Symbol);
+  virtual void setOverflowAction(Symbol);
+  //For glyph-annotation 
+  virtual void setAnnotationGlyphPlacement(Symbol);
+  virtual void setAnnotationGlyphStyle(PublicId);
+  //For multi-line-inline-note 
+  virtual void setInlineNoteLineCount(long);
+  virtual void setInlineNoteStyle(PublicId);
+  //For emphasizing-mark 
+  virtual void setMarkDistribution(Symbol);
+  virtual void setMarkStyle(PublicId);
+  //For side-by-side 
+  virtual void setSideBySideOverlapControl(Symbol);
+  //For side-by-side-item 
+  virtual void setSideBySidePreAlign(Symbol);
+  virtual void setSideBySidePostAlign(Symbol);
   // Others
   virtual void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
   // Backlinks
@@ -752,6 +899,42 @@ public:
   void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
   void endSimplePageSequenceHeaderFooter();
   void endSimplePageSequence();
+
+  //column-set-sequence
+  void startColumnSetSequence(const DisplayNIC &);
+  void endColumnSetSequence();
+  //page-sequence
+  void startPageSequence();
+  void endPageSequence();
+  //anchor
+  void anchor(const AnchorNIC &nic);
+  //embedded-text
+  void startEmbeddedText(const EmbeddedTextNIC &nic);
+  void endEmbeddedText();
+  //included-container-area
+  void startIncludedContainerArea(const IncludedContainerAreaNIC &nic);
+  void endIncludedContainerArea();
+  //aligned-column
+  void startAlignedColumn(const DisplayNIC &nic);
+  void endAlignedColumn();
+  //multi-line-inline-note
+  void startMultiLineInlineNote(const MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2]);
+  void endMultiLineInlineNote();
+  void endMultiLineInlineNoteOpenClose();
+  //emphasizing-mark
+  void startEmphasizingMark(const EmphasizingMarkNIC &nic, FOTBuilder* marknic[1]);
+  void endEmphasizingMark();
+  void endEmphasizingMarkEM();
+  //glyph-annotation
+  void startGlyphAnnotation(const GlyphAnnotationNIC &nic);
+  void endGlyphAnnotation();
+  //side-by-side
+  void startSideBySide(const DisplayNIC &nic);
+  void endSideBySide();
+  //side-by-side-item
+  void startSideBySideItem();
+  void endSideBySideItem();
+
   // page-number sosofo
   void pageNumber();
   // math
@@ -936,6 +1119,32 @@ public:
   void setEscapementSpaceBefore(const InlineSpace &);
   void setEscapementSpaceAfter(const InlineSpace &);
   void setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &);
+  //For page-sequence
+  void setPageCategory(Symbol);
+  void setForceLastPage(Symbol);
+  void setForceFirstPage(Symbol);
+  void setFirstPageType(Symbol);
+  void setJustifySpread(bool);
+  void setBindingEdge(Symbol);
+  //For anchor
+  void setAnchorKeepWithPrevious(bool);
+  //For included-container-area 
+  void setContentsAlignment(Symbol);
+  void setOverflowAction(Symbol);
+  //For glyph-annotation 
+  void setAnnotationGlyphPlacement(Symbol);
+  void setAnnotationGlyphStyle(PublicId);
+  //For multi-line-inline-note 
+  void setInlineNoteLineCount(long);
+  void setInlineNoteStyle(PublicId);
+  //For emphasizing-mark 
+  void setMarkDistribution(Symbol);
+  void setMarkStyle(PublicId);
+  //For side-by-side 
+  void setSideBySideOverlapControl(Symbol);
+  //For side-by-side-item 
+  void setSideBySidePreAlign(Symbol);
+  void setSideBySidePostAlign(Symbol);
   void startNode(const NodePtr &, const StringC &processingMode);
   void endNode();
   void currentNodePageNumber(const NodePtr &);
@@ -1183,6 +1392,12 @@ private:
     void emit(FOTBuilder &);
     Owner<CompoundExtensionFlowObj> arg;
   };
+  //anchor
+  struct AnchorCall : Call {
+    AnchorCall(const AnchorNIC &nic) : arg(nic) { }
+    void emit(FOTBuilder &);
+    AnchorNIC arg;
+  };
   Call *calls_;
   Call **tail_;
   NodePtr currentNode_;
@@ -1196,6 +1411,61 @@ struct StartSimplePageSequenceCall : SaveFOTBuilder::Call {
   StartSimplePageSequenceCall(FOTBuilder* headerFooter[FOTBuilder::nHF]);
   void emit(FOTBuilder&);
   SaveFOTBuilder headerFooter[FOTBuilder::nHF];
+};
+
+//column-set-sequence
+struct StartColumnSetSequenceCall : SaveFOTBuilder::Call {
+  StartColumnSetSequenceCall(const FOTBuilder::DisplayNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::DisplayNIC arg;
+};
+//embedded-text
+struct StartEmbeddedTextCall : SaveFOTBuilder::Call {
+  StartEmbeddedTextCall(const FOTBuilder::EmbeddedTextNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::EmbeddedTextNIC arg;
+};
+//included-container-area
+struct StartIncludedContainerAreaCall : SaveFOTBuilder::Call {
+  StartIncludedContainerAreaCall(const FOTBuilder::IncludedContainerAreaNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::IncludedContainerAreaNIC arg;
+};
+//aligned-column
+struct StartAlignedColumnCall : SaveFOTBuilder::Call {
+  StartAlignedColumnCall(const FOTBuilder::DisplayNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::DisplayNIC arg;
+};
+
+//multi-line-inline-note
+//argopenclose necesita a SaveFOTBuilder ya que viene de FOTB
+//se sabe que son dos open y close 
+struct StartMultiLineInlineNoteCall : SaveFOTBuilder::Call {
+  StartMultiLineInlineNoteCall(const FOTBuilder::MultiLineInlineNoteNIC &, FOTBuilder* openclosenic[2]);
+  void emit(FOTBuilder&);
+  FOTBuilder::MultiLineInlineNoteNIC arg;
+  SaveFOTBuilder argopenclose[2];
+};
+
+//emphasizing-mark
+struct StartEmphasizingMarkCall : SaveFOTBuilder::Call {
+  StartEmphasizingMarkCall(const FOTBuilder::EmphasizingMarkNIC &, FOTBuilder* marknic[1]);
+  void emit(FOTBuilder&);
+  FOTBuilder::EmphasizingMarkNIC arg;
+  SaveFOTBuilder argmark;
+};
+//glyph-annotation
+struct StartGlyphAnnotationCall : SaveFOTBuilder::Call {
+  StartGlyphAnnotationCall(const FOTBuilder::GlyphAnnotationNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::GlyphAnnotationNIC arg;
+};
+//side-by-side
+struct StartSideBySideCall : SaveFOTBuilder::Call {
+  StartSideBySideCall(const FOTBuilder::DisplayNIC &);
+  void emit(FOTBuilder&);
+  FOTBuilder::DisplayNIC arg;
 };
 
 struct StartFractionCall : SaveFOTBuilder::Call {
@@ -1289,6 +1559,25 @@ public:
   void startSimplePageSequence(FOTBuilder* headerFooter[nHF]);
   void endSimplePageSequenceHeaderFooter();
   void endSimplePageSequence();
+
+  //column-set-sequence
+  void startColumnSetSequence(const DisplayNIC &);
+  void endColumnSetSequence();
+  //page-sequence
+  void startPageSequence();
+  void endPageSequence();
+  //multi-line-inline-note
+  void startMultiLineInlineNote(const MultiLineInlineNoteNIC &nic, FOTBuilder* openclosenic[2]);
+  void endMultiLineInlineNote();
+  void endMultiLineInlineNoteOpenClose();
+  //emphasizing-mark
+  void startEmphasizingMark(const EmphasizingMarkNIC &, FOTBuilder* marknic[1]);
+  void endEmphasizingMark();
+  void endEmphasizingMarkEM();
+  //glyph-annotation
+  //void startGlyphAnnotation(const GlyphAnnotationNIC &);
+  //void endGlyphAnnotation();
+
   void startTablePart(const TablePartNIC &,
                       FOTBuilder *&header, FOTBuilder *&footer);
   void endTablePart();
@@ -1325,6 +1614,29 @@ public:
   virtual void startSimplePageSequenceHeaderFooter(unsigned);
   virtual void endSimplePageSequenceHeaderFooter(unsigned);
   virtual void endAllSimplePageSequenceHeaderFooter();
+
+  //column-set-sequence
+  virtual void startColumnSetSequenceSerial(const DisplayNIC &);
+  virtual void endColumnSetSequenceSerial();
+  //page-sequence
+  virtual void startPageSequenceSerial();
+  virtual void endPageSequenceSerial();
+  //multi-line-inline-note
+  virtual void startMultiLineInlineNoteSerial(const MultiLineInlineNoteNIC &nic);
+  virtual void endMultiLineInlineNoteSerial();
+  virtual void startMultiLineInlineNoteOpenClose(int);
+  virtual void endMultiLineInlineNoteOpenClose(int);
+  virtual void endAllMultiLineInlineNoteOpenClose();
+  //emphasizing-mark
+  virtual void startEmphasizingMarkSerial(const EmphasizingMarkNIC &);
+  virtual void endEmphasizingMarkSerial();
+  virtual void startEmphasizingMarkMark();
+  virtual void endEmphasizingMarkMark();
+  virtual void endAllEmphasizingMarkMark();
+  //glyph-annotation
+  //virtual void startGlyphAnnotationSerial(const GlyphAnnotationNIC &);
+  //virtual void endGlyphAnnotationSerial();
+
   virtual void startFractionSerial();
   virtual void endFractionSerial();
   virtual void startFractionNumerator();

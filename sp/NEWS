@@ -1,3 +1,7 @@
+Changes in OpenSP 1.5.2
+
+* Add more tests. (Karl Eichwalder)
+
 Changes in OpenSP 1.5.1
 
 * Enable run time selection of message format with SP_MESSAGE_FORMAT

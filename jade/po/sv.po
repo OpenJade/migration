@@ -2,6 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenJade 1.4\n"
+"POT-Creation-Date: 2000-03-28 14:20+0000\n"
 "PO-Revision-Date: 1999-12-08 23:03+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -34,24 +35,17 @@ msgstr ""
 msgid "TYPE"
 msgstr ""
 
-# MifMessages
-msgid "MIF: cannot open output file %1 (%2)"
-msgstr ""
-
-msgid "MIF: could not convert system identifier %1 to a single filename"
-msgstr ""
+msgid "could not convert system identifier %1 to a single filename"
+msgstr "kan inte göra om systemidentifieraren %1 till ett filnamn"
 
 msgid ""
-"MIF: missing table column flow object (table-auto-width feature not fully "
+"missing table column flow object (table-auto-width feature not fully "
 "supported)"
 msgstr ""
 
 # RtfMessages
 msgid "nested tables are not allowed in RTF"
 msgstr "nästlade tabeller är inte tillåtna i RTF"
-
-msgid "could not convert system identifier %1 to a single filename"
-msgstr "kan inte göra om systemidentifieraren %1 till ett filnamn"
 
 msgid "could not embed %1 with clsid %2"
 msgstr "kan inte bädda in %1 med clsid %2"
@@ -78,9 +72,6 @@ msgstr "TeX stöder inte ännu HyTime-länkar"
 msgid "TeX backend does not currently support TEI links"
 msgstr "TeX stöder inte ännu TEI-länkar"
 
-msgid "TeX backend does not currently support HTML links"
-msgstr "TeX stöder inte ännu HTML-länkar"
-
 msgid "TeX backend does not currently support glyph substitution tables"
 msgstr "TeX stöder inte ännu glyph-ersättningstabeller"
 
@@ -90,6 +81,10 @@ msgstr "%1 version %2"
 
 msgid "no DSSSL specification: use -d to specify"
 msgstr "ingen DSSSL-specifikation: använd -d för att ange en"
+
+msgid ""
+"no applicable processing instruction with title %1; available titles: %2"
+msgstr ""
 
 msgid ""
 "Options with a \"doc-\"/\"spec-\" prefix apply only to the "
@@ -103,6 +98,10 @@ msgid "Debug mode."
 msgstr ""
 
 msgid "Use DSSSL specification %1."
+msgstr "Använd DSSSL-specifikation %1."
+
+#, fuzzy
+msgid "Use DSSSL specification with title %1."
 msgstr "Använd DSSSL-specifikation %1."
 
 msgid "Pretend that %1 appeared in the specification."
@@ -186,12 +185,6 @@ msgstr "referens till odefinierad variabel %1"
 
 msgid "no character with name %1"
 msgstr "inget tecken med namn %1"
-
-msgid "syntactic keyword %1 not valid in call position"
-msgstr "syntaktiskt nyckelord %1 inte tillåtet i anropsposition"
-
-msgid "symbol required (got %1)"
-msgstr "symbol krävs (istället för ç1)"
 
 msgid "unknown top level form %1"
 msgstr "okänd toppnivå-form %1"
@@ -299,11 +292,6 @@ msgid ""
 msgstr ""
 "%2 argumentet till primitiven %1 är av fel typ: %3 är inget heltal eller "
 "symbolen \"force\""
-
-msgid ""
-"%2 argument for primitive %1 of wrong type: %3 not a valid element matching "
-"pattern"
-msgstr ""
 
 msgid "%2 argument for primitive %1 of wrong type: %3 not an address"
 msgstr "%2 argumentet till primitiven %1 är av fel typ: %3 är ingen adress"
@@ -563,9 +551,6 @@ msgstr ""
 msgid "error in declaration element"
 msgstr ""
 
-msgid "duplicate declaration element (%1)"
-msgstr ""
-
 msgid "%1 is not a valid identifier"
 msgstr ""
 
@@ -778,6 +763,24 @@ msgstr ""
 
 msgid "flow object not accepted by port; only table-cell flow objects accepted"
 msgstr ""
+
+msgid "priority-expression must be a number"
+msgstr ""
+
+msgid "query-expression must be a node-list"
+msgstr ""
+
+msgid "Sorry, non-integral priorities not implemented"
+msgstr ""
+
+#~ msgid "TeX backend does not currently support HTML links"
+#~ msgstr "TeX stöder inte ännu HTML-länkar"
+
+#~ msgid "syntactic keyword %1 not valid in call position"
+#~ msgstr "syntaktiskt nyckelord %1 inte tillåtet i anropsposition"
+
+#~ msgid "symbol required (got %1)"
+#~ msgstr "symbol krävs (istället för ç1)"
 
 #~ msgid ""
 #~ "%2 argument for primitive %1 of wrong type: %3 neither a string not a symbol"

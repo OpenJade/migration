@@ -10,9 +10,9 @@ dnl  Credits: this autoconf script was largely "inspired" <g> by the
 dnl  autoconf script around SP made by Henry Thompson.
 dnl
 AC_INIT(dsssl)
-AM_CONFIG_HEADER(style/config.h)
 AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(OpenJade, 1.4)
+AM_CONFIG_HEADER(style/config.h)
 AM_SANITY_CHECK
 missing_dir=`cd $ac_aux_dir && pwd`
 
@@ -51,28 +51,107 @@ fi
 AC_CHECK_SIZEOF(size_t)
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned short)
-AC_CHECK_SIZEOF(wchar_t)
+OJ_CHECK_SIZEOF(wchar_t, wchar.h)
 AC_CXX_BOOL
-AC_LANG_CPLUSPLUS
-AC_CHECK_SIZEOF(bool)
+if test "$ac_cv_cxx_bool" = yes; then
+  AC_LANG_CPLUSPLUS
+  AC_CHECK_SIZEOF(bool)
+  AC_LANG_C
+fi
 AC_CXX_NEW_FOR_SCOPING
 AC_CXX_PLACEMENT_OPERATOR_DELETE
 AC_CXX_DYNAMIC_CAST
 AC_CXX_NAMESPACES
 AC_CXX_EXPLICIT_INSTANTIATIONS
-if test "$GXX"
-then
+AC_CACHE_CHECK(for placement operator new,
+ac_cv_cxx_placement_operator_new,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([#include <stddef.h>
+#ifdef HAVE_NEW
+#include <new>
+#else
+#include <new.h>
+#endif
+class A {
+public:
+  A() {};
+};
+A* foo()
+{
+  void *x;
+  A *bar = new (x) A;
+  return bar;
+};],,
+   ac_cv_cxx_placement_operator_new=yes,
+   ac_cv_cxx_placement_operator_new=no)
+ AC_LANG_RESTORE
+])
+if test "$ac_cv_cxx_placement_operator_new" = yes; then
+  AC_DEFINE(HAVE_PLACEMENT_OPERATOR_NEW,,
+            [define if placement operator new is declared])
+fi
+AC_CACHE_CHECK(whether the C++ compiler supports the std namespace,
+ac_cv_cxx_namespace_std,
+[AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ AC_TRY_COMPILE([
+#ifdef HAVE_NEW
+#include <new>
+#else
+#include <new.h>
+#endif],[
+std::set_new_handler(0);],
+   ac_cv_cxx_namespace_std=yes,
+   ac_cv_cxx_namespace_std=no)
+ AC_LANG_RESTORE])
+if test "$ac_cv_cxx_namespace_std" = yes; then
+  AC_DEFINE(HAVE_NAMESPACE_STD,,
+            [define if the C++ compiler supports the std namespace])
+fi
+if test "$GXX"; then
+dnl These need tests for non-GNU compilers
   AC_CACHE_CHECK(whether GNU C++ supports automatic template instantiation,
-	         ac_cv_c_gnu_automatic_templates,
+                 ac_cv_c_gnu_automatic_templates,
                  AC_EGREP_CPP(yes,[
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 8)
   yes
 #endif
-	],AC_MSG_RESULT(yes)
-            AC_DEFINE(SP_DEFINE_TEMPLATES),
-          AC_MSG_RESULT(no)
-            AC_DEFINE(SP_MANUAL_INST)
-            CXXFLAGS="$CXXFLAGS -fno-implicit-templates"))
+                 ],
+                 ac_cv_c_gnu_automatic_templates=yes,
+                 ac_cv_c_gnu_automatic_templates=no))
+  if test "$ac_cv_c_gnu_automatic_templates" = yes; then
+    AC_DEFINE(SP_DEFINE_TEMPLATES)
+  else
+    AC_DEFINE(SP_MANUAL_INST)
+    CXXFLAGS="$CXXFLAGS -fno-implicit-templates"
+  fi
+  AC_CACHE_CHECK(whether GNU C++ links with libg++ if we include new.h,
+                 ac_cv_cxx_gnu_avoid_new_h,
+                 AC_EGREP_CPP(yes,[
+#if (__GNUC__ == 2 && __GNUC_MINOR__ < 8)
+  yes
+#endif
+                 ],
+                 ac_cv_cxx_gnu_avoid_new_h=yes,
+                 ac_cv_cxx_gnu_avoid_new_h=no))
+  if test "$ac_cv_cxx_gnu_avoid_new_h" = yes; then
+    AC_DEFINE(SP_NEW_H_MISSING)
+    AC_CACHE_CHECK(whether to declare set_new_handler extern "C",
+                    ac_cv_cxx_new_handler_extern_c,
+                    [AC_LANG_SAVE
+                     AC_LANG_CPLUSPLUS
+                     AC_TRY_COMPILE([
+typedef void (*new_handler)();
+new_handler set_new_handler(new_handler);],[
+set_new_handler(0);],
+                      ac_cv_cxx_new_handler_extern_c=no,
+                      ac_cv_cxx_new_handler_extern_c=yes)
+                     AC_LANG_RESTORE])
+    if test "$ac_cv_cxx_new_handler_extern_c" = yes; then
+      AC_DEFINE(SP_SET_NEW_HANDLER_EXTERN_C)
+    fi
+  fi
 fi
 AC_CACHE_CHECK(whether new_handler accepts size_t and returns int,
 ac_cv_cxx_fancy_new_handler,
@@ -91,10 +170,7 @@ if test "$ac_cv_cxx_fancy_new_handler" = yes; then
 fi
 
 dnl FIXME these need tests 
-AC_DEFINE(SP_SET_NEW_HANDLER_EXTERN_C)
 AC_DEFINE(SP_ANSI_LIB)
-AC_DEFINE(SP_NO_STD_NAMESPACE)
-dnl AC_DEFINE(SP_DECLARE_PLACEMENT_OPERATOR_NEW)
 
 dnl Checks for library functions.
 AC_REPLACE_FUNCS(memcmp)

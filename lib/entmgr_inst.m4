@@ -75,7 +75,7 @@ __instantiate(String<SyntaxChar>)
 __instantiate(XcharMap<PackedBoolean>)
 __instantiate(XcharMap<EquivCode>)
 __instantiate(Vector<char>)
-#if SP_HAVE_BOOL && SP_SIZEOF_BOOL_1
+#if defined(SP_HAVE_BOOL) && defined(SP_SIZEOF_BOOL_1)
 __instantiate(Vector<PackedBoolean>)
 #endif
 __instantiate(CharMap<Unsigned32>)

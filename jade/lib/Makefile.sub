@@ -7,7 +7,7 @@ ENTMGR_OBJS=CharsetInfo.o EntityCatalog.o EntityDecl.o EntityManager.o \
  UnivCharsetDesc.o entmgr_inst.o
 XENTMGR_OBJS=LiteralStorage.o URLStorage.o RewindStorageObject.o \
   ErrnoMessageArg.o OffsetOrderedList.o DescriptorManager.o \
-  ExtendEntityManager.o PosixStorage.o StdioStorage.o \
+  ExtendEntityManager.o PosixStorage.o StdioStorage.o NotationStorage.o \
   StorageManager.o CodingSystem.o IdentityCodingSystem.o \
   UTF8CodingSystem.o Fixed2CodingSystem.o UnicodeCodingSystem.o \
   EUCJPCodingSystem.o SJISCodingSystem.o TranslateCodingSystem.o \

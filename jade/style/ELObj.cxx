@@ -1082,6 +1082,7 @@ void PairNodeListObj::traceSubObjects(Collector &c) const
 ReverseNodeListObj::ReverseNodeListObj(NodeListObj *nl)
 : nl_(nl), reversed_(0)
 {
+  hasSubObjects_ = 1;
 }
 
 NodePtr ReverseNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
@@ -1112,7 +1113,7 @@ NodeListObj *ReverseNodeListObj::reversed(EvalContext &context, Interpreter &int
     NodePtr nd(nl_->nodeListFirst(context, interp));
     if (nd) {
       reversed_ = new (interp) NodePtrNodeListObj(nd);
-      NodeListObj *tem = this;
+      NodeListObj *tem = nl_;
       ELObjDynamicRoot protect(interp, tem);
       ELObjDynamicRoot protect2(interp, reversed_);
       for (;;) {

@@ -45,6 +45,14 @@ Boolean EntityCatalog::lookupPublic(const StringC &,
   return 0;
 }
 
+Boolean EntityCatalog::lookupChar(const StringC &,
+				  const CharsetInfo &,
+			    	  Messenger &,
+				  UnivChar &) const
+{
+  return 0;
+}
+
 #ifdef SP_NAMESPACE
 }
 #endif

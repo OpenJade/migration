@@ -291,7 +291,7 @@ void Syntax::implySgmlChar(const Sd &sd)
   const CharsetInfo &internalCharset = sd.internalCharset();
   internalCharset.getDescSet(set_[sgmlChar]);
   ISet<WideChar> invalid;
-  checkSgmlChar(sd, 0, invalid);
+  checkSgmlChar(sd, 0, 0, invalid);
   ISetIter<WideChar> iter(invalid);
   WideChar min, max;
   while (iter.next(min, max)) {
@@ -304,6 +304,7 @@ void Syntax::implySgmlChar(const Sd &sd)
 
 void Syntax::checkSgmlChar(const Sd &sd,
 			   const ::SP_NAMESPACE_SCOPE Syntax *otherSyntax,
+			   Boolean invalidUseDocumentCharset,
 			   ISet<WideChar> &invalid) const
 {
   ISetIter<Char> iter(shunchar_);
@@ -320,24 +321,40 @@ void Syntax::checkSgmlChar(const Sd &sd,
 	      && sd.internalCharset().univToDesc(univ, tem, set)
 	      && tem <= charMax)
 	    c = Char(tem);
-	  else
+	  else {
+	    const PublicId *base;
+	    StringC lit;
+	    Number n;
+	    CharsetDeclRange::Type type;
+	    // If it's a declared but unknown character,
+	    // then it can't be significant,
+	    if (invalidUseDocumentCharset
+	        && sd.docCharsetDecl().getCharInfo(min,
+		                                   base,
+						   type,
+						   n,
+						   lit)
+		&& type != CharsetDeclRange::unused)
+	      invalid += min;
 	    continue;
+	  }
 	}
 	else
 	  c = min;
 	if (!set_[significant].contains(c)
 	    && (!otherSyntax || !otherSyntax->set_[significant].contains(c))
 	    && set_[sgmlChar].contains(c))
-	  invalid += c;
+	 invalid += invalidUseDocumentCharset ? min : c;
       } while (min++ != max);
     }
   }
   if (shuncharControls_) {
     UnivChar i;
+    const CharsetInfo &charset = invalidUseDocumentCharset ? sd.docCharset() : sd.internalCharset();
     for (i = 0; i < 32; i++)
-      checkUnivControlChar(i, sd.internalCharset(), otherSyntax, invalid);
+      checkUnivControlChar(i, charset, otherSyntax, invalid);
     for (i = 127; i < 160; i++)
-      checkUnivControlChar(i, sd.internalCharset(), otherSyntax, invalid);
+      checkUnivControlChar(i, charset, otherSyntax, invalid);
   }
 }
 

@@ -76,6 +76,19 @@ private:
   void operator=(const ProcessContext &); // undefined
   void badContentMap(bool &, const Location &);
   void coverSpannedRows();
+  struct SavedConnection {
+    unsigned connectableLevel;
+    unsigned portIndex;
+    bool operator==(const SavedConnection &c) const {
+      return connectableLevel == c.connectableLevel && portIndex == c.portIndex;
+    }
+    bool operator!=(const SavedConnection &c) const {
+      return !(*this == c);
+    }
+  };
+  void saveCurrentConnection(SavedConnection &);
+  void restoreConnection(const SavedConnection &);
+  void restoreConnection(unsigned connectableLevel, size_t portIndex);
   struct Port {
     Port();
     FOTBuilder *fotb;
@@ -99,10 +112,12 @@ private:
   friend struct Connection;
   struct Connection : public Link {
     Connection(FOTBuilder *);
-    Connection(const StyleStack &, Port *);
+    Connection(const StyleStack &, Port *, unsigned connectableLevel, size_t portIndex);
     FOTBuilder *fotb;
     StyleStack styleStack;
     Port *port;
+    unsigned connectableLevel;
+    bool portIndex;
     unsigned nBadFollow;
   };
   struct Table : public Link {
@@ -117,6 +132,7 @@ private:
     unsigned nColumns;
     StyleObj *rowStyle;
     bool inTableRow;
+    SavedConnection rowConnection;
   };
   struct NodeStackEntry {
     unsigned long elementIndex;
@@ -126,6 +142,7 @@ private:
   FOTBuilder ignoreFotb_;
   IList<Connection> connectionStack_;
   IList<Connectable> connectableStack_;
+  unsigned connectableStackLevel_;
   IList<Table> tableStack_;
   NCVector<IQueue<SaveFOTBuilder> > principalPortSaveQueues_;
   VM vm_;
@@ -137,6 +154,7 @@ private:
   friend class CurrentNodeSetter;
   friend struct Connection;
   friend struct Connectable;
+  friend struct Table;
 };
 
 inline

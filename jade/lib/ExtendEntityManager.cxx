@@ -129,6 +129,7 @@ public:
   void noteInsertedRSs();
   void setDecoder(size_t i, Decoder *);
   void setId(size_t i, StringC &);
+  void getId(size_t i, StringC &) const;
   Boolean convertOffset(Offset, StorageObjectLocation &) const;
 private:
   ParsedSystemId parsedSysid_;
@@ -691,13 +692,17 @@ Boolean ExternalInputSource::rewind(Messenger &mgr)
     delete [] buf_;
   // reset makes a new EntityOrigin
   ParsedSystemId parsedSysid(info_->parsedSystemId());
+  ExternalInfoImpl *oldInfo = info_;
   info_ = new ExternalInfoImpl(parsedSysid);
-  inputSourceOrigin()->setExternalInfo(info_);
   so_ = 0;
   for (size_t i = 0; i < soIndex_; i++) {
     if (sov_[i] && !sov_[i]->rewind(mgr))
       return 0;
+    StringC tem;
+    oldInfo->getId(i, tem);
+    info_->setId(i, tem);
   }
+  inputSourceOrigin()->setExternalInfo(info_);
   init();
   return 1;
 }
@@ -743,22 +748,22 @@ Xchar ExternalInputSource::fill(Messenger &mgr)
       if (soIndex_ > 0)
 	info_->noteStorageObjectEnd(bufLimOffset_ - (bufLim_ - end()));
       const StorageObjectSpec &spec = info_->spec(soIndex_);
-      StringC id;
-      if (sov_[soIndex_])
-	;
-      else if (mayNotExist_) {
-	NullMessenger nullMgr;
-	sov_[soIndex_]
-	  = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
-						   spec.search,
-						   mayRewind_, nullMgr, id);
+      if (!sov_[soIndex_]) {
+	StringC id;
+	if (mayNotExist_) {
+	  NullMessenger nullMgr;
+	  sov_[soIndex_]
+	    = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
+						     spec.search,
+						     mayRewind_, nullMgr, id);
+	}
+	else
+	  sov_[soIndex_]
+	    = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
+						     spec.search,
+						     mayRewind_, mgr, id);
+	info_->setId(soIndex_, id);
       }
-      else
-	sov_[soIndex_]
-	  = spec.storageManager->makeStorageObject(spec.specId, spec.baseId,
-						   spec.search,
-						   mayRewind_, mgr, id);
-      info_->setId(soIndex_, id);
       so_ = sov_[soIndex_].pointer();
       if (so_) {
 	decoder_ = spec.codingSystem->makeDecoder();
@@ -1102,6 +1107,12 @@ void ExternalInfoImpl::setId(size_t i, StringC &id)
 {
   Mutex::Lock lock(&mutex_);
   id.swap(position_[i].id);
+}
+
+void ExternalInfoImpl::getId(size_t i, StringC &id) const
+{
+  Mutex::Lock lock(&((ExternalInfoImpl *)this)->mutex_);
+  id = position_[i].id;
 }
 
 void ExternalInfoImpl::setDecoder(size_t i, Decoder *decoder)

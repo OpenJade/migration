@@ -2,7 +2,7 @@
 
 lib_LTLIBRARIES= libosp.la
 
-libosp_la_LDFLAGS = -version-info 2:0:0
+libosp_la_LDFLAGS = -version-info 2:1:0
 
 ## We list the generated sources here. This has the side-effect
 ## of putting them in the distribution, but that is actually nice

@@ -296,4 +296,8 @@
 #define PATH_SEPARATOR ':'
 #endif
 
+#define SP_PACKAGE "OpenSP"
+#define SP_VERSION "1.4-pre1"
+#define SP_LOCALE_DIR ""
+
 #endif /* not config_INCLUDED */

@@ -103,12 +103,16 @@ void CmdLineApp::changeOptionRegistration(AppChar oldc, AppChar newc)
   for (size_t i = 0; i < opts_.size(); i++) {
     if (opts_[i].value == oldc) {
       opts_[i].value = newc;
+#ifdef SP_HAVE_LOCALE
       char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
       setlocale(LC_CTYPE, "C");
+#endif
       opts_[i].key = istalnum(newc) ? newc : 0;
+#ifdef SP_HAVE_LOCALE
       setlocale(LC_CTYPE, savedLocale);
       if (savedLocale)
         free(savedLocale);
+#endif
       return;
     }
   }
@@ -122,12 +126,16 @@ void CmdLineApp::registerOption(AppChar c, const AppChar *name,
   ASSERT((c != '-') && (c != ':') && (c != '?') && (c != '=')); 
   LongOption<AppChar> opt;
   opt.value = c;
+#ifdef SP_HAVE_LOCALE
   char *savedLocale = strdup(setlocale(LC_CTYPE, NULL));
   setlocale(LC_CTYPE, "C");
+#endif
   opt.key = istalnum(c) ? c : 0;
+#ifdef SP_HAVE_LOCALE
   setlocale(LC_CTYPE, savedLocale);
   if (savedLocale)
     free(savedLocale);
+#endif
   opt.name = name;
   opt.hasArgument = (arg.module() != CmdLineAppMessages::noArg.module()
                     || arg.number() != CmdLineAppMessages::noArg.number());

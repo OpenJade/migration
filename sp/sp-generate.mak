@@ -22,7 +22,6 @@ lib\StdioStorageMessages.h \
 lib\ParserMessages.h \
 lib\ParserAppMessages.h \
 lib\CmdLineAppMessages.h \
-lib\version.h \
 nsgmls\nsgmls_inst.cxx \
 nsgmls\RastEventHandlerMessages.h \
 nsgmls\NsgmlsMessages.h \
@@ -31,7 +30,7 @@ spam\spam_inst.cxx \
 sx\SxMessages.h \
 sx\XmlOutputMessages.h \
 sx\sx_inst.cxx \
-include\version.h
+include\config.h 
 
 .SUFFIXES: .m4 .msg
 
@@ -64,4 +63,4 @@ all: $(GENSRCS)
 	attrib +r $@
 
 include\config.h: include\config.h.old
-	copy /f include\config.h.old include\config.h 
+	copy include\config.h.old include\config.h 

@@ -1,8 +1,9 @@
 opensp (1.5pre4-2) unstable; urgency=low
 
   * debian/control: add Build-Depends
+  * back out bad patch to acconfig.h
 
- --
+ -- Adam Di Carlo <aph@debian.org>  Mon,  8 May 2000 21:28:07 -0400
 
 opensp (1.5pre4-1) unstable; urgency=low
 

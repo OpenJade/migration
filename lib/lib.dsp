@@ -1298,7 +1298,7 @@ SOURCE=..\include\Event.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\EventGenerator.h
+SOURCE=..\generic\EventGenerator.h
 # End Source File
 # Begin Source File
 
@@ -1682,7 +1682,7 @@ SOURCE=.\ParserAppMessages.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\ParserEventGeneratorKit.h
+SOURCE=..\generic\ParserEventGeneratorKit.h
 # End Source File
 # Begin Source File
 
@@ -1776,7 +1776,7 @@ SOURCE=..\include\SearchResultMessageArg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\SGMLApplication.h
+SOURCE=..\generic\SGMLApplication.h
 # End Source File
 # Begin Source File
 

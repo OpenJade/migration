@@ -17,12 +17,14 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 class Interpreter;
+class CodingSystem;
 
 class STYLE_API StyleEngine {
 public:
   StyleEngine(Messenger &, GroveManager &,
 	      int unitsPerInch, bool debugMode, bool dsssl2,
-	      bool strictMode, const FOTBuilder::Description &);
+	      bool strictMode, const FOTBuilder::Description &,
+              const CodingSystem *);
   void parseSpec(SgmlParser &specParser,
 		 const CharsetInfo &charset,
 		 const StringC &id,
@@ -43,6 +45,7 @@ private:
   bool dsssl2_;
   bool strictMode_;
   const FOTBuilder::Description *fotbDescr_;
+  const CodingSystem *outputCodingSystem_;
 };
 
 #ifdef DSSSL_NAMESPACE

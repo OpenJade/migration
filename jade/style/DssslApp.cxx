@@ -337,7 +337,7 @@ void DssslApp::processGrove()
   if (!fotb)
     return;
   StyleEngine se(*this, *this, unitsPerInch_, debugMode_, 
-                 dsssl2_, strictMode_, *fotbDescr); 
+                 dsssl2_, strictMode_, *fotbDescr, outputCodingSystem()); 
   se.parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, defineVars_);
   se.process(rootNode_, *fotb);
 }

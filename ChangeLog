@@ -1,5 +1,8 @@
 2002-12-01  Karl Eichwalder  <ke@suse.de>
 
+	* sunfix.sh: Remove it; it's required for OpenSP only.
+	* FILES: Remove sunfix.sh reference.
+
 	* docsrc/releasenotes.xml: Add system identifier.
 
 2002-12-01 14:55  icastle

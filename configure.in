@@ -10,7 +10,6 @@ dnl  Credits: this autoconf script was largely "inspired" <g> by the
 dnl  autoconf script around SP made by Henry Thompson.
 dnl
 AC_INIT(dsssl)
-AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE(OpenJade, 1.4)
 AM_CONFIG_HEADER(style/config.h)
 AM_SANITY_CHECK

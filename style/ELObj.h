@@ -40,6 +40,7 @@ class DisplaySpaceObj;
 class InlineSpaceObj;
 class GlyphSubstTableObj;
 class VectorObj;
+class LanguageObj;
 
 class ELObj : public Collector::Object {
 public:
@@ -75,6 +76,7 @@ public:
   virtual StringObj *convertToString();	// either symbol or string
   virtual BoxObj *asBox();
   virtual VectorObj *asVector();
+  virtual LanguageObj *asLanguage();
   virtual bool charValue(Char &);
   virtual bool stringData(const Char *&, size_t &);
   virtual void print(Interpreter &, OutputCharStream &);

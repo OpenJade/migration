@@ -17,6 +17,8 @@
 #include <limits.h>
 #include <stdio.h>
 #include <time.h>
+#include "LangObj.h"
+#include <ctype.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -122,10 +124,12 @@ const Signature name ## PrimitiveObj::signature_ \
   = { nRequired, nOptional, rest };
 
 #define XPRIMITIVE PRIMITIVE
+#define XXPRIMITIVE PRIMITIVE
 #define PRIMITIVE2 PRIMITIVE
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
+#undef XXPRIMITIVE
 #undef PRIMITIVE2
 
 #define DEFPRIMITIVE(name, argc, argv, context, interp, loc) \
@@ -4399,6 +4403,173 @@ DEFPRIMITIVE(VectorFill, argc, argv, context, interp, loc)
   return interp.makeUnspecified();
 }
 
+DEFPRIMITIVE(Language, argc, argv, context, interp, loc)
+{
+  StringObj *lang = argv[0]->convertToString();
+  if (!lang)
+    return argError(interp, loc,
+		    InterpreterMessages::notAStringOrSymbol, 0, argv[0]);
+  StringObj *country = argv[1]->convertToString();
+  if (!country)
+    return argError(interp, loc,
+		    InterpreterMessages::notAStringOrSymbol, 1, argv[1]);
+#ifdef SP_HAVE_LOCALE
+  if (RefLangObj::supportedLanguage(*lang, *country))
+    return new (interp) RefLangObj (*lang, *country);
+  else
+#endif
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(IsLanguage, argc, argv, context, interp, loc)
+{
+  if (argv[0]->asLanguage())
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(CurrentLanguage, argc, argv, context, interp, loc)
+{
+  if (context.currentLanguage)
+    return context.currentLanguage;
+  else
+    return interp.defaultLanguage();
+}
+
+DEFPRIMITIVE(WithLanguage, argc, argv, context, interp, loc)
+{
+  // Check that argv[0] is a language
+  LanguageObj *lang = argv[0]->asLanguage();
+  if (!lang)
+    return argError(interp, loc,
+                    InterpreterMessages::notALanguage, 0, argv[0]);
+  // Check that argv[1] is a thunk
+  FunctionObj *func = argv[1]->asFunction();
+  if (!func)
+    return argError(interp, loc,
+                    InterpreterMessages::notAProcedure, 1, argv[1]);
+  if (func->totalArgs() > 0) {
+    interp.message(InterpreterMessages::tooManyArgs);
+    return interp.makeError();
+  }
+  LanguageObj *savedLanguage = context.currentLanguage;
+  context.currentLanguage = lang;
+  VM vm(context, interp);
+  InsnPtr insn(func->makeCallInsn(1, interp, loc, InsnPtr()));
+  ELObj *ret = vm.eval(insn.pointer());
+  context.currentLanguage = savedLanguage;
+  return ret;
+}
+
+#define GETCURLANG(lang,context,interp) \
+  const LanguageObj *lang; \
+  if (context.currentLanguage != 0) \
+    lang = context.currentLanguage; \
+  else if (interp.defaultLanguage()->asLanguage() != 0) \
+    lang = interp.defaultLanguage()->asLanguage(); \
+  else { \
+    interp.message(InterpreterMessages::noCurrentLanguage); \
+    return interp.makeError(); \
+  }
+
+DEFPRIMITIVE(CharLess, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char c[2];
+  for (unsigned i = 0; i < 2; i++)
+    if (!argv[i]->charValue(c[i]))
+      return argError(interp, loc,
+                      InterpreterMessages::notAChar, i, argv[i]);
+  if (lang->isLess(StringC(c, 1), StringC(c + 1, 1)))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(CharLessOrEqual, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char c[2];
+  for (unsigned i = 0; i < 2; i++)
+    if (!argv[i]->charValue(c[i]))
+      return argError(interp, loc,
+                      InterpreterMessages::notAChar, i, argv[i]);
+  if (lang->isLessOrEqual(StringC(c, 1), StringC(c + 1, 1)))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(CharUpcase, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char c;
+  if (!argv[0]->charValue(c))
+    return argError(interp, loc,
+                    InterpreterMessages::notAChar, 0, argv[0]);
+  return interp.makeChar(lang->toUpper(c));
+}
+
+DEFPRIMITIVE(CharDowncase, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char c;
+  if (!argv[0]->charValue(c))
+    return argError(interp, loc,
+                    InterpreterMessages::notAChar, 0, argv[0]);
+  return interp.makeChar(lang->toLower(c));
+}
+
+DEFPRIMITIVE(StringEquiv, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char *s[2];
+  size_t n[2];
+  for (unsigned i = 0; i < 2; i++)
+    if (!argv[i]->stringData(s[i], n[i]))
+      return argError(interp, loc,
+                      InterpreterMessages::notAString, i, argv[i]);
+  long k = 0;
+  if (!argv[2]->exactIntegerValue(k) || (k <= 0))
+    return argError(interp, loc,
+                    InterpreterMessages::notAPositiveInteger, 2, argv[2]);
+  if (lang->areEquivalent(StringC(s[0], n[0]), StringC(s[1], n[1]), k))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(StringLess, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char *s[2];
+  size_t n[2];
+  for (unsigned i = 0; i < 2; i++)
+    if (!argv[i]->stringData(s[i], n[i]))
+      return argError(interp, loc,
+                      InterpreterMessages::notAString, i, argv[i]);
+  if (lang->isLess(StringC(s[0], n[0]), StringC(s[1], n[1])))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
+DEFPRIMITIVE(StringLessOrEqual, argc, argv, context, interp, loc)
+{
+  GETCURLANG(lang, context, interp);
+  Char *s[2];
+  size_t n[2];
+  for (unsigned i = 0; i < 2; i++)
+    if (!argv[i]->stringData(s[i], n[i]))
+      return argError(interp, loc,
+                      InterpreterMessages::notAString, i, argv[i]);
+  if (lang->isLessOrEqual(StringC(s[0], n[0]), StringC(s[1], n[1])))
+    return interp.makeTrue();
+  else
+    return interp.makeFalse();
+}
+
 #define DEFCAAR(NAME, PATH) \
 DEFPRIMITIVE(NAME, argc, argv, context, interp, loc) \
 { \
@@ -5011,12 +5182,18 @@ void Interpreter::installPrimitives()
 #define PRIMITIVE(name, string, nRequired, nOptional, rest) \
   installPrimitive(string, new (*this) name ## PrimitiveObj);
 #define XPRIMITIVE(name, string, nRequired, nOptional, rest) \
-  installXPrimitive(string, new (*this) name ## PrimitiveObj);
+  installXPrimitive("UNREGISTERED::James Clark//Procedure::", \
+                    string, new (*this) name ## PrimitiveObj);
+#define XXPRIMITIVE(name, string, nRequired, nOptional, rest) \
+  installXPrimitive("UNREGISTERED::OpenJade//Procedure::", \
+                    string, new (*this) name ## PrimitiveObj);
+
 #define PRIMITIVE2(name, string, nRequired, nOptional, rest) \
   if (dsssl2()) installPrimitive(string, new (*this) name ## PrimitiveObj);
 #include "primitive.h"
 #undef PRIMITIVE
 #undef XPRIMITIVE
+#undef XXPRIMITIVE
 #undef PRIMITIVE2
   FunctionObj *apply = new (*this) ApplyPrimitiveObj;
   makePermanent(apply);
@@ -5042,11 +5219,12 @@ void Interpreter::installPrimitive(const char *s, PrimitiveObj *value)
   externalProcTable_.insert(pubid, value);
 }
 
-void Interpreter::installXPrimitive(const char *s, PrimitiveObj *value)
+void Interpreter::installXPrimitive(const char *prefix, const char *s, 
+                                    PrimitiveObj *value)
 {
   makePermanent(value);
   value->setIdentifier(lookup(makeStringC(s)));
-  StringC pubid(makeStringC("UNREGISTERED::James Clark//Procedure::"));
+  StringC pubid(makeStringC(prefix));
   pubid += makeStringC(s);
   externalProcTable_.insert(pubid, value);
 }

@@ -157,6 +157,13 @@ public:
     keyDeclareFlowObjectMacro,
     keyOrElement,
     keyPositionPreference,
+    keyCollate,
+    keyToupper,
+    keyTolower,
+    keySymbol,
+    keyOrder,
+    keyForward,
+    keyBackward,
     keyArchitecture
   };
   enum { lastSyntacticKey = keyWithMode };
@@ -347,6 +354,8 @@ public:
   bool dsssl2() const;
   bool strictMode() const;
   void setNodeLocation(const NodePtr &);
+  void setDefaultLanguage(ELObj *);
+  ELObj *defaultLanguage() const;
   void makeReadOnly(ELObj *);
   ProcessingMode *lookupProcessingMode(const StringC &);
   ProcessingMode *initialProcessingMode();
@@ -382,8 +391,8 @@ private:
   void installPortNames();
   void installCValueSymbols();
   void installPrimitives();
-  void installPrimitive(const char *s, PrimitiveObj *value);
-  void installXPrimitive(const char *s, PrimitiveObj *value);
+  void installPrimitive(const char *, PrimitiveObj *);
+  void installXPrimitive(const char *, const char *, PrimitiveObj *);
   void installBuiltins();
   void installUnits();
   void installCharNames();
@@ -465,6 +474,7 @@ private:
   bool debugMode_;
   bool dsssl2_;
   bool strictMode_;
+  ELObj *defaultLanguage_;
   friend class Identifier;
 };
 

@@ -12,6 +12,8 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
+class LangObj;
+
 class SchemeParser : public Messenger {
 public:
   SchemeParser(Interpreter &, Owner<InputSource> &);
@@ -85,6 +87,15 @@ private:
   bool doDeclareClassAttribute();
   bool doDeclareIdAttribute();
   bool doDeclareFlowObjectMacro();
+  bool doDeclareDefaultLanguage();
+  bool doDefineLanguage();
+  bool doCollate();
+  bool doMultiCollatingElement();
+  bool doCollatingSymbol();
+  bool doCollatingOrder();
+  bool doWeights();
+  bool doToupper();
+  bool doTolower();
   bool skipForm();
   bool parseExpression(unsigned allowed, Owner<Expression> &,
 		       Identifier::SyntacticKey &, Token &);
@@ -146,6 +157,7 @@ private:
   ProcessingMode *defMode_;
   const char *afiiPublicId_;
   bool dsssl2_;
+  LangObj *lang_;
 };
 
 inline

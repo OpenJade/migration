@@ -131,6 +131,12 @@ E1+duplicateSdataEntityText++duplicate SDATA entity text %1
 W0+unsupportedDeclaration++unsupported declaration will be ignored
 W1+unsupportedCharRepertoire++unsupported character repertoire %1 will be ignored
 E0+badDeclaration++error in declaration element
+E1+duplicateDeclaration++duplicate declaration element (%1)
+E1+invalidIdentifier++%1 is not a valid identifier
+E0+badLanguageDefinition++error in language definition
+E0+noCurrentLanguage++no current language
+E3+notALanguage++%2 argument for primitive %1 of wrong type: %3 not a language
+E3+notAPositiveInteger++%2 argument for primitive %1 of wrong type: %3 not a po
 E3+notAnInteger++%2 argument for primitive %1 of wrong type: %3 not an integer
 E3+notAKeyword++%2 argument for primitive %1 of wrong type: %3 not a keyword
 E3+notAnAlist++%2 argument for primitive %1 of wrong type: %3 not an alist

@@ -3,7 +3,7 @@ openjade (1.4devel1-1) unstable; urgency=low
   * new package; upstream fork from James Clark's Jade package
     (closes: Bug#41697)
 
- -- Adam Di Carlo <aph@debian.org>  Sat,  6 May 2000 00:54:47 -0400
+ -- Adam Di Carlo <aph@debian.org>  Sat, 20 May 2000 00:20:17 -0400
 
 Local variables:
 mode: debian-changelog

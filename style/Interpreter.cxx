@@ -263,6 +263,10 @@ void Interpreter::installSyntacticKeys()
     { "define", Identifier::keyDefine },
     { "else", Identifier::keyElse },
     { "=>", Identifier::keyArrow },
+    { "there-exists?", Identifier::keyThereExists },
+    { "for-all?", Identifier::keyForAll },
+    { "select-each", Identifier::keySelectEach },
+    { "union-for-each", Identifier::keyUnionForEach },
     { "make", Identifier::keyMake },
     { "style", Identifier::keyStyle },
     { "with-mode", Identifier::keyWithMode },
@@ -1824,6 +1828,14 @@ ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
   if (preferred)
     preferBuiltin_ = 0;
   return value_;
+}
+
+ELObj *Identifier::computeBuiltinValue(bool force, Interpreter &interp) const
+{
+  preferBuiltin_ = 1;
+  ELObj *res = computeValue(force, interp);
+  preferBuiltin_ = 0;
+  return res;
 }
 
 Unit::Unit(const StringC &name)

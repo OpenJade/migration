@@ -53,6 +53,10 @@ public:
     keyArrow,
     keySet,
     keyBegin,
+    keyThereExists,
+    keyForAll,
+    keySelectEach,
+    keyUnionForEach,
     keyMake,
     keyStyle,
     keyWithMode,
@@ -183,6 +187,7 @@ public:
   Identifier(const StringC &name);
   // Return 0 is value can't yet be computed.
   ELObj *computeValue(bool force, Interpreter &) const;
+  ELObj *computeBuiltinValue(bool force, Interpreter &) const;
   bool syntacticKey(SyntacticKey &) const;
   void setSyntacticKey(SyntacticKey);
   bool defined(unsigned &, Location &) const;

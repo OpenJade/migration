@@ -71,6 +71,11 @@ protected:
   Vector<MessageType0> infos_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;
+  enum {
+    normalAction,
+    usageAction
+  };
+  int action_;
 private:
   Boolean getMessageText(const MessageFragment &, StringC &);
   void initCodingSystem(const char *requiredInternalCode);

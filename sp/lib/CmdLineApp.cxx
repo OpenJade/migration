@@ -69,7 +69,8 @@ CmdLineApp::CmdLineApp(const char *requiredInternalCode)
   outputCodingSystem_(0),
   MessageReporter(0),
   internalCharsetIsDocCharset_(1),
-  codingSystem_(0)
+  codingSystem_(0),
+  action_(normalAction)
 {
   initCodingSystem(requiredInternalCode);
   setMessageStream(makeStdErr());
@@ -162,6 +163,8 @@ void CmdLineApp::registerInfo(const MessageType0 &i, bool pre)
 
 void CmdLineApp::usage()
 {
+  const OutputCharStream::Newline nl = OutputCharStream::newline;
+  Owner<OutputCharStream> stdOut(makeStdOut());
   String<AppChar> tmp;
   if (progName) {
     StringMessageArg arg(convertInput(progName));
@@ -174,12 +177,24 @@ void CmdLineApp::usage()
       StringC tem;
       formatMessage(usages_[i], args, ostr, 1);
       ostr.extractString(tem); 
+      Vector<CopyOwner<MessageArg> > args2(1);
+      StringMessageArg arg2(tem);
+      args2[0] = arg2.copy();
+      formatMessage(i ? CmdLineAppMessages::usageCont 
+		    : CmdLineAppMessages::usage,
+		    args2, *stdOut, 1);
+      *stdOut << nl;
+#if 0
       message(i ? CmdLineAppMessages::usageCont 
                 : CmdLineAppMessages::usage, StringMessageArg(tem));
+#endif
     } 
   }
-  for (size_t i = 0; i < preInfos_.size(); i++)
-    message(preInfos_[i]);
+  for (size_t i = 0; i < preInfos_.size(); i++) {
+    Vector<CopyOwner<MessageArg> > args;
+    formatMessage(preInfos_[i], args, *stdOut, 1);
+    *stdOut << nl;
+  }
   Vector<StringC> leftSide;
   size_t leftSize = 0;
   for (size_t i = 0; i < opts_.size(); i++) {
@@ -239,15 +254,25 @@ void CmdLineApp::usage()
     StringC tem;
     ostr.extractString(tem);
     leftSide[i] += tem;
+    *stdOut << leftSide[i];
+    *stdOut << nl;
+#if 0
     message(
       MessageType1(MessageType::info, MessageFragment::libModule, 0
 #ifndef SP_NO_MESSAGE_TEXT
                    , "%1"
 #endif
       ), StringMessageArg(leftSide[i]));
+#endif
   }
-  for (size_t i = 0; i < infos_.size(); i++)
+  for (size_t i = 0; i < infos_.size(); i++) {
+    Vector<CopyOwner<MessageArg> > args;
+    formatMessage(infos_[i], args, *stdOut, 1);
+    *stdOut << nl;
+#if 0
     message(infos_[i]);
+#endif
+  }
 }
 
 static
@@ -314,6 +339,12 @@ int CmdLineApp::run(int argc, AppChar **argv)
   ret = processOptions(argc, argv, firstArg);
   if (ret)
     return ret;
+  // We do this here, so that the -b option works even if it is present after
+  // the -h option.
+  if (action_ == usageAction) {
+    usage();
+    return 0;
+  }
   ret = processArguments(argc - firstArg, argv + firstArg);
   progName = 0;
   return ret;
@@ -364,7 +395,7 @@ int CmdLineApp::processOptions(int argc, AppChar **argv, int &nextArg)
                : ((opt == ':') ? CmdLineAppMessages::missingOptionArgError
                : CmdLineAppMessages::invalidOptionError)),
 	      StringMessageArg(convertInput(ostr)));
-      usage();
+      message(CmdLineAppMessages::tryHelpOptionForInfo);
       return 1;
     default:
       processOption(opt, options.arg());
@@ -408,7 +439,7 @@ void CmdLineApp::processOption(AppChar opt, const AppChar *arg)
 	    StringMessageArg(convertInput(SP_T(SP_VERSION))));
     break;
   case 'h':
-    usage();
+    action_ = usageAction;
     break;
   default:
     CANNOT_HAPPEN();

@@ -149,3 +149,4 @@ E1+defLangDeclRequiresLanguage++%1 not a language as required in a default-langu
 E1+invalidUnitName++%1 is not a valid unit name
 E1+invalidCharName++%1 is not a valid character name
 E1+invalidCharNumber++%1 is not a valid character number
+E0+returnNotSosofo++value returned by procedure was not a sosofo

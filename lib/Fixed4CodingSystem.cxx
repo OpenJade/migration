@@ -84,7 +84,6 @@ size_t Fixed4Decoder::decode(Char *to, const char *from, size_t fromLen,
   size_t shift2 = 8*(!lsbFirst_ + 2*lswFirst_); 
   size_t shift3 = 8*(lsbFirst_ + 2*lswFirst_); 
   for (size_t n = fromLen; n > 0; n -= 4) {
-    if (lsbFirst_
     Unsigned32 c = ((unsigned char)from[0] << shift0) 
                  + ((unsigned char)from[1] << shift1) 
                  + ((unsigned char)from[2] << shift2) 

@@ -231,15 +231,18 @@ size_t XMLDecoder::decode(Char *to, const char *from, size_t fromLen,
       c = lsbFirst_ ? ((unsigned char)from[1] << 8) | (unsigned char)from[0]
 	            : ((unsigned char)from[0] << 8) | (unsigned char)from[1];
       break;
-    case 4:
-      size_t shift0 = 8*(!lsbFirst_ + 2*!lswFirst_); 
-      size_t shift1 = 8*(lsbFirst_ + 2*!lswFirst_); 
-      size_t shift2 = 8*(!lsbFirst_ + 2*lswFirst_); 
-      size_t shift3 = 8*(lsbFirst_ + 2*lswFirst_); 
-      c = ((unsigned char)from[0] << shift0)
-	| ((unsigned char)from[1] << shift1)
-	| ((unsigned char)from[2] << shift2)
-	| ((unsigned char)from[3] << shift3);
+    case 4: 
+       {
+        size_t shift0 = 8*(!lsbFirst_ + 2*!lswFirst_); 
+        size_t shift1 = 8*(lsbFirst_ + 2*!lswFirst_); 
+        size_t shift2 = 8*(!lsbFirst_ + 2*lswFirst_); 
+        size_t shift3 = 8*(lsbFirst_ + 2*lswFirst_); 
+        c = ((unsigned char)from[0] << shift0)
+	  | ((unsigned char)from[1] << shift1)
+	  | ((unsigned char)from[2] << shift2)
+	  | ((unsigned char)from[3] << shift3);
+      }
+      break;
     default:
       CANNOT_HAPPEN();
     }
@@ -295,12 +298,16 @@ void XMLDecoder::initDecoderDefault()
 {
   switch (guessBytesPerChar_) {
   case 1:
-    UTF8CodingSystem utf8;
-    subDecoder_ = utf8.makeDecoder();
+    {
+      UTF8CodingSystem utf8;
+      subDecoder_ = utf8.makeDecoder();
+    }
     break;
   case 2:
-    UTF16CodingSystem utf16;
-    subDecoder_ = utf16.makeDecoder(lsbFirst_); 
+    {
+      UTF16CodingSystem utf16;
+      subDecoder_ = utf16.makeDecoder(lsbFirst_); 
+    }
     break;
   default:
     CANNOT_HAPPEN();

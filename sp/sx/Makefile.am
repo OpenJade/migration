@@ -23,10 +23,10 @@ sx.o: SxMessages.h
 XmlOutputEventHandler.o: XmlOutputMessages.h
 
 
-SUFFIXES = .msg .m4
+SUFFIXES = .msg .m4 .rc .po
 
 .m4.cxx:
 	$(PERL) $(top_srcdir)/instmac.pl $< >$@
 
-%.h %.cxx %.rc: %.msg
+%.h %.cxx %.rc %.po: %.msg
 	$(PERL) -w $(top_srcdir)/msggen.pl $(MSGGENFLAGS) $<

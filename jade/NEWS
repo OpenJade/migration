@@ -1,5 +1,7 @@
 Changes in OpenJade 1.3
 
+* Jade supports special-query-expressions.
+
 * Jade can bind variables to string values on the command line.
 
 * All standard color spaces supported. 

@@ -4291,12 +4291,10 @@ unsigned long StringHash::hash( const String<char> &str ) {
 
 FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
                                const Ptr<ExtendEntityManager> &entityManager,
- 			                   const CharsetInfo &systemCharset,
+			       const CharsetInfo &systemCharset,
                                CmdLineApp *app,
-                               const FOTBuilder::Extension *&ext,
-                               const FOTBuilder::Feature *&f ) {
+                               const FOTBuilder::Description *&descr) {
 
-    
     MifFOTBuilder::IndexEntryFlowObj *indexEntryFlowObject
      = new MifFOTBuilder::IndexEntryFlowObj;
 
@@ -4331,14 +4329,20 @@ FOTBuilder *makeMifFOTBuilder( const String<CmdLineApp::AppChar> &fileLoc,
     },
     { 0, 0, 0}
   };
-  ext = extensions;
 
   static const FOTBuilder::Feature features[] = {
     { "table", 0},
     { "simple-page", 0},
     { 0, 0}
   };
-  f = features;
+
+  static const FOTBuilder::Description description = {
+    extensions,
+    features,
+    false
+  };
+
+  descr = &description;
 
   return new MifFOTBuilder( fileLoc, entityManager, systemCharset, app );
 }

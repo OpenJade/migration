@@ -12,7 +12,7 @@ namespace DSSSL_NAMESPACE {
 #endif
 
 FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *,
-	                       const FOTBuilder::Feature *&);
+	                       const FOTBuilder::Description *&);
 
 #ifdef DSSSL_NAMESPACE
 }

@@ -638,8 +638,7 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
 			      const Ptr<ExtendEntityManager> &entityManager,
 			      const CharsetInfo &systemCharset,
 			      Messenger *mgr,
-			      const FOTBuilder::Extension *&ext,
-			      const FOTBuilder::Feature *&f)
+			      const FOTBuilder::Description *&descr)
 {
   static const FOTBuilder::Extension extensions[] = {
     {
@@ -726,7 +725,6 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
     },
     { 0, 0, 0}
   };
-  ext = extensions;
 
   static const FOTBuilder::Feature features[] = {
     { "table", 0},
@@ -734,7 +732,12 @@ FOTBuilder *makeRtfFOTBuilder(OutputByteStream *os,
     { "simple-page", 0},
     { 0, 0}
   };
-  f = features;
+  static const FOTBuilder::Description description = {
+    extensions,
+    features,
+    false
+  };
+  descr = &description;
 
   return new RtfFOTBuilder(os, options, entityManager, systemCharset, mgr);
 }

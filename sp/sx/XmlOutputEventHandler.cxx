@@ -18,8 +18,13 @@
 #endif
 #include "InputSource.h"
 #include "StorageManager.h"
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -99,10 +104,15 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
   // Open file for writing external entity declarations if we are preserving
   // any entities
   if (! options_.expExt) {
-    char filePath[strlen(outputDir_) + 17];
+    char filePath[strlen(outputDir_) + 21];
     strcpy (filePath, outputDir_);
     strcat (filePath, "/");
     strcat (filePath, EXT_ENT_FILE);
+
+    if (! options_.overwrite) {
+      uniqueFilename(filePath);
+    }
+
     extEntFile_ = new FileOutputByteStream;
 
     // Open the file, exiting if we fail to do so.
@@ -120,10 +130,15 @@ XmlOutputEventHandler::XmlOutputEventHandler(const Options &options,
   // Open file for writing external entity declarations if we are preserving
   // any entities
   if (! options_.expInt) {
-    char filePath[strlen(outputDir_) + 17];
+    char filePath[strlen(outputDir_) + 21];
     strcpy (filePath, outputDir_);
     strcat (filePath, "/");
     strcat (filePath, INT_ENT_FILE);
+
+    if (! options_.overwrite) {
+      uniqueFilename(filePath);
+    }
+
     intEntFile_ = new FileOutputByteStream;
 
     // Open the file, exiting if we fail to do so.
@@ -1106,9 +1121,9 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 
 	  /* Determine name of file. Allocate space for the length of the
 	     output directory's string; the "/"; the file name's string;
-	     and ".xml" */
+	     ".xml"; possible 2-digit suffix (for uniqueness) */
 
-	  char filePath[strlen(outputDir_) + 5 +
+	  char filePath[strlen(outputDir_) + 9 +
 		       outputCodingSystem->convertOut(*systemIdPointer).size()];
 	  strcpy (filePath, outputDir_);
 	  strcat (filePath, "/");
@@ -1116,6 +1131,10 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 		 outputCodingSystem->convertOut(*systemIdPointer).data());
 	  // Set the suffix to ".xml"
 	  convertSuffix(filePath);
+
+          if (! options_.overwrite) {
+            uniqueFilename(filePath);
+          }
 
 	  // Open the file, exiting if we fail to do so.
 	  FileOutputByteStream *file = new FileOutputByteStream;
@@ -1313,6 +1332,39 @@ Boolean XmlOutputEventHandler::checkFirstSeen(const StringC &name)
   }
 
   return false;
+}
+
+
+/** Set the newFilename to a filename which, while similar or
+    identical to originalFilename, does not correspond to an existing
+    file. Gives an error if called more than 99 times on the same
+    filename (during the same or different executions of osx). Assumes
+    that the char array it's given is long enough to accept a two-digit
+    suffix in addition to the string that's already in there.
+ */
+void XmlOutputEventHandler::uniqueFilename(char *filePath) {
+
+  char baseFilePath[strlen(filePath)];
+  strcpy (baseFilePath, filePath);
+
+  struct stat statbuf;
+  int num = 0;
+  char numStr[3];
+
+  while (stat(filePath, &statbuf) == 0 && num <= 100) {
+    num++;
+    strcpy (filePath, baseFilePath);
+    strcat (filePath, ".");
+    sprintf(numStr, "%d", num);
+    strcat (filePath, numStr);
+  }
+
+  if (num >= 100) {
+    app_->message(XmlOutputMessages::tooManyOutputFiles,
+                  StringMessageArg
+                  (app_->codingSystem()->convertIn(baseFilePath)));
+    exit(1);
+  }
 }
 
 

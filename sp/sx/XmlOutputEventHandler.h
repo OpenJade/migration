@@ -46,6 +46,7 @@ public:
     PackedBoolean extDecl;
     PackedBoolean sdataAsPi;
     PackedBoolean preserveCase;
+    PackedBoolean overwrite;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,
@@ -90,6 +91,7 @@ private:
   Boolean equalsIgnoreCase(const StringC &str1, StringC &str2);
   char *convertSuffix(char *name);
   Boolean checkFirstSeen(const StringC &name);
+  void uniqueFilename(char *filename);
 
   CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;

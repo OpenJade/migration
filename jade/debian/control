@@ -2,7 +2,7 @@ Source: openjade
 Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
-Standards-Version: 3.1.1
+Standards-Version: 3.2.1
 Build-Depends: libosp-dev (>= 1.5pre4-1), debhelper, automake, libtool
 
 Package: openjade

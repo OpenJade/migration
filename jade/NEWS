@@ -1,5 +1,8 @@
 Changes in OpenJade 1.2.2 
 
+* The TeX backend has support for PDF bookmarks. This is
+  supported by the new version of jadetex which is included.
+
 * Predefined character names line-feed and carriage-return 
   for the character numbers 10 and 13.
 

@@ -1,0 +1,383 @@
+<!-- Typical use:
+
+<!doctype fot public "-//James Clark//DTD DSSSL Flow Object Tree//EN">
+
+-->
+<!entity % length-spec "cdata">
+<!-- represents length-spec or #f; #f is represented by empty value -->
+<!entity % opt-length-spec "cdata"> 
+<!entity % length "nmtoken">
+<!entity % enum "name">
+<!entity % enum-or-boolean "nmtoken">
+<!entity % boolean "number" -- (1|0) -->
+
+<!entity % simple-compound-flow-objects
+ "paragraph|sequence|display-group|line-field|link|scroll|marginalia
+  |leader|sideline|box|score|table-row"
+>
+<!entity % complex-compound-flow-objects
+ "simple-page-sequence|fraction|table|table-part|table-cell|multi-mode"
+>
+
+<!entity % atomic-flow-objects
+ "paragraph-break|external-graphic|rule|alignment-point|table-column
+  |character"
+>
+
+<!entity % indirect-flow-objects
+ "node-page-number|page-number"
+>
+
+<!entity % flow-objects
+ "%simple-compound-flow-objects|%complex-compound-flow-objects
+  |%atomic-flow-objects|%indirect-flow-objects"
+>
+
+<!entity % flow "(%flow-objects|chars|element)*">
+
+<!element fot o o %flow +(define-glyph-subst-table)>
+<!element chars - - (#pcdata)>
+<!element (%simple-compound-flow-objects) - - %flow>
+<!element (%atomic-flow-objects) - o empty>
+<!element (%indirect-flow-objects) - o empty>
+
+<!element define-glyph-subst-table - - (glyph-subst*)>
+<!attlist define-glyph-subst-table id id #required>
+<!element glyph-subst - o empty>
+<!attlist glyph-subst old cdata #required new cdata #required>
+
+<!element element - - %flow>
+<!attlist element
+  index number #required
+  id cdata #implied
+  mode cdata #implied
+  rule-type (rule-root|rule-element|rule-id|rule-default|rule-query) #implied
+  n-qual-gi number #implied
+>
+
+<!element simple-page-sequence - -
+  (simple-page-sequence.header-footer*,
+  %flow;)
+>
+
+<!element simple-page-sequence.header-footer - - %flow;>
+<!attlist simple-page-sequence.header-footer
+  header-footer (header|footer) #required
+  left-center-right (left|center|right) #required
+  first-other (first|other) #required
+  front-back (front|back) #required
+>
+
+<!element table - -
+(table.before-row-border, table.after-row-border,
+ table.before-column-border, table.after-column-border,
+ %flow;)>
+
+<!element (table.before-row-border
+           | table.after-row-border
+	   | table.before-column-border
+           | table.after-column-border) - o empty>
+
+<!element table-part - -
+ (table-part.principal, table-part.header, table-part.footer)
+>
+
+<!element (table-part.header|table-part.footer|table-part.principal)
+  - - %flow>
+
+<!element table-cell - -
+(table-cell.before-row-border, table-cell.after-row-border,
+ table-cell.before-column-border, table-cell.after-column-border,
+ %flow;)>
+
+<!element (table-cell.before-row-border
+           | table-cell.after-row-border
+	   | table-cell.before-column-border
+           | table-cell.after-column-border) - o empty>
+
+<!element fraction - - (fraction.numerator, fraction.denominator)>
+<!element (fraction.numerator|fraction.denominator) - - %flow>
+
+<!element multi-mode - - (multi-mode.mode, multi-mode.mode+)>
+<!element multi-mode.mode - - %flow>
+<!attlist multi-mode.mode
+  name cdata #implied -- default: #f --
+  desc cdata #implied -- default: none --
+>
+
+<!entity % inherited-characteristics "
+font-size %length #implied
+font-family-name cdata #implied
+font-weight %enum-or-boolean #implied
+font-posture %enum-or-boolean #implied
+start-indent %length-spec #implied
+end-indent %length-spec #implied
+first-line-start-indent %length-spec #implied
+last-line-end-indent %length-spec #implied
+line-spacing %length-spec #implied
+min-pre-line-spacing %opt-length-spec #implied
+min-post-line-spacing %opt-length-spec #implied
+min-leading %opt-length-spec #implied
+field-width %length-spec #implied
+lines %enum #implied
+quadding %enum #implied
+display-alignment %enum #implied
+field-align %enum #implied
+marginalia-side %enum #implied
+principal-mode-simultaneous %boolean #implied
+marginalia-sep %length-spec #implied
+marginalia-keep-with-previous %boolean #implied
+color.red number #implied
+color.green number #implied
+color.blue number #implied
+background-color.red number #implied
+background-color.green number #implied
+background-color.blue number #implied
+background-color number -- 0 -- #implied
+page-width %length #implied
+page-height %length #implied
+left-margin %length #implied
+right-margin %length #implied
+top-margin %length #implied
+bottom-margin %length #implied
+header-margin %length #implied
+footer-margin %length #implied
+border-present %boolean #implied
+hyphenate %boolean #implied
+kern %boolean #implied
+ligature %boolean #implied
+score-spaces %boolean #implied
+float-out-marginalia %boolean #implied
+float-out-sidelines %boolean #implied
+float-out-line-numbers %boolean #implied
+cell-background %boolean #implied
+span-weak %boolean #implied
+ignore-record-end %boolean #implied
+numbered-lines %boolean #implied
+hanging-punct %boolean #implied
+box-open-end %boolean #implied
+truncate-leader %boolean #implied
+align-leader %boolean #implied
+table-part-omit-middle-header %boolean #implied
+table-part-omit-middle-footer %boolean #implied
+border-omit-at-break %boolean #implied
+line-join %enum #implied
+line-cap %enum #implied
+line-number-side %enum #implied
+kern-mode %enum #implied
+input-whitespace-treatment %enum #implied
+filling-direction %enum #implied
+writing-mode %enum #implied
+last-line-quadding %enum #implied
+math-display-mode %enum #implied
+box-type %enum #implied
+glyph-alignment-mode %enum #implied
+box-border-alignment %enum #implied
+cell-row-alignment %enum #implied
+border-alignment %enum #implied
+sideline-side %enum #implied
+hyphenation-keep %enum-or-boolean #implied
+position-preference %enum-or-boolean #implied
+font-structure %enum-or-boolean #implied
+font-proportionate-width %enum-or-boolean #implied
+cell-crossed %enum-or-boolean #implied
+position-point-shift %length-spec #implied
+start-margin %length-spec #implied
+end-margin %length-spec #implied
+sideline-sep %length-spec #implied
+asis-wrap-indent %length-spec #implied
+line-number-sep %length-spec #implied
+last-line-justify-limit %length-spec #implied
+justify-glyph-space-max-add %length-spec #implied
+justify-glyph-space-max-remove %length-spec #implied
+table-corner-radius %length-spec #implied
+box-corner-radius %length-spec #implied
+line-thickness %length #implied
+cell-before-row-margin %length #implied
+cell-after-row-margin %length #implied
+cell-before-column-margin %length #implied
+cell-after-column-margin %length #implied
+line-sep %length #implied
+box-size-before %length #implied
+box-size-after %length #implied
+country nmtoken #implied
+language nmtoken #implied
+expand-tabs number #implied
+hyphenation-ladder-count number #implied
+layer nmtoken #implied
+background-layer nmtoken #implied
+border-priority nmtoken #implied
+line-repeat number #implied
+span number #implied
+min-leader-repeat number #implied
+hyphenation-remain-char-count number #implied
+hyphenation-push-char-count number #implied
+widow-count number #implied
+orphan-count number #implied
+background-tile cdata #implied
+line-breaking-method cdata #implied
+line-composition-method cdata #implied
+implicit-bidi-method cdata #implied
+glyph-subst-method cdata #implied
+glyph-reorder-method cdata #implied
+hyphenation-method cdata #implied
+table-auto-width-method cdata #implied
+font-name cdata #implied
+escapement-space-before.nominal %length-spec #implied
+escapement-space-before.max %length-spec #implied
+escapement-space-before.min %length-spec #implied
+escapement-space-after.nominal %length-spec #implied
+escapement-space-after.max %length-spec #implied
+escapement-space-after.min %length-spec #implied
+glyph-subst-table nmtokens -- 0 or list of idrefs -- #implied
+">
+
+<!entity % display-nic "
+  keep-with-next (keep-with-next) #implied
+  keep-with-previous (keep-with-previous) #implied
+  may-violate-keep-before (may-violate-keep-before) #implied
+  may-violate-keep-after (may-violate-keep-after) #implied
+  keep %enum-or-boolean #implied
+  break-before %enum-or-boolean #implied
+  break-after %enum-or-boolean #implied
+  space-before.nominal %length-spec #implied
+  space-before.max %length-spec #implied
+  space-before.min %length-spec #implied
+  space-before.conditional %boolean #implied
+  space-before.priority nmtoken #implied -- integer or force --
+  space-after.nominal %length-spec #implied
+  space-after.max %length-spec #implied
+  space-after.min %length-spec #implied
+  space-after.conditional %boolean #implied
+  space-after.priority nmtoken #implied -- integer or force --
+">
+
+<!entity % inline-nic "
+  break-before-priority nmtoken #implied
+  break-after-priority nmtoken #implied
+">
+
+<!attlist
+  (sequence|line-field|simple-page-sequence|fraction
+   |sideline|scroll|marginalia|multi-mode
+   |table-row
+   |table.before-row-border
+   |table.after-row-border
+   |table.before-column-border
+   |table.after-column-border
+   |table-cell.before-row-border
+   |table-cell.after-row-border
+   |table-cell.before-column-border
+   |table-cell.after-column-border)
+  %inherited-characteristics
+>
+
+<!attlist table-column
+  column-number number #required
+  n-columns-spanned number #implied
+  width %length-spec #implied
+  %inherited-characteristics
+>
+
+<!attlist table
+  width %length-spec #implied
+  minimum-width (minimum-width) #implied
+  %display-nic
+  %inherited-characteristics
+>
+
+<!attlist table-cell
+  -- column-number of 0 has a special meaning: it identifies a dummy cell that
+     can be used to fill out the row if it later proves necessary to do so --
+  column-number number #required
+  n-columns-spanned number #implied
+  n-rows-spanned number #implied
+  %inherited-characteristics
+>
+
+<!attlist link
+  destination.idref cdata #implied
+  destination.entity cdata #implied
+  destination.system-id cdata #implied
+  destination.element-index number #implied
+  %inherited-characteristics
+>
+
+<!attlist box
+  display (display) #implied
+  %display-nic
+  %inline-nic
+  %inherited-characteristics
+>
+
+<!attlist score
+  type (before|through|after) #implied
+  type.length-spec %length-spec #implied
+  type.char cdata #implied
+  %inherited-characteristics
+>
+
+<!attlist leader
+  length %length-spec #implied
+  %inherited-characteristics
+  %inline-nic
+>
+  
+<!attlist rule
+  orientation (horizontal|vertical|escapement|line-progression)
+              #required
+  length %length-spec #implied
+  %display-nic
+  %inline-nic
+  %inherited-characteristics
+>
+
+<!attlist external-graphic
+  display (display) #implied
+  scale %enum #implied
+  scale.x nmtoken #implied
+  scale.y nmtoken #implied
+  max-width %length-spec #implied
+  max-height %length-spec #implied
+  entity-system-id cdata #required
+  notation-system-id cdata #required
+  escapement-direction %enum #implied
+  position-point-x %length-spec #implied
+  position-point-y %length-spec #implied
+  %inline-nic
+  %display-nic
+  %inherited-characteristics
+>
+
+<!attlist display-group
+  coalesce-id cdata #implied
+  %display-nic
+  %inherited-characteristics
+>
+
+<!attlist (paragraph|paragraph-break|table-part)
+  %display-nic
+  %inherited-characteristics
+>
+
+<!attlist character
+  char cdata #required
+  glyph-id cdata #implied
+  drop-after-line-break %boolean #implied
+  drop-unless-before-line-break %boolean #implied
+  punct %boolean #implied
+  space %boolean #implied
+  input-tab %boolean #implied
+  input-whitespace %boolean #implied
+  record-end %boolean #implied
+  break-before-priority number #implied
+  break-after-priority number #implied
+  math-font-posture %enum-or-boolean #implied
+  math-class %enum #implied
+  script cdata #implied
+  %inherited-characteristics
+>
+
+<!attlist node-page-number
+  element-index number #implied
+>

@@ -52,7 +52,8 @@ public:
     outputIncluded = 010,
     outputNotationSysid = 020,
     outputNonSgml = 040,
-    outputEmpty = 0100
+    outputEmpty = 0100,
+    outputDataAtt = 0200
     };
       
   SgmlsEventHandler(const SgmlParser *,
@@ -121,6 +122,7 @@ private:
   PackedBoolean outputNotationSysid_;
   PackedBoolean outputNonSgml_;
   PackedBoolean outputEmpty_;
+  PackedBoolean outputDataAtt_;
 };
 
 inline

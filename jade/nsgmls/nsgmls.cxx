@@ -120,6 +120,7 @@ void NsgmlsApp::processOption(AppChar opt, const AppChar *arg)
 	{ SP_T("notation-sysid"), SgmlsEventHandler::outputNotationSysid },
 	{ SP_T("nonsgml"), SgmlsEventHandler::outputNonSgml },
 	{ SP_T("empty"), SgmlsEventHandler::outputEmpty },
+	{ SP_T("data-attribute"), SgmlsEventHandler::outputDataAtt },
       };
       Boolean found = 0;
       for (size_t i = 0; i < SIZEOF(outputOptions); i++)

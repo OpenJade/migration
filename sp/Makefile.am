@@ -11,8 +11,12 @@ pkginclude_HEADERS = config.h
 
 docdir = $(datadir)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
+man1dir=$(mandir)/man1
 
-pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog
+man_MANS = onsgmls.1 osgmlnorm.1 ospent.1 ospam.1 osx.1
+
+pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog \
+	releasenotes.html releasenotes.pdf releasenotes.ps
 
 BUILT_SOURCES = config.h msggen.pl
 
@@ -25,7 +29,9 @@ MAINTAINERCLEANFILES = install-sh mkinstalldirs missing \
 ## We include msggen.pl, since it won't be generated on Windows.
 EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak .cvsignore all \
-	@PACKAGE@-@VERSION@.spec config.rpath
+	@PACKAGE@-@VERSION@.spec config.rpath onsgmls.1 \
+	osgmlnorm.1 ospam.1 ospent.1 osx.1 releasenotes.html \
+	releasenotes.pdf releasenotes.ps
 
 dist-hook:
 	mv $(distdir)/include/config.h.old $(distdir)/config.h
@@ -40,3 +46,20 @@ dist-zip: distdir
 	zip -rql $(distdir).zip $(distdir)
 	-rm -rf $(distdir)
 
+install-man:
+	$(mkinstalldirs) $(DESTDIR)$(man1dir)
+	@list='$(man1_MANS)'; \
+	l2='$(man_MANS)'; for i in $$l2; do \
+	  case "$$i" in \
+            *.1*) list="$$list $$i" ;; \
+	  esac; \
+	done; \
+	for i in $$list; do \
+	  if test -f $(TOP)/docsrc/$$i; then file=$(TOP)/docsrc/$$i; \
+	  else file=$$i; fi; \
+	  ext=`echo $$i | sed -e 's/^.*\\.//'`; \
+	  inst=`echo $$i | sed -e 's/\\.[0-9a-z]*$$//'`; \
+	  inst=`echo $$inst | sed '$(transform)'`.$$ext; \
+	  echo " $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst"; \
+	  $(INSTALL_DATA) $$file $(DESTDIR)$(man1dir)/$$inst; \
+	done

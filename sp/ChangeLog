@@ -1,5 +1,10 @@
 2004-06-09  Karl Eichwalder  <ke@gnu.franken.de>
 
+	* tests/onsgmls-2: Make sure path to the binary will not come
+	into the way.
+
+2004-06-09  Karl Eichwalder  <ke@gnu.franken.de>
+
 	* configure.in (ALL_LINGUAS): Remove it; only po/LINGUAS is required.
 
 2004-06-09  Karl Eichwalder  <ke@suse.de>

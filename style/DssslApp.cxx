@@ -13,6 +13,7 @@
 #include "InputSource.h"
 #include "jade_version.h"
 #include "ArcEngine.h"
+#include "Entity.h"
 
 #include <ctype.h>
 #include <string.h>
@@ -379,6 +380,22 @@ bool DssslApp::load(const StringC &sysid, const Vector<StringC> &active,
   else
     parser.parseAll(*eh, eceh->cancelPtr());
   return 1;
+}
+
+void DssslApp::mapSysid(StringC &sysid)
+{
+ // map a sysid according to SYSTEM catalog entries. 
+  ConstPtr<EntityCatalog> 
+     catalog(entityManager()->makeCatalog(sysid, systemCharset(), *this));
+  Text txt;
+  Location loc;
+  txt.addChars(sysid, loc);
+  ExternalId extid;
+  extid.setSystem(txt);
+  StringC name;
+  ExternalTextEntity ent(name, EntityDecl::generalEntity, loc, extid);
+  catalog->lookup(ent, *(parser().instanceSyntax()), systemCharset(), 
+                  *this, sysid); 
 }
 
 bool DssslApp::readEntity(const StringC &sysid, StringC &contents) 

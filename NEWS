@@ -1,3 +1,21 @@
+Changes in OpenJade 1.3
+
+* Most of the derived procedures in the query language:
+  current-root, node-list-reduce, node-list-contains?,
+  node-list-remove-duplicates, node-list-union, 
+  node-list-intersection, node-list-difference, 
+  node-list-symmetric-difference, node-list-union-map,
+  node-list-some?, node-list-every?, node-list-filter,
+  node-list->list, node-list-tail, node-list-head,
+  node-list-sublist, node-list-count, node-list-last,
+  node-list-property, origin, origin-to-subnode-rel,
+  tree-root, grove-root, source, subtree, subgrove,
+  ancestors, grove-root-path, rsiblings, ipreced,
+  ifollow, grove-before?, sort-in-tree-order, tree-before?,
+  tree-before, property-lookup, select-by-property, 
+  select-by-null-property, select-by-missing-property,
+  attribute, referent, q-element, q-class, q-sdata,
+  
 Changes in OpenJade 1.2.2 
 
 * Predefined character names line-feed and carriage-return 

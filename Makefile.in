@@ -14,6 +14,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 srcdir=@srcdir@
 bindir=@bindir@
+datadir=@datadir@
 
 LIBTOOL=@LIBTOOL@
 
@@ -28,8 +29,11 @@ do=all
 
 $(TARGETS): FORCE
 	@$(MAKE) -f Makefile do=$@ $(dodirs)
-	if test $@ = 'install'; then $(LIBTOOL) --finish $(libdir); fi
-
+	@if test $@ = 'install'; then \
+	  $(LIBTOOL) --finish $(libdir); \
+	  mkdir -p $(datadir); \
+	  cp -f dsssl/builtins.dsl $(datadir); \
+	fi;
 
 $(LIBDIRS): FORCE
 	@if test $(srcdir) = .; \

@@ -1602,6 +1602,66 @@ MessageFragment::appModule,
 ,"error in declaration element"
 #endif
 );
+const MessageType3 InterpreterMessages::notAnInteger(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+139
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not an integer"
+#endif
+);
+const MessageType3 InterpreterMessages::notAKeyword(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+140
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a keyword"
+#endif
+);
+const MessageType3 InterpreterMessages::notAnAlist(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+141
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not an alist"
+#endif
+);
+const MessageType3 InterpreterMessages::notACharList(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+142
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 of wrong type: %3 not a list of characters"
+#endif
+);
+const MessageType3 InterpreterMessages::lengthError(
+MessageType::error,
+#ifdef BUILD_LIBSP
+MessageFragment::libModule,
+#else
+MessageFragment::appModule,
+#endif
+143
+#ifndef SP_NO_MESSAGE_TEXT
+,"%2 argument for primitive %1 has wrong length"
+#endif
+);
 #ifdef SP_NAMESPACE
 }
 #endif

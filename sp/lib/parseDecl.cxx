@@ -602,8 +602,8 @@ Boolean Parser::parseElementDecl()
   }
   else {
     for (i = 0; i < elements.size(); i++) {
-      StringC *origName;
-      origName = new StringC(nameVector[i].origName);
+      // StringC *origName;
+      // origName = new StringC(nameVector[i].origName);
       elements[i] = lookupCreateElement(nameVector[i].name);
       elements[i]->setOrigName(nameVector[i].origName);
     }

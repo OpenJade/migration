@@ -2270,7 +2270,6 @@ fi
 fi
 CXXCPP="$ac_cv_prog_CXXCPP"
 echo "$ac_t""$CXXCPP" 1>&6
-s%@CXXCPP@%$CXXCPP%g
 
 cat > conftest.$ac_ext <<EOF
 #line 2277 "configure"
@@ -2818,6 +2817,7 @@ s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@LN_S@%$LN_S%g
 s%@CXX@%$CXX%g
+s%@CXXCPP@%$CXXCPP%g
 s%@PERL@%$PERL%g
 s%@CPP@%$CPP%g
 s%@LIB_THREADS@%$LIB_THREADS%g

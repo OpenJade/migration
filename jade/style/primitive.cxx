@@ -30,17 +30,21 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  DescendantsNodeListObj(const NodePtr &, unsigned = 0);
+  DescendantsNodeListObj(const NodePtr &);
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
-  static void advance(NodePtr &, unsigned &);
-  static void chunkAdvance(NodePtr &, unsigned &);
+  void advance();
+  void chunkAdvance();
   // nodes in node list are strictly after this node
+  NodePtr root_;
   NodePtr start_;
   unsigned depth_;
 };
+
+
 
 class SiblingNodeListObj : public NodeListObj {
 public:
@@ -110,6 +114,7 @@ public:
   SelectElementsNodeListObj(NodeListObj *, const ConstPtr<PatternSet> &);
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *nodeList_;
   ConstPtr<PatternSet> patterns_;
@@ -5527,10 +5532,10 @@ void Interpreter::installXPrimitive(const char *prefix, const char *s,
   externalProcTable_.insert(pubid, value);
 }
 
-DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start, unsigned depth)
-: start_(start), depth_(depth)
+DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start)
+: start_(start), root_(start), depth_(0)
 {
-  advance(start_, depth_);
+  advance();
 }
 
 NodePtr DescendantsNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
@@ -5541,58 +5546,66 @@ NodePtr DescendantsNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 NodeListObj *DescendantsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
   DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
-  advance(obj->start_, obj->depth_);
+  obj->advance();
   return obj;
 }
 
 NodeListObj *DescendantsNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
   DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
-  chunkAdvance(obj->start_, obj->depth_);
+  obj->chunkAdvance();
   chunk = 1;
   return obj;
 }
 
-void DescendantsNodeListObj::advance(NodePtr &nd, unsigned &depth)
+void DescendantsNodeListObj::advance()
 {
-  if (!nd)
+  if (!start_)
     return;
-  if (nd.assignFirstChild() == accessOK) {
-    depth++;
-    return;
-  }
-  if (depth == 0) {
-    nd.clear();
+  if (start_.assignFirstChild() == accessOK) {
+    depth_++;
     return;
   }
-  while (nd.assignNextSibling() != accessOK) {
-    if (depth == 1 || nd.assignOrigin() != accessOK) {
-      nd.clear();
+  if (depth_ == 0) {
+    start_.clear();
+    return;
+  }
+  while (start_.assignNextSibling() != accessOK) {
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
       return;
     }
-    depth--;
+    depth_--;
   }
 }
 
-void DescendantsNodeListObj::chunkAdvance(NodePtr &nd, unsigned &depth)
+void DescendantsNodeListObj::chunkAdvance()
 {
-  if (!nd)
+  if (!start_)
     return;
-  if (nd.assignFirstChild() == accessOK) {
-    depth++;
-    return;
-  }
-  if (depth == 0) {
-    nd.clear();
+  if (start_.assignFirstChild() == accessOK) {
+    depth_++;
     return;
   }
-  while (nd.assignNextChunkSibling() != accessOK) {
-    if (depth == 1 || nd.assignOrigin() != accessOK) {
-      nd.clear();
+  if (depth_ == 0) {
+    start_.clear();
+    return;
+  }
+  while (start_.assignNextChunkSibling() != accessOK) {
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
       return;
     }
-    depth--;
+    depth_--;
   }
+}
+
+bool DescendantsNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  for (NodePtr parent = ptr; parent->getParent(parent) == accessOK;) 
+    if (*parent == *root_)
+      return 1;
+  return 0;
 }
 
 SelectByClassNodeListObj::SelectByClassNodeListObj(NodeListObj *nl, ComponentName::Id cls)
@@ -5823,6 +5836,14 @@ NodeListObj *SelectElementsNodeListObj::nodeListRest(EvalContext &context, Inter
   NodeListObj *tem = nodeList_->nodeListChunkRest(context, interp, chunk);
   ELObjDynamicRoot protect(interp, tem);
   return new (interp) SelectElementsNodeListObj(tem, patterns_);
+}
+
+bool SelectElementsNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  for (size_t i = 0; i < patterns_->size(); i++)
+    if ((*patterns_)[i].matches(ptr, interp)) 
+      return nodeList_->contains(context, interp, ptr);
+  return 0;
 }
 
 SiblingNodeListObj::SiblingNodeListObj(const NodePtr &first, const NodePtr &end)

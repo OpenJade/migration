@@ -158,7 +158,7 @@ void FOTBuilder::charactersFromNode(const NodePtr &, const Char *s, size_t n)
 
 void FOTBuilder::character(const CharacterNIC &nic)
 {
-  if (nic.specifiedC & (1 << CharacterNIC::cChar))
+  if (nic.valid)
     characters(&nic.ch, 1);
   atomic();
 }
@@ -320,26 +320,20 @@ void FOTBuilder::endSideline()
 {
 }
 
-void FOTBuilder::startSimplePageSequence()
+void FOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[nHF])
 {
+  for ( unsigned i = 0; i < nHF; ++i )
+    headerFooter[i] = this;
   start();
+}
+
+void FOTBuilder::endSimplePageSequenceHeaderFooter()
+{
 }
 
 void FOTBuilder::endSimplePageSequence()
 {
   end();
-}
-
-void FOTBuilder::startSimplePageSequenceHeaderFooter(unsigned)
-{
-}
-
-void FOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
-{
-}
-
-void FOTBuilder::endAllSimplePageSequenceHeaderFooter()
-{
 }
 
 void FOTBuilder::pageNumber()
@@ -1103,6 +1097,10 @@ void FOTBuilder::setEscapementSpaceAfter(const InlineSpace &)
 {
 }
 
+void FOTBuilder::setInlineSpaceSpace(const OptInlineSpace &)
+{
+}
+
 void FOTBuilder::setGlyphSubstTable(const Vector<ConstPtr<GlyphSubstTable> > &)
 {
 }
@@ -1184,8 +1182,7 @@ FOTBuilder::LeaderNIC::LeaderNIC()
 }
 
 FOTBuilder::CharacterNIC::CharacterNIC()
-: specifiedC(0),
-  stretchFactor(1.0)
+: valid(0), specifiedC(0), stretchFactor(1.0)
 {
 }
 
@@ -1305,9 +1302,8 @@ NO_ARG_CALL(endBox)
 NO_ARG_CALL(startSideline)
 NO_ARG_CALL(endSideline)
 NO_ARG_CALL(endNode)
-NO_ARG_CALL(startSimplePageSequence)
+NO_ARG_CALL(endSimplePageSequenceHeaderFooter)
 NO_ARG_CALL(endSimplePageSequence)
-NO_ARG_CALL(endAllSimplePageSequenceHeaderFooter)
 NO_ARG_CALL(pageNumber)
 NO_ARG_CALL(endTable)
 NO_ARG_CALL(tableBeforeRowBorder)
@@ -1503,8 +1499,6 @@ PUBLIC_ID_ARG_CALL(setFontName)
 
 UNSIGNED_ARG_CALL(setLanguage)
 UNSIGNED_ARG_CALL(setCountry)
-UNSIGNED_ARG_CALL(startSimplePageSequenceHeaderFooter)
-UNSIGNED_ARG_CALL(endSimplePageSequenceHeaderFooter)
 
 #define STRING_ARG_CALL(F) \
   void SaveFOTBuilder::F(const StringC &str) { \
@@ -1761,6 +1755,12 @@ void SaveFOTBuilder::startBox(const BoxNIC &nic)
   tail_ = &(*tail_)->next;
 }
 
+void SaveFOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[nHF])
+{
+  *tail_ = new StartSimplePageSequenceCall(headerFooter);
+  tail_ = &(*tail_)->next;
+}
+
 void SaveFOTBuilder::startTable(const TableNIC &nic)
 {
   *tail_ = new StartTableCall(nic);
@@ -1908,6 +1908,20 @@ SaveFOTBuilder::CharactersCall::CharactersCall(const Char *s, size_t n)
 void SaveFOTBuilder::CharactersCall::emit(FOTBuilder &fotb)
 {
   fotb.characters(str.data(), str.size());
+}
+
+StartSimplePageSequenceCall::StartSimplePageSequenceCall(FOTBuilder* hf[FOTBuilder::nHF])
+{
+  for ( unsigned i = 0; i < FOTBuilder::nHF; ++i )
+    hf[i] = &headerFooter[i];
+}
+
+void StartSimplePageSequenceCall::emit(FOTBuilder& fotb)
+{
+  FOTBuilder* hf[FOTBuilder::nHF];
+  fotb.startSimplePageSequence(hf);
+  for ( unsigned i = 0; i < FOTBuilder::nHF; ++i )
+    headerFooter[i].emit(*hf[i]);
 }
 
 StartFractionCall::StartFractionCall(FOTBuilder *&n, FOTBuilder *&d)
@@ -2185,6 +2199,40 @@ SerialFOTBuilder::SerialFOTBuilder()
 {
 }
 
+void SerialFOTBuilder::startSimplePageSequence(FOTBuilder* headerFooter[FOTBuilder::nHF])
+{
+  for ( unsigned i = 0; i < nHF; ++i ) {
+    save_.insert(new SaveFOTBuilder);
+    headerFooter[nHF-1-i] = save_.head();
+  }
+  startSimplePageSequenceSerial();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceHeaderFooter()
+{
+  Owner<SaveFOTBuilder> hf[nHF];  
+  for ( unsigned k = 0; k < nHF; ++k ) 
+    hf[k] = save_.get();
+  // output all 24 parts, but in same order as 1.2.1, for regression testing
+  // replace with single loop later.
+  // sorry about all those constants :(
+  for (int i = 0; i < (1 << 2); i++) {
+    for (int j = 0; j < 6; j++) {
+      unsigned k = i | (j << 2);
+      startSimplePageSequenceHeaderFooter(k);
+      hf[k]->emit(*this);
+      endSimplePageSequenceHeaderFooter(k);
+    }
+  }
+  endAllSimplePageSequenceHeaderFooter();
+}
+
+void SerialFOTBuilder::endSimplePageSequence()
+{
+  endSimplePageSequenceSerial();
+}
+
+
 void SerialFOTBuilder::startFraction(FOTBuilder *&numerator, FOTBuilder *&denominator)
 {
   save_.insert(new SaveFOTBuilder);
@@ -2376,6 +2424,30 @@ void SerialFOTBuilder::endMathOperator()
     endMathOperatorUpperLimit();
   }
   endMathOperatorSerial();
+}
+
+void SerialFOTBuilder::startSimplePageSequenceSerial()
+{
+  start();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceSerial()
+{
+  end();
+}
+
+void SerialFOTBuilder::startSimplePageSequenceHeaderFooter(unsigned)
+{
+  start();
+}
+
+void SerialFOTBuilder::endSimplePageSequenceHeaderFooter(unsigned)
+{
+  end();
+}
+
+void SerialFOTBuilder::endAllSimplePageSequenceHeaderFooter()
+{
 }
 
 void SerialFOTBuilder::startFractionSerial()

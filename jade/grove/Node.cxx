@@ -10,6 +10,7 @@
 #include "Node.h"
 #include "macros.h"
 #include <string.h>
+#include <assert.h>
 
 #ifdef GROVE_NAMESPACE
 namespace GROVE_NAMESPACE {
@@ -104,7 +105,7 @@ AccessResult Node::getNotationName(GroveString &) const
   return accessNotInClass;
 }
 
-AccessResult Node::getEntityType(EntityType &) const
+AccessResult Node::getEntityType(EntityType::Enum &) const
 {
   return accessNotInClass;
 }
@@ -144,6 +145,41 @@ AccessResult Node::getImplied(bool &) const
   return accessNotInClass;
 }
 
+AccessResult Node::getAttributeDef(NodePtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getCurrentAttributeIndex(long &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getCurrentGroup(NodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getDeclValueType(DeclValueType::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getDefaultValueType(DefaultValueType::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getDefaultValue(NodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getTokens(GroveStringListPtr &) const
+{
+  return accessNotInClass;
+}
+
 AccessResult Node::getGi(GroveString &) const
 {
   return accessNotInClass;
@@ -174,6 +210,71 @@ AccessResult Node::getMustOmitEndTag(bool &) const
   return accessNotInClass;
 }
 
+AccessResult Node::getAttributeDefs(NamedNodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getContentType(ContentType::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getExclusions(GroveStringListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getInclusions(GroveStringListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getModelGroup(NodePtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getOmitEndTag(bool &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getOmitStartTag(bool &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getConnector(Connector::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getOccurIndicator(OccurIndicator::Enum &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getContentTokens(NodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getDefaultEntity(NodePtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getElementType(NodePtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getParameterEntities(NamedNodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
 AccessResult Node::getToken(GroveString &) const
 {
   return accessNotInClass;
@@ -195,6 +296,11 @@ AccessResult Node::getGeneralEntities(NamedNodeListPtr &) const
 }
 
 AccessResult Node::getNotations(NamedNodeListPtr &) const
+{
+  return accessNotInClass;
+}
+
+AccessResult Node::getElementTypes(NamedNodeListPtr &) const
 {
   return accessNotInClass;
 }
@@ -367,21 +473,109 @@ AccessResult Node::property(ComponentName::Id id,
     break;
   case ComponentName::idEntityType:
     {
-      EntityType type;
+      EntityType::Enum type;
       ret = getEntityType(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case e: value.set(ComponentName::id##E); break;
-	ENUM(text, Text)
+#define ENUM(e, E) case EntityType::##e: value.set(ComponentName::id##E); break;
+	  ENUM(text, Text)
+	  ENUM(cdata, Cdata)
+	  ENUM(sdata, Sdata)
+	  ENUM(ndata, Ndata)
+	  ENUM(pi, Pi)
+	  ENUM(subdocument, Subdocument)
+#undef ENUM
+	  default:
+	    ret = accessNotInClass;
+	}
+      }
+      break;
+    }
+  case ComponentName::idDeclValueType:
+    {
+      DeclValueType::Enum type;
+      ret = getDeclValueType(type);
+      if (ret == accessOK) {
+	switch (type) {
+#define ENUM(e, E) case DeclValueType::##e: value.set(ComponentName::id##E); break;
 	ENUM(cdata, Cdata)
-	ENUM(sdata, Sdata)
-	ENUM(ndata, Ndata)
-	ENUM(pi, Pi)
-	ENUM(subdocument, Subdocument)
-	default:
+        ENUM(entity, Entity)
+        ENUM(entities, Entities)
+        ENUM(id, Id)
+        ENUM(idref, Idref)
+        ENUM(idrefs, Idrefs)
+        ENUM(name, Name)
+        ENUM(names, Names)
+        ENUM(nmtoken, Nmtoken)
+        ENUM(nmtokens, Nmtokens)
+        ENUM(number, Number)
+        ENUM(numbers, Numbers)
+        ENUM(nutoken, Nutoken)
+        ENUM(nutokens, Nutokens)
+        ENUM(notation, Notation)
+        ENUM(nmtkgrp, Nmtkgrp)
+#undef ENUM
+        default:
 	  ret = accessNotInClass;
 	}
       }
+      break;
+    }
+  case ComponentName::idDefaultValueType:
+    {
+      DefaultValueType::Enum type;
+      ret = getDefaultValueType(type);
+      if (ret == accessOK) {
+	switch (type) {
+#define ENUM(e, E) case DefaultValueType::##e: value.set(ComponentName::id##E); break;
+        ENUM(value, Value)
+        ENUM(fixed, Fixed)
+        ENUM(required, Required)
+        ENUM(current, Current)
+        ENUM(conref, Conref)
+        ENUM(implied, Implied)
+#undef ENUM
+        default:
+	  ret = accessNotInClass;
+	}
+      }
+      break;
+    }
+  case ComponentName::idContentType:
+    {
+      ContentType::Enum type;
+      ret = getContentType(type);
+      if (ret == accessOK) {
+	switch (type) {
+#define ENUM(e, E) case ContentType::##e: value.set(ComponentName::id##E); break;
+        ENUM(cdata, Cdata)
+        ENUM(rcdata, Rcdata)
+        ENUM(empty, Empty)
+        ENUM(any, Any)
+        ENUM(modelgrp, ModelGroup)
+#undef ENUM
+        default:
+	  ret = accessNotInClass;
+	}
+      }
+      break;
+    }
+  case ComponentName::idConnector:
+    {
+      Connector::Enum type;
+      ret = getConnector(type);
+      if (ret == accessOK) {
+	switch (type) {
+#define ENUM(e, E) case Connector::##e: value.set(ComponentName::id##E); break;
+        ENUM(and_, And)
+        ENUM(or_, Or)
+        ENUM(seq, Seq)
+#undef ENUM
+        default:
+	  ret = accessNotInClass;
+	}
+      }
+      break;
     }
   case ComponentName::idChar:
     {
@@ -408,6 +602,8 @@ AccessResult Node::property(ComponentName::Id id,
 #define PROP_NODE(name) PROP(name, NodePtr)
 #define PROP_NODELIST(name) PROP(name, NodeListPtr)
 #define PROP_NMNDLIST(name) PROP(name, NamedNodeListPtr)
+#define PROP_STRINGLIST(name) PROP(name, GroveStringListPtr)
+#define PROP_INTEGER(name) PROP(name, long)
   PROP_COMPNAME(ClassName)
   PROP_COMPNAME(ChildrenPropertyName)
   PROP_COMPNAME(DataPropertyName)
@@ -420,6 +616,8 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_BOOLEAN(Implied)
   PROP_BOOLEAN(Included)
   PROP_BOOLEAN(MustOmitEndTag)
+  PROP_BOOLEAN(OmitEndTag)
+  PROP_BOOLEAN(OmitStartTag)
   PROP_CHAR(TokenSep)
   PROP_NMNDLIST(Attributes)
   PROP_NMNDLIST(DefaultedEntities)
@@ -428,6 +626,9 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_NMNDLIST(Entities)
   PROP_NMNDLIST(GeneralEntities)
   PROP_NMNDLIST(Notations)
+  PROP_NMNDLIST(AttributeDefs)
+  PROP_NMNDLIST(ElementTypes)
+  PROP_NMNDLIST(ParameterEntities)
   PROP_NODE(DocumentElement)
   PROP_NODE(Entity)
   PROP_NODE(ExternalId)
@@ -439,10 +640,16 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_NODE(Referent)
   PROP_NODE(SgmlConstants)
   PROP_NODE(TreeRoot)
+  PROP_NODE(ModelGroup)
+  PROP_NODE(DefaultEntity)
+  PROP_NODE(ElementType)
   PROP_NODELIST(Content)
   PROP_NODELIST(Epilog)
   PROP_NODELIST(Prolog)
   PROP_NODELIST(Value)
+  PROP_NODELIST(ContentTokens)
+  PROP_NODELIST(DefaultValue)
+  PROP_NODELIST(CurrentGroup)
   PROP_STRING(ApplicationInfo)
   PROP_STRING(EntityName)
   PROP_STRING(GeneratedSystemId)
@@ -455,7 +662,11 @@ AccessResult Node::property(ComponentName::Id id,
   PROP_STRING(SystemId)
   PROP_STRING(Text)
   PROP_STRING(Token)
-  }
+  PROP_STRINGLIST(Exclusions)
+  PROP_STRINGLIST(Inclusions)
+  PROP_STRINGLIST(Tokens)
+  PROP_INTEGER(CurrentAttributeIndex)
+}
 #undef PROP
 #undef PROP_BOOLEAN
 #undef PROP_CHAR
@@ -513,6 +724,14 @@ struct NodeNameNodeVisitor : public NodeVisitor {
     if (type == NamedNodeList::notations)
       ret = nd.getName(*nameP);
   }
+  void elementType(Node &nd) {
+    if (type == NamedNodeList::elementTypes)
+      ret = nd.getGi(*nameP);
+  }
+  void attributeDef(Node &nd) {
+    if (type == NamedNodeList::attributeDefs)
+      ret = nd.getName(*nameP);
+  }
 };
 
 AccessResult NamedNodeList::nodeName(const NodePtr &node, GroveString &name) const
@@ -521,7 +740,7 @@ AccessResult NamedNodeList::nodeName(const NodePtr &node, GroveString &name) con
   node->accept(v);
   return v.ret;
 }
-  
+
 void NodeVisitor::sgmlDocument(Node &)
 {
 }
@@ -539,6 +758,10 @@ void NodeVisitor::element(Node &)
 }
 
 void NodeVisitor::attributeAssignment(Node &)
+{
+}
+
+void NodeVisitor::attributeDef(Node &)
 {
 }
 
@@ -586,6 +809,26 @@ void NodeVisitor::message(Node &)
 {
 }
 
+void NodeVisitor::elementType(Node &)
+{
+}
+
+void NodeVisitor::modelGroup(Node &)
+{
+}
+
+void NodeVisitor::elementToken(Node &)
+{
+}
+
+void NodeVisitor::pcdataToken(Node &)
+{
+}
+
+void NodeVisitor::defaultEntity(Node &)
+{
+}
+
 bool GroveString::operator==(const GroveString &str) const
 {
   if (size() != str.size())
@@ -595,6 +838,80 @@ bool GroveString::operator==(const GroveString &str) const
   if (memcmp(data(), str.data(), size() * sizeof(GroveChar)) == 0)
     return 1;
   return 0;
+}
+
+void GroveStringList::append(const GroveString &gs)
+{
+  GroveStringLink **pp;
+  for (pp = &head_; *pp; pp = &(*pp)->next_)
+    ;
+  *pp = new GroveStringLink( gs );
+  if (iter_.done())
+    iter_.attach(head_);
+}
+
+AccessResult GroveStringList::first(GroveString &str) const
+{
+  if (head_ == 0)
+    return accessNull;
+  str = head_->data_;
+  return accessOK;
+}
+
+AccessResult GroveStringList::rest(GroveStringListPtr &ptr) const
+{
+  if (canReuse(ptr)) {
+    GroveStringList *list = (GroveStringList *)this;
+    if (list->iter_.done())
+      return accessNull;
+    list->iter_.next();
+    return accessOK;
+  }
+  ptr.assign(new GroveStringList());
+  ConstGroveStringListIter iter(iter_);
+  if (iter.done())
+    return accessNull;
+  iter.next();
+  while (!iter.done()) {
+    ptr->append(iter.cur());
+    iter.next();
+  }
+  return accessOK;
+}
+
+void GroveStringList::release()
+{
+  assert(refCount_ != 0);
+  if (--refCount_ == 0)
+    delete this;
+}
+
+void GroveStringList::addRef()
+{
+  ++refCount_;
+}
+
+bool GroveStringList::canReuse(GroveStringListPtr &ptr) const
+{
+  const GroveStringList *tem = &*ptr;
+  return tem == this && refCount_ == 1;
+}
+
+GroveStringList::~GroveStringList()
+{
+  GroveStringLink *tmpPtr;
+  GroveStringLink *ptr = head_;
+  while (ptr)
+  {
+    tmpPtr = ptr;
+    ptr = ptr->next_;
+    delete tmpPtr;
+  }
+}
+
+ConstGroveStringListIter::ConstGroveStringListIter(const GroveStringList &list)
+ : link_(list.head_)
+{
 }
 
 SdataMapper::~SdataMapper()
@@ -610,55 +927,100 @@ const char *ComponentName::rcsName(Id id)
 {
   static const char *const names[] = {
     "allpns",
+    "and",
+    "any",
     "appinfo",
     "attasgn",
+    "attdef",
+    "attdefs",
     "atts",
     "attvaltk",
     "cdata",
     "char",
     "childpn",
     "classnm",
+    "connect",
+    "conref",
     "content",
+    "tokens",
+    "contype",
+    "current",
+    "curattix",
+    "curgrp",
     "datachar",
     "datapn",
     "dseppn",
+    "dcltype",
     "dflted",
     "dfltents",
+    "dfltent",
+    "dfltval",
+    "dflttype",
+    "dtlts",
     "docelem",
     "doctype",
-    "dtlts",
     "element",
     "elements",
+    "elemtk",
+    "elemtype",
+    "elemtps",
+    "empty",
     "entities",
     "entity",
     "entname",
     "enttype",
     "epilog",
+    "excls",
     "extdata",
     "extid",
+    "fixed",
     "genents",
     "gensysid",
     "gi",
-    "govdt",
     "govrning",
+    "govdt",
     "grovroot",
     "id",
+    "idref",
+    "idrefs",
     "implied",
     "included",
+    "incls",
+    "modelgrp",
     "momitend",
     "name",
+    "names",
     "ndata",
+    "nmtkgrp",
+    "nmtoken",
+    "nmtokens",
     "notation",
     "notname",
     "nots",
+    "number",
+    "numbers",
+    "nutoken",
+    "nutokens",
+    "occur",
+    "omitend",
+    "omitstrt",
+    "opt",
+    "or",
     "origin",
     "otsrelpn",
+    "parments",
     "parent",
+    "pcdatatk",
     "pi",
+    "plus",
     "prolog",
     "pubid",
+    "rcdata",
     "referent",
+    "rep",
+    "required",
     "sdata",
+    "seq",
     "sgmlcsts",
     "sgmldoc",
     "subdoc",
@@ -667,9 +1029,10 @@ const char *ComponentName::rcsName(Id id)
     "sysid",
     "text",
     "token",
+    "tokens",
     "tokensep",
     "treeroot",
-    "value",
+    "value"
   };
   if (id < 0 || id >= SIZEOF(names))
     return 0;
@@ -680,55 +1043,100 @@ const char *ComponentName::sdqlName(Id id)
 {
   static const char *const names[] = {
     "all-property-names",
+    "and",
+    "any",
     "application-info",
     "attribute-assignment",
+    "attribute-def",
+    "attribute-defs",
     "attributes",
     "attribute-value-token",
     "cdata",
     "char",
     "children-property-name",
     "class-name",
+    "connector",
+    "conref",
     "content",
+    "content-tokens",
+    "content-type",
+    "current",
+    "current-attribute-index",
+    "current-group",
     "data-char",
     "data-property-name",
     "data-sep-property-name",
+    "decl-value-type",
     "defaulted?",
     "defaulted-entities",
+    "default-entity",
+    "default-value",
+    "default-value-type",
+    "doctypes-and-linktypes",
     "document-element",
     "document-type",
-    "doctypes-and-linktypes",
     "element",
     "elements",
+    "element-token",
+    "element-type",
+    "element-types",
+    "empty",
     "entities",
     "entity",
     "entity-name",
     "entity-type",
     "epilog",
+    "exclusions",
     "external-data",
     "external-id",
+    "fixed",
     "general-entities",
     "generated-system-id",
     "gi",
-    "governing-doctype",
     "governing?",
+    "governing-doctype",
     "grove-root",
     "id",
+    "idref",
+    "idrefs",
     "implied?",
     "included?",
+    "inclusions",
+    "model-group",
     "must-omit-end-tag?",
     "name",
+    "names",
     "ndata",
+    "name-token-group",
+    "nmtoken",
+    "nmtokens",
     "notation",
     "notation-name",
     "notations",
+    "number",
+    "numbers",
+    "nutoken",
+    "nutokens",
+    "occur-indicator",
+    "omit-end-tag?",
+    "omit-start-tag?",
+    "opt",
+    "or",
     "origin",
     "origin-to-subnode-rel-property-name",
+    "parameter-entities",
     "parent",
+    "pcdata-token",
     "pi",
+    "plus",
     "prolog",
     "public-id",
+    "rcdata",
     "referent",
+    "rep",
+    "required",
     "sdata",
+    "seq",
     "sgml-constants",
     "sgml-document",
     "subdocument",
@@ -737,9 +1145,10 @@ const char *ComponentName::sdqlName(Id id)
     "system-id",
     "text",
     "token",
+    "tokens",
     "token-sep",
     "tree-root",
-    "value",
+    "value"
   };
   if (id < 0 || id >= SIZEOF(names))
     return 0;
@@ -779,14 +1188,20 @@ const ClassDef ClassDef::externalId = {
 static const ComponentName::Id allProps_documentType[] = {
   INTRINSIC_PROPS,
   ComponentName::idName,
+  ComponentName::idElementTypes,
   ComponentName::idGoverning,
   ComponentName::idGeneralEntities,
   ComponentName::idNotations,
+  ComponentName::idDefaultEntity,
+  ComponentName::idParameterEntities,
   ComponentName::noId
 };
 static const ComponentName::Id subnodeProps_documentType[] = {
   ComponentName::idGeneralEntities,
   ComponentName::idNotations,
+  ComponentName::idElementTypes,
+  ComponentName::idDefaultEntity,
+  ComponentName::idParameterEntities,
   ComponentName::noId
 };
 const ClassDef ClassDef::documentType = {
@@ -894,6 +1309,7 @@ static const ComponentName::Id allProps_element[] = {
   ComponentName::idContent,
   ComponentName::idIncluded,
   ComponentName::idMustOmitEndTag,
+  ComponentName::idElementType,
   ComponentName::noId
 };
 static const ComponentName::Id subnodeProps_element[] = {
@@ -913,10 +1329,12 @@ static const ComponentName::Id allProps_notation[] = {
   INTRINSIC_PROPS,
   ComponentName::idName,
   ComponentName::idExternalId,
+  ComponentName::idAttributeDefs,
   ComponentName::noId
 };
 static const ComponentName::Id subnodeProps_notation[] = {
   ComponentName::idExternalId,
+  ComponentName::idAttributeDefs,
   ComponentName::noId
 };
 const ClassDef ClassDef::notation = {
@@ -943,6 +1361,7 @@ const ClassDef ClassDef::externalData = {
 };
 static const ComponentName::Id allProps_attributeAssignment[] = {
   INTRINSIC_PROPS,
+  ComponentName::idAttributeDef,
   ComponentName::idValue,
   ComponentName::idName,
   ComponentName::idImplied,
@@ -1024,6 +1443,129 @@ const ClassDef ClassDef::message = {
   ComponentName::noId,
   noProps,
   noProps,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_attributeDef[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idCurrentAttributeIndex,
+  ComponentName::idCurrentGroup,
+  ComponentName::idDeclValueType,
+  ComponentName::idDefaultValueType,
+  ComponentName::idDefaultValue,
+  ComponentName::idName,
+  ComponentName::idTokens,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_attributeDef[] = {
+  ComponentName::idDefaultValue,
+  ComponentName::noId
+};
+const ClassDef ClassDef::attributeDef = {
+  ComponentName::idAttributeDef,
+  allProps_attributeDef,
+  subnodeProps_attributeDef,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_elementType[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idAttributeDefs,
+  ComponentName::idContentType,
+  ComponentName::idExclusions,
+  ComponentName::idGi,
+  ComponentName::idInclusions,
+  ComponentName::idModelGroup,
+  ComponentName::idOmitEndTag,
+  ComponentName::idOmitStartTag,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_elementType[] = {
+  ComponentName::idAttributeDefs,
+  ComponentName::idModelGroup,
+  ComponentName::noId
+};
+const ClassDef ClassDef::elementType = {
+  ComponentName::idElementType,
+  allProps_elementType,
+  subnodeProps_elementType,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_modelGroup[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idConnector,
+  ComponentName::idOccurenceIndicator,
+  ComponentName::idContentTokens,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_modelGroup[] = {
+  ComponentName::idContentTokens,
+  ComponentName::noId
+};
+const ClassDef ClassDef::modelGroup = {
+  ComponentName::idModelGroup,
+  allProps_modelGroup,
+  subnodeProps_modelGroup,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_elementToken[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idGi,
+  ComponentName::idOccurenceIndicator,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_elementToken[] = {
+  ComponentName::noId
+};
+const ClassDef ClassDef::elementToken = {
+  ComponentName::idElementToken,
+  allProps_elementToken,
+  subnodeProps_elementToken,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_pcdataToken[] = {
+  INTRINSIC_PROPS,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_pcdataToken[] = {
+  ComponentName::noId
+};
+const ClassDef ClassDef::pcdataToken = {
+  ComponentName::idPcdataToken,
+  allProps_pcdataToken,
+  subnodeProps_pcdataToken,
+  ComponentName::noId,
+  ComponentName::noId,
+  ComponentName::noId
+};
+static const ComponentName::Id allProps_defaultEntity[] = {
+  INTRINSIC_PROPS,
+  ComponentName::idName,
+  ComponentName::idEntityType,
+  ComponentName::idText,
+  ComponentName::idExternalId,
+  ComponentName::idAttributes,
+  ComponentName::idNotationName,
+  ComponentName::idNotation,
+  ComponentName::noId
+};
+static const ComponentName::Id subnodeProps_defaultEntity[] = {
+  ComponentName::idExternalId,
+  ComponentName::idAttributes,
+  ComponentName::noId
+};
+const ClassDef ClassDef::defaultEntity = {
+  ComponentName::idDefaultEntity,
+  allProps_defaultEntity,
+  subnodeProps_defaultEntity,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId

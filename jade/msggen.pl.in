@@ -173,7 +173,7 @@ if ($gen_c) {
 #pragma implementation
 #endif
 
-#include "config.h"
+#include "stylelib.h"
 #include "$class.h"
 
 #ifdef SP_NAMESPACE

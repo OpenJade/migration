@@ -165,13 +165,15 @@ PosixStorageManager::PosixStorageManager(const char *type,
 #ifndef SP_WIDE_SYSTEM
 					 const OutputCodingSystem *filenameCodingSystem,
 #endif
-					 int maxFDs)
+					 int maxFDs,
+					 Boolean restrictFileReading)
 : IdStorageManager(filenameCharset),
   type_(type),
 #ifndef SP_WIDE_SYSTEM
   filenameCodingSystem_(filenameCodingSystem),
 #endif
-  descriptorManager_(maxFDs)
+  descriptorManager_(maxFDs),
+  restrictFileReading_(restrictFileReading)
 {
   Char newline = idCharset()->execToDesc('\n');
   reString_.assign(&newline, 1);
@@ -185,6 +187,40 @@ const char *PosixStorageManager::type() const
 void PosixStorageManager::addSearchDir(const StringC &str)
 {
   searchDirs_.push_back(str);
+}
+
+Boolean PosixStorageManager::isSafe(const StringC &file) const
+{
+  size_t i = 0;
+  for (; i < file.size(); i++) {
+    if (file[i] == '.' && i > 0 && file[i - 1] == '.') return 0;
+    if (!(   (file[i] >= 'a' && file[i] <= 'z')
+          || (file[i] >= 'A' && file[i] <= 'Z')
+          || (file[i] >= '0' && file[i] <= '9')
+          || file[i] == '/'
+          || file[i] == '.'
+          || file[i] == '-'
+          || file[i] == '_'
+       )) return 0;
+  }
+
+  const StringC &dir = extractDir(file);
+
+  for (i = 0; i < searchDirs_.size(); i++) {
+    const StringC &searchDir = searchDirs_[i];
+
+    if (dir.size() >= searchDir.size()) {
+      size_t j = 0;
+      for (; j < searchDir.size(); j++) {
+        if (searchDir[j] != dir[j]) break;
+      }
+
+      if (j == searchDir.size() &&
+           (dir.size() == searchDir.size() || dir[j] == '/')) return 1;
+    }
+  }
+
+  return 0;
 }
 
 #ifdef SP_POSIX_FILENAMES
@@ -402,6 +438,9 @@ PosixStorageManager::makeStorageObject(const StringC &spec,
     	filename = combineDir(extractDir(base), spec);
     else
       filename = combineDir(searchDirs_[i - 1], spec);
+
+    if (restrictFileReading_ && !isSafe(filename)) continue;
+
 #ifdef SP_WIDE_SYSTEM
     String<FChar> cfilename;
     for (size_t j = 0; j < filename.size(); j++)
@@ -423,14 +462,14 @@ PosixStorageManager::makeStorageObject(const StringC &spec,
 				    &descriptorManager_);
     }
     int savedErrno = errno;
-    if (absolute || !search || searchDirs_.size() == 0) {
+    if ((absolute || !search || searchDirs_.size() == 0) && !restrictFileReading_) {
       ParentLocationMessenger(mgr).message(PosixStorageMessages::openSystemCall,
 					   StringMessageArg(filename),
 					   ErrnoMessageArg(savedErrno));
       descriptorManager_.releaseD();
       return 0;
     }
-    sr.add(filename, savedErrno);
+    if (!restrictFileReading_) sr.add(filename, savedErrno);
   }
   descriptorManager_.releaseD();
   ParentLocationMessenger(mgr).message(PosixStorageMessages::cannotFind,

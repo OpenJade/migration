@@ -28,6 +28,7 @@ __instantiate(Vector<MessageFragment>)
 __instantiate(Vector<MessageType1>)
 __instantiate(LongOption<CmdLineApp::AppChar>)
 __instantiate(Vector<LongOption<CmdLineApp::AppChar> >)
+__instantiate(Owner<OutputCharStream>)
 
 #ifdef SP_NAMESPACE
 }

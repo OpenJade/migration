@@ -28,7 +28,8 @@ public:
     xModule = 2 
     };
   enum { nModules = xModule + 1 };
-  MessageFragment(unsigned module, unsigned number, const char *text = 0);
+  MessageFragment(unsigned module = libModule,
+		  unsigned number = unsigned(-1), const char *text = 0);
   unsigned module() const;
   unsigned number() const;
   const char *text() const;
@@ -52,7 +53,8 @@ public:
     idrefError,
     error
     };
-  MessageType(Severity, unsigned module, unsigned number,
+  MessageType(Severity = info, unsigned module = libModule,
+	      unsigned number = unsigned(-1),
 	      const char *text = 0, const char *clauses = 0, 
               const char *auxText = 0);
   Severity severity() const;
@@ -69,55 +71,64 @@ private:
 
 class SP_API MessageType0 : public MessageType {
 public:
-  MessageType0(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType0(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType1 : public MessageType {
 public:
-  MessageType1(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType1(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType2 : public MessageType {
 public:
-  MessageType2(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType2(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType3 : public MessageType {
 public:
-  MessageType3(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType3(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType4 : public MessageType {
 public:
-  MessageType4(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType4(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType5 : public MessageType {
 public:
-  MessageType5(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType5(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType6 : public MessageType {
 public:
-  MessageType6(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType6(Severity = info, unsigned module = libModule,
+	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
 };
 
 class SP_API MessageType0L : public MessageType {
 public:
-  MessageType0L(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType0L(Severity = info, unsigned module = libModule,
+		unsigned number = unsigned(-1), const char *text = 0,
 		const char *clauses = 0, const char *auxText = 0);
 };
 
 class SP_API MessageType1L : public MessageType {
 public:
-  MessageType1L(Severity, unsigned module, unsigned number, const char *text = 0,
+  MessageType1L(Severity = info, unsigned module = libModule,
+		unsigned number = unsigned(-1), const char *text = 0,
 		const char *clauses = 0, const char *auxText = 0);
 };
 

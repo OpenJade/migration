@@ -1,8 +1,9 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 2000 Peter Nilsson
 // See the file copying.txt for copying permission.
 
 #include "stylelib.h"
 #include "ELObj.h"
+#include "EvalContext.h"
 #include "Interpreter.h"
 #include "InterpreterMessages.h"
 #include <OpenSP/macros.h>
@@ -23,6 +24,7 @@ public:
   NodePtr nodeListRef(long, EvalContext &, Interpreter &);
   long nodeListLength(EvalContext &context, Interpreter &interp);
   void traceSubObjects(Collector &) const;
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *reversed(EvalContext &context, Interpreter &interp);
   NodeListObj *nl_;
@@ -1065,6 +1067,188 @@ bool NodeListObj::suppressError()
   return 0;
 }
 
+bool NodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  NodeListObj *nl = this;
+  for (;;) {
+    ELObjDynamicRoot protect(interp, nl);
+    NodePtr nd(nl->nodeListFirst(context, interp));
+    if (!nd)
+      return 0;
+    if (*nd == *ptr)  
+      return 1;
+    ComponentName::Id cls1, cls2;
+    nd->getClassName(cls1);
+    ptr->getClassName(cls2);
+    bool chunk;
+    nl = (cls1 == cls2) 
+      ? nl->nodeListRest(context, interp)
+      : nl->nodeListChunkRest(context, interp, chunk);
+  }
+  return 0;
+}
+
+bool NodeListObj::contains(EvalContext &context, Interpreter &interp, ComponentName::Id id)
+{
+  NodeListObj *nl = this;
+  for (;;) {
+    ELObjDynamicRoot protect(interp, nl);
+    NodePtr nd(nl->nodeListFirst(context, interp));
+    if (!nd)
+      return 0;
+    ComponentName::Id cls;
+    nd->getClassName(cls);
+    if (cls == id)
+      return 1;
+    bool chunk;
+    nl = nl->nodeListChunkRest(context, interp, chunk);
+  }
+  return 0;
+}
+
+class OutputPropertyValue : public PropertyValue {
+public:
+  // Does NOT own the OUtputCharsTream.
+  OutputPropertyValue(OutputCharStream &os)
+    : os_(os), className_(ComponentName::noId) { }
+
+  // Set class name for next property value.
+  void setClassName(ComponentName::Id id) {
+    className_ = id;
+  }
+
+  // Print separator if something was output.
+  void sep(const char *s) {
+    if (className_ == ComponentName::noId)
+      os_ << s;
+  }
+  // Print indication of null value, can't do it inside set,
+  // since set isn't called for null values
+  void nullValue() {
+    flush();
+    os_ << "#<null>";
+  }
+  void set(const NodePtr &) { 
+    flush();
+    os_ << "#<node>";
+  }
+  void set(const NodeListPtr &) {
+    flush();
+    os_ << "#<node-list>";
+  }
+  void set(const NamedNodeListPtr &) { 
+    flush();
+    os_ << "#<named-node-list>";
+  }
+  void set(bool b) {
+    flush();
+    os_ << (b ? "#t" : "#f");
+  }
+  void set(GroveChar gc) {
+    flush();
+    // FIXME.
+    os_ << "#\\";
+    os_.put(gc);
+  }
+  void set(GroveString gs) {
+    flush();
+    // FIXME.
+    os_ << '\"';
+    os_.write(gs.data(), gs.size());
+    os_ << '\"';
+  }
+  void set(ComponentName::Id id) {
+    flush();
+    // Issue: Use RCS name or SDQL name? Compact vs. readable output.
+    os_ << ComponentName::sdqlName(id);
+  }
+  void set(const GroveStringListPtr &gsl) {
+    flush();
+    // FIXME.
+    os_ << '(';
+    bool first = true;
+    for(ConstGroveStringListIter iter(gsl->iter());!iter.done();iter.next()) {
+      if (!first)
+	os_ << ' ';
+      os_ << '\"';
+      os_.write(iter.cur().data(), iter.cur().size());
+      os_ << '\"';
+      first = false;
+    }
+    os_ << ')';
+  }
+  void set(const ComponentName::Id *idp) {
+    flush();
+    os_ << '(';
+    bool first = true;
+    while (*idp != ComponentName::noId) {
+      if (!first)
+	os_ << ' ';
+      os_ << ComponentName::sdqlName(*idp++);
+      first = false;
+    }
+    os_ << ')';
+  }
+  void set(long l) {
+    flush();
+    if (l < 0)
+      os_ << '-' << (unsigned long)-l;
+    else
+      os_ << (unsigned long)l;
+  }
+  // FIXME: add mechanism to limit number of items printed.
+private:
+  void flush() {
+    if (className_ != ComponentName::noId) {
+      os_ << ComponentName::sdqlName(className_) << ": ";
+      className_ = ComponentName::noId;
+    }
+  }
+
+  OutputCharStream &os_;
+  ComponentName::Id className_;
+};
+
+void NodeListObj::print(Interpreter &interp, OutputCharStream &os)
+{
+  // This is very verbose at the moment.
+  // FIXME: This EvalContext may not be correct in every case...
+  EvalContext ec;
+  NodeListObj *nl = this;
+  ELObjDynamicRoot protect(interp, nl);
+  OutputPropertyValue outProp(os);
+
+  os << "#node-list(";
+  for(;;) {
+    NodePtr nd(nl->nodeListFirst(ec, interp));
+    if (!nd)
+      break;
+
+    os << "< ";
+    // Print the properties.
+    const ComponentName::Id *idp;
+    if (nd->getAllPropertyNames(idp) != accessOK)
+      CANNOT_HAPPEN();
+    while (*idp != ComponentName::noId) {
+      switch (*idp) {
+      case ComponentName::idAllPropertyNames:
+	++idp;
+	continue;
+      }
+      outProp.setClassName(*idp);
+      if (nd->property(*idp, interp, outProp) == accessNull)
+	outProp.nullValue();
+      outProp.sep(" ");
+      ++idp;
+    }
+    os << "> ";
+
+    nl = nl->nodeListRest(ec, interp);
+    protect = nl;
+  }
+  os << ')';
+}
+
 NamedNodeListObj *NamedNodeListObj::asNamedNodeList()
 {
   return this;
@@ -1234,6 +1418,13 @@ void PairNodeListObj::traceSubObjects(Collector &c) const
   c.trace(tail_);
 }
 
+bool PairNodeListObj::contains(EvalContext &context, Interpreter &interp,
+                               const NodePtr &nd)
+{
+  return (head_ && head_->contains(context, interp, nd))
+          || tail_->contains(context, interp, nd);
+}
+
 ReverseNodeListObj::ReverseNodeListObj(NodeListObj *nl)
 : nl_(nl), reversed_(0)
 {
@@ -1302,6 +1493,12 @@ void ReverseNodeListObj::traceSubObjects(Collector &c) const
 {
   c.trace(nl_);
   c.trace(reversed_);
+}
+
+bool ReverseNodeListObj::contains(EvalContext &context, Interpreter &interp,
+				  const NodePtr &nd)
+{
+  return nl_->contains(context, interp, nd);
 }
 
 SubgroveSpecObj *ELObj::asSubgroveSpec()

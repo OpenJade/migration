@@ -1,25 +1,32 @@
-* Finish the query_branch: We must sort the query rules together with the
-element rules/root rules. To do so we probably have to introduce a virtual
-base class MatchBase which would be a base class of Rule and of Pattern.
-It would provide the trivial() and matches() functions. The we must make
-sure that we can properly compare root/query rules and element/query rules.
-Perhaps introduce a RootRule subclass.
-
+* Add some optimizations to the query stuff: add query rules to the per-gi
+  rule lists only if they actually contain at least on element node with that
+  gi, add a seperate list of char rules and a findCharRule function to use
+  for char nodes (or combine the various find...Rule functions into one
+  which gets the list to look in as a parameter). Then hasCharRules_ can 
+  be replaced by charRules_[0].size() > 0 || charRules_[1].size() > 0.
+x
 * Redo the modules stuff. Move it from Interpreter to grove/. Ideally, the
-style engine shouldn't need any hardwired knowledge about the limitations
-of the grove implementation, but should query it.
+  style engine shouldn't need any hardwired knowledge about the limitations
+  of the grove implementation, but should query it.
 
 * Redo the features stuff to make it cleaner.  
 
 * Remove the SdataMapper hack from the grove interface. Rename SdataMapper
-to something like GroveConstructionParameters and pass it to the grove
-construction process. Eventually we want to add the standard-chars,
-combine-char and other stuff to the GroveConstructionParameters.
+  to something like GroveConstructionParameters and pass it to the grove
+  construction process. Eventually we want to add the standard-chars,
+  combine-char and other stuff to the GroveConstructionParameters.
 
-* Fix spgrove for 32bit chars.
+* Make the in-memory representation for char chunks more compact. Right
+  now we store a flat array of 32bit chars, which is wasteful. If we use
+  a different representation, DataNode::charChunk will involve a making
+  a copy and thus be much more expensive than currently. Thus we should
+  make sure it is not called unnecessarily often (eg its called twice
+  in ProcessContext::processNode). 
 
 * Add more error messages to the SchemeParser. Currently, many parser
   functions just return 0 to the caller; they should also issue a message.
+  Add sth like AllowedTokensMessageArg and use that in 
+  SchemeParser::tokenRecover to give information about the expected tokens.
 
 * Free Expressions when they are no longer needed. Later, maybe replace the
   allocation mechanism with a simpler one that does not actually free
@@ -79,8 +86,18 @@ Things which are missing and need a lot of work
   groups. Also adjust the inclusions/exclusions. Optimization: recompile 
   only those which actually use #ALL/#IMPLICIT.
 
+<<<<<<< TODO
 * Annex K #IMPLIED doctype name.
 
+=======
+* Annex K DTD data entities: add a DTD notation framework. Applications
+  should have a way to register DTD notation handlers which would then
+  be called for DTD data entities with the corresponding notation. They
+  would get a pointer to the entity and to the current Dtd and would
+  add the element and entity declarations they extract from the entity
+  to the Dtd.
+
+>>>>>>> 1.12.2.6
 * check table-auto-width and multi-process features.
 
 * A caching mechanism for DTDs, dsssl specs, ...
@@ -110,6 +127,7 @@ Simple things
 * Perhaps split InterpreterMessages into InterpreterMessages and 
   SchemeParserMessages (and more...). 
 
+<<<<<<< TODO
 * Remove FOTBuilder::characters(const Vector<CharacterNIC> &) and instead add
   a procedure that lets the backend query character properties for a Char
   array. Makes storing parts of the FOT more efficient (otherwise,
@@ -123,6 +141,29 @@ Simple things
   can handle these special cases without major effort.) Instead we could add a
   FOTBuilder::FOMessage() non-virtual, so that backends may produce consistent
   error messages without knowing about ProcessContext internals.
+=======
+* Set up framework for I18N: generating .po from .msg, po/OpenXYZ.pot from ../*.po,
+  generate and install .mo files. This has been done for OpenSP,
+  still to do for OpenJade. 
+  
+  If you add a new .msg file, you now have to remember to add it 
+  to po/POTFILES.in.
+
+  Adding support for a new language is done by:
+  1) cp po/OpenSP.pot <lang>.po	
+  2) Add translations in po/<lang>.po
+  3) cvs add po/<lang>.po 
+  4) Add <lang> to ALL_LINGUAS in configure.in
+  5) cvs commit configure.in po/<lang>.po
+  Here <lang> stands for the proper 2-letter language code 
+  (is that ISO 639 ?)
+
+  Still to do: figure out how to create translated .rc files from
+  the translations in <lang>.po. This will need some perl magic
+  to read in <lang>.po, then go over the .rc file and for each string,
+  look up the translation. Then write out a translated .rc file 
+  containing the proper language identification (ask Didier about this). 
+>>>>>>> 1.12.2.6
 
 * Support uri-ref addresses in more backends.
 

@@ -177,10 +177,10 @@ public:
   }
   // Return 0 if not yet available.
   Boolean getAppinfo(const StringC *&) const;
-  const SubstTable<Char> *generalSubstTable() const {
+  const SubstTable *generalSubstTable() const {
     return instanceSyntax_.isNull() ? 0 : instanceSyntax_->generalSubstTable();
   }
-  const SubstTable<Char> *entitySubstTable() const {
+  const SubstTable *entitySubstTable() const {
     return instanceSyntax_.isNull() ? 0 : instanceSyntax_->entitySubstTable();
   }
   // Be careful not to change ref counts while accessing DTD.
@@ -1617,7 +1617,7 @@ private:
 class BaseNamedNodeList : public NamedNodeList {
 public:
   BaseNamedNodeList(const GroveImpl *grove,
-		    const SubstTable<Char> *substTable)
+		    const SubstTable *substTable)
   : grove_(grove), substTable_(substTable), refCount_(0) { }
   virtual ~BaseNamedNodeList() { }
   void addRef() { ++refCount_; }
@@ -1629,7 +1629,7 @@ public:
     ASSERT(refCount_ != 0);
     if (--refCount_ == 0) delete this;
   }
-  size_t normalize(Char *s, size_t n) const {
+  size_t normalize(GroveChar *s, size_t n) const {
     if (substTable_) {
       for (size_t i = 0; i < n; i++)
 	substTable_->subst(s[i]);
@@ -1645,7 +1645,7 @@ public:
   virtual AccessResult namedNodeU(const StringC &, NodePtr &) const = 0;
 private:
   GroveImplPtr grove_;
-  const SubstTable<Char> *substTable_;
+  const SubstTable *substTable_;
   unsigned refCount_;
 };
 
@@ -3120,7 +3120,7 @@ bool ElementNode::hasGi(GroveString str) const
   size_t len = gi.size();
   if (len != str.size())
     return 0;
-  const SubstTable<Char> *subst = grove()->generalSubstTable();
+  const SubstTable *subst = grove()->generalSubstTable();
   if (!subst)
     return 0;
   for (size_t i = 0; i < len; i++)
@@ -5352,7 +5352,7 @@ unsigned BaseNode::groveIndex() const
 
 bool BaseNode::operator==(const Node &node) const
 {
-  if (!sameGrove(node))
+  if (!sameGrove(node)) 
     return 0;
   return same((const BaseNode &)node);
 }

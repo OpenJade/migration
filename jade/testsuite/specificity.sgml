@@ -1,0 +1,10 @@
+<!doctype test [
+<!entity % elts "(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p)" >
+<!element test - - %elts; >
+<!element %elts; - o empty > 
+<!attlist %elts id ID #required > 
+]>
+<test>
+<a id=a><b id=b><c id=c><d id=d><e id=e><f id=f><g id=g><h id=h>
+<i id=i><j id=j><k id=k><l id=l><m id=m><n id=n><o id=o><p id=p>
+</test>

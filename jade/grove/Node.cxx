@@ -1734,13 +1734,10 @@ static const ComponentName::Id allProps_elementToken[] = {
   ComponentName::idOccurenceIndicator,
   ComponentName::noId
 };
-static const ComponentName::Id subnodeProps_elementToken[] = {
-  ComponentName::noId
-};
 const ClassDef ClassDef::elementToken = {
   ComponentName::idElementToken,
   allProps_elementToken,
-  subnodeProps_elementToken,
+  noProps,
   ComponentName::noId,
   ComponentName::noId,
   ComponentName::noId

@@ -164,9 +164,9 @@ Transformation language
 Style language
 ==============
 
-12.4.1   query
+12.4.1   query					*
 12.4.6	 char-script-case
-	 declare-char-characteristic+property *
+	 declare-char-characteristic+property	*
 12.4.7	 sync
 	 side-sync
 12.5.1	 generated-object?

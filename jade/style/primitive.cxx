@@ -1,4 +1,4 @@
-// Copyright (c) 1996 James Clark
+// Copyright (c) 1996 James Clark, 2000 Peter Nilsson
 // See the file copying.txt for copying permission.
 
 #include "stylelib.h"
@@ -25,21 +25,52 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-class DescendantsNodeListObj : public NodeListObj {
+class TreeNodeListObj : public NodeListObj {
 public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  DescendantsNodeListObj(const NodePtr &, unsigned = 0);
+  TreeNodeListObj(const NodePtr &);
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
-private:
-  static void advance(NodePtr &, unsigned &);
-  static void chunkAdvance(NodePtr &, unsigned &);
+protected:
+  virtual void advance(EvalContext &, Interpreter &) = 0;
+  virtual void chunkAdvance(EvalContext &, Interpreter &) = 0;
+  virtual TreeNodeListObj *copy(Interpreter &) = 0;
+  NodePtr root_;
   // nodes in node list are strictly after this node
   NodePtr start_;
+};
+
+class SubtreeNodeListObj : public TreeNodeListObj {
+public:
+  SubtreeNodeListObj(const NodePtr &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+protected:
+  void advance(EvalContext &, Interpreter &);
+  void chunkAdvance(EvalContext &, Interpreter &);
+  SubtreeNodeListObj *copy(Interpreter &);
   unsigned depth_;
+};
+
+class SubgroveNodeListObj : public TreeNodeListObj {
+public:
+  SubgroveNodeListObj(const NodePtr &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+protected:
+  void advance(EvalContext &, Interpreter &);
+  void chunkAdvance(EvalContext &, Interpreter &);
+  SubgroveNodeListObj *copy(Interpreter &);
+  unsigned depth_;
+};
+
+class DescendantsNodeListObj : public SubtreeNodeListObj {
+public:
+  DescendantsNodeListObj(const NodePtr &, Interpreter &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+protected:
+  DescendantsNodeListObj *copy(Interpreter &);
 };
 
 class SiblingNodeListObj : public NodeListObj {
@@ -51,6 +82,7 @@ public:
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodePtr first_;
   NodePtr end_;
@@ -63,6 +95,7 @@ public:
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
   void traceSubObjects(Collector &) const;
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *nodeList_;
   ComponentName::Id cls_;
@@ -92,10 +125,21 @@ public:
   bool suppressError();
 private:
   void mapNext(EvalContext &, Interpreter &);
+  NodeListObj *mapped_;
+protected:
   FunctionObj *func_;
   NodeListObj *nl_;
-  NodeListObj *mapped_;
   ConstPtr<Context> context_;
+};
+
+class FilterNodeListObj : public MapNodeListObj {
+public:
+  FilterNodeListObj(FunctionObj *func, NodeListObj *nl, const ConstPtr<Context> &);
+  NodePtr nodeListFirst(EvalContext &, Interpreter &);
+  NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
+private:
+  bool maybeIn(EvalContext &, Interpreter &, const NodePtr &);
 };
 
 class SelectElementsNodeListObj : public NodeListObj {
@@ -104,11 +148,12 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
+  void traceSubObjects(Collector &c) const;
   SelectElementsNodeListObj(NodeListObj *, NCVector<Pattern> &);
   SelectElementsNodeListObj(NodeListObj *, const ConstPtr<PatternSet> &);
-  void traceSubObjects(Collector &) const;
   NodePtr nodeListFirst(EvalContext &, Interpreter &);
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *nodeList_;
   ConstPtr<PatternSet> patterns_;
@@ -1795,7 +1840,7 @@ DEFPRIMITIVE(ProcessFirstDescendant, argc, argv, context, interp, loc)
     if (!interp.convertToPattern(argv[i], loc, patterns[i]))
       return interp.makeError();
   }
-  NodeListObj *nl = new (interp) DescendantsNodeListObj(context.currentNode);
+  NodeListObj *nl = new (interp) DescendantsNodeListObj(context.currentNode, interp);
   ELObjDynamicRoot protect(interp, nl);
   nl = new (interp) SelectElementsNodeListObj(nl, patterns);
   protect = nl;
@@ -1853,6 +1898,21 @@ DEFPRIMITIVE(IsMatchElement, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notASingletonNode, 1, argv[1]);
   if (pattern.matches(node, interp))
+    return interp.makeTrue();
+  return interp.makeFalse();
+}
+
+DEFPRIMITIVE(IsNodeListContains, argc, argv, context, interp, loc)
+{
+  NodeListObj *nl = argv[0]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  NodePtr node;
+  if (!argv[1]->optSingletonNodeList(context, interp, node) || !node)
+    return argError(interp, loc,
+		    InterpreterMessages::notASingletonNode, 1, argv[1]);
+  if (nl->contains(context, interp, node)) 
     return interp.makeTrue();
   return interp.makeFalse();
 }
@@ -4013,6 +4073,32 @@ DEFPRIMITIVE(Follow, argc, argv, context, interp, loc)
   return new (interp) NodeListPtrNodeListObj(nl);
 }
 
+DEFPRIMITIVE(Subtree, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
+  return new (interp) SubtreeNodeListObj(node);
+}
+
+DEFPRIMITIVE(Subgrove, argc, argv, context, interp, loc)
+{
+  NodePtr node;
+  if (!argv[0]->optSingletonNodeList(context, interp, node)) {
+    NodeListObj *nl = argv[0]->asNodeList();
+    if (nl)
+      return new (interp) MapNodeListObj(this, nl, new MapNodeListObj::Context(context, loc));
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 0, argv[0]);
+  }
+  return new (interp) SubgroveNodeListObj(node);
+}
+
 DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
 {
   NodePtr node;
@@ -4023,7 +4109,7 @@ DEFPRIMITIVE(Descendants, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 0, argv[0]);
   }
-  return new (interp) DescendantsNodeListObj(node);
+  return new (interp) DescendantsNodeListObj(node, interp);
 }
 
 DEFPRIMITIVE(Preced, argc, argv, context, interp, loc)
@@ -4259,6 +4345,32 @@ DEFPRIMITIVE(NodeListMap, argc, argv, context, interp, loc)
     return argError(interp, loc,
 		    InterpreterMessages::notANodeList, 1, argv[1]);
   return new (interp) MapNodeListObj(func, nl, new MapNodeListObj::Context(context, loc));
+}
+
+DEFPRIMITIVE(NodeListFilter, argc, argv, context, interp, loc)
+{
+  FunctionObj *func = argv[0]->asFunction();
+  if (!func)
+    return argError(interp, loc,
+		    InterpreterMessages::notAProcedure, 0, argv[0]);
+  if (func->nRequiredArgs() > 1) {
+    interp.setNextLocation(loc);
+    // FIXME
+    interp.message(InterpreterMessages::missingArg);
+    return interp.makeError();
+  }
+  if (func->nRequiredArgs() + func->nOptionalArgs() + func->restArg() == 0) {
+    interp.setNextLocation(loc);
+    // FIXME
+    interp.message(InterpreterMessages::tooManyArgs);
+    return interp.makeError();
+  }
+  interp.makeReadOnly(func);
+  NodeListObj *nl = argv[1]->asNodeList();
+  if (!nl)
+    return argError(interp, loc,
+		    InterpreterMessages::notANodeList, 1, argv[1]);
+  return new (interp) FilterNodeListObj(func, nl, new MapNodeListObj::Context(context, loc));
 }
 
 DEFPRIMITIVE(NodeListRef, argc, argv, context, interp, loc)
@@ -5526,73 +5638,341 @@ void Interpreter::installXPrimitive(const char *prefix, const char *s,
   externalProcTable_.insert(pubid, value);
 }
 
-DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start, unsigned depth)
-: start_(start), depth_(depth)
+TreeNodeListObj::TreeNodeListObj(const NodePtr &start)
+: start_(start), root_(start)
 {
-  advance(start_, depth_);
 }
 
-NodePtr DescendantsNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
+NodePtr TreeNodeListObj::nodeListFirst(EvalContext &, Interpreter &)
 {
   return start_;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+NodeListObj *TreeNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
 {
-  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
-  advance(obj->start_, obj->depth_);
+  TreeNodeListObj *obj = copy(interp);
+  // SubgroveNodeListObj::advance uses ELObjPropertyValue, so we must
+  // protect obj.
+  ELObjDynamicRoot protect(interp, obj);
+  obj->advance(context, interp);
   return obj;
 }
 
-NodeListObj *DescendantsNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
+NodeListObj *TreeNodeListObj::nodeListChunkRest(EvalContext &context, Interpreter &interp, bool &chunk)
 {
-  DescendantsNodeListObj *obj = new (interp) DescendantsNodeListObj(*this);
-  chunkAdvance(obj->start_, obj->depth_);
+  TreeNodeListObj *obj = copy(interp);
+  // SubgroveNodeListObj::chunkAdvance uses ELObjPropertyValue, so we must
+  // protect obj.
+  ELObjDynamicRoot protect(interp, obj);
+  obj->chunkAdvance(context, interp);
   chunk = 1;
   return obj;
 }
 
-void DescendantsNodeListObj::advance(NodePtr &nd, unsigned &depth)
+SubgroveNodeListObj::SubgroveNodeListObj(const NodePtr &start)
+: TreeNodeListObj(start), depth_(0)
 {
-  if (!nd)
+}
+
+SubgroveNodeListObj *SubgroveNodeListObj::copy(Interpreter &interp)
+{
+  return new (interp) SubgroveNodeListObj(*this);
+}
+
+void SubgroveNodeListObj::advance(EvalContext &context, Interpreter &interp)
+{
+  if (!start_)
     return;
-  if (nd.assignFirstChild() == accessOK) {
-    depth++;
+  // try to move down
+  const ComponentName::Id *ids;
+  if (start_->getSubnodePropertyNames(ids) == accessOK) {
+    for (;*ids != ComponentName::noId; ids++) {
+      ELObjPropertyValue pv(interp, 0);
+      NodeListObj *nl;
+      NodePtr nd;
+      if (start_->property(*ids, interp, pv) == accessOK
+	  && (nl = pv.obj->asNodeList())
+	  && (nd = nl->nodeListFirst(context, interp))) {
+	start_ = nd;
+	depth_++;
+	return;
+      }
+    }
+  }
+  // check if we are back up to the root
+  if (depth_ == 0) {
+    start_.clear();
     return;
   }
-  if (depth == 0) {
-    nd.clear();
-    return;
-  }
-  while (nd.assignNextSibling() != accessOK) {
-    if (depth == 1 || nd.assignOrigin() != accessOK) {
-      nd.clear();
+  // try to move horziontally first in the same property of origin
+  while (start_.assignNextSibling() != accessOK) {
+    NodePtr origin;
+    ComponentName::Id orel;
+    const ComponentName::Id *ids;
+    if (start_->getOrigin(origin) != accessOK 
+	|| start_->getOriginToSubnodeRelPropertyName(orel) != accessOK
+	|| origin->getSubnodePropertyNames(ids) != accessOK) {
+      start_.clear();
       return;
     }
-    depth--;
+    for (; *ids != orel; ids++) ;
+    // ...and then in the other properties of origin
+    for (ids++; *ids != ComponentName::noId; ids++) {
+      ELObjPropertyValue pv(interp, 0);
+      NodeListObj *nl;
+      NodePtr nd;
+      if (origin->property(*ids, interp, pv) == accessOK
+	  && (nl = pv.obj->asNodeList())
+	  && (nd = nl->nodeListFirst(context, interp))) {
+	start_ = nd;
+	return;
+      }
+    }
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
+      return;
+    }
+    depth_--;
   }
 }
 
-void DescendantsNodeListObj::chunkAdvance(NodePtr &nd, unsigned &depth)
+void SubgroveNodeListObj::chunkAdvance(EvalContext &context, Interpreter &interp)
 {
-  if (!nd)
+  if (!start_)
     return;
-  if (nd.assignFirstChild() == accessOK) {
-    depth++;
+  // try to move down
+  const ComponentName::Id *ids;
+  if (start_->getSubnodePropertyNames(ids) == accessOK) {
+    for (;*ids != ComponentName::noId; ids++) {
+      ELObjPropertyValue pv(interp, 0);
+      NodeListObj *nl;
+      NodePtr nd;
+      if (start_->property(*ids, interp, pv) == accessOK
+	  && (nl = pv.obj->asNodeList())
+	  && (nd = nl->nodeListFirst(context, interp))) {
+	start_ = nd;
+	depth_++;
+	return;
+      }
+    }
+  }
+  // check if we are back up to the root
+  if (depth_ == 0) {
+    start_.clear();
     return;
   }
-  if (depth == 0) {
-    nd.clear();
-    return;
-  }
-  while (nd.assignNextChunkSibling() != accessOK) {
-    if (depth == 1 || nd.assignOrigin() != accessOK) {
-      nd.clear();
+  // try to move horziontally first in the same property of origin
+  while (start_.assignNextChunkSibling() != accessOK) {
+    NodePtr origin;
+    ComponentName::Id orel;
+    const ComponentName::Id *ids;
+    if (start_->getOrigin(origin) != accessOK 
+	|| start_->getOriginToSubnodeRelPropertyName(orel) != accessOK
+	|| origin->getSubnodePropertyNames(ids) != accessOK) {
+      start_.clear();
       return;
     }
-    depth--;
+    for (; *ids != orel; ids++) ;
+    // ...and then in the other properties of origin
+    for (ids++; *ids != ComponentName::noId; ids++) {
+      ELObjPropertyValue pv(interp, 0);
+      NodeListObj *nl;
+      NodePtr nd;
+      if (origin->property(*ids, interp, pv) == accessOK
+	  && (nl = pv.obj->asNodeList())
+	  && (nd = nl->nodeListFirst(context, interp))) {
+	start_ = nd;
+	return;
+      }
+    }
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
+      return;
+    }
+    depth_--;
   }
 }
+
+bool SubgroveNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &ptr)
+{
+  if (!start_)
+    return 0;
+  NodePtr nd(ptr);
+  unsigned int depth = 0;
+
+  // determine the depth of ptr
+  for(;;) {
+    if (*start_ == *nd)
+      return 1; // start_ ancestor of ptr
+    if (*root_ == *nd)
+      break;
+    if (nd->getOrigin(nd) != accessOK)
+      return 0;
+    depth++;
+  }
+  
+  nd = ptr;
+  for (; depth > depth_; depth--) 
+    nd->getOrigin(nd);
+  NodePtr s(start_);
+  for (; depth_ > depth; depth++)
+    s->getOrigin(s);
+  if (*s == *nd)
+    return 0; // ptr ancestor of start_
+  // now s and nd are ancestors of start_ and ptr at the same depth
+  NodePtr s1(s);
+  NodePtr nd1(nd);
+  while (*s1 != *nd1) {
+    nd = nd1; 
+    s = s1;
+    nd1->getOrigin(nd1);
+    s1->getOrigin(s1); 
+  }
+  // now s and nd are ancestors of start_ and ptr with common parent s1
+  unsigned long i1, i2;
+  if (s->siblingsIndex(i1) == accessOK
+      && nd->siblingsIndex(i2) == accessOK)
+    return (i1 < i2);
+  NodePtr sibling;
+  if (s->firstSibling(sibling) != accessOK)
+    return 0;
+  for (;;) {
+    if (*sibling == *s)
+      return 1;
+    if (*sibling == *nd)
+      return 0;
+    if (sibling.assignNextSibling() != accessOK)
+      return 0;
+  }
+  return 0;
+}
+
+SubtreeNodeListObj::SubtreeNodeListObj(const NodePtr &start)
+: TreeNodeListObj(start), depth_(0)
+{
+}
+
+SubtreeNodeListObj *SubtreeNodeListObj::copy(Interpreter &interp)
+{
+  return new (interp) SubtreeNodeListObj(*this);
+}
+
+void SubtreeNodeListObj::advance(EvalContext &, Interpreter &)
+{
+  if (!start_)
+    return;
+  if (start_.assignFirstChild() == accessOK) {
+    depth_++;
+    return;
+  }
+  if (depth_ == 0) {
+    start_.clear();
+    return;
+  }
+  while (start_.assignNextSibling() != accessOK) {
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
+      return;
+    }
+    depth_--;
+  }
+}
+
+void SubtreeNodeListObj::chunkAdvance(EvalContext &, Interpreter &)
+{
+  if (!start_)
+    return;
+  if (start_.assignFirstChild() == accessOK) {
+    depth_++;
+    return;
+  }
+  if (depth_ == 0) {
+    start_.clear();
+    return;
+  }
+  while (start_.assignNextChunkSibling() != accessOK) {
+    if (depth_ == 1 || start_.assignOrigin() != accessOK) {
+      start_.clear();
+      return;
+    }
+    depth_--;
+  }
+}
+
+bool SubtreeNodeListObj::contains(EvalContext &, Interpreter &, const NodePtr &ptr)
+{
+  if (!start_)
+    return 0;
+  NodePtr nd(ptr);
+  unsigned int depth = 0;
+
+  // determine the depth of ptr
+  for(;;) {
+    if (*start_ == *nd)
+      return 1; // start_ ancestor of ptr
+    if (*root_ == *nd)
+      break;
+    if (nd->getParent(nd) != accessOK)
+      return 0;
+    depth++;
+  }
+  
+  nd = ptr;
+  for (; depth > depth_; depth--) 
+    nd->getParent(nd);
+  NodePtr s(start_);
+  for (; depth_ > depth; depth++)
+    s->getParent(s);
+  if (*s == *nd)
+    return 0; // ptr ancestor of start_
+  // now s and nd are ancestors of start_ and ptr at the same depth
+  NodePtr s1(s);
+  NodePtr nd1(nd);
+  while (*s1 != *nd1) {
+    nd = nd1; 
+    s = s1;
+    nd1->getParent(nd1);
+    s1->getParent(s1); 
+  }
+  // now s and nd are ancestors of start_ and ptr with common parent s1
+  unsigned long i1, i2;
+  if (s->siblingsIndex(i1) == accessOK
+      && nd->siblingsIndex(i2) == accessOK)
+    return (i1 < i2);
+  NodePtr sibling;
+  if (s->firstSibling(sibling) != accessOK)
+    return 0;
+  for (;;) {
+    if (*sibling == *s)
+      return 1;
+    if (*sibling == *nd)
+      return 0;
+    if (sibling.assignNextSibling() != accessOK)
+      return 0;
+  }
+  return 0;
+}
+
+DescendantsNodeListObj::DescendantsNodeListObj(const NodePtr &start,
+					       Interpreter &interp)
+  : SubtreeNodeListObj(start)
+{
+  EvalContext context;
+  advance(context, interp);
+}
+
+DescendantsNodeListObj *DescendantsNodeListObj::copy(Interpreter &interp)
+{
+  return new (interp) DescendantsNodeListObj(*this);
+}
+
+bool DescendantsNodeListObj::contains(EvalContext &context, 
+				      Interpreter &interp, const NodePtr &ptr)
+{
+  return (*ptr != *root_ 
+	  && SubtreeNodeListObj::contains(context, interp, ptr));
+}
+
 
 SelectByClassNodeListObj::SelectByClassNodeListObj(NodeListObj *nl, ComponentName::Id cls)
 : nodeList_(nl), cls_(cls)
@@ -5649,6 +6029,65 @@ void SelectByClassNodeListObj::traceSubObjects(Collector &c) const
 {
   c.trace(nodeList_);
 }
+
+bool SelectByClassNodeListObj::contains(EvalContext &context, Interpreter &interp,
+					const NodePtr &n)
+{
+  return (n->classDef().className == cls_
+	  && nodeList_->contains(context, interp, n));
+}
+
+FilterNodeListObj::FilterNodeListObj(FunctionObj *func, NodeListObj *nl,
+				     const ConstPtr<Context> &context)
+: MapNodeListObj(func, nl, context)
+{
+}
+
+bool FilterNodeListObj::maybeIn(EvalContext &context, Interpreter &interp, 
+				const NodePtr &nd)
+{
+  VM vm(context, interp);
+  context_->set(vm);
+  InsnPtr insn(func_->makeCallInsn(1, interp, context_->loc, InsnPtr()));
+  ELObj *ret = vm.eval(insn.pointer(), 0, new (interp) NodePtrNodeListObj(nd));
+  return ret->isTrue();
+}
+
+NodePtr FilterNodeListObj::nodeListFirst(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    NodePtr nd = nl_->nodeListFirst(context, interp);
+    if (!nd || maybeIn(context, interp, nd))
+      return nd;
+    nl_ = nl_->nodeListRest(context, interp);
+  }
+  // not reached
+  return NodePtr();
+}
+
+NodeListObj *FilterNodeListObj::nodeListRest(EvalContext &context, Interpreter &interp)
+{
+  for (;;) {
+    NodePtr nd = nl_->nodeListFirst(context, interp);
+    if (!nd || maybeIn(context, interp, nd))
+      break;
+    nl_ = nl_->nodeListRest(context, interp);
+  }
+  NodeListObj *tem = nl_->nodeListRest(context, interp);
+  ELObjDynamicRoot protect(interp, tem);
+  return new (interp) FilterNodeListObj(func_, tem, context_);
+}
+
+bool FilterNodeListObj::contains(EvalContext &context, Interpreter &interp,
+					const NodePtr &nd)
+{
+  VM vm(context, interp);
+  context_->set(vm);
+  InsnPtr insn(func_->makeCallInsn(1, interp, context_->loc, InsnPtr()));
+  ELObj *ret = vm.eval(insn.pointer(), 0, new (interp) NodePtrNodeListObj(nd));
+  return (ret->isTrue() && nl_->contains(context, interp, nd));
+}
+
 
 MapNodeListObj::MapNodeListObj(FunctionObj *func, NodeListObj *nl,
 			       const ConstPtr<Context> &context,
@@ -5817,6 +6256,14 @@ NodeListObj *SelectElementsNodeListObj::nodeListRest(EvalContext &context, Inter
   return new (interp) SelectElementsNodeListObj(tem, patterns_);
 }
 
+bool SelectElementsNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  for (size_t i = 0; i < patterns_->size(); i++)
+    if ((*patterns_)[i].matches(ptr, interp)) 
+      return nodeList_->contains(context, interp, ptr);
+  return 0;
+}
+
 SiblingNodeListObj::SiblingNodeListObj(const NodePtr &first, const NodePtr &end)
 : first_(first), end_(end)
 {
@@ -5850,6 +6297,22 @@ NodeListObj *SiblingNodeListObj::nodeListChunkRest(EvalContext &context, Interpr
     CANNOT_HAPPEN();
   chunk = 1;
   return new (interp) SiblingNodeListObj(nd, end_);
+}
+
+bool SiblingNodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
+{
+  NodePtr origin1, origin2;
+  if (first_->getOrigin(origin1) != accessOK 
+      || ptr->getOrigin(origin2) != accessOK
+      || *origin1 != *origin2) 
+    return 0;
+  unsigned long i1, i2, i3;
+  if (first_->siblingsIndex(i1) == accessOK
+      && ptr->siblingsIndex(i2) == accessOK
+      && end_->siblingsIndex(i3) == accessOK)
+    return i1 <= i2 && i2 < i3;
+  
+  return NodeListObj::contains(context, interp, ptr);
 }
 
 #ifdef DSSSL_NAMESPACE

@@ -10,13 +10,15 @@ pkginclude_HEADERS = config.h
 docdir = $(prefix)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
 
-pkgdoc_DATA = NEWS COPYING AUTHORS ChangeLog
+pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog
 
 BUILT_SOURCES = config.h msggen.pl
 
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
-EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak jade-generate.mak
+EXTRA_DIST = instmac.pl msggen.pl jade.dsw jade.mak \
+	jade-generate.mak .cvsignore all \
+	@PACKAGE@-@VERSION@.spec
 
 dist-hook:
 	if test -f $(top_srcdir)/update-changelog; then \
@@ -24,7 +26,7 @@ dist-hook:
 	  ./update-changelog; \
 	  cp $(top_srcdir)/ChangeLog $(top_distdir); \
         fi
-	
+
 dist-zip: dist-dir
 	-chmod -R a+r $(distdir)
 	zip -rql $(distdir).zip $(distdir)

@@ -12,7 +12,7 @@ dnl
 
 dnl Initialization
 AC_INIT(dsssl)
-AM_INIT_AUTOMAKE(OpenJade, 1.4-devel, no-define)
+AM_INIT_AUTOMAKE(OpenJade, 1.4devel, no-define)
 AM_CONFIG_HEADER(config.h)
 AM_SANITY_CHECK
 
@@ -233,9 +233,8 @@ changequote([,])dnl
   AC_MSG_RESULT(yes))
 
 AC_SUBST(LIBOBJS)
-AC_OUTPUT([Makefile msggen.pl style/Makefile grove/Makefile spgrove/Makefile
+AC_OUTPUT([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl style/Makefile grove/Makefile spgrove/Makefile
 	jade/Makefile dsssl/Makefile jadedoc/Makefile 
 	jadedoc/images/Makefile intl/Makefile po/Makefile.in],
 	[echo creating po/Makefile
 	sed -e "/POTFILES =/r po/POTFILES" po/Makefile.in > po/Makefile])
-

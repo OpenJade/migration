@@ -13,6 +13,8 @@
 #undef HAVE_LC_MESSAGES
 #undef HAVE_STPCPY
 
+#undef OPENJADE_PACKAGE
+#undef OPENJADE_VERSION
 #undef OPENJADE_LOCALE_DIR
 
 /* set this to the location of builtins.dsl */

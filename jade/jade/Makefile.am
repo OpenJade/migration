@@ -6,7 +6,7 @@ openjade_SOURCES = jade.cxx SgmlFOTBuilder.cxx RtfFOTBuilder.cxx \
 	HtmlFOTBuilder.cxx TeXFOTBuilder.cxx TransformFOTBuilder.cxx \
 	MifFOTBuilder.cxx SgmlFOTBuilder.h RtfFOTBuilder.h \
 	HtmlFOTBuilder.h TeXFOTBuilder.h TransformFOTBuilder.h \
-	MifFOTBuilder.h TextFOTBuilder.h TextFOTBuilder.cxx \
+	MifFOTBuilder.h \
 	JadeMessages.h HtmlMessages.h RtfMessages.h TeXMessages.h \
 	MifMessages.h TmpOutputByteStream.h
 

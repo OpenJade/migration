@@ -81,6 +81,7 @@ private:
   };
   bool doDefine();
   bool doDefineUnit();
+  bool doQuery();
   bool doElement();
   bool doOrElement();
   bool doDefault();
@@ -148,6 +149,8 @@ private:
 			       bool &spliced);
   void createQuasiquoteAbbreviation(const char *, Owner<Expression> &);
   bool parseRuleBody(Owner<Expression> &, ProcessingMode::RuleType &);
+  bool parseRuleBody(Owner<Expression> &, Owner<Expression> &, 
+		     ProcessingMode::RuleType &, bool);
   bool getToken(unsigned, Token &);
   bool handleNumber(unsigned, Token &);
   bool handleIdentifier(unsigned, Token &);

@@ -430,6 +430,10 @@ public:
   virtual NodeListObj *nodeListReverse(EvalContext &, Interpreter &);
   virtual long nodeListLength(EvalContext &, Interpreter &);
   virtual bool suppressError();
+  virtual bool contains(EvalContext &, Interpreter &, const NodePtr &);
+ // check for a node of class id
+  virtual bool contains(EvalContext &, Interpreter &, ComponentName::Id id);
+  void print(Interpreter &, OutputCharStream &);
 };
 
 class NamedNodeListObj : public NodeListObj {
@@ -496,6 +500,7 @@ public:
   NodeListObj *nodeListRest(EvalContext &, Interpreter &);
   NodeListObj *nodeListChunkRest(EvalContext &, Interpreter &, bool &);
   void traceSubObjects(Collector &) const;
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *head_; // may be null
   NodeListObj *tail_;

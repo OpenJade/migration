@@ -77,8 +77,8 @@ void StyleEngine::parseSpec(SgmlParser &specParser,
           }
 	}
       } while (local);
+      interpreter_->dEndPart();
     }
-    interpreter_->dEndPart();
   }
 
   for (size_t i = 0; i < parts.size(); i++) {

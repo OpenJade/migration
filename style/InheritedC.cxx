@@ -1127,16 +1127,30 @@ void IgnoredC::trace(Collector &c) const
   c.trace(value_);
 }
 
-class CharMapC : public IgnoredC {
+class CharMapC : public InheritedC, private Collector::DynamicRoot {
 public:
   CharMapC(const Identifier *, unsigned index, ELObj *, Interpreter &);
+  void set(VM &, const VarStyleObj *, FOTBuilder &,
+           ELObj *&, Vector<size_t> &) const;
   ConstPtr<InheritedC> make(ELObj *, const Location &, Interpreter &) const;
+  ELObj *value(VM &, const VarStyleObj *, Vector<size_t> &) const;
+  void trace(Collector &) const;
+private:
+  ELObj *value_;
+  FOTBuilder::Symbol sym_;
 };
 
 CharMapC::CharMapC(const Identifier *ident, unsigned index,
 		   ELObj *value, Interpreter &interp)
-: IgnoredC(ident, index, value, interp)
+  : InheritedC(ident, index), Collector::DynamicRoot(interp),
+    value_(value), sym_(FOTBuilder::symbolFalse)
 {
+}
+
+void CharMapC::set(VM &, const VarStyleObj *, FOTBuilder &fotb,
+           ELObj *&, Vector<size_t> &) const
+{
+  fotb.setCharMap(sym_);
 }
 
 ConstPtr<InheritedC> CharMapC::make(ELObj *obj, const Location &loc,
@@ -1159,11 +1173,39 @@ ConstPtr<InheritedC> CharMapC::make(ELObj *obj, const Location &loc,
     }
     return new CharMapC (identifier(), index(), obj, interp);
   }
+  if (interp.dsssl2()) {
+  static FOTBuilder::Symbol syms[] = {
+    FOTBuilder::symbolUppercase,
+    FOTBuilder::symbolLowercase,
+    FOTBuilder::symbolCapitalize,
+  };
+  FOTBuilder::Symbol sym;
+    if (interp.convertEnumC(syms, SIZEOF(syms), obj, identifier(), loc, sym)) {
+      CharMapC *cm(new CharMapC(identifier(), index(), obj, interp));
+      cm->sym_ = sym;
+      return cm;
+    }
+    else
+      return ConstPtr<InheritedC>();
+  }
+  // Not dsssl2.
   interp.setNextLocation(loc);
   interp.message(InterpreterMessages::invalidCharacteristicValue,
 		 StringMessageArg(identifier()->name()));
   return ConstPtr<InheritedC>();
 }
+
+ELObj *CharMapC::value(VM &, const VarStyleObj *, Vector<size_t> &) const
+{
+  return value_;
+}
+
+void CharMapC::trace(Collector &c) const
+{
+  c.trace(value_);
+}
+
+
 
 class BorderC : public IgnoredC {
 public:

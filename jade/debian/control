@@ -3,7 +3,7 @@ Section: text
 Priority: optional
 Maintainer: Adam Di Carlo <aph@debian.org>
 Standards-Version: 3.5.0
-Build-Depends: libosp-dev (>= 1.5pre4-1), debhelper, automake, libtool
+Build-Depends: libosp-dev (>= 1.5pre4-1), debhelper, automake, libtool, gettext
 
 Package: openjade
 Architecture: any
@@ -25,6 +25,7 @@ Description: Implementation of the DSSSL language
 
 Package: libostyle0
 Architecture: any
+Section: libs
 Depends: ${shlibs-libostyle0:Depends}
 Description: Runtime libraries for OpenJade
  OpenJade's shared libraries, runtime support.  Includes libogrove,
@@ -36,6 +37,7 @@ Description: Runtime libraries for OpenJade
 
 Package: libostyle-dev
 Architecture: any
+Section: devel
 Depends: ${libostyle:Version}, libc6-dev, libstdc++-dev
 Recommends: c++-compiler
 Description: OpenJade libraries, developer support

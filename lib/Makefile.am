@@ -1,7 +1,14 @@
+## Process this file with automake to produce Makefile.in
+
 lib_LTLIBRARIES= libosp.la
 
 libosp_la_LDFLAGS = --version-info 0:0:0 -lm 
 
+## We list the generated sources here. This has the side-effect
+## of putting them in the distribution, but that is actually nice
+## since it means that building the distribution doesn't require perl.
+##
+## Note that we put the windows-only sources into EXTRA_DIST.
 libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	ArcEngineMessages.h ArcProcessor.h Attribute.cxx \
 	Big5CodingSystem.cxx CatalogEntry.h CatalogMessages.h \
@@ -40,8 +47,7 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 	TranslateCodingSystem.cxx Trie.h TrieBuilder.cxx TrieBuilder.h \
 	TypeId.cxx URLStorage.cxx URLStorageMessages.h \
 	UTF8CodingSystem.cxx Undo.cxx Undo.h UnicodeCodingSystem.cxx \
-	UnivCharsetDesc.cxx \
-	XMLCodingSystem.cxx \
+	UnivCharsetDesc.cxx XMLCodingSystem.cxx \
 	assert.cxx big5.h events.h gb2312.h iso646-jis.h iso8859-2.h \
 	iso8859-3.h iso8859-4.h iso8859-5.h iso8859-6.h iso8859-7.h \
 	iso8859-8.h iso8859-9.h jis0201.h jis0208.h jis0212.h ksc5601.h \
@@ -52,26 +58,41 @@ libosp_la_SOURCES = Allocator.cxx ArcEngine.cxx \
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 
-EXTRA_DIST = ArcEngineMessages.msg CatalogMessages.msg CmdLineAppMessages.msg \
-	EntityManagerMessages.msg MessageFormatterMessages.msg \
-	MessageReporterMessages.msg ParserAppMessages.msg \
-	ParserMessages.msg PosixStorageMessages.msg StdioStorageMessages.msg \
-	URLStorageMessages.msg \
-	app_inst.m4 arc_inst.m4 entmgr_inst.m4 parser_inst.m4 xentmgr_inst.m4
+## We include the windows-only source and aux files here, so that
+## make dist-zip produces a working windows distribution.
+EXTRA_DIST = ArcEngineMessages.msg ArgEngineMessages.rc \
+	CatalogMessages.msg CatalogMessages.rc \
+	CmdLineAppMessages.msg CmdLineAppMessages.rc \
+	EntityManagerMessages.msg EntityManagerMessages.rc \
+	MessageFormatterMessages.msg MessageFormatterMessages.rc \
+	MessageReporterMessages.msg MessageReporterMessages.rc \
+	ParserAppMessages.msg ParserAppMessages.rc \
+	ParserMessages.msg ParserMessages.rc \
+	PosixStorageMessages.msg PosixStorageMessages.rc \
+	StdioStorageMessages.msg StdioStorageMessages.rc \
+	URLStorageMessages.msg URLStorageMessages.rc \
+	app_inst.m4 arc_inst.m4 entmgr_inst.m4 parser_inst.m4 \
+	xentmgr_inst.m4 \
+	WinInetStorage.cxx WinInetStorageMessages.h \
+	WinInetStorageMessages.msg WinInetStorageMessages.rc \
+	WinApp.cxx Win32CodingSystem.cxx lib.rc lib.dsp
 
 MSGGENFLAGS = -l
 
 BUILT_SOURCES = ArcEngineMessages.h ArcEngineMessages.rc \
-	CatalogMessages.h CatalogMessages.rc CmdLineAppMessages.h \
-	CmdLineAppMessages.rc EntityManagerMessages.h \
-	EntityManagerMessages.rc MessageFormatterMessages.h \
-	MessageFormatterMessages.rc MessageReporterMessages.h \
-	MessageReporterMessages.rc ParserAppMessages.h ParserAppMessages.rc \
+	CatalogMessages.h CatalogMessages.rc \
+	CmdLineAppMessages.h CmdLineAppMessages.rc \
+	EntityManagerMessages.h EntityManagerMessages.rc \
+	MessageFormatterMessages.h MessageFormatterMessages.rc \
+	MessageReporterMessages.h MessageReporterMessages.rc \
+	ParserAppMessages.h ParserAppMessages.rc \
 	ParserMessages.cxx ParserMessages.h ParserMessages.rc \
-	PosixStorageMessages.h PosixStorageMessages.rc StdioStorageMessages.h \
-	StdioStorageMessages.rc URLStorageMessages.h URLStorageMessages.rc \
-	app_inst.cxx \
-	arc_inst.cxx entmgr_inst.cxx parser_inst.cxx xentmgr_inst.cxx
+	PosixStorageMessages.h PosixStorageMessages.rc \
+	StdioStorageMessages.h StdioStorageMessages.rc \
+	URLStorageMessages.h URLStorageMessages.rc \
+	WinInetStorageMessages.h WinInetStorageMessages.rc \
+	app_inst.cxx arc_inst.cxx entmgr_inst.cxx parser_inst.cxx \
+	xentmgr_inst.cxx
 
 URLStorage.o: URLStorageMessages.h
 URLStorage.lo: URLStorageMessages.h

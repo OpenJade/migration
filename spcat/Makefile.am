@@ -1,14 +1,17 @@
+## Process this file with automake to produce Makefile.in
+
 bin_PROGRAMS = ospcat
 
 ospcat_SOURCES = spcat.cxx spcat_inst.cxx
 
-EXTRA_DIST = spcat_inst.m4
+EXTRA_DIST = spcat_inst.m4 spcat.dsp
 
 ospcat_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
 BUILT_SOURCES = spcat_inst.cxx
+
 
 SUFFIXES = .msg .m4
 

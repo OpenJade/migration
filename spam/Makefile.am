@@ -1,16 +1,20 @@
+## Process this file with automake to produce Makefile.in
+
 bin_PROGRAMS = ospam
 
 ospam_SOURCES = spam.cxx CopyEventHandler.cxx CopyEventHandler.h \
 	MarkupEventHandler.cxx MarkupEventHandler.h spam_inst.cxx \
 	SpamMessages.h
 
-EXTRA_DIST = spam_inst.m4 SpamMessages.msg
+EXTRA_DIST = SpamMessages.msg SpamMessages.rc \
+	spam.rc spam.dsp spam_inst.m4 
 
 ospam_LDADD = $(top_builddir)/lib/libosp.la
 
 INCLUDES = -I$(top_srcdir)/include
 
-BUILT_SOURCES = spam_inst.cxx SpamMessages.h
+BUILT_SOURCES = spam_inst.cxx \
+	SpamMessages.h SpamMessages.rc
 
 spam.o: SpamMessages.h
 

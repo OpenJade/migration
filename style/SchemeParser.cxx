@@ -8,6 +8,10 @@
 #include "MacroFlowObj.h"
 #include "macros.h"
 #include <stdlib.h>
+#include "LangObj.h"
+#include "VM.h"
+#include "ELObjMessageArg.h"
+#include "DssslSpecEventHandler.h"
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -19,13 +23,122 @@ SchemeParser::SchemeParser(Interpreter &interp,
 			   Owner<InputSource> &in)
 : interp_(&interp),
   defMode_(interp.initialProcessingMode()),
-  dsssl2_(interp.dsssl2())
+  dsssl2_(interp.dsssl2()),
+  lang_(0)
 {
   in_.swap(in);
   {
     StringC tem(Interpreter::makeStringC("ISO/IEC 10036/RA//Glyphs"));
     afiiPublicId_ = interp_->storePublicId(tem.data(), tem.size(), Location());
   }
+}
+
+void SchemeParser::parseStandardChars() 
+{
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+
+    StringC name(currentToken_);
+
+    if (!getToken(allowOtherExpr, tok) || tok != tokenNumber) {
+      message(InterpreterMessages::badDeclaration);
+      break;
+    }
+
+    int i; 
+    for (i = 0; i < name.size(); i++) 
+      if (interp_->lexCategory(name[i]) != Interpreter::lexLetter
+          && ((i == 0) || 
+              (interp_->lexCategory(name[i]) != Interpreter::lexDigit
+               && name[i] != '-' && name[i] != '.'))) 
+        break;
+    if (i < name.size() || name.size() == 1) {
+      message(InterpreterMessages::invalidCharName,
+              StringMessageArg(name));
+      continue;
+    } 
+
+    for (i = 0; i < currentToken_.size(); i++)
+      if (interp_->lexCategory(currentToken_[i]) != Interpreter::lexDigit)
+        break;       
+ 
+    if (i < currentToken_.size()) {
+      message(InterpreterMessages::invalidCharNumber,
+              StringMessageArg(currentToken_));
+      continue;
+    }
+
+    interp_->addStandardChar(name, currentToken_);
+  }
+}
+
+void SchemeParser::parseNameChars()
+{
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->addNameChar(currentToken_);
+  }
+}
+
+void SchemeParser::parseSeparatorChars()
+{
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok)
+        || tok == tokenEndOfEntity)
+      break;
+    interp_->addSeparatorChar(currentToken_);
+  }
+}
+
+void SchemeParser::parseFeatures()
+{
+  interp_->explicitFeatures();
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->declareFeature(currentToken_);
+  }
+}
+
+void SchemeParser::parseGrovePlan()
+{
+  interp_->explicitModules();
+  for (;;) {
+    Token tok;
+    if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+         || tok == tokenEndOfEntity)
+      break;
+    interp_->addModule(currentToken_);
+  }
+}
+
+void SchemeParser::parseMapSdataEntity(const StringC &ename, const StringC &etext)
+{
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::charset, loc);
+  Token tok;
+  if (!getToken(allowIdentifier|allowEndOfEntity, tok) 
+       || tok == tokenEndOfEntity) {
+    message(InterpreterMessages::badDeclaration);
+    return;
+  }
+
+  interp_->addSdataEntity(ename, etext, currentToken_);
 }
 
 void SchemeParser::parse()
@@ -96,14 +209,24 @@ void SchemeParser::parse()
 	  case Identifier::keyDeclareFlowObjectMacro:
 	    recovering = !doDeclareFlowObjectMacro();
 	    break;
-	  case Identifier::keyDeclareCharCharacteristicAndProperty:
-	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDeclareDefaultLanguage:
+            recovering = !doDeclareDefaultLanguage();
+            break;
+	  case Identifier::keyDefineLanguage:
+            recovering = !doDefineLanguage();
+            break;
 	  case Identifier::keyDeclareCharProperty:
+            recovering = !doDeclareCharProperty();
+            break;
+	  case Identifier::keyAddCharProperties:
+            recovering = !doAddCharProperties();
+            break;
+	  case Identifier::keyDeclareCharCharacteristicAndProperty:
+	    recovering = !doDeclareCharCharacteristicAndProperty();
+	    break;
+	  case Identifier::keyDeclareReferenceValueType:
 	  case Identifier::keyDefinePageModel:
 	  case Identifier::keyDefineColumnSetModel:
-	  case Identifier::keyDefineLanguage:
-	  case Identifier::keyAddCharProperties:
 	    recovering = !skipForm();
 	    break;
 	  default:
@@ -150,6 +273,12 @@ bool SchemeParser::parseExpression(Owner<Expression> &expr)
 
 bool SchemeParser::doMode()
 {
+  Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -205,6 +334,11 @@ bool SchemeParser::doMode()
 bool SchemeParser::doElement()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   ELObj *obj;
   if (!parseDatum(0, obj, loc, tok))
@@ -225,6 +359,11 @@ bool SchemeParser::doElement()
 bool SchemeParser::doOrElement()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowOpenParen, tok))
     return 0;
@@ -256,6 +395,11 @@ bool SchemeParser::doOrElement()
 bool SchemeParser::doId()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowString|allowIdentifier, tok))
     return 0;
@@ -278,6 +422,11 @@ bool SchemeParser::doId()
 bool SchemeParser::doDefault()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -294,6 +443,11 @@ bool SchemeParser::doDefault()
 bool SchemeParser::doRoot()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Owner<Expression> expr;
   ProcessingMode::RuleType ruleType;
   if (!parseRuleBody(expr, ruleType))
@@ -338,6 +492,12 @@ bool SchemeParser::parseRuleBody(Owner<Expression> &expr, ProcessingMode::RuleTy
 
 bool SchemeParser::doDeclareInitialValue()
 {
+  Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -357,9 +517,68 @@ bool SchemeParser::doDeclareInitialValue()
   return 1;
 }
 
+bool SchemeParser::doDeclareCharCharacteristicAndProperty()
+{
+  Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Identifier *ident = lookup(currentToken_);
+  CharProp *cp = interp_->lookupCharProperty(currentToken_);
+  if (!getToken(allowString|(dsssl2() ? unsigned(allowFalse) : 0), tok))
+    return 0;
+  StringC pubid;
+  if (tok == tokenString)
+    pubid = currentToken_;
+  Owner<Expression> expr;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  Location defLoc;
+  unsigned defPart;
+  if (ident->inheritedCDefined(defPart, defLoc)) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::duplicateCharacteristic,
+		     StringMessageArg(ident->name()),
+		     defLoc);
+  } 
+  else if (ident->charNICDefined(defPart, defLoc)
+           && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex()) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::duplicateCharacteristic,
+		       StringMessageArg(ident->name()),
+		       defLoc);
+    }
+  }
+  else if (cp->declared (defPart, defLoc)
+	   && defPart <= interp_->currentPartIndex()) {
+    message(InterpreterMessages::duplicateCharPropertyDecl,
+	    StringMessageArg(cp->name()),
+	    defLoc);
+  }
+  else {
+    cp->declare(expr, interp_->currentPartIndex(), loc,
+		interp_->installExtensionCharNIC(ident, pubid, loc));
+  }
+  return 1;
+}
+
 bool SchemeParser::doDeclareCharacteristic()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -377,8 +596,14 @@ bool SchemeParser::doDeclareCharacteristic()
     return 0;
   Location defLoc;
   unsigned defPart;
-  if (ident->inheritedCDefined(defPart, defLoc)
-      && defPart <= interp_->currentPartIndex()) {
+  if (ident->charNICDefined(defPart, defLoc)) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::duplicateCharacteristic,
+		       StringMessageArg(ident->name()),
+		       defLoc);
+  } 
+  else if (ident->inheritedCDefined(defPart, defLoc)
+           && defPart <= interp_->currentPartIndex()) {
     if (defPart == interp_->currentPartIndex()) {
       interp_->setNextLocation(loc);
       interp_->message(InterpreterMessages::duplicateCharacteristic,
@@ -396,6 +621,11 @@ bool SchemeParser::doDeclareCharacteristic()
 bool SchemeParser::doDeclareFlowObjectClass()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -423,6 +653,11 @@ bool SchemeParser::doDeclareFlowObjectClass()
 bool SchemeParser::doDeclareFlowObjectMacro()
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -521,11 +756,29 @@ bool SchemeParser::doDefine()
 {
   Location loc(in_->currentLocation());
   Token tok;
-  if (!getToken(allowOpenParen|allowIdentifier, tok))
+  bool internal = 0;
+  Interpreter::Feature feature = Interpreter::noFeature;
+  if (!getToken(allowOpenParen|allowIdentifier|
+         ((interp_->currentPartIndex() == unsigned(-1)) ? allowKeyword : 0), tok))
     return 0;
+  if (tok == tokenKeyword) {
+    if (currentToken_ == interp_->makeStringC("internal")) 
+      internal = 1; 
+    else if (currentToken_ == interp_->makeStringC("feature")) {
+      if (!getToken(allowIdentifier, tok) 
+          || !interp_->convertFeature(currentToken_, feature))
+        return 0;
+    }
+    else
+      return 0;
+    if (!getToken(allowOpenParen|allowIdentifier, tok))
+      return 0;
+  }
+
   Vector<const Identifier *> formals;
   bool isProcedure;
   if (tok == tokenOpenParen) {
+    interp_->requireFeature(Interpreter::expression, loc);
     if (!getToken(allowIdentifier, tok))
       return 0;
     isProcedure = 1;
@@ -566,8 +819,11 @@ bool SchemeParser::doDefine()
 	      StringMessageArg(ident->name()),
 	      defLoc);
   }
-  else
+  else if (internal)
+    ident->setBuiltinDefinition(expr, interp_->currentPartIndex(), loc);
+  else  
     ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  ident->setFeature(feature);
   return 1;
 }
 
@@ -577,6 +833,17 @@ bool SchemeParser::doDefineUnit()
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
+  int i;
+  for (i = 0; i < currentToken_.size(); i++)
+    if (interp_->lexCategory(currentToken_[i]) != Interpreter::lexLetter)
+      break;
+  if ((i < currentToken_.size())
+       || ((currentToken_.size() == 1) && (currentToken_[0] =='e'))) {
+    message(InterpreterMessages::invalidUnitName,
+            StringMessageArg(currentToken_));
+    return 0;
+  } 
+
   Unit *unit = interp_->lookupUnit(currentToken_);
   Owner<Expression> expr;
   Identifier::SyntacticKey key;
@@ -692,6 +959,14 @@ bool SchemeParser::parseExpression(unsigned allowed,
 	  return parseLetStar(expr);
 	case Identifier::keyLetrec:
 	  return parseLetrec(expr);
+        case Identifier::keyThereExists:
+          return parseSpecialQuery(expr, "node-list-some?");
+        case Identifier::keyForAll:
+          return parseSpecialQuery(expr, "node-list-every?");
+        case Identifier::keySelectEach:
+          return parseSpecialQuery(expr, "node-list-filter");
+        case Identifier::keyUnionForEach:
+          return parseSpecialQuery(expr, "node-list-union-map");
 	case Identifier::keyMake:
 	  return parseMake(expr);
 	case Identifier::keyStyle:
@@ -779,6 +1054,8 @@ bool SchemeParser::parseQuasiquoteTemplate(unsigned level,
 					  Token &tok,
 					  bool &spliced)
 {
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   key = Identifier::notKey;
   spliced = 0;
   ELObj *obj;
@@ -960,15 +1237,35 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
     return getToken(allowCloseParen, tok);
   }
   NCVector<Owner<Expression> > valExprs;
-  for (;;) {
-    Owner<Expression> tem;
-    if (!parseExpression(allowCloseParen, tem, key, tok))
+  Owner<Expression> tem;
+  bool arrow = 0;
+  if (!parseExpression(allowCloseParen|allowKeyArrow, tem, key, tok))
+    return 0;
+  if (key == Identifier::keyArrow) {
+    arrow = 1;
+    interp_->requireFeature(Interpreter::expression, testExpr->location());
+    if (!parseExpression(0, tem, key, tok))
       return 0;
-    if (!tem)
-      break;
+  }
+  if (!tem) 
+    interp_->requireFeature(Interpreter::expression, testExpr->location());
+  else { 
     valExprs.resize(valExprs.size() + 1);
     tem.swap(valExprs.back());
-  }
+    if (arrow || !dsssl2()) {
+      if (!getToken(allowCloseParen, tok)) 
+        return 0;
+    }
+    else  
+      for (;;) {
+        if (!parseExpression(allowCloseParen, tem, key, tok))
+          return 0;
+        if (!tem) 
+          break;
+        valExprs.resize(valExprs.size() + 1);
+        tem.swap(valExprs.back());
+      }
+    }
   Owner<Expression> valExpr;
   if (valExprs.size() == 1)
     valExprs[0].swap(valExpr);
@@ -977,7 +1274,20 @@ bool SchemeParser::parseCond(Owner<Expression> &expr, bool opt)
   Owner<Expression> elseExpr;
   if (!parseCond(elseExpr, 1))
     return 0;
-  if (valExpr)
+  if (arrow) {
+    const Identifier *ident = interp_->lookup(interp_->makeStringC("cond"));
+    Vector<const Identifier *> vars;
+    NCVector<Owner<Expression> > inits(1), args(1);
+    Owner<Expression> thenExpr, body; 
+    vars.push_back(ident);
+    testExpr.swap(inits.back());
+    testExpr = new VariableExpression(ident, loc); 
+    args.back() = new VariableExpression(ident, loc);
+    thenExpr = new CallExpression(valExpr, args, loc);
+    body = new IfExpression(testExpr, thenExpr, elseExpr, loc);
+    expr = new LetExpression(vars, inits, body, loc); 
+  } 
+  else if (valExpr)
     expr = new IfExpression(testExpr, valExpr, elseExpr, loc);
   else
     expr = new OrExpression(testExpr, elseExpr, loc);
@@ -1132,6 +1442,11 @@ bool SchemeParser::parseSet(Owner<Expression> &expr)
 bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier|allowFalse, tok))
     return 0;
@@ -1153,6 +1468,11 @@ bool SchemeParser::parseWithMode(Owner<Expression> &expr)
 bool SchemeParser::parseMake(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   Token tok;
   if (!getToken(allowIdentifier, tok))
     return 0;
@@ -1166,14 +1486,19 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
       return 0;
     if (!tem)
       break;
-    // FIXME check for duplicates
     if (keys.size() == exprs.size()) {
       const Identifier *k = tem->keyword();
       if (k) {
-	keys.push_back(k);
 	tem.clear();
 	if (!parseExpression(0, tem, key, tok))
 	  return 0;
+        size_t i;
+        for (i = 0; i < keys.size(); i++) 
+          if (keys[i]->name() == k->name()) 
+            break;
+        if (i < keys.size())
+          continue;
+        keys.push_back(k);
       }
     }
     exprs.resize(exprs.size() + 1);
@@ -1186,6 +1511,11 @@ bool SchemeParser::parseMake(Owner<Expression> &expr)
 bool SchemeParser::parseStyle(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  if (!interp_->style()) {
+    interp_->setNextLocation(loc);
+    interp_->message(InterpreterMessages::styleLanguage);
+    return 0;
+  }
   NCVector<Owner<Expression> > exprs;
   Vector<const Identifier *> keys;
   for (;;) {
@@ -1208,6 +1538,7 @@ bool SchemeParser::parseStyle(Owner<Expression> &expr)
 bool SchemeParser::parseLambda(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Token tok;
   if (!getToken(allowOpenParen, tok))
     return 0;
@@ -1234,6 +1565,7 @@ bool SchemeParser::parseFormals(Vector<const Identifier *> &formals,
 			       bool &hasRest,
 			       int &nKey)
 {
+  Location loc(in_->currentLocation());
   Token tok;
   enum FormalType { required, optional, rest, key } type = required;
   unsigned allowed = (allowCloseParen|allowIdentifier
@@ -1255,6 +1587,7 @@ bool SchemeParser::parseFormals(Vector<const Identifier *> &formals,
       type = rest;
       break;
     case tokenHashKey:
+      interp_->requireFeature(Interpreter::keyword, loc);
       allowed = (allowOpenParen|allowCloseParen|allowIdentifier);
       type = key;
       break;
@@ -1297,6 +1630,7 @@ done:
 bool SchemeParser::parseLet(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Token tok;
   if (!getToken(allowOpenParen|allowIdentifier, tok))
     return 0;
@@ -1333,6 +1667,7 @@ bool SchemeParser::parseLet(Owner<Expression> &expr)
 bool SchemeParser::parseLetStar(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Vector<const Identifier *> vars;
   NCVector<Owner<Expression> > inits;
   Owner<Expression> body;
@@ -1345,6 +1680,7 @@ bool SchemeParser::parseLetStar(Owner<Expression> &expr)
 bool SchemeParser::parseLetrec(Owner<Expression> &expr)
 {
   Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::expression, loc);
   Vector<const Identifier *> vars;
   NCVector<Owner<Expression> > inits;
   Owner<Expression> body;
@@ -1472,6 +1808,7 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
 				      ELObj *&result,
 				      Token &tok)
 {
+  Location loc(in_->currentLocation());
   if (!getToken(allowExpr|otherAllowed, tok))
     return 0;
   switch (tok) {
@@ -1502,6 +1839,11 @@ bool SchemeParser::parseSelfEvaluating(unsigned otherAllowed,
     }
     break;
   case tokenGlyphId:
+    if (!interp_->style()) {
+      interp_->setNextLocation(loc);
+      interp_->message(InterpreterMessages::styleLanguage);
+      return 0;
+    }
     result = convertAfiiGlyphId(currentToken_);
     break;
   default:
@@ -1527,6 +1869,7 @@ bool SchemeParser::parseAbbreviation(const char *sym, ELObj *&result)
 
 bool SchemeParser::getToken(unsigned allowed, Token &tok)
 {
+  Location loc(in_->currentLocation());
   InputSource *in = in_.pointer();
   for (;;) {
     in->startToken();
@@ -1674,6 +2017,10 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
 	tok = tokenGlyphId;
 	currentToken_.assign(in->currentTokenStart() + 2,
                              in->currentTokenLength() - 2);
+        if (!interp_->style()) {
+          interp_->setNextLocation(loc);
+          interp_->message(InterpreterMessages::styleLanguage);
+        }
 	return 1;
       case InputSource::eE:
 	message(InterpreterMessages::unexpectedEof);
@@ -1710,50 +2057,98 @@ bool SchemeParser::getToken(unsigned allowed, Token &tok)
     case ';':
       skipComment();
       break;
-    default:
-      if (c < ' ') {
-	// ignore it
-	message(InterpreterMessages::invalidChar);
-	break;
-      }
+    case '.':
       extendToken();
-      if (tokenIsNumber()) {
-	if (!(allowed & allowOtherExpr))
-	  return tokenRecover(allowed, tok);
-	tok = tokenNumber;
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength());
-	return 1;
-      }
-      else if (in_->currentTokenEnd()[-1] == ':') {
-	if (!(allowed & allowKeyword))
-	  return tokenRecover(allowed, tok);
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength() - 1);
-	tok = tokenKeyword;
-	return 1;
-      }
-      else if (*in->currentTokenStart() == '.'
-	       && in->currentTokenLength() == 1) {
+      switch (in->currentTokenLength()) {
+      case 1:
 	if (!(allowed & allowPeriod))
 	  return tokenRecover(allowed, tok);
 	tok = tokenPeriod;
 	return 1;
+      case 3:
+        if (in_->currentTokenStart()[1] == '.'
+	    && in_->currentTokenStart()[2] == '.')
+	  return handleIdentifier(allowed, tok);
+	break;
       }
-      else {
-	if (!(allowed & allowIdentifier))
-	  return tokenRecover(allowed, tok);
-	currentToken_.assign(in->currentTokenStart(),
-                             in->currentTokenLength());
-#if 0
-	if (!isValidIdentifier(currentToken_))
-	  message();
-#endif
-	tok = tokenIdentifier;
-	return 1;
+      return handleNumber(allowed, tok);
+    default:
+      switch (interp_->lexCategory(c)) {
+      case Interpreter::lexAddWhiteSpace:
+	break;
+      case Interpreter::lexOtherNumberStart:
+	extendToken();
+	// handle + and - as identifiers
+	if (in->currentTokenLength() == 1)
+	  return handleIdentifier(allowed, tok);
+	return handleNumber(allowed, tok);
+      case Interpreter::lexDigit:
+	extendToken();
+	return handleNumber(allowed, tok);
+      case Interpreter::lexOther:
+	if (c < ' ') {
+	  // ignore control characters
+	  message(InterpreterMessages::invalidChar);
+	  break;
+	}
+	in->ungetToken();
+	// fall through
+      default:
+	{
+	  bool invalid = 0;
+	  size_t length = in->currentTokenLength();
+	  for (;;) {
+	    Interpreter::LexCategory lc = interp_->lexCategory(in->tokenChar(*this));
+	    if (lc > Interpreter::lexOther)
+	      break;
+	    if (lc == Interpreter::lexOther)
+	      invalid = 1;
+	    length++;
+	  }
+	  in->endToken(length);
+
+	  if (in->currentTokenEnd()[-1] == ':' 
+              && in->currentTokenLength() > 1) {
+	    if (!(allowed & allowKeyword))
+	      return tokenRecover(allowed, tok);
+	    currentToken_.assign(in->currentTokenStart(),
+	                         in->currentTokenLength() - 1);
+	    tok = tokenKeyword;
+	    if (invalid || (currentToken_.size() > 1 
+                  && currentToken_[currentToken_.size() - 1] == ':'))
+	      message(InterpreterMessages::invalidIdentifier, 
+		      StringMessageArg(currentToken_));
+	    return 1;
+	  }
+	  if (invalid)
+	    message(InterpreterMessages::invalidIdentifier, 
+		    StringMessageArg(StringC(in->currentTokenStart(),
+		                             in->currentTokenLength())));
+	  return handleIdentifier(allowed, tok);
+	}
       }
     }
   }
+}
+
+bool SchemeParser::handleNumber(unsigned allowed, Token &tok)
+{
+  if (!(allowed & allowOtherExpr))
+    return tokenRecover(allowed, tok);
+  tok = tokenNumber;
+  currentToken_.assign(in_->currentTokenStart(),
+  	               in_->currentTokenLength());
+  return 1;
+}
+
+bool SchemeParser::handleIdentifier(unsigned allowed, Token &tok)
+{
+  if (!(allowed & allowIdentifier))
+    return tokenRecover(allowed, tok);
+  currentToken_.assign(in_->currentTokenStart(),
+	               in_->currentTokenLength());
+  tok = tokenIdentifier;
+  return 1;
 }
 
 bool SchemeParser::tokenRecover(unsigned allowed, Token &tok)
@@ -1773,66 +2168,15 @@ bool SchemeParser::tokenRecover(unsigned allowed, Token &tok)
   return 0;
 }
 
-bool SchemeParser::tokenIsNumber()
-{
-  switch (*in_->currentTokenStart()) {
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-  case '4':
-  case '5':
-  case '6':
-  case '7':
-  case '8':
-  case '9':
-    return 1;
-  case '+':
-  case '-':
-    return in_->currentTokenLength() > 1;
-  case '.':
-    if (in_->currentTokenLength() == 1
-        || (in_->currentTokenLength() == 3
-            && in_->currentTokenStart()[1] == '.'
-	    && in_->currentTokenStart()[2] == '.'))
-      return 0;
-    return 1;
-  }
-  return 0;
-}
-
 void SchemeParser::extendToken()
 {
   // extend to a delimiter
   InputSource *in = in_.pointer();
   size_t length = in->currentTokenLength();
-  while (!isDelimiter(in->tokenChar(*this)))
+  while (interp_->lexCategory(in->tokenChar(*this))
+         <= Interpreter::lexOther)
     length++;
   in->endToken(length);
-}
-
-bool SchemeParser::isDelimiter(Xchar c)
-{
-  switch (c) {
-  case InputSource::eE:
-  case '(':
-  case ')':
-  case '"':
-  case ';':
-  case ' ':
-  case '\t':
-  case '\f':
-  case '\r':
-  case '\n':
-    return 1;
-  default:
-    if (c < ' ') {
-       // FIXME check not added name character
-       return 1;
-    }
-  }
-  // FIXME return 1 if added white space char
-  return 0;
 }
 
 bool SchemeParser::scanString(unsigned allowed, Token &tok)
@@ -1918,6 +2262,431 @@ void SchemeParser::initMessage(Message &msg)
 {
   if (in_)
     msg.loc = in_->currentLocation();
+}
+
+bool SchemeParser::doDeclareDefaultLanguage()
+{
+  Location loc(in_->currentLocation());
+  Owner<Expression> expr;
+  Token tok;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  Location defLoc;
+  unsigned defPart;
+  if(interp_->defaultLanguageSet(defPart, defLoc)
+     && defPart <= interp_->currentPartIndex()) {
+    if(defPart == interp_->currentPartIndex()) {
+      interp_->setNextLocation(loc);
+      message(InterpreterMessages::duplicateDefLangDecl, defLoc);
+    }
+  }
+  else
+    interp_->setDefaultLanguage(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doDefineLanguage()
+{
+  Location loc(in_->currentLocation());
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Identifier *ident = lookup(currentToken_);
+  Identifier::SyntacticKey key;
+  if (ident->syntacticKey(key) && (key <= int(Identifier::lastSyntacticKey)))
+    message(InterpreterMessages::syntacticKeywordAsVariable,
+            StringMessageArg(currentToken_));
+  Location defLoc;
+  unsigned defPart;
+  if (ident->defined(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex()) {
+      message(InterpreterMessages::duplicateDefinition,
+              StringMessageArg(ident->name()),
+              defLoc);
+      return 0;
+    }
+  }
+  lang_ = new (*interp_) LangObj;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key))
+      return 0;
+    else {
+      switch (key) {
+      case Identifier::keyCollate:
+        if (!doCollate())
+          return 0;
+        break;
+      case Identifier::keyToupper:
+        if (!doToupper())
+          return 0;
+        break;
+      case Identifier::keyTolower:
+        if (!doTolower())
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+  }
+  if (!lang_->compile())
+    return 0;
+  interp_->makePermanent(lang_);
+  Owner<Expression> expr;
+  expr = new ConstantExpression(lang_, in_->currentLocation());
+  lang_ = 0;
+  ident->setDefinition(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doCollate()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    if (!getToken(allowIdentifier, tok))
+      return 0;
+    const Identifier *ident = lookup(currentToken_);
+    Identifier::SyntacticKey key;
+    if (!ident->syntacticKey(key)) {
+      return 0;
+    } else {
+      switch (key) {
+      case Identifier::keyElement:
+        if (!doMultiCollatingElement())
+          return 0;
+        break;
+      case Identifier::keySymbol:
+        if (!doCollatingSymbol())
+          return 0;
+        break;
+      case Identifier::keyOrder:
+        if (!doCollatingOrder())
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+  }
+  return 1;
+}
+
+bool SchemeParser::doMultiCollatingElement()
+{
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!getToken(allowString, tok))
+    return 0;
+  StringC str(currentToken_);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  lang_->addMultiCollatingElement(sym, str);
+  return 1;
+}
+
+bool SchemeParser::doCollatingSymbol()
+{
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  lang_->addCollatingSymbol(sym);
+  return 1;
+}
+
+bool SchemeParser::doCollatingOrder()
+{
+  Token tok;
+  if (!getToken(allowOpenParen, tok))
+    return 0;
+  int nested = 0;
+  LangObj::LevelSort sort = { 0, 0, 0};
+  for (;;) {
+    if (!getToken(((nested == 0) ? allowOpenParen : 0)|
+                  allowCloseParen|allowIdentifier, tok))
+      return 0;
+    if (tok == tokenOpenParen)
+      nested++;
+    else if (tok == tokenCloseParen)
+      nested--;
+    else {
+      const Identifier *ident = lookup(currentToken_);
+      Identifier::SyntacticKey key;
+      if (!ident->syntacticKey(key))
+        return 0;
+      switch (key) {
+        case Identifier::keyForward:
+          if (sort.backward)
+            return 0;
+          sort.forward = 1;
+          break;
+        case Identifier::keyBackward:
+          if (sort.forward)
+            return 0;
+          sort.backward = 1;
+          break;
+        case Identifier::keyPosition:
+          sort.position = 1;
+          break;
+        default:
+          return 0;
+        }
+      }
+    if (nested < 0)
+      break;
+    if (nested == 0) {
+      if (!sort.backward)
+        sort.forward = 1;
+      lang_->addLevel(sort);
+    }
+  }
+  for (;;) {
+    if (!getToken(allowOpenParen|
+                  allowCloseParen|
+                  allowIdentifier|
+                  allowOtherExpr, tok))
+      return 0;
+    if (tok == tokenCloseParen)
+      break;
+    StringC empty;
+    switch (tok) {
+    case tokenTrue:
+      lang_->addDefaultPos();
+      for(Char i = 0; i < lang_->levels(); i++)
+        lang_->addLevelWeight(i, empty);
+      break;
+    case tokenIdentifier:
+    case tokenChar:
+       if (!lang_->addCollatingPos(currentToken_))
+        return 0;
+      for (unsigned i = 0; i < lang_->levels(); i++)
+        lang_->addLevelWeight(i, currentToken_);
+      break;
+    case tokenOpenParen:
+      if (!doWeights())
+        return 0;
+      break;
+    default:
+      return 0;
+    }
+  }
+  return 1;
+}
+
+bool SchemeParser::doWeights()
+{
+  Token tok;
+  if (!getToken(allowIdentifier|allowOtherExpr, tok))
+    return 0;
+  StringC sym(currentToken_);
+  if (!lang_->addCollatingPos(sym))
+    return 0;
+  int nested = 0;
+  unsigned l = 0;
+  for (;;) {
+    if (!getToken((nested ? 0 : allowOpenParen)|
+                  allowCloseParen|
+                  allowIdentifier|
+                  allowOtherExpr|
+                  allowString, tok))
+      return 0;
+    if (tok == tokenOpenParen)
+      nested++;
+    else if (tok == tokenCloseParen)
+      nested--;
+    else {
+      switch (tok) {
+      case tokenString:
+         for (size_t i = 0; i < currentToken_.size(); i++) {
+          StringC ctok(&(currentToken_[i]), 1);
+          if (!lang_->addLevelWeight(l, ctok))
+            return 0;
+        }
+        break;
+      case tokenIdentifier:
+      case tokenChar:
+        if (!lang_->addLevelWeight(l, currentToken_))
+          return 0;
+        break;
+      default:
+        return 0;
+      }
+    }
+    if (nested < 0)
+      break;
+    if (nested == 0)
+      l++;
+  }
+  return 1;
+}
+
+bool SchemeParser::doToupper()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen) break;
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char lc = currentToken_[0];
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char uc = currentToken_[0];
+    if (!getToken(allowCloseParen, tok))
+      return 0;
+    lang_->addToupper(lc, uc);
+  }
+  return 1;
+}
+
+bool SchemeParser::doTolower()
+{
+  Token tok;
+  for (;;) {
+    if (!getToken(allowOpenParen|allowCloseParen, tok))
+      return 0;
+    if (tok == tokenCloseParen) break;
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char uc = currentToken_[0];
+    if (!getToken(allowOtherExpr, tok) || (tok != tokenChar))
+      return 0;
+    Char lc = currentToken_[0];
+    if (!getToken(allowCloseParen, tok))
+      return 0;
+    lang_->addTolower(uc, lc);
+  }
+  return 1;
+}
+
+bool SchemeParser::parseSpecialQuery(Owner<Expression> &rexp, const char *query)
+{
+  Location loc(in_->currentLocation());
+  interp_->requireFeature(Interpreter::query, loc);
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  Vector<const Identifier *> vars;
+  vars.push_back(lookup(currentToken_));
+  Identifier::SyntacticKey key;
+  if (vars.back()->syntacticKey(key) && key <= int(Identifier::lastSyntacticKey))
+    message(InterpreterMessages::syntacticKeywordAsVariable,
+            StringMessageArg(currentToken_));
+
+  Owner<Expression> op(new ConstantExpression(
+    interp_->lookup(interp_->makeStringC(query))->computeBuiltinValue(1, *interp_),
+    loc));
+  NCVector<Owner<Expression> > inits, args(2);
+  Owner<Expression> expr;
+  if (!parseExpression(0, args[1], key, tok)
+      || !parseExpression(0, expr, key, tok)
+      || !getToken(allowCloseParen, tok))
+    return 0;
+  args[0] = new LambdaExpression(vars, inits, 0, 0, 0, expr, loc);
+  rexp = new CallExpression(op, args, loc);
+  return 1;
+}
+
+bool SchemeParser::doDeclareCharProperty()
+{
+  Location loc(in_->currentLocation());
+  Token tok;
+  if (!getToken(allowIdentifier, tok))
+    return 0;
+  CharProp *cp = interp_->lookupCharProperty (currentToken_);
+  Owner<Expression> expr;
+  Identifier::SyntacticKey key;
+  if (!parseExpression(0, expr, key, tok))
+    return 0;
+  if (!getToken(allowCloseParen, tok))
+    return 0;
+  Location defLoc;
+  unsigned defPart;
+  if (cp->declared(defPart, defLoc)
+      && defPart <= interp_->currentPartIndex()) {
+    if (defPart == interp_->currentPartIndex())
+      message(InterpreterMessages::duplicateCharPropertyDecl,
+	      StringMessageArg(cp->name()),
+	      defLoc);
+  }
+  cp->declare(expr, interp_->currentPartIndex(), loc);
+  return 1;
+}
+
+bool SchemeParser::doAddCharProperties()
+{
+  Location loc (in_->currentLocation());
+  NCVector<Owner<Expression> > exprs;
+  Vector<CharProp *> cps;
+  Token tok;
+  for (;;) {
+    if (!getToken(allowKeyword|allowOtherExpr, tok))
+      return 0;
+    if (tok != tokenKeyword)
+      break;
+    cps.push_back(interp_->lookupCharProperty(currentToken_));
+    exprs.resize(exprs.size() + 1);
+    Identifier::SyntacticKey key;
+    if (!parseExpression(0, exprs.back(), key, tok))
+      return 0;
+  }
+  
+  StringC chars;
+  for (;;) {
+    if (tok != tokenChar) {
+      message(InterpreterMessages::badAddCharProperty);
+      return 0;
+    }
+    // FIXME: Check duplicates in same decl. Silently remove them or signal
+    // errors?
+    chars += currentToken_[0];
+    if (!getToken(allowOtherExpr|allowCloseParen, tok))
+      return 0;
+    if (tok==tokenCloseParen)
+      break;
+  }
+
+  unsigned defPart;
+  Location defLoc;
+  for (size_t i = 0; i < cps.size(); i++) {
+    StringC chars2;
+    for (size_t j = 0; j < chars.size(); j++) {
+      if (cps[i]->hasAddedValue (chars[j], defPart, defLoc)
+	  && defPart <= interp_->currentPartIndex()) {
+	if (defPart == interp_->currentPartIndex()) {
+	  message (InterpreterMessages::duplicateAddCharProperty,
+		   StringMessageArg(cps[i]->name()),
+		   defLoc);
+	}
+      }
+      else
+	chars2 += chars[j];
+    }
+    if (chars2.size() > 0)
+      cps[i]->setValue(chars2, exprs[i], interp_->currentPartIndex(), loc);
+  }
+  return 1;
 }
 
 #ifdef DSSSL_NAMESPACE

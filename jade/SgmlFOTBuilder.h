@@ -11,7 +11,8 @@
 namespace DSSSL_NAMESPACE {
 #endif
 
-FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *);
+FOTBuilder *makeSgmlFOTBuilder(OutputCharStream *,
+	                       const FOTBuilder::Description *&);
 
 #ifdef DSSSL_NAMESPACE
 }

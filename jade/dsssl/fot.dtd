@@ -333,6 +333,8 @@ table-auto-width-method CDATA #IMPLIED
 font-name CDATA #IMPLIED
 escapement-space-before CDATA #IMPLIED
 escapement-space-after CDATA #IMPLIED
+inline-space-space CDATA #IMPLIED
+char-map (false|uppercase|lowercase|capitalize) #IMPLIED
 glyph-subst-table NMTOKENS #IMPLIED
 ">
 

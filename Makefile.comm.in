@@ -58,7 +58,10 @@ depend_src: depend.temp
 
 depend.temp: FORCE
 	$(CXX) -MM $(CXXFLAGS) $(CXXDEPGENFLAGS) $(OBJS:.o=.cxx) \
-	  | sed -e 's; \([^/ ][^/ ]*\)/; $$(srcdir)/\1/;g' >depend.temp
+	  | sed -e 's; \([^/ ][^/ ]*\)/; $$(srcdir)/\1/;g' >depend.temp1
+	cat depend.temp1 > depend.temp
+	cat depend.temp1 | sed -e 's/\.o:/.lo:/g' >> depend.temp
+	rm depend.temp1
 
 clean: FORCE
 	-rm -f $(CLEANFILES)

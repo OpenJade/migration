@@ -8,9 +8,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: sp 1.5pre9\n"
-"POT-Creation-Date: 2002-11-15 23:13+0000\n"
-"PO-Revision-Date: 2002-11-17 15:39+0100\n"
+"Project-Id-Version: sp 1.5.1pre1\n"
+"POT-Creation-Date: 2003-09-03 15:12+0000\n"
+"PO-Revision-Date: 2003-10-10 21:18+0200\n"
 "Last-Translator: Karl Eichwalder <ke@suse.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1930,6 +1930,9 @@ msgstr "Inkompatible Windows Sockets Version"
 msgid "error number "
 msgstr "Fehlernummer "
 
+msgid "URL Redirected to %1"
+msgstr "URL Weitergeleitet nach %1"
+
 msgid "cannot open URL %1 (%2)"
 msgstr "Kann URL %1 nicht öffnen (%2)"
 
@@ -2099,6 +2102,21 @@ msgstr "Systembezeichner für die Entität %1 fehlt."
 msgid "unexpected entity type for entity named %1"
 msgstr "Unerwarteter Entitätstyp die Entität namens %1"
 
+msgid "cannot create directory %1"
+msgstr "Kann das Verzeichnis %1 nicht anlegen"
+
+msgid "already wrote 99 versions of %1; will not overwrite"
+msgstr "bereits 99 Versionen von %1 geschrieben; Überschreiben verweigert"
+
+msgid "already wrote output file %1; will not overwrite"
+msgstr "bereits Ausgabedatei %1 geschrieben; Überschreiben verweigert"
+
+msgid "removing leading slashes from output filename %1"
+msgstr "führende Schrägstriche werden vom Namen der Ausgabedatei %1 entfernt"
+
+msgid "path %1 outside output directory"
+msgstr "Pfad %1 liegt außerhalb des Verzeichnisses"
+
 msgid "Output a document type declaration."
 msgstr "Gib eine Dokumenttypdeklaration aus."
 
@@ -2170,7 +2188,3 @@ msgstr "%1 gibt die Verkettung der Entitäten mit den Systembezeichnern"
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... auf der Standardausgabe aus."
-
-#, fuzzy
-#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
-#~ msgstr "Ungültiger Wert %1 für ArcAuto Architekturunterstützungsattribut"

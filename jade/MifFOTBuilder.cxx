@@ -663,7 +663,7 @@ class MifDoc {
 
     struct TagStream {
 
-        enum TagStreamClass { tsTagStream, tsTextFlow, tsCell, tsPara } TagStreamClass;
+        enum TagStreamClass2 { tsTagStream, tsTextFlow, tsCell, tsPara } TagStreamClass;
 
         TagStream( T_indent osIndent = 2 );
         ~TagStream();
@@ -1281,8 +1281,8 @@ class MifFOTBuilder : public SerialFOTBuilder {
     void start();
     void end();
 
-    void startSimplePageSequence();
-    void endSimplePageSequence();
+    void startSimplePageSequenceSerial();
+    void endSimplePageSequenceSerial();
     void startSimplePageSequenceHeaderFooter( unsigned );
     void endSimplePageSequenceHeaderFooter( unsigned );
     void endAllSimplePageSequenceHeaderFooter();
@@ -1793,7 +1793,7 @@ class MifFOTBuilder : public SerialFOTBuilder {
     void beginHeaderFooter( bool header );
     void beginHeader() { beginHeaderFooter( true ); }
     void beginFooter() { beginHeaderFooter( false ); };
-    void endHeaderFooter();
+    void endHeaderFooter( unsigned hfPart );
     void makeEmptyTextFlow( MifDoc::TextRect & );
     void checkForParagraphReopening();
     void outPendingInlineStatements();
@@ -2470,6 +2470,10 @@ void MifFOTBuilder::doEndParagraph
         end();
     }
 
+// Desc: Content of document missing in the debug version
+// Author: Seshadri
+// Date: 24th feb 2000
+
     if( !curDs->paragraphClosedInMif ) {
         MifDoc::Para *p = mifDoc.curPara();
         mifDoc.exitPara();
@@ -2540,7 +2544,7 @@ void MifFOTBuilder::endDisplay() {
     delete di;
 }
 
-void MifFOTBuilder::startSimplePageSequence() {
+void MifFOTBuilder::startSimplePageSequenceSerial() {
 
     inSimplePageSequence = true;
     firstHeaderFooter = true;
@@ -2561,6 +2565,13 @@ void MifFOTBuilder::startSimplePageSequence() {
         bookComponentAvailable = false;
     }
 
+//      Desc: Pagesize was being initialized but not set after
+//      the attribute was read .
+
+        mifDoc.document().setDPageSize
+    ( MifDoc::T_WH( MifDoc::T_dimension( nextFormat.FotPageWidth ),
+                    MifDoc::T_dimension( nextFormat.FotPageHeight ) ) );
+
     nextFormat.FotCurDisplaySize
      = ( nextFormat.FotPageWidth - nextFormat.FotLeftMargin - nextFormat.FotRightMargin
           - nextFormat.FotPageColumnSep * ( nextFormat.FotPageNColumns - 1 ) )  
@@ -2577,7 +2588,7 @@ void MifFOTBuilder::startSimplePageSequence() {
     FotSimplePageSequence.paragraphFormat = format();
 }
 
-void MifFOTBuilder::endSimplePageSequence() {
+void MifFOTBuilder::endSimplePageSequenceSerial() {
 
     end();
     mifDoc.exitTextFlow();
@@ -2616,10 +2627,16 @@ void MifFOTBuilder::beginHeaderFooter( bool header ) {
     mifDoc.beginParaLine();
 }
 
-void MifFOTBuilder::endHeaderFooter() {
+void MifFOTBuilder::endHeaderFooter( unsigned hfPart ) {
 
     mifDoc.endParaLine();
     MifDoc::Para::outEpilog( mifDoc.os() );
+
+//  Right header missing beacuse the prev stmt has set
+//  currentlyopened flag to false for a right footer. So reset it.
+        if ( hfPart & rightHF ) {
+                MifDoc::Para::currentlyOpened= true ;
+        }
 
     end();
 }
@@ -2770,7 +2787,7 @@ void MifFOTBuilder::startSimplePageSequenceHeaderFooter( unsigned hfPart ) {
 void MifFOTBuilder::endSimplePageSequenceHeaderFooter( unsigned hfPart ) {
 
     if( hfPart & rightHF && (hfPart & frontHF || !(hfPart & firstHF)) ) {
-        endHeaderFooter();
+        endHeaderFooter(hfPart);
     }
 
     if( !(hfPart & firstHF) || hfPart & frontHF )

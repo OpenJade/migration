@@ -1,9 +1,11 @@
 Copyright (c) 1994, 1995, 1996 James Clark
+Copyright (c) 1999, 2002 OpenJade Project
 
-This directory contains an SGML parser called SP.
+This package contains
+   - a DSSSL processor called OpenJade.
 
-If you got this file as part of a Jade distribution, then you can find
-information about Jade in HTML format in jadedoc/jade.htm.
+If you got this file as part of an OpenJade distribution, then you can find
+information about OpenJade in HTML format in jadedoc/jade.htm.
 
 See the file COPYING for copying permission.
 
@@ -13,7 +15,5 @@ the file VERSION.
 All documentation is in HTML format in the doc directory.  Start with
 doc/index.htm.
 
-Please report any bugs you find.
+Please report any bugs you find to http://sourceforge.net/projects/openjade.
 
-James Clark
-jjc@jclark.com

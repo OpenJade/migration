@@ -224,6 +224,8 @@ size_t XMLDecoder::decode(Char *to, const char *from, size_t fromLen,
   size_t n = p - to;
   if (phase_ == phaseFinish && fromLen > 0)
     n += subDecoder_->decode(p, from, fromLen, rest);
+  else
+    *rest = from;
   return n;
 }
 

@@ -43,7 +43,8 @@ DssslApp::DssslApp(int unitsPerInch)
 : GroveApp("unicode"), unitsPerInch_(unitsPerInch),
   dssslSpecOption_(0), debugMode_(0), dsssl2_(0),
   strictMode_(0),
-  specTitleOption_(0), fotbDescr_(0)  
+  specTitleOption_(0), fotbDescr_(0),
+  fotb_(0), se_(0)
 {
   registerOption('2', 0, DssslAppMessages::help2);
   registerOption('G', SP_T("debug"), DssslAppMessages::GHelp);
@@ -127,17 +128,21 @@ int DssslApp::processSysid(const StringC &sysid)
       break;
     }
 
+  int ret = 1;
   fotb_ = makeFOTBuilder(fotbDescr_);
-  if (!fotb_)
-    return 1; 
-  if (!initSpecParser())
-    return 1;
-  se_ = new StyleEngine(*this, *this, unitsPerInch_, debugMode_, 
-			dsssl2_, strictMode_, *fotbDescr_, 
-			outputCodingSystem());  
-  se_->parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, defineVars_);
-
-  return GroveApp::processSysid(sysid);
+  if (fotb_) {
+    if (initSpecParser()) {
+      se_ = new StyleEngine(*this, *this, unitsPerInch_, debugMode_, 
+  			    dsssl2_, strictMode_, *fotbDescr_, 
+			    outputCodingSystem());  
+      se_->parseSpec(specParser_, systemCharset(), dssslSpecId_, *this, 
+                     defineVars_);
+      ret = GroveApp::processSysid(sysid);
+      delete se_;
+    }
+    delete fotb_; 
+  }
+  return ret;
 }
 
 void DssslApp::processOption(AppChar opt, const AppChar *arg)

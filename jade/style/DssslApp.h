@@ -66,8 +66,8 @@ private:
   StringC specTitle_;
   Vector<StringC> availableSpecTitles_;
 
-  Owner<FOTBuilder> fotb_;
-  Owner<StyleEngine> se_;
+  FOTBuilder *fotb_;
+  StyleEngine *se_;
 };
 
 #ifdef DSSSL_NAMESPACE

@@ -82,6 +82,7 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
   outputIncluded_((outputFlags & outputIncluded) != 0),
   outputNonSgml_((outputFlags & outputNonSgml) != 0),
   outputEmpty_((outputFlags & outputEmpty) != 0),
+  outputDataAtt_((outputFlags & outputDataAtt) != 0),
   haveData_(0), lastSos_(0)
 {
   os_->setEscaper(escape);
@@ -278,7 +279,11 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
       case AttributeValue::cdata:
 	{
 	  startAttribute(attributes.name(i), code, ownerName);
-	  os() << "CDATA ";
+	  CdataAttributeValue *cdataValue = (CdataAttributeValue *)value;
+	  if (outputDataAtt_ && cdataValue->notation())
+	    os() << "DATA " << cdataValue->notation()->name() << " "; 
+	  else
+	    os() << "CDATA ";
 	  TextIter iter(*text);
 	  TextItem::Type type;
 	  const Char *p;
@@ -303,6 +308,13 @@ void SgmlsEventHandler::attributes(const AttributeList &attributes,
 	      break;
 	    }
 	  os() << nl;
+	  if (outputDataAtt_ && cdataValue->notation()) {
+	    defineNotation(cdataValue->notation());
+	    DataAttributeValue *dataValue = (DataAttributeValue *)cdataValue;
+	    SgmlsEventHandler::attributes(dataValue->attributes(), 
+					  dataAttributeCode, 
+					  &attributes.name(i));
+	  }
 	}
 	break;
       }

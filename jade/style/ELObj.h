@@ -235,6 +235,7 @@ public:
 
 class IntegerObj : public ELObj {
 public:
+  void print(Interpreter &, OutputCharStream &);
   void print(Interpreter &, OutputCharStream &, unsigned);
   bool exactIntegerValue(long &);
   bool realValue(double &);

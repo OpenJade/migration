@@ -297,6 +297,134 @@ private:
 
 #endif /* __MACH__ */
 
+#ifdef SP_USE_PTHREADS
+
+// Support for pthreads on Linux.
+// Written by Matthias Clasen <clasen@mathematik.uni-freiburg.de>
+
+extern "C" {
+// for some reason sigset_t is missing here (with glibc 2.0.7);
+// so we define it manually.
+typedef __sigset_t sigset_t;
+#include <pthread.h>
+}
+
+#define SP_THREAD
+
+class Thread {
+public:
+  Thread(int (*func)(void *), void *arg) {
+    arg_ = new Arg;
+    arg_->func = func;
+    arg_->arg = arg;
+    arg_->exited = 0;
+    pthread_create (&handle_, NULL, start, (void *)arg_);
+  }
+  int wait() {
+    pthread_join(handle_, NULL);
+    if (arg_ && arg_->exited) {
+      int ret = arg_->ret;
+      delete arg_;
+      arg_ = 0;
+      return ret;
+    }
+    // Something's gone wrong.  We'll get a leak.
+    return 0;
+  }
+private:
+  struct Arg {
+    int (*func)(void *);
+    void *arg;
+    int ret;
+    int exited;
+  };
+  static void *start(void *p) {
+    Arg *arg = (Arg *)p;
+    arg->ret = (*arg->func)(arg->arg);
+    arg->exited = 1;
+    return 0;
+  }
+  pthread_t handle_;
+  Arg *arg_;
+};
+
+class Mutex {
+public:
+  class Lock {
+  // Lock serves to automatically unlock Mutex, however control leaves
+  // a block. Don't let any "warning: unused variable `class Mutex::Lock lock'"
+  // mislead you; hopefully your compiler won't optimise this away...
+  public:
+    Lock(Mutex *mp) : mp_(mp) { if (mp_) pthread_mutex_lock  (&mp_->cs_); }
+    ~Lock()                   { if (mp_) pthread_mutex_unlock(&mp_->cs_); }
+  private:
+    Mutex *mp_;
+  };
+  Mutex()  { pthread_mutex_init (&cs_, NULL); }
+  ~Mutex() { pthread_mutex_destroy (&cs_); }
+  friend class Lock;
+private:
+  pthread_mutex_t cs_;
+};
+
+// Thread-safe reference counts.
+
+class RefCount {
+public:
+  RefCount() : count_(0) { pthread_mutex_init (&cs_, NULL); }
+  ~RefCount()            { pthread_mutex_destroy (&cs_); }
+  void operator++() { pthread_mutex_lock(&cs_); ++count_; pthread_mutex_unlock(&cs_); }
+  bool operator--() {
+    bool ret;
+    pthread_mutex_lock(&cs_); ret=(0!=--count_); pthread_mutex_unlock(&cs_);
+    return ret; // safe iff reference-count semantics are observed
+  }
+  operator unsigned long() const { return count_; }
+    // safe iff reference-count semantics are observed
+private:
+  long count_; // hmm, () returns unsigned long...
+  pthread_mutex_t cs_; // don't build on top of Mutex class, for efficiency
+};
+
+#ifndef SP_NO_BLOCK
+
+#define SP_CONDITION
+
+class Condition { // doesn't trivially map to a condition_t!
+public:
+  Condition() : set_(0) {
+    pthread_mutex_init(&mutex_, NULL);
+    pthread_cond_init(&condition_, NULL);
+  }
+  ~Condition() {
+    pthread_mutex_destroy(&mutex_);
+    pthread_cond_destroy(&condition_);
+  }
+  void pulse() { pthread_cond_broadcast(&condition_); }
+  bool wait() {
+    pthread_mutex_lock(&mutex_);
+    if (!set_) pthread_cond_wait(&condition_, &mutex_);
+    pthread_mutex_unlock(&mutex_);
+    return 1;
+      // 0 would be interpreted as timeout, which is not supported directly
+      // do we need that? would require some more coding, with another thread
+  }
+  void set() {
+    pthread_mutex_lock(&mutex_);
+    set_=1;
+    pthread_mutex_unlock(&mutex_);
+    pthread_cond_broadcast(&condition_);
+  }
+private:
+  pthread_mutex_t mutex_;
+  pthread_cond_t condition_;
+  bool set_;
+};
+
+#endif /* SP_NO_BLOCK */
+
+#endif /* SP_USE_PTHREADS */
+
 #ifndef SP_THREAD
 
 class Thread {

@@ -1286,10 +1286,10 @@ void RtfFOTBuilder::characters(const Char *s, size_t n)
       }
       break;
     case 0x2002:
-      os() << "\\enspace ";
+      os() << "\\u8194\\'20";
       break;
     case 0x2003:
-      os() << "\\emspace ";
+      os() << "\\u8195\\'20";
       break;
     case 0x2010:
       os() << '-';
@@ -2315,11 +2315,17 @@ void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)
        << "\\tqr\\tx"
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)
        << ' '
+       << '{'
        << hfPart_[flags | headerHF | leftHF]
+       << '}'
        << "\\tab "
+       << '{'
        << hfPart_[flags | headerHF | centerHF]
+       << '}'
        << "\\tab "
+       << '{'
        << hfPart_[flags | headerHF | rightHF]
+       << '}'
        << "\\par}"
        << "{\\footer" << suffix
        << "\\pard\\sl"
@@ -2331,11 +2337,17 @@ void RtfFOTBuilder::outputHeaderFooter(const char *suffix, unsigned flags)
        << "\\tqr\\tx"
        << (pageFormat_.pageWidth - pageFormat_.leftMargin - pageFormat_.rightMargin)
        << ' '
+       << '{'
        << hfPart_[flags | footerHF | leftHF]
+       << '}'
        << "\\tab "
+       << '{'
        << hfPart_[flags | footerHF | centerHF]
+       << '}'
        << "\\tab "
+       << '{'
        << hfPart_[flags | footerHF | rightHF]
+       << '}'
        << "\\par}";
 }
 

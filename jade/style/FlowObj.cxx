@@ -2316,8 +2316,6 @@ public:
     Identifier::SyntacticKey key;
     if (ident->syntacticKey(key)) {
       switch (key) {
-      case Identifier::keyColumnNumber:
-      case Identifier::keyNColumnsSpanned:
       case Identifier::keyNRowsSpanned:
 	return 1;
       default:
@@ -2330,6 +2328,8 @@ public:
     Identifier::SyntacticKey key;
     if (ident->syntacticKey(key)) {
       switch (key) {
+      case Identifier::keyColumnNumber:
+      case Identifier::keyNColumnsSpanned:
       case Identifier::keyIsStartsRow:
       case Identifier::keyIsEndsRow:
 	return 1;
@@ -2535,19 +2535,15 @@ void ProcessContext::startTableRow(StyleObj *style)
     table->rowStyle = style;
     table->currentColumn = 0;
     table->inTableRow = 1;
-    saveCurrentConnection(table->rowConnection);
+    table->rowConnectableLevel = connectionStack_.head()->connectableLevel;
   }
   currentFOTBuilder().startTableRow();
 }
 
 void ProcessContext::endTableRow()
 {
-  SavedConnection curConn;
   Table *table = tableStack_.head();
   if (table) {
-    saveCurrentConnection(curConn);
-    if (curConn != table->rowConnection)
-      restoreConnection(table->rowConnection);
     // Fill in blank cells
     Vector<unsigned> &covered = table->covered;
     for (size_t i = 0; i < table->nColumns + 1; i++) {
@@ -2568,8 +2564,6 @@ void ProcessContext::endTableRow()
     table->inTableRow = 0;
   }
   currentFOTBuilder().endTableRow();
-  if (table && curConn != table->rowConnection)
-    endConnection();
 }
 
 bool ProcessContext::inTableRow()
@@ -2614,10 +2608,7 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(1);
   }
-  FormattingInstructionFlowObj() {
-    ASSERT(sizeof(FormattingInstructionFlowObj)
-           <= sizeof(UnresolvedQuantityObj));
-  }
+  FormattingInstructionFlowObj() { }
   void processInner(ProcessContext &context) {
     context.currentFOTBuilder().formattingInstruction(data_);
   }
@@ -2674,6 +2665,30 @@ public:
     interp_->message(InterpreterMessages::invalidCharacteristicValue,
 		     StringMessageArg(ident_->name()));
     return 0;
+  }
+  bool convertStringList(Vector<StringC> &v) const {
+    ELObj *obj = obj_;
+    for (;;) {
+      if (obj->isNil())
+        return 1;       
+      PairObj *pair = obj->asPair();
+      if (!pair)
+        break;
+      const Char *s;
+      size_t n;
+      if (!pair->car()->stringData(s, n))
+        break;
+      v.resize(v.size() + 1);
+      v.back().assign(s, n);
+      obj = pair->cdr();
+    }
+    interp_->setNextLocation(*loc_);
+    interp_->message(InterpreterMessages::invalidCharacteristicValue,
+                     StringMessageArg(ident_->name()));
+    return 0;
+  } 
+  bool convertBoolean(bool &result) const {
+    return interp_->convertBooleanC(obj_, ident_, *loc_, result);
   }
 private:
   ELObj *obj_;

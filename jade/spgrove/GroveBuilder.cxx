@@ -1839,6 +1839,11 @@ GroveImpl::~GroveImpl()
     blocks_ = blocks_->next;
     ::operator delete(tem);
   }
+  while (messageList_) {
+    MessageItem *tem = messageList_;
+    messageList_ = *messageList_->nextP();
+    delete tem;
+  }
 }
 
 void GroveImpl::setAppinfo(const StringC &appinfo)

@@ -154,22 +154,10 @@ that do not support redirection of stderr.</dd>
 Show the generic identifiers of open elements in error messages.</dd>
 
 <dt>
-<tt>-n</tt></dt>
-
-<dd>
-Show message numbers in error messages.</dd>
-
-<dt>
-<tt>-x</tt></dt>
-
-<dd>
-Show information about relevant clauses (from ISO 8879:1986) in error messages.</dd> 
-
-<dt>
 <a NAME="opti"></a><tt>-i<i>name</i></tt></dt>
 
 <dd>
-Pretend that</dd>
+Pretend that
 
 <pre>&lt;!ENTITY % <i>name</i> "INCLUDE"></pre>
 occurs at the start of the document type declaration subset in the SGML
@@ -185,7 +173,14 @@ the document type declaration will contain
 and will use
 <tt>%<i>name</i>;</tt> in the status keyword specification
 of a marked section declaration. In this case the effect of the option
-will be to cause the marked section not to be ignored.
+will be to cause the marked section not to be ignored.</dd>
+
+<dt>
+<tt>-n</tt></dt>
+
+<dd>
+Show message numbers in error messages.</dd>
+
 <dt>
 <tt>-o<i>output_option</i></tt></dt>
 
@@ -539,6 +534,13 @@ Do not give errors when AFDR meta-DTD notation features are used in the
 DTD. These errors are normally produced when parsing the DTD, but suppressed
 when parsing meta-DTDs.</dd>
 </dl>
+
+<dt>
+<tt>-x</tt></dt>
+
+<dd>
+Show information about relevant clauses (from ISO 8879:1986) in error messages.</dd> 
+
 </dl>
 The following options are also supported for backwards compatibility with
 sgmls:

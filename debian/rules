@@ -91,7 +91,7 @@ ChangeLog:
 	mv OpenSP-$(UPSTREAM_VERSION)/ChangeLog .
 	rm -r OpenSP-$(UPSTREAM_VERSION)
 
-config.status:	ChangeLog
+config.status Makefile:	ChangeLog
 	aclocal
 	autoheader
 	automake --add-missing
@@ -103,7 +103,7 @@ config.status:	ChangeLog
 	   --enable-default-search-path=$(default-sgml-path)
 
 
-build:	config.status
+build:	config.status Makefile
 	$(checkdir)
 	$(MAKE) SUBDIRS=lib CXXFLAGS="-O2 --pipe -D_REENTRANT"
 	$(MAKE)

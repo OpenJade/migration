@@ -402,7 +402,7 @@ public:
   PublicIdCharPropValues(FOTBuilder::PublicId def=0)
     : def_(def) {}
   FOTBuilder::PublicId getValue(Char) const;
-  void setRange(Char, Char, FOTBuilder::PublicId);
+  void setRange(Char, Char, const FOTBuilder::PublicId);
 private:
   PublicIdCharPropValues(const PublicIdCharPropValues &); // Undefined.
   PublicIdCharPropValues &operator=(const PublicIdCharPropValues &); // Undefined.

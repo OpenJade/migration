@@ -280,6 +280,11 @@ void ParserState::popInputStack()
 {
   ASSERT(inputLevel_ > 0);
   InputSource *p = inputStack_.get();
+
+  if (handler_ != 0 && inputLevel_ > 1) {
+    handler_->inputClosed(p);
+  }
+
   inputLevel_--;
   delete p;
   if (specialParseInputLevel_ > 0 && inputLevel_ == specialParseInputLevel_)
@@ -320,6 +325,11 @@ void ParserState::pushInput(InputSource *in)
 {
   if (!in)
     return;
+
+  if (handler_ != 0 && inputLevel_ > 0) {
+    handler_->inputOpened(in);
+  }
+
   if (!syntax_.isNull() && syntax_->multicode())
     in->setMarkupScanTable(syntax_->markupScanTable());
   inputStack_.insert(in);
@@ -511,6 +521,9 @@ ParserState::lookupEntity(Boolean isParameter,
     }
     else if (!entity.isNull()) {
       entity->setUsed();
+      eventHandler().entityDefaulted
+	(new (eventAllocator())EntityDefaultedEvent
+	 (entity, useLocation));
       return entity;
     }
     if (!isParameter) {

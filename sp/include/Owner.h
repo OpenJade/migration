@@ -17,7 +17,7 @@ class Owner {
 public:
   Owner() : p_(0) { }
   Owner(T *p) : p_(p) { }
-  ~Owner();
+  virtual ~Owner();
   void operator=(T *p) {
     if (p_) del();
     p_ = p;

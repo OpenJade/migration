@@ -12,6 +12,8 @@ Changes in OpenSP 1.5pre7
   message handling infrastructure.  Patch contributed by Peter Newcomb
   of Epremis Corp.
 
+* Enhancements to osx. Contributed by Jessica Perry Hekman, Dynamic Diagrams.
+
 Changes in OpenSP 1.5pre6
 
 * RPM spec file updates and corrections from Terje Bless

@@ -23,6 +23,7 @@ public:
   NodePtr nodeListRef(long, EvalContext &, Interpreter &);
   long nodeListLength(EvalContext &context, Interpreter &interp);
   void traceSubObjects(Collector &) const;
+  bool contains(EvalContext &, Interpreter &, const NodePtr &);
 private:
   NodeListObj *reversed(EvalContext &context, Interpreter &interp);
   NodeListObj *nl_;
@@ -1065,17 +1066,19 @@ bool NodeListObj::suppressError()
   return 0;
 }
 
-bool NodeListObj::contains(EvalContext &ec, Interpreter &in, const NodePtr &ptr)
+bool NodeListObj::contains(EvalContext &context, Interpreter &interp, const NodePtr &ptr)
 {
   NodeListObj *nl = this;
   for (;;) {
-    ELObjDynamicRoot protect(in, nl);
-    NodePtr nd(nl->nodeListFirst(ec, in));
+    ELObjDynamicRoot protect(interp, nl);
+    NodePtr nd(nl->nodeListFirst(context, interp));
     if (!nd)
       return 0;
     if (*nd == *ptr)  
       return 1;
-    nl = nl->nodeListRest(ec, in); 
+    // FIXME: Since all nodes in a chunk have the same class, skip the
+    // chunk if class of *nd != class of *ptr.
+    nl = nl->nodeListRest(context, interp); 
   }
   return 0;
 }
@@ -1317,6 +1320,12 @@ void ReverseNodeListObj::traceSubObjects(Collector &c) const
 {
   c.trace(nl_);
   c.trace(reversed_);
+}
+
+bool ReverseNodeListObj::contains(EvalContext &context, Interpreter &interp,
+				  const NodePtr &nd)
+{
+  return nl_->contains(context, interp, nd);
 }
 
 SubgroveSpecObj *ELObj::asSubgroveSpec()

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 1999-12-21 21:04+0000\n"
+"POT-Creation-Date: 2000-03-07 09:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,9 +88,6 @@ msgstr "Die Meta-DTD erlaubt keine Daten an dieser Stelle"
 msgid "invalid value %1 for ArcIgnD attribute"
 msgstr "Ungültiger Wert %1 für ArcIgnD Attribut"
 
-msgid "invalid value %1 for ArcIndr architectural support attribute"
-msgstr "Ungültiger Wert %1 für ArcIndr Architekturunterstützungsattribut"
-
 msgid "unrecognized quantity name %1"
 msgstr "Unbekannter Quantitätsname %1"
 
@@ -105,6 +102,22 @@ msgstr "Ungültige Ziffer %1"
 
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "Nur der Wert nArcIndr für das ArcIndr Attribut wird unterstützt"
+
+#, fuzzy
+msgid "#ARCCONT attribute already specified"
+msgstr "Kapazität %1 bereits spezifiziert"
+
+#, fuzzy
+msgid "invalid value %1 for #ARCCONT"
+msgstr "Ungültiger Wert %1 für ArcSupr Attribut"
+
+#, fuzzy
+msgid "%1 already used as a substitute name"
+msgstr "%1 ist bereits ein Funktionsname"
+
+#, fuzzy
+msgid "substitute name #CONTENT already specified"
+msgstr "Ersetzungsname für %1 bereits definiert"
 
 msgid "name expected"
 msgstr "Name erwartet"
@@ -2695,6 +2708,9 @@ msgstr "%1 gibt die Verkettung der Entitäten mit den Systembezeichnern"
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... auf der Standardausgabe aus."
+
+#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
+#~ msgstr "Ungültiger Wert %1 für ArcIndr Architekturunterstützungsattribut"
 
 #~ msgid "NAME "
 #~ msgstr "NAME"

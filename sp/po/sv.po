@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenSP 1.4\n"
-"POT-Creation-Date: 1999-12-21 22:25+0000\n"
+"POT-Creation-Date: 2000-03-07 09:17+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -85,9 +85,6 @@ msgstr "meta-DTD tillåter inte data här"
 msgid "invalid value %1 for ArcIgnD attribute"
 msgstr "ogiltigt värde %1 för attributet ArcIgnD"
 
-msgid "invalid value %1 for ArcIndr architectural support attribute"
-msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"
-
 msgid "unrecognized quantity name %1"
 msgstr "okänt kvantitetsnamn %1"
 
@@ -102,6 +99,22 @@ msgstr "ogiltig siffra %1"
 
 msgid "only value of nArcIndr for ArcIndr attribute supported"
 msgstr "för attributet ArcIndr stöds endast värdet nArcIndr"
+
+#, fuzzy
+msgid "#ARCCONT attribute already specified"
+msgstr "kapaciteten %1 är redan angiven"
+
+#, fuzzy
+msgid "invalid value %1 for #ARCCONT"
+msgstr "ogiltigt värde %1 för ArcSurp-attribut"
+
+#, fuzzy
+msgid "%1 already used as a substitute name"
+msgstr "%1 är redan ett funktionsnamn"
+
+#, fuzzy
+msgid "substitute name #CONTENT already specified"
+msgstr "ersättningsnamn för %1 är redan definierat"
 
 # CatalogMessages
 msgid "name expected"
@@ -2518,3 +2531,6 @@ msgstr "%1 slår samman och skriver ut entiteterna med systemidentifierarna "
 
 msgid "SYSID... on the standard output"
 msgstr "SYSID... på standard ut."
+
+#~ msgid "invalid value %1 for ArcIndr architectural support attribute"
+#~ msgstr "ogiltigt värde %1 för arkitekturstödsattributet ArcIndr"

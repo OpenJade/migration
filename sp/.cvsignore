@@ -13,3 +13,4 @@ stamp-h
 config.h.in
 msggen.pl
 *.tar.gz
+*.spec

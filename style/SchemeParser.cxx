@@ -12,6 +12,7 @@
 #include "VM.h"
 #include "ELObjMessageArg.h"
 #include "DssslSpecEventHandler.h"
+#include <stdio.h>
 
 #ifdef DSSSL_NAMESPACE
 namespace DSSSL_NAMESPACE {
@@ -881,12 +882,15 @@ bool SchemeParser::doAssociation()
   Identifier::SyntacticKey key;
   Token tok;
   if (!parseExpression(0, qexpr, key, tok)
-   || !parseExpression(0, texpr, key, tok)
-   || !parseExpression(allowCloseParen, pexpr, key, tok))
+      || !parseExpression(0, texpr, key, tok)
+      || !parseExpression(allowCloseParen, pexpr, key, tok)) 
     return 0;
-   if (!pexpr && !getToken(allowCloseParen, tok)) 
-     return 0;
-  // store association (qexpr texpr pexpr)
+  if (!pexpr)
+    pexpr = new ConstantExpression(interp_->makeInteger(0), in_->currentLocation());
+  else if (!getToken(allowCloseParen, tok)) 
+    return 0;
+  interp_->transformationMode()->addAssociation(qexpr, texpr, pexpr,
+						loc, *interp_);
   return 1;
 }
 

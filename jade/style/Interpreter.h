@@ -20,6 +20,7 @@
 #include "HashTable.h"
 #include "FOTBuilder.h"
 #include "Owner.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "GroveManager.h"
 #include "Pattern.h"

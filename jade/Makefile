@@ -6,7 +6,7 @@ exec_prefix=$(prefix)
 # Where to install the binaries
 bindir=$(exec_prefix)/bin
 INSTALL=cp
-# You might want to change this to uncomment this on BSD systems
+# You might want to uncomment this on BSD systems
 #INSTALL=install
 
 # If you use gcc, then you must have at least version 2.6.1 and
@@ -32,6 +32,7 @@ DEBUG=
 #   called "catalog" in the same directory as the document entity.
 # Add -Dsig_atomic_t=int on SunOS 4.1.x with g++ (or any other platform
 #  which doesn't appropriately define sig_atomic_t).
+# Add -DJADE_MIF to include the Jade MIF backend
 XDEFINES=
 DEFINES=-DSP_HAVE_BOOL -DSP_ANSI_CLASS_INST -DSP_MULTI_BYTE $(XDEFINES)
 CXXFLAGS=-ansi $(DEBUG) $(WARN)
@@ -49,7 +50,7 @@ LIBOBJS=#strerror.o memmove.o
 # -lnsl on SunOS 4.1.3
 XLIBS=#-lsocket -lnsl
 # -L/usr/local/lib may be needed on the RS/6000
-LIBS=$(XLIBS)
+LIBS=-lm $(XLIBS)
 # If you're building in another directory, copy or link this Makefile
 # to the build directory, and set srcdir to point to the source directory.
 srcdir=.
@@ -66,9 +67,15 @@ EXE=
 # Uncomment this for OS/2.
 #EXE=.exe
 
-LIBDIRS=lib $(XLIBDIRS)
-PROGDIRS=nsgmls spam sgmlnorm spent sx $(XPROGDIRS)
-dodirs=$(LIBDIRS) $(PROGDIRS)
+SP_LIBDIRS=lib $(XLIBDIRS)
+SP_PROGDIRS=nsgmls spam sgmlnorm spent sx $(XPROGDIRS)
+JADE_LIBDIRS=grove spgrove style
+JADE_PROGDIRS=jade
+LIBDIRS=$(SP_LIBDIRS) $(JADE_LIBDIRS)
+PROGDIRS=$(SP_PROGDIRS) $(JADE_PROGDIRS)
+sp_dodirs=$(SP_LIBDIRS) $(SP_PROGDIRS)
+jade_dodirs=$(LIBDIRS) $(PROGDIRS)
+
 PURIFYFLAGS=
 PURIFY=purify $(PURIFYFLAGS) -g++=yes -collector=`dirname \`gcc -print-libgcc-file-name\``/ld
 
@@ -87,8 +94,10 @@ libMakefile=Makefile.lib
 do=all
 
 $(TARGETS): FORCE
-	@$(MAKE) -f $(srcdir)/Makefile $(MDEFINES) do=$@ $(dodirs)
-
+	@if test -d $(srcdir)/jade; \
+	then $(MAKE) -f $(srcdir)/Makefile $(MDEFINES) do=$@ $(jade_dodirs); \
+	else $(MAKE) -f $(srcdir)/Makefile $(MDEFINES) do=$@ $(sp_dodirs); \
+	fi
 
 $(LIBDIRS): FORCE
 	@if test $(srcdir) = .; \

@@ -366,7 +366,7 @@ void InternalCdataEntity::litReference(Text &text,
     text.addEntityEnd(loc);
   }
   else
-    text.addCdata(this, origin.pointer());
+    text.addCdata(string(), origin.pointer());
 }
 
 
@@ -400,7 +400,7 @@ void InternalSdataEntity::litReference(Text &text,
     text.addEntityEnd(loc);
   }
   else
-    text.addSdata(this, origin.pointer());
+    text.addSdata(string(), origin.pointer());
 }
 
 void InternalTextEntity::normalReference(ParserState &parser,

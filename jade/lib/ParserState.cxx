@@ -404,14 +404,11 @@ void ParserState::popElement()
   delete popSaveElement();
 }
 			      
-Boolean ParserState::entityIsOpen(const Entity *entity) const
+Boolean ParserState::entityIsOpen(const EntityDecl *entityDecl) const
 {
-  for (IListIter<InputSource> iter(inputStack_); !iter.done(); iter.next()) {
-    const EntityOrigin *eo
-      = iter.cur()->currentLocation().origin()->asEntityOrigin();
-    if (eo && eo->entity() == entity)
+  for (IListIter<InputSource> iter(inputStack_); !iter.done(); iter.next())
+    if (iter.cur()->currentLocation().origin()->entityDecl() == entityDecl)
       return 1;
-  }
   return 0;
 }
 

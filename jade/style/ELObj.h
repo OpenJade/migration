@@ -47,6 +47,14 @@ public:
   void *operator new(size_t, Collector &c) {
     return c.allocateObject(0);
   }
+#ifdef SP_HAVE_PLACEMENT_OPERATOR_DELETE
+private:
+  void operator delete(void *p) { }
+public:
+  void operator delete(void *p, Collector &c) {
+    c.unallocateObject(p);
+  }
+#endif
   virtual bool isNil() const;
   virtual bool isList() const;
   virtual bool isTrue() const;

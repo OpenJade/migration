@@ -2,6 +2,9 @@
 // See the file copying.txt for copying permission.
 
 #include "config.h"
+
+#ifdef JADE_HTML
+
 #include "HtmlFOTBuilder.h"
 #include "FOTBuilder.h"
 #include "Link.h"
@@ -1193,3 +1196,5 @@ void HtmlFOTBuilder::StyleClass::outputName(OutputCharStream &os) const
 #endif
 
 #include "HtmlFOTBuilder_inst.cxx"
+
+#endif /* JADE_HTML */

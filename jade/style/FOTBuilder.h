@@ -6,6 +6,7 @@
 
 #include "types.h"
 #include "StringC.h"
+#include "Boolean.h"
 #include "Node.h"
 #include "Link.h"
 #include "IList.h"

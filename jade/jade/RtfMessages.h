@@ -1,4 +1,4 @@
-// This file was automatically generated from jade/RtfMessages.msg by msggen.pl.
+// This file was automatically generated from .\RtfMessages.msg by ..\msggen.pl.
 #include "Message.h"
 
 #ifdef SP_NAMESPACE

@@ -1,4 +1,4 @@
-// This file was automatically generated from lib\ArcEngineMessages.msg by msggen.pl.
+// This file was automatically generated from .\ArcEngineMessages.msg by ..\msggen.pl.
 #include "Message.h"
 
 #ifdef SP_NAMESPACE

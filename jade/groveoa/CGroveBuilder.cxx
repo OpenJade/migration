@@ -15,8 +15,12 @@
 
 using SP_NAMESPACE::StringC;
 
+#ifdef SP_NO_STD_NAMESPACE
+#define std /* as nothing */
+#endif
+
 #define TRY try {
-#define CATCH  } catch (bad_alloc) { return E_OUTOFMEMORY; }
+#define CATCH  } catch (std::bad_alloc) { return E_OUTOFMEMORY; }
 
 /* We need to keep a reference to the entity manager, because
 StoragePos can use storage managers that are owned by the entity
@@ -313,7 +317,7 @@ unsigned __stdcall SpParserThread::start(void *p)
   try {
     arg->parser.parseAll(*arg->eh, &arg->cancel_);
   }
-  catch (bad_alloc) {
+  catch (std::bad_alloc) {
     // FIXME how to report this?
   }
   arg->eh.clear();

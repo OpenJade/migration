@@ -256,11 +256,11 @@ void Parser::doDeclSubset()
 	eventHandler().entityEnd(new (eventAllocator())
 				 EntityEndEvent(currentLocation()));
       if (inputLevel() == 2) {
-	const Entity *e
-	  = currentLocation().origin()->entity();
+	const EntityDecl *e
+	  = currentLocation().origin()->entityDecl();
 	if (e
-	    && (e->declType() == Entity::doctype
-		|| e->declType() == Entity::linktype)) {
+	    && (e->declType() == EntityDecl::doctype
+		|| e->declType() == EntityDecl::linktype)) {
 	  // popInputStack may destroy e
 	  Boolean fake = e->defLocation().origin().isNull();
 	  popInputStack();

@@ -7,8 +7,9 @@ openjade (1.4devel1-5) unstable; urgency=low
   * problem fixed a while ago where we weren't shipping the HTML
     documentation
     closes: #71093
+  * Japanese translation added upstream
 
- -- Adam Di Carlo <aph@debian.org>  Fri, 20 Jul 2001 02:14:58 -0400
+ -- Adam Di Carlo <aph@debian.org>  Fri, 20 Jul 2001 02:19:45 -0400
 
 openjade (1.4devel1-4) unstable; urgency=low
 

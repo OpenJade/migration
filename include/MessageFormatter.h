@@ -33,7 +33,7 @@ public:
 private:
   MessageFormatter(const MessageFormatter &); // undefined
   void operator=(const MessageFormatter &);  // undefined
-
+protected:
   class Builder : public MessageBuilder {
   public:
     Builder(MessageFormatter *formatter, OutputCharStream &os, bool b)

@@ -4,11 +4,11 @@ bin_PROGRAMS = onsgmls
 
 onsgmls_SOURCES = nsgmls.cxx SgmlsEventHandler.cxx SgmlsEventHandler.h \
 	RastEventHandler.cxx RastEventHandler.h StringSet.cxx StringSet.h \
-	nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h
+	nsgmls_inst.cxx NsgmlsMessages.h RastEventHandlerMessages.h nsgmls.h
 
 EXTRA_DIST = nsgmls_inst.m4 NsgmlsMessages.msg NsgmlsMessages.rc \
 	RastEventHandlerMessages.msg RastEventHandlerMessages.rc \
-	nsgmls.rc nsgmls.dsp
+	nsgmls.rc nsgmls.dsp .cvsignore
 
 onsgmls_LDADD = $(top_builddir)/lib/libosp.la
 
@@ -16,6 +16,8 @@ INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 
 BUILT_SOURCES = nsgmls_inst.cxx NsgmlsMessages.h NsgmlsMessages.rc \
 	RastEventHandlerMessages.h RastEventHandlerMessages.rc
+
+MAINTAINERCLEANFILES = Makefile.in
   
 MSGGENFLAGS = -l appModule 
 

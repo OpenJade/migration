@@ -323,10 +323,10 @@ int CmdLineApp::init(int, AppChar **argv)
   progName = argv[0];
   if (progName)
     setProgramName(convertInput(progName));
-  MessageTable::instance()->registerMessageDomain(MessageFragment::libModule,
+  MessageTable::instance()->registerMessageDomain(libModule,
                                                   SP_MESSAGE_DOMAIN, 
                                                   SP_LOCALE_DIR);
-  MessageTable::instance()->registerMessageDomain(MessageFragment::appModule,
+  MessageTable::instance()->registerMessageDomain(appModule,
                                                   SP_MESSAGE_DOMAIN, 
                                                   SP_LOCALE_DIR);
   return 0;
@@ -461,7 +461,9 @@ Boolean CmdLineApp::getMessageText(const MessageFragment &frag,
   if (!MessageTable::instance()->getText(frag, str))
     return 0;
 #ifdef SP_WIDE_SYSTEM
-  text.assign((const Char *)str.data(), str.size());
+  text.resize(str.size());
+  for (size_t i = 0; i < str.size(); i++)
+    text[i] = Char(str[i]);
 #else
   str += 0;
   text = codingSystem()->convertIn(str.data());
@@ -547,7 +549,9 @@ CmdLineApp::lookupCodingSystem(const AppChar *codingName)
 StringC CmdLineApp::convertInput(const SP_TCHAR *s)
 {
 #ifdef SP_WIDE_SYSTEM
-  StringC str(s, wcslen(s));
+  StringC str;
+  for (size_t i = 0; i < tcslen(s); i++)
+    str += Char(s[i]);
 #else
   StringC str(codingSystem()->convertIn(s));
 #endif

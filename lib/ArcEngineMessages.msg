@@ -38,3 +38,8 @@ E0+arcContDuplicate+ISO/IEC 10744:1997 A3.5.2+#ARCCONT attribute already specifi
 E1+arcContInvalid+ISO/IEC 10744:1997 A3.5.2+invalid value %1 for #ARCCONT
 E1+renameFromDuplicate+ISO/IEC 10744:1997 A3.5.2+%1 already used as a substitute name
 E0+contentDuplicate+ISO/IEC 10744:1997 A3.5.2+substitute name #CONTENT already specified
+E0+is10744PiKeywordMissing++IS10744 PI keyword missing
+E1+is10744PiKeywordInvalid++invalid IS10744 PI keyword %1
+E1+duplicateArcDecl++architecture %1 already defined+the first definition
+W1+ignoringPiArcDecl++ignoring PI declaration of architecture %1+the ArcBase definition
+W1+ignoringArcBaseArcDecl++ignoring ArcBase declaration of architecture %1+the PI definition

@@ -287,9 +287,16 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       popInputStack();
       break;
     case tokenPeroGrpo:
-      if (!inInstance())
-	message(ParserMessages::peroGrpoProlog);
-      // fall through
+      {
+	if (!inInstance())
+	  message(ParserMessages::peroGrpoProlog);
+	Boolean start;
+	if (inTag(start))
+	    message(start 
+		    ? ParserMessages::peroGrpoStartTag 
+		    : ParserMessages::peroGrpoEndTag);
+	// fall through
+      }
     case tokenPeroNameStart:
       {
 	if (options().warnInternalSubsetTsParamEntityRef && inputLevel() == 1)
@@ -345,22 +352,34 @@ Boolean Parser::parseGroupToken(const AllowedGroupTokens &allow,
       }
       break;
     case tokenRni:
-      if (!allow.groupToken(GroupToken::pcdata)) {
+      if (!allow.groupToken(GroupToken::pcdata)
+          && !allow.groupToken(GroupToken::all)
+          && !allow.groupToken(GroupToken::implicit)) {
 	groupTokenInvalidToken(tokenRni, allow);
 	return 0;
       }
       Syntax::ReservedName rn;
       if (!getIndicatedReservedName(&rn))
 	return 0;
-      if (rn != Syntax::rPCDATA) {
-	StringC token(syntax().delimGeneral(Syntax::dRNI));
-	token += syntax().reservedName(Syntax::rPCDATA);
-	message(ParserMessages::invalidToken, StringMessageArg(token));
-	return 0;
+      if (rn == Syntax::rPCDATA && allow.groupToken(GroupToken::pcdata)) {
+        gt.type = GroupToken::pcdata;
+        gt.contentToken = new PcdataToken;
+        return 1;
       }
-      gt.type = GroupToken::pcdata;
-      gt.contentToken = new PcdataToken;
-      return 1;
+      else if (rn == Syntax::rALL && allow.groupToken(GroupToken::all)) {
+        message(ParserMessages::sorryAllImplicit);
+        return 0;
+      }
+      else if (rn == Syntax::rIMPLICIT && allow.groupToken(GroupToken::implicit)) {
+        message(ParserMessages::sorryAllImplicit);
+        return 0;
+      }
+      else {
+        StringC token(syntax().delimGeneral(Syntax::dRNI));
+        token += syntax().reservedName(rn);
+        message(ParserMessages::invalidToken, StringMessageArg(token));
+        return 0;
+      }
     case tokenS:
       if (currentMarkup()) {
 	extendS();
@@ -565,9 +584,14 @@ void Parser::groupConnectorInvalidToken(Token token,
 	  AllowedGroupConnectorsMessageArg(allow, syntaxPointer()));
 }
 
+static AllowedGroupTokens allowName(GroupToken::name);
+  
 Boolean Parser::parseElementNameGroup(unsigned declInputLevel, Param &parm)
 {
-  if (!parseNameGroup(declInputLevel, parm))
+  static AllowedGroupTokens allowCommonName(GroupToken::name, 
+                                             GroupToken::all,
+                                             GroupToken::implicit);
+  if (!parseGroup(sd().www() ? allowCommonName : allowName, declInputLevel, parm))
     return 0;
   parm.elementVector.resize(parm.nameTokenVector.size());
   for (size_t i = 0; i < parm.nameTokenVector.size(); i++)
@@ -587,16 +611,27 @@ Boolean Parser::parseEntityReferenceNameGroup(Boolean &ignore)
 	ignore = 0;
 	return 1;
       }
+      Ptr<Dtd> dtd = lookupDtd(parm.nameTokenVector[i].name).pointer();
+      if (!dtd.isNull()) {
+	instantiateDtd(dtd);
+	if (currentDtdPointer() == dtd) {
+	  ignore = 0;
+	  return 1;
+	}
+      }
     }
   }
   ignore = 1;
   return 1;
 }
 
-Boolean Parser::parseTagNameGroup(Boolean &active)
+Boolean Parser::parseTagNameGroup(Boolean &active, Boolean start)
 {
   Param parm;
-  if (!parseNameGroup(inputLevel(), parm))
+  enterTag(start);
+  Boolean ret = parseNameGroup(inputLevel(), parm);
+  leaveTag();
+  if (!ret)
     return 0;
   active = 0;
   for (size_t i = 0; i < parm.nameTokenVector.size(); i++) {
@@ -612,7 +647,6 @@ Boolean Parser::parseTagNameGroup(Boolean &active)
 
 Boolean Parser::parseNameGroup(unsigned declInputLevel, Param &parm)
 {
-  static AllowedGroupTokens allowName(GroupToken::name);
   return parseGroup(allowName, declInputLevel, parm);
 }
 
@@ -789,6 +823,12 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
 					      GroupToken::dataTagGroup,
 					      GroupToken::elementToken,
 					      GroupToken::modelGroup);
+  static AllowedGroupTokens allowCommonContentToken(GroupToken::pcdata,
+                                                    GroupToken::all,
+                                                    GroupToken::implicit,
+					            GroupToken::dataTagGroup,
+					            GroupToken::elementToken,
+					            GroupToken::modelGroup);
   static AllowedGroupConnectors allowAnyConnectorGrpc(GroupConnector::orGC,
 						      GroupConnector::andGC,
 						      GroupConnector::seqGC,
@@ -805,8 +845,9 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
   GroupConnector gc;
   Boolean pcdataCheck = 0;
   do {
-    if (!parseGroupToken(allowContentToken, nestingLevel, declInputLevel,
-			 groupInputLevel, gt))
+    if (!parseGroupToken(sd().www() ? allowCommonContentToken 
+                                    : allowContentToken, 
+                         nestingLevel, declInputLevel, groupInputLevel, gt))
       return 0;
     ContentToken *contentToken;
     if (gt.type == GroupToken::modelGroup)

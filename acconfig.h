@@ -93,6 +93,12 @@
 
 @TOP@
 
+/*
+#error The stuff above TOP goes to the top of config.h.in
+#error What appears below BOTTOM goes to the bottom
+#error This text should not appear anywhere!
+*/
+
 @BOTTOM@
 
 /* do not change below this line */

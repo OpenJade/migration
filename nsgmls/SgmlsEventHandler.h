@@ -46,6 +46,7 @@ class SgmlsEventHandler : public ErrorCountEventHandler,
   private SgmlsSubdocState, private Messenger {
 public:
   enum {
+    outputAll = 07777,
     outputLine = 01,
     outputEntity = 02,
     outputId = 04,
@@ -57,6 +58,8 @@ public:
     outputComment = 0400,
     outputTagOmission = 01000,
     outputAttributeOmission = 02000,
+    outputParserInformation = 04000,
+    outputPostfix = 010000, // note this not in outputAll
     };
       
   SgmlsEventHandler(const SgmlParser *,
@@ -86,6 +89,7 @@ private:
   SgmlsEventHandler(const SgmlsEventHandler &); // undefined
   void operator=(const SgmlsEventHandler &);	// undefined
 
+  void features(unsigned outputFlags);
   void attributes(const AttributeList &attributes, char code,
 		  const StringC *ownerName);
   void startAttribute(const StringC &name, char code,
@@ -131,6 +135,7 @@ private:
   PackedBoolean outputComment_;
   PackedBoolean outputTagOmission_;
   PackedBoolean outputAttributeOmission_;
+  PackedBoolean outputParserInformation_;
 };
 
 inline

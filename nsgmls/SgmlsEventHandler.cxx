@@ -12,6 +12,7 @@
 #include "StorageManager.h"
 #include "macros.h"
 #include "sptchar.h"
+#include "nsgmls.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -42,6 +43,11 @@ const char includedElementCode = 'i';
 const char emptyElementCode = 'e';
 const char commentCode = '_';
 const char omissionCode = 'o';
+const char featuresCode = 'V';
+const char featuresSubCodeOptions = 'o';
+const char featuresSubCodeVersion = 'v';
+const char featuresSubCodePackage = 'p';
+const char featuresSubCodePossibleCodes = 'c';
 
 const OutputCharStream::Newline nl = OutputCharStream::newline;
 
@@ -97,10 +103,13 @@ SgmlsEventHandler::SgmlsEventHandler(const SgmlParser *parser,
   outputComment_((outputFlags & outputComment) != 0),
   outputTagOmission_((outputFlags & outputTagOmission) != 0),
   outputAttributeOmission_((outputFlags & outputAttributeOmission) != 0),
+  outputParserInformation_((outputFlags & outputParserInformation) != 0),
 
   haveData_(0), lastSos_(0), inDocument_(0)
 {
   os_->setEscaper(escaper);
+  if (outputParserInformation_)
+    features(outputFlags);
 }
 
 SgmlsEventHandler::~SgmlsEventHandler()
@@ -115,6 +124,58 @@ void SgmlsEventHandler::message(MessageEvent *event)
 {
   messenger_->dispatchMessage(event->message());
   ErrorCountEventHandler::message(event);
+}
+
+void SgmlsEventHandler::features(unsigned outputFlags)
+{
+    os() << featuresCode << featuresSubCodePackage << space
+         << SP_PACKAGE
+         << nl;
+    
+    os() << featuresCode << featuresSubCodeVersion << space
+         << SP_VERSION
+         << nl;
+    
+    os() << featuresCode << featuresSubCodePossibleCodes << space;
+    os() << dataCode;
+    os() << piCode;
+    os() << conformingCode;
+    os() << appinfoCode;
+    os() << startElementCode;
+    os() << endElementCode;
+    os() << referenceEntityCode;
+    os() << attributeCode;
+    os() << dataAttributeCode;
+    os() << linkAttributeCode;
+    os() << defineNotationCode;
+    os() << defineExternalEntityCode;
+    os() << defineInternalEntityCode;
+    os() << defineSubdocEntityCode;
+    os() << defineExternalTextEntityCode;
+    os() << pubidCode;
+    os() << sysidCode;
+    os() << startSubdocCode;
+    os() << endSubdocCode;
+    os() << fileCode;
+    os() << locationCode;
+    os() << includedElementCode;
+    os() << emptyElementCode;
+    os() << commentCode;
+    os() << omissionCode;
+    os() << featuresCode;
+    
+    os() << nl;
+
+    os() << featuresCode << featuresSubCodeOptions
+         << space << SP_T("esis");
+    for (size_t i = 1; NsgmlsApp::outputOptions[i].flag != 0; i++) {
+      if (NsgmlsApp::outputOptions[i].flag == 0)
+        break;
+      if (0 != (outputFlags & NsgmlsApp::outputOptions[i].flag)) {
+        os() << space << NsgmlsApp::outputOptions[i].name;
+      }
+    }
+    os() << nl;
 }
 
 void SgmlsEventHandler::appinfo(AppinfoEvent *event)

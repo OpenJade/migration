@@ -276,6 +276,16 @@ struct InterpreterMessages {
   static const MessageType1 unsupportedCharRepertoire;
   // 138
   static const MessageType0 badDeclaration;
+  // 139
+  static const MessageType3 notAnInteger;
+  // 140
+  static const MessageType3 notAKeyword;
+  // 141
+  static const MessageType3 notAnAlist;
+  // 142
+  static const MessageType3 notACharList;
+  // 143
+  static const MessageType3 lengthError;
 };
 
 #ifdef SP_NAMESPACE

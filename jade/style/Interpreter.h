@@ -194,6 +194,9 @@ private:
   ConstPtr<InheritedC> inheritedC_;
   unsigned inheritedCPart_;
   Location inheritedCLoc_;
+  void maybeSaveBuiltin();
+  Identifier *builtin_;
+  static bool preferBuiltin_;
 };
 
 class Unit : public Named {
@@ -375,6 +378,7 @@ private:
   void installPrimitives();
   void installPrimitive(const char *s, PrimitiveObj *value);
   void installXPrimitive(const char *s, PrimitiveObj *value);
+  void installBuiltins();
   void installUnits();
   void installCharNames();
   void installInheritedCs();

@@ -22,6 +22,7 @@ public:
 	    const NodePtr &parent, NodePtr &rootNode,
 	    const Vector<StringC> &architecture);
   bool readEntity(const StringC &, StringC &);
+  void mapSysid(StringC &);
 protected:
   void processOption(AppChar opt, const AppChar *arg);
   int init(int argc, AppChar **argv);

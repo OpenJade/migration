@@ -13,6 +13,7 @@
 #include "Owner.h" 
 #include "SchemeParser.h"
 #include "macros.h"
+#include "InternalInputSource.h"
 #include <stdlib.h>
 
 #ifdef DSSSL_NAMESPACE
@@ -104,6 +105,8 @@ Interpreter::Interpreter(GroveManager *groveManager,
     for (const char *s = lexCategories[i]; *s; s++)
       lexCategory_.setChar(*s, i);
   initialProcessingMode_.setDefined();
+  // can't be done before initializing lexCategory_
+  installBuiltins();
 }
 
 void Interpreter::compile()
@@ -1706,15 +1709,30 @@ unsigned long Interpreter::StringSet::hash(const String<char> &str)
   return h;
 }
 
+bool Identifier::preferBuiltin_ = 0;
+
 Identifier::Identifier(const StringC &name)
-: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), flowObj_(0)
+: Named(name), value_(0), syntacticKey_(notKey), beingComputed_(0), 
+  flowObj_(0), builtin_(0), defPart_(0)
 {
 }
 
+void Identifier::maybeSaveBuiltin()
+{
+  if (defPart_ == unsigned(-1) && !builtin_) {
+    builtin_ = new Identifier(name());
+    if (value_)
+      builtin_->setValue(value_, defPart_);
+    else
+      builtin_->setDefinition(def_, defPart_, defLoc_);
+  }
+}
+ 
 void Identifier::setDefinition(Owner<Expression> &expr,
 			       unsigned part,
 			       const Location &loc)
 {
+  maybeSaveBuiltin();
   def_.swap(expr);
   defPart_ = part;
   defLoc_ = loc;
@@ -1723,6 +1741,7 @@ void Identifier::setDefinition(Owner<Expression> &expr,
 
 void Identifier::setValue(ELObj *value, unsigned partIndex)
 {
+  maybeSaveBuiltin();
   value_ = value;
   // Built in functions have lowest priority.
   defPart_ = partIndex;
@@ -1739,8 +1758,15 @@ bool Identifier::defined(unsigned &part, Location &loc) const
 
 ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
 {
+  if (builtin_ && preferBuiltin_)
+    return builtin_->computeValue(force, interp);
   if (value_)
     return value_;
+  bool preferred = 0;
+  if (defPart_ == unsigned(-1) && !preferBuiltin_) {
+    preferBuiltin_ = 1;
+    preferred = 1;
+  }
   ASSERT(def_);
   if (beingComputed_) {
     if (force) {
@@ -1764,6 +1790,8 @@ ELObj *Identifier::computeValue(bool force, Interpreter &interp) const
     }
     ((Identifier *)this)->beingComputed_ = 0;
   }
+  if (preferred)
+    preferBuiltin_ = 0;
   return value_;
 }
 
@@ -1942,6 +1970,22 @@ bool operator==(const StringC &s, const char *p)
     if (p[i] == '\0' || (unsigned char)p[i] != s[i])
       return 0;
   return p[s.size()] == '\0';
+}
+
+void Interpreter::installBuiltins()
+{
+  partIndex_ = unsigned(-1);
+  StringC sysid(makeStringC(DEFAULT_SCHEME_BUILTINS));
+  StringC src;
+  groveManager_->mapSysid(sysid);
+  if (groveManager_->readEntity(sysid, src)) {
+    Owner<InputSource> in(new InternalInputSource(src,
+                              InputSourceOrigin::make()));
+    SchemeParser scm(*this, in);
+    scm.parse();
+  }
+  endPart();
+  partIndex_ = 1;
 }
 
 #ifdef DSSSL_NAMESPACE

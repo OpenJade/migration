@@ -1488,16 +1488,30 @@ Boolean Parser::parseExternalId(const AllowedParams &sysidAllow,
     static AllowedParams allowMinimumLiteral(Param::minimumLiteral);
     if (!parseParam(allowMinimumLiteral, declInputLevel, parm))
       return 0;
-    const MessageType1 *err;
-    if (id.setPublic(parm.literalText, sd().internalCharset(), syntax().space(),
-		      err)) {
-      PublicId::TextClass textClass;
-      if (sd().formal() && id.publicId()->getTextClass(textClass) && textClass == PublicId::SD)
-	message(ParserMessages::wwwRequired);
+    const MessageType1 *fpierr;
+    const MessageType1 *urnerr;
+    switch (id.setPublic(parm.literalText, sd().internalCharset(), 
+                         syntax().space(), fpierr, urnerr)) {
+    case PublicId::fpi: 
+      {
+        PublicId::TextClass textClass;
+        if (sd().formal() && id.publicId()->getTextClass(textClass) && textClass == PublicId::SD)
+  	  message(ParserMessages::wwwRequired);
+        if (sd().urn() && !sd().formal()) 
+          message(*urnerr, StringMessageArg(*id.publicIdString()));
+      }
+      break;
+    case PublicId::urn:
+      if (sd().formal() && !sd().urn()) 
+        message(*fpierr, StringMessageArg(*id.publicIdString()));
+      break;
+    case PublicId::informal:
+      if (sd().formal())
+        message(*fpierr, StringMessageArg(*id.publicIdString()));
+      if (sd().urn())
+        message(*urnerr, StringMessageArg(*id.publicIdString()));
+      break;
     }
-    else if (sd().formal())
-      message(*err,
-	      StringMessageArg(*id.publicIdString()));
   }
   if (!parseParam(sysidAllow, declInputLevel, parm))
     return 0;
@@ -2261,8 +2275,9 @@ void Parser::checkDtd(Dtd &dtd)
       if (def.isNull())
 	def = new ElementDefinition(currentLocation(),
 				    size_t(ElementDefinition::undefinedIndex),
-				    0,
-				    ElementDefinition::any);
+				    ElementDefinition::omitEnd,
+				    ElementDefinition::any,
+                                    (implydefElement() != Sd::implydefElementAnyother));
       p->setElementDefinition(def, i++);
     }
     const ShortReferenceMap *map = p->map();
@@ -2329,12 +2344,12 @@ void Parser::checkDtd(Dtd &dtd)
       break;
     const ExternalDataEntity *external = entity->asExternalDataEntity();
     if (external) {
-      const Notation *notation = external->notation();
+      Notation *notation = (Notation *)external->notation();
       if (!notation->defined()) {
 	if (sd().implydefNotation()) {
 	  ExternalId id;
-	  ((Notation *)notation)->setExternalId(id, Location());
-	  ((Notation *)notation)->generateSystemId(*this);
+	  notation->setExternalId(id, Location());
+	  notation->generateSystemId(*this);
 	} 
 	else if (validate()) {
 	  setNextLocation(external->defLocation());
@@ -2363,6 +2378,7 @@ void Parser::checkDtd(Dtd &dtd)
   }
 }
 
+#if 0
 void Parser::addCommonAttributes(Dtd &dtd)
 {
   Ptr<AttributeDefinitionList> commonAdl[2];
@@ -2427,6 +2443,116 @@ void Parser::addCommonAttributes(Dtd &dtd)
       dtd.setImplicitNotationAttributeDef(n->attributeDef());
   }
 }
+#else
+void Parser::addCommonAttributes(Dtd &dtd)
+{
+  // These are #implicit, #all, #notation #implicit, #notation #all
+  Ptr<AttributeDefinitionList> commonAdl[4];
+  {
+    ElementType *e = lookupCreateElement(syntax()
+                                       .rniReservedName(Syntax::rIMPLICIT));
+    commonAdl[0] = e->attributeDef();
+    e = dtd.removeElementType(syntax().rniReservedName(Syntax::rALL));
+    if (e) 
+      commonAdl[1] = e->attributeDef();
+    delete e;
+  }
+  {
+    Ptr<Notation> nt 
+      = lookupCreateNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    commonAdl[2] = nt->attributeDef();
+    nt = dtd.removeNotation(syntax().rniReservedName(Syntax::rALL));
+    if (!nt.isNull()) 
+      commonAdl[3] = nt->attributeDef();
+  }
+  Dtd::ElementTypeIter elementIter(dtd.elementTypeIter());
+  Dtd::ElementTypeIter element2Iter(dtd.elementTypeIter());
+  Dtd::NotationIter notationIter(dtd.notationIter());
+  Dtd::NotationIter notation2Iter(dtd.notationIter());
+  Vector<PackedBoolean> done1Adl(dtd.nAttributeDefinitionList(),
+				PackedBoolean(0));
+  Vector<PackedBoolean> done2Adl(dtd.nAttributeDefinitionList(),
+				PackedBoolean(0));
+  // we do 2 passes over element types and notations,
+  // first merging #implicit attributes for implicit element types/notations
+  // next merging #all attributes for all element types/notations 
+  for (int i = 0; i < 4; i++) {
+    if (!commonAdl[i].isNull()) {
+      if (i % 2) 
+        done1Adl[commonAdl[i]->index()] = 1;
+      else
+        done2Adl[commonAdl[i]->index()] = 1;
+      for (;;) {
+        Boolean skip;
+	Attributed *a;
+        switch (i) {
+        case 0: 
+          {
+            ElementType *e = elementIter.next();
+            a = e;
+            skip = (e && e->definition()); // don't merge #implicit 
+                                           // attributes if e is defined
+          }
+          break;
+        case 1:
+	  a = element2Iter.next();
+          skip = 0;                        // always merge #all attributes
+          break;
+        case 2: 
+          {
+	    Notation *nt = notationIter.next().pointer();
+            a = nt;
+            skip = (nt && nt->defined());  // don't merge #implicit 
+                                           // attributes if nt is defined
+          }
+          break;
+        case 3:
+	  a = notation2Iter.next().pointer();
+          skip = 0;                        // always merge #all attributes
+          break;
+        default:
+          CANNOT_HAPPEN();
+        }
+        if (!a)
+          break;
+	Ptr<AttributeDefinitionList> adl = a->attributeDef();
+	if (adl.isNull()) {
+          if (!skip)
+	    a->setAttributeDef(commonAdl[i]);
+        }
+	else if (((i % 2) && !done1Adl[adl->index()])
+               ||(!(i % 2) && !done2Adl[adl->index()])) {
+          if (i % 2)
+	    done1Adl[adl->index()] = 1;
+          else 
+	    done2Adl[adl->index()] = 1;
+          if (!skip)
+	    for (size_t j = 0; j < commonAdl[i]->size(); j++) {
+	      unsigned tem;
+	      if (!adl->attributeIndex(commonAdl[i]->def(j)->name(),
+	  			       tem))
+	        adl->append(commonAdl[i]->def(j)->copy());
+	    }
+	}
+      }
+    }
+  }
+  {
+    ElementType *e = dtd.removeElementType(syntax()
+					   .rniReservedName(Syntax::rIMPLICIT));
+    if (e)
+      dtd.setImplicitElementAttributeDef(e->attributeDef());
+    delete e;
+  }
+  {
+    Ptr<Notation> n
+      = dtd.removeNotation(syntax().rniReservedName(Syntax::rIMPLICIT));
+    if (!n.isNull())
+      dtd.setImplicitNotationAttributeDef(n->attributeDef());
+  }
+}
+
+#endif
 
 Boolean Parser::maybeStatusKeyword(const Entity &entity)
 {

@@ -150,7 +150,7 @@ ContentState::lookupCreateUndefinedElement(const StringC &name,
 {
   ElementType *p = new ElementType(name,
 				   dtd.allocElementTypeIndex());
-  dtd.insertUndefinedElementType(p);
+  dtd.insertElementType(p);
   p->setElementDefinition(new ElementDefinition(loc,
 						size_t(ElementDefinition::undefinedIndex),
 						ElementDefinition::omitEnd,

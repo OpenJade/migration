@@ -1,2 +1,7 @@
 Makefile.in
 grove_inst.cxx
+*.lo
+.deps
+.libs
+Makefile
+libospgrove.la

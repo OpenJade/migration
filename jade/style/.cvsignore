@@ -7,3 +7,8 @@ InterpreterMessages.rc
 Makefile.in
 primitive_inst.cxx
 style_inst.cxx
+*.lo
+Makefile
+.deps
+.libs
+libostyle.la

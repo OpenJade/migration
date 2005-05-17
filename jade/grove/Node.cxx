@@ -547,14 +547,18 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getEntityType(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case EntityType::##e: value.set(ComponentName::id##E); break;
-	  ENUM(text, Text)
-	  ENUM(cdata, Cdata)
-	  ENUM(sdata, Sdata)
-	  ENUM(ndata, Ndata)
-	  ENUM(pi, Pi)
-	  ENUM(subdocument, Subdocument)
-#undef ENUM
+      case EntityType::text:
+        value.set(ComponentName::idText); break;
+      case EntityType::cdata:
+        value.set(ComponentName::idCdata); break;
+      case EntityType::sdata:
+        value.set(ComponentName::idSdata); break;
+      case EntityType::ndata:
+        value.set(ComponentName::idNdata); break;
+      case EntityType::pi:
+        value.set(ComponentName::idPi); break;
+      case EntityType::subdocument:
+        value.set(ComponentName::idSubdocument); break;
 	  default:
 	    ret = accessNotInClass;
 	}
@@ -567,24 +571,22 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getDeclValueType(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case DeclValueType::##e: value.set(ComponentName::id##E); break;
-	ENUM(cdata, Cdata)
-        ENUM(entity, Entity)
-        ENUM(entities, Entities)
-        ENUM(id, Id)
-        ENUM(idref, Idref)
-        ENUM(idrefs, Idrefs)
-        ENUM(name, Name)
-        ENUM(names, Names)
-        ENUM(nmtoken, Nmtoken)
-        ENUM(nmtokens, Nmtokens)
-        ENUM(number, Number)
-        ENUM(numbers, Numbers)
-        ENUM(nutoken, Nutoken)
-        ENUM(nutokens, Nutokens)
-        ENUM(notation, Notation)
-        ENUM(nmtkgrp, Nmtkgrp)
-#undef ENUM
+        case DeclValueType::cdata: value.set(ComponentName::idCdata); break;
+        case DeclValueType::entity: value.set(ComponentName::idEntity); break;
+        case DeclValueType::entities: value.set(ComponentName::idEntities); break;
+        case DeclValueType::id: value.set(ComponentName::idId); break;
+        case DeclValueType::idref: value.set(ComponentName::idIdref); break;
+        case DeclValueType::idrefs: value.set(ComponentName::idIdrefs); break;
+        case DeclValueType::name: value.set(ComponentName::idName); break;
+        case DeclValueType::names: value.set(ComponentName::idNames); break;
+        case DeclValueType::nmtoken: value.set(ComponentName::idNmtoken); break;
+        case DeclValueType::nmtokens: value.set(ComponentName::idNmtokens); break;
+        case DeclValueType::number: value.set(ComponentName::idNumber); break;
+        case DeclValueType::numbers: value.set(ComponentName::idNumbers); break;
+        case DeclValueType::nutoken: value.set(ComponentName::idNutoken); break;
+        case DeclValueType::nutokens: value.set(ComponentName::idNutokens); break;
+        case DeclValueType::notation: value.set(ComponentName::idNotation); break;
+        case DeclValueType::nmtkgrp: value.set(ComponentName::idNmtkgrp); break;
         default:
 	  ret = accessNotInClass;
 	}
@@ -597,14 +599,12 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getDefaultValueType(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case DefaultValueType::##e: value.set(ComponentName::id##E); break;
-        ENUM(value, Value)
-        ENUM(fixed, Fixed)
-        ENUM(required, Required)
-        ENUM(current, Current)
-        ENUM(conref, Conref)
-        ENUM(implied, Implied)
-#undef ENUM
+        case DefaultValueType::value: value.set(ComponentName::idValue); break;
+        case DefaultValueType::fixed: value.set(ComponentName::idFixed); break;
+        case DefaultValueType::required: value.set(ComponentName::idRequired); break;
+        case DefaultValueType::current: value.set(ComponentName::idCurrent); break;
+        case DefaultValueType::conref: value.set(ComponentName::idConref); break;
+        case DefaultValueType::implied: value.set(ComponentName::idImplied); break;
         default:
 	  ret = accessNotInClass;
 	}
@@ -617,13 +617,11 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getContentType(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case ContentType::##e: value.set(ComponentName::id##E); break;
-        ENUM(cdata, Cdata)
-        ENUM(rcdata, Rcdata)
-        ENUM(empty, Empty)
-        ENUM(any, Any)
-        ENUM(modelgrp, ModelGroup)
-#undef ENUM
+        case ContentType::cdata: value.set(ComponentName::idCdata); break;
+        case ContentType::rcdata: value.set(ComponentName::idRcdata); break;
+        case ContentType::empty: value.set(ComponentName::idEmpty); break;
+        case ContentType::any: value.set(ComponentName::idAny); break;
+        case ContentType::modelgrp: value.set(ComponentName::idModelGroup); break;
         default:
 	  ret = accessNotInClass;
 	}
@@ -636,11 +634,9 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getConnector(type);
       if (ret == accessOK) {
 	switch (type) {
-#define ENUM(e, E) case Connector::##e: value.set(ComponentName::id##E); break;
-        ENUM(and_, And)
-        ENUM(or_, Or)
-        ENUM(seq, Seq)
-#undef ENUM
+        case Connector::and_: value.set(ComponentName::idAnd); break;
+        case Connector::or_: value.set(ComponentName::idOr); break;
+        case Connector::seq: value.set(ComponentName::idSeq); break;
         default:
 	  ret = accessNotInClass;
 	}
@@ -653,11 +649,9 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getOwnerType(type);
       if (ret == accessOK) {
         switch (type) {
-#define ENUM(e, E) case OwnerType::##e: value.set(ComponentName::id##E); break;
-        ENUM(iso, Iso)
-        ENUM(registered, Registered)
-        ENUM(unregistered, Unregistered)
-#undef ENUM
+        case OwnerType::iso: value.set(ComponentName::idIso); break;
+        case OwnerType::registered: value.set(ComponentName::idRegistered); break;
+        case OwnerType::unregistered: value.set(ComponentName::idUnregistered); break;
         default:
           ret = accessNotInClass;
         }
@@ -670,21 +664,19 @@ AccessResult Node::property(ComponentName::Id id,
       ret = getTextClass(tclass);
       if (ret == accessOK) {
         switch (tclass) {
-#define ENUM(e, E) case TextClass::##e: value.set(ComponentName::id##E); break;
-        ENUM(capacity, Capacity)
-        ENUM(charset, Charset)
-        ENUM(document, Document)
-        ENUM(dtd, Dtd)
-        ENUM(elements, Elements)
-        ENUM(entities, Entities)
-        ENUM(lpd, Lpd)
-        ENUM(nonsgml, Nonsgml)
-        ENUM(notation, Notation)
-        ENUM(shortref, Shortref)
-        ENUM(subdoc, Subdoc)
-        ENUM(syntax, Syntax)
-        ENUM(text, Text)
-#undef ENUM
+        case TextClass::capacity: value.set(ComponentName::idCapacity); break;
+        case TextClass::charset: value.set(ComponentName::idCharset); break;
+        case TextClass::document: value.set(ComponentName::idDocument); break;
+        case TextClass::dtd: value.set(ComponentName::idDtd); break;
+        case TextClass::elements: value.set(ComponentName::idElements); break;
+        case TextClass::entities: value.set(ComponentName::idEntities); break;
+        case TextClass::lpd: value.set(ComponentName::idLpd); break;
+        case TextClass::nonsgml: value.set(ComponentName::idNonsgml); break;
+        case TextClass::notation: value.set(ComponentName::idNotation); break;
+        case TextClass::shortref: value.set(ComponentName::idShortref); break;
+        case TextClass::subdoc: value.set(ComponentName::idSubdoc); break;
+        case TextClass::syntax: value.set(ComponentName::idSyntax); break;
+        case TextClass::text: value.set(ComponentName::idText); break;
         default:
           ret = accessNotInClass;
         }
@@ -699,25 +691,25 @@ AccessResult Node::property(ComponentName::Id id,
 	value.set(tem);
       break;
     }
-  case ComponentName::idElementTypes: 
-    { 
+  case ComponentName::idElementTypes:
+    {
       // ElementTypes is special since it occurs as
       // named-node-list and as node-list.
       if (&classDef() == &ClassDef::documentType) {
-        NamedNodeListPtr tem; 
-        ret = getElementTypes(tem); 
+        NamedNodeListPtr tem;
+        ret = getElementTypes(tem);
         if (ret == accessOK)
-	  value.set(tem); 
+	  value.set(tem);
       }
-      else if (&classDef() == &ClassDef::rankStem) { 
+      else if (&classDef() == &ClassDef::rankStem) {
         NodeListPtr tem;
-        ret = getElementTypes(tem); 
+        ret = getElementTypes(tem);
         if (ret == accessOK)
-	  value.set(tem); 
-      } 
-      else 
-        ret = accessNotInClass; 
-      break; 
+	  value.set(tem);
+      }
+      else
+        ret = accessNotInClass;
+      break;
     }
 #define PROP(Name, Type) \
   case ComponentName::id##Name: \

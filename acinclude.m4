@@ -1,5 +1,5 @@
 dnl OJ_CHECK_SIZEOF(TYPE, HEADER [, CROSS-SIZE])
-AC_DEFUN(OJ_CHECK_SIZEOF,
+AC_DEFUN([OJ_CHECK_SIZEOF],
 [changequote(<<, >>)dnl
 dnl The name to #define.
 define(<<AC_TYPE_NAME>>, translit(sizeof_$1, [a-z *], [A-Z_P]))dnl
@@ -31,7 +31,7 @@ dnl HAVE_PLACEMENT_OPERATOR_DELETE.
 dnl
 dnl @author Matthias Clasen
 dnl
-AC_DEFUN(AC_CXX_PLACEMENT_OPERATOR_DELETE,
+AC_DEFUN([AC_CXX_PLACEMENT_OPERATOR_DELETE],
 [AC_CACHE_CHECK(whether the compiler supports placement operator delete,
 ac_cv_cxx_placement_operator_delete,
 [AC_LANG_SAVE
@@ -64,7 +64,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_BOOL,
+AC_DEFUN([AC_CXX_BOOL],
 [AC_CACHE_CHECK(whether the compiler recognizes bool as a built-in type,
 ac_cv_cxx_bool,
 [AC_LANG_SAVE
@@ -89,7 +89,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_TYPENAME,
+AC_DEFUN([AC_CXX_TYPENAME],
 [AC_CACHE_CHECK(whether the compiler recognizes typename,
 ac_cv_cxx_typename,
 [AC_LANG_SAVE
@@ -113,7 +113,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_NEW_FOR_SCOPING,
+AC_DEFUN([AC_CXX_NEW_FOR_SCOPING],
 [AC_CACHE_CHECK(whether the compiler accepts the new for scoping rules,
 ac_cv_cxx_new_for_scoping,
 [AC_LANG_SAVE
@@ -141,7 +141,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_DYNAMIC_CAST,
+AC_DEFUN([AC_CXX_DYNAMIC_CAST],
 [AC_CACHE_CHECK(whether the compiler supports dynamic_cast<>,
 ac_cv_cxx_dynamic_cast,
 [AC_LANG_SAVE
@@ -167,7 +167,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_NAMESPACES,
+AC_DEFUN([AC_CXX_NAMESPACES],
 [AC_CACHE_CHECK(whether the compiler implements namespaces,
 ac_cv_cxx_namespaces,
 [AC_LANG_SAVE
@@ -196,7 +196,7 @@ dnl
 dnl @version $Id$
 dnl @author Mark Elbrecht <snowball3@bigfoot.com>
 dnl
-AC_DEFUN(ACX_CHECK_PATHNAME_STYLE_DOS,
+AC_DEFUN([ACX_CHECK_PATHNAME_STYLE_DOS],
 [AC_MSG_CHECKING(for Windows and DOS and OS/2 style pathnames)
 AC_CACHE_VAL(acx_cv_pathname_style_dos,
 [AC_REQUIRE([AC_CANONICAL_HOST])
@@ -224,7 +224,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_EXPLICIT_INSTANTIATIONS,
+AC_DEFUN([AC_CXX_EXPLICIT_INSTANTIATIONS],
 [AC_CACHE_CHECK(whether the compiler supports explicit instantiations,
 ac_cv_cxx_explinst,
 [AC_LANG_SAVE
@@ -239,7 +239,7 @@ if test "$ac_cv_cxx_explinst" = yes; then
 fi
 ])
 
-AC_DEFUN(AC_DEFINE_DIR, [ 
+AC_DEFUN([AC_DEFINE_DIR], [ 
   ac_expanded=`( 
     test "x$prefix" = xNONE && prefix="$ac_default_prefix" 
     test "x$exec_prefix" = xNONE && exec_prefix="${prefix}" 
@@ -259,7 +259,7 @@ dnl
 dnl @version $Id$
 dnl @author Luc Maisonobe
 dnl
-AC_DEFUN(AC_CXX_MUTABLE,
+AC_DEFUN([AC_CXX_MUTABLE],
 [AC_CACHE_CHECK(whether the compiler supports the mutable keyword,
 ac_cv_cxx_mutable,
 [AC_LANG_SAVE

@@ -3,10 +3,15 @@ JADE=openjade
 JADETEX=jadetex
 PDFJADETEX=pdfjadetex
 XMLDECL=/usr/share/sgml/xml.dcl
+DB2MANXSL=/usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 
-MAN_PAGES=onsgmls.1 osgmlnorm.1 ospam.1 osx.1 ospent.1 ospcat.1
 
-all: $(MAN_PAGES) releasenotes.pdf releasenotes.html releasenotes.ps
+docdir = $(datadir)/doc
+pkgdocdir = $(docdir)/@PACKAGE@
+
+man_MANS = onsgmls.1 osgmlnorm.1 ospent.1 ospam.1 osx.1 ospcat.1
+BUILT_SOURCES = $(man_MANS)
+pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 
 %.tex: %.xml %.dsl
 	$(JADE) -v -t tex -V tex-backend -d $*.dsl#print $(XMLDECL) $*.xml
@@ -32,17 +37,19 @@ all: $(MAN_PAGES) releasenotes.pdf releasenotes.html releasenotes.ps
 	rm -f prior.aux
 
 %.ps: %.pdf
-#	acroread -toPostScript -pairs $< $@
 	pdf2ps $< $@
 
 %.html: %.xml %.dsl
 	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $*.dsl#html $(XMLDECL) $*.xml
 
 %.1: %.xml
-	xmlto man -x /usr/share/xmlto/xsl/db2man/docbook.xsl $*.xml
+	xmlto man -x $(DB2MANXSL) $*.xml
    
-clean:
+mostlyclean-local:
 	-rm -f *.out *.aux *.log *.dvi *.tex
 
-realclean: clean
-	-rm -f *.html *.pdf $(MAN_PAGES) *.ps
+clean-local: mostlyclean
+	-rm -f *.1 *.html *.pdf *.ps
+
+distclean-local: clean
+	-rm -f Makefile Makefile.in

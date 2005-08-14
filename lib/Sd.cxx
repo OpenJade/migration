@@ -22,7 +22,7 @@ Sd::Sd(const Ptr<EntityManager> &entityManager)
   entityRef_(entityRefAny),
   typeValid_(1),
   integrallyStored_(0),
-  implydefElement_(Sd::ImplydefElement::implydefElementNo)
+  implydefElement_(Sd::implydefElementNo)
 {
   int i;
   for (i = 0; i < nBooleanFeature; i++)

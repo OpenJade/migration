@@ -1653,9 +1653,9 @@ void NullOutputByteStream::flushBuf(char)
 char* dirname(const char* path)
 {
 	static char buffer[MAXPATHLEN];
-	char* p=strrchr(path,'/');
+	char* p=strrchr((char*)path,'/');
 #ifdef SP_MSDOS_FILENAMES
-	char *ppp = strrchr(path,'\\');
+	char *ppp = strrchr((char*)path,'\\');
 	if (ppp && (ppp > p || p==NULL)) p=ppp;
 #endif
  

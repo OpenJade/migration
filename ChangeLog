@@ -1,6 +1,92 @@
+2005-08-15 02:25  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* sx/XmlOutputEventHandler.cxx: explicit const char* to char*
+	  conversion for VS.NET 2005 Beta2
+
+2005-08-15 02:09  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/xentmgr_inst.m4: fix for vs.net when building with
+	  /Zc:wchar_t
+
+2005-08-15 00:05  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/Sd.cxx: make gcc happy again
+
+2005-08-14 22:49  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/Sd.cxx: initialize implydefElement_ so OpenSP does not assume
+	  some random value
+
+2005-07-21 16:12  Terje Bless  <link@pobox.com>
+
+	* Makefile.am, configure.in, docsrc/Makefile, docsrc/Makefile.am:
+	  Use automake/autoconf to generate man pages and
+	  releasenotes.{ps|pdf|html}.
+
+2005-07-15 16:03  Terje Bless  <link@pobox.com>
+
+	* acinclude.m4: Adding copious quoting for Automake >= 1.8; cf.
+	  <http://sources.redhat.com/automake/automake.html#Extending-aclocal>
+
+2005-07-15 16:01  Terje Bless  <link@pobox.com>
+
+	* BUILDING: Add note about missing gettext-devel/gettext.m4 causing
+	  aclocal complaints for undefined AM_GNU_GETTEXT macro.
+
+2004-09-07 06:45  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/PosixStorage.cxx: make -R consistent with common practise on
+	  Win32
+
+2004-09-07 05:15  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/parseDecl.cxx: allow applications to get non-random location
+	  information for dtd events for implied dtds
+
+2004-09-04 18:41  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* doc/generic.htm, generic/ParserEventGeneratorKit.h,
+	  lib/ParserEventGeneratorKit.cxx: adding --error-numbers to
+	  generic interface
+
+2004-08-29 14:57  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/lib.dsp: use proper paths to refer to source files of the
+	  generic interface
+
+2004-08-28 21:11  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* sp-generate.mak: turn off error checking for `del`, the relevant
+	  files do not exist for builds from CVS which causes the entire
+	  make process to fail
+
+2004-08-26 05:58  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* sx/: XmlOutputEventHandler.cxx, XmlOutputEventHandler.h: [ 970258
+	  ] Patch to make osx compile in MSVC -- Thanks to Tony Dodd
+
+2004-08-26 05:39  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/parseParam.cxx: fix for markup declaration memory leak, see
+	  http://sourceforge.net/mailarchive/forum.php?thread_id=5381372&forum_id=2437
+
+2004-08-23 02:01  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* lib/parseDecl.cxx: Dead memory-leaking code, see
+	  http://sourceforge.net/mailarchive/forum.php?thread_id=5381372&forum_id=2437
+
 2004-06-30  Karl Eichwalder  <ke@suse.de>
 
 	* acinclude.m4: Add missing quotations.
+
+2004-06-26 19:11  liamquinn
+
+	* doc/index.htm: Fixed broken link to NEWS (bug 666497).
+
+2004-06-26 19:05  liamquinn
+
+	* docsrc/osx.xml: Fixed -l option in man page synopsis (bug
+	  891323).
 
 2004-06-09  Karl Eichwalder  <ke@gnu.franken.de>
 
@@ -16,6 +102,40 @@
 	* include/MessageReporter.h: Add missing return; (thanks to Marcus
 	Meissner).
 	* lib/URLStorage.cxx (open): Likewise.
+
+2004-05-23 01:57  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* SP.dsw, msggen.pl.in, sp-generate.mak, include/Message.h,
+	  include/MessageReporter.h, include/config.h.old.in,
+	  lib/MessageTable.cxx, lib/lib.dsp: Win32 patch, see
+	  http://lists.w3.org/Archives/Public/www-archive/2004Jan/0081.html
+
+2004-04-09 04:14  Terje Bless  <link@pobox.com>
+
+	* spec.in: Merge "today" changelog entires into one entry (dunno
+	  what I was thinking).
+
+2004-04-09 03:58  Terje Bless  <link@pobox.com>
+
+	* spec.in: Merging in spec file changes from HEAD; add man pages to
+	  %files section and change the *.mo files to include the library
+	  major revision.
+
+2004-04-09 03:54  Terje Bless  <link@pobox.com>
+
+	* spec.in: Adding man pages to the %files section for the OpenSP
+	  package.
+
+2004-04-09 03:51  Terje Bless  <link@pobox.com>
+
+	* spec.in: Use _datadir macro for doc files; merged from
+	  opensp_1_5_branch, change by Karl Eichwalder and Ville Skytta.
+
+2004-04-09 03:38  Terje Bless  <link@pobox.com>
+
+	* spec.in: Tweak names of l10n/*.mo files in the %files section.
+	  These seem to get the library's major revision appended to the
+	  basename for some reason.
 
 2004-01-16  Karl Eichwalder  <ke@suse.de>
 
@@ -306,12 +426,12 @@
 	* configure.in: Make sure that SP_MULTI_BYTE is set by default
 	(reverts mistake in previous commit).
 
-2002-07-08 06:14  tbe
+2002-07-08 06:14  Terje Bless  <link@pobox.com>
 
 	* lib/ParserMessages.msg: Demote duplicateAttributeDef from Error
 	to Warning. This closes SF Bug Tracker bug #578543.
 
-2002-07-07 17:42  tbe
+2002-07-07 17:42  Terje Bless  <link@pobox.com>
 
 	* pubtext/xml.dcl: Update to canonical SGML Declaration for XML
 	from the W3C. Changes ISO Registration number for the BASESET from

@@ -1,3 +1,41 @@
+
+2005-08-26  Terje Bless <link@pobox.com> (via gettextize)
+
+	* m4/codeset.m4: Upgrade to gettext-0.14.5.
+	* m4/gettext.m4: Upgrade to gettext-0.14.5.
+	* m4/glibc2.m4: New file, from gettext-0.14.5.
+	* m4/glibc21.m4: Upgrade to gettext-0.14.5.
+	* m4/iconv.m4: Upgrade to gettext-0.14.5.
+	* m4/intdiv0.m4: New file, from gettext-0.14.5.
+	* m4/intmax.m4: New file, from gettext-0.14.5.
+	* m4/inttypes.m4: New file, from gettext-0.14.5.
+	* m4/inttypes_h.m4: New file, from gettext-0.14.5.
+	* m4/inttypes-pri.m4: New file, from gettext-0.14.5.
+	* m4/isc-posix.m4: Upgrade to gettext-0.14.5.
+	* m4/lcmessage.m4: Upgrade to gettext-0.14.5.
+	* m4/lib-ld.m4: Upgrade to gettext-0.14.5.
+	* m4/lib-link.m4: Upgrade to gettext-0.14.5.
+	* m4/lib-prefix.m4: Upgrade to gettext-0.14.5.
+	* m4/longdouble.m4: New file, from gettext-0.14.5.
+	* m4/longlong.m4: New file, from gettext-0.14.5.
+	* m4/nls.m4: New file, from gettext-0.14.5.
+	* m4/po.m4: New file, from gettext-0.14.5.
+	* m4/printf-posix.m4: New file, from gettext-0.14.5.
+	* m4/progtest.m4: Upgrade to gettext-0.14.5.
+	* m4/signed.m4: New file, from gettext-0.14.5.
+	* m4/size_max.m4: New file, from gettext-0.14.5.
+	* m4/stdint_h.m4: New file, from gettext-0.14.5.
+	* m4/uintmax_t.m4: New file, from gettext-0.14.5.
+	* m4/ulonglong.m4: New file, from gettext-0.14.5.
+	* m4/wchar_t.m4: New file, from gettext-0.14.5.
+	* m4/wint_t.m4: New file, from gettext-0.14.5.
+	* m4/xsize.m4: New file, from gettext-0.14.5.
+	* Makefile.am (SUBDIRS): Remove intl.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): Add mkinstalldirs.
+	* configure.in (AM_GNU_GETTEXT_VERSION): Bump to 0.14.5.
+	(AC_CONFIG_FILES): Add intl/Makefile.
+
 2005-08-15 02:25  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
 
 	* sx/XmlOutputEventHandler.cxx: explicit const char* to char*

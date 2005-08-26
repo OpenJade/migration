@@ -1,9 +1,10 @@
 MAX_TEX_RECURSION=4
-JADE=openjade
-JADETEX=jadetex
-PDFJADETEX=pdfjadetex
-XMLDECL=/usr/share/sgml/xml.dcl
-DB2MANXSL=/usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
+XMLTO=@XMLTO@
+JADE=@JADE@
+JADETEX=@JADETEX@
+PDF2PS=@PDF2PS@
+PDFJADETEX=@PDFJADETEX@
+XMLDCL=@XMLDCL@
 
 
 docdir = $(datadir)/doc
@@ -14,7 +15,7 @@ BUILT_SOURCES = $(man_MANS)
 pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 
 %.tex: %.xml %.dsl
-	$(JADE) -v -t tex -V tex-backend -d $*.dsl#print $(XMLDECL) $*.xml
+	$(JADE) -v -t tex -V tex-backend -d $*.dsl#print $(XMLDCL) $*.xml
 
 %.pdf: %.tex
 	$(PDFJADETEX) $<
@@ -37,13 +38,13 @@ pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 	rm -f prior.aux
 
 %.ps: %.pdf
-	pdf2ps $< $@
+	$(PDF2PS) $< $@
 
 %.html: %.xml %.dsl
-	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $*.dsl#html $(XMLDECL) $*.xml
+	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $*.dsl#html $(XMLDCL) $*.xml
 
 %.1: %.xml
-	xmlto man -x $(DB2MANXSL) $*.xml
+	$(XMLTO) man $*.xml
    
 mostlyclean-local:
 	-rm -f *.out *.aux *.log *.dvi *.tex

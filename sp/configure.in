@@ -24,7 +24,7 @@ dnl Autoheader definitions
 AH_TEMPLATE([HAVE_CATGETS],[Define if you have the gettext() function])
 AH_TEMPLATE([SGML_CATALOG_FILES_DEFAULT],[set this to the default catalog files list])
 AH_TEMPLATE([SGML_SEARCH_PATH_DEFAULT],[set this to the default SGML search path])
-AH_TEMPLATE([ SP_DECLARE_H_ERRNO],[define this if h_errno should be declared extern int])
+AH_TEMPLATE([SP_DECLARE_H_ERRNO],[define this if h_errno should be declared extern int])
 AH_TEMPLATE([DECLARE_MEMMOVE],[define this if memmove  should be declared extern "C"])
 AH_TEMPLATE([DECLARE_STRERROR],[define this if strerror should be declared extern "C"])
 AH_TEMPLATE([SP_HAVE_SOCKET],[define this if sockets are available])
@@ -235,6 +235,12 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PATH_PROGS(PERL, perl, perl)
 AM_PROG_LIBTOOL
+AC_PATH_PROG(XMLTO, xmlto)
+AC_PATH_PROG(PDF2PS, pdf2ps)
+AC_PATH_PROG(JADE, openjade jade)
+AC_PATH_PROG(JADETEX, jadetex)
+AC_PATH_PROG(PDFJADETEX, pdfjadetex)
+AC_PATH_PROG(XMLDCL, xml.dcl,, [/usr/share/sgml])
 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))

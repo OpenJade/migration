@@ -240,6 +240,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 
 AM_GNU_GETTEXT
+AM_GNU_GETTEXT_VERSION([0.11.1])
 AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale, [location of message catalogs])
 SP_MESSAGE_DOMAIN="sp$SP_LIBOSP_CUR"

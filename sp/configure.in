@@ -469,7 +469,7 @@ AC_ARG_ENABLE(xml-messages,
       AC_MSG_RESULT(no))
 
 dnl Output.
-AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl intl/Makefile
+AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl
 	lib/Makefile nsgmls/Makefile spent/Makefile
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
 	include/Makefile include/config.h.old generic/Makefile doc/Makefile docsrc/Makefile

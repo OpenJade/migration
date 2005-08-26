@@ -23,7 +23,7 @@ MAINTAINERCLEANFILES = install-sh mkinstalldirs missing \
 
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
-EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
+EXTRA_DIST = mkinstalldirs  instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
 	build-win32.bat sp-generate.mak .cvsignore all \
 	@PACKAGE@-@VERSION@.spec config.rpath BUGS
 
@@ -40,3 +40,5 @@ dist-zip: distdir
 	zip -rql $(distdir).zip $(distdir)
 	-rm -rf $(distdir)
 
+
+ACLOCAL_AMFLAGS = -I m4

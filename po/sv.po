@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenSP 1.5\n"
-"POT-Creation-Date: 2002-11-15 23:13+0000\n"
+"POT-Creation-Date: 2005-07-15 14:39+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"
@@ -2343,6 +2343,9 @@ msgstr "okompatibel version av Windows Sockets"
 msgid "error number "
 msgstr "felnummer "
 
+msgid "URL Redirected to %1"
+msgstr ""
+
 # WinInetStorageMessages
 msgid "cannot open URL %1 (%2)"
 msgstr "kan inte öppna URL %1 (%2)"
@@ -2529,6 +2532,22 @@ msgstr "Skriv ut verksam systemidentifierare för entiteten %1."
 #, fuzzy
 msgid "unexpected entity type for entity named %1"
 msgstr "Skriv ut entiteten med namnet %1."
+
+#, fuzzy
+msgid "cannot create directory %1"
+msgstr "kan inte skapa socket (%1)"
+
+msgid "already wrote 99 versions of %1; will not overwrite"
+msgstr ""
+
+msgid "already wrote output file %1; will not overwrite"
+msgstr ""
+
+msgid "removing leading slashes from output filename %1"
+msgstr ""
+
+msgid "path %1 outside output directory"
+msgstr ""
 
 msgid "Output a document type declaration."
 msgstr "Mata ut en dokumenttypsdeklaration."

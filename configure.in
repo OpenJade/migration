@@ -240,7 +240,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 
 AM_GNU_GETTEXT
-AM_GNU_GETTEXT_VERSION([0.11.1])
+AM_GNU_GETTEXT_VERSION([0.14.5])
 AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(SP_LOCALE_DIR, datadir/locale, [location of message catalogs])
 SP_MESSAGE_DOMAIN="sp$SP_LIBOSP_CUR"
@@ -469,7 +469,7 @@ AC_ARG_ENABLE(xml-messages,
       AC_MSG_RESULT(no))
 
 dnl Output.
-AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl
+AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl intl/Makefile
 	lib/Makefile nsgmls/Makefile spent/Makefile
 	spam/Makefile sgmlnorm/Makefile sx/Makefile spcat/Makefile
 	include/Makefile include/config.h.old generic/Makefile doc/Makefile docsrc/Makefile

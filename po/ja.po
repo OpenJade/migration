@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: opensp cvs20010327\n"
-"POT-Creation-Date: 2002-11-15 23:13+0000\n"
+"POT-Creation-Date: 2005-07-15 14:39+0000\n"
 "PO-Revision-Date: 2001-03-27 09:04+09:00\n"
 "Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <translation@gnome.gr.jp>\n"
@@ -2334,6 +2334,9 @@ msgstr "互換性のないWindowsソケットバージョン"
 msgid "error number "
 msgstr "エラー番号"
 
+msgid "URL Redirected to %1"
+msgstr ""
+
 msgid "cannot open URL %1 (%2)"
 msgstr "URL %1 (%2)を開けません"
 
@@ -2518,6 +2521,22 @@ msgstr "実体 %1 に対して有効なシステムIDを表示"
 #, fuzzy
 msgid "unexpected entity type for entity named %1"
 msgstr "%1 という名前の実体を出力"
+
+#, fuzzy
+msgid "cannot create directory %1"
+msgstr "ソケット(%1)を生成できません"
+
+msgid "already wrote 99 versions of %1; will not overwrite"
+msgstr ""
+
+msgid "already wrote output file %1; will not overwrite"
+msgstr ""
+
+msgid "removing leading slashes from output filename %1"
+msgstr ""
+
+msgid "path %1 outside output directory"
+msgstr ""
 
 msgid "Output a document type declaration."
 msgstr "文書型宣言を出力"

@@ -9,11 +9,11 @@
 
 #include <stddef.h>
 #include "types.h"
+#include "constant.h"
 #include "CharMap.h"
 #include "RangeMap.h"
 #include "Boolean.h"
 #include "ISet.h"
-#include "constant.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {

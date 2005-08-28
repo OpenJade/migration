@@ -318,7 +318,8 @@
           the <option>-D</option> option or included in the SGML_SEARCH_PATH
           environment variable. As a further security precaution, this
           option limits filesnames to the characters A-Z, a-z, 0-9, '?', '.',
-          '_', '-' and does not allow filenames containing "..".</para>
+          '_', '-' and does not allow filenames containing "..". On systems
+          with MS-DOS file names ':' and '\' are also allowed.</para>
       </listitem>
     </varlistentry>
     <varlistentry>

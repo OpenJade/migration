@@ -14,8 +14,10 @@ man_MANS = onsgmls.1 osgmlnorm.1 ospent.1 ospam.1 osx.1 ospcat.1
 BUILT_SOURCES = $(man_MANS)
 pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 
-%.tex: %.xml %.dsl
-	$(JADE) -v -t tex -V tex-backend -d $*.dsl#print $(XMLDCL) $*.xml
+EXTRA_DIST = $(patsubst %.1, %.xml, $(man_MANS)) releasenotes.xml releasenotes.dsl logo.png
+
+%.tex: $(srcdir)/%.xml $(srcdir)/%.dsl
+	$(JADE) -o $@ -v -t tex -V tex-backend -V '(define %openjade-logo% "$(srcdir)/logo.png")' -d $(srcdir)/$*.dsl#print $(XMLDCL) $(srcdir)/$*.xml
 
 %.pdf: %.tex
 	$(PDFJADETEX) $<
@@ -40,11 +42,11 @@ pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 %.ps: %.pdf
 	$(PDF2PS) $< $@
 
-%.html: %.xml %.dsl
-	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $*.dsl#html $(XMLDCL) $*.xml
+%.html: $(srcdir)/%.xml $(srcdir)/%.dsl
+	$(JADE) -v -t sgml -i html -V nochunks -V rootchunk -V "%root-filename%=$*" -V "%html-ext%=.html" -d $(srcdir)/$*.dsl#html $(XMLDCL) $(srcdir)/$*.xml
 
-%.1: %.xml
-	$(XMLTO) man $*.xml
+%.1: $(srcdir)/%.xml
+	$(XMLTO) man $<
    
 mostlyclean-local:
 	-rm -f *.out *.aux *.log *.dvi *.tex

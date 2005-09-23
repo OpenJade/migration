@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = check-news
 SUBDIRS = pubtext unicode doc \
 	include generic \
 	lib nsgmls spent spam sgmlnorm sx spcat \
-	intl po tests docsrc
+	intl po tests @DOCSRC@
 
 pkginclude_HEADERS = config.h
 
@@ -20,7 +20,6 @@ BUILT_SOURCES = config.h msggen.pl
 MAINTAINERCLEANFILES = install-sh mkinstalldirs missing \
 	config.guess config.sub	ltconfig ltmain.sh INSTALL \
 	Makefile.in
-
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
 EXTRA_DIST = mkinstalldirs  instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \

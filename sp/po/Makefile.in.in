@@ -111,13 +111,24 @@ stamp-po: $(srcdir)/$(DOMAIN).pot
 # This target rebuilds $(DOMAIN).pot; it is an expensive operation.
 # Note that $(DOMAIN).pot is not touched if it doesn't need to be changed.
 # NON-STANDARD method
+# If the POT-Creation-Date is not filtered out, then the files always appear
+# to differ.
 $(DOMAIN).pot-update: $(POTFILES)
 	$(PERL) -w ../msggen.pl -p $(DOMAIN).po $(POTFILES)
-	if cmp -s $(DOMAIN).po $(srcdir)/$(DOMAIN).pot; then \
-	  rm -f $(DOMAIN).po; \
+	if ! test -f $(srcdir)/$(DOMAIN).pot; then \
+	  mv $(DOMAIN).po $(srcdir)/$(DOMAIN).pot; \
 	else \
-	  rm -f $(srcdir)/$(DOMAIN).pot \
-	    && mv $(DOMAIN).po $(srcdir)/$(DOMAIN).pot; \
+	  TMPPO=`mktemp`; \
+	  TMPPOT=`mktemp`; \
+	  grep -v POT-Creation-Date $(DOMAIN).po > $$TMPPO; \
+	  grep -v POT-Creation-Date $(srcdir)/$(DOMAIN).pot > $$TMPPOT; \
+	  if cmp -s $$TMPPO $$TMPPOT; then \
+	    rm -f $(DOMAIN).po; \
+	  else \
+	    rm -f $(srcdir)/$(DOMAIN).pot \
+	      && mv $(DOMAIN).po $(srcdir)/$(DOMAIN).pot; \
+	  fi; \
+	  rm $$TMPPO $$TMPPOT; \
 	fi
 
 
@@ -369,3 +380,7 @@ force:
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
+
+# Local Variables:
+# mode: makefile
+# End:

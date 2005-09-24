@@ -466,6 +466,25 @@ AC_ARG_ENABLE(xml-messages,
                 AC_MSG_RESULT(no)
          fi,
       AC_MSG_RESULT(no))
+DTDDECL=yes
+AC_MSG_CHECKING(whether to include DTDDECL support)
+AC_ARG_ENABLE(dtddecl,
+[  --disable-dtddecl   disable support for DTDDECL catalog entries],
+    if test "$enableval" = "no"
+    then
+        AC_MSG_RESULT(no)
+	DTDDECL=no
+    else
+        AC_MSG_RESULT(yes)
+    fi,
+    AC_MSG_RESULT(yes))
+if test "$DTDDECL" = "yes"
+then
+    AC_DEFINE(SP_DTDDECL,1,[set this to enable DTDDECL support])
+    AM_CONDITIONAL(DTDDECL,true)
+else
+    AM_CONDITIONAL(DTDDECL,false)
+fi
 
 dnl Output.
 AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl

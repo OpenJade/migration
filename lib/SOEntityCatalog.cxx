@@ -594,6 +594,7 @@ Boolean SOEntityCatalog::sgmlDecl(const CharsetInfo &charset,
 				  StringC &result) const
 
 {
+#if SP_DTDDECL
   if (dtdDeclRunning_) {
     result = dtdDeclSpec_;
     return 1;
@@ -620,6 +621,7 @@ Boolean SOEntityCatalog::sgmlDecl(const CharsetInfo &charset,
       return 1; 
     }
   }
+#endif
 
   return haveSgmlDecl_ && expandCatalogSystemId(sgmlDecl_, sgmlDeclLoc_,
 						sgmlDeclBaseNumber_,

@@ -39,6 +39,7 @@ public:
   typedef ConstNamedResourceTableIter<Entity> ConstEntityIter;
   typedef NamedResourceTableIter<Entity> EntityIter;
   Dtd(const StringC &name, Boolean isBase);
+  ~Dtd();
   ConstPtr<Entity> lookupEntity(Boolean isParameter, const StringC &) const;
   const Entity *lookupEntityTemp(Boolean isParameter, const StringC &) const;
   Ptr<Entity> lookupEntity(Boolean isParameter, const StringC &);

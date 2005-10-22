@@ -36,6 +36,7 @@ public:
 #ifdef _MSC_VER
   MessageFragment() {};
 #endif
+  ~MessageFragment();
 
   MessageFragment(const MessageModule *module, unsigned number, const char *text = 0);
   const MessageModule *module() const;
@@ -65,6 +66,7 @@ public:
 	      unsigned number = unsigned(-1),
 	      const char *text = 0, const char *clauses = 0, 
               const char *auxText = 0);
+  ~MessageType();
   Severity severity() const;
   MessageFragment auxFragment() const;
   Boolean isError() const;
@@ -82,6 +84,7 @@ public:
   MessageType0(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType0();
 };
 
 class SP_API MessageType1 : public MessageType {
@@ -89,6 +92,7 @@ public:
   MessageType1(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType1();
 };
 
 class SP_API MessageType2 : public MessageType {
@@ -96,6 +100,7 @@ public:
   MessageType2(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType2();
 };
 
 class SP_API MessageType3 : public MessageType {
@@ -103,6 +108,7 @@ public:
   MessageType3(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType3();
 };
 
 class SP_API MessageType4 : public MessageType {
@@ -110,6 +116,7 @@ public:
   MessageType4(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType4();
 };
 
 class SP_API MessageType5 : public MessageType {
@@ -117,6 +124,7 @@ public:
   MessageType5(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType5();
 };
 
 class SP_API MessageType6 : public MessageType {
@@ -124,6 +132,7 @@ public:
   MessageType6(Severity = info, const MessageModule *module = &libModule,
 	       unsigned number = unsigned(-1), const char *text = 0,
                const char *clauses = 0);
+  ~MessageType6();
 };
 
 class SP_API MessageType0L : public MessageType {
@@ -131,6 +140,7 @@ public:
   MessageType0L(Severity = info, const MessageModule *module = &libModule,
 		unsigned number = unsigned(-1), const char *text = 0,
 		const char *clauses = 0, const char *auxText = 0);
+  ~MessageType0L();
 };
 
 class SP_API MessageType1L : public MessageType {
@@ -138,11 +148,14 @@ public:
   MessageType1L(Severity = info, const MessageModule *module = &libModule,
 		unsigned number = unsigned(-1), const char *text = 0,
 		const char *clauses = 0, const char *auxText = 0);
+  ~MessageType1L();
 };
 
 class SP_API OpenElementInfo {
 public:
   OpenElementInfo();
+  OpenElementInfo(OpenElementInfo const&);
+  inline ~OpenElementInfo() {};
   PackedBoolean included;
   StringC gi;
   StringC matchType;

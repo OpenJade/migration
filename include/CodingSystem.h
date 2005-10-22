@@ -38,6 +38,7 @@ class SP_API Encoder {
 public:
   class SP_API Handler {
   public:
+    virtual ~Handler();
     virtual void handleUnencodable(Char, OutputByteStream *) = 0;
   };
   Encoder();
@@ -79,6 +80,8 @@ public:
 };
 
 class SP_API CodingSystem : public InputCodingSystem, public OutputCodingSystem {
+public:
+  inline ~CodingSystem() {}
 };
 
 inline

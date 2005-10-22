@@ -23,6 +23,7 @@ class SP_API ShortReferenceMap : public Named {
 public:
   ShortReferenceMap();
   ShortReferenceMap(const StringC &);
+  inline ~ShortReferenceMap() {}
   Boolean defined() const;
   void setNameMap(Vector<StringC> &map);
   void setEntityMap(Vector<ConstPtr<Entity> > &map);

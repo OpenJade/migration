@@ -77,6 +77,7 @@ private:
 class SP_API Location {
 public:
   Location();
+  Location(const Location&);
   Location(Origin *, Index);
   Location(ConstPtr<Origin>, Index);
   void operator+=(Index i) { index_ += i; }
@@ -129,6 +130,7 @@ struct SP_API InputSourceOriginNamedCharRef {
 
 class SP_API InputSourceOrigin : public Origin {
 public:
+  virtual ~InputSourceOrigin() = 0;
   virtual void noteCharRef(Index replacementIndex, const NamedCharRef &) = 0;
   virtual void setExternalInfo(ExternalInfo *) = 0;
   virtual InputSourceOrigin *copy() const = 0;

@@ -42,6 +42,9 @@ public:
     };
   UnivCharsetDesc();
   UnivCharsetDesc(const Range *, size_t);
+  inline UnivCharsetDesc(const UnivCharsetDesc& x) :
+	  charMap_(x.charMap_), rangeMap_(x.rangeMap_) {}
+  inline ~UnivCharsetDesc() {}
   void set(const Range *, size_t);
   Boolean descToUniv(WideChar from, UnivChar &to) const;
   Boolean descToUniv(WideChar from, UnivChar &to, WideChar &alsoMax) const;

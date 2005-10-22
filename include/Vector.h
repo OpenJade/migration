@@ -21,7 +21,7 @@ public:
   typedef size_t size_type;
   typedef T *iterator;
   typedef const T *const_iterator;
-  Vector() : ptr_(0), size_(0), alloc_(0) { }
+  Vector() : size_(0), ptr_(0), alloc_(0) { }
   Vector(size_t n) : ptr_(0), size_(0), alloc_(0) { append(n); }
   virtual ~Vector();
   void resize(size_t n) {

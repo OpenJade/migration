@@ -23,6 +23,7 @@ namespace SP_NAMESPACE {
 class SP_API MessageFormatter {
 public:
   MessageFormatter();
+  virtual ~MessageFormatter();
   virtual void formatMessage(const MessageFragment &,
 		     const Vector<CopyOwner<MessageArg> > &args,
 		     OutputCharStream &, bool noquote = 0);
@@ -37,7 +38,8 @@ protected:
   class Builder : public MessageBuilder {
   public:
     Builder(MessageFormatter *formatter, OutputCharStream &os, bool b)
-      : formatter_(formatter), os_(&os), argIsCompleteMessage_(b) { }
+      : os_(&os), formatter_(formatter), argIsCompleteMessage_(b) { }
+    virtual ~Builder();
     void appendNumber(unsigned long);
     void appendOrdinal(unsigned long);
     void appendChars(const Char *, size_t);

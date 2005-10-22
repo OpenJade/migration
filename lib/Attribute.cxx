@@ -908,6 +908,8 @@ AttributeDefinitionList:: AttributeDefinitionList(const ConstPtr<AttributeDefini
   }
 }
 
+AttributeDefinitionList::~AttributeDefinitionList() {}
+
 Boolean AttributeDefinitionList::tokenIndex(const StringC &token, unsigned &index) const
 {
   for (size_t i = 0; i < defs_.size(); i++)
@@ -1144,6 +1146,24 @@ const Notation *DataAttributeValue::notation() const
 Attribute::Attribute()
 : specIndexPlus_(0)
 {
+}
+
+Attribute::Attribute(const Attribute& x)
+	: specIndexPlus_(x.specIndexPlus_),
+	  value_(x.value_),
+	  semantics_(x.semantics_)
+{
+}
+
+Attribute::~Attribute()
+{
+}
+
+Attribute& Attribute::operator=(const Attribute& x)
+{
+  specIndexPlus_ = x.specIndexPlus_;
+  value_ = x.value_;
+  semantics_ = x.semantics_;
 }
 
 void Attribute::clear()

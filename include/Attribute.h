@@ -361,6 +361,7 @@ public:
 			  size_t idIndex = size_t(-1),
 			  size_t notationIndex = size_t(-1));
   AttributeDefinitionList(const ConstPtr<AttributeDefinitionList> &);
+  ~AttributeDefinitionList();
   size_t size() const;
   AttributeDefinition *def(size_t);
   const AttributeDefinition *def(size_t) const;
@@ -460,6 +461,9 @@ private:
 class SP_API Attribute {
 public:
   Attribute();
+  Attribute(const Attribute&);
+  ~Attribute();
+  Attribute& operator=(const Attribute&);
   Boolean specified() const;
   size_t specIndex() const;
   const AttributeValue *value() const;
@@ -479,6 +483,7 @@ class SP_API AttributeList  {
 public:
   AttributeList();
   AttributeList(const ConstPtr<AttributeDefinitionList> &);
+  inline ~AttributeList() {}
   void init(const ConstPtr<AttributeDefinitionList> &);
   // was a conref attribute specified?
   Boolean conref() const;

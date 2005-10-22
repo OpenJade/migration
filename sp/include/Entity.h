@@ -271,6 +271,7 @@ private:
 
 class SP_API EntityOrigin : public InputSourceOrigin {
 public:
+  virtual ~EntityOrigin();
   static EntityOrigin *make(Allocator &, const ConstPtr<Entity> &);
   static EntityOrigin *make(Allocator &,
 			    const ConstPtr<Entity> &,

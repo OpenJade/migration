@@ -17,6 +17,8 @@
 namespace SP_NAMESPACE {
 #endif
 
+Transition::~Transition() {}
+
 AndModelGroup::AndModelGroup(NCVector<Owner<ContentToken> > &v,
 			     ContentToken::OccurrenceIndicator oi)
 : ModelGroup(v, oi)

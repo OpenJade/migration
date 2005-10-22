@@ -178,6 +178,7 @@ public:
     };
 
   Syntax(const Sd &);
+  virtual ~Syntax();
   Boolean lookupFunctionChar(const StringC &, Char *) const;
   HashTableIter<StringC,Char> functionIter() const;
   Boolean charFunctionName(Char c, const StringC *&name) const;

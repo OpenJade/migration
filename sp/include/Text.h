@@ -20,6 +20,8 @@ namespace SP_NAMESPACE {
 
 struct SP_API TextItem {
   TextItem();
+  TextItem(const TextItem& x);
+  ~TextItem();
   enum Type {
     data,
     cdata,
@@ -45,6 +47,7 @@ struct SP_API TextItem {
   Location loc;
   // index of character in chars_ to which this applies
   size_t index;
+  TextItem& operator=(const TextItem& from);
 };
 
 // This is used to represent literals and attribute values.

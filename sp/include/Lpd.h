@@ -93,11 +93,13 @@ private:
 class SP_API SourceLinkRuleResource : public Resource, public SourceLinkRule {
 public:
   SourceLinkRuleResource();
+  inline ~SourceLinkRuleResource() {}
 };
 
 class SP_API LinkSet : public Named {
 public:
   LinkSet(const StringC &, const Dtd *);
+  virtual ~LinkSet();
   void setDefined();
   Boolean defined() const;
   void addImplied(const ElementType *, AttributeList &);
@@ -154,6 +156,7 @@ public:
 	     const Syntax &syntax,
 	     const Ptr<Dtd> &sourceDtd,
 	     const Ptr<Dtd> &resultDtd);
+  virtual ~ComplexLpd();
   size_t allocAttributeDefinitionListIndex();
   size_t nAttributeDefinitionList() const;
   LinkSet *initialLinkSet();

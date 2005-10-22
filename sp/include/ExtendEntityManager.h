@@ -28,6 +28,9 @@ class Messenger;
 
 struct SP_API StorageObjectSpec {
   StorageObjectSpec();
+  ~StorageObjectSpec();
+  StorageObjectSpec(const StorageObjectSpec&);
+  StorageObjectSpec& operator=(const StorageObjectSpec&);
   StorageManager *storageManager;
   const char *codingSystemName;
   const InputCodingSystem *codingSystem;
@@ -63,6 +66,10 @@ struct SP_API ParsedSystemId : public Vector<StorageObjectSpec> {
     };
     Type type;
     StringC publicId;
+    Map();
+    Map(const Map&);
+    ~Map();
+    Map& operator=(const Map&);
   };
   Vector<Map> maps;
 };
@@ -78,6 +85,7 @@ struct SP_API StorageObjectLocation {
 
 class SP_API ExtendEntityManager : public EntityManager {
 public:
+  virtual ~ExtendEntityManager();
   class SP_API CatalogManager {
   public:
     virtual ~CatalogManager();

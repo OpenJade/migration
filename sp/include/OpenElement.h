@@ -21,6 +21,7 @@ namespace SP_NAMESPACE {
 
 class SP_API OpenElement : public Link {
 public:
+  inline ~OpenElement() {}
   void *operator new(size_t sz, Allocator &alloc) { return alloc.alloc(sz); }
   void *operator new(size_t sz) { return Allocator::allocSimple(sz); }
   void operator delete(void *p) { Allocator::free(p); }

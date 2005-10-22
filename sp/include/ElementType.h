@@ -42,6 +42,7 @@ public:
 		    unsigned char omitFlags,
 		    DeclaredContent declaredContent,
 		    Owner<CompiledModelGroup> &modelGroup);
+  ~ElementDefinition();
   const CompiledModelGroup *compiledModelGroup() const;
   DeclaredContent declaredContent() const;
   // Was the omitted tag minimization specified?

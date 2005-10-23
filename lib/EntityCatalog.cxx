@@ -54,6 +54,8 @@ Boolean EntityCatalog::lookupChar(const StringC &,
   return 0;
 }
 
+EntityCatalog::Syntax::~Syntax() {}
+
 #ifdef SP_NAMESPACE
 }
 #endif

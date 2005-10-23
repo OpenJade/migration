@@ -58,6 +58,20 @@ SdTextItem::SdTextItem()
 {
 }
 
+SdTextItem::SdTextItem(const SdTextItem& x)
+: loc(x.loc),
+  index(x.index)
+{
+}
+
+void SdTextItem::operator=(const SdTextItem& x)
+{
+  loc = x.loc;
+  index = x.index;
+}
+
+SdTextItem::~SdTextItem() {}
+
 SdTextIter::SdTextIter(const SdText &text)
 : ptr_(&text),
   itemIndex_(0)

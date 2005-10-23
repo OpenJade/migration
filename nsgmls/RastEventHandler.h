@@ -65,6 +65,7 @@ private:
 };
 
 struct LinkRulePi : public Link {
+  inline virtual ~LinkRulePi() {}
   StringC pi;
   Location loc;
 };

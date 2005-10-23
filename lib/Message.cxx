@@ -26,6 +26,8 @@ MessageFragment::MessageFragment(const MessageModule *module, unsigned number, c
 {
 }
 
+MessageFragment::~MessageFragment() {}
+
 MessageType::MessageType(Severity severity, const MessageModule *module, unsigned number,
 			 const char *text, const char *
 #ifndef SP_NO_MESSAGE_TEXT
@@ -46,11 +48,15 @@ MessageType::MessageType(Severity severity, const MessageModule *module, unsigne
   spare_ = severity;
 }
      
+MessageType::~MessageType() {}
+
 MessageType0::MessageType0(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
 : MessageType(severity, module, number, text, clauses)
 {
 }
+
+MessageType0::~MessageType0() {}
 
 MessageType1::MessageType1(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
@@ -58,11 +64,15 @@ MessageType1::MessageType1(Severity severity, const MessageModule *module, unsig
 {
 }
 
+MessageType1::~MessageType1() {}
+
 MessageType2::MessageType2(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
 : MessageType(severity, module, number, text, clauses)
 {
 }
+
+MessageType2::~MessageType2() {}
 
 MessageType3::MessageType3(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
@@ -70,11 +80,15 @@ MessageType3::MessageType3(Severity severity, const MessageModule *module, unsig
 {
 }
 
+MessageType3::~MessageType3() {}
+
 MessageType4::MessageType4(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
 : MessageType(severity, module, number, text, clauses)
 {
 }
+
+MessageType4::~MessageType4() {}
 
 MessageType5::MessageType5(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
@@ -82,11 +96,15 @@ MessageType5::MessageType5(Severity severity, const MessageModule *module, unsig
 {
 }
 
+MessageType5::~MessageType5() {}
+
 MessageType6::MessageType6(Severity severity, const MessageModule *module, unsigned number,
 			   const char *text, const char *clauses)
 : MessageType(severity, module, number, text, clauses)
 {
 }
+
+MessageType6::~MessageType6() {}
 
 MessageType0L::MessageType0L(Severity severity, const MessageModule *module, unsigned number,
 			     const char *text, const char *clauses,
@@ -95,6 +113,8 @@ MessageType0L::MessageType0L(Severity severity, const MessageModule *module, uns
 {
 }
 
+MessageType0L::~MessageType0L() {}
+
 MessageType1L::MessageType1L(Severity severity, const MessageModule *module, unsigned number,
 			     const char *text, const char *clauses,
                              const char *auxText)
@@ -102,8 +122,15 @@ MessageType1L::MessageType1L(Severity severity, const MessageModule *module, uns
 {
 }
 
+MessageType1L::~MessageType1L() {}
+
 OpenElementInfo::OpenElementInfo()
 : included(0), matchIndex(0)
+{
+}
+
+OpenElementInfo::OpenElementInfo(OpenElementInfo const& x)
+: included(x.included), matchIndex(x.matchIndex)
 {
 }
 

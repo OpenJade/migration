@@ -36,6 +36,8 @@ private:
   Mutex mutex_;
 };
 
+InputSourceOrigin::~InputSourceOrigin() {}
+
 class EntityOriginImpl : public InputSourceOriginImpl {
 public:
   void *operator new(size_t sz, Allocator &alloc) {
@@ -77,6 +79,11 @@ private:
 const size_t EntityOrigin::allocSize = sizeof(EntityOriginImpl);
 
 Location::Location()
+{
+}
+
+Location::Location(const Location& x)
+: origin_(x.origin_), index_(x.index_)
 {
 }
 
@@ -312,6 +319,8 @@ Boolean InputSourceOriginImpl::isNamedCharRef(Index ind, NamedCharRef &ref) cons
   }
   return 0;
 }
+
+EntityOrigin::~EntityOrigin() {}
 
 EntityOrigin *EntityOrigin::make(Allocator &alloc,
 				 const ConstPtr<Entity> &entity)

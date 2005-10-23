@@ -46,6 +46,8 @@ ElementDefinition::ElementDefinition(const Location &location,
   computeMode();
 }
 
+ElementDefinition::~ElementDefinition() {}
+
 void ElementDefinition::computeMode()
 {
   switch (declaredContent_) {

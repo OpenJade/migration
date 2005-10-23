@@ -195,6 +195,10 @@ MessageEvent::MessageEvent(Message &m)
   m.swap(message_);
 }
 
+MessageEvent::~MessageEvent()
+{
+}
+
 PiEvent::PiEvent(const Char *data, size_t dataLength, const Location &location)
 : data_(data), dataLength_(dataLength), LocatedEvent(pi, location)
 {

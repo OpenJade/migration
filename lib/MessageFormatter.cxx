@@ -31,6 +31,10 @@ MessageFormatter::MessageFormatter()
 {
 }
 
+MessageFormatter::~MessageFormatter()
+{
+}
+
 void MessageFormatter::formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
 					  OutputCharStream &os)
 {
@@ -98,6 +102,10 @@ Boolean MessageFormatter::formatFragment(const MessageFragment &frag,
     return 0;
   os << text;
   return 1;
+}
+
+MessageFormatter::Builder::~Builder()
+{
 }
 
 void MessageFormatter::Builder::appendNumber(unsigned long n)

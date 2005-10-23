@@ -1252,15 +1252,18 @@ StorageObjectSpec::StorageObjectSpec(const StorageObjectSpec& x)
 
 StorageObjectSpec& StorageObjectSpec::operator=(const StorageObjectSpec& x)
 {
-  codingSystemName = x.codingSystemName;
-  codingSystem = x.codingSystem;
-  specId = x.specId;
-  baseId = x.baseId;
-  records = x.records;
-  notrack = x.notrack;
-  zapEof = x.zapEof;
-  search = x.search;
-  codingSystemType = x.codingSystemType;
+  if (this != &x) {
+    codingSystemName = x.codingSystemName;
+    codingSystem = x.codingSystem;
+    specId = x.specId;
+    baseId = x.baseId;
+    records = x.records;
+    notrack = x.notrack;
+    zapEof = x.zapEof;
+    search = x.search;
+    codingSystemType = x.codingSystemType;
+  }
+  return *this;
 }
 
 StorageObjectSpec::~StorageObjectSpec()
@@ -2074,8 +2077,11 @@ ParsedSystemId::Map::~Map()
 
 ParsedSystemId::Map& ParsedSystemId::Map::operator=(const ParsedSystemId::Map& x)
 {
-  type = x.type;
-  publicId = x.publicId;
+  if (this != &x) {
+    type = x.type;
+    publicId = x.publicId;
+  }
+  return *this;
 }
 
 static

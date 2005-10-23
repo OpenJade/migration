@@ -1934,25 +1934,29 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 			   StringMessageArg(tokens[i + 1]));
       }
     }
-    if (fromIndex != invalidAtt && toIndex != invalidAtt) {
+    // NLR - Code used to not check if toIndex and fromIndex were
+    // contentPseudoAtt, only invalidAtt.  Array indexing was bogus, because
+    // contentPseudoAtt is defined as -2, but toIndex and fromIndex are
+    // unsigned, so -2 becomes a very large number instead.  Skip this next
+    // block if either fromIndex or toIndex is either invalidAtt OR
+    // contentPseudoAtt.
+    if (fromIndex != invalidAtt && toIndex != invalidAtt &&
+	fromIndex != contentPseudoAtt && toIndex != contentPseudoAtt) {
       map.attMapFrom.push_back(fromIndex);
       map.attMapTo.push_back(toIndex);
       attRenamed[toIndex + 1] = 1;
       attSubstituted[fromIndex + 1] = 1;
-      if (toIndex != contentPseudoAtt) {
-	if (metaAttDef->def(toIndex)->isId()
-	    && (fromIndex >= atts.size() || !atts.id(fromIndex)))
-	  Messenger::message(ArcEngineMessages::idMismatch,
-			     StringMessageArg(metaAttDef->def(toIndex)
-					      ->name()));
-	for (;i + 4 < tokens.size(); i += 3) {
-	  docSyntax_->generalSubstTable()->subst(tokens[i + 2]);
- 	  if (tokens[i + 2] != rniMaptoken_) 
-	    break;
-          // FIXME: should we check for duplicate from tokens ?
-	  map.tokenMapTo.push_back(tokens[i + 3]);
-	  map.tokenMapFrom.push_back(tokens[i + 4]);
-	}
+      if (metaAttDef->def(toIndex)->isId()
+	  && (fromIndex >= atts.size() || !atts.id(fromIndex)))
+	Messenger::message(ArcEngineMessages::idMismatch,
+			   StringMessageArg(metaAttDef->def(toIndex)->name()));
+      for (;i + 4 < tokens.size(); i += 3) {
+	docSyntax_->generalSubstTable()->subst(tokens[i + 2]);
+	if (tokens[i + 2] != rniMaptoken_) 
+	  break;
+	// FIXME: should we check for duplicate from tokens ?
+	map.tokenMapTo.push_back(tokens[i + 3]);
+	map.tokenMapFrom.push_back(tokens[i + 4]);
       }
       map.attTokenMapBase.push_back(map.tokenMapFrom.size());
     }

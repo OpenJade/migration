@@ -1161,9 +1161,12 @@ Attribute::~Attribute()
 
 Attribute& Attribute::operator=(const Attribute& x)
 {
-  specIndexPlus_ = x.specIndexPlus_;
-  value_ = x.value_;
-  semantics_ = x.semantics_;
+  if (this != &x) {
+    specIndexPlus_ = x.specIndexPlus_;
+    value_ = x.value_;
+    semantics_ = x.semantics_;
+  }
+  return *this;
 }
 
 void Attribute::clear()

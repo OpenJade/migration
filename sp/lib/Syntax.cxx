@@ -98,6 +98,8 @@ Syntax::Syntax(const Sd &sd)
     standardFunctionValid_[i] = 0;
 }
 
+Syntax::~Syntax() {}
+
 void Syntax::addNameCharacters(const ISet<Char> &set)
 {
   ISetIter<Char> iter(set);

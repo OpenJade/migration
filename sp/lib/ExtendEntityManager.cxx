@@ -248,6 +248,11 @@ private:
 const Char RS = '\n';
 const Char RE = '\r';
 
+
+ExtendEntityManager::~ExtendEntityManager()
+{
+}
+
 ExtendEntityManager::CatalogManager::~CatalogManager()
 {
 }
@@ -1232,6 +1237,36 @@ StorageObjectSpec::StorageObjectSpec()
 {
 }
 
+StorageObjectSpec::StorageObjectSpec(const StorageObjectSpec& x)
+: codingSystemName(x.codingSystemName),
+  codingSystem(x.codingSystem),
+  specId(x.specId),
+  baseId(x.baseId),
+  records(x.records),
+  notrack(x.notrack),
+  zapEof(x.zapEof),
+  search(x.search),
+  codingSystemType(x.codingSystemType)
+{
+}
+
+StorageObjectSpec& StorageObjectSpec::operator=(const StorageObjectSpec& x)
+{
+  codingSystemName = x.codingSystemName;
+  codingSystem = x.codingSystem;
+  specId = x.specId;
+  baseId = x.baseId;
+  records = x.records;
+  notrack = x.notrack;
+  zapEof = x.zapEof;
+  search = x.search;
+  codingSystemType = x.codingSystemType;
+}
+
+StorageObjectSpec::~StorageObjectSpec()
+{
+}
+
 StorageObjectPosition::StorageObjectPosition()
 : endOffset(Offset(-1)), line1RS(0), startsWithRS(0), insertedRSs(0)
 {
@@ -2019,8 +2054,28 @@ Boolean FSIParser::convertId(StringC &id, Xchar smcrd,
   return 1;
 }
 
-ParsedSystemId:: ParsedSystemId()
+ParsedSystemId::ParsedSystemId()
 {
+}
+
+ParsedSystemId::Map::Map()
+{
+}
+
+ParsedSystemId::Map::Map(const ParsedSystemId::Map& x)
+: type(x.type),
+  publicId(x.publicId)
+{
+}
+
+ParsedSystemId::Map::~Map()
+{
+}
+
+ParsedSystemId::Map& ParsedSystemId::Map::operator=(const ParsedSystemId::Map& x)
+{
+  type = x.type;
+  publicId = x.publicId;
 }
 
 static

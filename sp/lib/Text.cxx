@@ -237,6 +237,26 @@ TextItem::TextItem()
 {
 }
 
+TextItem::~TextItem()
+{
+}
+
+TextItem::TextItem(const TextItem& from)
+: type(from.type),
+  c(from.c),
+  loc(from.loc),
+  index(from.index)
+{
+}
+
+TextItem& TextItem::operator=(const TextItem& from)
+{
+  type = from.type;
+  c = from.c;
+  loc = from.loc;
+  index = from.index;
+}
+
 void Text::swap(Text &to)
 {
   items_.swap(to.items_);

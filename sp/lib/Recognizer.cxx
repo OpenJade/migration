@@ -28,6 +28,8 @@ Recognizer::Recognizer(Trie *trie, const XcharMap<EquivCode> &map,
   suppressTokens.swap(suppressTokens_);
 }
 
+Recognizer::~Recognizer() {}
+
 Token Recognizer::recognize(InputSource *in, Messenger &mgr) const
 {
   if (multicode_) {

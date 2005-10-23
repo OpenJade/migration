@@ -24,6 +24,8 @@ Notation::Notation(const StringC &name,
   setDeclIn(dtdName, dtdIsBase);
 }
 
+Notation::~Notation() {}
+
 void Notation::setExternalId(const ExternalId &id, const Location &defLocation)
 {
   externalId_ = id;

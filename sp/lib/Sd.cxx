@@ -37,6 +37,8 @@ Sd::Sd(const Ptr<EntityManager> &entityManager)
     internalCharsetPtr_ = &entityManager->charset();
 }
 
+Sd::~Sd() {}
+
 void Sd::setDocCharsetDesc(const UnivCharsetDesc &desc)
 {
   docCharset_.set(desc);

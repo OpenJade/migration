@@ -1,3 +1,157 @@
+2005-10-23  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* lib/Text.cxx, lib/Attribute.cxx: Make operator= return *this.
+
+	* lib/ExtendEntityManager.cxx:
+	Fix operator= to return *this (two places).
+
+	* lib/ArcEngine.cxx:
+	Ensure that toIndex and fromIndex are not invalidAtt OR contentPseudoAtt
+	before using to index into arrays.  Those constants are defined to be the
+	unsigned version of -1 and -2, which are very large numbers, and cause
+	segfaults when array elements with those indexes are accessed.
+
+	* nsgmls/RastEventHandler.h, lib/Text.cxx, lib/Syntax.cxx, lib/SdText.cxx, lib/Sd.cxx, lib/Recognizer.h, lib/Recognizer.cxx, lib/Notation.cxx, lib/MessageFormatter.cxx, lib/Message.cxx, lib/Markup.cxx, lib/Lpd.cxx, lib/Location.cxx, lib/ExtendEntityManager.cxx, lib/Event.cxx, lib/EntityCatalog.cxx, lib/ElementType.cxx, lib/Dtd.cxx:
+	Added functions to eliminate g++ 4.0 warnings.
+
+2005-10-22  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* lib/ContentToken.cxx, lib/CodingSystemKit.cxx, lib/CodingSystem.cxx:
+	Added functions to eliminate g++ 4.0 warnings.
+
+	* include/Vector.h:
+	Changed order of initializations to match order of declaration in class.
+
+	* include/UnivCharsetDesc.h, include/Text.h, include/Syntax.h, include/ShortReferenceMap.h, include/SdText.h, include/Sd.h, include/OpenElement.h, include/Notation.h:
+	Added functions to eliminate g++ 4.0 warnings.
+
+	* include/MessageFormatter.h:
+	Added functions to eliminate g++ 4.0 warnings.
+	Changed order of initializations to match order of declaration in class.
+
+	* include/MessageBuilder.h, include/Message.h, include/Markup.h, include/Lpd.h, include/Location.h, include/ExtendEntityManager.h, include/Event.h, include/EntityCatalog.h, include/Entity.h, include/ElementType.h, include/Dtd.h, include/ContentToken.h, include/CodingSystemKit.h, include/CodingSystem.h, include/CharsetInfo.h, lib/CharsetDecl.cxx, include/CharsetDecl.h, lib/Attribute.cxx:
+	Added functions to eliminate g++ 4.0 warnings.
+
+	* include/Attribute.h:
+	Added missing prototypes to eliminate g++ 4.0 warnings.
+
+	* configure.in:
+	Incremented SP_LIBOSP_CUR in preparation for upcoming checkins that will
+	technically break binary compatilibility.
+
+	* Makefile.am: Added autoinit.sh to EXTRA_DIST.
+
+2005-09-30  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* tests/Makefile.am:
+	Revert to using SHOWSTOPPERS variable after discussion with Karl Eichwalder.
+	Changed EXTRA_DIST and other variables so that all tests get put into dist
+	regardless of whether they are being run or not, e.g., if you run
+	"make distcheck SHOWSTOPPERS=" then only the tests that are known to pass will
+	be run during the make check part, but all tests, including the ones that are
+	known to pass, will be in the dist tarball.
+	Added comment that the tests that fail imply there are problems that need to
+	be tracked down and fixed.
+
+2005-09-27  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* docsrc/releasenotes.xml: Initial update for 1.5.2.
+
+2005-09-24  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* tests/Makefile.am:
+	Changed name of variable from SHOWSTOPPERS to XFAIL_TESTS.  These are tests
+	that are expected to fail, and the latter name is known by automake to tag
+	them as such.  This allows a "make check" to complete with a message that some
+	tests failed, but were expected to, and the make returns a normal exit code.
+	Use DTDDECL automake conditional to control whether catalog-1 is in
+	XFAIL_TESTS.  This test is the one that tests DTDDECL support, so if that is
+	disabled then the test is expected to fail.
+
+	* lib/SOEntityCatalog.cxx:
+	Use new config preprocessor directive SP_DTDDECL to control whether DTDDECL
+	support is enabled or not.
+
+	* configure.in:
+	Added option to disable DTDDECL support. If a default catalog is used, then
+	the DTDDECL support causes it to be read over and over again, causing a huge
+	performance hit if there are a significant number of entries in it.
+
+2005-09-23  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* po/Makefile.in.in:
+	Be more precise about updating $(srcdir)/$(DOMAIN).pot so that both a normal
+	make and a make distcheck work.
+
+	* po/Makefile.in.in: Added PERL variable to enable running msggen.pl.
+	Use old method of generating $(DOMAIN).pot with msggen.pl instead of newer
+	method using xgettext.  Should update to use the latter eventually.
+
+	* docsrc/Makefile.am:
+	Put man page XML sources, releasenotes.{xml,dsl} and logo.png in EXTRA_DIST
+	variable so they get put into dist tarball.
+	Added $(srcdir)/ prefix to files where necessary so docs will build even when
+	build area differs from source area, e.g., as when make distcheck is done.
+	Added (define %openjade-logo% "$(srcdir)/logo.png") so the logo can be found
+	when creating releasenotes.{pdf,ps}
+
+	* Makefile.am:
+	Use @DOCSRC@ variable in SUBDIRS so that it will not be included if doc
+	building is disabled.
+
+2005-09-19  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* configure.in:
+	Change AM_PROG_LIBTOOL to AC_PROG_LIBTOOL.
+	Added --disable-doc-build option.
+	Moved checks for doc building so they are only executed if building docs.
+	Added error messages for doc building programs so it is more clear what is
+	missing.
+	Added /usr/share/sgml/declaration to search path for xml.dcl.
+
+2005-08-28  Bjoern Hoehrmann  <bjoern@hoehrmann.de>
+
+	* docsrc/onsgmls.xml:
+	added documentation for the revised restricted file reading
+	behavior on win32, etc
+
+2005-08-27  Terje Bless <link@pobox.com>
+
+	* include/UnivCharsetDesc.h:
+	Fiddle #include's around as it seems to appease GCC 3.4 and does no harm
+	for GCC 4.0.
+
+2005-08-26  Terje Bless <link@pobox.com>
+
+	* configure.in: Bump version to 1.5.2, to shut check-news up.
+
+	* po/Makefile.in.in: Restore Neil Roeth's domain=soname for .po files.
+
+	* po/remove-potcdate.sed: Add another missing gettext file.
+
+	* po/remove-potcdate.sed: New file.
+
+	* configure.in, docsrc/Makefile.am:
+	Make autoconf check for the utils needed for docsrc/ building, and let
+	xmlto choose the stylesheet to use for the manpages.
+
+	( The rest of the docs should probably also be made by xmlto, but it's
+	  not currently working on my box so we'll do iut the old way for now. )
+
+	* configure.in, intl/dcigettext.c, intl/langprefs.c, intl/libgnuintl.h.in, intl/localcharset.h, intl/log.c, intl/printf-args.c, intl/printf-args.h, intl/printf-parse.c, intl/printf-parse.h, intl/printf.c, intl/relocatable.c, intl/relocatable.h, intl/vasnprintf.c, intl/vasnprintf.h, intl/vasnwprintf.h, intl/wprintf-parse.h, intl/xsize.h, po/ChangeLog, po/Makevars, po/Rules-quot, po/boldquot.sed, po/en@boldquot.header, po/en@quot.header, po/insert-header.sin, po/quot.sed, po/remove-potcdate.sin:
+	Add (new) files left out of previous checkin.
+
+	* intl/langprefs.c, intl/libgnuintl.h.in, intl/localcharset.h, intl/log.c, intl/printf-args.c, intl/printf-args.h, intl/printf-parse.c, intl/printf-parse.h, intl/printf.c, intl/relocatable.c, intl/relocatable.h, intl/vasnprintf.c, intl/vasnprintf.h, intl/vasnwprintf.h, intl/wprintf-parse.h, intl/xsize.h, po/ChangeLog, po/Makevars, po/Rules-quot, po/boldquot.sed, po/en@boldquot.header, po/en@quot.header, po/insert-header.sin, po/quot.sed, po/remove-potcdate.sin, m4/codeset.m4, m4/gettext.m4, m4/glibc2.m4, m4/glibc21.m4, m4/iconv.m4, m4/intdiv0.m4, m4/intmax.m4, m4/inttypes-pri.m4, m4/inttypes.m4, m4/inttypes_h.m4, m4/isc-posix.m4, m4/lcmessage.m4, m4/lib-ld.m4, m4/lib-link.m4, m4/lib-prefix.m4, m4/longdouble.m4, m4/longlong.m4, m4/nls.m4, m4/po.m4, m4/printf-posix.m4, m4/progtest.m4, m4/signed.m4, m4/size_max.m4, m4/stdint_h.m4, m4/uintmax_t.m4, m4/ulonglong.m4, m4/wchar_t.m4, m4/wint_t.m4, m4/xsize.m4:
+	New file.
+
+	* ABOUT-NLS, ChangeLog, Makefile.am, config.rpath, configure.in, intl/COPYING.LIB-2.0, intl/COPYING.LIB-2.1, intl/ChangeLog, intl/Makefile.in, intl/VERSION, intl/bindtextdom.c, intl/config.charset, intl/dcgettext.c, intl/dcigettext.c, intl/dcngettext.c, intl/dgettext.c, intl/dngettext.c, intl/eval-plural.h, intl/explodename.c, intl/finddomain.c, intl/gettext.c, intl/gettextP.h, intl/gmo.h, intl/hash-string.h, intl/intl-compat.c, intl/l10nflist.c, intl/libgnuintl.h, intl/loadinfo.h, intl/loadmsgcat.c, intl/localcharset.c, intl/locale.alias, intl/localealias.c, intl/localename.c, intl/ngettext.c, intl/os2compat.c, intl/os2compat.h, intl/osdep.c, intl/plural-exp.c, intl/plural-exp.h, intl/plural.c, intl/plural.y, intl/ref-add.sin, intl/ref-del.sin, intl/textdomain.c, m4/codeset.m4, m4/gettext.m4, m4/glibc2.m4, m4/glibc21.m4, m4/iconv.m4, m4/intdiv0.m4, m4/intmax.m4, m4/inttypes-pri.m4, m4/inttypes.m4, m4/inttypes_h.m4, m4/isc-posix.m4, m4/lcmessage.m4, m4/lib-ld.m4, m4/lib-link.m4, m4/lib-prefix.m4, m4/longdouble.m4, m4/longlong.m4, m4/nls.m4, m4/po.m4, m4/printf-posix.m4, m4/progtest.m4, m4/signed.m4, m4/size_max.m4, m4/stdint_h.m4, m4/uintmax_t.m4, m4/ulonglong.m4, m4/wchar_t.m4, m4/wint_t.m4, m4/xsize.m4, po/Makefile.in.in, po/de.po, po/fr.po, po/ja.po, po/sv.po, po/tr.po:
+	Upgrading gettext to 0.14.5 and including necessary .m4 files.
+
+	* spec.in: Slightly tweak spec towards Fedora guidelines;
+	for Vendor, Packager, Copyright vs. License, and BuildRoot.
+
+	* configure.in: Tell automake about our embedded gettext version.
+
 
 2005-08-26  Terje Bless <link@pobox.com> (via gettextize)
 

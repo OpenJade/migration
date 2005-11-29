@@ -1,5 +1,9 @@
-Changes in OpenSP 1.5.2
+Changes in OpenSP 1.5.2pre1
 
+* Support for version 4.0 of the GNU C++ compiler.
+* Added doc building and config option.
+* Updated local gettext.
+* Added config option to turn off DTDDECL support.
 * Update 'de' and 'fr' translations; add new 'tr' translation.
 * Add more tests. (Karl Eichwalder)
 

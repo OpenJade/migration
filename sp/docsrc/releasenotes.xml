@@ -179,7 +179,7 @@ tools (<command>onsgmls</command>, <command>osgmlnorm</command>,
 follows:
 <screen>gzip -d OpenSP-1.5.2.tar.gz | tar xvf - 
 cd OpenSP-1.5.2
-./configure <optional><option><replaceable>options&hellip;</replaceable></option></optional> 
+./configure <optional><option><replaceable>options...</replaceable></option></optional> 
 make</screen> You may need to switch to the super user
 <command>root</command> to complete the installation
 <screen>make install</screen>

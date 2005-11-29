@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenSP 1.5\n"
-"POT-Creation-Date: 2005-07-15 14:39+0000\n"
+"POT-Creation-Date: 2005-11-05 09:50+0000\n"
 "PO-Revision-Date: 1999-12-20 21:46+01:00\n"
 "Last-Translator: Peter Nilsson <pnidv96@student.vxu.se>\n"
 "Language-Team: Swedish <sv@li.org>\n"

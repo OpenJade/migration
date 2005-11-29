@@ -451,9 +451,9 @@
 	* New command line argument
 
 	* Warn before removing leading slashes in output file pathnames,
-          and remove them; added no-write-outside-outdir to request
-          exiting instead of writing output file outside (above) output
-          directory
+	  and remove them; added no-write-outside-outdir to request
+	  exiting instead of writing output file outside (above) output
+	  directory
 
 2003-04-29 22:08  Jessica Perry Hekman
 

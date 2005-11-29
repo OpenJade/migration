@@ -9,7 +9,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: sp 1.5.1pre1\n"
-"POT-Creation-Date: 2005-07-15 14:39+0000\n"
+"POT-Creation-Date: 2005-11-05 09:50+0000\n"
 "PO-Revision-Date: 2003-10-10 21:18+0200\n"
 "Last-Translator: Karl Eichwalder <ke@suse.de>\n"
 "Language-Team: German <de@li.org>\n"

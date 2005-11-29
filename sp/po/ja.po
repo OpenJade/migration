@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: opensp cvs20010327\n"
-"POT-Creation-Date: 2005-07-15 14:39+0000\n"
+"POT-Creation-Date: 2005-11-05 09:50+0000\n"
 "PO-Revision-Date: 2001-03-27 09:04+09:00\n"
 "Last-Translator: SATO Satoru <ss@gnome.gr.jp>\n"
 "Language-Team: Japanese <translation@gnome.gr.jp>\n"

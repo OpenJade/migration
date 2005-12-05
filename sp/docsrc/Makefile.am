@@ -15,6 +15,8 @@ BUILT_SOURCES = $(man_MANS)
 pkgdoc_DATA = releasenotes.html
 #pkgdoc_DATA = releasenotes.html releasenotes.pdf releasenotes.ps
 
+MAINTAINERCLEANFILES = Makefile.in
+
 EXTRA_DIST = $(patsubst %.1, %.xml, $(man_MANS)) releasenotes.xml releasenotes.dsl logo.png
 
 #%.tex: $(srcdir)/%.xml $(srcdir)/%.dsl
@@ -55,6 +57,3 @@ mostlyclean-local:
 
 clean-local: mostlyclean
 	-rm -f *.1 *.html *.pdf *.ps
-
-distclean-local: clean
-	-rm -f Makefile Makefile.in

@@ -36,7 +36,7 @@
 
       <refnamediv>
         <refname>osgmlnorm</refname>
-        <refpurpose>An SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of International Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</refpurpose>
+	<refpurpose>An SGML/XML document normalizer</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
@@ -93,6 +93,7 @@
        omitted. For example, with HTML osgmlnorm would output &lt;DL COMPACT&gt;
        rather than &lt;DL COMPACT="COMPACT"&gt;</para>
        
+        <para>Part of an SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of International Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</para>
    <para>The following options are available:</para>
    
    <variablelist>

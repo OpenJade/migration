@@ -37,7 +37,7 @@
 
       <refnamediv>
         <refname>osx</refname>
-        <refpurpose>An SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of International Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</refpurpose>
+	<refpurpose>An SGML to XML converter</refpurpose>
       </refnamediv>
 
       <refsynopsisdiv>
@@ -73,6 +73,7 @@
    equivalent.
 </para>
 
+        <para>Part of an SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of International Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</para>
      </refsect1>
    
    <refsect1>

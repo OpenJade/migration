@@ -38,7 +38,7 @@
 
       <refnamediv>
         <refname>ospent</refname>
-        <refpurpose>Concatenate entities</refpurpose>
+        <refpurpose>Concatenates entities in an SGML/XML document</refpurpose>
       </refnamediv>
     
       <refsynopsisdiv>

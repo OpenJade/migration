@@ -34,7 +34,7 @@ public:
   void pushCharRef(Char ch, const NamedCharRef &);
   Boolean rewind(Messenger &);
   const StringC *contents();
-  InternalInputSource *InternalInputSource::asInternalInputSource();
+  InternalInputSource *asInternalInputSource();
   ~InternalInputSource();
 private:
   InternalInputSource(const InternalInputSource &); // undefined

@@ -38,7 +38,7 @@
 
       <refnamediv>
         <refname>ospam</refname>
-        <refpurpose> An SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of Internation Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</refpurpose>
+	<refpurpose>An SGML/XML markup stream editor</refpurpose>
       </refnamediv>
     
       <refsynopsisdiv>
@@ -74,6 +74,8 @@
    to output other entities. The <option>-x</option> option can be used to expand entity
    references.</para>
    
+   <para>Part of an SGML System Conforming to International Standard ISO 8879 -- Standard Generalized Markup Language. An SGML Extended Facilities system conforming to Annex A of Internation Standard ISO/IEC 10744 -- Hypermedia/Time-based Structuring Language.</para>
+
    <para>The following options are available:</para>
    
    <variablelist>

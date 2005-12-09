@@ -21,7 +21,7 @@
 
 basename="$(basename "$0" || echo "$0")"
 
-for command in aclocal autoheader "automake --add-missing" autoconf; do
+for command in aclocal autoheader libtoolize "automake --add-missing" autoconf; do
     echo "$basename: Executing \"${command}\""
     ${command}
     status=$?

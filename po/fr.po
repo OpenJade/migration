@@ -752,7 +752,7 @@ msgstr ""
 msgid ""
 "an attribute value must be a literal unless it contains only name characters"
 msgstr ""
-"une valeur d'attribut doit être un litétal à moins qu'il ne contienne "
+"une valeur d'attribut doit être un litéral à moins qu'il ne contienne "
 "seulement des caractères de noms"
 
 msgid ""

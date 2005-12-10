@@ -4,7 +4,7 @@ bin_PROGRAMS = ospent
 
 ospent_SOURCES = spent.cxx SpentMessages.h
 
-ospent_LDADD = $(top_builddir)/lib/libosp.la
+ospent_LDADD = $(top_builddir)/lib/libosp.la $(LTLIBINTL)
 
 INCLUDES = -I$(top_srcdir)/include
 

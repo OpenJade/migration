@@ -9,7 +9,7 @@ EXTRA_DIST = XmlOutputMessages.msg XmlOutputMessages.rc \
 	SxMessages.msg SxMessages.rc sx_inst.m4 sx.rc sx.dsp \
 	.cvsignore
 
-osx_LDADD = $(top_builddir)/lib/libosp.la
+osx_LDADD = $(top_builddir)/lib/libosp.la $(LTLIBINTL)
 
 INCLUDES = -I$(top_srcdir)/include
 

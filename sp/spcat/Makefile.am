@@ -7,7 +7,7 @@ ospcat_SOURCES = spcat.cxx spcat_inst.cxx SpcatMessages.h
 EXTRA_DIST = spcat_inst.m4 spcat.dsp SpcatMessages.msg SpcatMessages.rc \
 	.cvsignore
 
-ospcat_LDADD = $(top_builddir)/lib/libosp.la
+ospcat_LDADD = $(top_builddir)/lib/libosp.la $(LTLIBINTL)
 
 INCLUDES = -I$(top_srcdir)/include
 

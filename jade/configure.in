@@ -40,6 +40,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create,,AC_CHECK_LIB(threads,cthread_fork))
 ALL_LINGUAS="de sv ja"
 AM_GNU_GETTEXT
+AM_GNU_GETTEXT_VERSION([0.10.35])
 AC_CHECK_HEADERS(locale.h)
 AC_DEFINE_DIR(OPENJADE_LOCALE_DIR, datadir/locale, [location of message catalogs])
 OPENJADE_MESSAGE_DOMAIN=jade

@@ -20,7 +20,8 @@ lib_LTLIBRARIES= libosp.la
 ## 6. If any interfaces have been removed since the last public release,
 ##    then set age to 0. 
 
-libosp_la_LDFLAGS = -version-info @SP_LIBOSP_CUR@:@SP_LIBOSP_REV@:@SP_LIBOSP_AGE@
+libosp_la_LDFLAGS = -no-undefined -version-info @SP_LIBOSP_CUR@:@SP_LIBOSP_REV@:@SP_LIBOSP_AGE@
+libosp_la_LIBADD = $(LTLIBINTL)
 
 ## We list the generated sources here. This has the side-effect
 ## of putting them in the distribution, but that is actually nice

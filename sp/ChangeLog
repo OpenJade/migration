@@ -1,3 +1,42 @@
+2005-12-11  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* docsrc/releasenotes.xml:
+	Changed release date to December 2005 from November 2005.
+
+	* docsrc/Makefile.am:
+	Redefined XMLDCL to be one included here, $(top_srcdir)/pubtext/xml.dcl.
+	Use EXTRADOCS variable now defined in configure step to determine if PDF and
+	PS format release notes will be built.
+
+	* configure.in:
+	Added --enable-full-doc-build option to build PDF and PS docs as well as man
+	and HTML.  Only check for necessary tools if enabled.
+	Removed search for xml.dcl, we will always use the one in pubtext.
+
+2005-12-10  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* sx/Makefile.am, spent/Makefile.am, spcat/Makefile.am, spam/Makefile.am, sgmlnorm/Makefile.am, nsgmls/Makefile.am, lib/Makefile.am:
+	Gerrit Haase's patch: add LTLIBINTL to avoid undefined references.
+
+2005-12-09  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* po/fr.po: Fixed typo.
+
+	* autoinit.sh: Added libtoolize to avoid error of missing ltmain.sh.
+
+2005-12-07  Neil Roeth  <neilroeth@users.sourceforge.net>
+
+	* docsrc/osx.xml:
+	Made purpose a one-liner because it is used for man -k and apropos, so it
+	should be short.  Moved long paragraph that was there to description section.
+
+	* docsrc/ospent.xml:
+	Made purpose a bit more descriptive so it makes more sense without context.
+
+	* docsrc/ospam.xml, docsrc/onsgmls.xml, docsrc/osgmlnorm.xml:
+	Made purpose a one-liner because it is used for man -k and apropos, so it
+	should be short.  Moved long paragraph that was there to description section.
+
 2005-12-07  Karl Eichwalder  <ke@suse.de>
 
 	* include/InternalInputSource.h: Prepare for gcc 4.1.

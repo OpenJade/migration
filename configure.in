@@ -469,7 +469,7 @@ AC_ARG_ENABLE(xml-messages,
 DTDDECL=yes
 AC_MSG_CHECKING(whether to include DTDDECL support)
 AC_ARG_ENABLE(dtddecl,
-[  --disable-dtddecl   disable support for DTDDECL catalog entries],
+[  --disable-dtddecl       disable support for DTDDECL catalog entries],
     if test "$enableval" = "no"
     then
         AC_MSG_RESULT(no)
@@ -495,7 +495,7 @@ AC_CONFIG_FILES([${PACKAGE}-${VERSION}.spec:spec.in Makefile msggen.pl
 	po/Makefile.in])
 
 BUILDDOCS=yes
-AC_MSG_CHECKING(whether to build docs)
+AC_MSG_CHECKING([whether to build docs (man and html)])
 AC_ARG_ENABLE(doc-build,
     [  --disable-doc-build     do not build docs from source],
     if test "$enableval" = "no"
@@ -514,6 +514,25 @@ then
     then AC_MSG_ERROR(
 [could not find xmlto; set XMLTO or consider --disable-doc-build])
     fi
+    AC_SUBST(DOCSRC, docsrc)
+    AC_CONFIG_FILES(docsrc/Makefile)
+fi
+
+BUILDFULLDOCS=no
+AC_MSG_CHECKING([whether to build all docs (man, html, pdf, ps)])
+AC_ARG_ENABLE(full-doc-build,
+    [  --enable-full-doc-build build all docs from source],
+    if test "$enableval" = "yes"
+    then
+        AC_MSG_RESULT(yes)
+        BUILDFULLDOCS=yes
+    else
+	AC_MSG_RESULT(no)
+    fi,
+    AC_MSG_RESULT(no))
+
+if test "$BUILDFULLDOCS" = "yes"
+then
     AC_PATH_PROG(PDF2PS, pdf2ps)
     if test -z "$PDF2PS"
     then AC_MSG_ERROR(
@@ -537,14 +556,7 @@ then
 	AC_MSG_ERROR(
 [could not find pdfjadetex; set PDFJADETEX or consider --disable-doc-build])
     fi
-    AC_PATH_PROG(XMLDCL, xml.dcl,, [/usr/share/sgml:/usr/share/sgml/declaration])
-    if test -z "$XMLDCL"
-    then
-	AC_MSG_ERROR(
-[could not find xml.dcl; set XMLDCL or consider --disable-doc-build])
-    fi
-    AC_SUBST(DOCSRC, docsrc)
-    AC_CONFIG_FILES(docsrc/Makefile)
+    AC_SUBST(EXTRADOCS,["releasenotes.pdf releasenotes.ps"])
 fi
 
 AC_OUTPUT

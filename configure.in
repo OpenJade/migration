@@ -13,7 +13,7 @@ dnl
 dnl Initialization.
 AC_INIT
 AC_CONFIG_SRCDIR([pubtext])
-AM_INIT_AUTOMAKE(OpenSP, 1.5.2pre1, no-define)
+AM_INIT_AUTOMAKE(OpenSP, 1.5.2pre2, no-define)
 AM_MAINTAINER_MODE
 AC_PREREQ(2.53)
 AM_CONFIG_HEADER(config.h)

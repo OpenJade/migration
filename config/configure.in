@@ -51,9 +51,9 @@ case "${SPINCLUDEDIR}" in
   /usr/local/include/OpenSP) osplibdir=/usr/local/lib ;;
   *) osplibdir=/usr/lib ;;
 esac
-# On PPC64 libosp is to be found in /usr/lib64; thus
-# fall back to this directory
-test -d ${osplibdir}64 && osplibdir=${osplibdir}64
+dnl On PPC64 libosp is to be found in /usr/lib64; thus fall back to this
+dnl directory, but make sure the lib is actually there as well.
+test -d ${osplibdir}64 && test -f ${osplibdir}64/libosp* && osplibdir=${osplibdir}64
 AC_MSG_CHECKING(location of OpenSP Library)
 AC_ARG_ENABLE(splibdir,
 [  --enable-splibdir=pathlist

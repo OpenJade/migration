@@ -16,6 +16,7 @@ class MessageFragment;
 
 class SP_API MessageBuilder {
 public:
+  inline virtual ~MessageBuilder() {}
   virtual void appendNumber(unsigned long) = 0;
   virtual void appendOrdinal(unsigned long) = 0;
   virtual void appendChars(const Char *, size_t) = 0;

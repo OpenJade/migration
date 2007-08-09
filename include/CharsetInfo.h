@@ -23,6 +23,7 @@ class SP_API CharsetInfo {
 public:
   CharsetInfo();
   CharsetInfo(const UnivCharsetDesc &);
+  inline ~CharsetInfo() {}
   void set(const UnivCharsetDesc &);
   // Use only for characters guaranteed to me in the C basic execution
   // character set and which have been verified to be in this

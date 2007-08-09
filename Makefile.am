@@ -4,15 +4,16 @@ AUTOMAKE_OPTIONS = check-news
 
 SUBDIRS = pubtext unicode doc \
 	include generic \
+	intl po \
 	lib nsgmls spent spam sgmlnorm sx spcat \
-	intl po
+	tests @DOCSRC@
 
 pkginclude_HEADERS = config.h
 
-docdir = $(prefix)/doc
+docdir = $(datadir)/doc
 pkgdocdir = $(docdir)/@PACKAGE@
 
-pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS ChangeLog
+pkgdoc_DATA = README ABOUT-NLS NEWS COPYING AUTHORS BUGS ChangeLog
 
 BUILT_SOURCES = config.h msggen.pl
 
@@ -20,12 +21,11 @@ BUILT_SOURCES = config.h msggen.pl
 MAINTAINERCLEANFILES = install-sh mkinstalldirs missing \
 	config.guess config.sub	ltconfig ltmain.sh INSTALL \
 	Makefile.in
-
 ## Note that we include the windows-only aux files.
 ## We include msggen.pl, since it won't be generated on Windows.
-EXTRA_DIST = instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
-	build-win32.bat sp-generate.mak .cvsignore all \
-	@PACKAGE@-@VERSION@.spec
+EXTRA_DIST = mkinstalldirs  instmac.pl msggen.pl sunfix.sh SP.dsw SP.mak \
+	build-win32.bat sp-generate.mak .cvsignore all/README all/all.dsp \
+	@PACKAGE@-@VERSION@.spec config.rpath BUGS autoinit.sh
 
 dist-hook:
 	mv $(distdir)/include/config.h.old $(distdir)/config.h
@@ -40,3 +40,5 @@ dist-zip: distdir
 	zip -rql $(distdir).zip $(distdir)
 	-rm -rf $(distdir)
 
+
+ACLOCAL_AMFLAGS = -I m4

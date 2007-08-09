@@ -58,6 +58,7 @@ public:
     sdLiteral
   };
   Markup();
+  ~Markup();
   size_t size() const;
   void clear();
   void resize(size_t);

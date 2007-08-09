@@ -76,6 +76,10 @@ Encoder::~Encoder()
 {
 }
 
+Encoder::Handler::~Handler()
+{
+}
+
 void Encoder::output(Char *s, size_t n, OutputByteStream *sp)
 {
   output((const Char *)s, n, sp);

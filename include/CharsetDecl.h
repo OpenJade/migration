@@ -25,6 +25,7 @@ public:
     unused
     };
   CharsetDeclRange();
+  ~CharsetDeclRange();
   CharsetDeclRange(WideChar, Number, WideChar);
   CharsetDeclRange(WideChar, Number);
   CharsetDeclRange(WideChar, Number, const StringC &);
@@ -49,6 +50,7 @@ private:
 class SP_API CharsetDeclSection {
 public:
   CharsetDeclSection();
+  ~CharsetDeclSection() {}
   void setPublicId(const PublicId &);
   void addRange(const CharsetDeclRange &);
   void rangeDeclared(WideChar min, Number count,

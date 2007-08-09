@@ -20,6 +20,9 @@ namespace SP_NAMESPACE {
 
 struct SP_API SdTextItem {
   SdTextItem();
+  SdTextItem(const SdTextItem &);
+  void operator=(const SdTextItem &);
+  ~SdTextItem();
   Location loc;
   size_t index;
 };

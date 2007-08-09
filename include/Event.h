@@ -78,6 +78,7 @@ public:
     sgmlDeclEntity
     };
   Event(Type);
+  virtual ~Event();
   virtual void handle(EventHandler &) = 0;
   virtual void copyData();
   void *operator new(size_t sz, Allocator &alloc) { return alloc.alloc(sz); }
@@ -118,6 +119,7 @@ class SP_API MessageEvent : public Event {
 public:
   MessageEvent(Message &);
   MessageEvent(const Message &);
+  ~MessageEvent();
   const Message &message() const;
   void handle(EventHandler &);
 private:
@@ -868,6 +870,11 @@ public:
 inline
 Event::Event(Type type)
 : type_(type)
+{
+}
+
+inline
+Event::~Event()
 {
 }
 

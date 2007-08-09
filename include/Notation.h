@@ -29,6 +29,7 @@ public:
   Notation(const StringC &,
 	   const ConstPtr<StringResource<Char> > &dtdName,
 	   Boolean dtdIsBase);
+  virtual ~Notation();
   void setExternalId(const ExternalId &, const Location &);
   const ExternalId &externalId() const;
   Boolean defined() const;

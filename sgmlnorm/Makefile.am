@@ -12,7 +12,7 @@ BUILT_SOURCES = SgmlnormMessages.h SgmlnormMessages.rc
 
 MAINTAINERCLEANFILES = Makefile.in
 
-osgmlnorm_LDADD = $(top_builddir)/lib/libosp.la
+osgmlnorm_LDADD = $(top_builddir)/lib/libosp.la $(LTLIBINTL)
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic
 

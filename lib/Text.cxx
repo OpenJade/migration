@@ -17,6 +17,10 @@ Text::Text()
 {
 }
 
+Text::~Text()
+{
+}
+
 void Text::addChar(Char c, const Location &loc)
 {
   if (items_.size() == 0
@@ -231,6 +235,29 @@ Boolean Text::delimType(Boolean &lita) const
 
 TextItem::TextItem()
 {
+}
+
+TextItem::~TextItem()
+{
+}
+
+TextItem::TextItem(const TextItem& from)
+: type(from.type),
+  c(from.c),
+  loc(from.loc),
+  index(from.index)
+{
+}
+
+TextItem& TextItem::operator=(const TextItem& from)
+{
+  if (this != &from) {
+    type = from.type;
+    c = from.c;
+    loc = from.loc;
+    index = from.index;
+  }
+  return *this;
 }
 
 void Text::swap(Text &to)

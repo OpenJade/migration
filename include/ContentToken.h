@@ -20,6 +20,7 @@ namespace SP_NAMESPACE {
 class LeafContentToken;
 
 struct SP_API Transition {
+  ~Transition();
   enum { invalidIndex = -1 };
   // When performing this transition, reset all andState with index >= this.
   unsigned clearAndStateStartIndex;
@@ -66,6 +67,7 @@ class AndModelGroup;
 struct GroupInfo;
 
 struct SP_API ContentModelAmbiguity {
+  inline ~ContentModelAmbiguity() {}
   const LeafContentToken *from;
   const LeafContentToken *to1;
   const LeafContentToken *to2;
@@ -118,6 +120,7 @@ class SP_API ModelGroup : public ContentToken {
 public:
   enum Connector { andConnector, orConnector, seqConnector };
   ModelGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  inline virtual ~ModelGroup() {};
   virtual Connector connector() const = 0;
   unsigned nMembers() const;
   void finish(Vector<unsigned> &minAndDepth,
@@ -182,6 +185,7 @@ class AndState;
 class SP_API AndInfo {
 public:
   AndInfo() { }
+  inline ~AndInfo() { }
   const AndModelGroup *andAncestor;
   unsigned andGroupIndex;
   Vector<Transition> follow;
@@ -196,6 +200,7 @@ private:
 class SP_API LeafContentToken : public ContentToken {
 public:
   LeafContentToken(const ElementType *, OccurrenceIndicator);
+  inline virtual ~LeafContentToken() {};
   unsigned index() const;
   unsigned typeIndex() const;
   const ElementType *elementType() const;
@@ -309,6 +314,7 @@ private:
 class SP_API CompiledModelGroup {
 public:
   CompiledModelGroup(Owner<ModelGroup> &);
+  inline ~CompiledModelGroup() {};
   void compile(size_t nElementTypeIndex,
 	       Vector<ContentModelAmbiguity> &,
 	       Boolean &pcdataUnreachable);

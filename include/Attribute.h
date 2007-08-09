@@ -31,6 +31,27 @@ class AttributeSemantics;
 class AttributeContext;
 class Syntax;
 
+ class SP_API AttributeValue : public Resource {
+ public:
+   enum Type {
+     implied,
+     cdata,
+     tokenized
+   };
+   AttributeValue();
+   virtual ~AttributeValue();
+   virtual AttributeSemantics *makeSemantics(const DeclaredValue *,
+                                             AttributeContext &,
+                                             const StringC &,
+                                             unsigned &,
+                                             unsigned &) const;
+   virtual Type info(const Text *&, const StringC *&) const = 0;
+   virtual const Text *text() const;
+   virtual Boolean recoverUnquoted(const StringC &, const Location &,
+                                   AttributeContext &, const StringC &);
+   static Boolean handleAsUnterminated(const Text &, AttributeContext &);
+ };
+
 class SP_API AttributeDefinitionDesc {
 public:
   AttributeDefinitionDesc() { }
@@ -340,6 +361,7 @@ public:
 			  size_t idIndex = size_t(-1),
 			  size_t notationIndex = size_t(-1));
   AttributeDefinitionList(const ConstPtr<AttributeDefinitionList> &);
+  ~AttributeDefinitionList();
   size_t size() const;
   AttributeDefinition *def(size_t);
   const AttributeDefinition *def(size_t) const;
@@ -388,27 +410,6 @@ public:
   AttributeSemantics *copy() const;
 private:
   ConstPtr<Notation> notation_;
-};
-
-class SP_API AttributeValue : public Resource {
-public:
-  enum Type {
-    implied,
-    cdata,
-    tokenized
-    };
-  AttributeValue();
-  virtual ~AttributeValue();
-  virtual AttributeSemantics *makeSemantics(const DeclaredValue *,
-					    AttributeContext &,
-					    const StringC &,
-					    unsigned &,
-					    unsigned &) const;
-  virtual Type info(const Text *&, const StringC *&) const = 0;
-  virtual const Text *text() const;
-  virtual Boolean recoverUnquoted(const StringC &, const Location &,
-				  AttributeContext &, const StringC &);
-  static Boolean handleAsUnterminated(const Text &, AttributeContext &);
 };
 
 class SP_API ImpliedAttributeValue : public AttributeValue {
@@ -460,6 +461,9 @@ private:
 class SP_API Attribute {
 public:
   Attribute();
+  Attribute(const Attribute&);
+  ~Attribute();
+  Attribute& operator=(const Attribute&);
   Boolean specified() const;
   size_t specIndex() const;
   const AttributeValue *value() const;
@@ -479,6 +483,7 @@ class SP_API AttributeList  {
 public:
   AttributeList();
   AttributeList(const ConstPtr<AttributeDefinitionList> &);
+  inline ~AttributeList() {}
   void init(const ConstPtr<AttributeDefinitionList> &);
   // was a conref attribute specified?
   Boolean conref() const;

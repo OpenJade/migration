@@ -16,3 +16,7 @@ W1+missingSystemId++missing system ID for entity %1
 W1+unexpectedEntityType++unexpected entity type for entity named %1
 W1+cannotCreateDirectory++cannot create directory %1
 W1+tooManyOutputFiles++already wrote 99 versions of %1; will not overwrite
+W1+alreadyWroteOutputFile++already wrote output file %1; will not overwrite
+W1+removingLeadingSlashes++removing leading slashes from output filename %1
+W1+pathOutsideOutputDirectory++path %1 outside output directory
+

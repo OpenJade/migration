@@ -18,13 +18,3 @@ use to compile the application.
 /cvs/sp$ ./configure
 /cvs/sp$ make
 /cvs/sp$ make install
-
-
-Known Issues
-============
-
-* If `aclocal` complains of a missing 'AM_GNU_GETTEXT' macro, you're
-  probably missing the gettext devel bits (the 'gettext-devel' RPM,
-  or the 'gettext.m4' macro definition file, depending on your system).
-
-

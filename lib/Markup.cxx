@@ -102,9 +102,9 @@ void MarkupItem::operator=(const MarkupItem &item)
   }
 }
 
-Markup::Markup()
-{
-}
+Markup::Markup() {}
+
+Markup::~Markup() {}
 
 void Markup::resize(size_t n)
 {

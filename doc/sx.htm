@@ -85,6 +85,11 @@ This has the same effect as in <A HREF="nsgmls.htm#opti">onsgmls</A>.
 Specify that the resulting XML file should conform to the DTD in
 <CODE><VAR>dtd_file</VAR></CODE>.
 <DT>
+<CODE>-R</CODE>,
+<CODE>--restricted</CODE>
+<DD>
+This has the same effect as in <A HREF="nsgmls.htm#optR">onsgmls</A>.
+<DT>
 <CODE>-v</CODE>,
 <CODE>--version</CODE>
 <DD>
@@ -174,7 +179,7 @@ resolutions in the DTD.
 <DT>
 <CODE>no-expand-external</CODE>
 <DD>
-Preserve external entities, write a declaration driver file named "extEntities.dtf", and include that file in the instance's internal subset.
+Preserve external entities (producing a new output file for each input file processed), write a declaration driver file named "extEntities.dtf", and include that file in the instance's internal subset.
 <DT>
 <CODE>no-expand-internal</CODE>
 <DD>
@@ -198,9 +203,15 @@ When translating SDATA entities (whether expanding them or providing a
 definition for them in the output's internal subset), express them as
 processing instructions instead of as general internal entities.
 <DT>
+<CODE>no-output-outside-outdir
+<DD>
+When preserving external entities, do not write output files outside the specified output directory ("." by default). In other words, if an external entity's system identifier includes enough instances of ".." to cause osx to write a file outside (above) the output directory, exit. (By default, osx will issue a warning but will write the file and continue.)
+<DT>
 <CODE>no-overwrite
 <DD>
-When preserving internal or external entities, multiple output files will be written. If this option is specified, do not overwrite existing files; instead, attempt to append a number to the end of the original filename to create a unique filename. Exit with an error if too many (100) such files already exist.
+When preserving internal or external entities, multiple output files will be written.
+If this option is specified, do not overwrite existing files; instead, attempt to append a number to the end of the original filename to create a unique filename.
+Exit with an error if too many (100) such files already exist.
 </DL>
 <P>
 Multiple

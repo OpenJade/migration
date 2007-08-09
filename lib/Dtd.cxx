@@ -25,6 +25,8 @@ Dtd::Dtd(const StringC &name, Boolean isBase)
   insertElementType(documentElementType_);
 }
 
+Dtd::~Dtd() {}
+
 Boolean Dtd::shortrefIndex(const StringC &str, const Syntax &syntax,
 			   size_t &index)
 {

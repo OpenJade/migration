@@ -47,6 +47,7 @@ public:
     PackedBoolean sdataAsPi;
     PackedBoolean preserveCase;
     PackedBoolean overwrite;
+    PackedBoolean writeOutsideOutDir;
   };
   XmlOutputEventHandler(const Options &,
 			OutputCharStream *,
@@ -76,6 +77,7 @@ private:
   XmlOutputEventHandler(const XmlOutputEventHandler &); // undefined
   void operator=(const XmlOutputEventHandler &); // undefined
   OutputCharStream &os();
+  void outputData(const Char *s, size_t n, Boolean inLit, Boolean inSuperLit);
   void outputData(const Char *s, size_t n, Boolean inLit);
   void outputCdata(const Char *s, size_t n);
   void outputExternalId(const EntityDecl &decl);
@@ -90,18 +92,21 @@ private:
   const StringC &generalName(const StringC &name, StringC &buf);
   Boolean equalsIgnoreCase(const StringC &str1, StringC &str2);
   char *convertSuffix(char *name);
+  int maybeCreateDirectories(char *path);
   Boolean checkFirstSeen(const StringC &name);
   void uniqueFilename(char *filename);
+  char getQuoteMark(const StringC *contents);
 
   CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;
   IList<OutputCharStream> outputStack_;
   IList<OutputByteStream> outputFileStack_;
+  Vector<StringC> filesCreated_;
+  Vector<StringC> originalFilePaths_;
   const CharsetInfo *systemCharset_;
   OutputCharStream *os_;
   OutputCharStream *extEnts_;
   OutputCharStream *intEnts_;
-  OutputCharStream *nullOut_;
   FileOutputByteStream *extEntFile_;
   FileOutputByteStream *intEntFile_;
   const char *outputDir_;
@@ -123,7 +128,7 @@ OutputCharStream &XmlOutputEventHandler::os()
   return *os_;
 }
 
-class SP_API NullOutputByteStream : public OutputByteStream {
+class NullOutputByteStream : public OutputByteStream {
 public:
   NullOutputByteStream();
   virtual ~NullOutputByteStream();

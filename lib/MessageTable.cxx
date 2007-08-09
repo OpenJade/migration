@@ -86,7 +86,7 @@ extern "C"
 BOOL WINAPI DllMain(HINSTANCE inst, ULONG reason, LPVOID)
 {
   if (reason == DLL_PROCESS_ATTACH)
-    SP_NAMESPACE_SCOPE::libModule->dllInstanceHandle = inst;
+    SP_NAMESPACE_SCOPE libModule.dllInstanceHandle = inst;
   return TRUE;
 }
 #endif

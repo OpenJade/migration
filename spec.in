@@ -5,13 +5,11 @@ Summary: The OpenJade Group's SGML and XML parsing tools
 Name: @PACKAGE@
 Version: @VERSION@
 Release: 1
-BuildRoot: /tmp/@PACKAGE@-@VERSION@-buildroot
-Copyright: Copyright 1997 James Clark
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+License: GPL
 Group: Applications/Text
 Source: http://download.sourceforge.net/openjade/@PACKAGE@-@VERSION@.tar.gz
 URL: http://openjade.sourceforge.net/
-Vendor: The OpenJade Team
-Packager: Matthias Clasen <clasen@mathematik.uni-freiburg.de>
 Requires: @PACKAGE@-lib
 
 %description
@@ -77,6 +75,10 @@ test "$RPM_BUILD_ROOT" = "/" || rm -rf "$RPM_BUILD_ROOT"
 %{_includedir}/@PACKAGE@/*
 
 %changelog
+* Fri Aug 26 2005 Terje Bless <link@pobox.com>
+- Slightly tweak spec towards Fedora guidelines;
+  for Vendor, Packager, Copyright vs. License, and BuildRoot.
+
 * Fri Apr 09 2004 Terje Bless <link@pobox.com>
 - Add man pages to the "files" section for OpenSP.
 - Use _datadir macro for doc files (Karl Eichwalder and Ville Skytta).

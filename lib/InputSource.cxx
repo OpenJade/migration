@@ -78,6 +78,11 @@ void InputSource::willNotSetDocCharset()
 {
 }
 
+InternalInputSource *InputSource::asInternalInputSource()
+{
+  return 0;
+}
+
 #ifdef SP_NAMESPACE
 }
 #endif

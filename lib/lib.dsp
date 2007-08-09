@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\osp15pre4.dll" /base:0x21000000
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /machine:I386 /out:"..\bin\osp152.dll" /base:0x21000000
 # SUBTRACT LINK32 /profile
 
 !ELSEIF  "$(CFG)" == "lib - Win32 Debug"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386
-# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\osp15pre3d.dll" /base:0x21000000
+# ADD LINK32 wininet.lib wsock32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib /nologo /subsystem:windows /dll /debug /machine:I386 /out:"..\dbgbin\osp152.dll" /base:0x21000000
 
 !ENDIF 
 
@@ -808,7 +808,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl libModule $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -820,7 +820,7 @@ InputPath=.\ParserMessages.msg
 InputName=ParserMessages
 
 "$(InputDir)\$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	perl -w ..\msggen.pl libModule $(InputPath)
+	perl -w ..\msggen.pl -l libModule $(InputPath)
 
 # End Custom Build
 
@@ -1298,7 +1298,7 @@ SOURCE=..\include\Event.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\EventGenerator.h
+SOURCE=..\generic\EventGenerator.h
 # End Source File
 # Begin Source File
 
@@ -1682,7 +1682,7 @@ SOURCE=.\ParserAppMessages.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\ParserEventGeneratorKit.h
+SOURCE=..\generic\ParserEventGeneratorKit.h
 # End Source File
 # Begin Source File
 
@@ -1776,7 +1776,7 @@ SOURCE=..\include\SearchResultMessageArg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\generic\SGMLApplication.h
+SOURCE=..\generic\SGMLApplication.h
 # End Source File
 # Begin Source File
 

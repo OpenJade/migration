@@ -21,7 +21,8 @@ Sd::Sd(const Ptr<EntityManager> &entityManager)
   netEnable_(netEnableNo),
   entityRef_(entityRefAny),
   typeValid_(1),
-  integrallyStored_(0)
+  integrallyStored_(0),
+  implydefElement_(Sd::implydefElementNo)
 {
   int i;
   for (i = 0; i < nBooleanFeature; i++)
@@ -35,6 +36,8 @@ Sd::Sd(const Ptr<EntityManager> &entityManager)
   else
     internalCharsetPtr_ = &entityManager->charset();
 }
+
+Sd::~Sd() {}
 
 void Sd::setDocCharsetDesc(const UnivCharsetDesc &desc)
 {

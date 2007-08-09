@@ -10,7 +10,7 @@ EXTRA_DIST = nsgmls_inst.m4 NsgmlsMessages.msg NsgmlsMessages.rc \
 	RastEventHandlerMessages.msg RastEventHandlerMessages.rc \
 	nsgmls.rc nsgmls.dsp .cvsignore
 
-onsgmls_LDADD = $(top_builddir)/lib/libosp.la
+onsgmls_LDADD = $(top_builddir)/lib/libosp.la $(LTLIBINTL)
 
 INCLUDES = -I$(top_srcdir)/include -I$(top_srcdir)/generic 
 

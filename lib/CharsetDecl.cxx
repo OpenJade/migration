@@ -18,6 +18,10 @@ CharsetDeclRange::CharsetDeclRange()
 {
 }
 
+CharsetDeclRange::~CharsetDeclRange()
+{
+}
+
 CharsetDeclRange::CharsetDeclRange(WideChar descMin, Number count,
 				   WideChar baseMin)
 : descMin_(descMin),

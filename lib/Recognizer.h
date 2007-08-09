@@ -25,6 +25,7 @@ class Recognizer : public Resource {
 public:
   Recognizer(Trie *, const XcharMap<EquivCode> &);
   Recognizer(Trie *, const XcharMap<EquivCode> &, Vector<Token> &);
+  ~Recognizer();
   Token recognize(InputSource *, Messenger &) const;
 private:
   Recognizer(const Recognizer &); // undefined

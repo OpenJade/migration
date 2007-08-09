@@ -23,7 +23,8 @@ public:
     outputMarkedSections,
     outputGeneralEntities,
     mapCatalogDocument,
-    restrictFileReading
+    restrictFileReading,
+    showErrorNumbers
   };
   enum OptionWithArg {
     addCatalog,

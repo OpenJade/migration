@@ -9,11 +9,11 @@
 
 #include <stddef.h>
 #include "types.h"
+#include "constant.h"
 #include "CharMap.h"
 #include "RangeMap.h"
 #include "Boolean.h"
 #include "ISet.h"
-#include "constant.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -42,6 +42,9 @@ public:
     };
   UnivCharsetDesc();
   UnivCharsetDesc(const Range *, size_t);
+  inline UnivCharsetDesc(const UnivCharsetDesc& x) :
+	  charMap_(x.charMap_), rangeMap_(x.rangeMap_) {}
+  inline ~UnivCharsetDesc() {}
   void set(const Range *, size_t);
   Boolean descToUniv(WideChar from, UnivChar &to) const;
   Boolean descToUniv(WideChar from, UnivChar &to, WideChar &alsoMax) const;

@@ -39,6 +39,7 @@ struct {
   { SP_T("sdata-as-pis"), &XmlOutputEventHandler::Options::sdataAsPi },
   { SP_T("preserve-case"), &XmlOutputEventHandler::Options::preserveCase },
   { SP_T("overwrite"), &XmlOutputEventHandler::Options::overwrite },
+  { SP_T("write-outside-outdir"), &XmlOutputEventHandler::Options::writeOutsideOutDir },
 };
 
 class SxApp : public ParserApp {
@@ -82,6 +83,7 @@ SxApp::SxApp()
   outputOptions_.expInt = 1;
   outputOptions_.expExt = 1;
   outputOptions_.overwrite = 1;
+  outputOptions_.writeOutsideOutDir = 1;
   outputDir_ = NULL;
   dtdLoc_ = NULL;
 }

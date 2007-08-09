@@ -30,7 +30,8 @@ public:
 #ifndef SP_WIDE_SYSTEM
 		      const OutputCodingSystem *filenameCodingSystem,
 #endif
-		      int maxFDs);
+		      int maxFDs,
+		      Boolean restrictFileReading = 0);
   StorageObject *makeStorageObject(const StringC &id,
 				   const StringC &baseId,
 				   Boolean search,
@@ -44,11 +45,13 @@ public:
   Boolean transformNeutral(StringC &, Boolean fold, Messenger &) const;
 private:
   Boolean isAbsolute(const StringC &) const;
+  Boolean isSafe(const StringC &) const;
   StringC extractDir(const StringC &) const;
   StringC combineDir(const StringC &, const StringC &) const;
   PosixStorageManager(const PosixStorageManager &); // undefined
   void operator=(const PosixStorageManager &);	    // undefined
   DescriptorManager descriptorManager_;
+  Boolean restrictFileReading_;
 #ifndef SP_WIDE_SYSTEM
   const OutputCodingSystem *filenameCodingSystem_;
 #endif

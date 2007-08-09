@@ -37,6 +37,7 @@ protected:
 
 class SP_API CodingSystemKit : public InputCodingSystemKit {
 public:
+  virtual ~CodingSystemKit() = 0;
   virtual CodingSystemKit *copy() const = 0;
   virtual const CodingSystem *
     identityCodingSystem() const = 0;

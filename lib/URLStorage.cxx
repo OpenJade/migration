@@ -569,7 +569,7 @@ HTTP_RESPONSE_TYPE HttpSocketStorageObject::open(const String<char> &host,
   const char* http_accept = getenv("SP_HTTP_ACCEPT") ;
   if ( http_accept ) {
     request.append("Accept: ", 8) ;
-    request.append(http_accept, strlen(http_accept) ;
+    request.append(http_accept, strlen(http_accept)) ;
     request.append("\r\n", 2);
   }
   request.append("\r\n", 2);
@@ -594,6 +594,7 @@ HTTP_RESPONSE_TYPE HttpSocketStorageObject::open(const String<char> &host,
       fd_ = INVALID_SOCKET;
       return HTTP_ERROR ;
   }
+  return HTTP_ERROR ;
 }
 
 HTTP_RESPONSE_TYPE HttpSocketStorageObject::readHeader(Messenger &mgr,

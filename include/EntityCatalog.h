@@ -26,6 +26,7 @@ public:
     virtual Boolean namecaseEntity() const = 0;
     virtual const SubstTable &upperSubstTable() const = 0;
     virtual const StringC &peroDelim() const = 0;
+    virtual ~Syntax() = 0;
   };
   virtual ~EntityCatalog();
   virtual Boolean sgmlDecl(const CharsetInfo &,

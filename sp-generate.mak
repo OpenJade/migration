@@ -42,32 +42,32 @@ all: $(GENSRCS)
 
 
 .m4.cxx:
-	del /f $@ 2> nul
+	-del /f $@ 2> nul
 	$(PERL) instmac.pl $< >$@
 	attrib +r $@
 
 {lib}.msg{lib}.h:
-	del /f $@ 2> nul
+	-del /f $@ 2> nul
 	$(PERL) -w msggen.pl -l libModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {nsgmls}.msg{nsgmls}.h:
-	del /f $@ 2> nul
+	-del /f $@ 2> nul
 	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {spam}.msg{spam}.h:
-	del /f $@ 2> nul
+	-del /f $@ 2> nul
 	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
 {sx}.msg{sx}.h:
-	del /f $@ 2> nul
+	-del /f $@ 2> nul
 	$(PERL) -w msggen.pl -l appModule -t po\$(LANG).po $<
 	attrib +r $@
 
-include\config.h: include\config.h.old
-	copy include\config.h.old include\config.h 
+include\config.h: include\config.h.old.in
+	copy include\config.h.old.in include\config.h 
 
 msggen.pl: msggen.pl.in
 	copy msggen.pl.in msggen.pl

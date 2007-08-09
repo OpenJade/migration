@@ -187,6 +187,7 @@ public:
   };
   enum { nCapacity = LKNMCAP + 1 };
   Sd(const Ptr<EntityManager> &);
+  ~Sd();
   void setDocCharsetDesc(const UnivCharsetDesc &);
   Boolean matchesReservedName(const StringC &, ReservedName) const;
   int digitWeight(Char) const;

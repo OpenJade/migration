@@ -78,6 +78,8 @@ LinkSet::LinkSet(const StringC &name, const Dtd *dtd)
 {
 }
 
+LinkSet::~LinkSet() {}
+
 void LinkSet::addLinkRule(const ElementType *element,
 			  const ConstPtr<SourceLinkRuleResource> &rule)
 {
@@ -158,6 +160,8 @@ ComplexLpd::ComplexLpd(const StringC &name, Type type,
   linkAttributeDefs_(sourceDtd.isNull() ? 0 : sourceDtd->nElementTypeIndex())
 {
 }
+
+ComplexLpd::~ComplexLpd() {}
 
 IdLinkRuleGroup *ComplexLpd::lookupCreateIdLink(const StringC &id)
 {

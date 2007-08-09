@@ -7,6 +7,7 @@
 #include "RangeMap.h"
 #include "ISet.h"
 #include "types.h"
+#include "constant.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {

@@ -539,6 +539,10 @@ Char CodingSystemKitImpl::replacementChar() const
 #endif
 }
 
+CodingSystemKit::~CodingSystemKit()
+{
+}
+
 CodingSystemKit *
 CodingSystemKit::make(const char *systemCharsetName)
 {

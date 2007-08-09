@@ -1,4 +1,0 @@
-PROG=ospcat
-OBJS=spcat.o
-INCLUDE=
-LIBS=../lib/libosp.a

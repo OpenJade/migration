@@ -31,8 +31,8 @@ To get the stable branch checkout (or update to)
 example,</p>
 
 <pre>
-cvs -z3 checkout jade   # get experimental branch
-cvs -z3 update -r RELEASE-1_3 jade  # switch to stable branch
+svn co https://openjade.svn.sourceforge.net/svnroot/openjade/trunk/jade   # get current development
+svn co https://openjade.svn.sourceforge.net/svnroot/openjade/branches/jade_RELEASE-1_3 jade-1_3 # switch to stable branch
 </pre>
 
 <p>Logs of development activity are kept in the <a
@@ -41,17 +41,20 @@ files. The former is generated automatically from the cvs commit
 logs, while the latter is manually updated by the maintainers,
 and is more user-level.</p>
 
-<h2>Requirements for using CVS</h2>
+<h2>Requirements for using Subversion</h2>
+
+<p>Since August 2007, OpenJade project work with Subversion SCM.
+CVS repository converted to SVN, so all history is here.</p>
 
 <p>Note that since November 99, we have moved OpenSP to a separate
-repository. Thus to use the OpenJade out of CVS, you will have to
+repository. Thus to use the OpenJade out of SVN, you will have to
 check out, build and install OpenSP as well:</p>
 
-<pre>cvs -z3 checkout sp</pre>
+<pre>svn co https://openjade.svn.sourceforge.net/svnroot/openjade/trunk/sp</pre>
 
 <p>We have also converted the Unix build process to automake, thus
 you'll need the developer tools automake, autoconf and libtool
-to work from CVS. You can use the <code>autoinit.sh</code> tool
+to work from SVN. You can use the <code>autoinit.sh</code> tool
 (currently found in the sp module, but it works as well for
 OpenJade) to automatically run the commands required to generate the
 configuration script etc.</p>
@@ -77,7 +80,7 @@ You can subscribe to the list from the <a
 href="http://sourceforge.net/mail/?group_id=2115">mailing lists</a> page on the
 OpenJade <a href="http://sourceforge.net/projects/openjade">SourceForge</a>
 site.  You may also wish to subscribe to the "checkins" list, which carries
-notifications of changes to the source within CVS.</p>
+notifications of changes to the source within SVN.</p>
 
 <h2>Submitting Patches</h2>
 
@@ -87,7 +90,7 @@ the developers on the mailing list first.</p>
 <p>Preferrably, start with a clean OpenJade release  
 and apply your changes to it. Then generate a patch with the command</p>
 
-<pre>cvs -z3 diff -u -r jade_1_2_1 &gt; patch</pre>
+<pre>svn diff https://openjade.svn.sourceforge.net/svnroot/openjade/tags/jade_1_2_1 &gt; patch</pre>
 
 <p>Pack the patch using the tools appropriate for your platform
 (Zip for windows or tar -z for *ix) and send it to the development

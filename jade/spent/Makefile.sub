@@ -1,4 +1,0 @@
-PROG=ospent
-OBJS=spent.o
-INCLUDE=
-XLIBS=../lib/libosp.a

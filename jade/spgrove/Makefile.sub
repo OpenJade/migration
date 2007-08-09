@@ -1,7 +1,0 @@
-LIB=spgrove
-INCLUDE=-I$(srcdir)/../grove
-OBJS=GroveApp.o GroveBuilder.o SdNode.o
-GENSRCS=grove_inst.cxx
-
-GroveBuilder.o: grove_inst.cxx
-

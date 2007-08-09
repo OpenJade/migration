@@ -1,3 +1,0 @@
-LIB=grove
-DEPLIBS=-lm
-OBJS=Node.o LocNode.o

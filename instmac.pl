@@ -1,4 +1,4 @@
-#! /bin/perl -w
+#! /usr/bin/env perl
 #
 # Copyright (c) 1999 Avi Kivity
 # instmac.pl --  generate template instantiations

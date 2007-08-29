@@ -13,6 +13,7 @@
 #include "macros.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 
 #ifdef SP_NAMESPACE

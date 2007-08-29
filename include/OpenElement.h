@@ -10,7 +10,6 @@
 #include "Boolean.h"
 #include "ContentToken.h"
 #include "ElementType.h"
-#include "Link.h"
 #include "Mode.h"
 #include "Allocator.h"
 #include "Location.h"
@@ -19,7 +18,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API OpenElement : public Link {
+class SP_API OpenElement {
 public:
   inline ~OpenElement() {}
   void *operator new(size_t sz, Allocator &alloc) { return alloc.alloc(sz); }

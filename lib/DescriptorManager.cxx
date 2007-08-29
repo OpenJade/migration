@@ -3,7 +3,7 @@
 
 #include "splib.h"
 #include "DescriptorManager.h"
-#include "ListIter.h"
+#include <list>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -51,15 +51,15 @@ DescriptorManager::DescriptorManager(int maxD)
 
 DescriptorManager::~DescriptorManager()
 {
-  for (ListIter<DescriptorUser *> iter(users_);
-       !iter.done();
-       iter.next())
-    iter.cur()->managerDeleted();
+  for ( std::list<DescriptorUser *>::iterator iter = users_.begin();
+       iter != users_.end();
+       ++iter )
+    (*iter)->managerDeleted();
 }
 
 void DescriptorManager::addUser(DescriptorUser *p)
 {
-  users_.insert(p);
+  users_.push_front(p);
 }
 
 void DescriptorManager::removeUser(DescriptorUser *p)
@@ -70,10 +70,10 @@ void DescriptorManager::removeUser(DescriptorUser *p)
 void DescriptorManager::acquireD()
 {
   if (usedD_ >= maxD_) {
-    for (ListIter<DescriptorUser *> iter(users_);
-	 !iter.done();
-	 iter.next()) {
-      if (iter.cur()->suspend())
+    for ( std::list<DescriptorUser *>::iterator iter = users_.begin();
+	 iter != users_.end();
+	 ++iter ) {
+      if ( (*iter)->suspend())
 	break;
     }
   }

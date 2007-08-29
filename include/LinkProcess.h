@@ -8,9 +8,7 @@
 #endif
 
 #include "Lpd.h"
-#include "IList.h"
-#include "Link.h"
-#include "Vector.h"
+#include <list>
 #include "Vector.h"
 #include "Ptr.h"
 
@@ -20,7 +18,7 @@ namespace SP_NAMESPACE {
 
 class Messenger;
 
-struct SP_API LinkProcessOpenElement : public Link {
+struct SP_API LinkProcessOpenElement {
   LinkProcessOpenElement(const LinkSet *current, const SourceLinkRule &);
   LinkProcessOpenElement(const LinkSet *current);
   const LinkSet *current;
@@ -56,7 +54,7 @@ private:
   LinkProcess(const LinkProcess &); // undefined
   void operator=(const LinkProcess &); // undefined
 
-  IList<LinkProcessOpenElement> open_;
+  std::list<LinkProcessOpenElement *> open_;
   ConstPtr<ComplexLpd> lpd_;
   Vector<ConstPtr<Lpd> > activeLpds_;
   Vector<const AttributeList *> linkAttributes_;

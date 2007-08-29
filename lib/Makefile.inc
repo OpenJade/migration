@@ -1,4 +1,4 @@
-# -*- Makefile -*- Time-stamp: <07/08/27 21:12:00 ptr>
+# -*- Makefile -*- Time-stamp: <07/08/29 23:41:59 ptr>
 
 LIBNAME = osp
 MAJOR = 1
@@ -17,9 +17,9 @@ SRC_CXX = Allocator.cxx ArcEngine.cxx \
 	ErrnoMessageArg.cxx ErrorCountEventHandler.cxx Event.cxx \
 	EventGenerator.cxx ExtendEntityManager.cxx \
 	ExternalId.cxx Fixed2CodingSystem.cxx GenericEventHandler.cxx \
-	Group.cxx Hash.cxx IListBase.cxx Id.cxx \
+	Group.cxx Hash.cxx Id.cxx \
 	IdentityCodingSystem.cxx InputSource.cxx InternalInputSource.cxx \
-	Link.cxx LinkProcess.cxx LiteralStorage.cxx Location.cxx Lpd.cxx \
+	LinkProcess.cxx LiteralStorage.cxx Location.cxx Lpd.cxx \
 	Markup.cxx Message.cxx MessageArg.cxx \
 	MessageEventHandler.cxx MessageFormatter.cxx \
 	MessageReporter.cxx \

@@ -8,8 +8,7 @@
 #endif
 
 #include "Location.h"
-#include "IList.h"
-#include "Link.h"
+#include <list>
 #include "Boolean.h"
 #include "types.h"
 #include "EventsWanted.h"
@@ -18,7 +17,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-struct OutputStateLevel : public Link {
+struct OutputStateLevel {
   OutputStateLevel();
   Boolean hasPendingRe() const;
   char state;			// should be OutputState::State
@@ -52,7 +51,7 @@ private:
     pendingAfterRsOrRe,
     pendingAfterMarkup
   };
-  IList<OutputStateLevel> stack_;
+  std::list<OutputStateLevel *> stack_;
   OutputStateLevel &top();
   Char re_;
   unsigned long nextSerial_;
@@ -68,7 +67,7 @@ Boolean OutputStateLevel::hasPendingRe() const
 inline
 OutputStateLevel &OutputState::top()
 {
-  return *stack_.head();
+  return *stack_.front();
 }
 
 #ifdef SP_NAMESPACE

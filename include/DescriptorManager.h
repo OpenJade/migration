@@ -5,7 +5,7 @@
 #define DescriptorManager_INCLUDED 1
 
 #include "Boolean.h"
-#include "List.h"
+#include <list>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -40,7 +40,7 @@ private:
 
   int usedD_;
   int maxD_;
-  List<DescriptorUser *> users_;
+  std::list<DescriptorUser *> users_;
 };
 
 #ifdef SP_NAMESPACE

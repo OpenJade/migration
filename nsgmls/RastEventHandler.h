@@ -9,16 +9,13 @@
 
 #include "Event.h"
 #include "Vector.h"
-#include "Vector.h"
 #include "Boolean.h"
-#include "Vector.h"
 #include "StringC.h"
 #include "types.h"
 #include "OutputCharStream.h"
 #include "LinkProcess.h"
 #include "Message.h"
-#include "Link.h"
-#include "IQueue.h"
+#include <deque>
 #include "ErrorCountEventHandler.h"
 
 #include <limits.h>
@@ -64,7 +61,7 @@ private:
   RastEventHandler *rast_;
 };
 
-struct LinkRulePi : public Link {
+struct LinkRulePi {
   inline virtual ~LinkRulePi() {}
   StringC pi;
   Location loc;
@@ -86,7 +83,7 @@ protected:
   Boolean haveLinkProcess_;
   Owner<EndPrologEvent> endPrologEvent_;
   Vector<PackedBoolean> parseSubdocQueue_;
-  IQueue<LinkRulePi> linkRuleQueue_;
+  std::deque<LinkRulePi *> linkRuleQueue_;
   enum AttributeType {
     dtdAttribute,
     linkAttribute,

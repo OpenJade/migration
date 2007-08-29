@@ -22,7 +22,7 @@ void OutputState::init()
 {
   nextSerial_ = 0;
   stack_.clear();
-  stack_.insert(new OutputStateLevel);
+  stack_.push_front(new OutputStateLevel);
 }
 
 OutputStateLevel::OutputStateLevel()
@@ -103,7 +103,7 @@ void OutputState::noteStartElement(Boolean included,
 				   const EventsWanted &)
 {
   if (included)
-    stack_.insert(new OutputStateLevel);
+    stack_.push_front(new OutputStateLevel);
   else {
     if (top().hasPendingRe())
       handler.data(new (alloc) ReEvent(&re_, top().reLocation, top().reSerial));
@@ -119,7 +119,8 @@ void OutputState::noteEndElement(Boolean included, EventHandler &handler,
     handler.ignoredRe(new (alloc) IgnoredReEvent(re_, top().reLocation,
 						 top().reSerial));
   if (included) {
-    delete stack_.get();
+    delete stack_.front();
+    stack_.pop_front();
     noteMarkup(handler, alloc, eventsWanted);
   }
   else

@@ -7,7 +7,7 @@
 
 #include "splib.h"
 #include "ContentState.h"
-#include "IListIter.h"
+#include <list>
 #include "NCVector.h"
 #include "macros.h"
 
@@ -16,10 +16,6 @@ namespace SP_NAMESPACE {
 #endif
 
 const ShortReferenceMap ContentState::theEmptyMap;
-
-#ifdef __GNUG__
-typedef IListIter<OpenElement> Dummy_IListIter_OpenElement;
-#endif
 
 ContentState::ContentState()
 : documentElementContainer_(StringC(), size_t(-1))
@@ -46,9 +42,11 @@ void ContentState::startContent(const Dtd &dtd)
 			    compiledModel);
   documentElementContainer_.setElementDefinition(def, 0);
   tagLevel_ = 0;
-  while (!openElements_.empty())
-    delete openElements_.get();
-  openElements_.insert(new OpenElement(&documentElementContainer_,
+  while (!openElements_.empty()) {    
+    delete openElements_.front();
+    openElements_.pop_front();
+  }
+  openElements_.push_front(new OpenElement(&documentElementContainer_,
 				       0,
 				       0,
 				       &theEmptyMap,
@@ -79,13 +77,14 @@ void ContentState::pushElement(OpenElement *e)
   if (e->netEnabling())
     netEnablingCount_++;
   e->setIndex(nextIndex_++);
-  openElements_.insert(e);
+  openElements_.push_front(e);
 }
 
 OpenElement *ContentState::popSaveElement()
 {
   ASSERT(tagLevel_ > 0);
-  OpenElement *e = openElements_.get();
+  OpenElement *e = openElements_.front();
+  openElements_.pop_front();
   tagLevel_--;
   openElementCount_[e->type()->index()]--;
   const ElementDefinition *def = e->type()->definition();
@@ -111,12 +110,12 @@ void ContentState::popElement()
 			      
 Boolean ContentState::checkImplyLoop(unsigned count)
 {
-  for (IListIter<OpenElement> iter(openElements_);
-       count > 0;
-       iter.next(), count--)
-    if (iter.cur()->type() == openElements_.head()->type()
+  for (std::list<OpenElement *>::iterator iter = openElements_.begin();
+       iter != openElements_.end() && count > 0;
+       ++iter, --count )
+    if ( (*iter)->type() == openElements_.front()->type()
 	// I'm not sure whether this is necessary.
-	&& iter.cur()->matchState() == openElements_.head()->matchState())
+	&& (*iter)->matchState() == openElements_.front()->matchState())
       return 0;
   return 1;
 }
@@ -127,18 +126,18 @@ void ContentState::getOpenElementInfo(Vector<OpenElementInfo> &v,
   v.clear();
   v.resize(tagLevel_);
   unsigned i = tagLevel_;
-  for (IListIter<OpenElement> iter(openElements_);
-       !iter.done() && i > 0;
-       iter.next()) {
+  for ( std::list<OpenElement *>::const_iterator iter = openElements_.begin();
+       iter != openElements_.end() && i > 0;
+       ++iter ) {
     OpenElementInfo &e = v[--i];
-    e.gi = iter.cur()->type()->name();
-    const LeafContentToken *token = iter.cur()->currentPosition();
+    e.gi = (*iter)->type()->name();
+    const LeafContentToken *token = (*iter)->currentPosition();
     if (token && !token->isInitial()) {
       e.matchIndex = token->typeIndex() + 1;
       const ElementType *type = token->elementType();
       e.matchType = type ? type->name() : rniPcdata;
     }
-    e.included = iter.cur()->included();
+    e.included = (*iter)->included();
   }
 }
 

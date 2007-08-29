@@ -7,7 +7,6 @@
 #pragma interface
 #endif
 
-#include "Link.h"
 #include "ContentToken.h"
 #include "OpenElement.h"
 #include "Allocator.h"
@@ -19,7 +18,7 @@ namespace SP_NAMESPACE {
 class ParserState;
 class Event;
 
-class Undo : public Link {
+class Undo {
 public:
   void *operator new(size_t sz, Allocator &alloc) { return alloc.alloc(sz); }
   void *operator new(size_t sz) { return Allocator::allocSimple(sz); }

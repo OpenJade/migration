@@ -408,7 +408,7 @@ Boolean RastEventHandler::interpretRastPi(const Char *data,
     p->pi.assign(data + rastLinkRuleString_.size(),
 		 dataLength - rastLinkRuleString_.size());
     p->loc = loc;
-    linkRuleQueue_.append(p);
+    linkRuleQueue_.push_back(p);
     return 1;
   }
   return 0;
@@ -835,7 +835,8 @@ Boolean RastLinkProcess::selectLinkRule(const Vector<const AttributeList *> &lin
 					size_t &selected)
 {
   if (!rast_->linkRuleQueue_.empty()) {
-    LinkRulePi *p = rast_->linkRuleQueue_.get();
+    LinkRulePi *p = rast_->linkRuleQueue_.front();
+    rast_->linkRuleQueue_.pop_front();
     if (!selectLinkRulePi(p->pi, p->loc, linkAttributes, selected))
       selected = 0;
   }

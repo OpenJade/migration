@@ -14,7 +14,7 @@
 #include "Boolean.h"
 #include "CharsetInfo.h"
 #include "ExtendEntityManager.h"
-#include "IList.h"
+#include <list>
 #include "Ptr.h"
 #include "SubstTable.h"
 
@@ -99,8 +99,8 @@ private:
 
   CmdLineApp *app_;
   Ptr<ExtendEntityManager> entityManager_;
-  IList<OutputCharStream> outputStack_;
-  IList<OutputByteStream> outputFileStack_;
+  std::list<OutputCharStream *> outputStack_;
+  std::list<OutputByteStream *> outputFileStack_;
   Vector<StringC> filesCreated_;
   Vector<StringC> originalFilePaths_;
   const CharsetInfo *systemCharset_;

@@ -4,7 +4,6 @@
 #ifndef OutputByteStream_INCLUDED
 #define OutputByteStream_INCLUDED 1
 
-#include "Link.h"
 #include "StringOf.h"
 #include "Boolean.h"
 
@@ -12,7 +11,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API OutputByteStream : public Link {
+class SP_API OutputByteStream {
 public:
   OutputByteStream();
   virtual ~OutputByteStream();

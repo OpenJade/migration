@@ -7,7 +7,6 @@
 #pragma interface
 #endif
 
-#include "Link.h"
 #include "Allocator.h"
 #include "Location.h"
 #include "Vector.h"
@@ -33,7 +32,7 @@ namespace SP_NAMESPACE {
 
 class EventHandler;
 
-class SP_API Event : public Link {
+class SP_API Event {
 public:
   enum Type {
     message,

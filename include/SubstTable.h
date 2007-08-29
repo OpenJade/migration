@@ -45,10 +45,10 @@ void SubstTable::subst(StringC &str) const
 inline
 Char SubstTable::operator[](Char t) const
 {
-  if (t < 256)
+//  if (t < 256)
     return lo_[t];
-  else 
-    return at(t);
+//  else 
+//    return at(t);
 }
 
 inline 

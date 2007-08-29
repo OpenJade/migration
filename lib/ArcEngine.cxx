@@ -11,7 +11,7 @@
 #include "ArcProcessor.h"
 #include "Vector.h"
 #include "NCVector.h"
-#include "IQueue.h"
+#include <deque>
 #include "ArcEngineMessages.h"
 #include "ParserMessages.h"
 #include "MessageArg.h"
@@ -62,11 +62,25 @@ protected:
   EventHandler *delegateTo_;
 };
 
-class QueueEventHandler : public EventHandler, public IQueue<Event> {
+class QueueEventHandler : public EventHandler {
 public:
-#define EVENT(C, f) void f(C *ev) { ev->copyData(); append(ev); }
+#define EVENT(C, f) void f(C *ev) { ev->copyData(); _queue.push_back(ev); }
 #include "events.h"
 #undef EVENT
+  bool empty() const
+  { return _queue.empty(); }
+  
+  Event *front() const
+  { return _queue.front(); }
+
+  void pop_front()
+  { _queue.pop_front(); }
+
+  void swap( std::deque<Event *>& q )
+      { _queue.swap( q ); }
+
+  private:
+    std::deque<Event *> _queue;
 };
 
 // This just passes through messages.
@@ -603,10 +617,12 @@ void ArcEngineImpl::endElement(EndElementEvent *event)
     delegateTo_ = delegateHandler();
     // Clear out eventQueue_ in case handling the events
     // causes events to be queued again.
-    IQueue<Event> tem;
-    tem.swap(eventQueue_);
-    while (!tem.empty())
-      tem.get()->handle(*this);
+    std::deque<Event *> tem;
+    eventQueue_.swap( tem );
+    while (!tem.empty()) {
+      tem.front()->handle(*this);
+      tem.pop_front();
+    }
   }
   currentLocation_ = event->location();
   for (size_t i = 0; i < arcProcessors_.size(); i++)

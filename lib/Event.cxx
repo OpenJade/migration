@@ -574,7 +574,7 @@ void Pass1EventHandler::message(MessageEvent *event)
     origHandler_->message(event);
   }
   else
-    IQueue<Event>::append(event);
+    EventQueue::append(event);
 }
 
 #ifdef SP_NAMESPACE

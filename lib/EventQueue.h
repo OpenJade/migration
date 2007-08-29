@@ -4,21 +4,40 @@
 #ifndef EventQueue_INCLUDED
 #define EventQueue_INCLUDED 1
 
-#include "IQueue.h"
+#include <deque>
 #include "Event.h"
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
 #endif
 
-class EventQueue : public EventHandler, public IQueue<Event> {
+class EventQueue : public EventHandler {
 public:
   EventQueue();
+
+  bool empty() const
+  { return _queue.empty(); }
+  
+  Event *front() const
+  { return _queue.front(); }
+
+  void pop_front()
+  { _queue.pop_front(); }
+
+  void swap( std::deque<Event *>& q )
+  { _queue.swap( q ); }
+
+  void clear()
+  { _queue.clear(); }
+
+  void append(Event *);
+
 private:
 #define EVENT(c, f) void f(c *);
 #include "events.h"
 #undef EVENT
-  void append(Event *);
+  
+  std::deque<Event *> _queue;
 };
 
 class Pass1EventHandler : public EventQueue {
@@ -36,7 +55,7 @@ private:
 inline
 void EventQueue::append(Event *event)
 {
-  IQueue<Event>::append(event);
+  _queue.push_back(event);
 }
 
 inline

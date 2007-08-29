@@ -49,7 +49,7 @@ struct SdBuilder {
   Boolean www;
   Boolean valid;
   Boolean external;
-  IList<SdFormalError> formalErrorList;
+  std::list<SdFormalError *> formalErrorList;
 };
 
 class CharsetMessageArg : public MessageArg {
@@ -745,7 +745,8 @@ Boolean Parser::parseSgmlDecl()
   setSdOverrides(*sdBuilder.sd);
   if (sdBuilder.sd->formal()) {
     while (!sdBuilder.formalErrorList.empty()) {
-      SdFormalError *p = sdBuilder.formalErrorList.get();
+      SdFormalError *p = sdBuilder.formalErrorList.front();
+      sdBuilder.formalErrorList.pop_front();
       ParserState *state = this; // work around lcc 3.0 bug
       p->send(*state);
       delete p;
@@ -3384,7 +3385,7 @@ void SdBuilder::addFormalError(const Location &location,
 			       const MessageType1 &message,
 			       const StringC &id)
 {
-  formalErrorList.insert(new SdFormalError(location, message, id));
+  formalErrorList.push_front(new SdFormalError(location, message, id));
 }
 
 SdFormalError::SdFormalError(const Location &location,

@@ -16,7 +16,7 @@
 #include "ElementType.h"
 #include "Entity.h"
 #include "Event.h"
-#include "IList.h"
+#include <list>
 #include "ISet.h"
 #include "Location.h"
 #include "Owner.h"
@@ -212,17 +212,17 @@ private:
 		      Boolean netEnabling);
   void handleBadStartTag(const ElementType *, StartElementEvent *,
 			 Boolean netEnabling);
-  void undo(IList<Undo> &);
+  void undo(std::list<Undo *> &);
   Boolean tryStartTag(const ElementType *, StartElementEvent *,
-		      Boolean netEnabling, IList<Event> &);
+		      Boolean netEnabling, std::list<Event *> &);
   void checkExclusion(const ElementType *e);
   Boolean tryImplyTag(const Location &, unsigned &, unsigned &,
-		      IList<Undo> &, IList<Event> &);
+		      std::list<Undo *> &, std::list<Event *> &);
   void pushElementCheck(const ElementType *, StartElementEvent *,
 			Boolean netEnabling);
   void pushElementCheck(const ElementType *, StartElementEvent *,
-			IList<Undo> &, IList<Event> &);
-  void queueElementEvents(IList<Event> &);
+			std::list<Undo *> &, std::list<Event *> &);
+  void queueElementEvents(std::list<Event *> &);
   Boolean parseAttributeSpec(Mode mode,
 			     AttributeList &,
 			     Boolean &netEnabling,

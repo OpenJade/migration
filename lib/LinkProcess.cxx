@@ -23,7 +23,7 @@ void LinkProcess::init(const ConstPtr<ComplexLpd> &lpd)
 {
   lpd_ = lpd;
   open_.clear();
-  open_.insert(new LinkProcessOpenElement(lpd_->initialLinkSet()));
+  open_.push_front(new LinkProcessOpenElement(lpd_->initialLinkSet()));
 }
 
 Boolean LinkProcess::startElement(const ElementType *element,
@@ -55,7 +55,7 @@ Boolean LinkProcess::startElement(const ElementType *element,
       else
 	selected = 0;
       const IdLinkRule &rule = p->linkRule(selected);
-      open_.insert(new LinkProcessOpenElement(open_.head()->current,
+      open_.push_front(new LinkProcessOpenElement(open_.front()->current,
 					      rule));
       linkAttributes = &rule.attributes();
       resultElementSpec = &rule.resultElementSpec();
@@ -68,7 +68,7 @@ Boolean LinkProcess::startElement(const ElementType *element,
       return 1;
     }
   }
-  const LinkSet *currentLinkSet = open_.head()->current;
+  const LinkSet *currentLinkSet = open_.front()->current;
   size_t nRules = currentLinkSet->nLinkRules(element);
   if (nRules > 0) {
     size_t selected;
@@ -85,7 +85,7 @@ Boolean LinkProcess::startElement(const ElementType *element,
     else
       selected = 0;
     const SourceLinkRule &rule = currentLinkSet->linkRule(element, selected);
-    open_.insert(new LinkProcessOpenElement(open_.head()->current,
+    open_.push_front(new LinkProcessOpenElement(open_.front()->current,
 					    rule));
     linkAttributes = &rule.attributes();
     resultElementSpec = &rule.resultElementSpec();
@@ -94,7 +94,7 @@ Boolean LinkProcess::startElement(const ElementType *element,
   // FIXME construct attributes from attribute definition list
   linkAttributes = 0;
   resultElementSpec = 0;
-  open_.insert(new LinkProcessOpenElement(open_.head()->current));
+  open_.push_front(new LinkProcessOpenElement(open_.front()->current));
   return 1;
 }
 
@@ -103,11 +103,12 @@ void LinkProcess::endElement()
 {
   if (lpd_.isNull())
     return;
-  LinkProcessOpenElement *top = open_.get();
+  LinkProcessOpenElement *top = open_.front();
+  open_.pop_front();
   if (top->post)
-    open_.head()->current = top->post;
+    open_.front()->current = top->post;
   else if (top->postRestore)
-    open_.head()->current = open_.head()->restore;
+    open_.front()->current = open_.front()->restore;
   delete top;
 }
 
@@ -120,21 +121,21 @@ void LinkProcess::uselink(const LinkSet *linkSet,
   if (lpd != lpd_.pointer())
     return;
   if (restore)
-    open_.head()->current = open_.head()->restore;
+    open_.front()->current = open_.front()->restore;
   else if (linkSet)
-    open_.head()->current = linkSet;
+    open_.front()->current = linkSet;
 }
 
 size_t LinkProcess::nImpliedLinkRules() const
 {
-  if (!open_.head())
+  if (!open_.front())
     return 0;
-  return open_.head()->current->nImpliedLinkRules();
+  return open_.front()->current->nImpliedLinkRules();
 }
 
 const ResultElementSpec &LinkProcess::impliedLinkRule(size_t i) const
 {
-  return open_.head()->current->impliedLinkRule(i);
+  return open_.front()->current->impliedLinkRule(i);
 }
 
 // Usually redefined by application.

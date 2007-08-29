@@ -4,7 +4,6 @@
 #ifndef EquivClass_INCLUDED
 #define EquivClass_INCLUDED 1
 
-#include "Link.h"
 #include "types.h"
 #include "ISet.h"
 
@@ -12,7 +11,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-struct EquivClass : public Link {
+struct EquivClass {
   EquivClass(unsigned in = 0) : inSets(in) { }
   ISet<Char> set;
   unsigned inSets;

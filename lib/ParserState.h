@@ -22,8 +22,8 @@
 #include "EventQueue.h"
 #include "Id.h"
 #include "InputSource.h"
-#include "IList.h"
-#include "IQueue.h"
+#include <list>
+#include <deque>
 #include "Location.h"
 #include "Message.h"
 #include "Mode.h"
@@ -266,7 +266,7 @@ private:
   NCVector<Owner<AttributeList> > attributeLists_;
   StringC nameBuffer_;
   Boolean keepingMessages_;
-  IQueue<MessageEvent> keptMessages_;
+  std::deque<MessageEvent *> keptMessages_;
   Mode currentMode_;
   Boolean pcdataRecovering_;
   // if in a special parse (cdata, rcdata, ignore), the input level
@@ -279,7 +279,7 @@ private:
   ConstPtr<Recognizer> recognizers_[nModes];
   XcharMap<PackedBoolean> normalMap_;
   unsigned inputLevel_;
-  IList<InputSource> inputStack_;
+  std::list<InputSource *> inputStack_;
   Vector<unsigned> inputLevelElementIndex_;
   Ptr<Dtd> currentDtd_;
   ConstPtr<Dtd> currentDtdConst_;
@@ -328,7 +328,7 @@ const EventsWanted &ParserState::eventsWanted() const
 inline
 InputSource *ParserState::currentInput() const
 {
-  return inputStack_.head();
+  return inputStack_.front();
 }
 
 inline
@@ -523,7 +523,7 @@ Mode ParserState::currentMode() const
 inline
 Xchar ParserState::getChar()
 {
-  return inputStack_.head()->get(messenger());
+  return inputStack_.front()->get(messenger());
 }
 
 inline
@@ -535,7 +535,7 @@ void ParserState::skipChar()
 inline
 Token ParserState::getToken(Mode mode)
 {
-  return recognizers_[mode]->recognize(inputStack_.head(), messenger());
+  return recognizers_[mode]->recognize(inputStack_.front(), messenger());
 }
 
 inline
@@ -553,7 +553,9 @@ Boolean ParserState::eventQueueEmpty() const
 inline
 Event *ParserState::eventQueueGet()
 {
-  return eventQueue_.get();
+  Event *tmp = eventQueue_.front();
+  eventQueue_.pop_front();
+  return tmp;
 }
 
 inline

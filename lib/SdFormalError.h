@@ -4,7 +4,6 @@
 #ifndef SdFormalError_INCLUDED
 #define SdFormalError_INCLUDED 1
 
-#include "Link.h"
 #include "StringC.h"
 #include "Message.h"
 #include "Location.h"
@@ -15,7 +14,7 @@ namespace SP_NAMESPACE {
 
 class ParserState;
 
-class SdFormalError : public Link {
+class SdFormalError {
 public:
   SdFormalError(const Location &, const MessageType1 &, const StringC &);
   void send(ParserState &);

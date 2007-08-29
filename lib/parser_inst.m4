@@ -11,9 +11,8 @@
 #include "Vector.h"
 #include "NCVector.h"
 #include "Ptr.h"
-#include "IList.h"
-#include "IQueue.h"
-#include "List.h"
+#include <deque>
+#include <list>
 #include "OwnerTable.h"
 #include "PointerTable.h"
 #include "HashTable.h"
@@ -106,13 +105,13 @@ __instantiate(`HashTableItem<StringC, int>')
 __instantiate(`HashTable<StringC,int>')
 __instantiate(`HashTableItem<StringC,Char>')
 __instantiate(`HashTable<StringC,Char>')
-__instantiate(IList<EquivClass>)
-__instantiate(IList<InputSource>)
-__instantiate(IList<OpenElement>)
-__instantiate(IList<Event>)
-__instantiate(IList<OutputStateLevel>)
-__instantiate(IList<SdFormalError>)
-__instantiate(IList<Undo>)
+__instantiate(std::list<EquivClass>)
+__instantiate(std::list<InputSource>)
+__instantiate(std::list<OpenElement>)
+__instantiate(std::list<Event>)
+__instantiate(std::list<OutputStateLevel>)
+__instantiate(std::list<SdFormalError>)
+__instantiate(std::list<Undo>)
 __instantiate(IQueue<MessageEvent>)
 __instantiate(IQueue<Event>)
 __instantiate(`OwnerTable<Named,StringC,Hash,NamedTableKeyFunction>')
@@ -193,7 +192,7 @@ __instantiate(`PointerTable<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntit
 __instantiate(`PointerTableIter<LpdEntityRef *, LpdEntityRef, LpdEntityRef, LpdEntityRef>')
 __instantiate(`OwnerTable<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>')
 __instantiate(`OwnerTableIter<LpdEntityRef, LpdEntityRef, LpdEntityRef, LpdEntityRef>')
-__instantiate(IList<LinkProcessOpenElement>)
+__instantiate(std::list<LinkProcessOpenElement>)
 
 #ifdef SP_NAMESPACE
 }

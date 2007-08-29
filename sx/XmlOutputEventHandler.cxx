@@ -231,7 +231,7 @@ void XmlOutputEventHandler::data(DataEvent *event)
     os() << "&" << entity->name() << ";";
 
     // save old output stream
-    outputStack_.insert(os_);
+    outputStack_.push_front(os_);
 
     // output beginning of entity declaration
     if (firstSeen) {
@@ -259,7 +259,8 @@ void XmlOutputEventHandler::data(DataEvent *event)
   if (! options_.expInt && entity != NULL) {
     os() << "\">" << RE;
     os_->flush();
-    os_ = outputStack_.get();
+    os_ = outputStack_.front();
+    outputStack_.pop_front();
   }
 
   delete event;
@@ -341,7 +342,7 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 	    os() << "&" << entity->name() << ";";
 
 	    // save old output stream
-	    outputStack_.insert(os_);
+	    outputStack_.push_front(os_);
 
 	    if (firstSeen) {
 	      // Point default output stream (os_) to the entities
@@ -379,7 +380,8 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
 	    else
 	      os() << "\"> <!-- originally sdata entity -->\n";
 	    os_->flush();
-	    os_ = outputStack_.get();
+	    os_ = outputStack_.front();
+            outputStack_.pop_front();
 	  } else {
 	    if (options_.sdataAsPi)
 	      os() << "\" ?>";
@@ -546,7 +548,7 @@ void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
     os() << "&" << entity->name() << ";";
 
     // save old output stream
-    outputStack_.insert(os_);
+    outputStack_.push_front(os_);
 
     if (firstSeen) {
       // Point default output stream (os_) to the entities
@@ -584,7 +586,8 @@ void XmlOutputEventHandler::sdataEntity(SdataEntityEvent *event)
     else
       os() << "\"> <!-- originally sdata entity -->\n";
     os_->flush();
-    os_ = outputStack_.get();
+    os_ = outputStack_.front();
+    outputStack_.pop_front();
   } else {
     if (options_.sdataAsPi)
       os() << " ?>";
@@ -1151,7 +1154,7 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 	}
 
 	// save old output stream
-	outputStack_.insert(os_);
+	outputStack_.push_front(os_);
 
 	if (firstSeen) {
 
@@ -1230,7 +1233,7 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 
 	  // Open the file, exiting if we fail to do so.
 	  FileOutputByteStream *file = new FileOutputByteStream;
-	  outputFileStack_.insert(file);
+	  outputFileStack_.push_front(file);
 	  StringC filePathStrC = app_->codingSystem()->convertIn(filePath);
 
 	  // If we've never seen this exact input filename before,
@@ -1273,7 +1276,7 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 	else {
 	  // push null os onto file output stack, set os_ to it
 	  NullOutputByteStream *nobs = new NullOutputByteStream;
-	  outputFileStack_.insert(nobs);
+	  outputFileStack_.push_front(nobs);
 
 	  // Create output stream to file and set os_ to it.
 	  os_ = (OutputCharStream *)
@@ -1295,7 +1298,7 @@ void XmlOutputEventHandler::inputOpened(InputSource *in)
 	os() << "&" << entDecl->name() << ";";
 
 	// save old output stream and point output stream at null
-	outputStack_.insert(os_);
+	outputStack_.push_front(os_);
         NullOutputByteStream *nobs = new NullOutputByteStream;
         os_ = (OutputCharStream *)
           new EncodeOutputCharStream(nobs, outputCodingSystem);
@@ -1354,11 +1357,12 @@ void XmlOutputEventHandler::inputClosed(InputSource *in)
 	delete os_;
 
 	// restore previous output stream
-	os_ = outputStack_.get();
+	os_ = outputStack_.front();
+        outputStack_.pop_front();
 
 	// close file
-	OutputByteStream *file = outputFileStack_.get();
-	delete file;
+	delete outputFileStack_.front();
+        outputFileStack_.pop_front();
       }
     }
 
@@ -1369,7 +1373,8 @@ void XmlOutputEventHandler::inputClosed(InputSource *in)
 	delete os_;
 
 	// restore previous output stream
-	os_ = outputStack_.get();
+	os_ = outputStack_.front();
+        outputStack_.pop_front();
       }
     }
 

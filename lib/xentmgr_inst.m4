@@ -10,8 +10,8 @@
 #include "Vector.h"
 #include "NCVector.h"
 #include "ListIter.h"
-#include "IList.h"
-#include "List.h"
+#include <list>
+#include <list>
 #include "Owner.h"
 #include "OwnerTable.h"
 #include "PointerTable.h"
@@ -44,7 +44,7 @@ __instantiate(NCVector<Owner<StorageObject> >)
 __instantiate(Vector<StorageObjectSpec>)
 __instantiate(NCVector<Owner<OffsetOrderedListBlock> >)
 __instantiate(NCVector<StorageObjectPosition>)
-__instantiate(IList<ListItem<DescriptorUser*> >)
+__instantiate(std::list<ListItem<DescriptorUser*> >)
 __instantiate(List<DescriptorUser*>)
 __instantiate(ListIter<DescriptorUser *>)
 __instantiate(ListItem<DescriptorUser *>)

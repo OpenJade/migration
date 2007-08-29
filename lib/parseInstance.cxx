@@ -36,8 +36,8 @@ void Parser::doInstanceStart()
     if (sd().omittag()) {
       unsigned startImpliedCount = 0;
       unsigned attributeListIndex = 0;
-      IList<Undo> undoList;
-      IList<Event> eventList;
+      std::list<Undo *> undoList;
+      std::list<Event *> eventList;
       if (!tryImplyTag(currentLocation(),
 		       startImpliedCount,
 		       attributeListIndex,
@@ -618,8 +618,8 @@ void Parser::acceptPcdata(const Location &startLocation)
   // Need to test here since implying tags may turn off pcdataRecovering.
   if (pcdataRecovering())
     return;
-  IList<Undo> undoList;
-  IList<Event> eventList;
+  std::list<Undo *> undoList;
+  std::list<Event *> eventList;
   unsigned startImpliedCount = 0;
   unsigned attributeListIndex = 0;
   keepMessages();
@@ -659,8 +659,8 @@ void Parser::acceptStartTag(const ElementType *e,
     }
     keepMessages();
   }
-  IList<Undo> undoList;
-  IList<Event> eventList;
+  std::list<Undo *> undoList;
+  std::list<Event *> eventList;
   unsigned startImpliedCount = 0;
   unsigned attributeListIndex = 1;
   while (tryImplyTag(event->location(), startImpliedCount,
@@ -681,25 +681,27 @@ void Parser::acceptStartTag(const ElementType *e,
   }
 }
 
-void Parser::undo(IList<Undo> &undoList)
+void Parser::undo(std::list<Undo *> &undoList)
 {
   while (!undoList.empty()) {
-    Undo *p = undoList.get();
+    Undo *p = undoList.front();
+    undoList.pop_front();
     p->undo(this);
     delete p;
   }
 }
 
-void Parser::queueElementEvents(IList<Event> &events)
+void Parser::queueElementEvents(std::list<Event *> &events)
 {
   releaseKeptMessages();
-  // FIXME provide IList<T>::reverse function
+  // FIXME provide std::list<T>::reverse function
   // reverse it
-  IList<Event> tem;
-  while (!events.empty())
-    tem.insert(events.get());
+  std::list<Event *> tem;
+  tem.swap(events);
+  tem.reverse();
   while (!tem.empty()) {
-    Event *e = tem.get();
+    Event *e = tem.front();
+    tem.pop_front();
     if (e->type() == Event::startElement) {
       noteStartElement(((StartElementEvent *)e)->included());
       eventHandler().startElement((StartElementEvent *)e);
@@ -725,7 +727,7 @@ void Parser::checkExclusion(const ElementType *e)
 Boolean Parser::tryStartTag(const ElementType *e,
 			    StartElementEvent *event,
 			    Boolean netEnabling,
-			    IList<Event> &impliedEvents)
+			    std::list<Event *> &impliedEvents)
 {
   if (elementIsExcluded(e)) {
     checkExclusion(e);
@@ -748,8 +750,8 @@ Boolean Parser::tryStartTag(const ElementType *e,
 Boolean Parser::tryImplyTag(const Location &loc,
 			    unsigned &startImpliedCount,
 			    unsigned &attributeListIndex,
-			    IList<Undo> &undo,
-			    IList<Event> &eventList)
+			    std::list<Undo *> &undo,
+			    std::list<Event *> &eventList)
 {
   if (!sd().omittag())
     return 0;
@@ -779,8 +781,8 @@ Boolean Parser::tryImplyTag(const Location &loc,
 					       currentDtdPointer(),
 					       loc,
 					       0);
-    eventList.insert(event);
-    undo.insert(new (internalAllocator()) UndoEndTag(popSaveElement()));
+    eventList.push_front(event);
+    undo.push_front(new (internalAllocator()) UndoEndTag(popSaveElement()));
     return 1;
   }
   const LeafContentToken *token = currentElement().impliedStartTag();
@@ -793,7 +795,7 @@ Boolean Parser::tryImplyTag(const Location &loc,
 	    StringMessageArg(e->name()),
 	    StringMessageArg(currentElement().type()->name()));
   if (tagLevel() != 0)
-    undo.insert(new (internalAllocator())
+    undo.push_front(new (internalAllocator())
 		     UndoTransition(currentElement().matchState()));
   currentElement().doRequiredTransition();
   const ElementDefinition *def = e->definition();
@@ -971,12 +973,12 @@ void Parser::implyEmptyElementEnd(const ElementType *e,
 }
 
 void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
-			      IList<Undo> &undoList,
-			      IList<Event> &eventList)
+			      std::list<Undo *> &undoList,
+			      std::list<Event *> &eventList)
 {
   if (tagLevel() == syntax().taglvl())
     message(ParserMessages::taglvlOpenElements, NumberMessageArg(syntax().taglvl()));
-  eventList.insert(event);
+  eventList.push_front(event);
   if (event->mustOmitEnd()) {
     EndElementEvent *end
       = new (eventAllocator()) EndElementEvent(e,
@@ -985,10 +987,10 @@ void Parser::pushElementCheck(const ElementType *e, StartElementEvent *event,
 					       0);
     if (event->included())
       end->setIncluded();
-    eventList.insert(end);
+    eventList.push_front(end);
   }
   else {
-    undoList.insert(new (internalAllocator()) UndoStartTag);
+    undoList.push_front(new (internalAllocator()) UndoStartTag);
     const ShortReferenceMap *map = e->map();
     if (!map)
       map = currentElement().map();
@@ -1207,8 +1209,8 @@ void Parser::handleBadStartTag(const ElementType *e,
 			       StartElementEvent *event,
 			       Boolean netEnabling)
 {
-  IList<Undo> undoList;
-  IList<Event> eventList;
+  std::list<Undo *> undoList;
+  std::list<Event *> eventList;
   keepMessages();
   for (;;) {
     Vector<const ElementType *> missing;
@@ -1258,8 +1260,8 @@ void Parser::handleBadStartTag(const ElementType *e,
 					       currentDtdPointer(),
 					       event->location(),
 					       0);
-    eventList.insert(endEvent);
-    undoList.insert(new (internalAllocator()) UndoEndTag(popSaveElement()));
+    eventList.push_front(endEvent);
+    undoList.push_front(new (internalAllocator()) UndoEndTag(popSaveElement()));
   }
   discardKeptMessages();
   undo(undoList);
@@ -1358,7 +1360,7 @@ void Parser::getAllowedElementTypes(Vector<const ElementType *> &v)
   // x says whether each element of v was excluded
   Vector<PackedBoolean> x(v.size(), 0);
   unsigned startImpliedCount = 0;
-  IList<Undo> undoList;
+  std::list<Undo> undoList;
   for (;;) {
     if (currentElement().currentPosition()) {
       // have a model group

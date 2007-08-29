@@ -11,7 +11,7 @@ SUBDIRS := lib nsgmls sgmlnorm spam spcat spent sx
 
 include ${SRCROOT}/Makefiles/gmake/subdirs.mak
 
-all install depend clean clobber distclean mostlyclean maintainer-clean check:
+all dbg-shared install depend clean clobber distclean mostlyclean maintainer-clean check:
 	+$(call doinsubdirs,${SUBDIRS})
 
 .PHONY: all install depend clean clobber distclean mostlyclean maintainer-clean check

@@ -30,28 +30,5 @@ ifndef WITHOUT_STLPORT
 stldbg-shared:	LDFLAGS += -L../lib/$(OUTPUT_DIR_STLDBG) -lospstlg
 endif
 
-check:	all-shared
-	$(MAKE) -C ../../test/mt
-	(cd ../../test/mt; ${OUTPUT_DIR}/mt_ut) || exit 1
-	(cd ../../test/mt; ${OUTPUT_DIR_DBG}/mt_ut) || exit 1
-	(cd ../../test/mt; ${OUTPUT_DIR_STLDBG}/mt_ut) || exit 1
-
-check-release-shared:	release-shared
-	$(MAKE) -C ../../test/mt release-shared
-	(cd ../../test/mt; ${OUTPUT_DIR}/mt_ut) || exit 1
-
-check-dbg-shared:	dbg-shared
-	$(MAKE) -C ../../test/mt dbg-shared
-	(cd ../../test/mt; ${OUTPUT_DIR_DBG}/mt_ut) || exit 1
-
-ifndef WITHOUT_STLPORT
-check-stldbg-shared:	stldbg-shared
-	$(MAKE) -C ../../test/mt stldbg-shared
-	(cd ../../test/mt; ${OUTPUT_DIR_STLDBG}/mt_ut) || exit 1
-endif
-
-depend::
-	$(MAKE) -C ../../test/mt depend
-
 clean::
 	for f in $(MSG_HEADERS); do rm -f $${f}Messages.h; done

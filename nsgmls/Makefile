@@ -42,9 +42,6 @@ ifndef WITHOUT_STLPORT
 stldbg-shared:	LDFLAGS += -L../lib/$(OUTPUT_DIR_STLDBG) -lospstlg
 endif
 
-depend::
-	$(MAKE) -C ../../test/mt depend
-
 maintainer-clean::
 	for f in $(MSG_HEADERS); do rm -f $${f}Messages.h; done
 	for f in $(INST_GEN) ; do rm -f $${f}.cxx; done

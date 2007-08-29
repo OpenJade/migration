@@ -6,7 +6,6 @@
 
 #include "types.h"
 #include <stddef.h>
-#include "Link.h"
 #include "StringC.h"
 #include "Owner.h"
 #include "CodingSystem.h"
@@ -16,7 +15,7 @@
 namespace SP_NAMESPACE {
 #endif
 
-class SP_API OutputCharStream : public Link {
+class SP_API OutputCharStream {
 public:
   enum Newline { newline };
   typedef void (*Escaper)(OutputCharStream &, Char);

@@ -10,7 +10,7 @@
 
 #include <stddef.h>
 #include "OpenElement.h"
-#include "IList.h"
+#include <list>
 #include "Vector.h"
 #include "Message.h"
 #include "Dtd.h"
@@ -46,7 +46,7 @@ public:
   Boolean checkImplyLoop(unsigned);
   static const ShortReferenceMap theEmptyMap;
 private:
-  IList<OpenElement> openElements_;
+  std::list<OpenElement *> openElements_;
   Vector<unsigned> openElementCount_;
   Vector<unsigned> includeCount_;
   Vector<unsigned> excludeCount_;
@@ -61,13 +61,13 @@ private:
 inline
 OpenElement &ContentState::currentElement()
 {
-  return *openElements_.head();
+  return *openElements_.front();
 }
 
 inline
 const OpenElement &ContentState::currentElement() const
 {
-  return *openElements_.head();
+  return *openElements_.front();
 }
 
 inline
@@ -109,7 +109,7 @@ Boolean ContentState::afterDocumentElement() const
 inline
 Mode ContentState::contentMode() const
 {
-  return openElements_.head()->mode(netEnablingCount_ > 0);
+  return openElements_.front()->mode(netEnablingCount_ > 0);
 }
 
 #ifdef SP_NAMESPACE

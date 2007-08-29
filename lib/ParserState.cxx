@@ -10,7 +10,7 @@
 #include "MessageArg.h"
 #include "macros.h"
 #include "SgmlParser.h"
-#include "IListIter.h"
+#include <list>
 #include "ParserMessages.h"
 #include "Undo.h"
 #include "Trie.h"
@@ -126,37 +126,41 @@ Boolean ParserState::maybeStartPass2()
     while (!pass1Handler_.empty()) {
       if (cancelled())
 	return 0;
-      pass1Handler_.get()->handle(*handler_);
+      pass1Handler_.front()->handle(*handler_);
+      pass1Handler_.pop_front();
     }
     InputSource *top = 0;
-    for (IListIter<InputSource> iter(inputStack_);
-	 !iter.done();
-	 iter.next())
-      top = iter.cur();
+    for ( std::list<InputSource *>::iterator iter = inputStack_.begin();
+	 iter != inputStack_.end();
+	 ++iter)
+      top = *iter;
     if (top)
       top->willNotRewind();
     return 0;
   }
   pass1Handler_.clear();
   while (inputLevel_ > 1) {
-    InputSource *p = inputStack_.get();
+    InputSource *p = inputStack_.front();
+    inputStack_.pop_front();
     inputLevel_--;
     delete p;
   }
   // Caller will call allDone() if inputLevel_ is 0.
   if (inputLevel_ == 0)
     return 0;
-  if (!inputStack_.head()->rewind(*this)) {
+  if (!inputStack_.front()->rewind(*this)) {
     inputLevel_ = 0;
-    delete inputStack_.get();
+    delete inputStack_.front();
+    inputStack_.pop_front();
     return 0;
   }
-  inputStack_.head()->willNotRewind();
+  inputStack_.front()->willNotRewind();
   for (; pass2StartOffset_ > 0; pass2StartOffset_--)
-    if (inputStack_.head()->get(messenger()) == InputSource::eE) {
+    if (inputStack_.front()->get(messenger()) == InputSource::eE) {
       message(ParserMessages::pass2Ee);
       inputLevel_ = 0;
-      delete inputStack_.get();
+      delete inputStack_.front();
+      inputStack_.pop_front();
       return 0;
     }
   specialParseInputLevel_ = 0;
@@ -279,7 +283,8 @@ void ParserState::endLpd()
 void ParserState::popInputStack()
 {
   ASSERT(inputLevel_ > 0);
-  InputSource *p = inputStack_.get();
+  InputSource *p = inputStack_.front();
+  inputStack_.pop_front();
 
   if (handler_ != 0 && inputLevel_ > 1) {
     handler_->inputClosed(p);
@@ -332,14 +337,14 @@ void ParserState::pushInput(InputSource *in)
 
   if (!syntax_.isNull() && syntax_->multicode())
     in->setMarkupScanTable(syntax_->markupScanTable());
-  inputStack_.insert(in);
+  inputStack_.push_front(in);
   inputLevel_++;
   if (specialParseInputLevel_ > 0 && inputLevel_ > specialParseInputLevel_)
     currentMode_ = rcconeMode;	// mode for rcdata in an entity
   else if (currentMode_ == dsMode)
     currentMode_ = dsiMode;
   if (inInstance_ && sd().integrallyStored())
-    inputLevelElementIndex_.push_back(tagLevel() ? currentElement().index() : 0);
+    inputLevelElementIndex_.push_back(tagLevel() ? currentElement().index() : 0); // push_front?
 }
 
 void ParserState::startMarkedSection(const Location &loc)
@@ -436,8 +441,8 @@ void ParserState::popElement()
 			      
 Boolean ParserState::entityIsOpen(const EntityDecl *entityDecl) const
 {
-  for (IListIter<InputSource> iter(inputStack_); !iter.done(); iter.next())
-    if (iter.cur()->currentLocation().origin()->entityDecl() == entityDecl)
+  for ( std::list<InputSource *>::const_iterator iter = inputStack_.begin(); iter != inputStack_.end(); ++iter)
+    if ( (*iter)->currentLocation().origin()->entityDecl() == entityDecl)
       return 1;
   return 0;
 }
@@ -706,7 +711,7 @@ void ParserState::queueMessage(MessageEvent *event)
     return;
   }
   if (keepingMessages_)
-    keptMessages_.append(event);
+    keptMessages_.push_back(event);
   else
     handler_->message(event);
 }
@@ -719,7 +724,8 @@ void ParserState::releaseKeptMessages()
       allDone();
       return;
     }
-    handler_->message(keptMessages_.get());
+    handler_->message(keptMessages_.front());
+    keptMessages_.pop_front();
   }
 }
 

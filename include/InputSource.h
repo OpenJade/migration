@@ -8,7 +8,6 @@
 #endif
 
 #include "types.h"
-#include "Link.h"
 #include "Ptr.h"
 #include "Location.h"
 #include "XcharMap.h"
@@ -23,7 +22,7 @@ class NamedCharRef;
 class CharsetInfo;
 class InternalInputSource;
 
-class SP_API InputSource : public Link {
+class SP_API InputSource {
 public:
   enum { eE = -1 };		// end of entity signal
 

@@ -1213,7 +1213,7 @@ void Parser::handleBadStartTag(const ElementType *e,
   std::list<Event *> eventList;
   keepMessages();
   for (;;) {
-    Vector<const ElementType *> missing;
+    std::vector<const ElementType *> missing;
     findMissingTag(e, missing);
     if (missing.size() == 1) {
       queueElementEvents(eventList);
@@ -1241,7 +1241,7 @@ void Parser::handleBadStartTag(const ElementType *e,
     }
     if (missing.size() > 0) {
       queueElementEvents(eventList);
-      Vector<StringC> missingNames;
+      std::vector<StringC> missingNames;
       for (size_t i = 0; i < missing.size(); i++)
 	missingNames.push_back(missing[i]->name());
       message(ParserMessages::missingElementMultiple,
@@ -1273,7 +1273,7 @@ void Parser::handleBadStartTag(const ElementType *e,
 }
 
 void Parser::findMissingTag(const ElementType *e,
-			    Vector<const ElementType *> &v)
+			    std::vector<const ElementType *> &v)
 {
   if (!currentElement().currentPosition()) {
     if (!e)
@@ -1352,13 +1352,13 @@ void Parser::findMissingTag(const ElementType *e,
 // This doesn't try to be very efficient.
 // 0 for #pcdata
 
-void Parser::getAllowedElementTypes(Vector<const ElementType *> &v)
+void Parser::getAllowedElementTypes(std::vector<const ElementType *> &v)
 {
   v.clear();
   // FIXME get a list of all inclusions first
   // getCurrentInclusions(v);
   // x says whether each element of v was excluded
-  Vector<PackedBoolean> x(v.size(), 0);
+  std::vector<PackedBoolean> x(v.size(), 0);
   unsigned startImpliedCount = 0;
   std::list<Undo> undoList;
   for (;;) {

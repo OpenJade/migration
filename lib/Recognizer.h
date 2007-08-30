@@ -11,7 +11,7 @@
 #include "Owner.h"
 #include "XcharMap.h"
 #include "types.h"
-#include "Vector.h"
+#include <vector>
 #include "Trie.h"
 
 #ifdef SP_NAMESPACE
@@ -24,7 +24,7 @@ class InputSource;
 class Recognizer : public Resource {
 public:
   Recognizer(Trie *, const XcharMap<EquivCode> &);
-  Recognizer(Trie *, const XcharMap<EquivCode> &, Vector<Token> &);
+  Recognizer(Trie *, const XcharMap<EquivCode> &, std::vector<Token> &);
   ~Recognizer();
   Token recognize(InputSource *, Messenger &) const;
 private:
@@ -33,7 +33,7 @@ private:
   Boolean multicode_;
   Owner<Trie> trie_;
   XcharMap<EquivCode> map_;
-  Vector<Token> suppressTokens_;
+  std::vector<Token> suppressTokens_;
 };
 
 #ifdef SP_NAMESPACE

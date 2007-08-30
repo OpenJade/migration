@@ -53,7 +53,7 @@ P PointerTable<P, K, HF, KF>::insert(P p, Boolean replace)
       }
       else {
 	// rehash
-	Vector<P> oldVec(vec_.size()*2, P(0));
+	std::vector<P> oldVec(vec_.size()*2, P(0));
 	vec_.swap(oldVec);
 	usedLimit_ = vec_.size() / 2;
 	for (size_t i = 0; i < oldVec.size(); i++)

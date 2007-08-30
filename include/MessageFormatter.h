@@ -25,9 +25,9 @@ public:
   MessageFormatter();
   virtual ~MessageFormatter();
   virtual void formatMessage(const MessageFragment &,
-		     const Vector<CopyOwner<MessageArg> > &args,
+		     const std::vector<CopyOwner<MessageArg> > &args,
 		     OutputCharStream &, bool noquote = 0);
-  virtual void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
+  virtual void formatOpenElements(const std::vector<OpenElementInfo> &openElementInfo,
 			  OutputCharStream &os);
   virtual Boolean getMessageText(const MessageFragment &, StringC &) = 0;
   virtual Boolean formatFragment(const MessageFragment &, OutputCharStream &);

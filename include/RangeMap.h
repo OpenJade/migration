@@ -4,7 +4,7 @@
 #ifndef RangeMap_INCLUDED
 #define RangeMap_INCLUDED 1
 
-#include "Vector.h"
+#include <vector>
 #include "Boolean.h"
 #include "ISet.h"
 #include "types.h"
@@ -32,7 +32,7 @@ public:
   unsigned inverseMap(To, From &, ISet<WideChar> &, WideChar &count) const;
   void addRange(From, From, To);
 private:
-  Vector<RangeMapRange<From,To> > ranges_;
+  std::vector<RangeMapRange<From,To> > ranges_;
   friend class RangeMapIter<From,To>;
 };
 
@@ -54,7 +54,7 @@ public:
   }
 private:
   size_t count_;
-  typename Vector<RangeMapRange<From,To> >::const_iterator ptr_;
+  typename std::vector<RangeMapRange<From,To> >::const_iterator ptr_;
 };
 
 #ifdef SP_NAMESPACE

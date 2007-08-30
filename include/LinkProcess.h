@@ -9,7 +9,7 @@
 
 #include "Lpd.h"
 #include <list>
-#include "Vector.h"
+#include <vector>
 #include "Ptr.h"
 
 #ifdef SP_NAMESPACE
@@ -41,7 +41,7 @@ public:
   void uselink(const LinkSet *linkSet,
 	       Boolean restore,
 	       const Lpd *);
-  virtual Boolean selectLinkRule(const Vector<const AttributeList *> &,
+  virtual Boolean selectLinkRule(const std::vector<const AttributeList *> &,
 				 const Location &location,
 				 size_t &selected);
   size_t nImpliedLinkRules() const;
@@ -56,8 +56,8 @@ private:
 
   std::list<LinkProcessOpenElement *> open_;
   ConstPtr<ComplexLpd> lpd_;
-  Vector<ConstPtr<Lpd> > activeLpds_;
-  Vector<const AttributeList *> linkAttributes_;
+  std::vector<ConstPtr<Lpd> > activeLpds_;
+  std::vector<const AttributeList *> linkAttributes_;
 };
 
 inline

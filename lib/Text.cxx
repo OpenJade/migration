@@ -291,7 +291,7 @@ const Char *TextIter::chars(size_t &length) const
 Boolean TextIter::next(TextItem::Type &type, const Char *&str, size_t &length,
 		       const Location *&loc)
 {
-  const TextItem *end = text_->items_.begin() + text_->items_.size();
+  std::vector<TextItem>::const_iterator end = text_->items_.begin() + text_->items_.size();
   if (ptr_ == end)
     return 0;
   type = ptr_->type;
@@ -305,7 +305,7 @@ Boolean TextIter::next(TextItem::Type &type, const Char *&str, size_t &length,
     size_t charsIndex = ptr_->index;
     str = chars.data() + charsIndex;
     if (ptr_ + 1 != end)
-      length = ptr_[1].index - charsIndex;
+      length = (ptr_ + 1)->index - charsIndex;
     else
       length = chars.size() - charsIndex;
   }

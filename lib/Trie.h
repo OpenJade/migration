@@ -7,7 +7,7 @@
 #include <limits.h>
 #include "types.h"
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 #include "CopyOwner.h"
 #include "Priority.h"
 
@@ -53,7 +53,7 @@ public:
 private:
   unsigned char additionalLength_;
   size_t maxBlanksToScan_;
-  Vector<PackedBoolean> codeIsBlank_;
+  std::vector<PackedBoolean> codeIsBlank_;
   friend class TrieBuilder;
 };
 

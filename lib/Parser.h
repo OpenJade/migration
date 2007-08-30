@@ -25,7 +25,7 @@
 #include "SgmlParser.h"
 #include "StringOf.h"
 #include "Undo.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -276,7 +276,7 @@ private:
   void handleShortref(int index);
   Boolean parseProcessingInstruction();
   Boolean parseAttributed(unsigned declInputLevel, Param &parm,
-			  Vector<Attributed *> &attributed,
+			  std::vector<Attributed *> &attributed,
 			  Boolean &isNotation);
   Boolean parseDeclaredValue(unsigned declInputLevel, Boolean isNotation,
 			     Param &parm, Owner<DeclaredValue> &value);
@@ -402,7 +402,7 @@ private:
   Boolean skipAttributeSpec();
   Boolean lookingAtStartTag(StringC &gi);
   void implyDtd(const StringC &gi);
-  void findMissingTag(const ElementType *e, Vector<const ElementType *> &);
+  void findMissingTag(const ElementType *e, std::vector<const ElementType *> &);
   unsigned paramsSubdocLevel(const SgmlParser::Params &);
   void addCommonAttributes(Dtd &dtd);
   Boolean parseAfdrDecl();

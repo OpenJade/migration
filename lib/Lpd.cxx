@@ -124,7 +124,7 @@ Boolean IdLinkRule::isAssociatedWith(const ElementType *e) const
   return 0;
 }
 
-void IdLinkRule::setAssocElementTypes(Vector<const ElementType *> &v)
+void IdLinkRule::setAssocElementTypes(std::vector<const ElementType *> &v)
 {
   v.swap(assocElementTypes_);
 }

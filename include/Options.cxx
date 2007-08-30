@@ -12,7 +12,7 @@ namespace SP_NAMESPACE {
 #endif
 
 template<class T>
-Options<T>::Options(int argc, T *const *argv, const Vector<LongOption<T> > &l)
+Options<T>::Options(int argc, T *const *argv, const std::vector<LongOption<T> > &l)
 : argc_(argc), argv_(argv), ind_(1), sp_(1), opts_(l), optInd_(-1)
 {
 }

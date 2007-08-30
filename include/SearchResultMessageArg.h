@@ -10,8 +10,8 @@
 
 #include "MessageArg.h"
 #include "StringC.h"
-#include "Vector.h"
-#include "Vector.h"
+#include <vector>
+#include <vector>
 #include "rtti.h"
 
 #ifdef SP_NAMESPACE
@@ -28,8 +28,8 @@ public:
   const StringC &filename(size_t) const;
   int errnum(size_t) const;
 private:
-  Vector<StringC> filename_;
-  Vector<unsigned int> errno_;
+  std::vector<StringC> filename_;
+  std::vector<unsigned int> errno_;
 };
 
 inline

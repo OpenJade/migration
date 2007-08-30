@@ -14,7 +14,7 @@
 #include "Boolean.h"
 #include "StringC.h"
 #include "types.h"
-#include "Vector.h"
+#include <vector>
 #include "Location.h"
 #include "CodingSystemKit.h"
 
@@ -56,7 +56,7 @@ struct SP_API StorageObjectSpec {
 };
 
 
-struct SP_API ParsedSystemId : public Vector<StorageObjectSpec> {
+struct SP_API ParsedSystemId : public std::vector<StorageObjectSpec> {
   ParsedSystemId();
   void unparse(const CharsetInfo &resultCharset, Boolean isNdata, StringC &result) const;
   struct SP_API Map {
@@ -71,7 +71,7 @@ struct SP_API ParsedSystemId : public Vector<StorageObjectSpec> {
     ~Map();
     Map& operator=(const Map&);
   };
-  Vector<Map> maps;
+  std::vector<Map> maps;
 };
 
 struct SP_API StorageObjectLocation {
@@ -109,7 +109,7 @@ public:
 				 const StringC *mapCatalogPublic,
 				 Messenger &,
 				 StringC &) = 0;
-  virtual Boolean mergeSystemIds(const Vector<StringC> &sysids,
+  virtual Boolean mergeSystemIds(const std::vector<StringC> &sysids,
 				 Boolean mapCatalogDocument,
 				 const CharsetInfo &,
 				 Messenger &mgr,

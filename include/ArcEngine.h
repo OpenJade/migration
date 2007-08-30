@@ -9,7 +9,7 @@
 #endif
 
 #include "Event.h"
-#include "Vector.h"
+#include <vector>
 #include "SgmlParser.h"
 #include <stddef.h>
 
@@ -21,22 +21,22 @@ class SP_API ArcDirector {
 public:
   virtual EventHandler *arcEventHandler(const StringC *arcPublicId,
 					const Notation *,
-					const Vector<StringC> &,
+					const std::vector<StringC> &,
 					const SubstTable *) = 0;
 };
 
 class SP_API SelectOneArcDirector : public ArcDirector, public Messenger {
 public:
-  SelectOneArcDirector(const Vector<StringC> &select, EventHandler &eh)
+  SelectOneArcDirector(const std::vector<StringC> &select, EventHandler &eh)
     : select_(select), eh_(&eh) { }
   EventHandler *arcEventHandler(const StringC *,
 				const Notation *,
-				const Vector<StringC> &,
+				const std::vector<StringC> &,
 				const SubstTable *);
   void dispatchMessage(const Message &);
   void dispatchMessage(Message &);
 private:
-  Vector<StringC> select_;
+  std::vector<StringC> select_;
   EventHandler *eh_;
 };
 

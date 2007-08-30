@@ -9,7 +9,7 @@
 
 #include "types.h"
 #include "StringC.h"
-#include "Vector.h"
+#include <vector>
 #include "Location.h"
 #include "SubstTable.h"
 #include <stddef.h>
@@ -93,7 +93,7 @@ public:
 private:
   void addSimple(TextItem::Type, const Location &);
   StringC chars_;
-  Vector<TextItem> items_;
+  std::vector<TextItem> items_;
   friend class TextIter;
 };
 
@@ -110,7 +110,7 @@ public:
   const Location &location() const;
   const Char *chars(size_t &length) const;
 private:
-  const TextItem *ptr_;
+  std::vector<TextItem>::const_iterator ptr_;
   const Text *text_;
 };
 

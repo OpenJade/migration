@@ -9,7 +9,7 @@
 #include "ContentToken.h"
 #include "macros.h"
 #include "ElementType.h"
-#include "Vector.h"
+#include <vector>
 #include "Dtd.h"
 #include "MessageArg.h"
 
@@ -19,7 +19,7 @@ namespace SP_NAMESPACE {
 
 Transition::~Transition() {}
 
-AndModelGroup::AndModelGroup(NCVector<Owner<ContentToken> > &v,
+AndModelGroup::AndModelGroup(std::vector<Owner<ContentToken> > &v,
 			     ContentToken::OccurrenceIndicator oi)
 : ModelGroup(v, oi)
 {
@@ -30,7 +30,7 @@ ModelGroup::Connector AndModelGroup::connector() const
   return andConnector;
 }
 
-OrModelGroup::OrModelGroup(NCVector<Owner<ContentToken> > &v,
+OrModelGroup::OrModelGroup(std::vector<Owner<ContentToken> > &v,
 			   ContentToken::OccurrenceIndicator oi)
 : ModelGroup(v, oi)
 {
@@ -43,7 +43,7 @@ ModelGroup::Connector OrModelGroup::connector() const
 }
 
 
-SeqModelGroup::SeqModelGroup(NCVector<Owner<ContentToken> > &v,
+SeqModelGroup::SeqModelGroup(std::vector<Owner<ContentToken> > &v,
 			     ContentToken::OccurrenceIndicator oi)
 : ModelGroup(v, oi)
 {
@@ -55,7 +55,7 @@ ModelGroup::Connector SeqModelGroup::connector() const
 }
 
 
-ModelGroup::ModelGroup(NCVector<Owner<ContentToken> > &v,
+ModelGroup::ModelGroup(std::vector<Owner<ContentToken> > &v,
 		       OccurrenceIndicator oi)
 : ContentToken(oi)
 {
@@ -147,14 +147,14 @@ Boolean InitialPseudoToken::isInitial() const
   return 1;
 }
 
-DataTagGroup::DataTagGroup(NCVector<Owner<ContentToken> > &vec,
+DataTagGroup::DataTagGroup(std::vector<Owner<ContentToken> > &vec,
 			   OccurrenceIndicator oi)
 : SeqModelGroup(vec, oi)
 {
 }
 
 DataTagElementToken::DataTagElementToken(const ElementType *element,
-					 Vector<Text> &templates,
+					 std::vector<Text> &templates,
 					 Text &paddingTemplate)
 : ElementToken(element, ContentToken::none),
   havePaddingTemplate_(1)
@@ -164,7 +164,7 @@ DataTagElementToken::DataTagElementToken(const ElementType *element,
 }
 
 DataTagElementToken::DataTagElementToken(const ElementType *element,
-					 Vector<Text> &templates)
+					 std::vector<Text> &templates)
 : ElementToken(element, ContentToken::none),
   havePaddingTemplate_(0)
 {
@@ -179,7 +179,7 @@ struct GroupInfo {
   unsigned nextLeafIndex;
   PackedBoolean containsPcdata;
   unsigned andStateSize;
-  Vector<unsigned> nextTypeIndex;
+  std::vector<unsigned> nextTypeIndex;
   GroupInfo(size_t);
 };
 
@@ -195,7 +195,7 @@ CompiledModelGroup::CompiledModelGroup(Owner<ModelGroup> &modelGroup)
 }
 
 void CompiledModelGroup::compile(size_t nElementTypeIndex,
-				 Vector<ContentModelAmbiguity> &ambiguities,
+				 std::vector<ContentModelAmbiguity> &ambiguities,
 				 Boolean &pcdataUnreachable)
 {
   FirstSet first;
@@ -213,8 +213,8 @@ void CompiledModelGroup::compile(size_t nElementTypeIndex,
   if (modelGroup_->inherentlyOptional())
     initial_->setFinal();
   pcdataUnreachable = 0;
-  Vector<unsigned> minAndDepth(info.nextLeafIndex);
-  Vector<size_t> elementTransition(nElementTypeIndex);
+  std::vector<unsigned> minAndDepth(info.nextLeafIndex);
+  std::vector<size_t> elementTransition(nElementTypeIndex);
   initial_->finish(minAndDepth, elementTransition, ambiguities,
 		   pcdataUnreachable);
   modelGroup_->finish(minAndDepth, elementTransition, ambiguities,
@@ -223,9 +223,9 @@ void CompiledModelGroup::compile(size_t nElementTypeIndex,
     pcdataUnreachable = 0;
 }
 
-void ModelGroup::finish(Vector<unsigned> &minAndDepth,
-			Vector<size_t> &elementTransition,
-			Vector<ContentModelAmbiguity> &ambiguities,
+void ModelGroup::finish(std::vector<unsigned> &minAndDepth,
+			std::vector<size_t> &elementTransition,
+			std::vector<ContentModelAmbiguity> &ambiguities,
 			Boolean &pcdataUnreachable)
 {
   for (unsigned i = 0; i < nMembers(); i++)
@@ -233,9 +233,9 @@ void ModelGroup::finish(Vector<unsigned> &minAndDepth,
 		     pcdataUnreachable);
 }
 
-void LeafContentToken::finish(Vector<unsigned> &minAndDepthVec,
-			      Vector<size_t> &elementTransitionVec,
-			      Vector<ContentModelAmbiguity> &ambiguities,
+void LeafContentToken::finish(std::vector<unsigned> &minAndDepthVec,
+			      std::vector<size_t> &elementTransitionVec,
+			      std::vector<ContentModelAmbiguity> &ambiguities,
 			      Boolean &pcdataUnreachable)
 {
   if (andInfo_) {
@@ -243,8 +243,8 @@ void LeafContentToken::finish(Vector<unsigned> &minAndDepthVec,
 	      pcdataUnreachable);
     return;
   }
-  Vector<size_t>::iterator elementTransition = elementTransitionVec.begin();
-  Vector<unsigned>::iterator minAndDepth = minAndDepthVec.begin();
+  std::vector<size_t>::iterator elementTransition = elementTransitionVec.begin();
+  std::vector<unsigned>::iterator minAndDepth = minAndDepthVec.begin();
   minAndDepthVec.assign(minAndDepthVec.size(), unsigned(-1));
   elementTransitionVec.assign(elementTransitionVec.size(), size_t(-1));
   pcdataTransitionType_ = 0;
@@ -252,7 +252,7 @@ void LeafContentToken::finish(Vector<unsigned> &minAndDepthVec,
   // follow_ is in decreasing order of andDepth because of how it's
   // constructed.
   size_t n = follow_.size();
-  Vector<LeafContentToken *>::iterator follow = follow_.begin();
+  std::vector<LeafContentToken *>::iterator follow = follow_.begin();
   size_t j = 0;
   for (size_t i = 0; i < n; i++) {
     unsigned &minDepth = minAndDepth[follow[i]->index()];
@@ -298,18 +298,18 @@ void LeafContentToken::finish(Vector<unsigned> &minAndDepthVec,
   follow_.resize(j);
 }
 
-void LeafContentToken::andFinish(Vector<unsigned> &minAndDepthVec,
-				 Vector<size_t> &elementTransitionVec,
-				 Vector<ContentModelAmbiguity> &ambiguities,
+void LeafContentToken::andFinish(std::vector<unsigned> &minAndDepthVec,
+				 std::vector<size_t> &elementTransitionVec,
+				 std::vector<ContentModelAmbiguity> &ambiguities,
 				 Boolean &pcdataUnreachable)
 {
   // Vector mapping element type index to index of leaf content token
   // of that type to which there is a transition, which is the "worst"
   // from the point of view of ambiguity.
-  Vector<size_t>::iterator elementTransition = elementTransitionVec.begin();
+  std::vector<size_t>::iterator elementTransition = elementTransitionVec.begin();
   // Vector mapping index of leaf content token
   // to minimum AND depth of transition to that token.
-  Vector<unsigned>::iterator minAndDepth = minAndDepthVec.begin();
+  std::vector<unsigned>::iterator minAndDepth = minAndDepthVec.begin();
   minAndDepthVec.assign(minAndDepthVec.size(), unsigned(-1));
   elementTransitionVec.assign(elementTransitionVec.size(), size_t(-1));
   pcdataTransitionType_ = 0;
@@ -320,7 +320,7 @@ void LeafContentToken::andFinish(Vector<unsigned> &minAndDepthVec,
   // constructed.
   size_t n = follow_.size();
   size_t j = 0;
-  Vector<Transition>::iterator andFollow = andInfo_->follow.begin();
+  std::vector<Transition>::iterator andFollow = andInfo_->follow.begin();
   for (size_t i = 0; i < n; i++) {
     unsigned &minDepth = minAndDepth[follow_[i]->index()];
     // ignore transitions to the same token with the same and depth.
@@ -502,8 +502,8 @@ void AndModelGroup::analyze1(GroupInfo &info,
   andGroupIndex_ = andGroupIndex;
   if (andIndex_ + nMembers() > info.andStateSize)
     info.andStateSize = andIndex_ + nMembers();
-  Vector<FirstSet> firstVec(nMembers());
-  Vector<LastSet> lastVec(nMembers());
+  std::vector<FirstSet> firstVec(nMembers());
+  std::vector<LastSet> lastVec(nMembers());
   member(0).analyze(info, this, 0, firstVec[0], lastVec[0]);
   first = firstVec[0];
   first.setNotRequired();
@@ -635,14 +635,14 @@ LeafContentToken::transitionToken(const ElementType *to,
 				  const AndState &andState,
 				  unsigned minAndDepth) const
 {
-  Vector<LeafContentToken *>::const_iterator p = follow_.begin();
+  std::vector<LeafContentToken *>::const_iterator p = follow_.begin();
   if (!andInfo_) {
     for (size_t n = follow_.size(); n > 0; n--, p++)
       if ((*p)->elementType() == to)
 	return *p;
   }
   else {
-    Vector<Transition>::const_iterator q = andInfo_->follow.begin();
+    std::vector<Transition>::const_iterator q = andInfo_->follow.begin();
     for (size_t n = follow_.size(); n > 0; n--, p++, q++)
       if ((*p)->elementType() == to
 	  && ((q->requireClear == unsigned(Transition::invalidIndex)
@@ -659,7 +659,7 @@ LeafContentToken::tryTransition(const ElementType *to,
 				unsigned &minAndDepth,
 				const LeafContentToken *&newpos) const
 {
-  Vector<LeafContentToken *>::const_iterator p = follow_.begin();
+  std::vector<LeafContentToken *>::const_iterator p = follow_.begin();
   if (!andInfo_) {
     for (size_t n = follow_.size(); n > 0; n--, p++) {
       if ((*p)->elementType() == to) {
@@ -670,7 +670,7 @@ LeafContentToken::tryTransition(const ElementType *to,
     }
   }
   else {
-    Vector<Transition>::const_iterator q = andInfo_->follow.begin();
+    std::vector<Transition>::const_iterator q = andInfo_->follow.begin();
     for (size_t n = follow_.size(); n > 0; n--, p++, q++) {
     if ((*p)->elementType() == to
 	&& ((q->requireClear == unsigned(Transition::invalidIndex)
@@ -691,15 +691,15 @@ LeafContentToken::tryTransition(const ElementType *to,
 void
 LeafContentToken::possibleTransitions(const AndState &andState,
 				      unsigned minAndDepth,
-				      Vector<const ElementType *> &v) const
+				      std::vector<const ElementType *> &v) const
 {
-  Vector<LeafContentToken *>::const_iterator p = follow_.begin();
+  std::vector<LeafContentToken *>::const_iterator p = follow_.begin();
   if (!andInfo_) {
     for (size_t n = follow_.size(); n > 0; n--, p++) 
       v.push_back((*p)->elementType());
   }
   else {
-    Vector<Transition>::const_iterator q = andInfo_->follow.begin();
+    std::vector<Transition>::const_iterator q = andInfo_->follow.begin();
     for (size_t n = follow_.size(); n > 0; n--, p++, q++)
       if ((q->requireClear == unsigned(Transition::invalidIndex)
 	   || andState.isClear(q->requireClear))

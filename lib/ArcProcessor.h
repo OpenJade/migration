@@ -8,7 +8,7 @@
 #include "ContentState.h"
 #include "Id.h"
 #include "NamedTable.h"
-#include "Vector.h"
+#include <vector>
 #include "ArcEngine.h"
 #include "SgmlParser.h"
 
@@ -29,13 +29,13 @@ public:
     unsigned suppressFlags;
     // #ARCCONT and #CONTENT are handled with a special index
     // list of indexes into element's attlist of architectural attributes
-    Vector<unsigned> attMapFrom;
+    std::vector<unsigned> attMapFrom;
     // corresponding list of indexes in form's attlist
-    Vector<unsigned> attMapTo;
+    std::vector<unsigned> attMapTo;
     // corresponding list of pointers in the token maps
-    Vector<size_t> attTokenMapBase;
-    Vector<StringC> tokenMapFrom;
-    Vector<StringC> tokenMapTo;
+    std::vector<size_t> attTokenMapBase;
+    std::vector<StringC> tokenMapFrom;
+    std::vector<StringC> tokenMapTo;
   };
   struct MetaMapCache {
     MetaMapCache();
@@ -56,8 +56,8 @@ public:
 	    const ConstPtr<Syntax> &,
 	    const SgmlParser *parser,
 	    Messenger *,
-	    const Vector<StringC> &superName,
-	    const NCVector<ArcProcessor> &arcProcessors,
+	    const std::vector<StringC> &superName,
+	    const std::vector<ArcProcessor> &arcProcessors,
 	    ArcDirector &director,
 	    const volatile sig_atomic_t *cancelPtr);
   // Return 0 if the content is needed, but wasn't supplied
@@ -78,8 +78,8 @@ public:
   void setPiDecl(const Location &loc, const StringC &attspecText, Index attspecIndex,
 		 const ConstPtr<AttributeDefinitionList> &archPiAttributeDefs);
 private:
-  ArcProcessor(const ArcProcessor &); // undefined
-  void operator=(const ArcProcessor &);	// undefined
+  // ArcProcessor(const ArcProcessor &); // undefined
+  // void operator=(const ArcProcessor &);	// undefined
   const Syntax &attributeSyntax() const;
   ConstPtr<Notation> getAttributeNotation(const StringC &,
 					  const Location &);
@@ -132,18 +132,18 @@ private:
 			       const Text &rename,
 			       const AttributeList &atts,
 			       const AttributeList *linkAtts,
-			       Vector<PackedBoolean> &attRenamed,
-			       Vector<PackedBoolean> &attSubstituted,
+			       std::vector<PackedBoolean> &attRenamed,
+			       std::vector<PackedBoolean> &attSubstituted,
                                Boolean isNotation);
   void buildAttributeMapRest(MetaMap &map,
 			     const AttributeList &atts,
 			     const AttributeList *linkAtts,
-			     const Vector<PackedBoolean> &attRenamed);
+			     const std::vector<PackedBoolean> &attRenamed);
   Boolean matchName(const StringC &name, const char *key);
   void split(const Text &text,
 	     Char space,
-	     Vector<StringC> &tokens,
-	     Vector<size_t> &tokenPos);
+	     std::vector<StringC> &tokens,
+	     std::vector<size_t> &tokenPos);
   Boolean mapAttributes(const AttributeList &from,
 			const AttributeList *fromLink,
 			const Text *content,
@@ -195,7 +195,7 @@ private:
   ConstPtr<AttributeDefinitionList> archPiAttributeDefs_;
   Boolean arcDtdIsParam_;
   Boolean arcAuto_;
-  Vector<StringC> arcOpts_;
+  std::vector<StringC> arcOpts_;
   StringC rniContent_;
   StringC rniArcCont_;
   StringC rniDefault_;
@@ -209,12 +209,12 @@ private:
     // recovering from invalid data
     recoverData = 040
     };
-  Vector<unsigned> openElementFlags_;
+  std::vector<unsigned> openElementFlags_;
   AttributeList attributeList_;
-  NCVector<Owner<MetaMapCache> > metaMapCache_;
+  std::vector<Owner<MetaMapCache> > metaMapCache_;
   MetaMap noCacheMetaMap_;
   NamedTable<Id> idTable_;
-  Vector<ConstPtr<AttributeValue> > currentAttributes_;
+  std::vector<ConstPtr<AttributeValue> > currentAttributes_;
   ConstPtr<Notation> defaultNotation_;
   Boolean errorIdref_;
   ArcDirector *director_;

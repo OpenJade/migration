@@ -173,8 +173,8 @@ void Parser::endProlog()
     setPhase(instanceStartPhase);
     startInstance();
     ConstPtr<ComplexLpd> lpd;
-    Vector<AttributeList> simpleLinkAtts;
-    Vector<StringC> simpleLinkNames;
+    std::vector<AttributeList> simpleLinkAtts;
+    std::vector<StringC> simpleLinkNames;
     for (size_t i = 0; i < nActiveLink(); i++)
       if (activeLpd(i).type() == Lpd::simpleLink) {
 	const SimpleLpd &lpd = (SimpleLpd &)activeLpd(i);
@@ -541,7 +541,7 @@ Boolean Parser::parseElementDecl()
   Param parm;
   if (!parseParam(allowNameNameGroup, declInputLevel, parm))
     return 0;
-  Vector<NameToken> nameVector;
+  std::vector<NameToken> nameVector;
   if (parm.type == Param::nameGroup) {
     parm.nameTokenVector.swap(nameVector);
     if (options().warnElementGroupDecl)
@@ -564,9 +564,9 @@ Boolean Parser::parseElementDecl()
   if (!parseParam(allowRankOmissionContent, declInputLevel, parm))
     return 0;
   StringC rankSuffix;
-  Vector<ElementType *> elements(nameVector.size());
-  Vector<RankStem *> rankStems;
-  Vector<const RankStem *> constRankStems;
+  std::vector<ElementType *> elements(nameVector.size());
+  std::vector<RankStem *> rankStems;
+  std::vector<const RankStem *> constRankStems;
   size_t i;
   if (parm.type == Param::number) {
     if (options().warnRank)
@@ -688,7 +688,7 @@ Boolean Parser::parseElementDecl()
 	message(ParserMessages::grpgtcnt, NumberMessageArg(syntax().grpgtcnt()));
       Owner<CompiledModelGroup>
 	modelGroup(new CompiledModelGroup(parm.modelGroupPtr));
-      Vector<ContentModelAmbiguity> ambiguities;
+      std::vector<ContentModelAmbiguity> ambiguities;
       Boolean pcdataUnreachable;
       modelGroup->compile(currentDtd().nElementTypeIndex(), ambiguities,
 			  pcdataUnreachable);
@@ -728,7 +728,7 @@ Boolean Parser::parseElementDecl()
       rankStems[i]->addDefinition(constDef);
   }
   if (currentMarkup()) {
-    Vector<const ElementType *> v(elements.size());
+    std::vector<const ElementType *> v(elements.size());
     for (i = 0; i < elements.size(); i++)
       v[i] = elements[i];
     eventHandler().elementDecl(new (eventAllocator())
@@ -903,10 +903,10 @@ Boolean Parser::parseAttlistDecl()
   Boolean anyCurrent = 0;
 
   Boolean isNotation;
-  Vector<Attributed *> attributed;
+  std::vector<Attributed *> attributed;
   if (!parseAttributed(declInputLevel, parm, attributed, isNotation))
     return 0;
-  Vector<CopyOwner<AttributeDefinition> > defs;
+  std::vector<CopyOwner<AttributeDefinition> > defs;
   if (!parseParam(sd().www() ? allowNameMdc : allowName, declInputLevel, parm))
     return 0;
   while (parm.type != Param::mdc) {
@@ -941,11 +941,11 @@ Boolean Parser::parseAttlistDecl()
 	notationIndex = defs.size();
       }
     }
-    const Vector<StringC> *tokensPtr = declaredValue->getTokens();
+    const std::vector<StringC> *tokensPtr = declaredValue->getTokens();
     if (tokensPtr) {
       size_t nTokens = tokensPtr->size();
       if (!sd().www()) {
-	Vector<StringC>::const_iterator tokens = tokensPtr->begin();
+	std::vector<StringC>::const_iterator tokens = tokensPtr->begin();
 	for (i = 0; i < nTokens; i++) {
 	  for (size_t j = 0; j < defs.size(); j++)
 	    if (defs[j]->containsToken(tokens[i])) {
@@ -1049,7 +1049,7 @@ Boolean Parser::parseAttlistDecl()
 	}
 	size_t oldSize = curAdl->size();
 	if (curAdl->count() != 1) {
-	  Vector<CopyOwner<AttributeDefinition> > copy(oldSize);
+	  std::vector<CopyOwner<AttributeDefinition> > copy(oldSize);
 	  for (size_t j = 0; j < oldSize; j++)
 	    copy[j] = curAdl->def(j)->copy();
 	  Ptr<AttributeDefinitionList> adlCopy
@@ -1091,7 +1091,7 @@ Boolean Parser::parseAttlistDecl()
   }
   if (currentMarkup()) {
     if (isNotation) {
-      Vector<ConstPtr<Notation> > v(attributed.size());
+      std::vector<ConstPtr<Notation> > v(attributed.size());
       for (size_t i = 0; i < attributed.size(); i++)
 	v[i] = (Notation *)attributed[i];
       eventHandler()
@@ -1101,7 +1101,7 @@ Boolean Parser::parseAttlistDecl()
 						      currentMarkup()));
     }
     else {
-      Vector<const ElementType *> v(attributed.size());
+      std::vector<const ElementType *> v(attributed.size());
       for (size_t i = 0; i < attributed.size(); i++)
 	v[i] = (ElementType *)attributed[i];
       if (haveDefLpd())
@@ -1144,7 +1144,7 @@ Boolean Parser::parseAttlistDecl()
 
 Boolean Parser::parseAttributed(unsigned declInputLevel,
 				Param &parm,
-				Vector<Attributed *> &attributed,
+				std::vector<Attributed *> &attributed,
 				Boolean &isNotation)
 {
   static AllowedParams
@@ -1326,7 +1326,7 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
       static AllowedParams allowNameGroup(Param::nameGroup);
       if (!parseParam(allowNameGroup, declInputLevel, parm))
 	return 0;
-      Vector<StringC> group(parm.nameTokenVector.size());
+      std::vector<StringC> group(parm.nameTokenVector.size());
       for (size_t i = 0; i < group.size(); i++)
 	parm.nameTokenVector[i].name.swap(group[i]);
       declaredValue = new NotationDeclaredValue(group);
@@ -1335,8 +1335,8 @@ Boolean Parser::parseDeclaredValue(unsigned declInputLevel,
     break;
   case Param::nameTokenGroup:
     {
-      Vector<StringC> group(parm.nameTokenVector.size());
-      Vector<StringC> origGroup(parm.nameTokenVector.size());
+      std::vector<StringC> group(parm.nameTokenVector.size());
+      std::vector<StringC> origGroup(parm.nameTokenVector.size());
       for (size_t i = 0; i < group.size(); i++) {
 	parm.nameTokenVector[i].name.swap(group[i]);
 	parm.nameTokenVector[i].origName.swap(origGroup[i]);
@@ -1957,7 +1957,7 @@ Boolean Parser::parseShortrefDecl()
     map->setDefLocation(markupLocation());
   if (!parseParam(allowParamLiteral, declInputLevel, parm))
     return 0;
-  Vector<StringC> vec;
+  std::vector<StringC> vec;
   do {
     StringC delim(parm.literalText.string());
     instanceSyntax().generalSubstTable()->subst(delim);
@@ -2062,7 +2062,7 @@ Boolean Parser::parseUsemapDecl()
 	return 0;
     }
     else {
-      Vector<const ElementType *> v;
+      std::vector<const ElementType *> v;
       if (parm.type == Param::name) {
 	ElementType *e = lookupCreateElement(parm.token);
 	v.push_back(e);
@@ -2098,7 +2098,7 @@ Boolean Parser::parseUsemapDecl()
 		StringMessageArg(map->name()));
       else {
 	if (currentMarkup()) {
-	  Vector<const ElementType *> v;
+	  std::vector<const ElementType *> v;
 	  eventHandler().usemap(new (eventAllocator())
 				UsemapEvent(map, v,
 					    currentDtdPointer(),
@@ -2421,7 +2421,7 @@ void Parser::checkDtd(Dtd &dtd)
     ShortReferenceMap *map = mapIter.next();
     if (!map)
       break;
-    Vector<ConstPtr<Entity> > entityMap(nShortref);
+    std::vector<ConstPtr<Entity> > entityMap(nShortref);
     for (i = 0; i < nShortref; i++) {
       const StringC *entityName = map->entityName(i);
       if (entityName) {
@@ -2543,7 +2543,7 @@ void Parser::addCommonAttributes(Dtd &dtd)
   }
   Dtd::ElementTypeIter elementIter(dtd.elementTypeIter());
   Dtd::NotationIter notationIter(dtd.notationIter());
-  Vector<PackedBoolean> doneAdl(dtd.nAttributeDefinitionList(),
+  std::vector<PackedBoolean> doneAdl(dtd.nAttributeDefinitionList(),
 				PackedBoolean(0));
   for (int isNotation = 0; isNotation < 2; isNotation++) {
     if (!commonAdl[isNotation].isNull()) {
@@ -2611,9 +2611,9 @@ void Parser::addCommonAttributes(Dtd &dtd)
   Dtd::ElementTypeIter element2Iter(dtd.elementTypeIter());
   Dtd::NotationIter notationIter(dtd.notationIter());
   Dtd::NotationIter notation2Iter(dtd.notationIter());
-  Vector<PackedBoolean> done1Adl(dtd.nAttributeDefinitionList(),
+  std::vector<PackedBoolean> done1Adl(dtd.nAttributeDefinitionList(),
 				PackedBoolean(0));
-  Vector<PackedBoolean> done2Adl(dtd.nAttributeDefinitionList(),
+  std::vector<PackedBoolean> done2Adl(dtd.nAttributeDefinitionList(),
 				PackedBoolean(0));
   // we do 2 passes over element types and notations,
   // first merging #implicit attributes for implicit element types/notations
@@ -3027,7 +3027,7 @@ Boolean Parser::parseLinkSet(Boolean idlink)
 	linkRuleResource = new SourceLinkRuleResource;
 	linkRule = linkRuleResource.pointer();
       }
-      Vector<const ElementType *> assocElementTypes;
+      std::vector<const ElementType *> assocElementTypes;
       if (parm.type == Param::name) {
 	assocElementTypes.resize(1);
 	assocElementTypes[0] = lookupCreateElement(parm.token);

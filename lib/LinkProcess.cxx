@@ -140,7 +140,7 @@ const ResultElementSpec &LinkProcess::impliedLinkRule(size_t i) const
 
 // Usually redefined by application.
 
-Boolean LinkProcess::selectLinkRule(const Vector<const AttributeList *> &,
+Boolean LinkProcess::selectLinkRule(const std::vector<const AttributeList *> &,
 				    const Location &,
 				    size_t &selected)
 {

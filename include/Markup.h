@@ -11,7 +11,7 @@
 #include "StringC.h"
 #include "Syntax.h"
 #include "Sd.h"
-#include "Vector.h"
+#include <vector>
 #include "Text.h"
 #include "SdText.h"
 
@@ -87,7 +87,7 @@ public:
   void swap(Markup &);
 private:
   StringC chars_;
-  Vector<MarkupItem> items_;
+  std::vector<MarkupItem> items_;
   friend class MarkupIter;
 };
 
@@ -112,7 +112,7 @@ public:
   Sd::ReservedName sdReservedName() const;
 private:
   const Char *chars_;
-  Vector<MarkupItem>::const_iterator items_;
+  std::vector<MarkupItem>::const_iterator items_;
   size_t nItems_;
   size_t index_;
   size_t charIndex_;

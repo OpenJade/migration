@@ -22,7 +22,7 @@ Recognizer::Recognizer(Trie *trie, const XcharMap<EquivCode> &map)
 }
 
 Recognizer::Recognizer(Trie *trie, const XcharMap<EquivCode> &map,
-		       Vector<Token> &suppressTokens)
+		       std::vector<Token> &suppressTokens)
 : trie_(trie), map_(map), multicode_(1)
 {
   suppressTokens.swap(suppressTokens_);

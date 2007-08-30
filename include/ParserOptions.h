@@ -9,7 +9,7 @@
 
 #include "types.h"
 #include "EventsWanted.h"
-#include "Vector.h"
+#include <vector>
 #include "StringC.h"
 
 #ifdef SP_NAMESPACE
@@ -132,7 +132,7 @@ struct SP_API ParserOptions : public Warnings {
   PackedBoolean entityRef;
   PackedBoolean externalEntityRef;
   PackedBoolean integral;
-  Vector<StringC> includes;
+  std::vector<StringC> includes;
 };
 
 #ifdef SP_NAMESPACE

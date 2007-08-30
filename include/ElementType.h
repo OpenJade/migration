@@ -9,12 +9,12 @@
 
 #include <stddef.h>
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 #include "Owner.h"
 #include "Location.h"
 #include "Ptr.h"
 #include "Named.h"
-#include "Vector.h"
+#include <vector>
 #include "Attributed.h"
 #include "Mode.h"
 #include "ContentToken.h"
@@ -58,9 +58,9 @@ public:
   const ElementType *exclusion(size_t) const;
   Boolean undefined() const;
   Boolean allowImmediateRecursion() const;
-  void setInclusions(Vector<const ElementType *> &inclusions);
-  void setExclusions(Vector<const ElementType *> &exclusions);
-  void setRank(StringC &suffix, Vector<const RankStem *> &rankStems);
+  void setInclusions(std::vector<const ElementType *> &inclusions);
+  void setExclusions(std::vector<const ElementType *> &exclusions);
+  void setRank(StringC &suffix, std::vector<const RankStem *> &rankStems);
   Mode mode(Boolean netEnabled) const;
   const Location &location() const;
 private:
@@ -74,11 +74,11 @@ private:
   DeclaredContent declaredContent_;
   Boolean allowImmediateRecursion_;
   Owner<CompiledModelGroup> modelGroup_;
-  Vector<const ElementType *> inclusions_;
-  Vector<const ElementType *> exclusions_;
+  std::vector<const ElementType *> inclusions_;
+  std::vector<const ElementType *> exclusions_;
   // rankStems_ contains all the rank stems in the ranked group in this
   // definition.
-  Vector<const RankStem *> rankStems_;
+  std::vector<const RankStem *> rankStems_;
   StringC rankSuffix_;
   Mode mode_;
   Mode netMode_;
@@ -95,7 +95,7 @@ private:
   RankStem(const RankStem &);	// undefined
   void operator=(const RankStem &); // undefined
   size_t index_;
-  Vector<ConstPtr<ElementDefinition> > def_;
+  std::vector<ConstPtr<ElementDefinition> > def_;
 };
 
 class SP_API ElementType : public Named, public Attributed {
@@ -116,8 +116,8 @@ public:
   const StringC &origName() const;
 private:
   StringC origName_;
-  ElementType(const ElementType &); // undefined
-  void operator=(const ElementType &); // undefined
+  // ElementType(const ElementType &); // undefined
+  // void operator=(const ElementType &); // undefined
   size_t index_;
   size_t defIndex_;		// index in the group having same definition
   ConstPtr<ElementDefinition> def_;
@@ -215,20 +215,20 @@ const Location &ElementDefinition::location() const
 }
 
 inline
-void ElementDefinition::setInclusions(Vector<const ElementType *> &inclusions)
+void ElementDefinition::setInclusions(std::vector<const ElementType *> &inclusions)
 {
   inclusions.swap(inclusions_);
 }
 
 inline
-void ElementDefinition::setExclusions(Vector<const ElementType *> &exclusions)
+void ElementDefinition::setExclusions(std::vector<const ElementType *> &exclusions)
 {
   exclusions.swap(exclusions_);
 }
 
 inline
 void ElementDefinition::setRank(StringC &rankSuffix,
-				Vector<const RankStem *> &rankStems)
+				std::vector<const RankStem *> &rankStems)
 {
   rankStems.swap(rankStems_);
   rankSuffix.swap(rankSuffix_);

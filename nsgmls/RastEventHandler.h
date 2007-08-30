@@ -8,7 +8,7 @@
 #endif
 
 #include "Event.h"
-#include "Vector.h"
+#include <vector>
 #include "Boolean.h"
 #include "StringC.h"
 #include "types.h"
@@ -46,14 +46,14 @@ class RastLinkProcess : public LinkProcess {
 public:
   RastLinkProcess();
   void setHandler(RastEventHandler *);
-  Boolean selectLinkRule(const Vector<const AttributeList *> &linkAttributes,
+  Boolean selectLinkRule(const std::vector<const AttributeList *> &linkAttributes,
 			 const Location &location,
 			 size_t &selected);
   void swap(RastLinkProcess &);
 private:
   Boolean selectLinkRulePi(const StringC &str,
 			   const Location &loc,
-			   const Vector<const AttributeList *> &linkAttributes,
+			   const std::vector<const AttributeList *> &linkAttributes,
 			   size_t &selected);
 
   RastLinkProcess(const RastLinkProcess &); // undefined
@@ -77,12 +77,12 @@ protected:
   SgmlParser *parser_;
   Boolean hadActiveLpdOrDtd_;
   Location activeLpdOrDtdLocation_;
-  Vector<StringC> activeLinkTypes_;
+  std::vector<StringC> activeLinkTypes_;
   Boolean hadDocumentElement_;
   RastLinkProcess linkProcess_;
   Boolean haveLinkProcess_;
   Owner<EndPrologEvent> endPrologEvent_;
-  Vector<PackedBoolean> parseSubdocQueue_;
+  std::vector<PackedBoolean> parseSubdocQueue_;
   std::deque<LinkRulePi *> linkRuleQueue_;
   enum AttributeType {
     dtdAttribute,
@@ -91,7 +91,7 @@ protected:
     simpleAttribute
     };
   enum { nAttributeType = simpleAttribute + 1 };
-  Vector<Vector<size_t> > attributeSortOrder_[nAttributeType];
+  std::vector<std::vector<size_t> > attributeSortOrder_[nAttributeType];
 private:
   RastSubdocState(const RastSubdocState &); // undefined
   void operator=(const RastSubdocState &);  // undefined

@@ -6,7 +6,7 @@
 
 
 #include <stddef.h>
-#include "Vector.h"
+#include <vector>
 #include "Boolean.h"
 
 #ifdef SP_NAMESPACE
@@ -44,7 +44,7 @@ public:
   void swap(ISet<T> &x) { r_.swap(x.r_); }
 friend class ISetIter<T>;
 private:
-  Vector<ISetRange<T> > r_;
+  std::vector<ISetRange<T> > r_;
 };
 
 #ifdef SP_NAMESPACE

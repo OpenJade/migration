@@ -10,7 +10,7 @@
 
 #include "types.h"
 #include "StringOf.h"
-#include "Vector.h"
+#include <vector>
 #include "Location.h"
 #include <stddef.h>
 
@@ -39,7 +39,7 @@ public:
 private:
   Boolean lita_;
   String<SyntaxChar> chars_;
-  Vector<SdTextItem> items_;
+  std::vector<SdTextItem> items_;
   friend class SdTextIter;
 };
 

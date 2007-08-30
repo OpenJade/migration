@@ -70,7 +70,7 @@ WinApp::getCodingSystem(const StringC &name)
 }
 
 static
-void split(const StringC &str, Char sep, Vector<StringC> &result)
+void split(const StringC &str, Char sep, std::vector<StringC> &result)
 {
   Boolean started = 0;
   for (size_t i = 0; i < str.size(); i++) {
@@ -107,7 +107,7 @@ void WinApp::initParser(const StringC &sysid, SgmlParser &parser,
 			      systemCharset,
 			      5);
   {
-    Vector<StringC> dirs;
+    std::vector<StringC> dirs;
     split(extraDirectories_, ';', dirs);
     split(defaultDirectories_, ';', dirs);
     for (size_t i = 0; i < dirs.size(); i++)
@@ -128,7 +128,7 @@ void WinApp::initParser(const StringC &sysid, SgmlParser &parser,
   xem->registerStorageManager(new URLStorageManager("URL"));
 #endif
   xem->registerStorageManager(new LiteralStorageManager("LITERAL"));
-  Vector<StringC> catalogSysids;
+  std::vector<StringC> catalogSysids;
   split(extraCatalogs_, ';', catalogSysids);
   size_t nExtra = catalogSysids.size();
   split(defaultCatalogs_, ';', catalogSysids);

@@ -12,7 +12,7 @@
 #include "Ptr.h"
 #include "StringOf.h"
 #include "StringC.h"
-#include "Vector.h"
+#include <vector>
 #include "ISet.h"
 #include "ISetIter.h"
 #include "XcharMap.h"
@@ -52,30 +52,30 @@ __instantiate(ConstPtr<EntityCatalog>)
 __instantiate(Owner<MessageArg>)
 __instantiate(CopyOwner<MessageArg>)
 __instantiate(String<Char>)
-__instantiate(Vector<OpenElementInfo>)
-__instantiate(Vector<CopyOwner<MessageArg> >)
+__instantiate(std::vector<OpenElementInfo>)
+__instantiate(std::vector<CopyOwner<MessageArg> >)
 __instantiate(SharedXcharMap<unsigned char>)
 __instantiate(XcharMap<unsigned char>)
-__instantiate(`Vector<RangeMapRange<WideChar,UnivChar> >')
+__instantiate(`std::vector<RangeMapRange<WideChar,UnivChar> >')
 __instantiate(`RangeMapIter<WideChar,UnivChar>')
 __instantiate(`RangeMap<WideChar,UnivChar>')
-__instantiate(Vector<InputSourceOriginNamedCharRef>)
-__instantiate(Vector<StringC>)
+__instantiate(std::vector<InputSourceOriginNamedCharRef>)
+__instantiate(std::vector<StringC>)
 __instantiate(Owner<ExternalInfo>)
 __instantiate(ISet<Char>)
-__instantiate(Vector<ISetRange<Char> >)
+__instantiate(std::vector<ISetRange<Char> >)
 __instantiate(ISet<WideChar>)
 __instantiate(ISetIter<Char>)
 __instantiate(ISetIter<WideChar>)
-__instantiate(Vector<ISetRange<WideChar> >)
+__instantiate(std::vector<ISetRange<WideChar> >)
 __instantiate(SharedXcharMap<PackedBoolean>)
 __instantiate(SharedXcharMap<EquivCode>)
 __instantiate(String<SyntaxChar>)
 __instantiate(XcharMap<PackedBoolean>)
 __instantiate(XcharMap<EquivCode>)
-__instantiate(Vector<char>)
+__instantiate(std::vector<char>)
 #if defined(SP_HAVE_BOOL) && defined(SP_SIZEOF_BOOL_1)
-__instantiate(Vector<PackedBoolean>)
+__instantiate(std::vector<PackedBoolean>)
 #endif
 __instantiate(CharMap<Unsigned32>)
 #ifdef SP_MULTI_BYTE
@@ -86,7 +86,7 @@ __instantiate(CharMapColumn<Unsigned32>)
 __instantiate(CharMapResource<Unsigned32>)
 __instantiate(Ptr<CharMapResource<Unsigned32> >)
 __instantiate(ConstPtr<CharMapResource<Unsigned32> >)
-__instantiate(Vector<SubstTable::Pair>)
+__instantiate(std::vector<SubstTable::Pair>)
 
 #ifdef SP_NAMESPACE
 }

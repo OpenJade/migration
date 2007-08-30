@@ -6,7 +6,7 @@
 
 #include "types.h"
 #include "StringC.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -31,7 +31,7 @@ public:
   };
 private:
   Char lo_[256];
-  mutable Vector<Pair> map_; 
+  mutable std::vector<Pair> map_; 
   mutable bool isSorted_;
 };
 

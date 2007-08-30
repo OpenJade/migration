@@ -5,7 +5,7 @@
 #define Options_INCLUDED 1
 
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -27,7 +27,7 @@ public:
 template<class T>
 class Options {
 public:
-  Options(int argc, T *const *, const Vector<LongOption<T> > &);
+  Options(int argc, T *const *, const std::vector<LongOption<T> > &);
   // Returns false if there are no more options.
   bool get(T &);
   T *arg() const { return arg_; } // optarg
@@ -43,7 +43,7 @@ private:
   T opt_;
   T *arg_;
   int sp_;
-  Vector<LongOption<T> > opts_;
+  std::vector<LongOption<T> > opts_;
   int optInd_;
 };
 

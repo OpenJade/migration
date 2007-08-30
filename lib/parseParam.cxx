@@ -666,7 +666,7 @@ Boolean Parser::parseNameTokenGroup(unsigned declInputLevel, Param &parm)
 }
 
 static
-Boolean groupContains(const Vector<NameToken> &vec, const StringC &str)
+Boolean groupContains(const std::vector<NameToken> &vec, const StringC &str)
 {
   for (size_t i = 0; i < vec.size(); i++)
     if (vec[i].name == str)
@@ -680,7 +680,7 @@ Boolean Parser::parseGroup(const AllowedGroupTokens &allowToken,
 {
   unsigned groupInputLevel = inputLevel();
   int nDuplicates = 0;
-  Vector<NameToken> &vec = parm.nameTokenVector;
+  std::vector<NameToken> &vec = parm.nameTokenVector;
   vec.clear();
   GroupConnector::Type connector = GroupConnector::grpcGC;
   GroupToken gt;
@@ -752,7 +752,7 @@ Boolean Parser::parseDataTagGroup(unsigned nestingLevel,
 		       groupInputLevel,
 		       gt))
     return 0;
-  Vector<Text> templates;
+  std::vector<Text> templates;
   if (gt.type == GroupToken::dataTagTemplateGroup)
     gt.textVector.swap(templates);
   else {
@@ -763,7 +763,7 @@ Boolean Parser::parseDataTagGroup(unsigned nestingLevel,
 					     GroupConnector::dtgcGC);
   if (!parseGroupConnector(allowSeqDtgc, declInputLevel, groupInputLevel, gc))
     return 0;
-  NCVector<Owner<ContentToken> > vec(2);
+  std::vector<Owner<ContentToken> > vec(2);
   vec[1] = new PcdataToken;
   if (gc.type != GroupConnector::dtgcGC) {
     static AllowedGroupTokens allowDataTagLiteral(GroupToken::dataTagLiteral);
@@ -793,7 +793,7 @@ Boolean Parser::parseDataTagTemplateGroup(unsigned nestingLevel,
   if (nestingLevel - 1 == syntax().grplvl())
     message(ParserMessages::grplvl, NumberMessageArg(syntax().grplvl()));
   unsigned groupInputLevel = inputLevel();
-  Vector<Text> &vec = result.textVector;
+  std::vector<Text> &vec = result.textVector;
   for (;;) {
     GroupToken gt;
     static AllowedGroupTokens allowDataTagLiteral(GroupToken::dataTagLiteral);
@@ -825,7 +825,7 @@ Boolean Parser::parseModelGroup(unsigned nestingLevel, unsigned declInputLevel,
     message(ParserMessages::grplvl, NumberMessageArg(syntax().grplvl()));
   unsigned groupInputLevel = inputLevel();
   GroupToken gt;
-  NCVector<Owner<ContentToken> > tokenVector;
+  std::vector<Owner<ContentToken> > tokenVector;
   GroupConnector::Type connector = GroupConnector::grpcGC;
   
   static AllowedGroupTokens allowContentToken(GroupToken::pcdata,

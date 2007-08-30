@@ -8,7 +8,7 @@
 #include "splib.h"
 #include "ContentState.h"
 #include <list>
-#include "NCVector.h"
+#include <vector>
 #include "macros.h"
 
 #ifdef SP_NAMESPACE
@@ -24,12 +24,12 @@ ContentState::ContentState()
 
 void ContentState::startContent(const Dtd &dtd)
 {
-  NCVector<Owner<ContentToken> > tokens(1);
+  std::vector<Owner<ContentToken> > tokens(1);
   tokens[0] = new ElementToken(dtd.documentElementType(),
 			       ContentToken::none);
   Owner<ModelGroup> model(new SeqModelGroup(tokens, ContentToken::none));
   Owner<CompiledModelGroup> compiledModel(new CompiledModelGroup(model));
-  Vector<ContentModelAmbiguity> ambiguities;
+  std::vector<ContentModelAmbiguity> ambiguities;
   Boolean pcdataUnreachable;
   compiledModel->compile(dtd.nElementTypeIndex(), ambiguities,
 			 pcdataUnreachable);
@@ -120,7 +120,7 @@ Boolean ContentState::checkImplyLoop(unsigned count)
   return 1;
 }
 
-void ContentState::getOpenElementInfo(Vector<OpenElementInfo> &v,
+void ContentState::getOpenElementInfo(std::vector<OpenElementInfo> &v,
 				      const StringC &rniPcdata) const
 {
   v.clear();

@@ -20,8 +20,8 @@ public:
     PointerTable<T *, K, HF, KF>::swap(x);
   }
 private:
-  OwnerTable(const OwnerTable<T, K, HF, KF> &);
-  void operator=(const OwnerTable<T, K, HF, KF> &);
+  // OwnerTable(const OwnerTable<T, K, HF, KF> &);
+  // void operator=(const OwnerTable<T, K, HF, KF> &);
 };
 
 template<class T, class K, class HF, class KF>

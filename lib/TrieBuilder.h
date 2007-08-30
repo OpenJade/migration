@@ -11,7 +11,7 @@
 #include "StringOf.h"
 #include "Owner.h"
 #include "Trie.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -19,7 +19,7 @@ namespace SP_NAMESPACE {
 
 class TrieBuilder {
 public:
-  typedef Vector<Token> TokenVector;
+  typedef std::vector<Token> TokenVector;
   TrieBuilder(int nCodes);
   void recognize(const String<EquivCode> &chars,
 		 Token t,

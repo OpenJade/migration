@@ -116,19 +116,19 @@ private:
   void operator=(const LinkSet &); // undefined
   Boolean defined_;
   // indexed by typeIndex of source elements
-  Vector<Vector<ConstPtr<SourceLinkRuleResource> > > 
+  std::vector<std::vector<ConstPtr<SourceLinkRuleResource> > > 
     linkRules_;
-  Vector<ResultElementSpec> impliedSourceLinkRules_;
+  std::vector<ResultElementSpec> impliedSourceLinkRules_;
 };
 
 class SP_API IdLinkRule : public SourceLinkRule {
 public:
   IdLinkRule();
   Boolean isAssociatedWith(const ElementType *) const;
-  void setAssocElementTypes(Vector<const ElementType *> &);
+  void setAssocElementTypes(std::vector<const ElementType *> &);
   void swap(IdLinkRule &);
 private:
-  Vector<const ElementType *> assocElementTypes_;
+  std::vector<const ElementType *> assocElementTypes_;
 };
 
 // A collection of link rules in a ID link set that are
@@ -143,7 +143,7 @@ public:
 private:
   IdLinkRuleGroup(const IdLinkRuleGroup &); // undefined
   void operator=(const IdLinkRuleGroup &);  // undefined
-  Vector<IdLinkRule> linkRules_;
+  std::vector<IdLinkRule> linkRules_;
 };
 
 // An implicit or explicit LPD.
@@ -182,7 +182,7 @@ private:
   ComplexLpd(const ComplexLpd &); // undefined
   void operator=(const ComplexLpd &); // undefined
   Ptr<Dtd> resultDtd_;
-  Vector<ConstPtr<AttributeDefinitionList> > linkAttributeDefs_;
+  std::vector<ConstPtr<AttributeDefinitionList> > linkAttributeDefs_;
   NamedTable<LinkSet> linkSetTable_;
   LinkSet initialLinkSet_;
   LinkSet emptyLinkSet_;

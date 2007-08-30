@@ -17,7 +17,7 @@
 #include "StringC.h"
 #include "StringResource.h"
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 #include "HashTable.h"
 
 #ifdef SP_NAMESPACE
@@ -121,7 +121,7 @@ private:
   size_t nAttributeDefinitionList_;
   size_t nElementType_;
   ElementType *documentElementType_;
-  Vector<StringC> shortrefs_;
+  std::vector<StringC> shortrefs_;
   HashTable<StringC,int> shortrefTable_;
   Boolean isBase_;
   Boolean isInstantitated_;

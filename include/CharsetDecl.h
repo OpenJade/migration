@@ -8,7 +8,7 @@
 #endif
 
 #include "types.h"
-#include "Vector.h"
+#include <vector>
 #include "ExternalId.h"
 #include "ISet.h"
 #include "Boolean.h"
@@ -67,7 +67,7 @@ public:
 		    ISet<WideChar> &to, Number &count) const;
 private:
   PublicId baseset_;
-  Vector<CharsetDeclRange> ranges_;
+  std::vector<CharsetDeclRange> ranges_;
 };
 
 class SP_API CharsetDecl {
@@ -100,7 +100,7 @@ public:
 		    ISet<WideChar> &to, Number &count) const;
   void numberToChar(const PublicId *id, Number n, ISet<WideChar> &to) const;
 private:
-  Vector<CharsetDeclSection> sections_;
+  std::vector<CharsetDeclSection> sections_;
   ISet<WideChar> declaredSet_;
 };
 

@@ -450,7 +450,7 @@ Boolean XMLMessageReporter::XMLformatFragment(const MessageFragment &frag,
   return 1 ;
 }
 void XMLMessageReporter::formatMessage(const MessageFragment &frag,
-	const Vector<CopyOwner<MessageArg> > &args,
+	const std::vector<CopyOwner<MessageArg> > &args,
 	OutputCharStream &os, bool noquote) {
   switch ( msgmode ) {
     case SP_MESSAGES_TRADITIONAL:
@@ -489,7 +489,7 @@ void XMLMessageReporter::formatMessage(const MessageFragment &frag,
   }
 }
 void XMLMessageReporter::formatOpenElements(
-	const Vector<OpenElementInfo> &openElementInfo ,
+	const std::vector<OpenElementInfo> &openElementInfo ,
 	OutputCharStream &os) {
   switch ( msgmode ) {
     case SP_MESSAGES_TRADITIONAL:

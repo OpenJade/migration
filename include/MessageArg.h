@@ -8,7 +8,7 @@
 #endif
 
 #include "StringC.h"
-#include "Vector.h"
+#include <vector>
 #include "rtti.h"
 
 #ifdef SP_NAMESPACE
@@ -61,11 +61,11 @@ public:
 
 class SP_API StringVectorMessageArg : public MessageArg {
 public:
-  StringVectorMessageArg(const Vector<StringC> &);
+  StringVectorMessageArg(const std::vector<StringC> &);
   MessageArg *copy() const;
   void append(MessageBuilder &) const;
 private:
-  Vector<StringC> v_;
+  std::vector<StringC> v_;
 };
 
 

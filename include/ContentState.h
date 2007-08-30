@@ -11,7 +11,7 @@
 #include <stddef.h>
 #include "OpenElement.h"
 #include <list>
-#include "Vector.h"
+#include <vector>
 #include "Message.h"
 #include "Dtd.h"
 #include "Mode.h"
@@ -30,7 +30,7 @@ public:
   void popElement();
   OpenElement &currentElement();
   const OpenElement &currentElement() const;
-  void getOpenElementInfo(Vector<OpenElementInfo> &,
+  void getOpenElementInfo(std::vector<OpenElementInfo> &,
 			  const StringC &rniPcdata) const;
   unsigned tagLevel() const;
   Boolean elementIsIncluded(const ElementType *) const;
@@ -47,9 +47,9 @@ public:
   static const ShortReferenceMap theEmptyMap;
 private:
   std::list<OpenElement *> openElements_;
-  Vector<unsigned> openElementCount_;
-  Vector<unsigned> includeCount_;
-  Vector<unsigned> excludeCount_;
+  std::vector<unsigned> openElementCount_;
+  std::vector<unsigned> includeCount_;
+  std::vector<unsigned> excludeCount_;
   unsigned totalExcludeCount_;
   unsigned tagLevel_;
   unsigned netEnablingCount_;

@@ -9,7 +9,7 @@
 
 #include "StorageManager.h"
 #include "DescriptorManager.h"
-#include "Vector.h"
+#include <vector>
 #include "StringC.h"
 #include "CharsetInfo.h"
 
@@ -56,7 +56,7 @@ private:
   const OutputCodingSystem *filenameCodingSystem_;
 #endif
   const char *type_;
-  Vector<StringC> searchDirs_;
+  std::vector<StringC> searchDirs_;
 };
 
 class SP_API PosixFdStorageManager : public IdStorageManager {

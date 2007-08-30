@@ -29,7 +29,7 @@ private:
   InputSourceOriginImpl(const InputSourceOriginImpl &); // undefined
   void operator=(const InputSourceOriginImpl &);	// undefined
   size_t nPrecedingCharRefs(Index ind) const;
-  Vector<InputSourceOriginNamedCharRef> charRefs_;
+  std::vector<InputSourceOriginNamedCharRef> charRefs_;
   StringC charRefOrigNames_;
   Owner<ExternalInfo> externalInfo_; // 0 for internal entities
   Location refLocation_;	// where referenced from

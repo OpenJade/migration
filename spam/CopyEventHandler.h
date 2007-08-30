@@ -9,8 +9,7 @@
 
 #include "Event.h"
 #include "OutputCharStream.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include "MarkupEventHandler.h"
 
 // This should be local to CopyEventHandler, but some compilers
@@ -113,10 +112,10 @@ private:
   SubstTable lowerSubst_;
   unsigned normalizeFlags_;
   StringC outputEntity_;
-  Vector<StringC> elementTypeOrigNames_;
+  std::vector<StringC> elementTypeOrigNames_;
   unsigned omittagHoist_;
   ConstPtr<EntityOrigin> entityOrigin_;
-  NCVector<CopyEventHandlerEntityInfo> entityStack_;
+  std::vector<CopyEventHandlerEntityInfo> entityStack_;
   Boolean inSpecialMarkedSection_;
   Boolean hasInternalSubset_;
   Boolean mustOmitEnd_;

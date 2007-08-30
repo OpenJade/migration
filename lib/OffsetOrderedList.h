@@ -6,9 +6,9 @@
 
 #include "types.h"
 #include "Owner.h"
-#include "NCVector.h"
 #include "Boolean.h"
 #include "Mutex.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -38,7 +38,7 @@ private:
   void addByte(unsigned char b);
   // bytes used in current block
   int blockUsed_;
-  NCVector<Owner<OffsetOrderedListBlock> > blocks_;
+  std::vector<Owner<OffsetOrderedListBlock> > blocks_;
   Mutex mutex_;
 };
 

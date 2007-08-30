@@ -12,7 +12,7 @@
 #include "StringOf.h"
 #include "ISet.h"
 #include "XcharMap.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -33,7 +33,7 @@ private:
   Partition(const Partition &);	// undefined
   void operator=(const Partition &); // undefined
   EquivCode maxCode_;
-  Vector<String<EquivCode> > setCodes_;
+  std::vector<String<EquivCode> > setCodes_;
   XcharMap<EquivCode> map_;
 };
 

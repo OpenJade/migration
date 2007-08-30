@@ -10,7 +10,7 @@
 
 #include <stddef.h>
 #include "Location.h"
-#include "Vector.h"
+#include <vector>
 #include "CopyOwner.h"
 #include "Boolean.h"
 #include "StringC.h"
@@ -169,8 +169,8 @@ public:
   const MessageType *type;
   Location loc;
   Location auxLoc;
-  Vector<CopyOwner<MessageArg> > args;
-  Vector<OpenElementInfo> openElementInfo;
+  std::vector<CopyOwner<MessageArg> > args;
+  std::vector<OpenElementInfo> openElementInfo;
   void swap(Message &);
   Boolean isError() const;
 };

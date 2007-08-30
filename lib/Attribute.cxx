@@ -67,12 +67,12 @@ Boolean DeclaredValue::isIdref() const
   return 0;
 }
 
-const Vector<StringC> *DeclaredValue::getTokens() const
+const std::vector<StringC> *DeclaredValue::getTokens() const
 {
   return 0;
 }
 
-const Vector<StringC> *DeclaredValue::getOrigTokens() const
+const std::vector<StringC> *DeclaredValue::getOrigTokens() const
 {
   return 0;
 }
@@ -191,7 +191,7 @@ TokenizedDeclaredValue::makeTokenizedValue(Text &text,
 					   const StringC &name,
 					   unsigned &specLength) const
 {
-  Vector<size_t> spaceIndex;
+  std::vector<size_t> spaceIndex;
   const Syntax &syntax = context.attributeSyntax();
   Char space = syntax.space();
   text.subst(*(type_ == entityName
@@ -325,7 +325,7 @@ DeclaredValue *TokenizedDeclaredValue::copy() const
 }
 
 GroupDeclaredValue::GroupDeclaredValue(TokenType type,
-				       Vector<StringC> &vec)
+				       std::vector<StringC> &vec)
 : TokenizedDeclaredValue(type, 0)
 {
   vec.swap(allowedValues_);
@@ -342,7 +342,7 @@ DeclaredValue *GroupDeclaredValue::copy() const
   return new GroupDeclaredValue(*this);
 }
 
-void GroupDeclaredValue::setOrigAllowedValues(Vector<StringC> &origAllowedValues)
+void GroupDeclaredValue::setOrigAllowedValues(std::vector<StringC> &origAllowedValues)
 {
   origAllowedValues.swap(origAllowedValues_);
 }
@@ -380,7 +380,7 @@ AttributeValue *GroupDeclaredValue::makeValueFromToken(Text &text,
 		    NumberMessageArg(litlen),
 		    NumberMessageArg(text.size() + normsep));
   specLength += text.size() + normsep;
-  return new TokenizedAttributeValue(text, Vector<size_t>());
+  return new TokenizedAttributeValue(text, std::vector<size_t>());
 }
 
 Boolean GroupDeclaredValue::containsToken(const StringC &token) const
@@ -391,17 +391,17 @@ Boolean GroupDeclaredValue::containsToken(const StringC &token) const
   return 0;
 }
 
-const Vector<StringC> *GroupDeclaredValue::getTokens() const
+const std::vector<StringC> *GroupDeclaredValue::getTokens() const
 {
   return &allowedValues_;
 }
 
-const Vector<StringC> *GroupDeclaredValue::getOrigTokens() const
+const std::vector<StringC> *GroupDeclaredValue::getOrigTokens() const
 {
   return &origAllowedValues_;
 }
 
-NameTokenGroupDeclaredValue::NameTokenGroupDeclaredValue(Vector<StringC> &vec)
+NameTokenGroupDeclaredValue::NameTokenGroupDeclaredValue(std::vector<StringC> &vec)
 : GroupDeclaredValue(nameToken, vec)
 {
 }
@@ -417,7 +417,7 @@ DeclaredValue *NameTokenGroupDeclaredValue::copy() const
   return new NameTokenGroupDeclaredValue(*this);
 }
 
-NotationDeclaredValue::NotationDeclaredValue(Vector<StringC> &vec)
+NotationDeclaredValue::NotationDeclaredValue(std::vector<StringC> &vec)
 : GroupDeclaredValue(name, vec)
 {
 }
@@ -479,7 +479,7 @@ EntityDeclaredValue::makeSemantics(const TokenizedAttributeValue &value,
   Boolean valid = 1;
   size_t nTokens = value.nTokens();
   nEntityNames += nTokens;
-  Vector<ConstPtr<Entity> > entities(nTokens);
+  std::vector<ConstPtr<Entity> > entities(nTokens);
   for (size_t i = 0; i < nTokens; i++) {
     entities[i] = context.getAttributeEntity(value.token(i),
 					     value.tokenLocation(i));
@@ -881,7 +881,7 @@ AttributeDefinition *FixedAttributeDefinition::copy() const
 }
 
 AttributeDefinitionList
-::AttributeDefinitionList(Vector<CopyOwner<AttributeDefinition> > &vec,
+::AttributeDefinitionList(std::vector<CopyOwner<AttributeDefinition> > &vec,
 			  size_t index,
 			  Boolean anyCurrent,
 			  size_t idIndex,
@@ -991,7 +991,7 @@ AttributeSemantics *NotationAttributeSemantics::copy() const
   return new NotationAttributeSemantics(*this);
 }
 
-EntityAttributeSemantics::EntityAttributeSemantics(Vector<ConstPtr<Entity> > &entity)
+EntityAttributeSemantics::EntityAttributeSemantics(std::vector<ConstPtr<Entity> > &entity)
 {
   entity.swap(entity_);
 }
@@ -1050,7 +1050,7 @@ AttributeValue::Type ImpliedAttributeValue::info(const Text *&,
 }
 
 TokenizedAttributeValue::TokenizedAttributeValue(Text &text,
-						 const Vector<size_t> &spaceIndex)
+						 const std::vector<size_t> &spaceIndex)
 : spaceIndex_(spaceIndex)
 {
   text.swap(text_);

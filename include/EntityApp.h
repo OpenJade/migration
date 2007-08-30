@@ -28,8 +28,8 @@ public:
 protected:
   void clearEntityManager();
 private:
-  Vector<const AppChar *> searchDirs_;
-  Vector<const AppChar *> catalogSysids_;
+  std::vector<const AppChar *> searchDirs_;
+  std::vector<const AppChar *> catalogSysids_;
   Boolean mapCatalogDocument_;
   Boolean restrictFileReading_;
   Ptr<ExtendEntityManager> entityManager_;

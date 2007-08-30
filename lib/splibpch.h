@@ -60,7 +60,6 @@
 #include "MessageFormatter.h"
 #include "MessageReporter.h"
 #include "Mode.h"
-#include "NCVector.h"
 #include "Named.h"
 #include "NamedResource.h"
 #include "NamedResourceTable.h"
@@ -98,7 +97,7 @@
 #include "TypeId.h"
 #include "URLStorage.h"
 #include "UnivCharsetDesc.h"
-#include "Vector.h"
+#include <vector>
 #include "XcharMap.h"
 #include "config.h"
 #include "constant.h"

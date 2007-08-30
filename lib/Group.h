@@ -40,7 +40,7 @@ public:
   Owner<ModelGroup> model;
   Owner<ContentToken> contentToken; // elementToken pcdata dataTagGroup
   Text text;
-  Vector<Text> textVector;
+  std::vector<Text> textVector;
 private:
   GroupToken(const GroupToken &); // undefined
   void operator=(const GroupToken &); // undefined

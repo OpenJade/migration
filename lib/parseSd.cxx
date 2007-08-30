@@ -30,8 +30,8 @@ public:
   WideChar switchFrom(size_t i) const;
   WideChar switchTo(size_t i) const;
 private:
-  Vector<PackedBoolean> switchUsed_;
-  Vector<WideChar> switches_;
+  std::vector<PackedBoolean> switchUsed_;
+  std::vector<WideChar> switches_;
 };
 
 // Information about the SGML declaration being built.
@@ -1260,7 +1260,7 @@ Boolean Parser::sdParseSyntax(SdBuilder &sdBuilder, SdParam &parm)
 				      SdParam::reservedName + Sd::rSWITCHES),
 		      parm))
       return 0;
-    Vector<UnivChar> charSwitches;
+    std::vector<UnivChar> charSwitches;
     if (parm.type == SdParam::reservedName + Sd::rSWITCHES) {
       if (!parseSdParam(AllowedSdParams(SdParam::number), parm))
 	return 0;
@@ -1540,7 +1540,7 @@ Boolean Parser::sdParseNaming(SdBuilder &sdBuilder, SdParam &parm)
   ISet<Char> nameChar;
   do {
     String<SyntaxChar> lc;
-    Vector<size_t> rangeIndex;
+    std::vector<size_t> rangeIndex;
     enum PrevParam {
       paramNone,
       paramNumber,

@@ -12,8 +12,7 @@
 #include "Entity.h"
 #include "Notation.h"
 #include "Attribute.h"
-#include "Vector.h"
-#include "Vector.h"
+#include <vector>
 #include "MessageArg.h"
 
 #include "RastEventHandlerMessages.h"
@@ -269,7 +268,7 @@ void RastEventHandler::simpleLinkInfo()
 void RastEventHandler::impliedSourceLinkRules()
 {
   size_t n = linkProcess_.nImpliedLinkRules();
-  Vector<size_t> sortOrder(n);
+  std::vector<size_t> sortOrder(n);
   size_t i;
   for (i = 0; i < n; i++)
     sortOrder[i] = i;
@@ -656,7 +655,7 @@ void RastEventHandler::attributeInfo(const AttributeList &attributes,
   size_t defIndex = attributes.defIndex();
   if (defIndex >= attributeSortOrder_[attributeType].size())
     attributeSortOrder_[attributeType].resize(defIndex + 1);
-  Vector<size_t> &sortOrder = attributeSortOrder_[attributeType][defIndex];
+  std::vector<size_t> &sortOrder = attributeSortOrder_[attributeType][defIndex];
   if (sortOrder.size() != length
       || attributeType == simpleAttribute) {
     sortOrder.resize(length);
@@ -830,7 +829,7 @@ void RastLinkProcess::setHandler(RastEventHandler *rast)
 
 // Always return 1. 0 means not ready.
 
-Boolean RastLinkProcess::selectLinkRule(const Vector<const AttributeList *> &linkAttributes,
+Boolean RastLinkProcess::selectLinkRule(const std::vector<const AttributeList *> &linkAttributes,
 					const Location &location,
 					size_t &selected)
 {
@@ -854,7 +853,7 @@ Boolean RastLinkProcess::selectLinkRule(const Vector<const AttributeList *> &lin
 
 Boolean RastLinkProcess::selectLinkRulePi(const StringC &value,
 					  const Location &loc,
-					  const Vector<const AttributeList *> &linkAttributes,
+					  const std::vector<const AttributeList *> &linkAttributes,
 					  size_t &selected)
 {
   Boolean haveSelection = 0;

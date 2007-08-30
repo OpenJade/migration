@@ -10,7 +10,7 @@
 
 #include "Named.h"
 #include "Location.h"
-#include "Vector.h"
+#include <vector>
 
 #ifdef SP_NAMESPACE
 namespace SP_NAMESPACE {
@@ -23,10 +23,10 @@ public:
   void addPendingRef(const Location &);
   Boolean defined() const;
   const Location &defLocation() const;
-  const Vector<Location> &pendingRefs() const;
+  const std::vector<Location> &pendingRefs() const;
 private:
   Location defLocation_;
-  Vector<Location> pendingRefs_;
+  std::vector<Location> pendingRefs_;
 };
 
 inline
@@ -42,7 +42,7 @@ const Location &Id::defLocation() const
 }
 
 inline
-const Vector<Location> &Id::pendingRefs() const
+const std::vector<Location> &Id::pendingRefs() const
 {
   return pendingRefs_;
 }

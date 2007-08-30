@@ -12,8 +12,7 @@
 #include "OffsetOrderedList.h"
 #include "rtti.h"
 #include "StorageManager.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include "Owner.h"
 #include "constant.h"
 #include "EntityManagerMessages.h"
@@ -72,7 +71,7 @@ public:
 			 const StringC *,
 			 Messenger &,
 			 StringC &);
-  Boolean mergeSystemIds(const Vector<StringC> &,
+  Boolean mergeSystemIds(const std::vector<StringC> &,
 			 Boolean mapCatalogDocument,
 			 const CharsetInfo &,
 			 Messenger &mgr,
@@ -108,7 +107,7 @@ private:
   static Boolean defLocation(const Location &, StorageObjectLocation &);
   static Boolean matchKey(const StringC &type, const char *s,
 			  const CharsetInfo &internalCharset);
-  NCVector<Owner<StorageManager> > storageManagers_;
+  std::vector<Owner<StorageManager> > storageManagers_;
   Owner<StorageManager> defaultStorageManager_;
   const InputCodingSystem *defaultCodingSystem_;
   Owner<CatalogManager> catalogManager_;
@@ -133,7 +132,7 @@ public:
   Boolean convertOffset(Offset, StorageObjectLocation &) const;
 private:
   ParsedSystemId parsedSysid_;
-  NCVector<StorageObjectPosition> position_;
+  std::vector<StorageObjectPosition> position_;
   size_t currentIndex_;
   // list of inserted RSs
   OffsetOrderedList rsList_;
@@ -177,7 +176,7 @@ private:
   Offset bufLimOffset_;
   size_t bufSize_;
   size_t readSize_;
-  NCVector<Owner<StorageObject> > sov_;
+  std::vector<Owner<StorageObject> > sov_;
   StorageObject *so_;
   size_t soIndex_;
   Boolean insertRS_;
@@ -338,7 +337,7 @@ EntityManagerImpl::makeCatalog(StringC &systemId,
 }
 
 Boolean
-EntityManagerImpl::mergeSystemIds(const Vector<StringC> &sysids,
+EntityManagerImpl::mergeSystemIds(const std::vector<StringC> &sysids,
 				  Boolean mapCatalogDocument,
 				  const CharsetInfo &docCharset,
 				  Messenger &mgr,

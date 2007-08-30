@@ -11,7 +11,7 @@
 #include "Resource.h"
 #include "Owner.h"
 #include "StringC.h"
-#include "Vector.h"
+#include <vector>
 #include "CopyOwner.h"
 #include "Boolean.h"
 #include "Text.h"
@@ -84,8 +84,8 @@ public:
   };
   DefaultValueType defaultValueType;
   ConstPtr<AttributeValue> defaultValue;
-  Vector<StringC> allowedValues;
-  Vector<StringC> origAllowedValues;
+  std::vector<StringC> allowedValues;
+  std::vector<StringC> origAllowedValues;
   // Attribute definitions whose default value type is current and
   // which have the same currentIndex share current values.
   size_t currentIndex;
@@ -120,8 +120,8 @@ public:
   virtual Boolean isEntity() const;
   virtual Boolean isId() const;
   virtual Boolean isIdref() const;
-  virtual const Vector<StringC> *getTokens() const;
-  virtual const Vector<StringC> *getOrigTokens() const;
+  virtual const std::vector<StringC> *getTokens() const;
+  virtual const std::vector<StringC> *getOrigTokens() const;
   virtual void buildDesc(AttributeDefinitionDesc &) const = 0;
   virtual DeclaredValue *copy() const = 0;
 };
@@ -166,7 +166,7 @@ private:
 
 class GroupDeclaredValue : public TokenizedDeclaredValue {
 public:
-  GroupDeclaredValue(TokenType, Vector<StringC> &);
+  GroupDeclaredValue(TokenType, std::vector<StringC> &);
   Boolean containsToken(const StringC &) const;
   AttributeValue *makeValue(Text &, AttributeContext &, const StringC &,
 			    unsigned &) const;
@@ -174,27 +174,27 @@ public:
 				     AttributeContext &,
 				     const StringC &name,
 				     unsigned &) const;
-  const Vector<StringC> *getTokens() const;
-  const Vector<StringC> *getOrigTokens() const;
+  const std::vector<StringC> *getTokens() const;
+  const std::vector<StringC> *getOrigTokens() const;
   void buildDesc(AttributeDefinitionDesc &) const;
   DeclaredValue *copy() const;
-  void setOrigAllowedValues(Vector<StringC> &origAllowedValues);
+  void setOrigAllowedValues(std::vector<StringC> &origAllowedValues);
 
 private:
-  Vector<StringC> allowedValues_;
-  Vector<StringC> origAllowedValues_;
+  std::vector<StringC> allowedValues_;
+  std::vector<StringC> origAllowedValues_;
 };
 
 class NameTokenGroupDeclaredValue : public GroupDeclaredValue {
 public:
-  NameTokenGroupDeclaredValue(Vector<StringC> &);
+  NameTokenGroupDeclaredValue(std::vector<StringC> &);
   void buildDesc(AttributeDefinitionDesc &) const;
   DeclaredValue *copy() const;
 };
 
 class NotationDeclaredValue : public GroupDeclaredValue {
 public:
-  NotationDeclaredValue(Vector<StringC> &);
+  NotationDeclaredValue(std::vector<StringC> &);
   AttributeSemantics *makeSemantics(const TokenizedAttributeValue &,
 				    AttributeContext &,
 				    const StringC &,
@@ -274,8 +274,8 @@ public:
   Boolean isId() const;
   Boolean isIdref() const;
   void getDesc(AttributeDefinitionDesc &) const;
-  const Vector<StringC> *getTokens() const;
-  const Vector<StringC> *getOrigTokens() const;
+  const std::vector<StringC> *getTokens() const;
+  const std::vector<StringC> *getOrigTokens() const;
   virtual AttributeDefinition *copy() const = 0;
   void setDeclaredValue(DeclaredValue *);
   void setSpecified(Boolean implicit);
@@ -355,7 +355,7 @@ public:
 
 class SP_API AttributeDefinitionList : public Resource {
 public:
-  AttributeDefinitionList(Vector<CopyOwner<AttributeDefinition> > &,
+  AttributeDefinitionList(std::vector<CopyOwner<AttributeDefinition> > &,
 			  size_t listIndex,
 			  Boolean anyCurrent = 0,
 			  size_t idIndex = size_t(-1),
@@ -375,7 +375,7 @@ public:
   void setIndex(size_t);
   void append(AttributeDefinition *);
 private:
-  Vector<CopyOwner<AttributeDefinition> > defs_;
+  std::vector<CopyOwner<AttributeDefinition> > defs_;
   size_t index_;
   size_t idIndex_;		// -1 if no ID attribute
   size_t notationIndex_;	// -1 if no notation attribute
@@ -395,12 +395,12 @@ public:
 
 class EntityAttributeSemantics  : public AttributeSemantics {
 public:
-  EntityAttributeSemantics(Vector<ConstPtr<Entity> > &);
+  EntityAttributeSemantics(std::vector<ConstPtr<Entity> > &);
   size_t nEntities() const;
   ConstPtr<Entity> entity(size_t) const;
   AttributeSemantics *copy() const;
 private:
-  Vector<ConstPtr<Entity> > entity_;
+  std::vector<ConstPtr<Entity> > entity_;
 };
 
 class NotationAttributeSemantics : public AttributeSemantics {
@@ -433,7 +433,7 @@ private:
 
 class TokenizedAttributeValue : public AttributeValue {
 public:
-  TokenizedAttributeValue(Text &, const Vector<size_t> &);
+  TokenizedAttributeValue(Text &, const std::vector<size_t> &);
   size_t nTokens() const;
   AttributeSemantics *makeSemantics(const DeclaredValue *,
 				    AttributeContext &,
@@ -455,7 +455,7 @@ private:
   Text text_;
   // index into value of each space
   // length is number of tokens - 1
-  Vector<size_t> spaceIndex_;
+  std::vector<size_t> spaceIndex_;
 };
 
 class SP_API Attribute {
@@ -515,7 +515,7 @@ public:
   Boolean specified(unsigned) const;
   Boolean id(unsigned) const;
   Boolean idref(unsigned) const;
-  const Vector<StringC> *getAllowedTokens(unsigned) const;
+  const std::vector<StringC> *getAllowedTokens(unsigned) const;
   const StringC *getId() const;	// null if none
   Boolean idIndex(unsigned &) const;
   void noteInvalidSpec();
@@ -527,7 +527,7 @@ private:
   unsigned nIdrefs_;
   unsigned nEntityNames_;
   size_t nSpec_;
-  Vector<Attribute> vec_;
+  std::vector<Attribute> vec_;
   ConstPtr<AttributeDefinitionList> def_;
 };
 
@@ -607,13 +607,13 @@ Boolean AttributeDefinition::isIdref() const
 }
 
 inline
-const Vector<StringC> *AttributeDefinition::getTokens() const
+const std::vector<StringC> *AttributeDefinition::getTokens() const
 {
   return declaredValue_->getTokens();
 }
 
 inline
-const Vector<StringC> *AttributeDefinition::getOrigTokens() const
+const std::vector<StringC> *AttributeDefinition::getOrigTokens() const
 {
   return declaredValue_->getOrigTokens();
 }
@@ -864,7 +864,7 @@ const StringC &AttributeList::name(unsigned i) const
 }
 
 inline
-const Vector<StringC> *AttributeList::getAllowedTokens(unsigned i) const
+const std::vector<StringC> *AttributeList::getAllowedTokens(unsigned i) const
 {
   return def(i)->getTokens();
 }

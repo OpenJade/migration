@@ -12,7 +12,7 @@
 #include "Allocator.h"
 #include "Attribute.h"
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 #include "StringC.h"
 #include "Dtd.h"
 #include "Entity.h"
@@ -34,7 +34,6 @@
 #include "Recognizer.h"
 #include "Sd.h"
 #include "Syntax.h"
-#include "NCVector.h"
 #include "Owner.h"
 #include "Lpd.h"
 #include "LpdEntityRef.h"
@@ -247,9 +246,9 @@ private:
   Boolean inEndTag_;
   Ptr<Dtd> defDtd_;
   Ptr<Lpd> defLpd_;
-  Vector<ConstPtr<Lpd> > allLpd_;
-  Vector<ConstPtr<Lpd> > lpd_; // active LPDs
-  mutable Vector<StringC> activeLinkTypes_;
+  std::vector<ConstPtr<Lpd> > allLpd_;
+  std::vector<ConstPtr<Lpd> > lpd_; // active LPDs
+  mutable std::vector<StringC> activeLinkTypes_;
   mutable Boolean activeLinkTypesSubsted_;
   Boolean hadLpd_;
   Boolean resultAttributeSpecMode_;
@@ -263,7 +262,7 @@ private:
   ConstPtr<Entity> dsEntity_;
   Allocator eventAllocator_;
   Allocator internalAllocator_;
-  NCVector<Owner<AttributeList> > attributeLists_;
+  std::vector<Owner<AttributeList> > attributeLists_;
   StringC nameBuffer_;
   Boolean keepingMessages_;
   std::deque<MessageEvent *> keptMessages_;
@@ -275,23 +274,23 @@ private:
   Mode specialParseMode_;
   unsigned markedSectionLevel_;
   unsigned markedSectionSpecialLevel_;
-  Vector<Location> markedSectionStartLocation_;
+  std::vector<Location> markedSectionStartLocation_;
   ConstPtr<Recognizer> recognizers_[nModes];
   XcharMap<PackedBoolean> normalMap_;
   unsigned inputLevel_;
   std::list<InputSource *> inputStack_;
-  Vector<unsigned> inputLevelElementIndex_;
+  std::vector<unsigned> inputLevelElementIndex_;
   Ptr<Dtd> currentDtd_;
   ConstPtr<Dtd> currentDtdConst_;
-  Vector<Ptr<Dtd> > dtd_;
+  std::vector<Ptr<Dtd> > dtd_;
   Ptr<Dtd> pass1Dtd_;
   unsigned instantiatedDtds_;
   ConstPtr<Syntax> syntax_;
-  Vector<StringC> currentRank_;
+  std::vector<StringC> currentRank_;
   NamedTable<Id> idTable_;
   NamedResourceTable<Entity> instanceDefaultedEntityTable_;
   NamedResourceTable<Entity> undefinedEntityTable_;
-  Vector<ConstPtr<AttributeValue> > currentAttributes_;
+  std::vector<ConstPtr<AttributeValue> > currentAttributes_;
   Markup *currentMarkup_;
   Markup markup_;
   Location markupLocation_;

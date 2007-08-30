@@ -9,7 +9,7 @@
 
 #include "Allocator.h"
 #include "Location.h"
-#include "Vector.h"
+#include <vector>
 #include "Owner.h"
 #include "Boolean.h"
 #include "types.h"
@@ -365,18 +365,18 @@ private:
 class UsemapEvent : public MarkupEvent {
 public:
   UsemapEvent(const ShortReferenceMap *,
-	      Vector<const ElementType *> &,
+	      std::vector<const ElementType *> &,
 	      const ConstPtr<Dtd> &,
 	      const Location &,
 	      Markup *);
   void handle(EventHandler &);
   const ShortReferenceMap *map() const;
-  const Vector<const ElementType *> &elements() const;
+  const std::vector<const ElementType *> &elements() const;
 private:
   UsemapEvent(const UsemapEvent &); // undefined
   void operator=(const UsemapEvent &); // undefined
   ConstPtr<Dtd> dtd_;
-  Vector<const ElementType *> elements_;
+  std::vector<const ElementType *> elements_;
   const ShortReferenceMap *map_;
 };
 
@@ -458,8 +458,8 @@ class EndPrologEvent : public LocatedEvent {
 public:
   EndPrologEvent(const ConstPtr<Dtd> &dtd,
 		 const ConstPtr<ComplexLpd> &lpd,
-		 Vector<StringC> &simpleLinkNames,
-		 Vector<AttributeList> &simpleLinkAttributes,
+		 std::vector<StringC> &simpleLinkNames,
+		 std::vector<AttributeList> &simpleLinkAttributes,
 		 const Location &);
   EndPrologEvent(const ConstPtr<Dtd> &dtd,
 		 const Location &);
@@ -467,15 +467,15 @@ public:
   const Dtd &dtd() const;
   const ConstPtr<Dtd> &dtdPointer() const;
   const ConstPtr<ComplexLpd> &lpdPointer() const;
-  const Vector<StringC> &simpleLinkNames() const;
-  const Vector<AttributeList> &simpleLinkAttributes() const;
+  const std::vector<StringC> &simpleLinkNames() const;
+  const std::vector<AttributeList> &simpleLinkAttributes() const;
 private:
   EndPrologEvent(const EndPrologEvent &); // undefined
   void operator=(const EndPrologEvent &); // undefined
   ConstPtr<Dtd> dtd_;
   ConstPtr<ComplexLpd> lpd_;
-  Vector<StringC> simpleLinkNames_;
-  Vector<AttributeList> simpleLinkAttributes_;
+  std::vector<StringC> simpleLinkNames_;
+  std::vector<AttributeList> simpleLinkAttributes_;
 };
 
 class SgmlDeclEvent : public MarkupEvent {
@@ -673,60 +673,60 @@ private:
 
 class ElementDeclEvent : public MarkupEvent {
 public:
-  ElementDeclEvent(Vector<const ElementType *> &elements,
+  ElementDeclEvent(std::vector<const ElementType *> &elements,
 		   const ConstPtr<Dtd> &,
 		   const Location &,
 		   Markup *);
   void handle(EventHandler &);
-  const Vector<const ElementType *> &elements() const;
+  const std::vector<const ElementType *> &elements() const;
 private:
   ElementDeclEvent(const ElementDeclEvent &); // undefined
   void operator=(const ElementDeclEvent &);   // undefined
-  Vector<const ElementType *> elements_;
+  std::vector<const ElementType *> elements_;
   ConstPtr<Dtd> dtd_;
 };
 
 class AttlistDeclEvent : public MarkupEvent {
 public:
-  AttlistDeclEvent(Vector<const ElementType *> &elements,
+  AttlistDeclEvent(std::vector<const ElementType *> &elements,
 		   const ConstPtr<Dtd> &,
 		   const Location &,
 		   Markup *);
   void handle(EventHandler &);
-  const Vector<const ElementType *> &elements() const;
+  const std::vector<const ElementType *> &elements() const;
 private:
   AttlistDeclEvent(const AttlistDeclEvent &); // undefined
   void operator=(const AttlistDeclEvent &);   // undefined
-  Vector<const ElementType *> elements_;
+  std::vector<const ElementType *> elements_;
   ConstPtr<Dtd> dtd_;
 };
 
 class AttlistNotationDeclEvent : public MarkupEvent {
 public:
-  AttlistNotationDeclEvent(Vector<ConstPtr<Notation> > &notations,
+  AttlistNotationDeclEvent(std::vector<ConstPtr<Notation> > &notations,
 			   const Location &,
 			   Markup *);
   void handle(EventHandler &);
-  const Vector<ConstPtr<Notation> > &notations() const;
+  const std::vector<ConstPtr<Notation> > &notations() const;
 private:
   AttlistNotationDeclEvent(const AttlistNotationDeclEvent &); // undefined
   void operator=(const AttlistDeclEvent &);		      // undefined
-  Vector<ConstPtr<Notation> > notations_;
+  std::vector<ConstPtr<Notation> > notations_;
 };
 
 class LinkAttlistDeclEvent : public MarkupEvent {
 public:
-  LinkAttlistDeclEvent(Vector<const ElementType *> &elements,
+  LinkAttlistDeclEvent(std::vector<const ElementType *> &elements,
 		       const ConstPtr<Lpd> &,
 		       const Location &,
 		       Markup *);
   void handle(EventHandler &);
-  const Vector<const ElementType *> &elements() const;
+  const std::vector<const ElementType *> &elements() const;
   const Lpd &lpd() const;
 private:
   LinkAttlistDeclEvent(const LinkAttlistDeclEvent &); // undefined
   void operator=(const LinkAttlistDeclEvent &);   // undefined
-  Vector<const ElementType *> elements_;
+  std::vector<const ElementType *> elements_;
   ConstPtr<Lpd> lpd_;
 };
 
@@ -1130,13 +1130,13 @@ const ConstPtr<ComplexLpd> &EndPrologEvent::lpdPointer() const
 }
 
 inline
-const Vector<StringC> &EndPrologEvent::simpleLinkNames() const
+const std::vector<StringC> &EndPrologEvent::simpleLinkNames() const
 {
   return simpleLinkNames_;
 }
 
 inline
-const Vector<AttributeList> &EndPrologEvent::simpleLinkAttributes() const
+const std::vector<AttributeList> &EndPrologEvent::simpleLinkAttributes() const
 {
   return simpleLinkAttributes_;
 }
@@ -1275,19 +1275,19 @@ const ConstPtr<Notation> &NotationDeclEvent::notationPointer() const
 }
 
 inline
-const Vector<const ElementType *> &ElementDeclEvent::elements() const
+const std::vector<const ElementType *> &ElementDeclEvent::elements() const
 {
   return elements_;
 }
 
 inline
-const Vector<const ElementType *> &AttlistDeclEvent::elements() const
+const std::vector<const ElementType *> &AttlistDeclEvent::elements() const
 {
   return elements_;
 }
 
 inline
-const Vector<const ElementType *> &LinkAttlistDeclEvent::elements() const
+const std::vector<const ElementType *> &LinkAttlistDeclEvent::elements() const
 {
   return elements_;
 }
@@ -1317,7 +1317,7 @@ const ComplexLpd &IdLinkDeclEvent::lpd() const
 }
 
 inline
-const Vector<ConstPtr<Notation> > &
+const std::vector<ConstPtr<Notation> > &
 AttlistNotationDeclEvent::notations() const
 {
   return notations_;

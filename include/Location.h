@@ -12,7 +12,7 @@
 #include "Ptr.h"
 #include "Resource.h"
 #include "Boolean.h"
-#include "Vector.h"
+#include <vector>
 #include "Owner.h"
 #include "StringC.h"
 #include "rtti.h"

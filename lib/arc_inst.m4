@@ -6,8 +6,7 @@
 #ifdef SP_MANUAL_INST
 
 #define SP_DEFINE_TEMPLATES
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include "Owner.h"
 #undef SP_DEFINE_TEMPLATES
 
@@ -17,9 +16,9 @@
 namespace SP_NAMESPACE {
 #endif
 
-__instantiate(NCVector<ArcProcessor>)
+__instantiate(std::vector<ArcProcessor>)
 __instantiate(Owner<ArcProcessor::MetaMapCache>)
-__instantiate(NCVector<Owner<ArcProcessor::MetaMapCache> >)
+__instantiate(std::vector<Owner<ArcProcessor::MetaMapCache> >)
 
 #ifdef SP_NAMESPACE
 }

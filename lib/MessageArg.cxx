@@ -78,7 +78,7 @@ void OtherMessageArg::append(MessageBuilder &builder) const
   builder.appendOther(this);
 }
 
-StringVectorMessageArg::StringVectorMessageArg(const Vector<StringC> &v)
+StringVectorMessageArg::StringVectorMessageArg(const std::vector<StringC> &v)
 : v_(v)
 {
 }

@@ -85,7 +85,7 @@ int EntityApp::processArguments(int argc, AppChar **argv)
 Boolean EntityApp::makeSystemId(int nFiles, AppChar *const *files,
 					StringC &result)
 {
-  Vector<StringC> filenames(nFiles == 0 ? 1 : nFiles);
+  std::vector<StringC> filenames(nFiles == 0 ? 1 : nFiles);
   int i;
   for (i = 0; i < nFiles; i++)
     filenames[i] = convertInput(tcscmp(files[i], SP_T("-")) == 0
@@ -153,7 +153,7 @@ Ptr<ExtendEntityManager> &EntityApp::entityManager()
   entityManager_->registerStorageManager(new LiteralStorageManager("LITERAL"));
   entityManager_->registerStorageManager(new NotationStorageManager("CLSID"));
   entityManager_->registerStorageManager(new NotationStorageManager("MIMETYPE"));
-  Vector<StringC> v;
+  std::vector<StringC> v;
   for (i = 0; i < catalogSysids_.size(); i++)
     // filenames specified on command-line must exist
     v.push_back(convertInput(catalogSysids_[i]));

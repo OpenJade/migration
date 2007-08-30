@@ -18,7 +18,7 @@
 #include "Ptr.h"
 #include "Syntax.h"
 #include "Text.h"
-#include "Vector.h"
+#include <vector>
 
 // This describes a markup declaration parameter.
 
@@ -64,10 +64,10 @@ public:
   Text literalText;
   Boolean lita;
   Owner<ModelGroup> modelGroupPtr;
-  Vector<NameToken> nameTokenVector;
+  std::vector<NameToken> nameTokenVector;
   StringC token;		// name nameToken; with substitution
   StringC origToken;
-  Vector<const ElementType *> elementVector;
+  std::vector<const ElementType *> elementVector;
 private:
   Param(const Param &);		// undefined
   void operator=(const Param &); // undefined

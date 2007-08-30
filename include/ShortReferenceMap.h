@@ -7,8 +7,8 @@
 #pragma interface
 #endif
 
-#include "Vector.h"
-#include "Vector.h"
+#include <vector>
+#include <vector>
 #include "StringC.h"
 #include "Named.h"
 #include "Boolean.h"
@@ -25,8 +25,8 @@ public:
   ShortReferenceMap(const StringC &);
   inline ~ShortReferenceMap() {}
   Boolean defined() const;
-  void setNameMap(Vector<StringC> &map);
-  void setEntityMap(Vector<ConstPtr<Entity> > &map);
+  void setNameMap(std::vector<StringC> &map);
+  void setEntityMap(std::vector<ConstPtr<Entity> > &map);
   Boolean lookup(int i, const StringC *&) const;
   const StringC *entityName(size_t i) const;
   const ConstPtr<Entity> &entity(size_t i) const;
@@ -37,8 +37,8 @@ public:
 private:
   ShortReferenceMap(const ShortReferenceMap &);	// undefined
   void operator=(const ShortReferenceMap &);	// undefined
-  Vector<StringC> nameMap_;
-  Vector<ConstPtr<Entity> > entityMap_;
+  std::vector<StringC> nameMap_;
+  std::vector<ConstPtr<Entity> > entityMap_;
   ConstPtr<Entity> nullEntity_;
   Boolean used_;
   Location defLocation_;
@@ -69,7 +69,7 @@ const ConstPtr<Entity> &ShortReferenceMap::entity(size_t i) const
 }
 
 inline
-void ShortReferenceMap::setEntityMap(Vector<ConstPtr<Entity> > &map)
+void ShortReferenceMap::setEntityMap(std::vector<ConstPtr<Entity> > &map)
 {
   map.swap(entityMap_);
 }

@@ -63,10 +63,10 @@ public:
   virtual void dispatchMessage(const Message &);
   virtual Boolean XMLformatFragment(const MessageFragment &, OutputCharStream &);
   virtual void formatMessage(const MessageFragment &,
-		     const Vector<CopyOwner<MessageArg> > &args,
+		     const std::vector<CopyOwner<MessageArg> > &args,
 		     OutputCharStream &, bool noquote = 0);
 
-  virtual void formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
+  virtual void formatOpenElements(const std::vector<OpenElementInfo> &openElementInfo,
 			  OutputCharStream &os);
   virtual const ExternalInfo *locationHeader(const Origin *, Index, Offset &off);
   virtual void showOpenEntities(const Origin *, Index, Offset &off) ;

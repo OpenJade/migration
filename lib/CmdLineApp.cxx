@@ -196,7 +196,7 @@ void CmdLineApp::usage()
   if (!stdOut)
     stdOut = new EncodeOutputCharStream(&standardOutput, codingSystem());
 
-  Vector<CopyOwner<MessageArg> > args(1);
+  std::vector<CopyOwner<MessageArg> > args(1);
   StringMessageArg arg(convertInput(progName ? progName : SP_T("program")));
   args[0] = arg.copy();
   if (usages_.size() == 0) 
@@ -206,7 +206,7 @@ void CmdLineApp::usage()
     StringC tem;
     formatMessage(usages_[i], args, ostr, 1);
     ostr.extractString(tem); 
-    Vector<CopyOwner<MessageArg> > args2(1);
+    std::vector<CopyOwner<MessageArg> > args2(1);
     StringMessageArg arg2(tem);
     args2[0] = arg2.copy();
     formatMessage(i ? CmdLineAppMessages::usageCont 
@@ -219,7 +219,7 @@ void CmdLineApp::usage()
     formatMessage(preInfos_[i], args, *stdOut, 1);
     *stdOut << nl;
   }
-  Vector<StringC> leftSide;
+  std::vector<StringC> leftSide;
   size_t leftSize = 0;
   for (size_t i = 0; i < opts_.size(); i++) {
     leftSide.resize(leftSide.size() + 1);
@@ -264,7 +264,7 @@ void CmdLineApp::usage()
     for (size_t j = leftSide[i].size(); j <= leftSize; j++)
       leftSide[i] += ' ';
     StrOutputCharStream ostr;
-    Vector<CopyOwner<MessageArg> > args2(1);
+    std::vector<CopyOwner<MessageArg> > args2(1);
     StringC t;
     if (!getMessageText(optArgs_[i], t))
       t.resize(0);

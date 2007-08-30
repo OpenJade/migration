@@ -20,7 +20,7 @@
 #include "Boolean.h"
 #include "SubstTable.h"
 #include "CatalogEntry.h"
-#include "Vector.h"
+#include <vector>
 #include "StorageManager.h"
 #include "macros.h"
 #include "ParserOptions.h"
@@ -37,7 +37,7 @@ class SOEntityCatalog;
 
 class SOCatalogManagerImpl : public SOCatalogManager {
 public:
-  SOCatalogManagerImpl(const Vector<StringC> &sysids,
+  SOCatalogManagerImpl(const std::vector<StringC> &sysids,
 		       size_t nSysidsMustExist,
 		       const CharsetInfo *sysidCharset,
 		       const CharsetInfo *catalogCharset,
@@ -56,7 +56,7 @@ private:
 			      const CharsetInfo &charset,
 			      Messenger &mgr) const;
   size_t nSystemCatalogsMustExist_;
-  Vector<StringC> systemCatalogs_;
+  std::vector<StringC> systemCatalogs_;
   const CharsetInfo *sysidCharset_;
   const CharsetInfo *catalogCharset_;
   Boolean useDocCatalog_;
@@ -150,7 +150,7 @@ private:
   Location documentLoc_;
   size_t documentBaseNumber_;
   Boolean haveCurrentBase_;
-  Vector<Location> base_;
+  std::vector<Location> base_;
   Ptr<ExtendEntityManager> em_;
 };
 
@@ -242,7 +242,7 @@ private:
 };
 
 ExtendEntityManager::CatalogManager *
-SOCatalogManager::make(const Vector<StringC> &sysids,
+SOCatalogManager::make(const std::vector<StringC> &sysids,
 		       size_t nSysidsMustExist,
 		       const CharsetInfo *sysidCharset,
 		       const CharsetInfo *catalogCharset,
@@ -255,7 +255,7 @@ SOCatalogManager::make(const Vector<StringC> &sysids,
 				  useDocCatalog);
 }
 		       
-SOCatalogManagerImpl::SOCatalogManagerImpl(const Vector<StringC> &systemCatalogs,
+SOCatalogManagerImpl::SOCatalogManagerImpl(const std::vector<StringC> &systemCatalogs,
 					   size_t nSystemCatalogsMustExist,
 					   const CharsetInfo *sysidCharset,
 					   const CharsetInfo *catalogCharset,
@@ -272,7 +272,7 @@ Boolean SOCatalogManagerImpl::mapCatalog(ParsedSystemId &systemId,
 					 ExtendEntityManager *em,
 					 Messenger &mgr) const
 {
-  Vector<ParsedSystemId::Map> maps;
+  std::vector<ParsedSystemId::Map> maps;
   systemId.maps.swap(maps);
   while (maps.size() > 0) {
     StringC catalogSystemId;
@@ -362,7 +362,7 @@ void SOCatalogManagerImpl::addCatalogsForDocument(CatalogParser &parser,
     }
     return;
   }
-  Vector<StringC> catalogs;
+  std::vector<StringC> catalogs;
   size_t i;
   for (i = 0; i < v.size(); i++)
     if (v[i].storageManager->inheritable()) {
@@ -865,8 +865,8 @@ void CatalogParser::parseCatalog(const StringC &sysid,
   mgr_ = &mgr;
   override_ = 0;
   Boolean recovering = false;
-  Vector<StringC> subSysids;
-  Vector<Location> subSysidLocs;
+  std::vector<StringC> subSysids;
+  std::vector<Location> subSysidLocs;
   for (;;) {
     Param parm = parseParam();
     if (parm == nameParam) {

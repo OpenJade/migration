@@ -5,7 +5,7 @@
 #define WinApp_INCLUDED 1
 
 #include "Event.h"
-#include "Vector.h"
+#include <vector>
 #include "StringC.h"
 #include "CharsetInfo.h"
 #include "ParserOptions.h"

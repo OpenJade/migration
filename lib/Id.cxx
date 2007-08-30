@@ -21,7 +21,7 @@ void Id::define(const Location &loc)
 {
   defLocation_ = loc;
   // release memory for pendingRefs_
-  Vector<Location> tem;
+  std::vector<Location> tem;
   pendingRefs_.swap(tem);
 }
 

@@ -17,7 +17,7 @@ namespace SP_NAMESPACE {
 class SP_API SOCatalogManager : public ExtendEntityManager::CatalogManager {
 public:
   static ExtendEntityManager::CatalogManager *
-    make(const Vector<StringC> &sysids,
+    make(const std::vector<StringC> &sysids,
 	 size_t nSysidsMustExist,
 	 const CharsetInfo *sysidCharset,
 	 const CharsetInfo *catalogCharset,

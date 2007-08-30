@@ -9,8 +9,7 @@
 
 #include "Owner.h"
 #include "Text.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include "Boolean.h"
 
 #ifdef SP_NAMESPACE
@@ -50,15 +49,15 @@ public:
   size_t requiredIndex() const;
   void setNotRequired();
 private:
-  Vector<LeafContentToken *> v_;
+  std::vector<LeafContentToken *> v_;
   // index of contextually required token or -1 if none
   size_t requiredIndex_;
 };
 
-class SP_API LastSet : public Vector<LeafContentToken *> {
+class SP_API LastSet : public std::vector<LeafContentToken *> {
 public:
   LastSet() { }
-  LastSet(size_t n) : Vector<LeafContentToken *>(n) { }
+  LastSet(size_t n) : std::vector<LeafContentToken *>(n) { }
   void append(const LastSet &);
 };
 
@@ -97,9 +96,9 @@ public:
 			       = (unsigned)Transition::invalidIndex,
 			     unsigned toSet
 			       = (unsigned)Transition::invalidIndex);
-  virtual void finish(Vector<unsigned> &minAndDepth,
-		      Vector<size_t> &elementTransition,
-		      Vector<ContentModelAmbiguity> &,
+  virtual void finish(std::vector<unsigned> &minAndDepth,
+		      std::vector<size_t> &elementTransition,
+		      std::vector<ContentModelAmbiguity> &,
 		      Boolean &pcdataUnreachable) = 0;
   virtual unsigned long grpgtcnt() const;
   virtual void setOrGroupMember();
@@ -119,13 +118,13 @@ private:
 class SP_API ModelGroup : public ContentToken {
 public:
   enum Connector { andConnector, orConnector, seqConnector };
-  ModelGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  ModelGroup(std::vector<Owner<ContentToken> > &, OccurrenceIndicator);
   inline virtual ~ModelGroup() {};
   virtual Connector connector() const = 0;
   unsigned nMembers() const;
-  void finish(Vector<unsigned> &minAndDepth,
-	      Vector<size_t> &elementTransition,
-	      Vector<ContentModelAmbiguity> &,
+  void finish(std::vector<unsigned> &minAndDepth,
+	      std::vector<size_t> &elementTransition,
+	      std::vector<ContentModelAmbiguity> &,
 	      Boolean &pcdataUnreachable);
   ContentToken &member(unsigned i);
   const ContentToken &member(unsigned i) const;
@@ -136,12 +135,12 @@ protected:
 private:
   ModelGroup(const ModelGroup &); // undefined
   void operator=(const ModelGroup &); // undefined
-  NCVector<Owner<ContentToken> > members_;
+  std::vector<Owner<ContentToken> > members_;
 };
 
 class AndModelGroup : public ModelGroup {
 public:
-  AndModelGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  AndModelGroup(std::vector<Owner<ContentToken> > &, OccurrenceIndicator);
   Connector connector() const;
   unsigned andDepth() const;
   unsigned andIndex() const;
@@ -160,7 +159,7 @@ private:
 
 class OrModelGroup : public ModelGroup {
 public:
-  OrModelGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  OrModelGroup(std::vector<Owner<ContentToken> > &, OccurrenceIndicator);
   Connector connector() const;
 private:
   OrModelGroup(const OrModelGroup &); // undefined
@@ -171,7 +170,7 @@ private:
 
 class SeqModelGroup : public ModelGroup {
 public:
-  SeqModelGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  SeqModelGroup(std::vector<Owner<ContentToken> > &, OccurrenceIndicator);
   Connector connector() const;
 private:
   SeqModelGroup(const SeqModelGroup &);	// undefined
@@ -188,7 +187,7 @@ public:
   inline ~AndInfo() { }
   const AndModelGroup *andAncestor;
   unsigned andGroupIndex;
-  Vector<Transition> follow;
+  std::vector<Transition> follow;
 private:
   AndInfo(const AndInfo &);	// undefined
   void operator=(const AndInfo &); // undefined
@@ -213,9 +212,9 @@ public:
 		      unsigned requireClear,
 		      unsigned toSet);
   void setFinal();
-  void finish(Vector<unsigned> &minAndDepth,
-	      Vector<size_t> &elementTransition,
-	      Vector<ContentModelAmbiguity> &,
+  void finish(std::vector<unsigned> &minAndDepth,
+	      std::vector<size_t> &elementTransition,
+	      std::vector<ContentModelAmbiguity> &,
 	      Boolean &pcdataUnreachable);
   Boolean isFinal() const;
   Boolean tryTransition(const ElementType *, AndState &,
@@ -223,7 +222,7 @@ public:
 			const LeafContentToken *&newpos) const;
   Boolean tryTransitionPcdata(AndState &, unsigned &minAndDepth,
 			      const LeafContentToken *&newpos) const;
-  void possibleTransitions(const AndState &, unsigned minAndDepth, Vector<const ElementType *> &) const;
+  void possibleTransitions(const AndState &, unsigned minAndDepth, std::vector<const ElementType *> &) const;
   const LeafContentToken *impliedStartTag(const AndState &andpos,
 					  unsigned minAndDepth) const;
   const LeafContentToken *transitionToken(const ElementType *to,
@@ -245,14 +244,14 @@ protected:
 private:
   LeafContentToken(const LeafContentToken &); // undefined
   void operator=(const LeafContentToken &);   // undefined
-  void andFinish(Vector<unsigned> &minAndDepth,
-		 Vector<size_t> &elementTransition,
-		 Vector<ContentModelAmbiguity> &,
+  void andFinish(std::vector<unsigned> &minAndDepth,
+		 std::vector<size_t> &elementTransition,
+		 std::vector<ContentModelAmbiguity> &,
 		 Boolean &pcdataUnreachable);
   unsigned computeMinAndDepth1(const AndState&) const;
   unsigned leafIndex_;
   unsigned typeIndex_;
-  Vector<LeafContentToken *> follow_;
+  std::vector<LeafContentToken *> follow_;
   PackedBoolean isFinal_;
   PackedBoolean orGroupMember_;
   // 0 none, 1 yes - simple, 2 - compled
@@ -292,7 +291,7 @@ private:
 class DataTagGroup : public SeqModelGroup {
 public:
   // first content token is a DataTagElementToken, second is PcdataToken
-  DataTagGroup(NCVector<Owner<ContentToken> > &, OccurrenceIndicator);
+  DataTagGroup(std::vector<Owner<ContentToken> > &, OccurrenceIndicator);
 private:
   DataTagGroup(const DataTagGroup &); // undefined
   void operator=(const DataTagGroup &); // undefined
@@ -300,13 +299,13 @@ private:
 
 class DataTagElementToken : public ElementToken {
 public:
-  DataTagElementToken(const ElementType *, Vector<Text> &templates);
-  DataTagElementToken(const ElementType *, Vector<Text> &templates,
+  DataTagElementToken(const ElementType *, std::vector<Text> &templates);
+  DataTagElementToken(const ElementType *, std::vector<Text> &templates,
 		      Text &paddingTemplate);
 private:
   DataTagElementToken(const DataTagElementToken &); // undefined
   void operator=(const DataTagElementToken &); // undefined
-  Vector<Text> templates_;
+  std::vector<Text> templates_;
   Boolean havePaddingTemplate_;
   Text paddingTemplate_;
 };
@@ -316,7 +315,7 @@ public:
   CompiledModelGroup(Owner<ModelGroup> &);
   inline ~CompiledModelGroup() {};
   void compile(size_t nElementTypeIndex,
-	       Vector<ContentModelAmbiguity> &,
+	       std::vector<ContentModelAmbiguity> &,
 	       Boolean &pcdataUnreachable);
   CompiledModelGroup *copy() const;
   const LeafContentToken *initial() const;
@@ -343,7 +342,7 @@ public:
 private:
   void clearFrom1(unsigned);
   unsigned clearFrom_;
-  Vector<PackedBoolean> v_;
+  std::vector<PackedBoolean> v_;
 };
 
 class SP_API MatchState {
@@ -352,7 +351,7 @@ public:
   MatchState(const CompiledModelGroup *); // may be 0
   Boolean tryTransition(const ElementType *);
   Boolean tryTransitionPcdata();
-  void possibleTransitions(Vector<const ElementType *> &) const;
+  void possibleTransitions(std::vector<const ElementType *> &) const;
   Boolean isFinished() const;
   const LeafContentToken *impliedStartTag() const;
   const LeafContentToken *invalidExclusion(const ElementType *) const;
@@ -541,7 +540,7 @@ Boolean MatchState::tryTransitionPcdata()
 }
 
 inline
-void MatchState::possibleTransitions(Vector<const ElementType *> &v) const
+void MatchState::possibleTransitions(std::vector<const ElementType *> &v) const
 {
   pos_->possibleTransitions(andState_, minAndDepth_, v);
 }

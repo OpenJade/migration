@@ -32,8 +32,8 @@ public:
   void clear() { table_.clear(); }
   void swap(NamedTable<T> &to) { table_.swap(to.table_); }
 private:
-  NamedTable(const NamedTable<T> &); // undefined
-  void operator=(const NamedTable<T> &); // undefined
+  // NamedTable(const NamedTable<T> &); // undefined
+  // void operator=(const NamedTable<T> &); // undefined
   OwnerTable<Named, StringC, Hash, NamedTableKeyFunction>
     table_;
   friend class NamedTableIter<T>;

@@ -22,7 +22,7 @@ ShortReferenceMap::ShortReferenceMap(const StringC &name)
 {
 }
 
-void ShortReferenceMap::setNameMap(Vector<StringC> &map)
+void ShortReferenceMap::setNameMap(std::vector<StringC> &map)
 {
   map.swap(nameMap_);
   // Make sure we know it's defined.

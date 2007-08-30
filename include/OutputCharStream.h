@@ -33,8 +33,8 @@ public:
   OutputCharStream &operator<<(int);
   OutputCharStream &operator<<(Newline);
 private:
-  OutputCharStream(const OutputCharStream &);	// undefined
-  void operator=(const OutputCharStream &);	// undefined
+  // OutputCharStream(const OutputCharStream &);	// undefined
+  // void operator=(const OutputCharStream &);	// undefined
 
   virtual void flushBuf(Char) = 0;
 protected:
@@ -75,8 +75,8 @@ public:
 private:
   void flushBuf(Char);
   void sync(size_t);
-  StrOutputCharStream(const StrOutputCharStream &); // undefined
-  void operator=(const StrOutputCharStream &);	    // undefined
+  // StrOutputCharStream(const StrOutputCharStream &); // undefined
+  // void operator=(const StrOutputCharStream &);	    // undefined
   Char *buf_;
   size_t bufSize_;
 };

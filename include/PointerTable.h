@@ -4,7 +4,7 @@
 #ifndef PointerTable_INCLUDED
 #define PointerTable_INCLUDED 1
 
-#include "Vector.h"
+#include <vector>
 #include "Boolean.h"
 #include <stddef.h>
 
@@ -35,7 +35,7 @@ public:
 protected:
   size_t used_;
   size_t usedLimit_;
-  Vector<P> vec_;
+  std::vector<P> vec_;
   P null_;
 
   size_t startIndex(const K &k) const {

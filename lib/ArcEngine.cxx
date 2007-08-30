@@ -9,8 +9,7 @@
 #include "splib.h"
 #include "ArcEngine.h"
 #include "ArcProcessor.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include <deque>
 #include "ArcEngineMessages.h"
 #include "ParserMessages.h"
@@ -104,7 +103,7 @@ public:
 		const volatile sig_atomic_t *cancelPtr,
 		const StringC *arcPublicId,
 		const Notation *,
-		const Vector<StringC> &name,
+		const std::vector<StringC> &name,
 		const SubstTable *table);
   ~ArcEngineImpl();
   void sgmlDecl(SgmlDeclEvent *);
@@ -129,7 +128,7 @@ private:
   void initMessage(Message &);
 
   EventHandler *eventHandler_;
-  NCVector<ArcProcessor> arcProcessors_;
+  std::vector<ArcProcessor> arcProcessors_;
   ConstPtr<Sd> sd_;
   ConstPtr<Syntax> syntax_;
   StringC is10744_;
@@ -151,7 +150,7 @@ private:
   const AttributeList *linkAttributes_;
   LinkProcess linkProcess_;
   Boolean haveLinkProcess_;
-  Vector<StringC> docName_;
+  std::vector<StringC> docName_;
   ArcDirector *director_;
   Messenger *mgr_;
   const volatile sig_atomic_t *cancelPtr_;
@@ -164,14 +163,14 @@ void ArcEngine::parseAll(SgmlParser &parser,
 			 const volatile sig_atomic_t *cancelPtr)
 {
   ArcEngineImpl wrap(mgr, &parser, director, cancelPtr,
-		     0, 0, Vector<StringC>(), 0);
+		     0, 0, std::vector<StringC>(), 0);
   parser.parseAll(wrap, cancelPtr);
 }
 
 EventHandler *
 SelectOneArcDirector::arcEventHandler(const StringC *,
 				      const Notation *,
-				      const Vector<StringC> &name,
+				      const std::vector<StringC> &name,
 				      const SubstTable *table)
 {
   if (name.size() != select_.size())
@@ -201,7 +200,7 @@ ArcEngineImpl::ArcEngineImpl(Messenger &mgr,
 			     const volatile sig_atomic_t *cancelPtr,
 			     const StringC *arcPublicId,
 			     const Notation *notation,
-			     const Vector<StringC> &docName,
+			     const std::vector<StringC> &docName,
 			     const SubstTable *table)
 
 : director_(&director), mgr_(&mgr), cancelPtr_(cancelPtr),
@@ -313,7 +312,7 @@ void ArcEngineImpl::pi(PiEvent *event)
 		{ "options", 0, AttdefData::dvCdata, 0 },
 		{ "quantity", 0, AttdefData::dvCdata, 0 }
 	      };
-	      Vector<CopyOwner<AttributeDefinition> > attdefs;
+	      std::vector<CopyOwner<AttributeDefinition> > attdefs;
 	      for (size_t i = 0; i < SIZEOF(attdefData); i++) {
 		StringC attName(sd_->execToInternal(attdefData[i].name));
 		syntax_->generalSubstTable()->subst(attName);
@@ -326,7 +325,7 @@ void ArcEngineImpl::pi(PiEvent *event)
 		  declaredValue = new CdataDeclaredValue();
 		  break;
 		case AttdefData::dvNameTokenGroup: {
-		   Vector<StringC> allowedTokens;
+		   std::vector<StringC> allowedTokens;
 		   for (const char *const *allowedToken = attdefData[i].allowedTokens;
 			*allowedToken; allowedToken++) {
 		     allowedTokens.push_back(sd_->execToInternal(*allowedToken));
@@ -797,8 +796,8 @@ void ArcProcessor::init(const EndPrologEvent &event,
 			const ConstPtr<Syntax> &syntax,
 			const SgmlParser *parentParser,
 			Messenger *mgr,
-			const Vector<StringC> &superName,
-			const NCVector<ArcProcessor> &arcProcessors,
+			const std::vector<StringC> &superName,
+			const std::vector<ArcProcessor> &arcProcessors,
 			ArcDirector &director,
 			const volatile sig_atomic_t *cancelPtr)
 {
@@ -826,7 +825,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
       return;
   }
   const ArcProcessor *first = 0;
-  for (const ArcProcessor *p = arcProcessors.begin(); p != this; p++)
+  for (std::vector<ArcProcessor>::const_iterator p = arcProcessors.begin(); &(*p) != this; ++p)
     if (name_ == p->name()) {
       if ((piDecl() && p->piDecl()) || (!piDecl() && !p->piDecl())) {
 	setNextLocation(declLoc_);
@@ -835,7 +834,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
 		p->declLoc_);
 	return;
       } else {
-	first = p;
+	first = &(*p);
       }
     }
   if (first) {
@@ -870,7 +869,7 @@ void ArcProcessor::init(const EndPrologEvent &event,
       message(ArcEngineMessages::noArcNotation, StringMessageArg(name_));
     }
   }
-  Vector<StringC> docName(superName);
+  std::vector<StringC> docName(superName);
   docName.push_back(name_);
   ArcEngineImpl *engine
     = new ArcEngineImpl(*mgr, parentParser, director, cancelPtr,
@@ -1207,14 +1206,14 @@ void ArcProcessor::supportAttributes(const AttributeList &atts, Boolean piDecl)
 
 void ArcProcessor::processArcOpts(const AttributeList &atts, Boolean piDecl)
 {
-  Vector<StringC> arcOptA;
+  std::vector<StringC> arcOptA;
   unsigned ind;
   if (piDecl)
     arcOptA.push_back(docSd_->execToInternal("options"));
   else {
     StringC attName(docSd_->execToInternal("ArcOptSA"));
     docSyntax_->generalSubstTable()->subst(attName);
-    Vector<size_t> arcOptAPos;
+    std::vector<size_t> arcOptAPos;
     const Text *arcOptAText = 0;
     if (atts.attributeIndex(attName, ind)) {
       const AttributeValue *value = atts.value(ind);
@@ -1234,8 +1233,8 @@ void ArcProcessor::processArcOpts(const AttributeList &atts, Boolean piDecl)
       if (value) {
 	const Text *textP = value->text();
 	if (textP) {
-	  Vector<StringC> opts;
-	  Vector<size_t> optsPos;
+	  std::vector<StringC> opts;
+	  std::vector<size_t> optsPos;
 	  split(*textP, docSyntax_->space(), opts, optsPos);
 	  arcOpts_.insert(arcOpts_.begin(),
 			  opts.begin(), opts.begin() + opts.size());
@@ -1248,8 +1247,8 @@ void ArcProcessor::processArcOpts(const AttributeList &atts, Boolean piDecl)
 void ArcProcessor::processArcQuant(const Text &text)
 {
   Ptr<Syntax> newMetaSyntax;
-  Vector<StringC> tokens;
-  Vector<size_t> tokensPos;
+  std::vector<StringC> tokens;
+  std::vector<size_t> tokensPos;
   split(text, docSyntax_->space(), tokens, tokensPos);
   for (size_t i = 0; i < tokens.size(); i++) {
     docSyntax_->generalSubstTable()->subst(tokens[i]);
@@ -1495,8 +1494,8 @@ Boolean ArcProcessor::mapAttributes(const AttributeList &from,
 	unsigned specLength = 0;
         Text tem1;
         if (map.attTokenMapBase[i] < map.attTokenMapBase[i + 1]) {
-          Vector<StringC> tokens;
-          Vector<size_t> tokensPos;
+          std::vector<StringC> tokens;
+          std::vector<size_t> tokensPos;
 	  split(*fromText, docSyntax_->space(), tokens, tokensPos);
           Boolean replaced = 0; 
           for (size_t k = 0; k < tokens.size(); k++) 
@@ -1631,10 +1630,10 @@ ArcProcessor::buildMetaMap(const ElementType *docElementType,
   if (metaAttributed) {
     ConstPtr<AttributeDefinitionList> metaAttDef
       = metaAttributed->attributeDef();
-    Vector<PackedBoolean> renamed(metaAttDef.isNull() 
+    std::vector<PackedBoolean> renamed(metaAttDef.isNull() 
                                   ? 1 : metaAttDef->size() + 1, 
                                    PackedBoolean(0));
-    Vector<PackedBoolean> substituted((atts.def().isNull() ? 1 : atts.def()->size() + 1) 
+    std::vector<PackedBoolean> substituted((atts.def().isNull() ? 1 : atts.def()->size() + 1) 
   	                             + (linkAtts && !linkAtts->def().isNull() ? linkAtts->def()->size() : 0),
 		                     PackedBoolean(0));
     if (linkAtts) {
@@ -1866,12 +1865,12 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 					   const Text &rename,
 					   const AttributeList &atts,
 					   const AttributeList *linkAtts,
-					   Vector<PackedBoolean> &attRenamed,
-					   Vector<PackedBoolean> &attSubstituted,
+					   std::vector<PackedBoolean> &attRenamed,
+					   std::vector<PackedBoolean> &attSubstituted,
 					   Boolean isNotation)
 {
-  Vector<StringC> tokens;
-  Vector<size_t> tokensPos;
+  std::vector<StringC> tokens;
+  std::vector<size_t> tokensPos;
   split(rename, docSyntax_->space(), tokens, tokensPos);
   ConstPtr<AttributeDefinitionList> metaAttDef;
   if (map.attributed)
@@ -1982,7 +1981,7 @@ void ArcProcessor::buildAttributeMapRename(MetaMap &map,
 void ArcProcessor::buildAttributeMapRest(MetaMap &map,
 					 const AttributeList &atts,
 					 const AttributeList *linkAtts,
-					 const Vector<PackedBoolean> &attRenamed)
+					 const std::vector<PackedBoolean> &attRenamed)
 {
   ConstPtr<AttributeDefinitionList> metaAttDef
     = map.attributed->attributeDef();
@@ -2025,8 +2024,8 @@ Boolean ArcProcessor::matchName(const StringC &name, const char *key)
 
 void ArcProcessor::split(const Text &text,
 			 Char space,
-			 Vector<StringC> &tokens,
-			 Vector<size_t> &tokensPos)
+			 std::vector<StringC> &tokens,
+			 std::vector<size_t> &tokensPos)
 {
   const StringC &str = text.string();
   for (size_t i = 0;;) {

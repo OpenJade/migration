@@ -9,7 +9,7 @@
 #include "ModeInfo.h"
 #include "Partition.h"
 #include "SrInfo.h"
-#include "Vector.h"
+#include <vector>
 #include "ISetIter.h"
 #include "token.h"
 #include "TrieBuilder.h"
@@ -227,7 +227,7 @@ void Parser::compileModes(const Mode *modes,
     if (functions[i])
       functionCode[i] += partition.charCode(syntax().standardFunction(i));
 
-  Vector<SrInfo> srInfo;
+  std::vector<SrInfo> srInfo;
       
   int nShortref;
   if (!includesShortref || !dtd)
@@ -297,7 +297,7 @@ void Parser::compileModes(const Mode *modes,
   for (i = 0; i < n; i++) {
     TrieBuilder tb(partition.maxCode() + 1);
     TrieBuilder::TokenVector ambiguities;
-    Vector<Token> suppressTokens;
+    std::vector<Token> suppressTokens;
     if (multicode) {
       suppressTokens.assign(partition.maxCode() + 1, 0);
       suppressTokens[partition.eECode()] = tokenEe;

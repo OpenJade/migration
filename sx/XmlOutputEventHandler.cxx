@@ -400,11 +400,11 @@ void XmlOutputEventHandler::outputAttribute(const AttributeList &attributes, siz
     os() << *string;
   else
     if (options_.preserveCase) {
-      const Vector<StringC> *tokensPtr =
+      const std::vector<StringC> *tokensPtr =
         attributes.def()->def(i)->getOrigTokens();
       if (tokensPtr) {
         size_t nTokens = tokensPtr->size();
-        Vector<StringC>::const_iterator tokens = tokensPtr->begin();
+        std::vector<StringC>::const_iterator tokens = tokensPtr->begin();
         for (i = 0; i < nTokens; i++) {
           if (equalsIgnoreCase(*string, (StringC &)tokens[i])) {
             os() << tokens[i];

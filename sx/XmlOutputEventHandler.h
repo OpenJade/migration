@@ -15,6 +15,7 @@
 #include "CharsetInfo.h"
 #include "ExtendEntityManager.h"
 #include <list>
+#include <vector>
 #include "Ptr.h"
 #include "SubstTable.h"
 
@@ -101,8 +102,8 @@ private:
   Ptr<ExtendEntityManager> entityManager_;
   std::list<OutputCharStream *> outputStack_;
   std::list<OutputByteStream *> outputFileStack_;
-  Vector<StringC> filesCreated_;
-  Vector<StringC> originalFilePaths_;
+  std::vector<StringC> filesCreated_;
+  std::vector<StringC> originalFilePaths_;
   const CharsetInfo *systemCharset_;
   OutputCharStream *os_;
   OutputCharStream *extEnts_;

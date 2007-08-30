@@ -7,10 +7,8 @@
 
 #define SP_DEFINE_TEMPLATES
 #include "StringOf.h"
-#include "Vector.h"
-#include "NCVector.h"
+#include <vector>
 #include "ListIter.h"
-#include <list>
 #include <list>
 #include "Owner.h"
 #include "OwnerTable.h"
@@ -40,13 +38,13 @@ namespace SP_NAMESPACE {
 #endif
 
 __instantiate(String<char>)
-__instantiate(NCVector<Owner<StorageObject> >)
-__instantiate(Vector<StorageObjectSpec>)
-__instantiate(NCVector<Owner<OffsetOrderedListBlock> >)
-__instantiate(NCVector<StorageObjectPosition>)
+__instantiate(std::vector<Owner<StorageObject> >)
+__instantiate(std::vector<StorageObjectSpec>)
+__instantiate(std::vector<Owner<OffsetOrderedListBlock> >)
+__instantiate(std::vector<StorageObjectPosition>)
 __instantiate(std::list<ListItem<DescriptorUser*> >)
-__instantiate(List<DescriptorUser*>)
-__instantiate(ListIter<DescriptorUser *>)
+__instantiate(std::list<DescriptorUser*>)
+__instantiate(std::list<DescriptorUser *>::iterator)
 __instantiate(ListItem<DescriptorUser *>)
 __instantiate(IListIter<ListItem<DescriptorUser*> >)
 __instantiate(Owner<StorageObject>)
@@ -54,7 +52,7 @@ __instantiate(Owner<Decoder>)
 __instantiate(Owner<OffsetOrderedListBlock>)
 __instantiate(Owner<ExtendEntityManager::CatalogManager>)
 __instantiate(Owner<StorageManager>)
-__instantiate(NCVector<Owner<StorageManager> >)
+__instantiate(std::vector<Owner<StorageManager> >)
 __instantiate(`HashTable<String<Char>,CatalogEntry>')
 __instantiate(`HashTableIter<String<Char>,CatalogEntry>')
 __instantiate(`HashTableItem<String<Char>,CatalogEntry>')
@@ -64,10 +62,10 @@ __instantiate(`CopyOwnerTable<HashTableItemBase<String<Char> >,String<Char>,Hash
 __instantiate(`OwnerTableIter<HashTableItemBase<String<Char> >, String<Char>, Hash, HashTableKeyFunction<String<Char> > >')
 __instantiate(`PointerTable<HashTableItemBase<String<Char> >*,String<Char>,Hash,HashTableKeyFunction<String<Char> > >')
 __instantiate(`PointerTableIter<HashTableItemBase<String<Char> > *, String<Char>, Hash, HashTableKeyFunction<String<Char> > >')
-__instantiate(Vector<HashTableItemBase<String<Char> >*>)
+__instantiate(std::vector<HashTableItemBase<String<Char> >*>)
 __instantiate(Ptr<ExtendEntityManager>)
 __instantiate(ConstPtr<ExtendEntityManager>)
-__instantiate(Vector<ParsedSystemId::Map>)
+__instantiate(std::vector<ParsedSystemId::Map>)
 __instantiate(ConstPtr<InputCodingSystemKit>)
 __instantiate(Ptr<InputCodingSystemKit>)
 __instantiate(ConstPtr<CodingSystemKit>)
@@ -92,7 +90,7 @@ __instantiate(Ptr<CharMapResource<unsigned char> >)
 __instantiate(ConstPtr<CharMapResource<unsigned char> >)
 __instantiate(String<unsigned short>)
 __instantiate(String<wchar_t>)
-__instantiate(Vector<String<unsigned short> >)
+__instantiate(std::vector<String<unsigned short> >)
 __instantiate(Ptr<CharMapResource<bool> >)
 __instantiate(Ptr<CharMapResource<unsigned short> >)
 #endif

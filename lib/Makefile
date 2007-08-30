@@ -3,7 +3,7 @@
 SRCROOT := ..
 
 MSG_HEADERS = ArcEngine Parser CmdLineApp EntityApp EntityManager MessageFormatter MessageReporter Catalog ParserApp PosixStorage StdioStorage URLStorage
-INST_GEN = app_inst arc_inst entmgr_inst parser_inst xentmgr_inst
+INST_GEN = app_inst arc_inst entmgr_inst parser_inst
 
 define genmsg
 EXTRA_PRE += $(1)Messages.h
@@ -40,3 +40,4 @@ DEFS += -DSP_NAMESPACE=osp -DSP_API= -DSP_ANSI_LIB -DSP_HAVE_BOOL -DSP_DEFINE_TE
 maintainer-clean::
 	for f in $(MSG_HEADERS); do rm -f $${f}Messages.h; done
 	for f in $(INST_GEN) ; do rm -f $${f}.cxx; done
+

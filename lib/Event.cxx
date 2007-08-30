@@ -273,7 +273,7 @@ UselinkEvent::UselinkEvent(const ConstPtr<Lpd> &lpd,
 }
 
 UsemapEvent::UsemapEvent(const ShortReferenceMap *map,
-			 Vector<const ElementType *> &elements,
+			 std::vector<const ElementType *> &elements,
 			 const ConstPtr<Dtd> &dtd,
 			 const Location &loc,
 			 Markup *markup)
@@ -331,8 +331,8 @@ EndLpdEvent::EndLpdEvent(const ConstPtr<Lpd> &lpd,
 
 EndPrologEvent::EndPrologEvent(const ConstPtr<Dtd> &dtd,
 			       const ConstPtr<ComplexLpd> &lpd,
-			       Vector<StringC> &simpleLinkNames,
-			       Vector<AttributeList> &simpleLinkAttributes,
+			       std::vector<StringC> &simpleLinkNames,
+			       std::vector<AttributeList> &simpleLinkAttributes,
 			       const Location &location)
 : LocatedEvent(endProlog, location), dtd_(dtd), lpd_(lpd)
 {
@@ -456,7 +456,7 @@ NotationDeclEvent:: NotationDeclEvent(const ConstPtr<Notation> &notation,
 {
 }
 
-ElementDeclEvent::ElementDeclEvent(Vector<const ElementType *> &elements,
+ElementDeclEvent::ElementDeclEvent(std::vector<const ElementType *> &elements,
 				   const ConstPtr<Dtd> &dtd,
 				   const Location &loc,
 				   Markup *markup)
@@ -465,7 +465,7 @@ ElementDeclEvent::ElementDeclEvent(Vector<const ElementType *> &elements,
   elements.swap(elements_);
 }
 
-AttlistDeclEvent::AttlistDeclEvent(Vector<const ElementType *> &elements,
+AttlistDeclEvent::AttlistDeclEvent(std::vector<const ElementType *> &elements,
 				   const ConstPtr<Dtd> &dtd,
 				   const Location &loc,
 				   Markup *markup)
@@ -475,7 +475,7 @@ AttlistDeclEvent::AttlistDeclEvent(Vector<const ElementType *> &elements,
 }
 
 AttlistNotationDeclEvent::AttlistNotationDeclEvent(
-  Vector<ConstPtr<Notation> > &notations, const Location &loc,
+  std::vector<ConstPtr<Notation> > &notations, const Location &loc,
 						   Markup *markup)
 : MarkupEvent(attlistNotationDecl, loc, markup)
 {
@@ -483,7 +483,7 @@ AttlistNotationDeclEvent::AttlistNotationDeclEvent(
 }
 
 LinkAttlistDeclEvent
-::LinkAttlistDeclEvent(Vector<const ElementType *> &elements,
+::LinkAttlistDeclEvent(std::vector<const ElementType *> &elements,
 		       const ConstPtr<Lpd> &lpd,
 		       const Location &loc,
 		       Markup *markup)

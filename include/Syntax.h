@@ -13,7 +13,7 @@
 #include "StringC.h"
 #include "SubstTable.h"
 #include "HashTable.h"
-#include "Vector.h"
+#include <vector>
 #include "Resource.h"
 #include "XcharMap.h"
 #include "EntityCatalog.h"
@@ -272,7 +272,7 @@ private:
   Boolean namecaseGeneral_;
   Boolean namecaseEntity_;
   StringC delimGeneral_[nDelimGeneral];
-  Vector<StringC> delimShortrefComplex_;
+  std::vector<StringC> delimShortrefComplex_;
   ISet<Char> delimShortrefSimple_;
   StringC names_[nNames];
   Number quantity_[nQuantity];
@@ -286,7 +286,7 @@ private:
   Boolean multicode_;
   XcharMap<unsigned char> markupScanTable_;
   Boolean hasMarkupScanTable_;
-  Vector<StringC> entityNames_;
+  std::vector<StringC> entityNames_;
   StringC entityChars_;
   static const int referenceQuantity_[];
 };

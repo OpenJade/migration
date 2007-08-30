@@ -36,8 +36,8 @@ protected:
   ParserOptions options_;
   SgmlParser parser_;
   unsigned errorLimit_;
-  Vector<StringC> arcNames_;
-  Vector<const AppChar *> activeLinkTypes_;
+  std::vector<StringC> arcNames_;
+  std::vector<const AppChar *> activeLinkTypes_;
 };
 
 inline

@@ -15,7 +15,7 @@
 #endif
 
 #include "MessageReporter.h"
-#include "Vector.h"
+#include <vector>
 #include "StringOf.h"
 #include "Boolean.h"
 #include "CodingSystem.h"
@@ -72,12 +72,12 @@ protected:
   static Boolean stringMatches(const AppChar *s, const char *key);
   const AppChar *errorFile_;
   const CodingSystem *outputCodingSystem_;
-  Vector<LongOption<AppChar> > opts_;
-  Vector<MessageType1> optDocs_;
-  Vector<MessageFragment> optArgs_;
-  Vector<MessageType1> usages_;
-  Vector<MessageType1> preInfos_;
-  Vector<MessageType1> infos_;
+  std::vector<LongOption<AppChar> > opts_;
+  std::vector<MessageType1> optDocs_;
+  std::vector<MessageFragment> optArgs_;
+  std::vector<MessageType1> usages_;
+  std::vector<MessageType1> preInfos_;
+  std::vector<MessageType1> infos_;
   Boolean internalCharsetIsDocCharset_;
   Ptr<CodingSystemKit> codingSystemKit_;
   enum {

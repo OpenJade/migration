@@ -35,7 +35,7 @@ MessageFormatter::~MessageFormatter()
 {
 }
 
-void MessageFormatter::formatOpenElements(const Vector<OpenElementInfo> &openElementInfo,
+void MessageFormatter::formatOpenElements(const std::vector<OpenElementInfo> &openElementInfo,
 					  OutputCharStream &os)
 {
   unsigned nOpenElements = openElementInfo.size();
@@ -64,7 +64,7 @@ void MessageFormatter::formatOpenElements(const Vector<OpenElementInfo> &openEle
 }
 
 void MessageFormatter::formatMessage(const MessageFragment &frag,
-				     const Vector<CopyOwner<MessageArg> > &args,
+				     const std::vector<CopyOwner<MessageArg> > &args,
 				     OutputCharStream &os, bool noquote)
 {
   StringC text;

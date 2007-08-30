@@ -43,8 +43,8 @@ public:
     }
   }
 private:
-  Owner(const Owner<T> &);	// undefined
-  void operator=(const Owner<T> &o); // undefined
+  // Owner(const Owner<T> &);	// undefined
+  // void operator=(const Owner<T> &o); // undefined
   void del();
   T *p_;
 };

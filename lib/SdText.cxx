@@ -80,7 +80,7 @@ SdTextIter::SdTextIter(const SdText &text)
 
 Boolean SdTextIter::next(const SyntaxChar *&ptr, size_t &length, Location &loc)
 {
-  const Vector<SdTextItem> &items = ptr_->items_;
+  const std::vector<SdTextItem> &items = ptr_->items_;
   if (itemIndex_ >= items.size())
     return 0;
   loc = items[itemIndex_].loc;

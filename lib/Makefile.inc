@@ -45,8 +45,7 @@ SRC_CXX = Allocator.cxx ArcEngine.cxx \
 	assert.cxx \
 	parseAttribute.cxx parseCommon.cxx parseDecl.cxx parseInstance.cxx \
 	parseMode.cxx parseParam.cxx parseSd.cxx splib.cxx \
-	app_inst.cxx arc_inst.cxx entmgr_inst.cxx \
-	parser_inst.cxx xentmgr_inst.cxx SubstTable.cxx \
+	SubstTable.cxx \
 	UTF16CodingSystem.cxx Fixed4CodingSystem.cxx
 
 SRC_C =	memcmp.c memmove.c strerror.c

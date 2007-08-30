@@ -2,4 +2,4 @@
 
 PRGNAME = ospam
 
-SRC_CXX = spam.cxx CopyEventHandler.cxx MarkupEventHandler.cxx spam_inst.cxx
+SRC_CXX = spam.cxx CopyEventHandler.cxx MarkupEventHandler.cxx

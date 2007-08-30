@@ -2,5 +2,4 @@
 
 PRGNAME = onsgmls
 
-SRC_CXX = nsgmls.cxx SgmlsEventHandler.cxx RastEventHandler.cxx StringSet.cxx \
-          nsgmls_inst.cxx
+SRC_CXX = nsgmls.cxx SgmlsEventHandler.cxx RastEventHandler.cxx StringSet.cxx

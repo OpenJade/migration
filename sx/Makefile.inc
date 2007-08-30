@@ -2,4 +2,4 @@
 
 PRGNAME = osx
 
-SRC_CXX = sx.cxx XmlOutputEventHandler.cxx sx_inst.cxx
+SRC_CXX = sx.cxx XmlOutputEventHandler.cxx

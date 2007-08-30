@@ -2,4 +2,4 @@
 
 PRGNAME = ospcat
 
-SRC_CXX = spcat.cxx spcat_inst.cxx
+SRC_CXX = spcat.cxx

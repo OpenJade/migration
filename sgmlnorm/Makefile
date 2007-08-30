@@ -3,7 +3,6 @@
 SRCROOT := ..
 
 MSG_HEADERS = Sgmlnorm
-INST_GEN = app_inst arc_inst entmgr_inst parser_inst xentmgr_inst
 
 define genmsg
 EXTRA_PRE += $(1)Messages.h

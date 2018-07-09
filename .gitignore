@@ -1,0 +1,276 @@
+
+# /jade/
+/jade/Makefile
+/jade/OpenJade-1.4devel.spec
+/jade/Makefile.in
+/jade/aclocal.m4
+/jade/autom4te.cache
+/jade/config.h.in
+/jade/configure
+/jade/stamp-h.in
+/jade/*.lo
+/jade/config.h
+/jade/config.log
+/jade/config.status
+/jade/libtool
+/jade/ltconfig
+/jade/ltmain.sh
+/jade/msggen.pl
+/jade/stamp-h
+/jade/stamp-h1
+
+# /jade/dsssl/
+/jade/dsssl/Makefile.in
+/jade/dsssl/Makefile
+/jade/dsssl/*.lo
+
+# /jade/grove/
+/jade/grove/Makefile.in
+/jade/grove/.deps
+/jade/grove/.libs
+/jade/grove/*.lo
+/jade/grove/Makefile
+/jade/grove/libogrove.la
+
+# /jade/intl/
+/jade/intl/Makefile
+
+# /jade/jade/
+/jade/jade/HtmlFOTBuilder_inst.cxx
+/jade/jade/HtmlMessages.h
+/jade/jade/HtmlMessages.rc
+/jade/jade/JadeMessages.h
+/jade/jade/JadeMessages.rc
+/jade/jade/Makefile.in
+/jade/jade/MifFOTBuilder_inst.cxx
+/jade/jade/MifMessages.h
+/jade/jade/MifMessages.rc
+/jade/jade/RtfFOTBuilder_inst.cxx
+/jade/jade/RtfMessages.h
+/jade/jade/RtfMessages.rc
+/jade/jade/TeXFOTBuilder_inst.cxx
+/jade/jade/TeXMessages.h
+/jade/jade/TeXMessages.rc
+/jade/jade/TransformFOTBuilder_inst.cxx
+/jade/jade/*.lo
+/jade/jade/Makefile
+/jade/jade/.libs
+/jade/jade/.deps
+
+# /jade/jadedoc/
+/jade/jadedoc/Makefile.in
+/jade/jadedoc/Makefile
+
+# /jade/jadedoc/images/
+/jade/jadedoc/images/Makefile.in
+/jade/jadedoc/images/Makefile
+/jade/jadedoc/images/*.lo
+
+# /jade/po/
+/jade/po/*.gmo
+/jade/po/Makefile
+/jade/po/Makefile.in
+/jade/po/POTFILES
+
+# /jade/spgrove/
+/jade/spgrove/Makefile.in
+/jade/spgrove/grove_inst.cxx
+/jade/spgrove/*.lo
+/jade/spgrove/.deps
+/jade/spgrove/.libs
+/jade/spgrove/Makefile
+/jade/spgrove/libospgrove.la
+
+# /jade/style/
+/jade/style/DssslAppMessages.h
+/jade/style/DssslAppMessages.rc
+/jade/style/FlowObj_inst.cxx
+/jade/style/InterpreterMessages.cxx
+/jade/style/InterpreterMessages.h
+/jade/style/InterpreterMessages.rc
+/jade/style/Makefile.in
+/jade/style/primitive_inst.cxx
+/jade/style/style_inst.cxx
+/jade/style/*.lo
+/jade/style/Makefile
+/jade/style/.deps
+/jade/style/.libs
+/jade/style/libostyle.la
+
+# /sp/
+/sp/config.h
+/sp/Makefile.in
+/sp/ChangeLog
+/sp/stamp-h.in
+/sp/config.cache
+/sp/configure
+/sp/aclocal.m4
+/sp/config.log
+/sp/libtool
+/sp/config.status
+/sp/Makefile
+/sp/stamp-h
+/sp/stamp-h1
+/sp/config.h.in
+/sp/msggen.pl
+/sp/*.tar.gz
+/sp/*.spec
+/sp/autom4te-2.53.cache
+/sp/autom4te.cache
+/sp/onsgmlnorm.1
+/sp/onsgmls.1
+/sp/osgmlnorm.1
+/sp/ospam.1
+/sp/ospent.1
+/sp/osx.1
+/sp/ospcat.1
+/sp/releasenotes.html
+/sp/releasenotes.pdf
+/sp/releasenotes.ps
+/sp/stamp-h1.in
+/sp/stamp-h2.in
+/sp/stamp-h3.in
+/sp/stamp-h4.in
+
+# /sp/doc/
+/sp/doc/Makefile.in
+/sp/doc/Makefile
+
+# /sp/docsrc/
+/sp/docsrc/onsgmls.1
+/sp/docsrc/osgmlnorm.1
+/sp/docsrc/ospam.1
+/sp/docsrc/ospent.1
+/sp/docsrc/osx.1
+/sp/docsrc/ospcat.1
+/sp/docsrc/releasenotes.tex
+/sp/docsrc/releasenotes.aux
+/sp/docsrc/releasenotes.html
+/sp/docsrc/releasenotes.log
+/sp/docsrc/releasenotes.out
+/sp/docsrc/releasenotes.pdf
+/sp/docsrc/releasenotes.ps
+
+# /sp/generic/
+/sp/generic/Makefile
+/sp/generic/Makefile.in
+
+# /sp/include/
+/sp/include/Makefile
+/sp/include/Makefile.in
+
+# /sp/intl/
+/sp/intl/Makefile
+/sp/intl/po2tbl.sed
+
+# /sp/lib/
+/sp/lib/Makefile
+/sp/lib/Makefile.in
+/sp/lib/.libs
+/sp/lib/.deps
+/sp/lib/*.la
+/sp/lib/*.lo
+/sp/lib/*Messages.h
+/sp/lib/*Messages.rc
+/sp/lib/*Messages.cxx
+/sp/lib/*_inst.cxx
+
+# /sp/nsgmls/
+/sp/nsgmls/Makefile
+/sp/nsgmls/Makefile.in
+/sp/nsgmls/.libs
+/sp/nsgmls/.deps
+/sp/nsgmls/*.la
+/sp/nsgmls/*.lo
+/sp/nsgmls/*Messages.h
+/sp/nsgmls/*Messages.rc
+/sp/nsgmls/*Messages.cxx
+/sp/nsgmls/*_inst.cxx
+/sp/nsgmls/onsgmls
+
+# /sp/po/
+/sp/po/Makefile
+/sp/po/Makefile.in
+/sp/po/POTFILES
+/sp/po/*.pot
+/sp/po/*.gmo
+/sp/po/*.mo
+/sp/po/cat-id-tbl.c
+/sp/po/stamp-cat-id
+
+# /sp/pubtext/
+/sp/pubtext/Makefile
+/sp/pubtext/Makefile.in
+
+# /sp/sgmlnorm/
+/sp/sgmlnorm/Makefile
+/sp/sgmlnorm/Makefile.in
+/sp/sgmlnorm/.libs
+/sp/sgmlnorm/.deps
+/sp/sgmlnorm/*.la
+/sp/sgmlnorm/*.lo
+/sp/sgmlnorm/*Messages.h
+/sp/sgmlnorm/*Messages.rc
+/sp/sgmlnorm/*Messages.cxx
+/sp/sgmlnorm/*_inst.cxx
+/sp/sgmlnorm/osgmlnorm
+
+# /sp/spam/
+/sp/spam/Makefile
+/sp/spam/Makefile.in
+/sp/spam/.libs
+/sp/spam/.deps
+/sp/spam/*.la
+/sp/spam/*.lo
+/sp/spam/*Messages.h
+/sp/spam/*Messages.rc
+/sp/spam/*Messages.cxx
+/sp/spam/*_inst.cxx
+/sp/spam/ospam
+
+# /sp/spcat/
+/sp/spcat/Makefile
+/sp/spcat/Makefile.in
+/sp/spcat/.libs
+/sp/spcat/.deps
+/sp/spcat/*.la
+/sp/spcat/*.lo
+/sp/spcat/*Messages.h
+/sp/spcat/*Messages.rc
+/sp/spcat/*Messages.cxx
+/sp/spcat/*_inst.cxx
+/sp/spcat/ospcat
+
+# /sp/spent/
+/sp/spent/Makefile
+/sp/spent/Makefile.in
+/sp/spent/.libs
+/sp/spent/.deps
+/sp/spent/*.la
+/sp/spent/*.lo
+/sp/spent/*Messages.h
+/sp/spent/*Messages.rc
+/sp/spent/*Messages.cxx
+/sp/spent/*_inst.cxx
+/sp/spent/ospent
+
+# /sp/sx/
+/sp/sx/Makefile
+/sp/sx/Makefile.in
+/sp/sx/.libs
+/sp/sx/.deps
+/sp/sx/*.la
+/sp/sx/*.lo
+/sp/sx/*Messages.h
+/sp/sx/*Messages.rc
+/sp/sx/*Messages.cxx
+/sp/sx/*_inst.cxx
+/sp/sx/osx
+
+# /sp/tests/
+/sp/tests/Makefile
+/sp/tests/Makefile.in
+
+# /sp/unicode/
+/sp/unicode/Makefile
+/sp/unicode/Makefile.in
